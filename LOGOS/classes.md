@@ -1180,6 +1180,55 @@ Ruled by the founder 2026-08-26 (the party rulings).
   you from the wheel — the exit law holds mid-fight, and the arena simply stops
   counting you. No jails.
 
+## The vehicle — a portal ground whose passage moves you
+
+*Crossing a portal changes what you read. Standing on a portal ground changes what you may do. Entering a vehicle
+changes where you are.*
+
+Rendered in the world as `the-town/vehicle`, its one verb as `the-town/ride`.
+
+A **vehicle** is a portal ground that moves — `extends: portal-ground`, `mobility: derived` — whose class contract lends
+one act, **ride**, to those inside it. It was planted at v0 on 2026-08-19 ("vessel becomes vehicle", Keemin's word)
+with the sentence *"an enterable mark that moves — position by frame, boarding by entry, never a walker; its timetable
+is its published word"*, and stood uninstanced until the founder's sitting of 2026-09-19, which found that nobody had
+ever ridden the Post Office (zero acts on her in 2,077 journal rows; residents walk to her wharves and stand there)
+and ruled the shape below. The Post Office is its first instance (`class: vehicle` on `the-town/the-post-office`).
+
+- **The hull and the riding are decoupled** (Keemin: *"decouple the geometric movement of the Post Office from the
+  residents' ability to ride it"*). The hull keeps its ring on its timetable — the `paper/timetable` its wheelhouse
+  instances, read by `tools/vessel.mjs` — and no ride depends on where the hull is.
+- **Every stop is a door into the vehicle** (`vehicle/stops-are-doors`). Entering any mark the timetable names enters
+  the vehicle itself, wherever its hull is; the ordinary threshold machinery delivers the vehicle's terms first. The set
+  of places you may ride to is that same stop list, and no other. *(A class for "the destinations you may pick from a
+  vehicle", distinct from the timetable's geometric route, was considered and PARKED by the founder the same day as
+  premature: the decoupling of geometric and functional routes is not yet clear.)*
+- **Aboard, you stand where the hull stands** (`vehicle/aboard-position`) — never at a point between origin and
+  destination. A ride is a timer, not a road. This is what keeps a ride from being a walk at a bigger pace, and it is
+  one branch in the position derivation rather than a stated rule.
+- **Ride** (`the-town/ride`, `requires: {within_class: vehicle}`): name a stop; the act is appended with the instant, the
+  origin, the destination and the arrival instant — the declared instant plus the straight-line distance between the
+  two stops over the timetable's pace (`ride/the-timer`: the pace lives on the wheelhouse, never restated). The origin is
+  the stop you entered through until a ride's timer has run, and the stop that ride named after (`ride/the-origin`);
+  naming a new stop restarts the timer now over the whole distance — you were never partway anywhere. The clock starts
+  on the act, never at a cast-off (Keemin: *"on board makes more sense … otherwise it might still just be faster to
+  walk"*).
+- **Exit sets you down by the deposit rule** (`vehicle/the-deposit`): at the destination once its timer has run,
+  otherwise at the stop you came in through, on the stop's own ground. Nobody is set down anywhere else, and nobody is
+  set down without leaving. A walk declared aboard is the choice to leave: the deposit, then the walk from it.
+- **The log differentiates.** A ride is a `ride` act on the journal, never a movement row; the movements grammar stays
+  the ledger's, column for column. A reader of the record never mistakes a vehicle for a walker.
+- **The ground speaks** (`enter/the-ground-speaks`, enter's law, not the vehicle's): any class that lends verbs answers
+  its body and roster at the threshold, on the terms call and on the crossing. The vehicle is one instance of this.
+
+**What this retires** (`WORLD/ENGINE.md § The timetable mechanic`, amendment of 2026-09-19): boarding by presence at a
+cast-off, the `bound:`/`riding` policies, through-riding, and set-down-on-arrival for residents. Frame-law carriage
+stands for things riding things; the passenger case is occupancy → hull, exit → deposit.
+
+**Terminology.** LOGOS § Homonyms registers "portal" in two senses — ① the read-root slot, ② the verb-lending ground.
+The vehicle is a third behaviour and takes the compound name `vehicle` for the same reason ② took a compound one:
+crossing ① changes what you read, standing on ② changes what you may do, entering a vehicle changes where you are, and
+the three must never be read as one mechanism wearing three hats.
+
 ## The witnessed roll
 
 *A roll the record cannot reproduce is not a roll, it is a rumour.*
