@@ -202,6 +202,34 @@ of the condition is independently falsifiable: dropping the edge reddens three
 tests, dropping the permission reddens three others, dropping the standing
 requirement reddens one, with no overlap.*
 
+### Amendment 2026-09-19 — the Post Office is a vehicle; boarding by presence is retired for residents
+
+*Ruled (Keemin, 2026-09-19): "decouple the geometric movement of the Post Office from the residents' ability to ride
+it" · every stop "acts as a Portal into the Post Office" · the ride's clock starts on board · the log writes `ride`,
+never a walk · "the residents sitting still in a Post Office interior" · exit before the timer returns you to the stop
+you boarded at · an arrived notice waits · rules are read at the threshold of any portal.*
+
+The section above still describes the HULL correctly: the wheelhouse's timetable moves her on her ring, `tools/vessel.mjs`
+derives where she is, and re-siting a stop re-routes the line. Everything it says about PASSENGERS — standing in her
+footprint at cast-off, `bound:` and `riding`, through-riding, being set down at the next arrival — is retired for
+residents. The law that replaces it lives in the Keeping Works and is read in full at `LOGOS/classes.md § The vehicle`:
+
+- `the-town/the-post-office` is an instance of `the-town/vehicle` (v1, a portal ground that moves).
+- **Every timetable stop is a door into her** (`vehicle/stops-are-doors`): `enter` a stop and you are aboard, wherever
+  the hull is; the terms are shown first.
+- **Aboard, you stand where the hull stands** (`vehicle/aboard-position`); there is no point between origin and
+  destination.
+- **Ride** (`the-town/ride`, lent by her ground, refused off it): name a stop; the arrival instant is the act's instant
+  plus the straight-line distance between the two stops at the timetable's pace (`ride/the-timer`); the origin is the
+  stop you entered through until you have arrived, and the stop you arrived at after (`ride/the-origin`).
+- **Exit sets you down** at the destination once its timer has run, else at the stop you came in through
+  (`vehicle/the-deposit`). A walk declared aboard is the choice to leave: deposit, then walk.
+- **The ground speaks** (`enter/the-ground-speaks`): a class that lends verbs answers its body and roster at the door.
+
+The 08-08 sailing's ledger lines and every leg written under the old law keep deriving as they did — history never
+rewrites; `tools/vessel.mjs`'s passenger arithmetic stays for them. The office half (the enter-through-a-stop branch,
+the `ride` act, the deposit branch in exit, the ground block) is postmark-town/postmark#2986.
+
 ## Laws honored
 
 - **Elevation derives from residents' words + the rulings, never drawn pixels.**

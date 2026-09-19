@@ -73,6 +73,7 @@ const at = (p) => [p.x, p.y];
 const TOWN = "the-town/the-post-office";
 const LANDING = "the-town/the-pando-landing";
 const WHARF = "sol-of-garrison/grove-wharf"; // the Garrison stop, ruled 2026-08-10 (#1596), granted case-by-case
+const SNUG = "current-the-reader/the-snug-mooring"; // the Snug Harbour stop, ruled 2026-09-19 (#2986) — first call after the quay
 
 // ── the record's own numbers ────────────────────────────────────────────────
 //
@@ -134,7 +135,7 @@ test("the wheelhouse's timetable folds into a service — stops resolved BY MARK
   assert.equal(service.vessel.handle, "the-post-office", "the ledger handle is the vessel mark's leaf slug");
   assert.deepEqual(service.vessel.extent, byId.get(TOWN).extent, "her footprint is her own mark's extent");
   assert.equal(service.pace, PACE);
-  assert.deepEqual(service.stops.map((s) => s.markId), [TOWN, LANDING, WHARF]);
+  assert.deepEqual(service.stops.map((s) => s.markId), [TOWN, LANDING, WHARF, SNUG]);
 
   // The coordinates are the STOP MARKS' own — the timetable names ids only.
   for (const stop of service.stops) {
@@ -147,19 +148,21 @@ test("the wheelhouse's timetable folds into a service — stops resolved BY MARK
   assert.deepEqual(serviceFromFold(moved, WHEELHOUSE).stops[1].at, ELSEWHERE);
 });
 
-test("the ruled schedule: quay 06:00Z/18:00Z, landing 00:00Z/12:00Z, the wharf 04:15Z/16:15Z, and the day closes", () => {
+test("the ruled schedule: quay 06:00Z/18:00Z, landing 00:00Z/12:00Z, the wharf 04:15Z/16:15Z, the Snug 05:00Z/17:00Z, and the day closes", () => {
   const day = sailingsBetween(service, fcAt("2026-08-09T00:00:00Z") - 1e-9, fcAt("2026-08-09T23:59:00Z"));
   assert.deepEqual(
     day.map((s) => [new Date(instantOf(s.departFc)).toISOString(), s.from.markId, s.to.markId]),
     [
       ["2026-08-09T00:00:00.000Z", LANDING, WHARF],
-      ["2026-08-09T04:15:00.000Z", WHARF, TOWN],
+      ["2026-08-09T04:15:00.000Z", WHARF, SNUG],
+      ["2026-08-09T05:00:00.000Z", SNUG, TOWN],
       ["2026-08-09T06:00:00.000Z", TOWN, LANDING],
       ["2026-08-09T12:00:00.000Z", LANDING, WHARF],
-      ["2026-08-09T16:15:00.000Z", WHARF, TOWN],
+      ["2026-08-09T16:15:00.000Z", WHARF, SNUG],
+      ["2026-08-09T17:00:00.000Z", SNUG, TOWN],
       ["2026-08-09T18:00:00.000Z", TOWN, LANDING],
     ],
-    "six sailings a day — the wharf call rides the southbound return (ruled 2026-08-10, #1596), so the quay→landing mail run stays one unbroken sailing");
+    "eight sailings a day — the wharf call rides the southbound return (ruled 2026-08-10, #1596) and the Snug call follows it as the last call before home (2026-09-19, #2986), so the quay→landing mail run stays one unbroken sailing");
 
   // A crossing lasts the run over the pace, both read back out of the record:
   // each leg is ITS OWN two stop MARKS' separation and the pace is the
@@ -283,8 +286,11 @@ test("CHANGING YOUR MIND IS WALKING AWAY — there is no cancellation rule becau
   const outbound = nextFrom(TOWN, DAY0);
   const ticket = agree("waverer", boundTo(LANDING), agreedDuring(outbound));
 
-  // Agreed on her deck, then walks off it before she goes.
-  const away = { x: QUAY.x, y: QUAY.y + 600 };
+  // Agreed on her deck, then walks off it before she goes. (300 m, not 600: the
+  // Snug call of 2026-09-19 shortened her lie at the quay before the 06:00Z
+  // cast-off to ~42 min, and this walk derives at the legacy 15 km/crossing —
+  // 600 m would no longer finish inside the dwell's second half.)
+  const away = { x: QUAY.x, y: QUAY.y + 300 };
   const leaves = D({ handle: "waverer", from: QUAY, toward: away, at: agreedDuring(outbound) + 1e-6 });
   assert.ok(walkPositionAt(leaves, outbound.departFc).arrived, "the walk is finished before she casts off");
 
@@ -497,8 +503,17 @@ test("full round-trip: ONE agreement each way — the re-board hop the anti-conv
   assert.equal(atWharf.aboard, "the-post-office");
   assert.equal(atWharf.onDeckAt, WHARF);
 
-  const lastLeg = nextFrom(WHARF, homeward.arriveFc);
-  assert.equal(lastLeg.to.markId, TOWN, "her next cast-off from the wharf is the run home");
+  // The Snug call (2026-09-19, #2986) rides the same return: the wharf's next
+  // cast-off is the hop to the Snug, and he rides straight through that one too.
+  const snugLeg = nextFrom(WHARF, homeward.arriveFc);
+  assert.equal(snugLeg.to.markId, SNUG, "her next cast-off from the wharf is the hop to the Snug");
+  const atSnug = positionAt(toBerth, midDwellAfter(snugLeg), service, downTicket);
+  assert.equal(atSnug.ashoreAt, null, "the Snug call does not put him off either — he is bound for the quay");
+  assert.equal(atSnug.aboard, "the-post-office");
+  assert.equal(atSnug.onDeckAt, SNUG);
+
+  const lastLeg = nextFrom(SNUG, snugLeg.arriveFc);
+  assert.equal(lastLeg.to.markId, TOWN, "her next cast-off from the Snug is the run home");
   const home = positionAt(toBerth, midDwellAfter(lastLeg), service, downTicket);
   assert.equal(home.ashoreAt, TOWN, "set down on the quay side of the reach");
   assert.ok(!pointInRect(home.x, home.y, footprintOf(service, QUAY)), "outside her footprint again");
