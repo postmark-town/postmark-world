@@ -148,7 +148,9 @@ createServer(async (req, res) => {
     // different world from the one on this clone's disk. The fallback is gone
     // now, so this route is not a convenience; it is the answer.
     if (p === "/WORLD/walk-ledger.md") return serveFile(res, "WORLD/walk-ledger.md");
-    if (p === "/seeding/manifest.json") return serveFile(res, "seeding/manifest.json"); // homes → green (viewer derives home-ness; the record is untouched)
+    // `/seeding/manifest.json` was served here beside it, for the viewer's
+    // green. The manifest is deleted (postmark#3025) — green is the fold's
+    // answer now — so the route goes with the file rather than answering 404.
 
     if (p === "/api/stakes") {
       const holder = url.searchParams.get("holder");

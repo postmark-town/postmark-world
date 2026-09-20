@@ -68,9 +68,13 @@ ceiling +22 m, walk speed 15 km/crossing **as ruled then — amended to 60 by 00
 poles (dawn NE → dark pole at Caelina, **provisional on caelum's word**).
 
 **Placement dials** — `tools/world-poc.mjs`:
-- Household anchors are **extracted** from `seeding/manifest.json` (itself
-  extracted from the atlas `HOME_XY`). Only **little-bird** carries a hand dial —
-  the canonical nomad, "no fixed berth," which the manifest itself leaves unplaced.
+- Household anchors are **extracted from the marks** — every sited mark at its
+  nearest region anchor's band height (`deriveHomeControlPoints`, world-build.mjs),
+  which is what the browser has always used. Until 2026-09-20 this CLI overrode
+  that with anchors extracted from `seeding/manifest.json` (itself extracted from
+  the atlas `HOME_XY`), so the terrain it reported and the terrain the viewer drew
+  were two different terrains. The manifest is retired (postmark#3025) and the
+  override with it; the two agree now.
 - The heightfield's region control points are the seventeen bands at coordinates
   **extracted** from placed homes + terrain features; only `north-rim`,
   `the-east-low-hills`, `the-headland` are `derived` leans (flagged, no home/feature

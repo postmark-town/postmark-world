@@ -2,7 +2,7 @@
 // regions-manifest-gen.mjs — generate seeding/regions-manifest.json for the
 // region pre-mark fleet: every region from the live atlas, with a bounding
 // extent derived by extraction from the renderer's own REGION_LAYOUT washes —
-// never hand-copied (sibling of seed-manifest-gen.mjs; fix the class).
+// never hand-copied (sibling of the retired seed-manifest-gen.mjs; fix the class).
 //
 // Extents are ATLAS-SEEDED CLAIMS at 5 m/px (the ruled invitation mechanics:
 // "extents seeded from the ratified atlas"), coarse by construction — a wash
