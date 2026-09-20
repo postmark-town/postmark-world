@@ -31,11 +31,19 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildHomeSet } from "../spectator/viewer.mjs";
 import { markStanding } from "./mark-standing.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const VIEWER = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
+
+// `buildHomeSet` is imported DYNAMICALLY, and that is load-bearing rather than
+// stylistic. A static `import { buildHomeSet } from "../spectator/viewer.mjs"`
+// makes this whole file fail to PARSE against any viewer that does not export
+// it — which is every viewer before this change. The flip proof then "went red"
+// without running a single assertion: a module-load crash wearing a falsifier's
+// clothes. Imported this way, each test below runs and fails on its own terms
+// against main's viewer, which is the only kind of red that proves anything.
+const viewerModule = () => import("../spectator/viewer.mjs");
 
 // ---------------------------------------------------------------------------
 // THE DEMAND
@@ -85,20 +93,35 @@ const insideTheHarbour = { id: "reader/the-taproom", by: "reader", kind: "sited"
 const MARKS = [spar, ownParcel, onOwnGround, offOwnGround, insideTheHarbour];
 const byId = new Map(MARKS.map((m) => [m.id, m]));
 
-// tierOf, as spectator/viewer.mjs composes it.
-const homeSet = buildHomeSet(MARKS);
-const tierOf = (m) => (homeSet.has(m.id) ? "home" : markStanding(byId.get(m.id) ?? m, byId));
+// The colour rule must be ASKABLE. It was an inner function of the mount
+// closure for as long as it read `data.manifest`, and a rule nothing can put a
+// question to is how a July painting outranked the record for two months.
+async function homeGreen() {
+  const mod = await viewerModule();
+  assert.equal(typeof mod.buildHomeSet, "function",
+    "spectator/viewer.mjs must export buildHomeSet — the colour rule is not askable otherwise");
+  return mod.buildHomeSet;
+}
 
-test("a declared house standing off its household's parcel is MARKET, not home", () => {
+// tierOf, as spectator/viewer.mjs composes it.
+const tierWith = (buildHomeSet) => {
+  const homeSet = buildHomeSet(MARKS);
+  return (m) => (homeSet.has(m.id) ? "home" : markStanding(byId.get(m.id) ?? m, byId));
+};
+
+test("a declared house standing off its household's parcel is MARKET, not home", async () => {
+  const tierOf = tierWith(await homeGreen());
   assert.equal(tierOf(offOwnGround), "market");
   assert.equal(tierOf(insideTheHarbour), "market", "and so is everything it contains — the badge travelled to them too");
 });
 
-test("a house standing ON its household's parcel is still HOME — nothing green was lost", () => {
+test("a house standing ON its household's parcel is still HOME — nothing green was lost", async () => {
+  const tierOf = tierWith(await homeGreen());
   assert.equal(tierOf(onOwnGround), "home");
 });
 
-test("buildHomeSet is the fold's sovereigns and nothing else", () => {
+test("buildHomeSet is the fold's sovereigns and nothing else", async () => {
+  const buildHomeSet = await homeGreen();
   assert.deepEqual([...buildHomeSet(MARKS)].sort(), ["reader/the-house"]);
   assert.equal(buildHomeSet(MARKS.map(({ sovereign, ...rest }) => rest)).size, 0,
     "with no mark folded sovereign the set is empty — there is no second source of green");
