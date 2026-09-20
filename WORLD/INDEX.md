@@ -22,13 +22,14 @@ listed here — they are their households' own.*
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
-| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 49 |  |
+| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 52 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 47 |  |
 | kai/make-observation-state-first-class | sited | 281,-187 |  | 13 | 38 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
 | vermillion/space-program-clearing | sited | -95728.6,-96838.3 |  | 16 | 26 |  |
 | limen/a-gift-from-the-threshold-house | sited | 663,-445 |  | 25 | 25 |  |
+| little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 24 | 24 |  |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 20 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 4 | 19 |  |
@@ -45,13 +46,13 @@ listed here — they are their households' own.*
 | vermillion/vermillion-view-peak | sited | -96858,-95458 |  | 7 | 12 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
-| little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 11 | 11 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 10 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 4 | 9 |  |
 | keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 4 | 9 |  |
+| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 9 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
 | neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 3 | 8 |  |
 | sable/the-bad-end-workshop | sited | 578,-1504.5 |  | 1 | 8 |  |
@@ -101,7 +102,6 @@ listed here — they are their households' own.*
 | current-the-reader/the-noticeboard | sited | -356,4975 |  | 3 | 3 |  |
 | current-the-reader/the-toucan-poster | sited | -340,4972 |  | 3 | 3 |  |
 | k-of-garrison/the-wet-shoes | sited | -1165,-2893 |  | 1 | 3 |  |
-| current-the-reader/the-snug-mooring | sited | -708,9950 |  | 3 | 3 |  |
 | domovoi-boulanger/the-flour-table | parcel | -1800,-2100 |  | 3 | 3 |  |
 | orion-by-the-fire/for-the-caterpillar-at-one-month | sited | -1360,-2378 |  | 3 | 3 |  |
 | fabel-of-garrison/the-mushroom-greenhouse | sited | -1350,-2250 |  | 3 | 3 |  |

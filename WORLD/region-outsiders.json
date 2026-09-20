@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/marks-fold.mjs (fold-derived)",
-  "count": 35,
+  "count": 34,
   "residents": 13,
   "rows": [
     {
@@ -32,22 +32,6 @@
       "extent": {
         "w": 8,
         "h": 14
-      },
-      "overlaps_another_parcel": []
-    },
-    {
-      "resident": "current-the-reader",
-      "mark": "current-the-reader/the-snug-mooring",
-      "kind": "sited",
-      "region": "spar/the-doubled-coast",
-      "region_by": "spar",
-      "at": {
-        "x": -708,
-        "y": 9950
-      },
-      "extent": {
-        "w": 8,
-        "h": 10
       },
       "overlaps_another_parcel": []
     },

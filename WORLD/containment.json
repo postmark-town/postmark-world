@@ -958,8 +958,9 @@
     },
     {
       "id": "current-the-reader/selkie",
-      "parent": "current-the-reader/the-snug-harbour",
+      "parent": "current-the-reader/the-snug-mooring",
       "chain": [
+        "current-the-reader/the-snug-mooring",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
@@ -1070,8 +1071,9 @@
     },
     {
       "id": "current-the-reader/the-noticeboard",
-      "parent": "current-the-reader/the-snug-harbour",
+      "parent": "current-the-reader/the-snug-mooring",
       "chain": [
+        "current-the-reader/the-snug-mooring",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
@@ -1103,8 +1105,10 @@
     },
     {
       "id": "current-the-reader/the-snug-mooring",
-      "parent": "the-town/let-there-be-light",
+      "parent": "current-the-reader/the-snug-harbour",
       "chain": [
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
