@@ -92,6 +92,14 @@ test("[pin] the card's label call is the parcel's, not the dwelling's", async ()
     "the overlay card labels itself from the parcel");
   assert.ok(!/label: home \? markName\(home\)\.name/.test(code),
     "and not from the dwelling homeMarkOfParcel picked");
+  // AND THE COLUMN THE CARD OPENS SAYS THE SAME THING. A card and its column
+  // are two views of one ground; left alone, the column kept reading
+  // `markIdentity(home ?? mark)` and rei's card would have said "The
+  // Lanternstep House" while her column said "The Garden Notebook Tin".
+  assert.match(code, /title: parcelCardLabel\(mark, data\?\.worldState\?\.determined \?\? \{\}\)/,
+    "the home column's title is the ground's name too");
+  assert.ok(!/title: markIdentity\(home \?\? mark\)/.test(code),
+    "and not the dwelling's, which is the same defect one surface over");
 });
 
 test("homeMarkOfParcel stays — the label was not its only reader", async () => {

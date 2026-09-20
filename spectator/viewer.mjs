@@ -11038,7 +11038,13 @@ export function mountViewer(appEl) {
       handle,
       parcelId, canEnter,
       kicker: String(mark.household ?? mark.by ?? handle),
-      title: markIdentity(home ?? mark),
+      // THE SAME RULE AS THE CARD (Keemin, 2026-09-20): the ground's own name,
+      // "parcel" stripped. This was `markIdentity(home ?? mark)` — the dwelling
+      // `homeMarkOfParcel` picked, falling back to the parcel — so the column
+      // read "The Garden Notebook Tin" for rei while the card beside it was
+      // about to read "The Lanternstep House". A card and the column it opens
+      // are two views of one ground and may not call it two things.
+      title: parcelCardLabel(mark, data?.worldState?.determined ?? {}),
       // the dwelling's picture, and failing that the ground's own
       leadImage: (home && markImagePath(home)) ?? markImagePath(mark),
     };
