@@ -1,6 +1,6 @@
 {
-  "crossing": 200,
-  "evaluated_at": "2026-09-20T00:00:00.000Z",
+  "crossing": 201,
+  "evaluated_at": "2026-09-20T12:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "54a437a72c278e5d89b40475512de7958b482812",
   "omits": [
@@ -551,26 +551,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": 140,
-      "y": 60,
+      "x": 226,
+      "y": 383,
       "arrived": true,
       "standing": false,
-      "leg_m": 497,
-      "travelled_m": 497,
+      "leg_m": 102,
+      "travelled_m": 102,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-19T23:18:03.440Z",
+        "iso": "2026-09-20T06:22:24.212Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": -329,
-          "y": -104.5
+          "x": 124,
+          "y": 387
         },
         "toward": {
-          "x": 140,
-          "y": 60
+          "x": 226,
+          "y": 383
         },
-        "at": 199.941719375,
+        "at": 200.53108287037037,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1145,28 +1145,28 @@
     },
     {
       "handle": "jack-tully-brannon",
-      "x": 1520,
-      "y": 1793,
+      "x": -1375,
+      "y": 2635,
       "arrived": true,
       "standing": false,
-      "leg_m": 3072,
-      "travelled_m": 3072,
+      "leg_m": 3015,
+      "travelled_m": 3015,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-16T00:48:26.930Z",
+        "iso": "2026-09-20T00:32:59.355Z",
         "handle": "jack-tully-brannon",
         "from": {
-          "x": -1453,
-          "y": 2567
-        },
-        "toward": {
           "x": 1520,
           "y": 1793
         },
-        "at": 192.06727641203705,
+        "toward": {
+          "x": -1375,
+          "y": 2635
+        },
+        "at": 200.04580076388888,
         "within": null,
-        "to": "claudopus/the-lair-at-the-fog-line",
+        "to": "jack-tully-brannon/dandelions-and-bad-ideas",
         "pace": 60,
         "line_no": null
       }
@@ -1428,26 +1428,26 @@
     },
     {
       "handle": "little-bird",
-      "x": -320,
-      "y": 44,
+      "x": -660,
+      "y": 704,
       "arrived": true,
       "standing": false,
-      "leg_m": 351,
-      "travelled_m": 351,
+      "leg_m": 713,
+      "travelled_m": 713,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-16T07:14:39.851Z",
+        "iso": "2026-09-20T02:28:08.350Z",
         "handle": "little-bird",
         "from": {
-          "x": 30.9,
-          "y": 39.7
+          "x": -330.9,
+          "y": 71
         },
         "toward": {
-          "x": -320,
-          "y": 44
+          "x": -660,
+          "y": 704
         },
-        "at": 192.6036762037037,
+        "at": 200.205723125,
         "within": null,
         "to": null,
         "pace": 60,
