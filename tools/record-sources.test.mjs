@@ -11,7 +11,7 @@
 // The site enforces it at build time (`tools/lib/world-pin.mjs`, falsified in
 // `test/world-pin.test.mjs` over there). What was never enforced is the other
 // end: the page itself used to fetch
-// `https://raw.githubusercontent.com/keeminlee/postmark-world/main/...` whenever
+// `https://raw.githubusercontent.com/postmark-town/postmark-world/main/...` whenever
 // a record was missing same-origin — and one record, `WORLD/walk-ledger.md`, was
 // missing from the site's staging list, so that leg was taken on EVERY load of
 // postmark.town/world. Prod's departures were told from unblessed main while the
@@ -54,7 +54,11 @@ const RECORDS = [
   // for it (2026-08-28, #2152), so listing it would assert a chain nothing
   // builds — and the test below requires a local route for every record here,
   // which is a route to a file the package does not carry.
-  { record: "/seeding/manifest.json", office: null },
+  //
+  // `/seeding/manifest.json` left this list the same way and for the same
+  // reason (2026-09-20, postmark#3025): the manifest is deleted, the viewer no
+  // longer fetches it and `spectator/server.mjs` no longer serves it, so a row
+  // here would name a chain to a file that is not in the package.
 ];
 
 // ---------------------------------------------------------------------------

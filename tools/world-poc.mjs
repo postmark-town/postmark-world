@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // world-poc.mjs — the spine proof-of-concept: open-your-eyes anywhere in the
 // seeded world, zero deps. Assembles a `world` for world-verbs.mjs from real,
-// extracted sources (WORLD/marks + skeleton + manifest), then tells what a
+// extracted sources (WORLD/marks + skeleton), then tells what a
 // standing agent sees. This is the README's recompute-it-yourself CLI: same
 // loader, same fold, same assembly the office and browser use.
 //
@@ -10,9 +10,10 @@
 // as clearly-labelled dials, so the engine stays general and the leans stay
 // visible and movable.
 //
-// EXTRACTION OVER MIRRORS: household placements are read from seeding/manifest.json
-// (itself extracted from the atlas's HOME_XY). A future atlas re-derive flows
-// through mechanically.
+// EXTRACTION OVER MIRRORS: household placements were read from
+// seeding/manifest.json (itself extracted from the atlas's HOME_XY) until that
+// file retired (postmark#3025); they come off the marks now, which is the
+// record, so nothing needs to flow through from a re-derived atlas at all.
 //
 // (The run-01 legacy-fixture adapter that once lived here retired with
 // `_archived/sims/` in the 2026-08-01 solidification pass.)
@@ -27,7 +28,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs"; // the ONE loader
-import { assembleWorld, REGION_ANCHORS } from "./world-build.mjs"; // the ONE assembly (shared with the browser)
+import { assembleWorld } from "./world-build.mjs"; // the ONE assembly (shared with the browser)
 import { orient, openYourEyes } from "./world-verbs.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -38,30 +39,29 @@ const has = (f) => process.argv.includes(f);
 // ───────────────────────── DIALS local to the PoC ──────────────────────────
 const DEFAULT_CROSSING = Number(arg("--crossing", 19)); // fog is the crossing's weather; 19 is foggy — see the report
 
-// Every placed home as a heightfield control point at its REGION's band-midpoint
-// height (decision 008). Real inhabited positions at ruled heights — this
-// densifies the naive field so a low region (e.g. the four threshold homes) holds
-// its corridor down instead of the surrounding hills bleeding in. Homes in
-// regions outside the seventeen rows (open-ground / null) are left to gentle
-// interpolation, per the open-ground principle. Pure extraction, no hand-tuning.
-function homeBandControlPoints() {
-  const M = JSON.parse(readFileSync(join(ROOT, "seeding/manifest.json"), "utf8"));
-  const bandH = new Map(REGION_ANCHORS.map((r) => [r.id, r.h]));
-  const alias = { "the-still-reach-and-blackwater": "the-still-reach-and-blackwater" }; // reserved for future region-name drift
-  const pts = [];
-  for (const h of M.homes) {
-    const rid = alias[h.region] ?? h.region;
-    if (!bandH.has(rid)) continue;                 // open-ground / null / off-rows: leave gentle
-    pts.push({ x: h.grid_m.x, y: h.grid_m.y, h: bandH.get(rid), id: rid });
-  }
-  return pts;
-}
+// ── THE DENSIFICATION COMES OFF THE MARKS NOW (postmark#3025, 2026-09-20) ───
+//
+// A `homeBandControlPoints()` lived here: every placed home in
+// `seeding/manifest.json` as a heightfield control point at its region's
+// band-midpoint height, passed to `assembleWorld` as the `homeControlPoints`
+// OVERRIDE. That file is a July build intermediate read off the atlas painting
+// at 5 m/px, and it is deleted.
+//
+// Nothing replaces it, because `assembleWorld` already has the replacement and
+// has been using it all along: with no override it calls
+// `deriveHomeControlPoints(marks)`, which is what the BROWSER passes through —
+// every sited mark at its nearest region anchor's height. So the terrain this
+// CLI reports and the terrain the viewer draws were two different terrains,
+// and the CLI's was the painting's. Measured on the fold at 5f042bb: 64
+// manifest points against 525 derived ones, and the two heightfields differ at
+// 4517 of 4575 sampled points, by up to 33.2 m. Dropping the override does not
+// introduce that gap — it CLOSES it, onto the side the town actually looks at.
 
 // ───────────────────────── build the world ─────────────────────────────────
 // buildWorld — the DISK path. Reads + folds the marks, then hands the folded
 // world-state and the skeleton to the shared assembleWorld (world-build.mjs) —
-// the same function the browser calls. The manifest home densification is passed
-// as the homeControlPoints override.
+// the same function the browser calls, with no homeControlPoints override, so
+// the home densification is the derived one the browser gets (see above).
 // Default: the seeded canon tree, WORLD/marks, through the SHARED loadMarks.
 export function buildWorld({ crossing = DEFAULT_CROSSING, marksDir = null, stakesPath = null, fanup = "legacy" } = {}) {
   const terrain = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
@@ -71,8 +71,9 @@ export function buildWorld({ crossing = DEFAULT_CROSSING, marksDir = null, stake
   // fold at this crossing (stakes take effect the crossing after they land)
   const state = fold({ marks: placed, terrain, stakes, tick: crossing + 1, fanup });
 
-  // one assembly, disk data source: the manifest densification is the override
-  const world = assembleWorld({ worldState: state, skeleton: terrain, homeControlPoints: homeBandControlPoints() });
+  // one assembly, disk data source, no override: the home densification is
+  // derived from the marks, exactly as the browser derives it (see above)
+  const world = assembleWorld({ worldState: state, skeleton: terrain });
   world.foldErrors = state.errors;
   // sandbox receipts ride to the caller (assembleWorld picks fields, so these
   // must be re-attached; absent under fanup:"legacy" by construction)

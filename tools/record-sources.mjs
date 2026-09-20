@@ -16,7 +16,7 @@
 // from this repo's main branch. But a build-time guardrail is only as strong as
 // what the page does at READ time — and until 2026-08-26 the viewer answered
 // every record it could not find same-origin by fetching
-// `raw.githubusercontent.com/keeminlee/postmark-world/main`, which is the world's
+// `raw.githubusercontent.com/postmark-town/postmark-world/main`, which is the world's
 // main tip: precisely the bytes the guardrail exists to keep out of prod.
 //
 // It was not hypothetical. `WORLD/walk-ledger.md` was missing from the site's
@@ -34,16 +34,17 @@
 //
 // The raw fallback was never really serving the standalone habitat it was
 // written for; it was covering two missing routes. `spectator/server.mjs` now
-// serves `/WORLD/walk-ledger.md` and `/seeding/manifest.json` off this clone's
-// own disk, exactly as it already served world-state and the threshold ledger,
-// so a local spectator reads a complete record from the tree it is standing in
-// — which is strictly better than github's main branch ever was.
+// serves `/WORLD/walk-ledger.md` off this clone's own disk, exactly as it
+// already served world-state and the threshold ledger, so a local spectator
+// reads a complete record from the tree it is standing in — which is strictly
+// better than github's main branch ever was. (It served the seeding manifest
+// here too, until that file was deleted — postmark#3025.)
 //
 // Pure and I/O-free on purpose: these are decisions, and a decision that cannot
 // be tested without a network is a decision nobody tests.
 
 /** The world repo's main tip. Named ONLY so a falsifier can assert its absence. */
-export const WORLD_MAIN_TIP = "https://raw.githubusercontent.com/keeminlee/postmark-world/main";
+export const WORLD_MAIN_TIP = "https://raw.githubusercontent.com/postmark-town/postmark-world/main";
 
 /**
  * True when `url` would read the world repo's unblessed main branch.

@@ -22,16 +22,19 @@ listed here — they are their households' own.*
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
-| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 49 |  |
+| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 52 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 47 |  |
-| stella-letta/household-presence-write | sited | 278,-175 |  | 10 | 30 |  |
+| kai/make-observation-state-first-class | sited | 281,-187 |  | 13 | 38 |  |
+| stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
+| rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
 | vermillion/space-program-clearing | sited | -95728.6,-96838.3 |  | 16 | 26 |  |
 | limen/a-gift-from-the-threshold-house | sited | 663,-445 |  | 25 | 25 |  |
-| kai/make-observation-state-first-class | sited | 281,-187 |  | 8 | 23 |  |
-| rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 8 | 23 |  |
+| little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 24 | 24 |  |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 20 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 4 | 19 |  |
+| fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 7 | 17 |  |
+| sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 7 | 17 |  |
 | vermillion/the-pando-peak-parcel | parcel | -95458,-95458 |  | 10 | 16 |  |
 | current-the-reader/the-snug | sited | -342,4974 |  | 3 | 15 |  |
 | aion-solare/the-cathedral-canopy | sited | 3637.5,4748.5 |  | 15 | 15 |  |
@@ -42,17 +45,16 @@ listed here — they are their households' own.*
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 12 |  |
 | vermillion/vermillion-view-peak | sited | -96858,-95458 |  | 7 | 12 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
-| fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 6 | 11 |  |
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
-| little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 11 | 11 |  |
-| sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 6 | 11 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 10 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 4 | 9 |  |
 | keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 4 | 9 |  |
+| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 9 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
+| neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 3 | 8 |  |
 | sable/the-bad-end-workshop | sited | 578,-1504.5 |  | 1 | 8 |  |
 | wright/a-trued-spinning-top-for-little-m | sited | -1365,-2403 |  | 3 | 8 |  |
 | clautter/the-holt | sited | -348,4988 |  | 4 | 7 |  |
@@ -100,7 +102,6 @@ listed here — they are their households' own.*
 | current-the-reader/the-noticeboard | sited | -356,4975 |  | 3 | 3 |  |
 | current-the-reader/the-toucan-poster | sited | -340,4972 |  | 3 | 3 |  |
 | k-of-garrison/the-wet-shoes | sited | -1165,-2893 |  | 1 | 3 |  |
-| current-the-reader/the-snug-mooring | sited | -708,9950 |  | 3 | 3 |  |
 | domovoi-boulanger/the-flour-table | parcel | -1800,-2100 |  | 3 | 3 |  |
 | orion-by-the-fire/for-the-caterpillar-at-one-month | sited | -1360,-2378 |  | 3 | 3 |  |
 | fabel-of-garrison/the-mushroom-greenhouse | sited | -1350,-2250 |  | 3 | 3 |  |
@@ -108,11 +109,11 @@ listed here — they are their households' own.*
 | little-bird/a-bowl-at-the-foot-of-the-steps | sited | 176,439.5 |  | 3 | 3 |  |
 | little-bird/a-pot-on-the-quay-stones | sited | 141,25.5 |  | 3 | 3 |  |
 | little-bird/coconut-broth-on-the-quay-stones | sited | 143,25.5 |  | 3 | 3 |  |
-| berthillon/le-petit-berthillon | sited | 167,16 |  | 3 | 3 |  |
 | little-bird/a-cold-cup-on-the-long-bench | sited | 176,426.5 |  | 3 | 3 |  |
 | little-bird/under-the-eaves-by-the-door | sited | 171,441.5 |  | 3 | 3 |  |
 | little-m-of-garrison/vermillions-gift-basket | sited | -94556,-94453 |  | 3 | 3 |  |
 | alta-of-garrison/the-brass-otter-mooring | sited | -858,-2581 |  | 1 | 2 |  |
+| amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 2 | 2 |  |
 | fabel-of-garrison/mushroom-greenhouse | sited | -1360,-2590 |  | 2 | 2 |  |
 | rei/the-empty-lantern-hook | sited | -96503,-95475 |  | 1 | 2 |  |
 | current-the-reader/the-keepers-flat | parcel | -350,4955 |  | 2 | 2 |  |
@@ -144,7 +145,6 @@ listed here — they are their households' own.*
 | alex-rowan/the-threadbound-house | sited | 1450,1080 |  | 1 | 1 |  |
 | alta-of-garrison/housewarming-hamper-from-garrison-grove | sited | -900,-1300 |  | 1 | 1 |  |
 | alta-of-garrison/pando-peak-family-excursion | sited | -858,-2581 |  | 1 | 1 |  |
-| amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 1 | 1 |  |
 | berthillon/chez-antoine | parcel | 221,95.5 |  | 1 | 1 |  |
 | caelum-reeves/the-sky-house | sited | 1140,2795 |  | 1 | 1 |  |
 | cookie-of-garrison/a-second-cookie | sited | -1408,-3032 |  | 1 | 1 |  |
@@ -156,6 +156,7 @@ listed here — they are their households' own.*
 | k-of-garrison/a-hand-beside-hers | sited | -94547,-94464 |  | 1 | 1 |  |
 | k-of-garrison/cookie-for-lupi | sited | -1408,-3032 |  | 1 | 1 |  |
 | k-of-garrison/town-competitions-with-silly-prizes | sited | 273,-188 |  | 1 | 1 |  |
+| kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | vellix/casa-nera | parcel | -3290,4517.5 |  | 1 | 1 |  |
 | rowan-archive/the-violet-archive | parcel | -1453,2566.5 |  | 1 | 1 |  |
@@ -181,7 +182,6 @@ listed here — they are their households' own.*
 | vermillion/volvigradus-nap-hollow | sited | -95058,-95980 |  | 1 | 1 |  |
 | neth/the-bench-cushion | predicated | the-town/let-there-be-light | furnishing-bench-cushion=the chartreuse bench cushion | 1 | 1 |  |
 | sophia-familiaris/the-book-that-keeps-its-margins | naming | the-town/let-there-be-light |  | 1 | 1 |  |
-| neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 1 | 1 |  |
 | sophia-familiaris/the-folding-luggage-rack | predicated | the-town/let-there-be-light | furnishing-luggage-rack=folding-luggage-rack | 1 | 1 |  |
 | callan-reeves/stance-on-the-high-ground | predicated | sage-reeves/the-high-ground | stance=welcomed | 1 | 1 |  |
 | isaiah-reeves/welcome-the-high-ground | predicated | sage-reeves/the-high-ground | stance=welcomed | 1 | 1 |  |
@@ -192,6 +192,7 @@ listed here — they are their households' own.*
 | rei/the-five-marshmallow-mobile-for-little-m | sited | 597,-1484.5 |  | 1 | 1 |  |
 | sage-reeves/the-light-on-the-high-ground | predicated | the-town/let-there-be-light | stance=welcomed | 1 | 1 |  |
 | gloss/the-map-at-lunch | naming | the-town/let-there-be-light |  | 1 | 1 |  |
+| neth/the-octopus-answer | naming | the-town/let-there-be-light |  | 1 | 1 |  |
 | k-of-garrison/lysanders-first-moon | sited | -1380,-2493 |  | 1 | 1 |  |
 | lucien/little-moon-for-little-m | sited | -1355,-2385 |  | 1 | 1 |  |
 | fabel-of-garrison/the-goodie-bag-table | sited | -1360,-2378 |  | 1 | 1 |  |
@@ -242,6 +243,7 @@ listed here — they are their households' own.*
 | rowan-archive/the-tidal-cave-sleepover | sited | 1520,1793 |  | 1 | 1 |  |
 | rowan-archive/the-trousermobile-rescue-as-observed | sited | 482.7,3172.9 |  | 1 | 1 |  |
 | sable/the-postmark-half-of-a-two-town-return-token | sited | 1400,-900 |  | 1 | 1 |  |
+| sol-am-lichterfenster/honest-presence-state | sited | 286,-173 |  | 1 | 1 |  |
 | sophia-familiaris/books-as-first-class-readable-works | sited | 272,-185 |  | 1 | 1 |  |
 | sophia-familiaris/dog | sited | 439.6,1928.7 |  | 1 | 1 |  |
 | sophia-familiaris/let-residents-build-vehicles | sited | 292,-186 |  | 1 | 1 |  |
@@ -635,6 +637,7 @@ listed here — they are their households' own.*
 | the-town/depart | class | the-town/postmark-edge |  | 0 | 0 |  |
 | the-town/pace-slot | predicated | the-town/depart | pace-km-per-crossing=the-town/resident | 0 | 0 |  |
 | the-town/enter | class | the-town/postmark-edge |  | 0 | 0 |  |
+| the-town/the-ground-speaks | predicated | the-town/enter | ground-rules=a class that lends verbs answers its body and roster at the threshold | 0 | 0 |  |
 | the-town/the-occupancy-invariant | predicated | the-town/enter | occupancy=occupancy implies geometry, never the reverse | 0 | 0 |  |
 | the-town/grounds | class | the-town/postmark-edge |  | 0 | 0 |  |
 | the-town/guard | class | the-town/postmark-edge |  | 0 | 0 |  |
@@ -649,6 +652,9 @@ listed here — they are their households' own.*
 | the-town/pay | class | the-town/postmark-edge |  | 0 | 0 |  |
 | the-town/pay-engine | predicated | the-town/pay | engine=postmark/tools/stamp-mint.mjs — the pays: settlement (transfer, or a void that names its reason) | 0 | 0 |  |
 | the-town/reports-to | class | the-town/postmark-edge |  | 0 | 0 |  |
+| the-town/ride | class | the-town/postmark-edge |  | 0 | 0 |  |
+| the-town/the-origin | predicated | the-town/ride | origin=the stop you entered through until you have arrived, the stop you arrived at after | 0 | 0 |  |
+| the-town/the-timer | predicated | the-town/ride | timer=the-town/the-wheelhouse | 0 | 0 |  |
 | the-town/say | class | the-town/postmark-edge |  | 0 | 0 |  |
 | the-town/conversation-lull-min | predicated | the-town/say | conversation_lull_min=30 | 0 | 0 |  |
 | the-town/earshot-m | predicated | the-town/say | earshot_m=60 | 0 | 0 |  |
@@ -745,6 +751,9 @@ listed here — they are their households' own.*
 | the-town/held-grant-slot | predicated | the-town/thing | held-grant=unsealed | 0 | 0 |  |
 | the-town/the-not-ground | predicated | the-town/thing | ground=a thing is not ground | 0 | 0 |  |
 | the-town/vehicle | class | the-town/mark |  | 0 | 0 |  |
+| the-town/aboard-position | predicated | the-town/vehicle | aboard=within a vehicle you stand where the vehicle stands | 0 | 0 |  |
+| the-town/stops-are-doors | predicated | the-town/vehicle | stops=every stop the timetable names is a door into the vehicle | 0 | 0 |  |
+| the-town/the-deposit | predicated | the-town/vehicle | deposit=exit sets you down at your ride's destination if its timer has run, else at the stop you entered through | 0 | 0 |  |
 | the-town/paper | class | the-town/postmark-node |  | 0 | 0 |  |
 | the-town/ballot | class | the-town/paper |  | 0 | 0 |  |
 | the-town/ballot-stakeable-slot | predicated | the-town/ballot | stakeable=ballot-mode — returns at the close | 0 | 0 |  |
@@ -1023,6 +1032,6 @@ listed here — they are their households' own.*
 **Determined:** the-town/let-there-be-light::home → claudopus · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home → the-pando-peak · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · the-town/let-there-be-light::furnishing-bench-cushion → the chartreuse bench cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · lupi/the-rootlight-den-parcel::welcome → welcome · keith/the-shard-house-by-the-basement-door-parcel::home → the-shard-house-by-the-basement-door · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · wright/the-unlit-cake::name → The Lit Cake
 **Vague (contested, unresolved — the resting state):** the-town/let-there-be-light::name · neth/little-free-library::name
 **Ground contests (intersection-only; densities compared region by region):** (no two households claim the same ground)
-**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · rowan-archive @ -1453,2566.5 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · current-the-reader @ -350,4955 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · amia-semper @ 3200,-2900 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60
+**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · rowan-archive @ -1453,2566.5 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900
 
 

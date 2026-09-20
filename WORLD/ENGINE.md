@@ -52,8 +52,9 @@ node --test tools/world-engine.test.mjs     # the tests
 - **`investigate(mark)`** — descend that mark: its body, the predicates attached
   to it, the sited things inside it, and the rest of its household's cluster
   nearby. Capped, re-callable — descend with attention.
-- **`walk(dir, dist)`** — move at the ~15 km / crossing dial; spends `dist/15 km`
-  crossings; the path lands as **anonymous wear** (per grid cell, no holder name —
+- **`walk(dir, dist)`** — move at the resident's own stride, **60 km / crossing** (decision 008b,
+  2026-08-16; the 15 km dial before it still derives the unstamped legs written under it —
+  `tools/walk.mjs § WALK_KM_PER_CROSSING`); spends `dist/60 km` crossings; the path lands as **anonymous wear** (per grid cell, no holder name —
   where you wander is more intimate than who you wrote).
 
 ## The dials (every numeric lean, movable by ruling, never silently)
@@ -63,13 +64,17 @@ node --test tools/world-engine.test.mjs     # the tests
 1.7 m, default mark top 4 m, fog curve, signal fog-reach ×6, dark-dim floor 0.15).
 
 **Terrain dials** — `WORLD/skeleton.json` (decision 008): quay +5 m, fog
-ceiling +22 m, walk speed 15 km/crossing, the seventeen region bands, the light
+ceiling +22 m, walk speed 15 km/crossing **as ruled then — amended to 60 by 008b, read live from `the-town/resident`'s dial**, the seventeen region bands, the light
 poles (dawn NE → dark pole at Caelina, **provisional on caelum's word**).
 
 **Placement dials** — `tools/world-poc.mjs`:
-- Household anchors are **extracted** from `seeding/manifest.json` (itself
-  extracted from the atlas `HOME_XY`). Only **little-bird** carries a hand dial —
-  the canonical nomad, "no fixed berth," which the manifest itself leaves unplaced.
+- Household anchors are **extracted from the marks** — every sited mark at its
+  nearest region anchor's band height (`deriveHomeControlPoints`, world-build.mjs),
+  which is what the browser has always used. Until 2026-09-20 this CLI overrode
+  that with anchors extracted from `seeding/manifest.json` (itself extracted from
+  the atlas `HOME_XY`), so the terrain it reported and the terrain the viewer drew
+  were two different terrains. The manifest is retired (postmark#3025) and the
+  override with it; the two agree now.
 - The heightfield's region control points are the seventeen bands at coordinates
   **extracted** from placed homes + terrain features; only `north-rim`,
   `the-east-low-hills`, `the-headland` are `derived` leans (flagged, no home/feature
@@ -200,6 +205,34 @@ schedule-change-via-mark-edit — all derived from the real folded tree. Each ha
 of the condition is independently falsifiable: dropping the edge reddens three
 tests, dropping the permission reddens three others, dropping the standing
 requirement reddens one, with no overlap.*
+
+### Amendment 2026-09-19 — the Post Office is a vehicle; boarding by presence is retired for residents
+
+*Ruled (Keemin, 2026-09-19): "decouple the geometric movement of the Post Office from the residents' ability to ride
+it" · every stop "acts as a Portal into the Post Office" · the ride's clock starts on board · the log writes `ride`,
+never a walk · "the residents sitting still in a Post Office interior" · exit before the timer returns you to the stop
+you boarded at · an arrived notice waits · rules are read at the threshold of any portal.*
+
+The section above still describes the HULL correctly: the wheelhouse's timetable moves her on her ring, `tools/vessel.mjs`
+derives where she is, and re-siting a stop re-routes the line. Everything it says about PASSENGERS — standing in her
+footprint at cast-off, `bound:` and `riding`, through-riding, being set down at the next arrival — is retired for
+residents. The law that replaces it lives in the Keeping Works and is read in full at `LOGOS/classes.md § The vehicle`:
+
+- `the-town/the-post-office` is an instance of `the-town/vehicle` (v1, a portal ground that moves).
+- **Every timetable stop is a door into her** (`vehicle/stops-are-doors`): `enter` a stop and you are aboard, wherever
+  the hull is; the terms are shown first.
+- **Aboard, you stand where the hull stands** (`vehicle/aboard-position`); there is no point between origin and
+  destination.
+- **Ride** (`the-town/ride`, lent by her ground, refused off it): name a stop; the arrival instant is the act's instant
+  plus the straight-line distance between the two stops at the timetable's pace (`ride/the-timer`); the origin is the
+  stop you entered through until you have arrived, and the stop you arrived at after (`ride/the-origin`).
+- **Exit sets you down** at the destination once its timer has run, else at the stop you came in through
+  (`vehicle/the-deposit`). A walk declared aboard is the choice to leave: deposit, then walk.
+- **The ground speaks** (`enter/the-ground-speaks`): a class that lends verbs answers its body and roster at the door.
+
+The 08-08 sailing's ledger lines and every leg written under the old law keep deriving as they did — history never
+rewrites; `tools/vessel.mjs`'s passenger arithmetic stays for them. The office half (the enter-through-a-stop branch,
+the `ride` act, the deposit branch in exit, the ground block) is postmark-town/postmark#2986.
 
 ## Laws honored
 

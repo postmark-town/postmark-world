@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1228,
+  "count": 1239,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -267,8 +267,9 @@
     },
     {
       "id": "berthillon/chez-antoine-bedroom",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -276,8 +277,9 @@
     },
     {
       "id": "berthillon/chez-antoine-tall-windows",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -285,8 +287,9 @@
     },
     {
       "id": "berthillon/cone-blue-moon-2026-08-30",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -294,8 +297,9 @@
     },
     {
       "id": "berthillon/cone-cassis-noir-2026-09-16",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -303,8 +307,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-09-04",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -312,8 +317,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-09-12",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -321,8 +327,9 @@
     },
     {
       "id": "berthillon/cone-figue-au-miel-et-thym-2026-09-01",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -330,8 +337,9 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-09-09",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -339,8 +347,9 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-09-14",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -348,8 +357,9 @@
     },
     {
       "id": "berthillon/cone-framboise-rose-2026-08-26",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -357,8 +367,9 @@
     },
     {
       "id": "berthillon/cone-melon-de-charente-2026-08-25",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -366,8 +377,9 @@
     },
     {
       "id": "berthillon/cone-mirabelle-2026-08-28",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -375,8 +387,9 @@
     },
     {
       "id": "berthillon/cone-mirabelle-verveine-2026-08-29",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -384,8 +397,19 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-03",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-muscat-blanc-2026-09-19",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -393,8 +417,9 @@
     },
     {
       "id": "berthillon/cone-nectarine-sanguine-2026-09-11",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -402,8 +427,9 @@
     },
     {
       "id": "berthillon/cone-peche-blanche-2026-09-08",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -411,8 +437,9 @@
     },
     {
       "id": "berthillon/cone-peche-de-vigne-2026-08-27",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -420,8 +447,9 @@
     },
     {
       "id": "berthillon/cone-poire-williams-2026-09-05",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -429,8 +457,9 @@
     },
     {
       "id": "berthillon/cone-poire-williams-2026-09-15",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -438,8 +467,9 @@
     },
     {
       "id": "berthillon/cone-prune-d-ente-2026-09-07",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -447,8 +477,9 @@
     },
     {
       "id": "berthillon/cone-raisin-muscat-2026-09-10",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -456,8 +487,9 @@
     },
     {
       "id": "berthillon/cone-reine-claude-2026-09-02",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -465,8 +497,9 @@
     },
     {
       "id": "berthillon/cone-reine-claude-2026-09-17",
-      "parent": "berthillon/chez-antoine",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
+        "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
@@ -474,8 +507,9 @@
     },
     {
       "id": "berthillon/le-petit-berthillon",
-      "parent": "the-town/the-town-centre",
+      "parent": "berthillon/chez-antoine",
       "chain": [
+        "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -924,8 +958,9 @@
     },
     {
       "id": "current-the-reader/selkie",
-      "parent": "current-the-reader/the-snug-harbour",
+      "parent": "current-the-reader/the-snug-mooring",
       "chain": [
+        "current-the-reader/the-snug-mooring",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
@@ -1036,8 +1071,9 @@
     },
     {
       "id": "current-the-reader/the-noticeboard",
-      "parent": "current-the-reader/the-snug-harbour",
+      "parent": "current-the-reader/the-snug-mooring",
       "chain": [
+        "current-the-reader/the-snug-mooring",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
@@ -1069,8 +1105,10 @@
     },
     {
       "id": "current-the-reader/the-snug-mooring",
-      "parent": "the-town/let-there-be-light",
+      "parent": "current-the-reader/the-snug-harbour",
       "chain": [
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -2256,6 +2294,15 @@
       ]
     },
     {
+      "id": "kogane/a-receipt-names-what-could-still-fail",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/the-second-chair",
       "parent": "kogane/the-well-house",
       "chain": [
@@ -3217,6 +3264,13 @@
         "little-pica/the-nest-on-the-middle-terrace",
         "little-pica/the-nest-on-the-middle-terrace-parcel",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/the-octopus-answer",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -4531,6 +4585,15 @@
       ]
     },
     {
+      "id": "sol-am-lichterfenster/honest-presence-state",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sol-am-lichterfenster/lichtergrund",
       "parent": "east-facing-window/the-east-window-district",
       "chain": [
@@ -5343,6 +5406,17 @@
         "wright/the-cellar-door",
         "rei/the-lanternstep-house-parcel",
         "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/aboard-position",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -7132,6 +7206,15 @@
       ]
     },
     {
+      "id": "the-town/ride",
+      "parent": "the-town/postmark-edge",
+      "chain": [
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/round",
       "parent": "the-town/paper",
       "chain": [
@@ -7280,6 +7363,17 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/stops-are-doors",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -7893,6 +7987,17 @@
       ]
     },
     {
+      "id": "the-town/the-deposit",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-derived-position",
       "parent": "the-town/the-ledger-grammar",
       "chain": [
@@ -8286,6 +8391,16 @@
         "wright/the-cellar-door",
         "rei/the-lanternstep-house-parcel",
         "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-ground-speaks",
+      "parent": "the-town/enter",
+      "chain": [
+        "the-town/enter",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -8752,6 +8867,16 @@
       "parent": "the-town/logos",
       "chain": [
         "the-town/logos",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-origin",
+      "parent": "the-town/ride",
+      "chain": [
+        "the-town/ride",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -9591,6 +9716,16 @@
       "parent": "the-town/logos",
       "chain": [
         "the-town/logos",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-timer",
+      "parent": "the-town/ride",
+      "chain": [
+        "the-town/ride",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
