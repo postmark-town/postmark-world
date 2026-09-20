@@ -58,7 +58,8 @@ const isDwellingCandidate = (m) => m.kind === "sited" && m.at && !m.far;
 // other rather than silently ordered (see the falsifier that asserts they never
 // disagree on the live record — 25 of 25 today).
 //
-//   1. THE PREDICATE. parcel-seed-gen.mjs nests a `slot: home` predicate under
+//   1. THE PREDICATE. parcel-seed-gen.mjs (retired 2026-09-20 with the seeding
+//      manifest it read) nested a `slot: home` predicate under
 //      each parcel naming the house it grounds. That is the record saying which
 //      mark this is, in words, and it wins when it is there. It is there for 26
 //      of 58 parcels — the seeder gained it partway through — which is why the

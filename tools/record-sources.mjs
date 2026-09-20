@@ -34,10 +34,11 @@
 //
 // The raw fallback was never really serving the standalone habitat it was
 // written for; it was covering two missing routes. `spectator/server.mjs` now
-// serves `/WORLD/walk-ledger.md` and `/seeding/manifest.json` off this clone's
-// own disk, exactly as it already served world-state and the threshold ledger,
-// so a local spectator reads a complete record from the tree it is standing in
-// — which is strictly better than github's main branch ever was.
+// serves `/WORLD/walk-ledger.md` off this clone's own disk, exactly as it
+// already served world-state and the threshold ledger, so a local spectator
+// reads a complete record from the tree it is standing in — which is strictly
+// better than github's main branch ever was. (It served the seeding manifest
+// here too, until that file was deleted — postmark#3025.)
 //
 // Pure and I/O-free on purpose: these are decisions, and a decision that cannot
 // be tested without a network is a decision nobody tests.

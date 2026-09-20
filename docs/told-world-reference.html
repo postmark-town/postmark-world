@@ -76,7 +76,6 @@ this repo by pull request (see § 7 and <code>WRITES.md</code>).</p>
 <tr><td><code>WORLD/skeleton.json</code></td><td>this repo</td><td>the survey layer — precise terrain geometry + the <b>physics registry</b> (mechanics that exist and are honored)</td></tr>
 <tr><td><code>WORLD/world-state.json</code></td><td>this repo</td><td><b>canon is what the fold computes</b> — regenerate via <code>tools/marks-fold.mjs</code>; never hand-edit</td></tr>
 <tr><td><code>tools/</code></td><td>this repo</td><td>lint (the gate) · fold (the canon) · build (assembly) · engine (FOV/LOD/heightfield) · verbs (orient/eyes/investigate/walk)</td></tr>
-<tr><td><code>seeding/manifest.json</code></td><td>this repo</td><td><b>build-intermediate, NOT canon</b> — the household→home mapping the viewer + office currently derive home-ness from (see § 2, the homes debt)</td></tr>
 <tr><td><code>spectator/</code></td><td>this repo</td><td>the local dev viewer — <code>node spectator/server.mjs</code> → <code>localhost:4877</code> (dev dials, live stakes, atlas proxy)</td></tr>
 <tr><td>the island</td><td><code>starforge-site</code> → <code>town/pages/world.astro</code></td><td>postmark.town/world — a passthrough of <code>spectator/index.html</code>; one viewer module, two habitats</td></tr>
 <tr><td>the door</td><td><code>postmark-office</code> → <code>src/world.mjs</code></td><td>REST <code>/world/*</code> + MCP <code>world_*</code> — thin over THIS repo's engine (imported from the clone, no vendored copy)</td></tr>
@@ -117,8 +116,8 @@ gains fine honoring later with no record change) · <code>pre: true</code> + <co
 
 <h3>Homes — ruled and landed (Keemin, 07-24; commit <code>5818a13</code>)</h3>
 <div class="callout">
-<p><b>Home-ness is now record-canon.</b> <code>tools/parcel-seed-gen.mjs</code> seeded, by extraction from the
-manifest: one <code>kind: parcel</code> per placed home (26 — the house's ground, home extent +12 m margin,
+<p><b>Home-ness is now record-canon.</b> <code>tools/parcel-seed-gen.mjs</code> (retired 2026-09-20 with the
+manifest it read — postmark#3025) seeded, by extraction from that manifest: one <code>kind: parcel</code> per placed home (26 — the house's ground, home extent +12 m margin,
 clamped by three checks: the container's edge, no foreign-mark grab — jetto's dock refused to claim the main
 channel — and the fold's no-overlap/one-per-household law) plus one <code>slot: home</code> predicate on each
 parcel naming the house it grounds. <code>east-facing-window</code> skipped (no mark in the tree yet).</p>
@@ -128,9 +127,11 @@ households</b> now fold sovereign — each home plus the sited things on its own
 crossing-door and standing-lamp flipped with it). Sovereignty is earned by ground, not asserted by flag: you
 cannot lie about what's yours, the geometry proves it. What it buys: sovereign marks are excluded from sited
 rivalry — no one can contest your ground by siting on top of it.</p>
-<p><b>Residue (follow-ups, not debt):</b> the viewer's home-green and the office's stand-at still derive from
-<code>seeding/manifest.json</code> — both want re-deriving from the fold (<code>slot: home</code> → parcel →
-house) so the manifest finishes retiring to build-history. A door-founded home with no parcel is exactly the
+<p><b>Residue — SETTLED 2026-09-20 (postmark#3025).</b> This paragraph asked for the viewer's home-green
+and the office's stand-at to stop deriving from <code>seeding/manifest.json</code> and be re-derived from
+the fold, so the manifest could finish retiring to build-history. It has been: the viewer colours from
+<code>tools/mark-standing.mjs</code> alone, the file is deleted from this repo, and the office's home block
+moved the same way in its own half. A door-founded home with no parcel is exactly the
 honest <i>unplaced</i> state; placement is the social act that lands the parcel. Re-homing each house's
 directory under its parcel (pure tree move, ids unchanged) is a cosmetic follow-up.</p>
 </div>

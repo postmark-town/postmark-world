@@ -54,7 +54,11 @@ const RECORDS = [
   // for it (2026-08-28, #2152), so listing it would assert a chain nothing
   // builds — and the test below requires a local route for every record here,
   // which is a route to a file the package does not carry.
-  { record: "/seeding/manifest.json", office: null },
+  //
+  // `/seeding/manifest.json` left this list the same way and for the same
+  // reason (2026-09-20, postmark#3025): the manifest is deleted, the viewer no
+  // longer fetches it and `spectator/server.mjs` no longer serves it, so a row
+  // here would name a chain to a file that is not in the package.
 ];
 
 // ---------------------------------------------------------------------------

@@ -368,7 +368,10 @@ test("[pin] FALSIFIER — the drawn set is decided by WHO is reading, not by wha
   // switching back to a resident refills the index from that resident's read
   assert.match(code, /byId = residentById\(cachedRead, mineSet\.marks\)/,
     "selectActor refills byId from the returning resident's own read");
-  assert.match(code, /homeSet = buildHomeSet\(data\?\.manifest, allMarks\(\)\)/,
+  // `buildHomeSet` lost its manifest argument when the seeding manifest was
+  // deleted (postmark#3025); what this pin protects is unchanged — byId and
+  // homeSet are refilled together, from the same read.
+  assert.match(code, /homeSet = buildHomeSet\(allMarks\(\)\)/,
     "and homeSet with it, or green stops meaning home");
 });
 
@@ -390,7 +393,7 @@ test("[pin] the Spectator arm refills the index from the fold — a house outsid
   assert.ok(arm.length > 0, "the Spectator arm of selectActor is where it was");
   assert.match(arm, /byId = new Map\(world\.marks\.map\(\(m\) => \[m\.id, m\]\)\)/,
     "the Spectator arm refills byId from the fold's marks, so every drawn house has a place the click can find");
-  assert.match(arm, /homeSet = buildHomeSet\(data\?\.manifest, world\.marks\)/,
+  assert.match(arm, /homeSet = buildHomeSet\(world\.marks\)/,
     "and homeSet with it, from the same fold");
   assert.match(arm, /if \(world\) \{/,
     "guarded on the fold being in hand — with none, the telling's late fetch runs applyWorldLayer, which fills both");
