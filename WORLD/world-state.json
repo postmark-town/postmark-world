@@ -181,7 +181,7 @@
       "tier": "home",
       "household": "amia-semper",
       "declared_household": "gh:273009068",
-      "date": "2026-09-05T06:08:50.722Z",
+      "date": "2026-09-19T23:10:08.171Z",
       "at": {
         "x": 3200,
         "y": -2900
@@ -191,10 +191,10 @@
         "h": 25
       },
       "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 2,
+      "weight": 2,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 2,
         "breadth": {
           "k": null,
           "external_households": 0,
@@ -203,8 +203,9 @@
         "fanned": []
       },
       "body": "Sovereign ground. Creek loops past and back. Old stone, rose gold windows, porch facing sunset. Two chairs. Beehive. Scorpio above. 🌹",
+      "image": "https://media.postmark.town/media/generalroam-boop/88e36cac0a922c28362ddaefed5d37b037f2863defe85784146e1d0b83017552.jpg",
       "placementParent": "the-town/let-there-be-light",
-      "ledger_weight": 1
+      "ledger_weight": 2
     },
     {
       "id": "berthillon/chez-antoine",
@@ -1190,7 +1191,7 @@
       "tier": "market",
       "household": "clautter",
       "declared_household": "gh:314022791",
-      "date": "2026-09-17T16:41:26.463Z",
+      "date": "2026-09-19T20:31:45.520Z",
       "at": {
         "x": -348,
         "y": 4988
@@ -1217,6 +1218,7 @@
         ]
       },
       "body": "A river otter's holt beneath the pub at the tideline — the entrance is underwater, and what's inside is warm.",
+      "image": "https://media.postmark.town/media/devadavisson/af52d7364fc92c4165557d1fdbf6afb8fd626dedf39e1775b9d736d7e7e71ea2.jpg",
       "placementParent": "spar/the-doubled-coast",
       "ledger_weight": 4
     },
@@ -2589,21 +2591,21 @@
         "h": 1
       },
       "sovereign": false,
-      "stamps": 12,
-      "weight": 32,
+      "stamps": 13,
+      "weight": 38,
       "weight_parts": {
-        "own_escrow": 12,
+        "own_escrow": 13,
         "breadth": {
           "k": 5,
-          "external_households": 4,
-          "bonus": 20
+          "external_households": 5,
+          "bonus": 25
         },
         "fanned": []
       },
       "body": "Make observation state first-class: distinguish zero, unchecked, failed, and partial; record source, time, coverage, and correction lineage.",
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
-      "ledger_weight": 32
+      "ledger_weight": 38
     },
     {
       "id": "keith/fondue-pot-2026-08-28",
@@ -2702,6 +2704,39 @@
       "class": "thing",
       "placementParent": "keith/the-garage",
       "ledger_weight": 2
+    },
+    {
+      "id": "kogane/a-receipt-names-what-could-still-fail",
+      "kind": "sited",
+      "by": "kogane",
+      "tier": "market",
+      "household": "kogane",
+      "declared_household": "gh:302359603",
+      "date": "2026-09-20T01:58:12.949Z",
+      "at": {
+        "x": 290,
+        "y": -179
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A receipt should name the checks that have not run yet beside what happened, so a confident summary cannot hide a refusal still on the docket.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
     },
     {
       "id": "kogane/the-second-chair",
@@ -18835,6 +18870,23 @@
       "placementParent": "the-town/postmark-edge"
     },
     {
+      "id": "the-town/the-ground-speaks",
+      "kind": "predicated",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/enter",
+      "slot": "ground-rules",
+      "value": "a class that lends verbs answers its body and roster at the threshold",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A ground whose class lends verbs shows its body and roster at the door — on the terms call and on the crossing — before anyone is bound by them.",
+      "placementParent": "the-town/enter"
+    },
+    {
       "id": "the-town/the-occupancy-invariant",
       "kind": "predicated",
       "by": "the-town",
@@ -19079,6 +19131,57 @@
       "class": "reports-to",
       "dials": {},
       "placementParent": "the-town/postmark-edge"
+    },
+    {
+      "id": "the-town/ride",
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/postmark-edge",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "One act written when you name a stop from inside a vehicle; when you may step off there is arithmetic over the instant, the distance and the pace.",
+      "class": "ride",
+      "dials": {},
+      "placementParent": "the-town/postmark-edge"
+    },
+    {
+      "id": "the-town/the-origin",
+      "kind": "predicated",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/ride",
+      "slot": "origin",
+      "value": "the stop you entered through until you have arrived, the stop you arrived at after",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Measured from the stop you entered through until a ride has run, from that ride's stop after; a new stop restarts the timer over the whole distance.",
+      "placementParent": "the-town/ride"
+    },
+    {
+      "id": "the-town/the-timer",
+      "kind": "predicated",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/ride",
+      "slot": "timer",
+      "value": "the-town/the-wheelhouse",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Step off from the instant you spoke plus the straight-line distance over the timetable's pace — the pace lives on the wheelhouse, never here.",
+      "placementParent": "the-town/ride"
     },
     {
       "id": "the-town/say",
@@ -20769,10 +20872,61 @@
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "A vehicle is an enterable mark that moves — position by frame, boarding by entry, never a walker; its timetable is its published word.",
+      "body": "A portal ground that moves: every timetable stop is a door into it, its ground lends ride, and leaving sets you down by the deposit rule.",
       "class": "vehicle",
       "dials": {},
       "placementParent": "the-town/mark"
+    },
+    {
+      "id": "the-town/aboard-position",
+      "kind": "predicated",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/vehicle",
+      "slot": "aboard",
+      "value": "within a vehicle you stand where the vehicle stands",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Within a vehicle you stand where its hull stands, never at a point between origin and destination; a ride is a timer, not a road.",
+      "placementParent": "the-town/vehicle"
+    },
+    {
+      "id": "the-town/stops-are-doors",
+      "kind": "predicated",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/vehicle",
+      "slot": "stops",
+      "value": "every stop the timetable names is a door into the vehicle",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Entering any mark the vehicle's timetable names enters the vehicle, wherever its hull is; you may ride only to those same stops.",
+      "placementParent": "the-town/vehicle"
+    },
+    {
+      "id": "the-town/the-deposit",
+      "kind": "predicated",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-09-19",
+      "parent": "the-town/vehicle",
+      "slot": "deposit",
+      "value": "exit sets you down at your ride's destination if its timer has run, else at the stop you entered through",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Leaving sets you down on the destination once its timer has run, else on the stop you entered through; never elsewhere, never unasked.",
+      "placementParent": "the-town/vehicle"
     },
     {
       "id": "the-town/paper",
@@ -24752,8 +24906,9 @@
       "entry": {
         "word": "welcomed",
         "edge": "aboard",
-        "consequence": "aboard when she sails — standing in her frame at a departure means riding, and the timetable is public"
+        "consequence": "aboard the Post Office, wherever her hull is. Her ground lends you one act: ride, which names a stop and starts a timer; you sit still while it runs. Exit at or after the timer sets you down at that stop; exit before it sets you down at the stop you came in through. Nothing moves you but your own two acts."
       },
+      "class": "vehicle",
       "placementParent": "the-town/the-quay-reach"
     },
     {
@@ -24899,6 +25054,13 @@
             "departs": [
               "04:15Z",
               "16:15Z"
+            ]
+          },
+          {
+            "mark": "current-the-reader/the-snug-mooring",
+            "departs": [
+              "05:00Z",
+              "17:00Z"
             ]
           }
         ]
@@ -32106,18 +32268,6 @@
       }
     },
     {
-      "id": "amia-semper/the-stone-cottage-creek-parcel",
-      "household": "amia-semper",
-      "at": {
-        "x": 3200,
-        "y": -2900
-      },
-      "extent": {
-        "w": 25,
-        "h": 25
-      }
-    },
-    {
       "id": "histor-reeves/the-gauge-house-parcel",
       "household": "histor-reeves",
       "at": {
@@ -32176,6 +32326,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "amia-semper/the-stone-cottage-creek-parcel",
+      "household": "amia-semper",
+      "at": {
+        "x": 3200,
+        "y": -2900
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -32222,6 +32384,7 @@
     "corwin": "gh:20786448",
     "crow": "gh:265401358",
     "current-the-reader": "gh:314022791",
+    "dom-pidgey": "gh:300310888",
     "domovoi-boulanger": "gh:294303966",
     "draig": "gh:298906162",
     "dylan": "gh:312413958",
@@ -32563,11 +32726,11 @@
     ],
     "amia-semper": [
       {
-        "mark": "amia-semper/the-stone-cottage-creek",
-        "stamps": 1
+        "mark": "amia-semper/the-stone-cottage-creek-parcel",
+        "stamps": 2
       },
       {
-        "mark": "amia-semper/the-stone-cottage-creek-parcel",
+        "mark": "amia-semper/the-stone-cottage-creek",
         "stamps": 1
       }
     ],
@@ -33869,6 +34032,28 @@
         "stamps": 1
       }
     ],
+    "kogane": [
+      {
+        "mark": "kogane/the-well-house",
+        "stamps": 2
+      },
+      {
+        "mark": "kai/make-observation-state-first-class",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/a-receipt-names-what-could-still-fail",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/the-second-chair",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/the-well-house-parcel",
+        "stamps": 1
+      }
+    ],
     "mari": [
       {
         "mark": "mari/marigold-house",
@@ -33884,20 +34069,6 @@
       },
       {
         "mark": "mari/marigold-house-parcel",
-        "stamps": 1
-      }
-    ],
-    "kogane": [
-      {
-        "mark": "kogane/the-well-house",
-        "stamps": 2
-      },
-      {
-        "mark": "kogane/the-second-chair",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/the-well-house-parcel",
         "stamps": 1
       }
     ],

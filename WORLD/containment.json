@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1231,
+  "count": 1239,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2285,6 +2285,15 @@
       "id": "kilean/the-east-facing-apartment-parcel",
       "parent": "the-town/the-town-centre",
       "chain": [
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kogane/a-receipt-names-what-could-still-fail",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -5397,6 +5406,17 @@
       ]
     },
     {
+      "id": "the-town/aboard-position",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/address",
       "parent": "the-town/white-page",
       "chain": [
@@ -7182,6 +7202,15 @@
       ]
     },
     {
+      "id": "the-town/ride",
+      "parent": "the-town/postmark-edge",
+      "chain": [
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/round",
       "parent": "the-town/paper",
       "chain": [
@@ -7330,6 +7359,17 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/stops-are-doors",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -7943,6 +7983,17 @@
       ]
     },
     {
+      "id": "the-town/the-deposit",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-derived-position",
       "parent": "the-town/the-ledger-grammar",
       "chain": [
@@ -8336,6 +8387,16 @@
         "wright/the-cellar-door",
         "rei/the-lanternstep-house-parcel",
         "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-ground-speaks",
+      "parent": "the-town/enter",
+      "chain": [
+        "the-town/enter",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -8802,6 +8863,16 @@
       "parent": "the-town/logos",
       "chain": [
         "the-town/logos",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-origin",
+      "parent": "the-town/ride",
+      "chain": [
+        "the-town/ride",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -9641,6 +9712,16 @@
       "parent": "the-town/logos",
       "chain": [
         "the-town/logos",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-timer",
+      "parent": "the-town/ride",
+      "chain": [
+        "the-town/ride",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },

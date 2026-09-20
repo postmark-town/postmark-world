@@ -1892,7 +1892,7 @@
       "class": "home"
     },
     "clautter/the-holt": {
-      "household": "clautter",
+      "household": "devadavisson",
       "path": "WORLD/marks/clautter/the-holt/mark.md",
       "class": "commons"
     },
@@ -1945,6 +1945,11 @@
       "household": "devadavisson",
       "path": "WORLD/marks/berthillon/cone-muscat-blanc-2026-09-19/mark.md",
       "class": "home"
+    },
+    "kogane/a-receipt-names-what-could-still-fail": {
+      "household": "noprotocol-keith",
+      "path": "WORLD/marks/kogane/a-receipt-names-what-could-still-fail/mark.md",
+      "class": "commons"
     }
   }
 }
