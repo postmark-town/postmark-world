@@ -208,6 +208,75 @@ export function resolveMarkName(mark, determined = {}) {
     : { name: deslugMarkId(mark?.id), determined: false };
 }
 
+/** THE PARCEL CARD IS LABELLED WITH THE PARCEL'S OWN NAME (Keemin, 2026-09-20:
+ *  "let's just use the parcel's name, and strip the word 'parcel'").
+ *
+ *  The card used to be labelled with the DWELLING's name, found by
+ *  `homeMarkOfParcel` — which takes the first home-tier sited mark on the
+ *  parcel and prefers one with a picture. On rei's ground that is the Garden
+ *  Notebook Tin, 0.4 × 0.3 m and pictured, so the card read "The Garden
+ *  Notebook Tin" while the house beside it was the Lanternstep House at
+ *  12 × 12. A card names the GROUND it is drawn on, and the ground has a name
+ *  of its own; nothing has to be picked, so nothing can be picked wrong.
+ *
+ *  The trailing "parcel" goes because it is filing, not naming: 80 of the
+ *  town's 92 parcels carry it in their slug and the other 12 do not
+ *  (`berthillon/chez-antoine`, `current-the-reader/the-keepers-flat`), so
+ *  leaving it in would label two thirds of the town with a word about the
+ *  record's own bookkeeping. THE ID IS UNTOUCHED — this is the display name
+ *  only, and no link, lookup or record moves.
+ *
+ *  Stripped from the RESOLVED name, so a determined name ending in the word
+ *  loses it too, not only a slug. A parcel named nothing but "parcel" keeps
+ *  its name rather than being labelled with an empty string. Pure. */
+export function parcelCardLabel(parcel, determined = {}) {
+  const { name } = resolveMarkName(parcel, determined);
+  const stripped = String(name ?? "").replace(/[\s\-_]*parcel\s*$/i, "").trim();
+  return stripped || String(name ?? "");
+}
+
+/** WHERE A HOUSEHOLD IS AT HOME: THE GROUND IT HOLDS (postmark#3025).
+ *
+ *  THE PARCEL IS THE HOME (ruling 7), which is why the fold publishes the
+ *  parcel list at all — `world-build.mjs` says it in as many words: "every
+ *  reader that needs to answer 'where does this resident stand?' reads the same
+ *  list". This is that read, and it is the same answer the office's `homeOf`
+ *  gives (`parcelsFor(handle)[0].at`), so the page and the door agree.
+ *
+ *  It replaces `seeding/manifest.json`'s `grid_m` — the July atlas painting at
+ *  5 m/px — in the three places the viewer wanted a resident's home
+ *  coordinate: a household resident's walk origin, the acting resident's home
+ *  when the office cannot be reached, and the jump-to-my-house presets. All
+ *  three now point at ground the household actually holds. 92 of the town's
+ *  households hold one; only for a household with none is the answer absent,
+ *  and that absence is the honest one — no parcel, no home yet.
+ *
+ *  Two sources, one answer: the fold's published `parcels` where a fold is in
+ *  hand, else the parcel MARKS the page holds — because the resident path never
+ *  opens the fold, and a resident's own read carries their own ground. The two
+ *  cannot disagree: measured over all 92 rows at 5f042bb, every parcel mark's
+ *  `at` is byte-equal to its published row's. Order is the published order, so
+ *  `[0]` means what it means at the door. Pure. */
+export function householdHomeAt(handle, { parcels = [], marks = [] } = {}) {
+  const who = String(handle ?? "");
+  if (!who) return null;
+  const householdOf = (p) => String(p?.household ?? p?.by ?? "");
+  const rows = (parcels ?? []).filter((p) => householdOf(p) === who);
+  const fromMarks = (marks ?? []).filter((m) => m?.kind === "parcel" && householdOf(m) === who);
+  // `!= null` BEFORE the finiteness check, and it is not belt-and-braces:
+  // `Number(null)` is 0, not NaN, so a parcel row carrying a null coordinate
+  // would pass `Number.isFinite` and answer THE ORIGIN — which is precisely the
+  // failure `world-build.mjs` warns about where it publishes this list ("home
+  // resolution silently falls back to the Origin for everyone, which reads as
+  // ordinary 'no ground yet' behaviour and hides"). Caught by this function's
+  // own test before it shipped.
+  const placed = (p) => p?.at?.x != null && p?.at?.y != null
+    && Number.isFinite(Number(p.at.x)) && Number.isFinite(Number(p.at.y));
+  const held = (rows.length ? rows : fromMarks).find(placed);
+  if (!held) return null;
+  return { x: Number(held.at.x), y: Number(held.at.y), markId: held.id ?? null };
+}
+
 export function extentGlyphKind(mark) {
   if (!mark?.extent || !(Number(mark.extent.w) > 0 || Number(mark.extent.h) > 0)) return null;
   return polygonOf(mark) ? "polygon" : "rect";
@@ -4490,9 +4559,10 @@ function markShapeSVG(m, px, cls, { attrs = "", inner = "" } = {}) {
 // #2752). It was labelled "The quay — Ferry's crossing" here, which disagreed with
 // the door twice over: the only mark named the-town/the-quay stands in the Long
 // Run 5.6 km away, and the ferry's CROSSINGS are the twice-daily clock rather than
-// a place. Exported so the label can be asked directly rather than grepped. These
-// three are now the whole list: renderPresets used to swap them for the reader's
-// own homes off the seeding manifest, which is deleted (postmark#3025).
+// a place. Exported so the label can be asked directly rather than grepped — and
+// note that renderPresets swaps this whole list for the reader's own GROUND once
+// they are signed in (the parcels their household holds, by their own names), so
+// these three are the keyless view.
 export const PRESETS = [
   { x: 0, y: 0, label: "The Origin" },
   { x: 575, y: -2600, label: "Trueing Terrace — above the fog" },
@@ -9047,11 +9117,15 @@ export function mountViewer(appEl) {
       : true;
     return overlayHomeCardSVG({
       at, id: parcel.id, classes: markClasses(parcel), mine,
-      // THE LABEL IS THE HOME'S NAME (founder, 2026-09-11: "let's have the actual
-      // home's name instead of the resident name in the label for each parcel
-      // card") — the dwelling's own name where a dwelling stands, the household
-      // only where none does
-      label: home ? markName(home).name : String(parcel.household ?? parcel.by ?? ""),
+      // THE LABEL IS THE PARCEL'S OWN NAME, "parcel" stripped (Keemin,
+      // 2026-09-20: "let's just use the parcel's name, and strip the word
+      // 'parcel'"). It was the DWELLING's name from 2026-09-11 ("let's have the
+      // actual home's name instead of the resident name"), with the household
+      // where no dwelling stood — but the dwelling had to be PICKED, and
+      // `homeMarkOfParcel` picks the first home-tier sited mark preferring a
+      // picture, which on rei's ground is the Garden Notebook Tin (0.4 × 0.3 m)
+      // and not the Lanternstep House beside it. The ground has a name already.
+      label: parcelCardLabel(parcel, data?.worldState?.determined ?? {}),
       image: room && home ? markImagePath(home) : null,
       lit: houseIsLit(parcel, walkState.walkers, (h) => faceOf(h).household),
       fan, title,
@@ -9514,20 +9588,18 @@ export function mountViewer(appEl) {
   }
 
   // A home for a resident the reader is not currently acting as: the office
-  // answer, if this household has already asked for it. The SELECTED resident
-  // keeps reading state.actorHome, which `readActorHome` fills from the office
-  // the moment that resident is selected — so nothing about the walk desk's
-  // "no origin yet" moves for the person actually at the desk.
+  // answer if this household has already asked for it, the ground the household
+  // HOLDS otherwise. The SELECTED resident keeps reading state.actorHome, so
+  // nothing about the walk desk's "no origin yet" moves.
   //
-  // The seeding manifest was the second source here (postmark#3025): a July
-  // painting's grid_m, handed out as a resident's home coordinate. It is gone,
-  // and its absence is a NAMED absence — an un-asked-for resident has no home
-  // origin until the office is asked, which is the truth, where the manifest's
-  // answer only looked like one.
+  // The second source was `seeding/manifest.json`'s grid_m until 2026-09-20 —
+  // the July atlas painting, handed out as a resident's home coordinate. It is
+  // the household's parcel centre now (postmark#3025), which is what the
+  // office's own `homeOf` answers, so the desk and the door name one place.
   function homeFor(handle) {
     const cached = viewCache.get(handle)?.home;
     if (cached && Number.isFinite(cached.x) && Number.isFinite(cached.y)) return cached;
-    return null;
+    return householdHomeAt(handle, { parcels: world?.parcels ?? [], marks: allMarks() });
   }
   // Where a handle stands — the walk ledger first, their home second. One
   // function for every resident in the household, because a view built ahead
@@ -10311,10 +10383,12 @@ export function mountViewer(appEl) {
         state.actorHome = { x: Number(place.x), y: Number(place.y), markId: place.mark_id ?? null };
         return;
       }
-    } catch { /* an office that cannot be reached leaves actorHome null, which is the honest answer */ }
-    // The seeding manifest used to answer here when the office could not
-    // (postmark#3025). A July painting's grid_m is not this resident's home,
-    // and an office that is down is a thing to say, not a thing to paper over.
+    } catch { /* the ground-held fallback below is spectator-safe */ }
+    // The seeding manifest answered here when the office could not, with a July
+    // painting's grid_m. The ground the household HOLDS answers instead
+    // (postmark#3025) — the same parcel centre the office's own `homeOf`
+    // returns, so an unreachable office costs the page freshness, not truth.
+    state.actorHome = householdHomeAt(state.handle, { parcels: world?.parcels ?? [], marks: allMarks() });
   }
 
   async function loadActorBalance() {
@@ -13559,17 +13633,30 @@ export function mountViewer(appEl) {
     renderActivity();
   }
 
-  // The jump buttons. These swapped themselves for "your own homes" when the
-  // reader was signed in, reading the household's rows out of the seeding
-  // manifest — so the button that said `home` walked you to where the July
-  // atlas put your house, not to your ground on the record. The manifest is
-  // deleted (postmark#3025) and the buttons are the keyless three for everyone
-  // until something derives them from the fold, which is the right source and
-  // is not this lane's to build.
+  // The jump buttons. Signed in, they become YOUR OWN GROUND — one per handle
+  // of the household, at the centre of the parcel that household holds, labelled
+  // with the parcel's own name. They were read out of `seeding/manifest.json`
+  // until 2026-09-20, so the button walked you to where the July atlas painting
+  // put your house; it walks you to the ground you hold now (postmark#3025),
+  // which is the same place the office would send you. Keyless, and a household
+  // with no parcel yet, keep the defaults.
   function renderPresets() {
     const box = $(root, ".presets");
     if (!box) return;
-    box.innerHTML = PRESETS.map((p) => `<button class="ctl" data-x="${p.x}" data-y="${p.y}">${esc(p.label)}</button>`).join("");
+    const determined = data?.worldState?.determined ?? {};
+    const parcels = world?.parcels ?? [];
+    const marks = allMarks();
+    const seen = new Set();
+    const mine = [];
+    for (const handle of state.whoami?.handles ?? []) {
+      const at = householdHomeAt(handle, { parcels, marks });
+      if (!at || seen.has(at.markId)) continue;   // one household, several handles, one ground
+      seen.add(at.markId);
+      const parcel = byId.get(at.markId) ?? marks.find((m) => m?.id === at.markId) ?? { id: at.markId };
+      mine.push({ x: at.x, y: at.y, label: parcelCardLabel(parcel, determined) });
+    }
+    const list = mine.length ? mine : PRESETS;
+    box.innerHTML = list.map((p) => `<button class="ctl" data-x="${p.x}" data-y="${p.y}">${esc(p.label)}</button>`).join("");
   }
 
   // ───────── the ambient clock (crossing rollover + auto-update) ─────────

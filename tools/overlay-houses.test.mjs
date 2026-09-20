@@ -130,9 +130,23 @@ test("[pin] THE PARCEL UNDERFOOT — entered directly, through the dwelling on i
   // ⚑ THE FLIP: drop `m.placementParent` from the queue push → the dwelling line reds.
 });
 
-test("[pin] THE CARD'S LABEL IS THE HOME'S NAME — the dwelling where one stands, the household only where none does (founder, 2026-09-11)", () => {
-  assert.match(SOURCE, /label: home \? markName\(home\)\.name : String\(parcel\.household \?\? parcel\.by \?\? ""\),/, "the viewer's card asks the home first");
-  // ⚑ THE FLIP: put the household back first → reds.
+test("[pin] THE CARD'S LABEL IS THE PARCEL'S OWN NAME, 'parcel' stripped (founder, 2026-09-20)", () => {
+  // SUPERSEDES the 2026-09-11 rule this pin used to hold — "the dwelling where
+  // one stands, the household only where none does" — which asserted
+  // `label: home ? markName(home).name : String(parcel.household ?? parcel.by ?? "")`.
+  //
+  // That rule had to PICK the dwelling, and `homeMarkOfParcel` picks the first
+  // home-tier sited mark on the parcel preferring one with a picture: on rei's
+  // ground the Garden Notebook Tin, 0.4 × 0.3 m and pictured, while the
+  // Lanternstep House stood beside it at 12 × 12. Keemin, 2026-09-20: "let's
+  // just use the parcel's name, and strip the word 'parcel'." The ground has a
+  // name already, so nothing is picked and nothing can be picked wrong.
+  //
+  // The rule itself is tested in tools/parcel-card-label.test.mjs; this stays a
+  // SOURCE pin because the behaviour lives in a browser these tests do not have.
+  assert.match(SOURCE, /label: parcelCardLabel\(parcel, data\?\.worldState\?\.determined \?\? \{\}\),/, "the viewer's card asks the ground it is drawn on");
+  assert.ok(!/label: home \? markName\(home\)\.name/.test(SOURCE), "and never the dwelling it had to guess at");
+  // ⚑ THE FLIP: put `label: home ? markName(home).name : …` back → reds.
 });
 
 test("THE RESIDENT'S OWN HOUSE WEARS ITS PICTURE TOO — a portfolio row that shadows the world's record is filled, never overwritten (Keemin's terrace screenshot, 2026-09-11)", () => {
