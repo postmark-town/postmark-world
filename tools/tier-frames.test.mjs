@@ -38,17 +38,27 @@ import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadMarks, placementParent, tierRank, standingRank, TIER_RANK, COORDS_FIELD, COORDS_RELATIVE } from "./marks-fold.mjs";
 import { markStanding, standingHouseholdOf } from "./mark-standing.mjs";
+import { deriveOutsiders } from "./region-outsiders.mjs";
+import { overlapArea, polygonOf, rectInsideRing } from "./geometry.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 
-// The declared act's own receipt, generated with the rings. The GATE stopped
-// reading it at the freeze — there is no containment clause left for it to
-// except — but the ref-diff falsifier below still needs it: a region re-shape
-// legitimately moves `placementParent` for the marks it names, and that is the
-// re-shape arriving, not a regression in the tier binding.
+// The declared act's own receipt. The GATE stopped reading it at the freeze —
+// there is no containment clause left for it to except — but the ref-diff
+// falsifier below still needs it: a region re-shape legitimately moves
+// `placementParent` for the marks it names, and that is the re-shape arriving,
+// not a regression in the tier binding.
+//
+// DERIVED, not read off WORLD/region-outsiders.json (POS-175, 2026-09-21). The
+// committed json is a fold artifact and is stale for the whole interval between
+// an operator's pre-act and the next crossing, so an exemption read from it goes
+// missing exactly when a re-shape has just happened — which is the only moment
+// it is needed. This is an ALLOWANCE consumed by a different assertion, never
+// the subject of one, so deriving it here is not a test agreeing with itself.
 const DISPLACED_BY_DECLARED_ACT = new Set(
-  (JSON.parse(readFileSync(join(HERE, "..", "WORLD/region-outsiders.json"), "utf8")).rows ?? []).map((r) => r.mark));
+  deriveOutsiders(loadMarks(join(ROOT, "WORLD/marks")), { rectInsideRing, polygonOf, overlapArea })
+    .map((r) => r.mark));
 const LINT = join(HERE, "mark-lint.mjs");
 
 // The household a handle belongs to — the town's own registry (WORLD/households.json,

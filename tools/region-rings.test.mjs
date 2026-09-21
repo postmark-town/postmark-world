@@ -34,10 +34,45 @@ const marks = loadMarks(join(ROOT, "WORLD/marks"));
 const byId = new Map(marks.map((m) => [m.id, m]));
 const bySlug = (slug) => marks.find((m) => m.slug === slug);
 
-// The generated heads-up list, read as an ARTIFACT rather than recomputed here.
-// Recomputing it would make these tests agree with themselves: the point is that
-// what the generator WROTE matches what the record says, so the file on disk is
-// the thing under test.
+// The heads-up list, read as an ARTIFACT rather than recomputed here. Reading it
+// is deliberate and stays: what a test here asks is whether the FILE agrees with
+// the record, so the file on disk is the thing under test. Recomputing it would
+// make such a test agree with itself.
+//
+// WHO WRITES IT (corrected 2026-09-21, POS-175). This note used to say "what the
+// GENERATOR wrote". That stopped being true on 2026-08-24, S45's seventh
+// refusal: the list left the hand-run tools/region-rings-gen.mjs and became a
+// FOLD-DERIVED VIEW, emitted by tools/marks-fold.mjs beside world-state.json at
+// every fold. tools/region-outsiders.mjs § header carries the reasoning.
+//
+// WHAT THAT COSTS, AND THE TWO TESTS IT RETIRED. Because the file is rewritten
+// at every fold and only at a fold, it is stale for the whole interval between
+// an operator's pre-act that moves a mark and the next crossing — and any test
+// that compares this artifact against the live tree reads RED for that interval.
+// It cost five consecutive world PRs on 2026-09-20/21. Two tests that lived here
+// were deleted rather than re-pointed, because for each of them the STALENESS
+// WAS THE ONLY THING THEY COULD EVER CATCH:
+//
+//   · "CONTAINED OR LISTED: every mark under a region is one or the other" —
+//     a weaker duplicate. The same biconditional is held by
+//     tools/region-outsiders.test.mjs § "CONTAINED OR LISTED holds against the
+//     freshly folded list", which folds a scratch copy and checks the property
+//     against the fold's own output, over REGION_SLUGS' thirteen regions where
+//     this file's RINGED is twelve. That one is non-vacuous — a mis-wire in
+//     marks-fold.mjs reds it — and it is the form that survives.
+//
+//   · "DECOUPLED: a listed mark stands outside its ring AND is still filed
+//     under its region" — vacuous against ANY freshly derived list. Both halves
+//     are construction guarantees of deriveOutsiders: it pushes a row only when
+//     !rectInsideRing(ring, rectOf(k)) (the ground half) and only for
+//     k of descendantsOf(region.id) (the filing half). Measured: 33
+//     perturbations, one per listed mark, each moved inside its own region's
+//     ring — it fired zero times. The law it named is real and is enforced by
+//     construction in the deriver, which is why there is nothing left to assert.
+//
+// If you are tempted to put either back, put it back as a scratch FOLD (copy
+// WORLD/ + tools/, run marks-fold.mjs, read that output) — never as a derivation
+// computed inline here, which agrees with itself by definition.
 const OUTSIDERS = JSON.parse(readFileSync(join(ROOT, "WORLD/region-outsiders.json"), "utf8"));
 
 // THE ROSTER. tools/founding-act.mjs (town repo) names thirteen founding targets;
@@ -121,7 +156,7 @@ test("CLAIM HONESTY holds for the water too — the svgs that match", () => {
   }
 });
 
-// ── FALSIFIER (b): contained, or on the list — and the list is exact ─────────
+// ── FALSIFIER (b): the list is exact in the direction the FILE can be wrong ──
 //
 // THE PIVOT (the founder, 2026-08-24): "the regions just get drawn to match
 // their atlas renders. And then we can just make a Town Bulletin announcement
@@ -130,32 +165,17 @@ test("CLAIM HONESTY holds for the water too — the svgs that match", () => {
 // bend the ring until they are — is retired, knowingly, along with the 08-22
 // sable word it was written for.
 //
-// What replaces it is not weaker, it is a BICONDITIONAL. "Some marks are
-// outside now" would be a licence; this says every mark under a ringed region
-// is EITHER inside its ring OR named on the generated list, never neither and
-// never both. Neither would be a resident who lost their ground with nobody
-// told; both would be a list that cries wolf and trains its readers to ignore
-// it. The list is the town's promise to the people it displaces, so it has to
-// be exact in both directions.
-test("CONTAINED OR LISTED: every mark under a region is one or the other, never neither, never both", () => {
-  const listed = new Set(OUTSIDERS.rows.map((r) => r.mark));
-  const unlisted = [], doubled = [];
-  for (const slug of RINGED) {
-    const region = bySlug(slug);
-    const ring = polygonOf(region);
-    const kids = groundUnder(region.id);
-    assert.ok(kids.length > 0, `${slug} has marks under it (or this assertion is vacuous)`);
-    for (const k of kids) {
-      const inside = rectInsideRing(ring, rect(k));
-      if (!inside && !listed.has(k.id)) unlisted.push(`${k.id} (${k.by}) stands outside ${region.id} and nobody is telling them`);
-      if (inside && listed.has(k.id)) doubled.push(`${k.id} is inside ${region.id} and on the heads-up list anyway`);
-    }
-  }
-  assert.deepEqual(unlisted, [], "a resident whose ground fell outside their region, with no notice generated, is the town moving a boundary under someone in silence");
-  assert.deepEqual(doubled, [], "a list that names people who are fine is a list nobody will read the next time");
-});
-
-test("…and the list names nothing that is not a mark under a ringed region", () => {
+// What replaced it is a BICONDITIONAL: every mark under a ringed region is
+// EITHER inside its ring OR named on the list, never neither and never both.
+// That property is held in tools/region-outsiders.test.mjs, against a scratch
+// FOLD rather than against this committed file — see the note at the top of
+// this file for why it stopped being held here (POS-175, 2026-09-21).
+//
+// What stays here is the half that is a claim about the ARTIFACT and not about
+// the derivation: no row may name something that is not a mark standing under a
+// ringed region. A row pointing at a mark the record no longer holds is a fact
+// about the FILE, so the file is rightly the thing under test.
+test("the list names nothing that is not a mark under a ringed region", () => {
   // A row names its region by ID (`<by>/<slug>`), not by slug — the first draft
   // of this check looked it up the wrong way and called every row a stray, which
   // is the failure mode a probe should have: loud and obviously about itself.
@@ -397,41 +417,25 @@ test("THE EXCEPTION IS RETIRED: the outsider list no longer moves the gate, beca
 });
 
 
-// ── FALSIFIER (g): ground and filing are decoupled, and both halves hold ─────
+// ── FALSIFIER (g) — DELETED 2026-09-21 (POS-175) ─────────────────────────────
 //
-// THE LAW THE PIVOT ACTUALLY MADE, stated positively rather than as the absence
-// of an error. Before tonight a mark's ground and its filing were one fact: you
-// were filed under the region whose ring contained you, and a ring bent until
-// that was true. The founder's re-shape broke the coupling on purpose — the
-// regions match their atlas renders, and a resident left outside keeps their
-// filing while their ground stands where they put it, with the list as the
-// notice between the two.
+// It read "DECOUPLED: a listed mark stands outside its ring AND is still filed
+// under its region", and the law it stated is real: the founder's 2026-08-24
+// re-shape broke ground and filing apart on purpose, so a resident left outside
+// keeps their filing while their ground stands where they put it.
 //
-// So a listed mark must be BOTH things at once: outside its region's ring, and
-// still filed under that region. Asserting only the first would let a silent
-// re-home pass as displacement; only the second would let the list name people
-// who are actually fine. The loader's own framing law is the authority for the
-// filing half — `_parentMarkId` is the directory ancestry the frame walk uses
-// ("its nearest POSITIONED ancestor THAT BINDS IT", marks-fold.mjs § frameMarks)
-// — so this reads the tree, not the geometry.
-test("DECOUPLED: a listed mark stands outside its ring AND is still filed under its region", () => {
-  const wrong = [];
-  for (const row of OUTSIDERS.rows) {
-    const m = byId.get(row.mark);
-    if (!m) { wrong.push(`${row.mark}: not in the record at all`); continue; }
-    const region = byId.get(row.region);
-    if (!rectInsideRing(polygonOf(region), rect(m)))
-      ; // the ground half: genuinely outside, which is why it is listed
-    else wrong.push(`${row.mark}: listed, but its ground is inside ${row.region}'s ring`);
-    // the filing half: the paper did not move. The mark's own ancestry must
-    // still lead to the region the row names.
-    let p = m._parentMarkId, seen = new Set(), filed = false;
-    while (p && !seen.has(p)) { if (p === row.region) { filed = true; break; } seen.add(p); p = byId.get(p)?._parentMarkId; }
-    if (!filed) wrong.push(`${row.mark}: listed under ${row.region} but no longer filed there — the pivot moves boundaries, never anyone's paper`);
-  }
-  assert.deepEqual(wrong, [], "every displaced mark keeps its filing and loses only the ring around it");
-  assert.ok(OUTSIDERS.rows.length > 0, "…and there is something to check");
-});
+// But the test could only ever go red against a STALE list. Both halves are
+// construction guarantees of deriveOutsiders — the ground half because a row is
+// pushed only when !rectInsideRing(ring, rectOf(k)), the filing half because
+// rows are built only from descendantsOf(region.id) — so any correctly derived
+// list satisfies it by definition, and the committed file satisfies it too for
+// every interval in which it is current. Measured before deleting: 33
+// perturbations, one per listed mark, each moved inside its own region's ring,
+// and it fired zero times.
+//
+// The law is enforced where it is made, in tools/region-outsiders.mjs §
+// deriveOutsiders, not asserted here against a file whose disagreement is only
+// ever a clock. Removing it is what ends this file's share of the red interval.
 
 // ── the two regions that get no ring, and why ────────────────────────────────
 test("the undrawn stay undrawn: Pando is a horizon object and the carried weight awaits its ruling", () => {

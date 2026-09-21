@@ -24,8 +24,8 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 import { loadMarks } from "./marks-fold.mjs";
-import { polygonOf, rect, rectInsideRing } from "./geometry.mjs";
-import { REGION_SLUGS, occupiesGround } from "./region-outsiders.mjs";
+import { overlapArea, polygonOf, rect, rectInsideRing } from "./geometry.mjs";
+import { REGION_SLUGS, deriveOutsiders, occupiesGround } from "./region-outsiders.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -69,7 +69,17 @@ test("THE FOLD EMITS THE LIST: deleting it and re-folding brings it back", () =>
 test("A PUBLISH CANNOT STALE IT: a new mark outside its region is on the next fold's list", () => {
   const dir = scratchWorld();
   try {
-    const before = listOf(dir);
+    // The baseline is DERIVED from the scratch tree, not read off the committed
+    // artifact (POS-175, 2026-09-21). `listOf(dir)` here was this suite's one
+    // stale coupling: between an operator's pre-act and the next crossing the
+    // committed json is out of date by design, so `before.count` was a number
+    // from the last fold while `after.count` came from this one, and the delta
+    // assertion below went red for the whole interval — on five consecutive
+    // world PRs, 09-20/21. Deriving it costs no second fold and makes the
+    // assertion stronger: `after` still comes from the real fold, so this now
+    // also says the fold's list IS the derivation, plus exactly the new mark.
+    const before = { count: deriveOutsiders(loadMarks(join(dir, "WORLD/marks")),
+      { rectInsideRing, polygonOf, overlapArea }).length };
     const gardens = loadMarks(join(ROOT, "WORLD/marks")).find((m) => m.slug === "the-lanternseed-gardens");
     // far outside any ring, filed under the Gardens, in the Gardens' own frame
     const slug = "the-settlement-published-this";
