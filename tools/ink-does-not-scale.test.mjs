@@ -28,6 +28,9 @@ const SRC = readFileSync(join(HERE, "..", "spectator", "viewer.mjs"), "utf8");
 const INK = [
   ".wv-ph-extent {", ".wv-ph-extent.c-portal-ground {", ".wv-ph-threshold {", ".wv-ph-door-leaf {",
   ".wv-ph-door-swing {", ".wv-scene-art-frame {", ".wv-scene-rule {", ".wv-scene-wall {", ".wv-tg-region {",
+  // the atlas's terrain lines are drawn lines too: at near the coastline's 1-unit
+  // edge was the band along every region that meets the water
+  ".wv-tg-water {", ".wv-tg-feature {", ".wv-tg-cliffs {", ".wv-tg-stepping-stone {", ".wv-tg-footbridge {", ".wv-tg-oddity {",
 ];
 
 /** the one CSS rule that starts with this selector, up to its closing brace */
@@ -46,9 +49,10 @@ test("every drawn-line class on the ground and in the room is screen-pixel ink",
 });
 
 test("the can-fail control: a rule without the property is caught by the same reader", () => {
-  // `.wv-tg-water` is deliberately left scaling (the atlas's own craft, out of
-  // this change's scope) — so the reader must be able to say so.
-  assert.doesNotMatch(ruleOf(".wv-tg-water {"), /non-scaling-stroke/);
+  // `.wv-tg-tree` has no stroke at all (`stroke:none`), so it carries no
+  // vector-effect — the reader must be able to say so, or the pins above could
+  // not fail.
+  assert.doesNotMatch(ruleOf(".wv-tg-tree {"), /non-scaling-stroke/);
 });
 
 test("a hung scene picture fills its extent (slice), never a letterbox inside its frame", () => {

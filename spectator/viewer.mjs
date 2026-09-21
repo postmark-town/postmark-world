@@ -5244,17 +5244,17 @@ const STYLE = `
 .wv-tg-rule, .wv-tg-daylight, .wv-tg-night { pointer-events:none; }
 .wv-tg-region { fill-opacity:.30; stroke-opacity:.55; stroke-width:1.4; pointer-events:none; vector-effect:non-scaling-stroke; }
 .wv-tg-water { fill:url(#wv-tg-water-grad); fill-opacity:.92; stroke:#6b7a8c; stroke-opacity:.35;
-  stroke-width:1; pointer-events:none; }
+  stroke-width:1; pointer-events:none; vector-effect:non-scaling-stroke; }
 .wv-tg-water-line { stroke:#1e3a52; stroke-opacity:.85; stroke-linecap:round; stroke-linejoin:round;
   pointer-events:none; }
 .wv-tg-feature { fill:#6b6256; fill-opacity:.8; stroke:#6b6256; stroke-opacity:.8; stroke-width:1.6;
-  pointer-events:none; }
-.wv-tg-cliffs { stroke:#8a7550; stroke-width:2.2; stroke-opacity:.9; }
+  pointer-events:none; vector-effect:non-scaling-stroke; }
+.wv-tg-cliffs { stroke:#8a7550; stroke-width:2.2; stroke-opacity:.9; vector-effect:non-scaling-stroke; }
 .wv-tg-tree { fill:#41603f; fill-opacity:.85; stroke:none; }
-.wv-tg-stepping-stone { stroke:#8a7a5e; stroke-width:1.6; stroke-dasharray:4 3.2; stroke-opacity:.75; }
-.wv-tg-footbridge { stroke:#6b6256; stroke-width:2.4; stroke-opacity:.9; }
+.wv-tg-stepping-stone { stroke:#8a7a5e; stroke-width:1.6; stroke-dasharray:4 3.2; stroke-opacity:.75; vector-effect:non-scaling-stroke; }
+.wv-tg-footbridge { stroke:#6b6256; stroke-width:2.4; stroke-opacity:.9; vector-effect:non-scaling-stroke; }
 .wv-tg-locks { fill:#54774d; fill-opacity:.7; stroke:none; }
-.wv-tg-oddity { fill:#dfe6ff; fill-opacity:.75; stroke:#6b7a8c; stroke-width:1; }
+.wv-tg-oddity { fill:#dfe6ff; fill-opacity:.75; stroke:#6b7a8c; stroke-width:1; vector-effect:non-scaling-stroke; }
 /* the atlas's own region label, to the byte: Georgia, 19px, #241c10, bold, and
    the paper-coloured stroke behind the glyphs so a name over water still reads */
 .wv-tg-region-label { font:700 19px Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif;
