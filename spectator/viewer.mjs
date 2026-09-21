@@ -1264,7 +1264,12 @@ export function sceneArtSVG(mark, px) {
   const b = px({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
   const w = (b.x - a.x).toFixed(1), h = (b.y - a.y).toFixed(1);
   return `<g class="wv-scene-mark-art" data-id="${esc(mark.id)}" pointer-events="none">`
-    + `<image href="${esc(href)}" x="${a.x.toFixed(1)}" y="${a.y.toFixed(1)}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet"/>`
+    // THE PICTURE FILLS ITS EXTENT (2026-09-20, Keemin's screenshot of a hung
+    // picture floating in a pale band inside its own frame). `meet` letterboxed
+    // the picture and left the frame's inside showing around it — the same
+    // report placedArtSVG already answered on 09-13 ("it should zoom to fill").
+    // An <image> clips to its own box, so `slice` fills the extent with no clip.
+    + `<image href="${esc(href)}" x="${a.x.toFixed(1)}" y="${a.y.toFixed(1)}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"/>`
     + `<rect x="${a.x.toFixed(1)}" y="${a.y.toFixed(1)}" width="${w}" height="${h}" fill="none" class="wv-scene-art-frame"/>`
     + `</g>`;
 }
@@ -5202,7 +5207,15 @@ const STYLE = `
    at district width, and the houses now carded inside rooms, a full block
    buried the ground it stands on. Hue still does the distinguishing (low
    saturation, per-mark); the half is so the ground reads through. */
-.wv-ph-extent { stroke-width:1.2; opacity:.5; pointer-events:none; }
+/* INK DOES NOT SCALE WITH THE CAMERA (2026-09-20, Keemin: "keep the border
+   size under control"). The viewBox is the camera, so a stroke in viewBox units
+   grows with every zoom step — measured on prod at near, scale 4.5×, a region's
+   1.4-unit edge drew 6.4 px, and near runs deeper than that. Every stroke below
+   that is a DRAWN line (a block's edge, a wash's edge, a frame, a wall, a door)
+   is now screen-pixel ink, exactly as the walkers, the highlight box and the
+   placed-art frame already were. Strokes that are physical widths on the record
+   (a centreline's w_m) are set inline and untouched. */
+.wv-ph-extent { stroke-width:1.2; opacity:.5; pointer-events:none; vector-effect:non-scaling-stroke; }
 /* A DOOR DRAWS AS A DOOR (founder, 2026-08-27). A portal-ground is a way
    through, and on a plan a way through is drawn the way an architect draws
    one: the opening's edge in the WALL's own ink rather than the block's hash
@@ -5212,13 +5225,13 @@ const STYLE = `
    the door reads as drawn on the same sheet as the walls and not stuck onto it.
    The glyph is opaque where the block is half-present: a way through is the one
    thing on the floor a reader must not have to squint for. */
-.wv-ph-extent.c-portal-ground { stroke:#c9c0ab; stroke-width:2.4; }
-.wv-ph-threshold { fill:none; stroke:#c9c0ab; stroke-width:1.1; stroke-dasharray:3 2.4; opacity:.7; }
-.wv-ph-door-leaf { fill:none; stroke:#c9c0ab; stroke-width:2.2; stroke-linecap:round; }
-.wv-ph-door-swing { fill:none; stroke:#c9c0ab; stroke-width:1.1; stroke-dasharray:2.5 2.5; opacity:.62; }
-.wv-scene-art-frame { stroke:#c9c0ab; stroke-opacity:.7; stroke-width:1.6; }
-.wv-scene-rule { fill:none; stroke:#8c8470; stroke-opacity:.28; stroke-width:1; }
-.wv-scene-wall { fill:none; stroke:#c9c0ab; stroke-opacity:.85; stroke-width:2.5; }
+.wv-ph-extent.c-portal-ground { stroke:#c9c0ab; stroke-width:2.4; vector-effect:non-scaling-stroke; }
+.wv-ph-threshold { fill:none; stroke:#c9c0ab; stroke-width:1.1; stroke-dasharray:3 2.4; opacity:.7; vector-effect:non-scaling-stroke; }
+.wv-ph-door-leaf { fill:none; stroke:#c9c0ab; stroke-width:2.2; stroke-linecap:round; vector-effect:non-scaling-stroke; }
+.wv-ph-door-swing { fill:none; stroke:#c9c0ab; stroke-width:1.1; stroke-dasharray:2.5 2.5; opacity:.62; vector-effect:non-scaling-stroke; }
+.wv-scene-art-frame { stroke:#c9c0ab; stroke-opacity:.7; stroke-width:1.6; vector-effect:non-scaling-stroke; }
+.wv-scene-rule { fill:none; stroke:#8c8470; stroke-opacity:.28; stroke-width:1; vector-effect:non-scaling-stroke; }
+.wv-scene-wall { fill:none; stroke:#c9c0ab; stroke-opacity:.85; stroke-width:2.5; vector-effect:non-scaling-stroke; }
 /* the house cards carded inside a room (2026-09-11) wear a paper-toned edge on
    the slate floor; outside, on the atlas's paper, they keep their dark one */
 .wv-minimap.is-scene-mark .ov-glyph { stroke:#c9c0ab; }
@@ -5229,7 +5242,7 @@ const STYLE = `
    every pip, extent and label above it belongs to the one overlay. */
 .wv-tg-paper { fill:#ece0c4; }
 .wv-tg-rule, .wv-tg-daylight, .wv-tg-night { pointer-events:none; }
-.wv-tg-region { fill-opacity:.30; stroke-opacity:.55; stroke-width:1.4; pointer-events:none; }
+.wv-tg-region { fill-opacity:.30; stroke-opacity:.55; stroke-width:1.4; pointer-events:none; vector-effect:non-scaling-stroke; }
 .wv-tg-water { fill:url(#wv-tg-water-grad); fill-opacity:.92; stroke:#6b7a8c; stroke-opacity:.35;
   stroke-width:1; pointer-events:none; }
 .wv-tg-water-line { stroke:#1e3a52; stroke-opacity:.85; stroke-linecap:round; stroke-linejoin:round;
