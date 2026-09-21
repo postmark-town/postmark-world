@@ -200,13 +200,28 @@ test("[pin] the far tier's act-as face asks the shelf for its copy — the same 
     "the far tier's `mine` is no longer the household test the near tier uses");
 });
 
-test("[pin] the can-fail control: the same reader, on a source with the thumb removed, says so", () => {
-  // the exact edit the flip proof makes, applied to a COPY of the source
-  const broken = SRC.replace("\n          thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null });", " });");
-  assert.notEqual(broken, SRC, "the flip's own edit no longer matches the source — the control is measuring nothing");
-  const call = frameCall(farTierDraw(broken));
-  assert.ok(call, "the reader still finds the call after the edit");
+test("[pin] the can-fail control: the same reader, over a far-tier draw that asks for nothing, says so", () => {
+  // The control does NOT derive its subject from the live source: a control
+  // that starts by editing SRC goes red the moment the pin does, which is
+  // exactly when a reader needs a second opinion about whether the INSTRUMENT
+  // still works. This is the shape before POS-163 landed, written out, and the
+  // reader is the one above — so it passes whether the source is fixed or
+  // flipped, and it is the proof the pin's predicate can return false.
+  const BEFORE = [
+    `    if (tier === "far") {`,
+    `      for (const w of drawnWalkers) {`,
+    `        const actor = isActor(w.handle);`,
+    `        const face = actor ? faceOf(w.handle) : null;`,
+    `        s += walkerFrameSVG({ at: px(w), handle: w.handle, moving: w.moving ?? (!w.arrived && !w.standing),`,
+    `          mine: isOwnHandle(w.handle), found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor,`,
+    `          art: actor ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null });`,
+    `      }`,
+    `      writeWalkLayer(paths + s, drawnWalkers);`,
+  ].join("\n");
+  const call = frameCall(farTierDraw(BEFORE));
+  assert.ok(call, "the reader cannot even find the call in the shape it is meant to judge");
   assert.doesNotMatch(call, /thumb:/, "the reader CANNOT see the absence, so the pin above could not have failed");
+  assert.doesNotMatch(call, /const mine = /, "…and it cannot see the missing hoist either");
 });
 
 test("[pin] the settle pass's copy key carries both of the far tier's answers", () => {
