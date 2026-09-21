@@ -531,12 +531,32 @@ async function bootStubOffice() {
   CLEANUP.push(() => srv.close());
   return { port };
 }
-async function openActingAs(handle) {
+// a 1×1 PNG, the same bytes at every shelf name that answers — so a face that
+// asks for a COPY gets one, and armThumbFallback never fires to hide the ask
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");
+const FACE_SHA = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+const FACE_ORIGINAL = `/shelf/near-reader/${FACE_SHA}.png`;
+const FACE_COPY_96 = `/shelf/near-reader/${FACE_SHA}-96.png`;
+
+/** `faces` hangs a shelf avatar on the act-as body; without it the rig serves
+ *  no faces and the actor is drawn as a monogram, which is what (5) reads. */
+async function openActingAs(handle, { faces = false } = {}) {
   const office = await bootStubOffice();
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.route("**/WORLD/walk-ledger.md", (route) => route.fulfill({ status: 200, contentType: "text/markdown", body: "# empty\n" }));
+  if (faces) {
+    // the door the viewer reads faces from (loadResidentsMeta), same-origin
+    await page.route("**/world-engine/residents-meta.json", (route) => route.fulfill({
+      status: 200, contentType: "application/json",
+      body: JSON.stringify({ residents: { [handle]: { name: "The Near Reader", avatar: FACE_ORIGINAL, color: "#8899aa", household: handle } } }),
+    }));
+    // BOTH names answer: the original AND its copy. A 404 on the copy would
+    // make the fallback swap the original back in and the assertion below would
+    // read a page that had asked correctly and been refused.
+    await page.route("**/shelf/**", (route) => route.fulfill({ status: 200, contentType: "image/png", body: PNG }));
+  }
   await page.addInitScript(([base, h]) => {
     try {
       localStorage.setItem("pm.office.base", base);
@@ -555,9 +575,13 @@ const readBodies = (page) => page.evaluate(() => {
   const body = (h) => {
     const g = document.querySelector(`#wv-walk-layer [data-handle="${CSS.escape(h)}"]`);
     if (!g) return null;
+    const img = g.querySelector("image.wv-walker-face");
     return {
       classes: g.getAttribute("class"),
       face: !!g.querySelector("image.wv-walker-face, .wv-walker-mono"),
+      // what the face actually ASKED the shelf for, and the original beside it
+      href: img?.getAttribute("href") ?? null,
+      orig: img?.getAttribute("data-orig") ?? null,
       halo: !!g.querySelector(".wv-walker-halo"),
       stroke: getComputedStyle(g.querySelector(".wv-walker-frame")).strokeWidth,
       colour: getComputedStyle(g.querySelector(".wv-walker-frame")).stroke,
@@ -595,5 +619,38 @@ test("(5) ON THE PAGE, at the far tier: the act-as body wears its face, is-actor
   assert.doesNotMatch(seen.stranger.classes, /\bis-mine\b|\bis-actor\b/);
   assert.equal(seen.stranger.stroke, "2px");
   assert.equal(seen.dots, 0, "one body, one marker: the drawn actor takes the dot's place (POS-93)");
+  assert.deepEqual(errors, [], "the page threw: " + errors.join(" | "));
+});
+
+// ── (5b) AND THAT FACE ASKS FOR ITS COPY (POS-163) ──────────────────────────
+//
+// (5) above reads the actor drawn as a MONOGRAM, because the local rig serves
+// no faces. This one hangs a real shelf avatar on the same body and reads what
+// the <image> asked the shelf for. POS-114 taught every other face and card to
+// ask; this one call site (the far tier's act-as draw) went on loading the
+// original at the zoom where a copy pays best.
+//
+// The box is 22 units — `walkerFrameSVG` sizes a FILLED frame at
+// `WALKER_FRAME.near` at every tier — which on this painting is at most 61.69
+// device px inside the far tier, so the answer is the 96 copy at every far-tier
+// zoom. See the measured table in thumbnails-follow-the-drawn-size.test.mjs.
+//
+// The rig answers 200 to BOTH the copy and the original on purpose: if the copy
+// 404'd, armThumbFallback would swap the original back in and a page that had
+// asked correctly would read exactly like a page that never asked.
+
+test("(5b) ON THE PAGE, at the far tier: the act-as face asks for the -96 copy and carries the original in data-orig", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  const { page, errors } = await openActingAs("near-reader", { faces: true });
+  const seen = await readBodies(page);
+  await page.close();
+  t.diagnostic(JSON.stringify(seen));
+  assert.ok(seen.viewW > 1047, "the page must open at the far tier for this to mean anything: viewBox width " + seen.viewW);
+  assert.ok(seen.actor, "the act-as body is not drawn: " + JSON.stringify(seen));
+  assert.match(seen.actor.classes, /\bis-actor\b/, "the act-as body carries is-actor");
+  assert.match(seen.actor.classes, /\bwv-walker-near\b/, "…and is FILLED at the far tier");
+  assert.ok(seen.actor.href, "the actor wears no <image> at all — the rig served no face, so this proves nothing: " + JSON.stringify(seen.actor));
+  assert.equal(seen.actor.href, FACE_COPY_96, "the far tier's one face loaded the ORIGINAL, not the copy that covers its box");
+  assert.equal(seen.actor.orig, FACE_ORIGINAL, "…and the original is not beside it for the fallback to reach");
   assert.deepEqual(errors, [], "the page threw: " + errors.join(" | "));
 });
