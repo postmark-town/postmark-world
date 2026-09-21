@@ -13625,30 +13625,30 @@ export function mountViewer(appEl) {
   const activityTown = () =>
     (onResidentPath() ? (world?.marks ? new Set(world.marks.map((m) => m.id)) : null) : byId);
   // ONE PAGE OF THE RAIL, at its own offset and under the reader's filter.
+  // LATELY READS THE RESIDENT'S READ, NOT THE SEARCH INDEX. `allMarks()` is the
+  // right painting set, but a resident's painting deliberately adds every town
+  // house and parcel so search and navigation can find them (`withTownHouses`).
+  // Those records were never in the resident read and therefore are not acts the
+  // resident's Lately pane may call "wrote". Rebuild the read-owned set from the
+  // same two sources that fill it: the apex records plus the household's own
+  // rows. A Spectator still reads the fold exactly as before.
+  function activityMarks() {
+    if (!onResidentPath()) return allMarks();
+    const standpoint = { x: state.cam.x, y: state.cam.y };
+    const read = readCache.get(residentStandpointKey(standpoint, state.handle));
+    return [...residentById(read ?? {}, mineSet.marks).values()];
+  }
   function composeActivity(page) {
+    const marks = activityMarks();
     return activityFeed({
       departures,
-      // WHO IS READING DECIDES THE SET, HERE TOO (2026-09-13). This read the
-      // fold directly -- `world?.marks ?? data?.worldState?.marks ?? []` -- and
-      // `applyWorldLayer` nulls BOTH of those on the resident path, deliberately
-      // and with its reason written above. So a signed-in reader was handed the
-      // empty array: every "wrote" row vanished while the settlement rows, which
-      // come from `settleState.recent`, stayed. That is what Keemin met on prod --
-      // Lately showing settlements and no residents -- and it is why the pane
-      // flashes the full list on boot and then empties, as the read lands.
-      //
-      // `allMarks()` IS that law already: the resident's own records on their
-      // path, the fold's marks on a spectator's. This line was the one place in
-      // the function that went round it -- `names`, two lines down, has always
-      // asked correctly. Nothing new is fetched and the spectator's pane is
-      // byte-for-byte what it was.
-      marks: allMarks(),
+      marks,
       // Both lanes are optional by construction: a source that never answered
       // contributes nothing and the feed is exactly what it was before. One
       // quiet lane must never be able to empty the whole rail.
       stakes: stakeEvents,
       blessings: settleState.recent,
-      names: new Map((allMarks()).map((m) => [m.id, markName(m).name])),
+      names: new Map(marks.map((m) => [m.id, markName(m).name])),
       kinds: activityKind ? [activityKind] : null,
       limit: ACTIVITY_PAGE,
       offset: page * ACTIVITY_PAGE,
