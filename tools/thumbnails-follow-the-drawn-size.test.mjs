@@ -33,6 +33,8 @@ import {
 } from "../spectator/viewer.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// the viewer as TEXT, for the call-site pins at the bottom (POS-163)
+const SRC = readFileSync(join(ROOT, "spectator", "viewer.mjs"), "utf8");
 const SHA = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 const SHELF = `/shelf/AionSolare/${SHA}.jpg`;
 const HOST = `https://media.postmark.town/media/Ra-Valentine/${SHA}.png`;
@@ -146,6 +148,100 @@ test("no thumb, or a face that is not on the shelf, renders exactly what it did 
   const orig = imageTag(overlayHomeCardSVG({ at: { x: 1, y: 2 }, id: "p", image: SHELF, thumb: null }));
   assert.equal(attr(orig, "href"), SHELF);
   assert.equal(attr(orig, "data-orig"), null);
+});
+
+// ── EVERY FACE THE MAP DRAWS ASKS, THE FAR TIER INCLUDED (POS-163) ──────────
+//
+// POS-114 taught every face and card to ask the shelf for the copy that covers
+// its drawn box. One call site did not get the lesson: the FAR tier's act-as
+// body (a69e47fc, "the body you are acting as — its face at every tier"), which
+// is the single face drawn at town width and went to the ORIGINAL.
+//
+// The box is FACE_UNITS — 22 units, `WALKER_FRAME.near` — and not the far
+// tier's 14: `walkerFrameSVG` sizes a FILLED frame at `WALKER_FRAME.near`
+// whatever the tier, and the actor is the one body drawn filled there. Measured
+// on this town's painting (1,715 painting units at 5 m per unit = 8,575 m
+// across) on a 1,360 px pane: the far tier is `zoomK` under 1.715, and its
+// widest face box is 22.85 px at 1× and 61.69 px at 2× with your own accent.
+// The 96 copy at every far-tier zoom, at both pixel ratios, yours or not.
+//
+// Source-shape, so it carries the "[pin] " prefix the 2026-09-14 ruling gives a
+// test that reads a source file as text (suite.yml: text gates the pull
+// request, behaviour gates the candle). The render-side receipt is the page
+// assertion in walk-layer-once.test.mjs § (5).
+
+/** the far tier's draw, from its own `if` to the write that ends it */
+function farTierDraw(src = SRC) {
+  const i = src.indexOf(`    if (tier === "far") {`);
+  assert.ok(i >= 0, "the far-tier branch of drawWalkers is not where this reader looks for it");
+  const j = src.indexOf("writeWalkLayer(paths + s, drawnWalkers);", i);
+  assert.ok(j > i, "the far-tier branch no longer ends at its own writeWalkLayer");
+  return src.slice(i, j);
+}
+/** the one walkerFrameSVG call inside a draw, whole */
+function frameCall(block) {
+  const i = block.indexOf("walkerFrameSVG({");
+  if (i < 0) return null;
+  const j = block.indexOf("});", i);
+  return j > i ? block.slice(i, j + 3) : null;
+}
+
+test("[pin] the far tier's act-as face asks the shelf for its copy — the same expression the near tier spells", () => {
+  const call = frameCall(farTierDraw());
+  assert.ok(call, "the far tier draws no walkerFrameSVG at all any more");
+  assert.match(call, /thumb: face\?\.avatar \? thumbFor\(FACE_UNITS, mine\) : null/,
+    "the far tier's face draws from the ORIGINAL — it passes no `thumb`:\n" + call);
+  // the near tier spells the same thing, so the two cannot drift apart
+  assert.match(SRC, /thumb: face\.avatar \? thumbFor\(FACE_UNITS, mine\) : null/,
+    "the near tier's face no longer asks with FACE_UNITS — the far tier above is now copying a thing that moved");
+  // `mine` is the household accent, because the accent is what scales the box
+  assert.match(call, /\bmine\b/, "the far call passes no `mine`, so the accent and the copy can disagree:\n" + call);
+  assert.match(farTierDraw(), /const mine = isOwnHandle\(w\.handle\);/,
+    "the far tier's `mine` is no longer the household test the near tier uses");
+});
+
+test("[pin] the can-fail control: the same reader, on a source with the thumb removed, says so", () => {
+  // the exact edit the flip proof makes, applied to a COPY of the source
+  const broken = SRC.replace("\n          thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null });", " });");
+  assert.notEqual(broken, SRC, "the flip's own edit no longer matches the source — the control is measuring nothing");
+  const call = frameCall(farTierDraw(broken));
+  assert.ok(call, "the reader still finds the call after the edit");
+  assert.doesNotMatch(call, /thumb:/, "the reader CANNOT see the absence, so the pin above could not have failed");
+});
+
+test("[pin] the settle pass's copy key carries both of the far tier's answers", () => {
+  // drawWalkers is rebuilt when thumbClassKey() moves, and the far tier's actor
+  // asks thumbFor(FACE_UNITS, mine) with `mine` either way — both are in the key,
+  // so a zoom that walks the far-tier face across a copy's edge is a rebuild.
+  assert.match(SRC, /const thumbClassKey = \(\) => \[thumbFor\(FACE_UNITS\), thumbFor\(FACE_UNITS, true\), thumbFor\(CARD_UNITS\), thumbFor\(CARD_UNITS, true\)\]\.join\("\/"\);/,
+    "the copy key no longer holds both FACE_UNITS answers — the far tier's face can cross a copy's edge without a redraw");
+  assert.match(SRC, /thumbClassKey\(\) !== drawnAt\.thumbs/, "the settle pass no longer compares the copy key at all");
+  // and the far tier's faces live on the walk layer, which is where the
+  // fallback for a copy the shelf lacks is armed
+  assert.match(SRC, /armThumbFallback\(walkLayer\);/, "nothing arms the fallback on the layer the far-tier face is drawn into");
+});
+
+test("[pin] the far tier's copy, measured: 96 at every far-tier zoom, 1× and 2×, yours or not", () => {
+  // the far tier is `across > 5000 m` on an 8,575 m painting: zoomK < 1.715.
+  // the box GROWS as k grows, so the far tier's widest face is at its own edge.
+  const PAINTING_UNITS = 1715, M_PER_UNIT = 5, PANE = 1360;
+  const kFarEdge = (PAINTING_UNITS * M_PER_UNIT) / 5000;
+  const copyAt = (k, dpr, mine) => {
+    const px = glyphScreenPx(WALKER_FRAME.near, { zoomK: k, viewW: PAINTING_UNITS / k, panePx: PANE, dpr, mine });
+    return { px, size: thumbSizeFor({ w: px, h: px }) };
+  };
+  for (const k of [0.05, 0.5, 1, kFarEdge * 0.999999]) {
+    for (const dpr of [1, 2]) for (const mine of [false, true]) {
+      const { px, size } = copyAt(k, dpr, mine);
+      assert.equal(size, 96, `the far tier at k=${k}, dpr=${dpr}, mine=${mine} draws ${px.toFixed(2)} px and asked for ${size}`);
+    }
+  }
+  const widest = copyAt(kFarEdge * 0.999999, 2, true);
+  assert.ok(widest.px < 96, `the far tier's widest face is ${widest.px.toFixed(2)} px — past 96 it would want the 256 copy and this pin is stale`);
+  // and the control: the NEAR tier does cross into the 256, which is why the
+  // two tiers' calls are the same expression and not the same constant
+  const near = glyphScreenPx(WALKER_FRAME.near, { zoomK: 15, viewW: PAINTING_UNITS / 15, panePx: PANE, dpr: 2, mine: true });
+  assert.equal(thumbSizeFor({ w: near, h: near }), 256, "a near-tier face at 2× with your accent is past the 96 copy");
 });
 
 // ── the fallback, once ───────────────────────────────────────────────────────

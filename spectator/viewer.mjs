@@ -10200,9 +10200,22 @@ export function mountViewer(appEl) {
       for (const w of drawnWalkers) {
         const actor = isActor(w.handle);
         const face = actor ? faceOf(w.handle) : null;
+        const mine = isOwnHandle(w.handle);
+        // AND IT ASKS FOR ITS COPY HERE TOO (#2940 / POS-163). This is the one
+        // face drawn at the far tier, and it went to the ORIGINAL while every
+        // other face and card on the map asked the shelf for the copy that
+        // covers its box. The box is FACE_UNITS, not WALKER_FRAME.far: the
+        // actor is drawn filled, and walkerFrameSVG sizes a filled frame at
+        // WALKER_FRAME.near at every tier. Measured on this town's painting
+        // (1,715 units, 5 m per unit → 8,575 m across) on a 1,360 px pane: the
+        // far tier is k < 1.715, and its widest face box is 22.85 px at 1× and
+        // 61.69 px at 2× with your own accent — the 96 copy at every far-tier
+        // zoom, at both ratios, yours or not. `mine` is the same household test
+        // the frame's accent reads, because the accent is what scales the box.
         s += walkerFrameSVG({ at: px(w), handle: w.handle, moving: w.moving ?? (!w.arrived && !w.standing),
-          mine: isOwnHandle(w.handle), found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor,
-          art: actor ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null });
+          mine, found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor,
+          art: actor ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null,
+          thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null });
       }
       writeWalkLayer(paths + s, drawnWalkers);
       return;
