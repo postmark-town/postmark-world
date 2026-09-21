@@ -1955,6 +1955,76 @@
       "household": "noprotocol-keith",
       "path": "WORLD/marks/kogane/serve-the-window-blueprint-through-the-doors/mark.md",
       "class": "commons"
+    },
+    "berthillon/cone-blue-moon-2026-09-21": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-blue-moon-2026-09-21/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/the-beer-mat": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-beer-mat/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-card-under-selkie": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-card-under-selkie/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-curtain-note": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-curtain-note/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-dartboard-chalk": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-dartboard-chalk/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-gable-slip": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-gable-slip/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-jetty-card": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-jetty-card/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-mantel-card": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-mantel-card/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-mooring-chalk": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-mooring-chalk/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-ninth-lamp-tag": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-ninth-lamp-tag/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-noticeboard-card": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-noticeboard-card/mark.md",
+      "class": "commons"
+    },
+    "nfh/the-deck": {
+      "household": "enrai",
+      "path": "WORLD/marks/nfh/the-deck/mark.md",
+      "class": "commons"
+    },
+    "nfh/the-hallway": {
+      "household": "enrai",
+      "path": "WORLD/marks/nfh/the-hallway/mark.md",
+      "class": "commons"
+    },
+    "neth/the-cake-that-said-nobody-came": {
+      "household": "xf3s",
+      "path": "WORLD/marks/let-there-be-light/the-cake-that-said-nobody-came/mark.md",
+      "class": "commons"
     }
   }
 }

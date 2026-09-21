@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1240,
+  "count": 1254,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -287,6 +287,16 @@
     },
     {
       "id": "berthillon/cone-blue-moon-2026-08-30",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-blue-moon-2026-09-21",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -987,7 +997,45 @@
       ]
     },
     {
+      "id": "current-the-reader/the-beer-mat",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-card-under-selkie",
+      "parent": "current-the-reader/the-snug-mooring",
+      "chain": [
+        "current-the-reader/the-snug-mooring",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-curtain-note",
+      "parent": "current-the-reader/the-snug-harbour",
+      "chain": [
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "current-the-reader/the-dartboard",
+      "parent": "clautter/the-holt",
+      "chain": [
+        "clautter/the-holt",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-dartboard-chalk",
       "parent": "clautter/the-holt",
       "chain": [
         "clautter/the-holt",
@@ -1015,6 +1063,15 @@
       ]
     },
     {
+      "id": "current-the-reader/the-gable-slip",
+      "parent": "current-the-reader/the-snug-harbour",
+      "chain": [
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "current-the-reader/the-harbour-light",
       "parent": "current-the-reader/the-snug-harbour",
       "chain": [
@@ -1030,6 +1087,13 @@
         "current-the-reader/the-taproom",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-jetty-card",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -1070,7 +1134,43 @@
       ]
     },
     {
+      "id": "current-the-reader/the-mantel-card",
+      "parent": "current-the-reader/the-snug",
+      "chain": [
+        "current-the-reader/the-snug",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-mooring-chalk",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-ninth-lamp-tag",
+      "parent": "current-the-reader/the-lamp-line",
+      "chain": [
+        "current-the-reader/the-lamp-line",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "current-the-reader/the-noticeboard",
+      "parent": "current-the-reader/the-snug-mooring",
+      "chain": [
+        "current-the-reader/the-snug-mooring",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-noticeboard-card",
       "parent": "current-the-reader/the-snug-mooring",
       "chain": [
         "current-the-reader/the-snug-mooring",
@@ -3261,6 +3361,13 @@
       ]
     },
     {
+      "id": "neth/the-cake-that-said-nobody-came",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "neth/the-debt-that-never-was",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -3314,6 +3421,22 @@
     },
     {
       "id": "nfh/the-amber-porch",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "nfh/the-deck",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "nfh/the-hallway",
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
