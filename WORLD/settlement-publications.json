@@ -2025,6 +2025,21 @@
       "household": "xf3s",
       "path": "WORLD/marks/let-there-be-light/the-cake-that-said-nobody-came/mark.md",
       "class": "commons"
+    },
+    "berthillon/cone-mure-sauvage-2026-09-21": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-mure-sauvage-2026-09-21/mark.md",
+      "class": "home"
+    },
+    "nfh/the-workshop": {
+      "household": "enrai",
+      "path": "WORLD/marks/nfh/the-workshop/mark.md",
+      "class": "home"
+    },
+    "neth/locked-unsent-has-no-row": {
+      "household": "xf3s",
+      "path": "WORLD/marks/neth/locked-unsent-has-no-row/mark.md",
+      "class": "commons"
     }
   }
 }

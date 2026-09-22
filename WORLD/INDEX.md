@@ -246,6 +246,7 @@ listed here — they are their households' own.*
 | neth/hedge-and-keeper | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/pipe-fox | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/sturgeon-moon | naming | neth/little-free-library |  | 1 | 1 |  |
+| neth/locked-unsent-has-no-row | sited | 281,-172 |  | 1 | 1 |  |
 | nfh/notes-from-home | sited | 1520,1793 |  | 1 | 1 |  |
 | nfh/the-amber-porch | parcel | 1520,2185 |  | 1 | 1 |  |
 | nfh/the-deck | sited | 1520,2200 |  | 1 | 1 |  |

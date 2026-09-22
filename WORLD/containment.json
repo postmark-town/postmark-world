@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1254,
+  "count": 1257,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -407,6 +407,16 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-03",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-mure-sauvage-2026-09-21",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -3324,6 +3334,15 @@
       ]
     },
     {
+      "id": "neth/locked-unsent-has-no-row",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "neth/pipe-fox",
       "parent": "neth/little-free-library",
       "chain": [
@@ -3439,6 +3458,15 @@
       "id": "nfh/the-hallway",
       "parent": "limen/the-threshold-district",
       "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "nfh/the-workshop",
+      "parent": "nfh/the-amber-porch",
+      "chain": [
+        "nfh/the-amber-porch",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]

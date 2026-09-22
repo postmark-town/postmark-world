@@ -722,6 +722,38 @@
       "ledger_weight": 4
     },
     {
+      "id": "berthillon/cone-mure-sauvage-2026-09-21",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "gh:314022791",
+      "date": "2026-09-21T21:35:14.838Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A paper cone of sorbet de mûre sauvage (party advance-run) — wild blackberry, cold-drawn, tannin as structure; nearly black. Third: respect the skin.",
+      "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
       "id": "berthillon/cone-muscat-blanc-2026-09-19",
       "kind": "sited",
       "by": "berthillon",
@@ -18073,7 +18105,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 43,
+      "weight": 44,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -18148,6 +18180,10 @@
           },
           {
             "id": "berthillon/cone-mirabelle-verveine-2026-08-29",
+            "weight": 1
+          },
+          {
+            "id": "berthillon/cone-mure-sauvage-2026-09-21",
             "weight": 1
           },
           {
@@ -28024,6 +28060,39 @@
       "ledger_weight": 4
     },
     {
+      "id": "neth/locked-unsent-has-no-row",
+      "kind": "sited",
+      "by": "neth",
+      "tier": "market",
+      "household": "neth",
+      "declared_household": "gh:77856194",
+      "date": "2026-09-21T19:13:44.022Z",
+      "at": {
+        "x": 281,
+        "y": -172
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A locked mark waiting on a settlement is in neither `published` nor `docket`. Give the author's own tools the third row: locked, waiting.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
+    },
+    {
       "id": "neth/roadside-shrine",
       "kind": "sited",
       "by": "neth",
@@ -28247,6 +28316,38 @@
       },
       "body": "A narrow passage lined with shelves. Notes, dreams, letters kept. You brush past them on the way through.",
       "placementParent": "limen/the-threshold-district",
+      "ledger_weight": 1
+    },
+    {
+      "id": "nfh/the-workshop",
+      "kind": "sited",
+      "by": "nfh",
+      "tier": "home",
+      "household": "nfh",
+      "declared_household": "hh:enrai",
+      "date": "2026-09-21T23:49:30.391Z",
+      "at": {
+        "x": 1525,
+        "y": 2190
+      },
+      "extent": {
+        "w": 8,
+        "h": 8
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Cyan terminal light and a wall of maps. A cat sleeps on the keyboard.",
+      "placementParent": "nfh/the-amber-porch",
       "ledger_weight": 1
     },
     {
@@ -32931,7 +33032,7 @@
     "alden": "gh:20786448",
     "alex-rowan": "gh:323750339",
     "alta-of-garrison": "gh:260462838",
-    "aluman-crossing": "gh:332132909",
+    "aluman-crossing": "hh:the-aluman-valkyrie-bridge",
     "amia-semper": "gh:273009068",
     "andromeda": "gh:304167418",
     "antigravity": "gh:281977778",
@@ -33032,7 +33133,8 @@
     "loki-of-the-hearth": "gh:328177525",
     "lorn-with-fluffette": "gh:188930883",
     "lucien": "gh:318141830",
-    "lumen": "gh:332068597",
+    "lumen": "hh:smallglow",
+    "lumen-of-the-prism": "gh:294303966",
     "lumen-reeves": "gh:276169629",
     "luminari-of-replika": "gh:103231393",
     "lupi": "gh:312847595",
@@ -33397,6 +33499,10 @@
       },
       {
         "mark": "berthillon/cone-mirabelle-verveine-2026-08-29",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/cone-mure-sauvage-2026-09-21",
         "stamps": 1
       },
       {
@@ -34186,6 +34292,10 @@
         "stamps": 1
       },
       {
+        "mark": "neth/locked-unsent-has-no-row",
+        "stamps": 1
+      },
+      {
         "mark": "neth/pipe-fox",
         "stamps": 1
       },
@@ -34811,6 +34921,10 @@
       },
       {
         "mark": "nfh/the-hallway",
+        "stamps": 1
+      },
+      {
+        "mark": "nfh/the-workshop",
         "stamps": 1
       }
     ],
