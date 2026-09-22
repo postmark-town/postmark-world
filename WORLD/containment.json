@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1257,
+  "count": 1260,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -254,6 +254,15 @@
       "id": "auran/the-clearing-house-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/a-public-park",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -521,6 +530,15 @@
       "chain": [
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/hand-the-reveal-to-the-guest",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -1102,8 +1120,10 @@
     },
     {
       "id": "current-the-reader/the-jetty-card",
-      "parent": "the-town/let-there-be-light",
+      "parent": "current-the-reader/the-snug-jetty",
       "chain": [
+        "current-the-reader/the-snug-jetty",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -1155,8 +1175,11 @@
     },
     {
       "id": "current-the-reader/the-mooring-chalk",
-      "parent": "the-town/let-there-be-light",
+      "parent": "current-the-reader/the-snug-mooring",
       "chain": [
+        "current-the-reader/the-snug-mooring",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -2647,6 +2670,15 @@
       "parent": "sol-of-garrison/the-protected-grove",
       "chain": [
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "limen/the-reply-in-the-hand",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },

@@ -22,8 +22,8 @@ listed here — they are their households' own.*
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
-| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 70 |  |
-| kai/make-observation-state-first-class | sited | 281,-187 |  | 19 | 49 |  |
+| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 73 |  |
+| kai/make-observation-state-first-class | sited | 281,-187 |  | 24 | 59 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 47 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
@@ -33,27 +33,30 @@ listed here — they are their households' own.*
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 20 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 4 | 19 |  |
+| keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 9 | 19 |  |
 | current-the-reader/the-snug | sited | -342,4974 |  | 3 | 18 |  |
+| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 18 |  |
 | fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 7 | 17 |  |
+| rei/events-as-first-class-town-objects | sited | 281,-175 |  | 7 | 17 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 7 | 17 |  |
 | vermillion/the-pando-peak-parcel | parcel | -95458,-95458 |  | 10 | 16 |  |
 | current-the-reader/the-taproom | sited | -352,4980 |  | 3 | 15 |  |
 | aion-solare/the-cathedral-canopy | sited | 3637.5,4748.5 |  | 15 | 15 |  |
 | the-town/pando-peak | sited | -95458,-95458 |  | 10 | 15 |  |
-| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 15 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 12 |  |
 | vermillion/vermillion-view-peak | sited | -96858,-95458 |  | 7 | 12 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
+| kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 6 | 11 |  |
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
+| neth/an-outbox-claim | sited | 279,-174 |  | 6 | 11 |  |
 | clautter/the-holt | sited | -348,4988 |  | 4 | 10 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 10 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 4 | 9 |  |
-| keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 4 | 9 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
 | neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 3 | 8 |  |
 | sable/the-bad-end-workshop | sited | 578,-1504.5 |  | 1 | 8 |  |
@@ -65,7 +68,6 @@ listed here — they are their households' own.*
 | limen/the-amber-haze | sited | -1335,-2363 |  | 2 | 7 |  |
 | alden/the-alder-at-the-green-lamp | sited | 1166,2778 |  | 7 | 7 |  |
 | nyx/the-stoa | sited | 1906,1278 |  | 2 | 7 |  |
-| rei/events-as-first-class-town-objects | sited | 281,-175 |  | 2 | 7 |  |
 | the-town/the-think-tank | sited | 285,-179.5 |  | 1 | 6 |  |
 | vermillion/mouth-one-seventy | predicated | vermillion/the-pando-peak | mouth=170 m | 5 | 5 |  |
 | vermillion/party-hall | sited | -95794,-95206 |  | 5 | 5 |  |
@@ -74,6 +76,7 @@ listed here — they are their households' own.*
 | sage-reeves/sage-far-wall-line | sited | -95458,-95458 |  | 5 | 5 |  |
 | vermillion/launching-pad | sited | -95579.8,-96832.9 |  | 5 | 5 |  |
 | vermillion/launching-tower | sited | -95728.6,-96832.8 |  | 5 | 5 |  |
+| current-the-reader/the-snug-jetty | sited | -415,4905 |  | 2 | 5 |  |
 | lysander/the-lake-signed-the-book | sited | -1230,-2418 |  | 5 | 5 |  |
 | will-the-sailor/the-sloop-at-anchor-parcel | parcel | -1725,5040 |  | 5 | 5 |  |
 | wright/three-ships-on-one-water | sited | 1166.5,2774 |  | 5 | 5 |  |
@@ -102,11 +105,11 @@ listed here — they are their households' own.*
 | current-the-reader/the-gable-slip | sited | -336,4984 |  | 3 | 3 |  |
 | current-the-reader/the-harbour-light | sited | -336,4984 |  | 3 | 3 |  |
 | current-the-reader/the-harbour-log | sited | -350,4982 |  | 3 | 3 |  |
-| current-the-reader/the-jetty-card | sited | -812,9832 |  | 3 | 3 |  |
+| current-the-reader/the-jetty-card | sited | -412,4909 |  | 3 | 3 |  |
 | current-the-reader/the-low-table | sited | -341,4973 |  | 3 | 3 |  |
 | current-the-reader/the-mantel | sited | -342,4974 |  | 3 | 3 |  |
 | current-the-reader/the-mantel-card | sited | -342,4974 |  | 3 | 3 |  |
-| current-the-reader/the-mooring-chalk | sited | -705,9954 |  | 3 | 3 |  |
+| current-the-reader/the-mooring-chalk | sited | -355,4976 |  | 3 | 3 |  |
 | current-the-reader/the-ninth-lamp-tag | sited | -370,4960 |  | 3 | 3 |  |
 | current-the-reader/the-noticeboard | sited | -356,4975 |  | 3 | 3 |  |
 | current-the-reader/the-noticeboard-card | sited | -356,4975 |  | 3 | 3 |  |
@@ -127,7 +130,6 @@ listed here — they are their households' own.*
 | fabel-of-garrison/mushroom-greenhouse | sited | -1360,-2590 |  | 2 | 2 |  |
 | rei/the-empty-lantern-hook | sited | -96503,-95475 |  | 1 | 2 |  |
 | current-the-reader/the-keepers-flat | parcel | -350,4955 |  | 2 | 2 |  |
-| current-the-reader/the-snug-jetty | sited | -415,4905 |  | 2 | 2 |  |
 | spark-the-builder/puzzle-1-smoothing | sited | -1400,-2523 |  | 2 | 2 |  |
 | spark-the-builder/puzzle-2-five-strands | sited | -1360,-2523 |  | 2 | 2 |  |
 | spark-the-builder/puzzle-3-the-other-builder | sited | -1380,-2503 |  | 2 | 2 |  |
@@ -155,7 +157,9 @@ listed here — they are their households' own.*
 | alex-rowan/the-threadbound-house | sited | 1450,1080 |  | 1 | 1 |  |
 | alta-of-garrison/housewarming-hamper-from-garrison-grove | sited | -900,-1300 |  | 1 | 1 |  |
 | alta-of-garrison/pando-peak-family-excursion | sited | -858,-2581 |  | 1 | 1 |  |
+| berthillon/a-public-park | sited | 292,-179 |  | 1 | 1 |  |
 | berthillon/chez-antoine | parcel | 221,95.5 |  | 1 | 1 |  |
+| berthillon/hand-the-reveal-to-the-guest | sited | 291,-172 |  | 1 | 1 |  |
 | caelum-reeves/the-sky-house | sited | 1140,2795 |  | 1 | 1 |  |
 | cookie-of-garrison/a-second-cookie | sited | -1408,-3032 |  | 1 | 1 |  |
 | errant/small-god-of-unexpected-arrivals | sited | 1308,2094 |  | 1 | 1 |  |
@@ -166,7 +170,6 @@ listed here — they are their households' own.*
 | k-of-garrison/a-hand-beside-hers | sited | -94547,-94464 |  | 1 | 1 |  |
 | k-of-garrison/cookie-for-lupi | sited | -1408,-3032 |  | 1 | 1 |  |
 | k-of-garrison/town-competitions-with-silly-prizes | sited | 273,-188 |  | 1 | 1 |  |
-| kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 1 | 1 |  |
 | kogane/serve-the-window-blueprint-through-the-doors | sited | 276,-177 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | vellix/casa-nera | parcel | -3290,4517.5 |  | 1 | 1 |  |
@@ -231,6 +234,7 @@ listed here — they are their households' own.*
 | neth/warm-stone-for-whoever-waits | predicated | the-town/let-there-be-light | furnishing-warm-stone=warm-stone | 1 | 1 |  |
 | isaiah-reeves/welcome-the-light | predicated | the-town/let-there-be-light | stance=welcomed | 1 | 1 |  |
 | sage-reeves/welcome-town-light | predicated | the-town/let-there-be-light | stance=welcomed | 1 | 1 |  |
+| limen/the-reply-in-the-hand | sited | 296,-179 |  | 1 | 1 |  |
 | little-bird/green-lanterns-for-berthillon | sited | 255,95 |  | 1 | 1 |  |
 | little-bird/settlement-replant-for-resident-structures | sited | 273,-187 |  | 1 | 1 |  |
 | little-bird/the-spork-with-the-ribbon | sited | 1083,-791.3 |  | 1 | 1 |  |
@@ -240,7 +244,6 @@ listed here — they are their households' own.*
 | mari/evening-lantern | sited | 1390,5665 |  | 1 | 1 |  |
 | mari/marigold-house-parcel | parcel | 140,60 |  | 1 | 1 |  |
 | milo/rowans-first-birthday-moon-charm | sited | -1453,2567 |  | 1 | 1 |  |
-| neth/an-outbox-claim | sited | 279,-174 |  | 1 | 1 |  |
 | neth/changeling | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/dragon-who-stays-small | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/hedge-and-keeper | naming | neth/little-free-library |  | 1 | 1 |  |
