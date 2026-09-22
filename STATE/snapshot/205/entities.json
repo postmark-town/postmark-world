@@ -1,6 +1,6 @@
 {
-  "crossing": 204,
-  "evaluated_at": "2026-09-22T00:00:00.000Z",
+  "crossing": 205,
+  "evaluated_at": "2026-09-22T12:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "1e382e2b35f9b49e99881e6907154c533caf6b81",
   "omits": [
@@ -551,26 +551,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": 96,
-      "y": 190,
+      "x": 126,
+      "y": 28,
       "arrived": true,
       "standing": false,
-      "leg_m": 75,
-      "travelled_m": 75,
+      "leg_m": 118,
+      "travelled_m": 118,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T21:22:25.024Z",
+        "iso": "2026-09-22T11:22:22.788Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 161,
-          "y": 153
+          "x": 59,
+          "y": 125
         },
         "toward": {
-          "x": 96,
-          "y": 190
+          "x": 126,
+          "y": 28
         },
-        "at": 203.78110694444445,
+        "at": 204.94772377314814,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1145,28 +1145,28 @@
     },
     {
       "handle": "jack-tully-brannon",
-      "x": -358,
-      "y": 4972,
+      "x": -350,
+      "y": 4978,
       "arrived": true,
       "standing": false,
-      "leg_m": 2549,
-      "travelled_m": 2549,
+      "leg_m": 10,
+      "travelled_m": 10,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T00:15:09.643Z",
+        "iso": "2026-09-22T00:37:56.268Z",
         "handle": "jack-tully-brannon",
         "from": {
-          "x": -1375,
-          "y": 2635
-        },
-        "toward": {
           "x": -358,
           "y": 4972
         },
-        "at": 202.02101858796297,
+        "toward": {
+          "x": -350,
+          "y": 4978
+        },
+        "at": 204.0526737962963,
         "within": null,
-        "to": "current-the-reader/the-snug-mooring",
+        "to": "current-the-reader/the-snug-harbour",
         "pace": 60,
         "line_no": null
       }
@@ -1767,31 +1767,31 @@
     },
     {
       "handle": "neth",
-      "x": 1306,
-      "y": 2093.5,
+      "x": 1341.1,
+      "y": 2070.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 25,
-      "travelled_m": 25,
+      "leg_m": 326,
+      "travelled_m": 326,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T19:06:46.180Z",
+        "iso": "2026-09-22T03:32:55.085Z",
         "handle": "neth",
         "from": {
-          "x": 1329,
-          "y": 2083
+          "x": 1518,
+          "y": 1797
         },
         "toward": {
-          "x": 1305,
-          "y": 2094
+          "x": 1333,
+          "y": 2083
         },
-        "at": 203.59271416666667,
+        "at": 204.29570002314816,
         "within": {
-          "w": 2,
-          "h": 2
+          "w": 25,
+          "h": 25
         },
-        "to": "neth/roadside-shrine",
+        "to": "neth/hedgerow-cottage",
         "pace": 60,
         "line_no": null
       }
@@ -2395,31 +2395,28 @@
     },
     {
       "handle": "sophia-familiaris",
-      "x": 155,
-      "y": 66.6,
+      "x": -1395,
+      "y": -2730,
       "arrived": true,
       "standing": false,
-      "leg_m": 72,
-      "travelled_m": 72,
+      "leg_m": 458,
+      "travelled_m": 458,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T17:34:51.090Z",
+        "iso": "2026-09-22T11:32:48.867Z",
         "handle": "sophia-familiaris",
         "from": {
-          "x": 221,
-          "y": 95.5
+          "x": -1480,
+          "y": -2280
         },
         "toward": {
-          "x": 140,
-          "y": 60
+          "x": -1395,
+          "y": -2730
         },
-        "at": 203.46503831018518,
-        "within": {
-          "w": 30,
-          "h": 24
-        },
-        "to": "mari/marigold-house",
+        "at": 204.96222351851853,
+        "within": null,
+        "to": "fabel-of-garrison/garrison-bridge",
         "pace": 60,
         "line_no": null
       }
