@@ -10,13 +10,15 @@ import { readFileSync } from "node:fs";
 import {
   OVERLAY_PIP_R, HOME_CARD, homeCardPath, markerScale,
   overlayHomeCardSVG, homeMarkOfParcel, houseIsLit, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
-  sceneArtSVG,
+  sceneArtSVG, parcelLeadImage, markImagePath,
 } from "../spectator/viewer.mjs";
 
 const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
 
 const PARCEL = { id: "jack/the-lantern-parcel", kind: "parcel", household: "jack", at: { x: 100, y: 200 }, extent: { w: 25, h: 25 } };
-const HOME = { id: "jack/the-lantern", kind: "sited", tier: "home", placementParent: PARCEL.id, at: { x: 100, y: 200 }, extent: { w: 12, h: 12 }, image: "https://media.postmark.town/media/jack/abc.jpg" };
+// `by` as every published fold row carries it — the dwelling rule reads the
+// holder's own marks (POS-200)
+const HOME = { id: "jack/the-lantern", kind: "sited", by: "jack", tier: "home", placementParent: PARCEL.id, at: { x: 100, y: 200 }, extent: { w: 12, h: 12 }, image: "https://media.postmark.town/media/jack/abc.jpg" };
 
 test("a card is the picture in a house-shaped frame with the name under it, anchored by the transparent pip", () => {
   const svg = overlayHomeCardSVG({ at: { x: 10, y: -20 }, id: PARCEL.id, label: "jack", image: "/shelf/jack/abc.jpg", classes: "t-home" });
@@ -90,12 +92,31 @@ test("identical inputs give identical markup at any camera", () => {
   assert.match(a, /class="ov-home lit"/);
 });
 
-test("the card's picture is the HOME sited on the parcel, preferring one with a picture", () => {
-  const bare = { ...HOME, id: "jack/the-shed", image: undefined };
-  assert.equal(homeMarkOfParcel(PARCEL.id, [bare, HOME]), HOME);
-  assert.equal(homeMarkOfParcel(PARCEL.id, [bare]), bare, "a home with no picture still names the card");
-  assert.equal(homeMarkOfParcel(PARCEL.id, [{ ...HOME, tier: "market" }]), null, "a market mark on the parcel is not the dwelling");
-  assert.equal(homeMarkOfParcel("nobody/nowhere", [HOME]), null);
+// SUPERSEDES "the card's picture is the HOME sited on the parcel, preferring
+// one with a picture" (2026-09-11), which asserted the preference itself:
+// `homeMarkOfParcel(PARCEL.id, [bare, HOME]) === HOME`. That preference is how
+// rei's house wore the garden tin's photograph (POS-200); the dwelling is now
+// the record's own answer (tools/dwelling.mjs), and the picture follows it.
+test("the card's picture is the RECORD's dwelling — the parcel's own child at its centre — never the first pictured child (POS-200)", () => {
+  const tin = { ...HOME, id: "jack/the-tin", at: { x: 101, y: 188 }, extent: { w: 0.4, h: 0.3 }, image: "https://media.postmark.town/media/jack/tin.jpg" };
+  assert.equal(homeMarkOfParcel(PARCEL.id, [PARCEL, tin, HOME]), HOME, "the house at the centre, though the pictured tin is listed first");
+  const bare = { ...HOME, image: undefined };
+  assert.equal(homeMarkOfParcel(PARCEL.id, [PARCEL, tin, bare]), bare, "a dwelling with no picture is still the dwelling");
+  assert.equal(homeMarkOfParcel(PARCEL.id, [PARCEL, { ...tin, at: { x: 90, y: 190 } }, { ...HOME, at: { x: 110, y: 210 } }]), null,
+    "two children, neither at the centre: the record cannot single one out, and the page does not guess");
+  assert.equal(homeMarkOfParcel("nobody/nowhere", [PARCEL, HOME]), null);
+});
+
+test("[pin] the column's lead is parcelLeadImage — the dwelling's picture, else the ground's, else none (POS-200)", () => {
+  const pictured = { ...PARCEL, image: "https://media.postmark.town/media/jack/ground.jpg" };
+  assert.equal(parcelLeadImage(pictured, HOME), markImagePath(HOME));
+  assert.equal(parcelLeadImage(pictured, { ...HOME, image: undefined }), markImagePath(pictured));
+  assert.equal(parcelLeadImage(pictured, null), markImagePath(pictured), "no dwelling on the record: the ground's own");
+  assert.equal(parcelLeadImage(PARCEL, null), null);
+  assert.match(SOURCE, /leadImage: parcelLeadImage\(mark, home\),/, "the column asks it");
+  assert.match(SOURCE, /const found = dwellingOf\(mark\.id\);/, "of the dwelling the record names");
+  assert.match(SOURCE, /const home = dwellingOf\(parcel\.id\);/, "and the card beside it asks the same");
+  // ⚑ THE FLIP: put `homeMarkOfParcel(mark.id, allMarks())` back in the column → reds.
 });
 
 test("HOME: the household's walker at rest inside the parcel lights the frame", () => {

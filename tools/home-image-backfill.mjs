@@ -39,6 +39,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadMarks } from "./marks-fold.mjs";
+import { homeMarkFor, dwellingContext } from "./dwelling.mjs";
 
 // THE SHELF'S OWN SHAPE, and deliberately the strict one. tools/mark-lint.mjs
 // admits any path under the media host; spectator/viewer.mjs will only RENDER
@@ -48,76 +49,20 @@ import { loadMarks } from "./marks-fold.mjs";
 export const SHELF_URL = /^https:\/\/media\.postmark\.town\/media\/[A-Za-z0-9][A-Za-z0-9/._-]*$/;
 
 const eol = (raw) => (raw.includes("\r\n") ? "\r\n" : "\n");
-const isDwellingCandidate = (m) => m.kind === "sited" && m.at && !m.far;
-
 // ── the join ────────────────────────────────────────────────────────────────
 //
-// "Which mark is this household's dwelling" is answered by the RECORD, in four
-// layers, strongest evidence first. Every layer is arithmetic; none is a
-// judgment; and where two of them can both answer they are checked against each
-// other rather than silently ordered (see the falsifier that asserts they never
-// disagree on the live record — 25 of 25 today).
-//
-//   1. THE PREDICATE. parcel-seed-gen.mjs (retired 2026-09-20 with the seeding
-//      manifest it read) nested a `slot: home` predicate under
-//      each parcel naming the house it grounds. That is the record saying which
-//      mark this is, in words, and it wins when it is there. It is there for 26
-//      of 58 parcels — the seeder gained it partway through — which is why the
-//      layers below exist at all.
-//   2. TREE CHILD AND CENTRE TOGETHER. The seeder centres a parcel on its home
-//      (`at: home.at`), and the re-homing follow-up moved house dirs INSIDE
-//      their parcels. So a sited mark that is both a direct child of the parcel
-//      and sits at its exact centre is two independent facts agreeing, and it
-//      is what resolves every household whose ground is crowded (rei has 24
-//      sited marks and two at the parcel's centre; this picks the house, not
-//      the pocket lantern inside it).
-//   3. THE SOLE TREE CHILD, where a parcel has exactly one sited child of its
-//      holder's.
-//   4. THE SOLE MARK AT THE CENTRE, where the tree says nothing.
-//
-// The seeder's own warning is the one this inherits: "picking one is a
-// judgment, not arithmetic." Two candidates and no agreeing evidence is a
-// refusal, reported with both names.
-export function homeMarkFor(parcel, { marks, byId, sitedByHandle }) {
-  const own = sitedByHandle.get(parcel.by) ?? [];
-  const at = (m) => m.at.x === parcel.at.x && m.at.y === parcel.at.y;
-
-  const pred = marks.find((m) => m._parentMarkId === parcel.id && m.kind === "predicated" && m.slot === "home");
-  if (pred?.value != null && String(pred.value).trim()) {
-    const value = String(pred.value).trim();
-    const byIdHit = byId.get(`${parcel.by}/${value}`);
-    if (byIdHit && isDwellingCandidate(byIdHit)) return { mark: byIdHit, how: "the parcel's slot: home predicate" };
-    // the seeder's documented drift: a manifest home_id and a directory leaf can
-    // disagree (east-facing-window's home mark is the-cathedral-at-east-window)
-    const bySlug = own.filter((m) => m.slug === value);
-    if (bySlug.length === 1) return { mark: bySlug[0], how: "the predicate's value, matched by slug" };
-  }
-
-  const children = own.filter((m) => m._parentMarkId === parcel.id);
-  const both = children.filter(at);
-  if (both.length === 1) return { mark: both[0], how: "the parcel's own child, standing at its centre" };
-  if (children.length === 1) return { mark: children[0], how: "the parcel's only sited child" };
-  const centred = own.filter(at);
-  if (centred.length === 1) return { mark: centred[0], how: "the only mark at the parcel's centre" };
-
-  const why = children.length || centred.length
-    ? `${children.length} sited child(ren) of the parcel and ${centred.length} at its centre — no single mark both, and picking one is a judgment`
-    : "the parcel holds no sited mark of this household's — the dwelling was never planted";
-  return { mark: null, how: null, why, candidates: [...new Set([...children, ...centred].map((m) => m.id))].sort() };
-}
+// "Which mark is this household's dwelling" is the record's own four-layer
+// rule, and it lives in tools/dwelling.mjs now — the viewer reads the same one
+// (POS-200: a second rule there put the garden tin's picture on rei's house).
+// Re-exported so this tool's callers and its tests keep their import.
+export { homeMarkFor };
 
 // Every handle's home mark, read off their parcel. Handles with no parcel at
 // all are reported separately from handles whose parcel reaches no dwelling —
 // they are different gaps in the record and a caller should be able to tell
 // them apart.
 export function homeMarksByHandle(marks) {
-  const byId = new Map(marks.map((m) => [m.id, m]));
-  const sitedByHandle = new Map();
-  for (const m of marks) {
-    if (!isDwellingCandidate(m) || !m.by) continue;
-    if (!sitedByHandle.has(m.by)) sitedByHandle.set(m.by, []);
-    sitedByHandle.get(m.by).push(m);
-  }
+  const { byId, sitedByHandle } = dwellingContext(marks);
   const homes = new Map(), unreachable = new Map(), manyParcels = new Map();
   const parcels = new Map();
   for (const m of marks) {
