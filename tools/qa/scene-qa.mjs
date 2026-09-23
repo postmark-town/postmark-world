@@ -96,6 +96,13 @@ const roomCardReading = () => page.evaluate(() => {
     exitCount: exits.length,
     dotHidden: !dot || getComputedStyle(dot).display === "none",
     expanded: !!cell?.querySelector(":scope > .wv-expand"),
+    // the way out is FILLED and spans its row (Keemin 18:0x: "needs to stand out more")
+    filled: (() => {
+      if (!exit) return null;
+      const cs = getComputedStyle(exit), row = exit.parentElement, rs = getComputedStyle(row);
+      const inner = row.clientWidth - parseFloat(rs.paddingLeft) - parseFloat(rs.paddingRight);
+      return { bg: cs.backgroundColor, color: cs.color, spans: Math.abs(eb.width - inner) <= 2 };
+    })(),
   };
 });
 // a REAL click, at the room cell's own words — the route under test is the
@@ -131,6 +138,9 @@ const cardCheck = (r, where) => {
   check(`…it is the room's own card, and remounts keep it — ${where}`, r.names && r.names === r.roomId && r.keep, `${r.names}`);
   check(`…it RESTS compact: no expansion until the reader asks — ${where}`, !r.expanded, `expanded=${r.expanded}`);
   check(`…THE WAY OUT is inside it, the page's one exit — ${where}`, r.exitInCard && r.exitCount === 1, `${r.exitCount} exit button(s)`);
+  check(`…and it is the FILLED pill, amber under navy, the row's whole width — ${where}`,
+    r.filled?.bg === "rgb(232, 196, 139)" && r.filled?.color === "rgb(13, 20, 38)" && r.filled?.spans,
+    JSON.stringify(r.filled));
   check(`…and the corner dot that used to reveal it stands down — ${where}`, r.dotHidden);
 };
 

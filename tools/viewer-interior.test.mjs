@@ -125,6 +125,23 @@ test("[pin] the page builds the card from the room's OWN mark cell, open but COM
   assert.match(SOURCE, /const onPane = \(id\) => \(id && id === sceneRoomId \? null : id\);/, "the mounted room is never a bubble");
 });
 
+test("[pin] the card's way out is the FILLED pill, and only the card's (Keemin: \"the step outside button needs to stand out more\")", () => {
+  const rule = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl \{([^}]*)\}/);
+  assert.ok(rule, "a modifier scoped to the card's exit row");
+  assert.match(rule[1], /background:#e8c48b/, "amber ground");
+  assert.match(rule[1], /color:#0d1426/, "the town's navy on it");
+  assert.match(rule[1], /width:100%/, "the whole width of its row");
+  assert.match(rule[1], /font-size:\.82rem/, "a step up in size");
+  assert.match(rule[1], /padding:\.7em 1em/, "and in padding");
+  const hover = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl:hover \{([^}]*)\}/);
+  assert.ok(hover && /background:#d4a862/.test(hover[1]), "hover deepens the ground");
+  // the crossing sheet's outline pill is untouched: the shared rule still dresses it
+  assert.match(SOURCE, /\n\.wv-int-exit \.ctl, \.wv-cross-row \.ctl \{[^}]*color:#e8c48b; background:rgba\(13,20,38,\.92\);/, "the shared outline pill is unchanged");
+  assert.doesNotMatch(SOURCE, /\n\.[^\n{]*wv-cross-row[^\n{]*\{[^}]*background:#e8c48b/, "no filled dress leaks onto the crossing sheet");
+  // same class, same glyph
+  assert.match(roomCardHTML({ roomId: "r", cellHTML: "", exitLabel: "↤ step outside" }), /class="ctl wv-int-exit-btn" data-mark="r">↤ step outside</);
+});
+
 test("the telling's plaque says who is here, and leaves the room's name and words to the card", () => {
   const built = realInterior();
   const html = interiorPlaqueHTML({ room: built.room, bodies: built.bodies, you: built.you });

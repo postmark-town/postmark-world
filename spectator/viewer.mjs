@@ -5262,6 +5262,21 @@ const STYLE = `
 /* on a card it sits on a background of its own, so a drop shadow meant to lift
    it off the painting is only noise here */
 .wv-int-exit .ctl, .wv-cross-row .ctl { box-shadow:none; }
+/* THE CARD'S WAY OUT IS FILLED (Keemin, 2026-09-23 18:0x: "the step outside
+   button needs to stand out more"). In the room card it is the ONE act among
+   a card of chips and readings, so it stops being one more outline pill: the
+   same pill turned over — amber ground, the town's navy on it, the whole width
+   of its row, a step up in size, the ↤ kept in its label. Hover DEEPENS the
+   ground rather than drawing an outline. A modifier on the card's exit row
+   only: the crossing sheet's outline pill (.wv-cross-row) is untouched, and
+   the class and click route (.wv-int-exit-btn → stepOutside) are the same. */
+.wv-int-exit.wv-room-card-exit .ctl {
+  display:flex; width:100%; justify-content:center;
+  padding:.7em 1em; font-size:.82rem; font-weight:600;
+  color:#0d1426; background:#e8c48b; border:1px solid #e8c48b;
+}
+.wv-int-exit.wv-room-card-exit .ctl:hover { color:#0d1426; background:#d4a862; border-color:#d4a862; }
+.wv-int-exit.wv-room-card-exit .ctl[disabled] { background:#e8c48b; border-color:#e8c48b; }
 /* the paper floor — the placeholder ground is the drafting sheet (founder's
    word): warm and low-contrast, because it is the GROUND, and ground that
    competes with the furniture standing on it is a rug, not a floor */
