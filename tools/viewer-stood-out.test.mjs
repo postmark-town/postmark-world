@@ -29,8 +29,8 @@ test("a landed exit takes the interior down without waiting for the ledger's clo
   assert.match(SOURCE, /function standOutOfRoom\(leftId = null\) \{/);
   assert.match(SOURCE, /interiorByKey\.delete\(key\);\r?\n\s*const boxEl = \$\(root, "\.wv-minimap"\);/,
     "the built pane is dropped, then the town goes back up");
-  assert.match(SOURCE, /boxEl\.classList\.remove\("is-scene-mark"\);[\s\S]{0,120}?syncSceneExit\(boxEl, null, key\);[\s\S]{0,120}?remountTown\(boxEl\);/,
-    "and everything the room owned goes with it — the way-out pill included");
+  assert.match(SOURCE, /boxEl\.classList\.remove\("is-scene-mark"\);[\s\S]{0,120}?syncRoomCard\(boxEl, null, key\);[\s\S]{0,120}?remountTown\(boxEl\);/,
+    "and everything the room owned goes with it — the room card and the way out inside it included (POS-206)");
   // driven by the ACT, not by a poll — the founder's own instruction
   assert.match(SOURCE, /window\.addEventListener\("pm:stood-out", onStoodOut\);/);
   assert.match(SOURCE, /window\.removeEventListener\("pm:stood-out", onStoodOut\);/, "and given back at stop()");

@@ -111,8 +111,9 @@ test("[pin] syncScene mounts the new key's room, or remounts the town when it ha
 });
 
 test("[pin] the way out is hung off the room, so it leaves with the room", () => {
-  assert.match(SOURCE, /if \(!room\) \{ chrome\?\.remove\(\); return; \}/,
-    "no room, no pill — the spectator cannot be left holding an exit it cannot use");
+  // since POS-206 the way out lives inside the room card, so the card is what goes
+  assert.match(SOURCE, /function syncRoomCard\(boxEl, room, key = null\) \{\s*let card = \$\(boxEl, "\.wv-room-card"\);\s*if \(!room\) \{ card\?\.remove\(\); return; \}/,
+    "no room, no card and no exit — the spectator cannot be left holding an exit it cannot use");
 });
 
 // ── POS-94 (c): the Spectator stands where the camera looks (2026-09-18) ────
