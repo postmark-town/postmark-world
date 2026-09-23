@@ -97,20 +97,49 @@ test("the room card speaks in the ROOM's own words, and the way out is INSIDE it
   assert.equal(roomCardHTML({ roomId: null, cellHTML }), "", "no room, no card");
 });
 
-test("[pin] the page builds the card from the room's OWN mark cell, open, and it survives remounts", () => {
+test("[pin] the page builds the card from the room's OWN mark cell, open but COMPACT, and it survives remounts", () => {
   const fn = SOURCE.match(/function syncRoomCard\(boxEl, room, key = null\) \{[\s\S]*?\n  \}\n/);
   assert.ok(fn, "syncRoomCard exists");
   assert.match(fn[0], /card\.setAttribute\("data-wv-keep", ""\)/, "data-wv-keep: a scene remount keeps the card");
   assert.match(fn[0], /card\.className = `wv-bubble wv-room-card \$\{markClasses\(mark\)\}`/, "the pinned bubble's own dress");
   assert.match(fn[0], /cellHTML: markCell\(mark, \{ role: "fov" \}\)/, "the room's own mark cell — the card the corner dot used to open");
-  assert.match(fn[0], /cell\._stack = \[room\.id\]; renderExpansion\(cell\);/, "EXPANDED, as the pinned bubble opens it");
+  // OPEN, NOT EXPANDED (Keemin, 2026-09-23, the second POS-206 PR): the card
+  // rests compact, and the build never opens the expansion on its own
+  assert.doesNotMatch(fn[0], /_stack = \[room\.id\]/, "the build does not force the expansion open");
+  // the reader's open/closed survives a rebuild of the SAME room, and a new room starts compact
+  assert.match(fn[0], /const keptStack = card\.dataset\.room === room\.id\s*\?[^:]*\._stack[^:]*:\s*\[\];/, "the stack is kept only for the same room");
+  assert.match(fn[0], /if \(cell && keptStack\.length\) \{ cell\._stack = keptStack; renderExpansion\(cell\); \}/, "…and restored only when the reader had it open");
+  assert.ok(fn[0].indexOf("const keptStack") < fn[0].indexOf("card.innerHTML ="), "the stack is read BEFORE the rebuild replaces the cell");
   assert.match(fn[0], /exitButtonLabel\(entered, nameOf\)/, "the exit still names the room a nested dweller lands in");
+  // A CLICK EXPANDS IT, BY THE PINNED BUBBLE'S OWN ROUTE — the card is a
+  // .wv-bubble, and a .wv-card inside a bubble toggles its stack on a click.
+  // One route: no second handler names the room card.
+  assert.match(SOURCE, /if \(b\.closest\("\.wv-bubble"\)\) \{\s*b\._stack = b\._stack\?\.length \? \[\] : \[b\.dataset\.id\];\s*renderExpansion\(b\);\s*return;\s*\}/,
+    "the bubble's click-to-expand route is the one that folds the card open and shut");
+  assert.doesNotMatch(SOURCE, /closest\("\.wv-room-card[^"]*"\).*_stack/, "no second expansion route for the room card");
   // retired: the pane pill, and the telling's second copy of the button
   assert.doesNotMatch(SOURCE, /wv-scene-exit/, "the bottom-left pill is gone, selector and all");
   assert.equal((SOURCE.match(/class="ctl wv-int-exit-btn"/g) ?? []).length, 1, "ONE exit button in the source: the card's");
   // the reveal is retired: indoors the dot stands down and the room never bubbles
   assert.match(SOURCE, /\.wv-minimap\.is-scene-mark \.wv-worldmark \{ display:none; \}/, "the corner dot stands down indoors");
   assert.match(SOURCE, /const onPane = \(id\) => \(id && id === sceneRoomId \? null : id\);/, "the mounted room is never a bubble");
+});
+
+test("[pin] the card's way out is the FILLED pill, and only the card's (Keemin: \"the step outside button needs to stand out more\")", () => {
+  const rule = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl \{([^}]*)\}/);
+  assert.ok(rule, "a modifier scoped to the card's exit row");
+  assert.match(rule[1], /background:#e8c48b/, "amber ground");
+  assert.match(rule[1], /color:#0d1426/, "the town's navy on it");
+  assert.match(rule[1], /width:100%/, "the whole width of its row");
+  assert.match(rule[1], /font-size:\.82rem/, "a step up in size");
+  assert.match(rule[1], /padding:\.7em 1em/, "and in padding");
+  const hover = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl:hover \{([^}]*)\}/);
+  assert.ok(hover && /background:#d4a862/.test(hover[1]), "hover deepens the ground");
+  // the crossing sheet's outline pill is untouched: the shared rule still dresses it
+  assert.match(SOURCE, /\n\.wv-int-exit \.ctl, \.wv-cross-row \.ctl \{[^}]*color:#e8c48b; background:rgba\(13,20,38,\.92\);/, "the shared outline pill is unchanged");
+  assert.doesNotMatch(SOURCE, /\n\.[^\n{]*wv-cross-row[^\n{]*\{[^}]*background:#e8c48b/, "no filled dress leaks onto the crossing sheet");
+  // same class, same glyph
+  assert.match(roomCardHTML({ roomId: "r", cellHTML: "", exitLabel: "↤ step outside" }), /class="ctl wv-int-exit-btn" data-mark="r">↤ step outside</);
 });
 
 test("the telling's plaque says who is here, and leaves the room's name and words to the card", () => {
