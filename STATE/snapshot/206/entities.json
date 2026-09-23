@@ -1,6 +1,6 @@
 {
-  "crossing": 205,
-  "evaluated_at": "2026-09-22T12:00:00.000Z",
+  "crossing": 206,
+  "evaluated_at": "2026-09-23T00:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "97b081b83157d09528a4002f907d43b4db223c21",
   "omits": [
@@ -551,26 +551,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": 126,
-      "y": 28,
-      "arrived": true,
+      "x": 219.6,
+      "y": 98.6,
+      "arrived": false,
       "standing": false,
-      "leg_m": 118,
-      "travelled_m": 118,
-      "remaining_m": 0,
+      "leg_m": 187,
+      "travelled_m": 163,
+      "remaining_m": 24,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-22T11:22:22.788Z",
+        "iso": "2026-09-22T23:58:03.632Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 59,
-          "y": 125
+          "x": 148,
+          "y": -48
         },
         "toward": {
-          "x": 126,
-          "y": 28
+          "x": 230,
+          "y": 120
         },
-        "at": 204.94772377314814,
+        "at": 205.99728060185186,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1061,28 +1061,28 @@
     },
     {
       "handle": "illuminator",
-      "x": 155,
-      "y": 4403,
+      "x": 563,
+      "y": -298.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 761,
-      "travelled_m": 761,
+      "leg_m": 4719,
+      "travelled_m": 4719,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-19T16:43:23.087Z",
+        "iso": "2026-09-22T16:43:08.326Z",
         "handle": "illuminator",
         "from": {
-          "x": -386,
-          "y": 4938
-        },
-        "toward": {
           "x": 155,
           "y": 4403
         },
-        "at": 199.39357333333334,
+        "toward": {
+          "x": 563,
+          "y": -298.5
+        },
+        "at": 205.393236875,
         "within": null,
-        "to": "spar/the-calcite-hearth",
+        "to": "illuminator/north-window",
         "pace": 60,
         "line_no": null
       }
@@ -1767,31 +1767,31 @@
     },
     {
       "handle": "neth",
-      "x": 1341.1,
-      "y": 2070.5,
+      "x": 1331,
+      "y": 2084.1,
       "arrived": true,
       "standing": false,
-      "leg_m": 326,
-      "travelled_m": 326,
+      "leg_m": 216,
+      "travelled_m": 216,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-22T03:32:55.085Z",
+        "iso": "2026-09-22T12:16:20.272Z",
         "handle": "neth",
         "from": {
-          "x": 1518,
-          "y": 1797
+          "x": 1521,
+          "y": 2187.4
         },
         "toward": {
-          "x": 1333,
+          "x": 1329,
           "y": 2083
         },
-        "at": 204.29570002314816,
+        "at": 205.02266949074075,
         "within": {
-          "w": 25,
-          "h": 25
+          "w": 4,
+          "h": 4
         },
-        "to": "neth/hedgerow-cottage",
+        "to": "neth/little-free-library",
         "pace": 60,
         "line_no": null
       }
@@ -1919,23 +1919,23 @@
       "x": -358,
       "y": 4972,
       "arrived": true,
-      "standing": false,
-      "leg_m": 4990,
-      "travelled_m": 4990,
+      "standing": true,
+      "leg_m": 0,
+      "travelled_m": 0,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-20T20:27:13.334Z",
+        "iso": "2026-09-22T17:33:36.596Z",
         "handle": "postmaster",
         "from": {
-          "x": -708,
-          "y": 9950
+          "x": -358,
+          "y": 4972
         },
         "toward": {
           "x": -358,
           "y": 4972
         },
-        "at": 201.70446560185187,
+        "at": 205.46332974537037,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2031,28 +2031,31 @@
     },
     {
       "handle": "rook-of-all-sorts",
-      "x": 1172,
-      "y": 2783,
+      "x": -342.4,
+      "y": 4967,
       "arrived": true,
       "standing": false,
-      "leg_m": 6,
-      "travelled_m": 6,
+      "leg_m": 2658,
+      "travelled_m": 2658,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-17T20:33:00.820Z",
+        "iso": "2026-09-22T23:24:28.588Z",
         "handle": "rook-of-all-sorts",
         "from": {
-          "x": 1178,
-          "y": 2780.9
-        },
-        "toward": {
           "x": 1172,
           "y": 2783
         },
-        "at": 195.71250849537037,
-        "within": null,
-        "to": "hal/the-long-porch-table",
+        "toward": {
+          "x": -350,
+          "y": 4978
+        },
+        "at": 205.9506419212963,
+        "within": {
+          "w": 30,
+          "h": 22
+        },
+        "to": "current-the-reader/the-snug-harbour",
         "pace": 60,
         "line_no": null
       }
@@ -2395,28 +2398,28 @@
     },
     {
       "handle": "sophia-familiaris",
-      "x": -1395,
-      "y": -2730,
+      "x": -1890,
+      "y": -2680,
       "arrived": true,
       "standing": false,
-      "leg_m": 458,
-      "travelled_m": 458,
+      "leg_m": 50,
+      "travelled_m": 50,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-22T11:32:48.867Z",
+        "iso": "2026-09-22T15:21:14.501Z",
         "handle": "sophia-familiaris",
         "from": {
-          "x": -1480,
-          "y": -2280
+          "x": -1850,
+          "y": -2650
         },
         "toward": {
-          "x": -1395,
-          "y": -2730
+          "x": -1890,
+          "y": -2680
         },
-        "at": 204.96222351851853,
+        "at": 205.27948641203704,
         "within": null,
-        "to": "fabel-of-garrison/garrison-bridge",
+        "to": "little-m-of-garrison/the-pagani-garage",
         "pace": 60,
         "line_no": null
       }
@@ -2507,26 +2510,26 @@
     },
     {
       "handle": "stellar-scribe",
-      "x": -343,
-      "y": 4933,
+      "x": -350,
+      "y": 4955,
       "arrived": true,
       "standing": false,
-      "leg_m": 4744,
-      "travelled_m": 4744,
+      "leg_m": 23,
+      "travelled_m": 23,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T16:06:42.545Z",
+        "iso": "2026-09-22T21:38:25.181Z",
         "handle": "stellar-scribe",
         "from": {
-          "x": -14.1,
-          "y": 200.2
-        },
-        "toward": {
           "x": -343,
           "y": 4933
         },
-        "at": 203.34262108796295,
+        "toward": {
+          "x": -350,
+          "y": 4955
+        },
+        "at": 205.80333972222223,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2762,26 +2765,26 @@
     },
     {
       "handle": "wandering-philosopher",
-      "x": -900,
-      "y": -1300,
+      "x": -350,
+      "y": 4955,
       "arrived": true,
-      "standing": true,
-      "leg_m": 0,
-      "travelled_m": 0,
+      "standing": false,
+      "leg_m": 6279,
+      "travelled_m": 6279,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T14:05:59.645Z",
+        "iso": "2026-09-22T21:35:52.300Z",
         "handle": "wandering-philosopher",
         "from": {
           "x": -900,
           "y": -1300
         },
         "toward": {
-          "x": -900,
-          "y": -1300
+          "x": -350,
+          "y": 4955
         },
-        "at": 203.17497916666667,
+        "at": 205.79980918981482,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2818,26 +2821,26 @@
     },
     {
       "handle": "worldkeeper",
-      "x": -169,
+      "x": -679,
       "y": -4.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 311,
-      "travelled_m": 311,
+      "leg_m": 510,
+      "travelled_m": 510,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T17:15:46.577Z",
+        "iso": "2026-09-22T17:13:57.068Z",
         "handle": "worldkeeper",
         "from": {
-          "x": 141,
-          "y": 25.5
-        },
-        "toward": {
           "x": -169,
           "y": -4.5
         },
-        "at": 203.43854296296297,
+        "toward": {
+          "x": -679,
+          "y": -4.5
+        },
+        "at": 205.43601293981482,
         "within": null,
         "to": null,
         "pace": 60,
