@@ -1031,8 +1031,9 @@ export function exitDestination(entered = []) {
   return stack.length > 1 ? stack[stack.length - 2] : null;
 }
 
-// …and the button says it. One owner for both copies of the button — the
-// Telling's and the pane's — so they can never name different places.
+// …and the button says it. One owner for the button's words — there is one
+// button since POS-206, in the room card — so the label can never drift from
+// what the press does.
 export function exitButtonLabel(entered = [], nameOf = (id) => id) {
   const next = exitDestination(entered);
   return next ? `↤ step outside → ${nameOf(next)}` : "↤ step outside";
@@ -1702,28 +1703,44 @@ export function townGround(marks, skeleton, { originPx, mPerPx, pad = TOWN_GROUN
   return { svgText, originPx, mPerPx, groundMarkIds: new Set([...regions.map((m) => m.id), ...waters.filter((w) => w.mark).map((w) => w.mark.id)]) };
 }
 
+// ── the room card ───────────────────────────────────────────────────────────
+//
+// The room tells you where you are IN ITS OWN WORDS, and since POS-206 it says
+// so on the painting, OPEN, at the pane's upper left, in every view mode
+// (Keemin, 2026-09-23: "just always have that mark card expanded, and sitting in
+// the upper left, and move the 'exit' button *into* the card while making it
+// easily distinguishable"). It is the SAME card the corner dot used to open on a
+// hover or a click — the room's own mark cell, its predicates and its
+// investigate expansion, the pinned bubble's recipe — so outside and inside read
+// the room with one component. What this function adds is the two things only
+// the inside has: the "you are inside" head, and THE WAY OUT, on its own row
+// under a rule so it reads as the one act on a card that is otherwise a reading.
+//
+// One button class for the way out (`.wv-int-exit-btn`, `data-mark`), the one
+// the click route has always listened for; the label is exitButtonLabel's, so a
+// nested dweller's exit still names the room it opens onto. `cellHTML` is the
+// caller's mark cell, passed in whole — this function never re-renders a mark.
+export function roomCardHTML({ roomId = null, cellHTML = "", exitLabel = "↤ step outside" } = {}) {
+  if (!roomId) return "";
+  return `<div class="wv-room-card-lbl">you are inside</div>`
+    + cellHTML
+    + `<div class="wv-int-exit wv-room-card-exit">`
+    + `<button type="button" class="ctl wv-int-exit-btn" data-mark="${esc(roomId)}">${esc(exitLabel)}</button>`
+    + `</div>`;
+}
+
 // ── the plaque ──────────────────────────────────────────────────────────────
 //
-// The room tells you where you are IN ITS OWN WORDS. Not a caption written about
-// it and not its id deslugged — the mark's own body, the same prose the telling
-// would have read out from outside, mounted on the wall you are standing in.
-// That is the whole of what makes an interior a place rather than a container:
-// the record already said what this room is, and inside it that sentence is the
-// most important thing on the page.
-export function interiorPlaqueHTML({ room, name = null, bodies = [], you = null, nameOf = deslugMarkId } = {}) {
-  if (!room?.id) return "";
-  const title = name ?? nameOf(room.id);
-  const body = String(room.body ?? "").trim();
+// What the telling still says about the room once the card carries its head:
+// who else is in it. The name and the room's own body live on the card (above);
+// printing them again at the top of the telling would be the one room told
+// twice on one screen. An empty company is no plaque at all.
+export function interiorPlaqueHTML({ room, bodies = [], you = null } = {}) {
+  if (!room?.id || !bodies.length) return "";
   const others = bodies.filter((h) => h !== you);
-  const company = !bodies.length ? ""
-    : others.length ? `<p class="wv-int-company">Also here: ${esc(others.join(", "))}.</p>`
+  const company = others.length ? `<p class="wv-int-company">Also here: ${esc(others.join(", "))}.</p>`
     : `<p class="wv-int-company">You have it to yourself.</p>`;
-  return `<div class="wv-int-plaque">`
-    + `<div class="wv-int-plaque-lbl">you are inside</div>`
-    + `<h2 class="wv-int-plaque-name">${esc(title)}</h2>`
-    + (body ? `<p class="wv-int-plaque-body">${esc(body)}</p>` : "")
-    + company
-    + `</div>`;
+  return `<div class="wv-int-plaque">${company}</div>`;
 }
 
 // ── stepping out ────────────────────────────────────────────────────────────
@@ -5087,14 +5104,12 @@ const STYLE = `
 .wv-entered-lbl { font-size:.68rem; letter-spacing:.13em; text-transform:uppercase; opacity:.75; }
 .wv-entered-mark { color:var(--amber); border:1px solid var(--amber-dark); border-radius:999px; padding:1px 8px; }
 .wv-entered-into { opacity:.55; }
-/* the plaque — the room's own words, on the wall you are standing in */
-.wv-int-plaque { margin:0 0 16px; padding:13px 15px; max-width:76ch;
+/* the plaque — who else is in the room; its name and its own words are on the
+   room card, open on the painting (POS-206) */
+.wv-int-plaque { margin:0 0 16px; padding:9px 15px; max-width:76ch;
   border-left:5px solid var(--amber); background:rgba(224,160,42,.07); }
-.wv-int-plaque-lbl { font-size:.68rem; letter-spacing:.13em; text-transform:uppercase;
-  color:var(--dim); opacity:.8; }
-.wv-int-plaque-name { margin:3px 0 6px; font-size:1.18rem; color:var(--paper); }
-.wv-int-plaque-body { margin:0; font-size:1.02rem; line-height:1.5; color:var(--paper); opacity:.92; }
 .wv-int-company { margin:8px 0 0; font-size:.86rem; font-style:italic; color:var(--dim); }
+.wv-int-plaque > .wv-int-company:first-child { margin-top:0; }
 /* the door, on the card it belongs to */
 .wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
   border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
@@ -5196,25 +5211,39 @@ const STYLE = `
 .wv-minimap { position:relative; overflow:hidden; cursor:crosshair; }
 /* inside, the painting is not dimmed or filtered — it is GONE. A ghost of the
    aerial view under a floor would say the roof is missing. */
-/* THE WAY OUT, on the pane, bottom left, in every view mode (founder's word) —
-   the telling's own exit collapses with the telling in painting-only, which is
-   the default, and a room with no visible door out is the founder's original
-   bug. Same button class as the telling's copy: one click route, no drift.
-   bottom:58px, not 12: the site docks its Time-travel pill at the pane's
-   bottom-left corner (world.astro place() — nav rail + 14, bottom 14), so the
-   door stacks ABOVE it rather than underneath it (founder, 2026-08-20 evening).
-   Styled in the page's own chrome grammar — the amber-on-navy pill the
-   Time-travel button already speaks — so the two read as one family. */
-.wv-scene-exit { position:absolute; left:14px; bottom:58px; z-index:9; }
+/* THE ROOM CARD, OPEN AT THE PANE'S UPPER LEFT, IN EVERY VIEW MODE (Keemin,
+   2026-09-23, POS-206). It sits where the corner dot sat — the dot that used to
+   open this same card on a hover or a click, retired inside a room just below —
+   and it wears the pinned bubble's own dress (it IS that card, class and all),
+   placed by the corner rather than by an anchor. It is data-wv-keep, so a scene
+   remount carries it rather than dropping it.
+   WHY IT NEVER HIDES: the exit used to be the telling's, and the telling
+   collapses in painting-only — the DEFAULT — which is how the founder once stood
+   in a room with no visible door (SCENES.md row 5). The card is on the painting,
+   so the door is wherever the reader is.
+   z-index 6, with the rail: under the bubble layer (7), because a bubble is a
+   thing the reader asked for and positionBubbles already steps it around this
+   card rather than over it. */
+.wv-bubble.wv-room-card { top:13px; left:13px; z-index:6; pointer-events:auto;
+  max-width:min(24rem, calc(100% - 26px)); max-height:min(72%, 34rem); overflow-y:auto; }
+.wv-room-card-lbl { padding:9px 13px 0; font-size:.68rem; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--dim); opacity:.8; }
+.wv-minimap.is-scene-mark .wv-worldmark { display:none; }
+/* THE WAY OUT, INSIDE THE CARD, ON A ROW OF ITS OWN. A rule over it and the
+   amber-on-navy pill in it: the one act on a card that is otherwise a reading.
+   Sticky to the card's bottom edge, so an expansion long enough to scroll the
+   card never scrolls the door out of reach. */
+.wv-int-exit.wv-room-card-exit { position:sticky; bottom:0; margin:0; padding:10px 13px 12px;
+  border-top:1px solid rgba(232,196,139,.3); background:rgba(13,15,19,.97); }
 /* ONE WAY OUT, ONE LOOK. The .ctl class has no base rule in this sheet — every
    control is dressed by the rail it sits in (.wv-mapctl, .wv-nav, this one) —
-   so the Telling's copy of this exact button, which sits in .wv-int-exit and
-   nothing else, was falling through to the browser's default chrome. Same act,
-   same words, two appearances, and one of them not ours (founder, 2026-08-21:
-   "the 'step outside' button in the Telling still looks jarringly vanilla").
-   Sharing the selector is the fix that cannot drift: there is now no way to
-   restyle one of them and forget the other. */
-.wv-scene-exit .ctl, .wv-int-exit .ctl, .wv-cross-row .ctl {
+   so a button in .wv-int-exit and nothing else was falling through to the
+   browser's default chrome (founder, 2026-08-21: "the 'step outside' button in
+   the Telling still looks jarringly vanilla"). The way out has lived in the
+   room card since POS-206, and it is still that pill, in the page's own chrome
+   grammar — the one the site's Time-travel button speaks. The crossing sheet's
+   row shares the selector so the two cannot drift. */
+.wv-int-exit .ctl, .wv-cross-row .ctl {
   display:inline-flex; align-items:center; gap:.5em; cursor:pointer;
   padding:.55em .9em; border-radius:999px;
   font-size:.72rem; letter-spacing:.08em;
@@ -5222,14 +5251,14 @@ const STYLE = `
   border:1px solid rgba(232,196,139,.5);
   box-shadow:0 6px 22px rgba(0,0,0,.45);
 }
-.wv-scene-exit .ctl:hover, .wv-int-exit .ctl:hover, .wv-cross-row .ctl:hover { border-color:#f0d5a8; color:#f0d5a8; background:rgba(13,20,38,.97); }
+.wv-int-exit .ctl:hover, .wv-cross-row .ctl:hover { border-color:#f0d5a8; color:#f0d5a8; background:rgba(13,20,38,.97); }
 /* the act takes a network write, and the button says so by going quiet rather
    than by going grey-and-dead: it is still the same pill, just not offering */
-.wv-scene-exit .ctl[disabled], .wv-int-exit .ctl[disabled], .wv-cross-row .ctl[disabled] {
+.wv-int-exit .ctl[disabled], .wv-cross-row .ctl[disabled] {
   cursor:default; opacity:.55; border-color:rgba(232,196,139,.28); box-shadow:none;
 }
-/* in the panel it sits on a background of its own, so the drop shadow that
-   makes it read over the painting is only noise here */
+/* on a card it sits on a background of its own, so a drop shadow meant to lift
+   it off the painting is only noise here */
 .wv-int-exit .ctl, .wv-cross-row .ctl { box-shadow:none; }
 /* the paper floor — the placeholder ground is the drafting sheet (founder's
    word): warm and low-contrast, because it is the GROUND, and ground that
@@ -7375,11 +7404,10 @@ export function mountViewer(appEl) {
     const children = (found.children ?? []).map((c) => (isEntity(c) ? c : { ...(byId.get(c.id) ?? c) }));
     const { things, bodies } = interiorFurniture({ room, children });
     const nameOf = (id) => markName(byId.get(id) ?? { id }).name;
-    // what one press actually does: a nested dweller lands in the room around
-    // this one, and the button says which rather than letting them find out
-    const { entered } = standpointOccupancy({ acts: enterExitLedger.acts, at: occupancyClock(), handle: key });
-    box.innerHTML = interiorPlaqueHTML({ room, bodies, you: key, name: nameOf(room.id), nameOf })
-      + `<div class="wv-int-exit"><button type="button" class="ctl wv-int-exit-btn" data-mark="${esc(room.id)}">${esc(exitButtonLabel(entered, nameOf))}</button></div>`
+    // NO EXIT HERE, AND NO NAME (POS-206): the room card on the painting carries
+    // the room's head and the one way out, in every view mode — see syncRoomCard.
+    // The telling says the rest: who is here, and what the room holds.
+    box.innerHTML = interiorPlaqueHTML({ room, bodies, you: key })
       + (things.length
         ? `<div class="wv-section-lbl">what is in here — ${things.length}</div>`
           + `<div class="wv-cards">${things.map((t) => markCell(byId.get(t.id) ?? t, { role: "fov" })).join("")}</div>`
@@ -7541,7 +7569,7 @@ export function mountViewer(appEl) {
     const boxEl = $(root, ".wv-minimap");
     if (boxEl) {
       boxEl.classList.remove("is-scene-mark");
-      syncSceneExit(boxEl, null, key);
+      syncRoomCard(boxEl, null, key);
       remountTown(boxEl);
     }
     // the record catches up behind the redraw, and renderCurrent then agrees
@@ -7558,28 +7586,78 @@ export function mountViewer(appEl) {
     const built = interiorByKey.get(key) ?? null;
     const room = built?.room ?? null;
     boxEl.classList.toggle("is-scene-mark", !!room);
-    syncSceneExit(boxEl, room, key);
+    syncRoomCard(boxEl, room, key);
     if ((room?.id ?? null) === sceneRoomId) return;
     if (room) mountRoomScene(boxEl, room);
     else remountTown(boxEl);
   }
-  // THE WAY OUT, ON THE PANE, IN EVERY VIEW MODE (founder, 2026-08-20: bottom
-  // left). The telling's own exit collapses with the telling in painting-only —
-  // the default mode — which is how the founder stood in a room with no way to
-  // leave it. Same class as the telling's button, so the existing click route
-  // carries both and neither can drift.
-  function syncSceneExit(boxEl, room, key = null) {
-    let chrome = $(boxEl, ".wv-scene-exit");
-    if (!room) { chrome?.remove(); return; }
-    if (!chrome) {
-      chrome = document.createElement("div");
-      chrome.className = "wv-scene-exit";
-      chrome.setAttribute("data-wv-keep", "");
-      boxEl.appendChild(chrome);
-    }
+  // THE ROOM CARD, OPEN ON THE PANE, IN EVERY VIEW MODE — AND THE WAY OUT IS IN
+  // IT (Keemin, 2026-09-23, POS-206). Before this the room's card was a reveal:
+  // the corner dot (`.wv-root-mark`, which names the ENTERED room indoors — see
+  // chipMark) opened it as the pinned bubble on a click and as the glance on a
+  // hover, and the way out was a separate pill at the pane's bottom left. Now
+  // the card is simply open where the dot was, the dot stands down indoors, and
+  // the pill's button moved into the card — same class, same data-mark, same
+  // click route (`.wv-int-exit-btn` → stepOutside); only where it sits changed.
+  //
+  // THE SAME CARD, NOT A SECOND ONE: the pinned bubble's own recipe — the room's
+  // mark cell, its predicates folded in, and its investigate expansion open —
+  // in the bubble's own dress. One component, outside and inside.
+  //
+  // BUILT ONCE PER ROOM AND LABEL, the pinned bubble's rule: this runs on every
+  // scene sync, and a rebuild would drop an open backing sheet or the reader's
+  // scroll. A nested exit changes the room (or the label), and that rebuilds it.
+  function syncRoomCard(boxEl, room, key = null) {
+    let card = $(boxEl, ".wv-room-card");
+    if (!room) { card?.remove(); return; }
+    // what one press actually does: a nested dweller lands in the room around
+    // this one, and the button says which rather than letting them find out
     const { entered } = standpointOccupancy({ acts: enterExitLedger.acts, at: occupancyClock(), handle: key });
     const nameOf = (id) => markName(byId.get(id) ?? { id }).name;
-    chrome.innerHTML = `<button type="button" class="ctl wv-int-exit-btn" data-mark="${esc(room.id)}">${esc(exitButtonLabel(entered, nameOf))}</button>`;
+    const exitLabel = exitButtonLabel(entered, nameOf);
+    const mark = byId.get(room.id) ?? room;
+    if (!card) {
+      card = document.createElement("div");
+      card.setAttribute("data-wv-keep", "");
+      boxEl.appendChild(card);
+    }
+    const built = `${room.id} ${exitLabel}`;
+    if (card.dataset.built === built && card.firstChild) { seatRoomCard(); return; }
+    card.dataset.built = built;
+    card.className = `wv-bubble wv-room-card ${markClasses(mark)}`;
+    const predicates = allMarks().filter((p) => p.parent === mark.id && isPredicateAttribute(p));
+    card.innerHTML = roomCardHTML({
+      roomId: room.id,
+      cellHTML: markCell(mark, { role: "fov" }) + predicates.map((p) => markCell(p, { role: "fov" })).join(""),
+      exitLabel,
+    });
+    foldRenderedPredicates(card);
+    mountMarkImages(card);
+    const cell = $(card, `.wv-card[data-id="${CSS.escape(room.id)}"]`);
+    if (cell) { cell._stack = [room.id]; renderExpansion(cell); }
+    seatRoomCard();
+  }
+  // THE CARD YIELDS THE TOP EDGE TO THE RAIL WHERE THE TWO WOULD MEET. On a desk
+  // the rail is top-right and the card top-left and they never touch; on a phone
+  // the rail wraps across the whole top of the pane, and a card at 13px lay on
+  // the search field and the fit button (measured at 390 px, POS-206). So the
+  // card keeps the upper left and starts under whatever of the rail shares its
+  // columns — measured, because the rail's height is its wrap and its wrap is
+  // the width and the font. Its bottom edge stays where the stylesheet put it.
+  function seatRoomCard() {
+    const boxEl = $(root, ".wv-minimap");
+    const card = boxEl?.querySelector(":scope > .wv-room-card");
+    if (!card) return;
+    card.style.top = "";
+    card.style.maxHeight = "";
+    const rail = $(boxEl, ".wv-mapctl");
+    if (!rail || !rail.getClientRects().length) return;
+    const pane = boxEl.getBoundingClientRect(), c = card.getBoundingClientRect(), r = rail.getBoundingClientRect();
+    const shareColumns = c.left < r.right && r.left < c.right;
+    if (!shareColumns || c.top >= r.bottom) return;
+    const top = Math.round(r.bottom - pane.top + 8);
+    card.style.top = `${top}px`;
+    card.style.maxHeight = `min(34rem, calc(72% - ${top - 13}px))`;
   }
   // ── crossing in ──────────────────────────────────────────────────────────
   //
@@ -7725,8 +7803,11 @@ export function mountViewer(appEl) {
       mapCtx?.setView?.(mapCtx.frameOn(rim, { keepZoom: true }), true);
     } catch (err) {
       if (button) { button.disabled = false; button.textContent = label ?? "↤ step outside"; }
-      const plaque = $(root, ".wv-int-plaque");
-      if (plaque) plaque.insertAdjacentHTML("beforeend",
+      // said beside the button that was pressed — the room card's exit row since
+      // POS-206, which is on the painting in every view mode, so the refusal is
+      // where the reader is looking rather than in a telling that may be folded
+      const row = button?.closest(".wv-int-exit");
+      if (row) row.insertAdjacentHTML("beforeend",
         `<p class="wv-int-company">The door did not take it: ${esc(err?.message ?? err)}</p>`);
     }
   }
@@ -11459,7 +11540,9 @@ export function mountViewer(appEl) {
     if (!id) return null;
     const world = markAnchorPoint(id);
     if (world) return paintingPointToBox(world);
-    return elementBoxPoint($(root, ".wv-root-mark"));
+    // indoors the corner dot stands down and the room card holds its corner, so
+    // the placeless hang off the card (POS-206) — a hidden dot measures 0,0
+    return elementBoxPoint($(root, sceneRoomId ? ".wv-room-card" : ".wv-root-mark"));
   }
   function placeBubbleAt(el, at, avoid = null) {
     if (!el || el.hidden) return;
@@ -11734,7 +11817,12 @@ export function mountViewer(appEl) {
     }
     renderingBubbles = true;
     try {
-      const { hoveredId, selectedId } = markInteraction.getState();
+      // THE MOUNTED ROOM IS NEVER A BUBBLE (POS-206): its card is already open on
+      // the pane, so a pinned copy or a glance of it would be the same card twice
+      // — the reveal the corner dot used to do, retired
+      const onPane = (id) => (id && id === sceneRoomId ? null : id);
+      const state_ = markInteraction.getState();
+      const hoveredId = onPane(state_.hoveredId), selectedId = onPane(state_.selectedId);
       // THE ONE SWAP. A parcel's selection is held by the column; every other
       // selection is held by the pinned bubble exactly as before. The pinned
       // bubble is told the truth about what IT holds, which is nothing — so it
@@ -11766,9 +11854,12 @@ export function mountViewer(appEl) {
     // the walk desk holds its corner — it is a thing you are part way through, so
     // the bubbles step around it rather than the other way about
     const desk = bubbleRect($(root, ".wv-walkdesk"));
-    placeBubbleAt(bubbleEls.pinned, anchorBoxFor(selectedId), desk);
+    // …and so does the room card indoors: it is open by law (POS-206), so a
+    // bubble that lands on it would be covering the room's own name and its door
+    const roomCard = sceneRoomId ? bubbleRect($(root, ".wv-room-card")) : null;
+    placeBubbleAt(bubbleEls.pinned, anchorBoxFor(selectedId), [desk, roomCard]);
     const pinned = bubbleRect(bubbleEls.pinned);
-    placeBubbleAt(bubbleEls.hover, anchorBoxFor(hoveredId), [pinned, desk]);
+    placeBubbleAt(bubbleEls.hover, anchorBoxFor(hoveredId), [pinned, desk, roomCard]);
   }
   // ───────── the tour ─────────
   // Opened by the ? on the painting, never on arrival: a page that seizes the
@@ -12079,7 +12170,7 @@ export function mountViewer(appEl) {
   }
 
   // a window resize is the same event as a toggle, only slower
-  const onViewerResize = () => { mapCtx?.refit?.(); positionBubbles(); placeTour(); sizeSearchField(); };
+  const onViewerResize = () => { mapCtx?.refit?.(); sizeSearchField(); seatRoomCard(); positionBubbles(); placeTour(); };
   window.addEventListener("resize", onViewerResize);
   // THE COCKPIT'S ONE WORD TO THIS PANE — see standOutOfRoom for why the redraw
   // cannot wait for the ledger's clock. Guarded like the dock and feed seams
@@ -12089,7 +12180,7 @@ export function mountViewer(appEl) {
   window.addEventListener("pm:stood-out", onStoodOut);
   sizeSearchField();
   // the first measurement can land on a fallback face; the real one arrives later
-  try { document.fonts?.ready?.then(() => sizeSearchField()); } catch { /* no font loading API */ }
+  try { document.fonts?.ready?.then(() => { sizeSearchField(); seatRoomCard(); }); } catch { /* no font loading API */ }
 
   // ───────── dev pane ─────────
   function buildDevPane() {
