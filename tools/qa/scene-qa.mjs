@@ -71,6 +71,10 @@ check("the rig offers an entered resident as the fixture", !!actor, actor ?? `ro
 // in EVERY view mode, the way out inside it, and the corner dot that used to
 // reveal it standing down. Measured against the pane's own rect, and run once
 // per view mode below — the mode that hid the old telling exit is the default.
+// OPEN, NOT EXPANDED (the second POS-206 PR, same day: "the card is always open
+// but not expanded, and you can click to expand it"): it RESTS compact, a real
+// click on the room's cell folds the expansion open, a second click shut, and
+// the way out stays inside the card in both states.
 const roomCardReading = () => page.evaluate(() => {
   const box = document.querySelector(".wv-minimap");
   const bb = box?.getBoundingClientRect();
@@ -91,12 +95,41 @@ const roomCardReading = () => page.evaluate(() => {
     exitInCard: !!exit && eb.width > 0 && eb.y >= cr.y && eb.bottom <= cr.bottom + 1 && eb.y < window.innerHeight,
     exitCount: exits.length,
     dotHidden: !dot || getComputedStyle(dot).display === "none",
+    expanded: !!cell?.querySelector(":scope > .wv-expand"),
   };
 });
+// a REAL click, at the room cell's own words — the route under test is the
+// page's click handler, so a synthetic dispatch would skip the thing it names
+const clickRoomCell = async () => {
+  const at = await page.evaluate(() => {
+    const body = document.querySelector(".wv-minimap > .wv-room-card .wv-card[data-id] > .cbody");
+    body?.scrollIntoView({ block: "nearest" });
+    const r = body?.getBoundingClientRect();
+    return r && r.width > 0 ? { x: r.x + Math.min(24, r.width / 2), y: r.y + r.height / 2 } : null;
+  });
+  if (at) await page.mouse.click(at.x, at.y);
+  // …and the pointer leaves, so the reading (and the shot) is the card as a
+  // reader who clicked and moved on sees it, not the card under a hover
+  await page.mouse.move(5, 995);
+  await page.waitForTimeout(700);
+  return !!at;
+};
+const expandFold = async (where, shot = null) => {
+  const clicked = await clickRoomCell();
+  const opened = await roomCardReading();
+  if (shot) await page.screenshot({ path: join(SHOTS, shot) });
+  check(`…a click on it EXPANDS it, the way out still inside — ${where}`,
+    clicked && opened.expanded && opened.exitInCard && opened.exitCount === 1, `expanded=${opened.expanded} exitInCard=${opened.exitInCard}`);
+  await clickRoomCell();
+  const folded = await roomCardReading();
+  check(`…and a second click FOLDS it back to the resting card — ${where}`,
+    !folded.expanded && folded.open && folded.exitInCard, `expanded=${folded.expanded}`);
+};
 const cardCheck = (r, where) => {
   check(`THE ROOM CARD is open at the pane's upper left — ${where}`, r.open && r.upperLeft,
     `${r.mode}; open=${r.open} upperLeft=${r.upperLeft}`);
   check(`…it is the room's own card, and remounts keep it — ${where}`, r.names && r.names === r.roomId && r.keep, `${r.names}`);
+  check(`…it RESTS compact: no expansion until the reader asks — ${where}`, !r.expanded, `expanded=${r.expanded}`);
   check(`…THE WAY OUT is inside it, the page's one exit — ${where}`, r.exitInCard && r.exitCount === 1, `${r.exitCount} exit button(s)`);
   check(`…and the corner dot that used to reveal it stands down — ${where}`, r.dotHidden);
 };
@@ -133,17 +166,24 @@ check("placeholders are DISTINCT by hue and low-saturation by word",
 check("THE ROOF: no atlas content inside the room's svg", !inside.atlasContent);
 check("the room's things draw as pips through the ONE overlay", inside.pips >= 1, `${inside.pips} pips`);
 cardCheck(cardDefault, "the DEFAULT view mode");
+await expandFold("the DEFAULT view mode", "scene-a1-expanded.png");
 // …and in the OTHER view mode: the card does not ride the telling, so folding
-// or unfolding it must not move the card or its door
+// or unfolding it must not move the card or its door. It is switched with the
+// card EXPANDED: the reader's open/closed is theirs, and a view change keeps it.
+await clickRoomCell();
 await page.evaluate(() => {
   document.querySelector(".wv-telling-toggle")?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 });
 await page.waitForTimeout(900);
+const switched = await roomCardReading();
+check("the telling toggle really changed the view mode", switched.mode !== cardDefault.mode,
+  `${cardDefault.mode} -> ${switched.mode}`);
+check("…and the reader's EXPANDED card survives the switch", switched.expanded, `expanded=${switched.expanded}`);
+await clickRoomCell();
 const cardOther = await roomCardReading();
 await page.screenshot({ path: join(SHOTS, "scene-a2-inside-other-mode.png") });
-check("the telling toggle really changed the view mode", cardOther.mode !== cardDefault.mode,
-  `${cardDefault.mode} -> ${cardOther.mode}`);
 cardCheck(cardOther, "the OTHER view mode");
+await expandFold("the OTHER view mode");
 await page.evaluate(() => {
   document.querySelector(".wv-telling-toggle")?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 });

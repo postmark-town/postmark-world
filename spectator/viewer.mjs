@@ -1710,11 +1710,13 @@ export function townGround(marks, skeleton, { originPx, mPerPx, pad = TOWN_GROUN
 // (Keemin, 2026-09-23: "just always have that mark card expanded, and sitting in
 // the upper left, and move the 'exit' button *into* the card while making it
 // easily distinguishable"). It is the SAME card the corner dot used to open on a
-// hover or a click — the room's own mark cell, its predicates and its
-// investigate expansion, the pinned bubble's recipe — so outside and inside read
-// the room with one component. What this function adds is the two things only
-// the inside has: the "you are inside" head, and THE WAY OUT, on its own row
-// under a rule so it reads as the one act on a card that is otherwise a reading.
+// hover or a click — the room's own mark cell and its predicates, the pinned
+// bubble's recipe — so outside and inside read the room with one component. It
+// rests COMPACT and a click expands it (Keemin, same day: "always open but not
+// expanded, and you can click to expand it"); see syncRoomCard. What this
+// function adds is the two things only the inside has: the "you are inside"
+// head, and THE WAY OUT, on its own row under a rule so it reads as the one act
+// on a card that is otherwise a reading.
 //
 // One button class for the way out (`.wv-int-exit-btn`, `data-mark`), the one
 // the click route has always listened for; the label is exitButtonLabel's, so a
@@ -7601,12 +7603,23 @@ export function mountViewer(appEl) {
   // click route (`.wv-int-exit-btn` → stepOutside); only where it sits changed.
   //
   // THE SAME CARD, NOT A SECOND ONE: the pinned bubble's own recipe — the room's
-  // mark cell, its predicates folded in, and its investigate expansion open —
-  // in the bubble's own dress. One component, outside and inside.
+  // mark cell, its predicates folded in — in the bubble's own dress. One
+  // component, outside and inside.
+  //
+  // OPEN, NOT EXPANDED (Keemin, 2026-09-23, the second POS-206 PR: "the card is
+  // always open but not expanded, and you can click to expand it"). The card
+  // RESTS compact — the room's cell and the way out — and a click on the cell
+  // folds the investigate expansion open, a second click shut. That click is
+  // the pinned bubble's own route (the root click handler: a `.wv-card` inside
+  // a `.wv-bubble` toggles its `_stack` and calls renderExpansion), so this
+  // function adds no second one; it only stops opening the expansion itself.
   //
   // BUILT ONCE PER ROOM AND LABEL, the pinned bubble's rule: this runs on every
   // scene sync, and a rebuild would drop an open backing sheet or the reader's
   // scroll. A nested exit changes the room (or the label), and that rebuilds it.
+  // The reader's open/closed (the cell's whole `_stack`, a drilled crumb
+  // included) is carried across a rebuild of the SAME room — a label change is
+  // not the reader closing the card — and a new room starts compact.
   function syncRoomCard(boxEl, room, key = null) {
     let card = $(boxEl, ".wv-room-card");
     if (!room) { card?.remove(); return; }
@@ -7623,7 +7636,11 @@ export function mountViewer(appEl) {
     }
     const built = `${room.id} ${exitLabel}`;
     if (card.dataset.built === built && card.firstChild) { seatRoomCard(); return; }
+    const keptStack = card.dataset.room === room.id
+      ? [...($(card, `.wv-card[data-id="${CSS.escape(room.id)}"]`)?._stack ?? [])]
+      : [];
     card.dataset.built = built;
+    card.dataset.room = room.id;
     card.className = `wv-bubble wv-room-card ${markClasses(mark)}`;
     const predicates = allMarks().filter((p) => p.parent === mark.id && isPredicateAttribute(p));
     card.innerHTML = roomCardHTML({
@@ -7634,7 +7651,7 @@ export function mountViewer(appEl) {
     foldRenderedPredicates(card);
     mountMarkImages(card);
     const cell = $(card, `.wv-card[data-id="${CSS.escape(room.id)}"]`);
-    if (cell) { cell._stack = [room.id]; renderExpansion(cell); }
+    if (cell && keptStack.length) { cell._stack = keptStack; renderExpansion(cell); }
     seatRoomCard();
   }
   // THE CARD YIELDS THE TOP EDGE TO THE RAIL WHERE THE TWO WOULD MEET. On a desk

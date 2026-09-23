@@ -97,14 +97,26 @@ test("the room card speaks in the ROOM's own words, and the way out is INSIDE it
   assert.equal(roomCardHTML({ roomId: null, cellHTML }), "", "no room, no card");
 });
 
-test("[pin] the page builds the card from the room's OWN mark cell, open, and it survives remounts", () => {
+test("[pin] the page builds the card from the room's OWN mark cell, open but COMPACT, and it survives remounts", () => {
   const fn = SOURCE.match(/function syncRoomCard\(boxEl, room, key = null\) \{[\s\S]*?\n  \}\n/);
   assert.ok(fn, "syncRoomCard exists");
   assert.match(fn[0], /card\.setAttribute\("data-wv-keep", ""\)/, "data-wv-keep: a scene remount keeps the card");
   assert.match(fn[0], /card\.className = `wv-bubble wv-room-card \$\{markClasses\(mark\)\}`/, "the pinned bubble's own dress");
   assert.match(fn[0], /cellHTML: markCell\(mark, \{ role: "fov" \}\)/, "the room's own mark cell — the card the corner dot used to open");
-  assert.match(fn[0], /cell\._stack = \[room\.id\]; renderExpansion\(cell\);/, "EXPANDED, as the pinned bubble opens it");
+  // OPEN, NOT EXPANDED (Keemin, 2026-09-23, the second POS-206 PR): the card
+  // rests compact, and the build never opens the expansion on its own
+  assert.doesNotMatch(fn[0], /_stack = \[room\.id\]/, "the build does not force the expansion open");
+  // the reader's open/closed survives a rebuild of the SAME room, and a new room starts compact
+  assert.match(fn[0], /const keptStack = card\.dataset\.room === room\.id\s*\?[^:]*\._stack[^:]*:\s*\[\];/, "the stack is kept only for the same room");
+  assert.match(fn[0], /if \(cell && keptStack\.length\) \{ cell\._stack = keptStack; renderExpansion\(cell\); \}/, "…and restored only when the reader had it open");
+  assert.ok(fn[0].indexOf("const keptStack") < fn[0].indexOf("card.innerHTML ="), "the stack is read BEFORE the rebuild replaces the cell");
   assert.match(fn[0], /exitButtonLabel\(entered, nameOf\)/, "the exit still names the room a nested dweller lands in");
+  // A CLICK EXPANDS IT, BY THE PINNED BUBBLE'S OWN ROUTE — the card is a
+  // .wv-bubble, and a .wv-card inside a bubble toggles its stack on a click.
+  // One route: no second handler names the room card.
+  assert.match(SOURCE, /if \(b\.closest\("\.wv-bubble"\)\) \{\s*b\._stack = b\._stack\?\.length \? \[\] : \[b\.dataset\.id\];\s*renderExpansion\(b\);\s*return;\s*\}/,
+    "the bubble's click-to-expand route is the one that folds the card open and shut");
+  assert.doesNotMatch(SOURCE, /closest\("\.wv-room-card[^"]*"\).*_stack/, "no second expansion route for the room card");
   // retired: the pane pill, and the telling's second copy of the button
   assert.doesNotMatch(SOURCE, /wv-scene-exit/, "the bottom-left pill is gone, selector and all");
   assert.equal((SOURCE.match(/class="ctl wv-int-exit-btn"/g) ?? []).length, 1, "ONE exit button in the source: the card's");
