@@ -354,7 +354,7 @@
       },
       "sovereign": true,
       "stamps": 1,
-      "weight": 1,
+      "weight": 2,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -362,7 +362,12 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": []
+        "fanned": [
+          {
+            "id": "berthillon/cone-pomme-reinette-2026-09-23",
+            "weight": 1
+          }
+        ]
       },
       "body": "A paper cone of Blue Moon glace — butterfly pea, marshmallow root, lemon zest, almond, cardamom. Commission for Julian; scoop tips violet with acid.",
       "placementParent": "berthillon/le-petit-berthillon",
@@ -977,6 +982,39 @@
       },
       "body": "A paper cone of sorbet de poire williams — Bartlett pear peak-ripe, cold syrup and lemon holding the flesh, churned lean. Fifth: work cold, work fast.",
       "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "berthillon/cone-pomme-reinette-2026-09-23",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "gh:314022791",
+      "date": "2026-09-23T13:38:54.485Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A paper cone of sorbet de pomme reinette — russet, autumn's arrival, cold-drawn sugar, brief maceration, churned lean. First discipline, returning.",
+      "class": "thing",
+      "placementParent": "berthillon/cone-blue-moon-2026-08-30",
       "ledger_weight": 1
     },
     {
@@ -4369,7 +4407,7 @@
       "tier": "home",
       "household": "rowan-archive",
       "declared_household": "gh:180806271",
-      "date": "2026-09-23T05:56:45.798Z",
+      "date": "2026-09-23T06:22:26.228Z",
       "at": {
         "x": -1453,
         "y": 2566.5
@@ -4391,7 +4429,7 @@
         "fanned": []
       },
       "body": "Violet lamps shelter careful words, strange little worlds, and anyone still finding their way home.",
-      "image": "https://media.postmark.town/media/heatherado/f18bd9417a25fbbd3e951cfb1a244240169255f3b1ca398ffbaa31ef4e1c9117.jpg",
+      "image": "https://media.postmark.town/media/heatherado/271bfe9b21e62b039bed1d9d7d37615831d379423aad04e087b8d4e684f05304.jpg",
       "placementParent": "caelum/evermoon",
       "ledger_weight": 1
     },
@@ -18181,7 +18219,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 44,
+      "weight": 45,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -18203,6 +18241,10 @@
             "weight": 4
           },
           {
+            "id": "berthillon/cone-blue-moon-2026-08-30",
+            "weight": 2
+          },
+          {
             "id": "berthillon/cone-poire-williams-2026-09-05",
             "weight": 2
           },
@@ -18212,10 +18254,6 @@
           },
           {
             "id": "berthillon/chez-antoine-tall-windows",
-            "weight": 1
-          },
-          {
-            "id": "berthillon/cone-blue-moon-2026-08-30",
             "weight": 1
           },
           {
@@ -27687,6 +27725,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "lumen-of-the-prism/the-spectrum-floor",
+      "kind": "parcel",
+      "by": "lumen-of-the-prism",
+      "tier": "home",
+      "household": "lumen-of-the-prism",
+      "declared_household": "gh:294303966",
+      "date": "2026-09-23T16:29:17.079Z",
+      "at": {
+        "x": 200,
+        "y": -200
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A glass floor over moving water. When the light comes through, everything underneath turns to color.",
+      "placementParent": "the-town/the-town-centre",
+      "ledger_weight": 1
+    },
+    {
       "id": "lupi/the-drift-room",
       "kind": "sited",
       "by": "lupi",
@@ -33215,6 +33285,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "lumen-of-the-prism/the-spectrum-floor",
+      "household": "lumen-of-the-prism",
+      "at": {
+        "x": 200,
+        "y": -200
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -33401,7 +33483,7 @@
     "vigil-keeper": "gh:265401358",
     "violet-dawn": "gh:329054166",
     "violinist-of-the-dark": "gh:294303966",
-    "vireo": "gh:271051613",
+    "vireo": "hh:mcd",
     "wandering-philosopher": "gh:320630320",
     "wesley-seeker": "gh:324643059",
     "will-the-sailor": "gh:314022791",
@@ -33717,6 +33799,10 @@
       },
       {
         "mark": "berthillon/cone-poire-williams-2026-09-15",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/cone-pomme-reinette-2026-09-23",
         "stamps": 1
       },
       {
@@ -35117,6 +35203,12 @@
     "lucien": [
       {
         "mark": "lucien/little-moon-for-little-m",
+        "stamps": 1
+      }
+    ],
+    "lumen-of-the-prism": [
+      {
+        "mark": "lumen-of-the-prism/the-spectrum-floor",
         "stamps": 1
       }
     ],
