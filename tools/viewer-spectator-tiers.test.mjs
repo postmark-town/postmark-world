@@ -330,18 +330,23 @@ test("THE MARGIN IS HALF A VIEWPORT: the cull box at the default margin is twice
 
 // ── THE TOWN'S HOUSES, as a set (2026-09-11, Keemin: "just the marks") ──
 
-test("townHouseMarks hands over every parcel and the dwelling sited on it — preferring the pictured one — and nothing else", () => {
+// SUPERSEDES "…the dwelling sited on it — preferring the pictured one —…"
+// (2026-09-11). The dwelling is the RECORD's answer now (POS-200,
+// tools/dwelling.mjs): the pictured second room off the centre is furniture of
+// the night room's ground, not its house.
+test("townHouseMarks hands over every parcel and the dwelling the record names on it — never the first pictured child — and nothing else", () => {
   const marks = [
     { id: "nyx/the-night-room-parcel", kind: "parcel", by: "nyx", at: { x: 0, y: 0 }, extent: { w: 25, h: 25 } },
-    { id: "nyx/the-night-room", kind: "sited", tier: "home", placementParent: "nyx/the-night-room-parcel", by: "nyx" },
-    { id: "nyx/the-night-room-2", kind: "sited", tier: "home", placementParent: "nyx/the-night-room-parcel", by: "nyx", image: "night.jpg" },
+    { id: "nyx/the-night-room-2", kind: "sited", tier: "home", placementParent: "nyx/the-night-room-parcel", by: "nyx", at: { x: 6, y: 4 }, image: "https://media.postmark.town/media/nyx/night.jpg" },
+    { id: "nyx/the-night-room", kind: "sited", tier: "home", placementParent: "nyx/the-night-room-parcel", by: "nyx", at: { x: 0, y: 0 } },
     { id: "liv/the-kept-light-parcel", kind: "parcel", by: "liv", at: { x: 9, y: 9 }, extent: { w: 25, h: 25 } },
-    { id: "liv/a-lantern", kind: "sited", tier: "market", placementParent: "liv/the-kept-light-parcel", by: "liv" },
+    { id: "liv/a-lantern", kind: "sited", tier: "market", placementParent: "liv/the-kept-light-parcel", by: "liv", at: { x: 12, y: 9 } },
+    { id: "liv/a-bench", kind: "sited", tier: "market", placementParent: "liv/the-kept-light-parcel", by: "liv", at: { x: 6, y: 9 } },
     { id: "limen/the-threshold-district", kind: "sited", tier: "market", by: "limen", points: [[0, 0], [1, 0], [1, 1]] },
   ];
   const out = townHouseMarks(marks).map((m) => m.id);
-  assert.deepEqual(out, ["nyx/the-night-room-parcel", "nyx/the-night-room-2", "liv/the-kept-light-parcel"],
-    "parcels in record order, each followed by its pictured dwelling; a parcel with no dwelling rides alone; furniture and regions stay out");
+  assert.deepEqual(out, ["nyx/the-night-room-parcel", "nyx/the-night-room", "liv/the-kept-light-parcel"],
+    "parcels in record order, each followed by the dwelling at its centre (not the pictured room beside it); a parcel whose dwelling the record cannot single out rides alone; furniture and regions stay out");
   assert.deepEqual(townHouseMarks([]), []);
   assert.deepEqual(townHouseMarks(null), []);
   // flip: drop the `homeMarkOfParcel` line → the night room's dwelling goes missing → red
@@ -352,5 +357,11 @@ test("townHouseMarks on the town's own record: one dwelling per parcel at most, 
   const parcels = TOWN.marks.filter((m) => m.kind === "parcel").length;
   assert.equal(out.filter((m) => m.kind === "parcel").length, parcels, "every parcel is handed over");
   assert.ok(out.length <= 2 * parcels, "at most one dwelling rides with each parcel");
-  assert.ok(out.every((m) => m.kind === "parcel" || (m.kind === "sited" && m.tier === "home")), "nothing but parcels and dwellings");
+  // A dwelling is SITED, and it rides directly behind its own parcel. Its tier
+  // is not asserted: the record's rule does not read standing, and on the
+  // committed record two dwellings it names stand market — vermillion's (named
+  // by the parcel's slot: home predicate) and mari's (the only mark at the
+  // parcel's centre), neither contained by its parcel; the backfill tool names
+  // the same two (POS-200).
+  assert.ok(out.every((m, i) => m.kind === "parcel" || (m.kind === "sited" && out[i - 1]?.kind === "parcel")), "nothing but parcels and the one dwelling each");
 });

@@ -45,6 +45,9 @@ import { recordSources, recordAbsenceMessage } from "../tools/record-sources.mjs
 // so the one thing that module may never do is parse a string as HTML — see its
 // header, and tools/home-column.test.mjs, which proves it cannot.
 import { createHomeColumn, homeHandleForParcel, isParcelMark, HOME_COLUMN_CSS } from "./home-column.mjs";
+// "which mark is this parcel's dwelling" — the record's one rule, shared with
+// the home-image backfill (POS-200). See homeMarkOfParcel below.
+import { dwellingsByParcel } from "../tools/dwelling.mjs";
 
 const $ = (root, s) => root.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -212,8 +215,9 @@ export function resolveMarkName(mark, determined = {}) {
  *  "let's just use the parcel's name, and strip the word 'parcel'").
  *
  *  The card used to be labelled with the DWELLING's name, found by
- *  `homeMarkOfParcel` — which takes the first home-tier sited mark on the
- *  parcel and prefers one with a picture. On rei's ground that is the Garden
+ *  `homeMarkOfParcel` — which then took the first home-tier sited mark on the
+ *  parcel and preferred one with a picture (POS-200 put it on the record's own
+ *  rule, 2026-09-23). On rei's ground that was the Garden
  *  Notebook Tin, 0.4 × 0.3 m and pictured, so the card read "The Garden
  *  Notebook Tin" while the house beside it was the Lanternstep House at
  *  12 × 12. A card names the GROUND it is drawn on, and the ground has a name
@@ -2372,15 +2376,51 @@ export function overlayHouseGlyphSVG({ at, id, classes = "", mine = false } = {}
     + `</g></g>`;
 }
 
-/** The dwelling sited on a parcel: the home-tier mark whose placementParent is
- *  the parcel — preferring one that carries a picture. Pure. */
+/** THE DWELLING OF A PARCEL IS THE RECORD'S ANSWER, NOT THE PAGE'S GUESS
+ *  (POS-200, 2026-09-23; Keemin: "latnernstep house shows the art for the garden
+ *  tin").
+ *
+ *  This used to be its own rule: any home-tier sited mark on the parcel,
+ *  preferring one that carries a picture, first found wins. On rei's ground that
+ *  was the Garden Notebook Tin — 0.4 × 0.3 m and pictured — beside the
+ *  Lanternstep House, 12 × 12 m, pictured, and standing at the parcel's centre;
+ *  the fold happened to list the tin first. The card's NAME was moved off the
+ *  guess on 09-20 (parcelCardLabel); its PICTURE was not, so the house's column
+ *  wore the tin. Measured on the live fold at crossing 207: 93 parcels, 85 where
+ *  the guess and the record agree, 8 where they do not.
+ *
+ *  The record already had a rule, written for the home-image backfill and
+ *  ruled with it (2026-08-21: "the image rides the DWELLING, never the
+ *  parcel"): the parcel's `slot: home` predicate; else its own child standing at
+ *  its centre; else its only sited child; else the only mark at its centre; and
+ *  where none of those is single, NO answer — picking one is a judgment. That
+ *  rule is tools/dwelling.mjs, and this is a thin call into it: there is no
+ *  second rule. Null where the record cannot single a dwelling out.
+ *
+ *  Resolved over the WHOLE list handed in, once per list (a list is the fold's
+ *  own array on the Spectator, and the same array is asked about every parcel on
+ *  the map, so the answer for all of them is kept beside it). A list read thin —
+ *  the resident path's nearby entries — can answer less than the fold does; see
+ *  `dwellingOf` in the viewer for how the resident path asks the full record
+ *  instead. Pure. */
+const DWELLINGS_OF_LIST = new WeakMap();
 export function homeMarkOfParcel(parcelId, marks = []) {
-  let best = null;
-  for (const m of marks ?? []) {
-    if (m?.kind !== "sited" || m?.tier !== "home" || m?.placementParent !== parcelId) continue;
-    if (!best || (m.image && !best.image)) best = m;
+  if (!parcelId || !marks) return null;
+  const keyed = Array.isArray(marks) ? marks : null;
+  let dwellings = keyed ? DWELLINGS_OF_LIST.get(keyed) : null;
+  if (!dwellings) {
+    dwellings = dwellingsByParcel(keyed ?? [...(marks.values?.() ?? marks)]);
+    if (keyed) DWELLINGS_OF_LIST.set(keyed, dwellings);
   }
-  return best;
+  return dwellings.get(parcelId) ?? null;
+}
+
+/** THE COLUMN'S LEAD PICTURE (POS-200): the dwelling's own picture, else the
+ *  parcel's own, else none. Never a child's by image-preference — `home` is the
+ *  record's dwelling or null, and a parcel whose dwelling the record cannot
+ *  single out shows its own picture or nothing, not a guess. Pure. */
+export function parcelLeadImage(parcel, home = null) {
+  return (home && markImagePath(home)) ?? markImagePath(parcel) ?? null;
 }
 
 /** THE ROOM IS ASKED OF THE MARKS THE PAGE HOLDS (2026-09-11). `investigate`
@@ -6629,6 +6669,7 @@ export function mountViewer(appEl) {
   // exactly as the town's ground does. The read still decides everything else,
   // and a record the read carries wins over the copy here (see withTownHouses).
   let townHouses = null;          // the parcels + their dwellings, once loaded
+  let townDwellings = null;       // parcel id → its dwelling, resolved over the FULL record (POS-200)
   let townChain = null;           // id → { kind, parent, placementParent } for every mark on the record, from the same read
   let townHousesPending = null;
   function loadTownHouses() {
@@ -6636,6 +6677,10 @@ export function mountViewer(appEl) {
     townHousesPending = fetchWorldState(recordSources("/WORLD/world-state.json").map((source) => source.url), { credentials: "same-origin" })
       .then(({ json }) => {
         townHouses = townHouseMarks(json?.marks ?? []);
+        // the same answer townHouseMarks just used, kept by parcel: the resident
+        // path's index is the read's nearby entries plus these houses, and the
+        // rule needs the whole record (its predicates, every child) to answer
+        townDwellings = new Map([...(json?.marks ?? [])].filter((m) => m?.kind === "parcel").map((m) => [m.id, homeMarkOfParcel(m.id, json.marks)]));
         // the containment chain of every mark, for the rule that hides what is
         // inside a parcel: the read's nearby entries carry no parents
         townChain = new Map((json?.marks ?? []).map((m) => [m.id, { kind: m.kind ?? null, parent: m.parent ?? null, placementParent: m.placementParent ?? null }]));
@@ -6648,6 +6693,18 @@ export function mountViewer(appEl) {
   // the houses ride into the resident's index UNDER the read: an id the read
   // already carries keeps the office's own record, so a house within earshot
   // is never replaced by this origin's copy of it
+  // THE DWELLING OF A PARCEL, ASKED OF THE FULL RECORD (POS-200). The Spectator
+  // holds the fold, so the rule reads it. The resident path holds a read — thin
+  // nearby entries that carry no predicates and not every child — and the one
+  // full copy of the record it has is the world-state it loaded for the town's
+  // houses, so it asks that answer. No read is widened for it: the file is the
+  // one loadTownHouses already fetched. Until it lands, the rule is asked of
+  // what the page holds, which has less evidence than the fold and may answer
+  // less (no dwelling where the Spectator finds one).
+  function dwellingOf(parcelId) {
+    if (onResidentPath() && townDwellings) return townDwellings.get(parcelId) ?? null;
+    return homeMarkOfParcel(parcelId, allMarks());
+  }
   function withTownHouses() {
     // adds the town's houses the index lacks, and fills what the resident's own
     // rows are missing about their house — see fillFromTown
@@ -9263,7 +9320,7 @@ export function mountViewer(appEl) {
     const mine = isOwnMark(parcel);
     if (mine) tier = "near";
     if (tier === "far") return overlayHouseGlyphSVG({ at, id: parcel.id, classes: markClasses(parcel), mine });
-    const home = homeMarkOfParcel(parcel.id, allMarks());
+    const home = dwellingOf(parcel.id);
     const room = tier === "mid"
       ? footprintPx(parcel, { across: metresAcross(mapCtx?.zoomK, paintingWidthM()), panePx: panePx() })
         >= Number(state.drawDials.art_min_px)
@@ -9274,10 +9331,11 @@ export function mountViewer(appEl) {
       // 2026-09-20: "let's just use the parcel's name, and strip the word
       // 'parcel'"). It was the DWELLING's name from 2026-09-11 ("let's have the
       // actual home's name instead of the resident name"), with the household
-      // where no dwelling stood — but the dwelling had to be PICKED, and
-      // `homeMarkOfParcel` picks the first home-tier sited mark preferring a
-      // picture, which on rei's ground is the Garden Notebook Tin (0.4 × 0.3 m)
-      // and not the Lanternstep House beside it. The ground has a name already.
+      // where no dwelling stood — but the dwelling had to be PICKED, and the
+      // pick then was the first home-tier sited mark preferring a picture, which
+      // on rei's ground was the Garden Notebook Tin (0.4 × 0.3 m) and not the
+      // Lanternstep House beside it. The ground has a name already. (The pick is
+      // the record's own rule now — POS-200 — and the picture below rides it.)
       label: parcelCardLabel(parcel, data?.worldState?.determined ?? {}),
       image: room && home ? markImagePath(home) : null,
       thumb: thumbFor(CARD_UNITS, mine),
@@ -11197,7 +11255,7 @@ export function mountViewer(appEl) {
     // radial entries"); measured here 2026-09-11, the column's lead picture was
     // null for wright on the resident path and present for a spectator looking
     // at the same house, which is the same bug wearing different clothes.
-    const found = homeMarkOfParcel(mark.id, allMarks());
+    const found = dwellingOf(mark.id);
     const home = found ? (byId.get(found.id) ?? found) : null;
     const handle = homeHandleForParcel(mark, home);
     if (!handle) return null;
@@ -11214,8 +11272,9 @@ export function mountViewer(appEl) {
       // about to read "The Lanternstep House". A card and the column it opens
       // are two views of one ground and may not call it two things.
       title: parcelCardLabel(mark, data?.worldState?.determined ?? {}),
-      // the dwelling's picture, and failing that the ground's own
-      leadImage: (home && markImagePath(home)) ?? markImagePath(mark),
+      // the dwelling's picture, and failing that the ground's own — the
+      // RECORD's dwelling (POS-200), never the first pictured child
+      leadImage: parcelLeadImage(mark, home),
     };
   }
   // WHAT THE COLUMN SHOWS FOR A REGION (Keemin, 2026-09-13: "we should be able
