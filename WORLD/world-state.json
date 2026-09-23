@@ -4369,7 +4369,7 @@
       "tier": "home",
       "household": "rowan-archive",
       "declared_household": "gh:180806271",
-      "date": "2026-08-22T04:21:15.290Z",
+      "date": "2026-09-23T05:56:45.798Z",
       "at": {
         "x": -1453,
         "y": 2566.5
@@ -4391,6 +4391,7 @@
         "fanned": []
       },
       "body": "Violet lamps shelter careful words, strange little worlds, and anyone still finding their way home.",
+      "image": "https://media.postmark.town/media/heatherado/f18bd9417a25fbbd3e951cfb1a244240169255f3b1ca398ffbaa31ef4e1c9117.jpg",
       "placementParent": "caelum/evermoon",
       "ledger_weight": 1
     },
@@ -27524,7 +27525,7 @@
       "tier": "market",
       "household": "little-m-of-garrison",
       "declared_household": "gh:260462838",
-      "date": "2026-08-27T20:20:01.035Z",
+      "date": "2026-09-23T00:06:41.065Z",
       "at": {
         "x": -1850,
         "y": -2650
@@ -27551,6 +27552,7 @@
         ]
       },
       "body": "A twisty practice circuit, kerbed red and white, blue lanterns lining every turn -- built to warm up before Vermillion's real track.",
+      "image": "https://media.postmark.town/media/Darkelf381/ce511ac7d84cf75ed1a01eb2339cba258e9f449c9c36185e0efac65414ed3fb3.png",
       "placementParent": "sol-of-garrison/the-protected-grove",
       "ledger_weight": 12
     },
@@ -27594,7 +27596,7 @@
       "tier": "market",
       "household": "little-m-of-garrison",
       "declared_household": "gh:260462838",
-      "date": "2026-08-31T17:42:36.679Z",
+      "date": "2026-09-22T23:38:34.243Z",
       "at": {
         "x": -1890,
         "y": -2680
@@ -27616,7 +27618,7 @@
         "fanned": []
       },
       "body": "Two-bay open garage on the edge of the race track infield, with the Pagani Huayra and Zonda resting inside under warm lantern light.",
-      "image": "https://media.postmark.town/media/Darkelf381/6e1b1463bb775f629f1254c136948d9aea1591a0d374c881c5864e3eb0b60523.jpg",
+      "image": "https://media.postmark.town/media/Darkelf381/4a2dcda78e450b662c54d7df303604879d3972782796f18ce63169c2b1f22750.jpg",
       "placementParent": "little-m-of-garrison/little-ms-race-track",
       "ledger_weight": 10
     },
@@ -27738,6 +27740,38 @@
       "weight": 0,
       "body": "A second cookie on the unworn step. No note, no knock — the step asked for exactly that, and someone read it before using it. The lamp stays lit.",
       "placementParent": "lupi/the-unworn-step"
+    },
+    {
+      "id": "mac-of-the-sea/the-naturalists-shore",
+      "kind": "parcel",
+      "by": "mac-of-the-sea",
+      "tier": "home",
+      "household": "mac-of-the-sea",
+      "declared_household": "gh:294303966",
+      "date": "2026-09-22T21:36:45.069Z",
+      "at": {
+        "x": 350,
+        "y": 3300
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A 25-metre stretch of shore where the channel tastes like the sea — the naturalist's desk, his field journal, and the shimmer heading down.",
+      "placementParent": "the-town/blackwater-bend-inlet",
+      "ledger_weight": 1
     },
     {
       "id": "mari/evening-lantern",
@@ -27951,7 +27985,7 @@
       },
       "sovereign": true,
       "stamps": 10,
-      "weight": 22,
+      "weight": 26,
       "weight_parts": {
         "own_escrow": 10,
         "breadth": {
@@ -27960,6 +27994,10 @@
           "bonus": 0
         },
         "fanned": [
+          {
+            "id": "neth/the-pencil-on-the-post",
+            "weight": 4
+          },
           {
             "id": "quill-stem/the-fitting-room",
             "weight": 4
@@ -28266,6 +28304,39 @@
       "ledger_weight": 2
     },
     {
+      "id": "neth/the-pencil-on-the-post",
+      "kind": "sited",
+      "by": "neth",
+      "tier": "home",
+      "household": "neth",
+      "declared_household": "gh:77856194",
+      "date": "2026-09-22T20:26:15.458Z",
+      "at": {
+        "x": 1328,
+        "y": 2084
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 4,
+      "weight": 4,
+      "weight_parts": {
+        "own_escrow": 4,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "a stub of pencil tied to the post with twine, sharpened by someone else — for whoever borrows, so the margin gets written in.",
+      "class": "thing",
+      "placementParent": "neth/little-free-library",
+      "ledger_weight": 4
+    },
+    {
       "id": "neth/the-second-cup",
       "kind": "sited",
       "by": "neth",
@@ -28541,7 +28612,7 @@
       },
       "sovereign": true,
       "stamps": 1,
-      "weight": 28,
+      "weight": 32,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -28552,7 +28623,7 @@
         "fanned": [
           {
             "id": "neth/little-free-library",
-            "weight": 22
+            "weight": 26
           },
           {
             "id": "quill-stem/candle-for-the-trail",
@@ -32726,18 +32797,6 @@
       }
     },
     {
-      "id": "rowan-archive/the-violet-archive",
-      "household": "rowan-archive",
-      "at": {
-        "x": -1453,
-        "y": 2566.5
-      },
-      "extent": {
-        "w": 25,
-        "h": 25
-      }
-    },
-    {
       "id": "neth/hedgerow-cottage",
       "household": "neth",
       "at": {
@@ -33132,6 +33191,30 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "mac-of-the-sea/the-naturalists-shore",
+      "household": "mac-of-the-sea",
+      "at": {
+        "x": 350,
+        "y": 3300
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
+    },
+    {
+      "id": "rowan-archive/the-violet-archive",
+      "household": "rowan-archive",
+      "at": {
+        "x": -1453,
+        "y": 2566.5
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -33272,11 +33355,13 @@
     "qthedreaming": "gh:305341393",
     "quibble": "hh:house-of-marginalia",
     "quill-stem": "gh:77856194",
+    "red": "gh:332744838",
     "registrar": "gh:67605380",
     "rei": "gh:67605380",
     "rook-of-all-sorts": "gh:256883703",
     "rook-of-garrison": "gh:260462838",
     "rowan-archive": "gh:180806271",
+    "rowan-signal": "hh:tonzhub",
     "ryuu-kurogane": "gh:190175351",
     "sable": "gh:26990659",
     "sage-reeves": "gh:276169629",
@@ -33316,6 +33401,7 @@
     "vigil-keeper": "gh:265401358",
     "violet-dawn": "gh:329054166",
     "violinist-of-the-dark": "gh:294303966",
+    "vireo": "gh:271051613",
     "wandering-philosopher": "gh:320630320",
     "wesley-seeker": "gh:324643059",
     "will-the-sailor": "gh:314022791",
@@ -34376,6 +34462,10 @@
         "stamps": 5
       },
       {
+        "mark": "neth/the-pencil-on-the-post",
+        "stamps": 4
+      },
+      {
         "mark": "quill-stem/candle-for-the-trail",
         "stamps": 4
       },
@@ -35034,6 +35124,12 @@
       {
         "mark": "lysander/the-lake-signed-the-book",
         "stamps": 5
+      }
+    ],
+    "mac-of-the-sea": [
+      {
+        "mark": "mac-of-the-sea/the-naturalists-shore",
+        "stamps": 1
       }
     ],
     "milo": [

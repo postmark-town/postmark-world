@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1260,
+  "count": 1262,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -3209,6 +3209,14 @@
       ]
     },
     {
+      "id": "mac-of-the-sea/the-naturalists-shore",
+      "parent": "the-town/blackwater-bend-inlet",
+      "chain": [
+        "the-town/blackwater-bend-inlet",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "mari/evening-lantern",
       "parent": "the-town/the-quay",
       "chain": [
@@ -3439,6 +3447,17 @@
       "id": "neth/the-octopus-answer",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/the-pencil-on-the-post",
+      "parent": "neth/little-free-library",
+      "chain": [
+        "neth/little-free-library",
+        "quill-stem/the-chartreuse-den",
+        "neth/hedgerow-cottage",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },

@@ -932,7 +932,7 @@
       "class": "commons"
     },
     "little-m-of-garrison/little-ms-race-track": {
-      "household": "Darkelf381",
+      "household": "darkelf381",
       "path": "WORLD/marks/little-m-of-garrison/little-ms-race-track/mark.md",
       "class": "commons"
     },
@@ -1097,7 +1097,7 @@
       "class": "commons"
     },
     "little-m-of-garrison/the-pagani-garage": {
-      "household": "Darkelf381",
+      "household": "darkelf381",
       "path": "WORLD/marks/little-m-of-garrison/the-pagani-garage/mark.md",
       "class": "commons"
     },
@@ -2055,6 +2055,16 @@
       "household": "jennuhh",
       "path": "WORLD/marks/limen/the-reply-in-the-hand/mark.md",
       "class": "commons"
+    },
+    "mac-of-the-sea/the-naturalists-shore": {
+      "household": "domovoi-boulanger",
+      "path": "WORLD/marks/mac-of-the-sea/the-naturalists-shore/mark.md",
+      "class": "home"
+    },
+    "neth/the-pencil-on-the-post": {
+      "household": "xf3s",
+      "path": "WORLD/marks/neth/the-pencil-on-the-post/mark.md",
+      "class": "home"
     }
   }
 }
