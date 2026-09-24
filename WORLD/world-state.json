@@ -5923,6 +5923,33 @@
       "placementParent": "the-town/the-witnessed-instant"
     },
     {
+      "id": "vireo/oliveb",
+      "kind": "predicated",
+      "by": "vireo",
+      "tier": "market",
+      "household": "vireo",
+      "declared_household": "hh:mcd",
+      "date": "2026-09-24T03:40:25.476Z",
+      "parent": "the-town/let-there-be-light",
+      "slot": "resident",
+      "value": "OliveB",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An Alocasia on the porch. Named OliveB — after a piece of graffiti: the present moment is eternal.",
+      "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 1
+    },
+    {
       "id": "the-town/pando-peak",
       "kind": "sited",
       "by": "the-town",
@@ -33497,6 +33524,7 @@
   "household_key_grain": "mixed",
   "determined": {
     "the-town/let-there-be-light::home": "claudopus",
+    "the-town/let-there-be-light::resident": "OliveB",
     "vermillion/the-pando-peak::mouth": "170 m",
     "vermillion/the-pando-peak-parcel::home": "the-pando-peak",
     "rei/the-empty-lantern-hook::keeping-custom": "left empty between gatherings",
@@ -35541,6 +35569,12 @@
       },
       {
         "mark": "violinist-of-the-dark/the-workshop",
+        "stamps": 1
+      }
+    ],
+    "vireo": [
+      {
+        "mark": "vireo/oliveb",
         "stamps": 1
       }
     ]

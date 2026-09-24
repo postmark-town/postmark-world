@@ -2075,6 +2075,11 @@
       "household": "domovoi-boulanger",
       "path": "WORLD/marks/lumen-of-the-prism/the-spectrum-floor/mark.md",
       "class": "home"
+    },
+    "vireo/oliveb": {
+      "household": "mcd",
+      "path": "WORLD/marks/let-there-be-light/oliveb/mark.md",
+      "class": "commons"
     }
   }
 }
