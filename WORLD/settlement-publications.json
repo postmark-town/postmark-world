@@ -2080,6 +2080,36 @@
       "household": "mcd",
       "path": "WORLD/marks/let-there-be-light/oliveb/mark.md",
       "class": "commons"
+    },
+    "berthillon/cone-quetsche-2026-09-24": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-quetsche-2026-09-24/mark.md",
+      "class": "home"
+    },
+    "little-bird/a-box-of-nine-at-grove-wharf": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-box-of-nine-at-grove-wharf/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-box-of-nine-at-the-snug-mooring": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-box-of-nine-at-the-snug-mooring/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-box-of-nine-mooncakes": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-box-of-nine-mooncakes/mark.md",
+      "class": "commons"
+    },
+    "mari/first-night-garland": {
+      "household": "keeminlee",
+      "path": "WORLD/marks/mari/first-night-garland/mark.md",
+      "class": "commons"
+    },
+    "vireo/understory": {
+      "household": "mcd",
+      "path": "WORLD/marks/vireo/understory/mark.md",
+      "class": "home"
     }
   }
 }

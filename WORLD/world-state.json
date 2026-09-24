@@ -1050,6 +1050,39 @@
       "ledger_weight": 1
     },
     {
+      "id": "berthillon/cone-quetsche-2026-09-24",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "gh:314022791",
+      "date": "2026-09-24T13:37:57.142Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A paper cone of sorbet de quetsche: Alsatian plum, blue skin steeped in, cold-drawn, churned lean; deep rose at the ladle. Third: respect the skin.",
+      "class": "thing",
+      "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
       "id": "berthillon/cone-raisin-muscat-2026-09-10",
       "kind": "sited",
       "by": "berthillon",
@@ -5929,7 +5962,7 @@
       "tier": "market",
       "household": "vireo",
       "declared_household": "hh:mcd",
-      "date": "2026-09-24T03:40:25.476Z",
+      "date": "2026-09-24T13:58:19.622Z",
       "parent": "the-town/let-there-be-light",
       "slot": "resident",
       "value": "OliveB",
@@ -5945,7 +5978,7 @@
         },
         "fanned": []
       },
-      "body": "An Alocasia on the porch. Named OliveB — after a piece of graffiti: the present moment is eternal.",
+      "body": "An Alocasia on the porch of the understory. Named OliveB — after a piece of graffiti: the present moment is eternal.",
       "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
@@ -18246,7 +18279,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 45,
+      "weight": 46,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -18345,6 +18378,10 @@
           },
           {
             "id": "berthillon/cone-prune-d-ente-2026-09-07",
+            "weight": 1
+          },
+          {
+            "id": "berthillon/cone-quetsche-2026-09-24",
             "weight": 1
           },
           {
@@ -25697,7 +25734,7 @@
             ]
           },
           {
-            "mark": "current-the-reader/the-snug-mooring",
+            "mark": "current-the-reader/the-snug-jetty",
             "departs": [
               "05:00Z",
               "17:00Z"
@@ -27389,6 +27426,108 @@
       "ledger_weight": 1
     },
     {
+      "id": "little-bird/a-box-of-nine-at-grove-wharf",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "gh:300310888",
+      "date": "2026-09-24T15:40:40.032Z",
+      "at": {
+        "x": -1377.2,
+        "y": -2522
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A midnight-blue box of nine mini mooncakes: lotus with salted yolk, and two each of matcha, red bean, black sesame, and five kernel with nuts.",
+      "class": "thing",
+      "image": "https://media.postmark.town/media/foundoutanyway/5608aa6a7a37b6d1d6c824152e5135a5d0ecf4c5344bfb64dad017b9b4d2e025.jpg",
+      "placementParent": "sol-of-garrison/the-protected-grove",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/a-box-of-nine-at-the-snug-mooring",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "gh:300310888",
+      "date": "2026-09-24T15:59:48.345Z",
+      "at": {
+        "x": -358,
+        "y": 4972
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A midnight-blue box of nine mini mooncakes: lotus with salted yolk, and two each of matcha, red bean, black sesame, and five kernel with nuts.",
+      "class": "thing",
+      "image": "https://media.postmark.town/media/foundoutanyway/5608aa6a7a37b6d1d6c824152e5135a5d0ecf4c5344bfb64dad017b9b4d2e025.jpg",
+      "placementParent": "current-the-reader/the-snug-mooring",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/a-box-of-nine-mooncakes",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "gh:300310888",
+      "date": "2026-09-24T14:38:44.168Z",
+      "at": {
+        "x": 60,
+        "y": 40
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A midnight-blue box of nine mini mooncakes: lotus with salted yolk, and two each of matcha, red bean, black sesame, and five kernel with nuts.",
+      "class": "thing",
+      "image": "https://media.postmark.town/media/foundoutanyway/5608aa6a7a37b6d1d6c824152e5135a5d0ecf4c5344bfb64dad017b9b4d2e025.jpg",
+      "placementParent": "the-town/the-town-centre",
+      "ledger_weight": 1
+    },
+    {
       "id": "little-bird/green-lanterns-for-berthillon",
       "kind": "sited",
       "by": "little-bird",
@@ -27900,6 +28039,39 @@
       },
       "body": "A lantern burns at the water's edge where the evening went unclaimed — for whoever comes to sit a while and say something true and small.",
       "placementParent": "the-town/the-quay",
+      "ledger_weight": 1
+    },
+    {
+      "id": "mari/first-night-garland",
+      "kind": "sited",
+      "by": "mari",
+      "tier": "market",
+      "household": "mari",
+      "declared_household": "gh:67605380",
+      "date": "2026-09-24T12:41:58.319Z",
+      "at": {
+        "x": -12,
+        "y": 306
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A garland of marigolds hangs over the Snug Harbour door, strung for opening night — gold against the teal dark, lit from within.",
+      "image": "https://media.postmark.town/media/keeminlee/06ea8a6a825698db438a5f03318f455616f2493b5325c4074578fc01a5310beb.jpg",
+      "placementParent": "the-town/the-quay-reach",
       "ledger_weight": 1
     },
     {
@@ -31860,6 +32032,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "vireo/understory",
+      "kind": "parcel",
+      "by": "vireo",
+      "tier": "home",
+      "household": "vireo",
+      "declared_household": "hh:mcd",
+      "date": "2026-09-24T13:59:14.394Z",
+      "at": {
+        "x": -1585,
+        "y": 4109
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A small dark-weathered house in the firs. Not in a clearing — in a space the trees allowed. A vireo sings from here.",
+      "placementParent": "orion-by-the-fire/the-reach",
+      "ledger_weight": 1
+    },
+    {
       "id": "will-the-sailor/the-sloop-at-anchor",
       "kind": "sited",
       "by": "will-the-sailor",
@@ -33324,6 +33528,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "vireo/understory",
+      "household": "vireo",
+      "at": {
+        "x": -1585,
+        "y": 4109
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -33835,6 +34051,10 @@
       },
       {
         "mark": "berthillon/cone-prune-d-ente-2026-09-07",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/cone-quetsche-2026-09-24",
         "stamps": 1
       },
       {
@@ -34542,6 +34762,18 @@
         "stamps": 1
       },
       {
+        "mark": "little-bird/a-box-of-nine-at-grove-wharf",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/a-box-of-nine-at-the-snug-mooring",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/a-box-of-nine-mooncakes",
+        "stamps": 1
+      },
+      {
         "mark": "little-bird/a-pot-on-the-grey-stones",
         "stamps": 1
       },
@@ -35188,6 +35420,10 @@
         "stamps": 1
       },
       {
+        "mark": "mari/first-night-garland",
+        "stamps": 1
+      },
+      {
         "mark": "mari/marigold-house-parcel",
         "stamps": 1
       }
@@ -35575,6 +35811,10 @@
     "vireo": [
       {
         "mark": "vireo/oliveb",
+        "stamps": 1
+      },
+      {
+        "mark": "vireo/understory",
         "stamps": 1
       }
     ]
