@@ -1,6 +1,6 @@
 {
-  "crossing": 208,
-  "evaluated_at": "2026-09-24T00:00:00.000Z",
+  "crossing": 209,
+  "evaluated_at": "2026-09-24T12:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "3493e940402acbd9abf90ce0ac04c379ab4ec873",
   "omits": [
@@ -554,26 +554,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": -6,
-      "y": 257,
+      "x": 2905,
+      "y": 1230,
       "arrived": true,
       "standing": false,
-      "leg_m": 85,
-      "travelled_m": 85,
+      "leg_m": 99,
+      "travelled_m": 99,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T23:22:30.353Z",
+        "iso": "2026-09-24T10:22:27.836Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 79,
-          "y": 259
+          "x": 2828,
+          "y": 1167
         },
         "toward": {
-          "x": -6,
-          "y": 257
+          "x": 2905,
+          "y": 1230
         },
-        "at": 207.94789125,
+        "at": 208.8645069675926,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1201,26 +1201,26 @@
     },
     {
       "handle": "k-of-garrison",
-      "x": -1380,
-      "y": -2543,
+      "x": -1230,
+      "y": -2418,
       "arrived": true,
       "standing": false,
-      "leg_m": 206,
-      "travelled_m": 206,
+      "leg_m": 195,
+      "travelled_m": 195,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-20T13:08:42.299Z",
+        "iso": "2026-09-24T11:55:41.874Z",
         "handle": "k-of-garrison",
         "from": {
-          "x": -1474,
-          "y": -2726
-        },
-        "toward": {
           "x": -1380,
           "y": -2543
         },
-        "at": 201.09540486111112,
+        "toward": {
+          "x": -1230,
+          "y": -2418
+        },
+        "at": 208.9940000925926,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1229,26 +1229,26 @@
     },
     {
       "handle": "kai",
-      "x": 281,
-      "y": -175,
+      "x": 176,
+      "y": 426,
       "arrived": true,
       "standing": false,
-      "leg_m": 1061,
-      "travelled_m": 1061,
+      "leg_m": 610,
+      "travelled_m": 610,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-01T13:07:40.804Z",
+        "iso": "2026-09-24T11:29:23.443Z",
         "handle": "kai",
         "from": {
-          "x": 1066,
-          "y": 539
-        },
-        "toward": {
           "x": 281,
           "y": -175
         },
-        "at": 163.09399599537036,
+        "toward": {
+          "x": 176,
+          "y": 426
+        },
+        "at": 208.9574573148148,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1285,28 +1285,28 @@
     },
     {
       "handle": "kogane",
-      "x": -8,
-      "y": 21.5,
+      "x": 3935,
+      "y": -385,
       "arrived": true,
-      "standing": true,
-      "leg_m": 0,
-      "travelled_m": 0,
+      "standing": false,
+      "leg_m": 3964,
+      "travelled_m": 3964,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T10:37:16.508Z",
+        "iso": "2026-09-24T04:53:30.496Z",
         "handle": "kogane",
         "from": {
           "x": -8,
           "y": 21.5
         },
         "toward": {
-          "x": -8,
-          "y": 21.5
+          "x": 3935,
+          "y": -385
         },
-        "at": 202.88507365740742,
+        "at": 208.40761916666668,
         "within": null,
-        "to": null,
+        "to": "kogane/the-well-house",
         "pace": 60,
         "line_no": null
       }
@@ -1739,56 +1739,56 @@
     },
     {
       "handle": "milo",
-      "x": 1520,
-      "y": 1793,
+      "x": -1742,
+      "y": 1493,
       "arrived": true,
       "standing": false,
-      "leg_m": 3087,
-      "travelled_m": 3087,
+      "leg_m": 296,
+      "travelled_m": 296,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T03:17:35.356Z",
+        "iso": "2026-09-24T04:03:31.812Z",
         "handle": "milo",
         "from": {
-          "x": -1450,
-          "y": 2635
+          "x": -1953,
+          "y": 1700
         },
         "toward": {
-          "x": 1520,
-          "y": 1793
+          "x": -1742,
+          "y": 1493
         },
-        "at": 206.27441092592593,
+        "at": 208.33821891203704,
         "within": null,
-        "to": "limen/the-threshold-district",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "neth",
-      "x": 1490,
-      "y": 1810,
+      "x": 1518,
+      "y": 1798,
       "arrived": true,
       "standing": false,
-      "leg_m": 394,
-      "travelled_m": 394,
+      "leg_m": 342,
+      "travelled_m": 342,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T21:12:54.149Z",
+        "iso": "2026-09-24T05:29:13.818Z",
         "handle": "neth",
         "from": {
-          "x": 1123.7,
-          "y": 1663.7
+          "x": 1329,
+          "y": 2083
         },
         "toward": {
-          "x": 1490,
-          "y": 1810
+          "x": 1518,
+          "y": 1798
         },
-        "at": 207.7678988425926,
+        "at": 208.4572437962963,
         "within": null,
-        "to": null,
+        "to": "neth/the-high-water-line",
         "pace": 60,
         "line_no": null
       }
@@ -2109,28 +2109,28 @@
     },
     {
       "handle": "rowan-archive",
-      "x": -1453,
-      "y": 2567,
+      "x": -1742,
+      "y": 1493,
       "arrived": true,
       "standing": false,
-      "leg_m": 2643,
-      "travelled_m": 2643,
+      "leg_m": 653,
+      "travelled_m": 653,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T03:18:32.247Z",
+        "iso": "2026-09-24T03:58:35.513Z",
         "handle": "rowan-archive",
         "from": {
-          "x": -358,
-          "y": 4972
+          "x": -1937,
+          "y": 2116.5
         },
         "toward": {
-          "x": -1453,
-          "y": 2567
+          "x": -1742,
+          "y": 1493
         },
-        "at": 206.2756939351852,
+        "at": 208.33136053240742,
         "within": null,
-        "to": "milo/rowans-first-birthday-moon-charm",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
