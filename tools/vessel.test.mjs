@@ -73,7 +73,7 @@ const at = (p) => [p.x, p.y];
 const TOWN = "the-town/the-post-office";
 const LANDING = "the-town/the-pando-landing";
 const WHARF = "sol-of-garrison/grove-wharf"; // the Garrison stop, ruled 2026-08-10 (#1596), granted case-by-case
-const SNUG = "current-the-reader/the-snug-mooring"; // the Snug Harbour stop, ruled 2026-09-19 (#2986) — first call after the quay
+const SNUG = "current-the-reader/the-snug-jetty"; // the Snug Harbour stop: the jetty since 2026-09-24 (Keemin's ruling; Current + the keeper asked 09-22 — the story starts on the jetty); the mooring from 2026-09-19 (#2986) — first call after the quay
 
 // ── the record's own numbers ────────────────────────────────────────────────
 //
