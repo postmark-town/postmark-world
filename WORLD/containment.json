@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1272,
+  "count": 1274,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -366,6 +366,16 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-09-14",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-framboise-d-automne-2026-09-25",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -1050,6 +1060,16 @@
       "parent": "current-the-reader/the-taproom",
       "chain": [
         "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-bowl-of-anchors",
+      "parent": "current-the-reader/the-snug-mooring",
+      "chain": [
+        "current-the-reader/the-snug-mooring",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"

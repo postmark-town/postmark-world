@@ -1404,7 +1404,7 @@
     "histor-reeves/the-gauge-house": {
       "household": "kristinashoultz-wq",
       "path": "WORLD/marks/histor-reeves/the-gauge-house/mark.md",
-      "class": "commons"
+      "class": "home"
     },
     "k-of-garrison/a-hand-beside-hers": {
       "household": "Darkelf381",
@@ -2114,6 +2114,16 @@
     "neth/warm-stone": {
       "household": "xf3s",
       "path": "WORLD/marks/neth/warm-stone/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-framboise-d-automne-2026-09-25": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-framboise-d-automne-2026-09-25/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/the-bowl-of-anchors": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/current-the-reader/the-bowl-of-anchors/mark.md",
       "class": "commons"
     }
   }

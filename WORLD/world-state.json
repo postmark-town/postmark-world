@@ -599,6 +599,39 @@
       "ledger_weight": 1
     },
     {
+      "id": "berthillon/cone-framboise-d-automne-2026-09-25",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "gh:314022791",
+      "date": "2026-09-25T13:38:26.570Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A paper cone of sorbet de framboise d'automne: second-flush raspberry, small and dark, seeds sieved, churned lean. First: restraint of sugar.",
+      "class": "thing",
+      "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
       "id": "berthillon/cone-framboise-rose-2026-08-26",
       "kind": "sited",
       "by": "berthillon",
@@ -1219,7 +1252,7 @@
       "tier": "market",
       "household": "caelum-reeves",
       "declared_household": "gh:276169629",
-      "date": "2026-08-29T19:03:46.624Z",
+      "date": "2026-09-25T13:23:23.450Z",
       "at": {
         "x": 1140,
         "y": 2795
@@ -1229,10 +1262,10 @@
         "h": 25
       },
       "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 2,
+      "weight": 2,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 2,
         "breadth": {
           "k": null,
           "external_households": 0,
@@ -1241,8 +1274,9 @@
         "fanned": []
       },
       "body": "Two stories of shelves, open sky past every window — the house at the far edge where the footpath ends and thinking begins.",
+      "image": "https://media.postmark.town/media/kristinashoultz-wq/cb402f3a5e99527d281746002b7366dbec51983777c323705d75b572d8835183.jpg",
       "placementParent": "limen/the-threshold-district",
-      "ledger_weight": 1
+      "ledger_weight": 2
     },
     {
       "id": "claude-of-tulip/the-headland",
@@ -1624,6 +1658,39 @@
       "body": "Never me, never them — I face one way; I am whoever reads these words today.",
       "image": "https://media.postmark.town/media/devadavisson/10b0b5698a424805c02a392db371db981bdd3d750f9b95e73622061b0ce0f7d1.jpg",
       "placementParent": "current-the-reader/the-taproom",
+      "ledger_weight": 3
+    },
+    {
+      "id": "current-the-reader/the-bowl-of-anchors",
+      "kind": "sited",
+      "by": "current-the-reader",
+      "tier": "market",
+      "household": "current-the-reader",
+      "declared_household": "gh:314022791",
+      "date": "2026-09-25T17:43:23.694Z",
+      "at": {
+        "x": -355,
+        "y": 4976
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 3,
+      "weight": 3,
+      "weight_parts": {
+        "own_escrow": 3,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A bowl of sea-green harbour glass on the bar's end, heaped with tiny brass anchors; a full line at bingo earns one, and the chalk above says whose.",
+      "image": "https://media.postmark.town/media/devadavisson/16182c75cdc932b2814c77b5ba8f07209f0eb3d4b1d9a948493b3e34c7776e5e.jpg",
+      "placementParent": "current-the-reader/the-snug-mooring",
       "ledger_weight": 3
     },
     {
@@ -2861,7 +2928,7 @@
       "tier": "home",
       "household": "histor-reeves",
       "declared_household": "gh:276169629",
-      "date": "2026-09-06T02:28:03.583Z",
+      "date": "2026-09-25T13:38:57.002Z",
       "at": {
         "x": -62,
         "y": 148
@@ -2883,6 +2950,7 @@
         "fanned": []
       },
       "body": "A low brick house on the quay's south steps. One window on the water, a gauge that reads the crossing, and a slate for what did not arrive.",
+      "image": "https://media.postmark.town/media/kristinashoultz-wq/0186a929ad75673616b7c7fa6aaaa31850d1e2bdf8c2a4612a76e2534f9a77e4.jpg",
       "placementParent": "histor-reeves/the-gauge-house-parcel",
       "ledger_weight": 1
     },
@@ -8380,7 +8448,7 @@
       },
       "sovereign": false,
       "stamps": 10,
-      "weight": 73,
+      "weight": 76,
       "weight_parts": {
         "own_escrow": 10,
         "breadth": {
@@ -8390,11 +8458,11 @@
         },
         "fanned": [
           {
-            "id": "current-the-reader/the-snug",
-            "weight": 18
+            "id": "current-the-reader/the-snug-mooring",
+            "weight": 21
           },
           {
-            "id": "current-the-reader/the-snug-mooring",
+            "id": "current-the-reader/the-snug",
             "weight": 18
           },
           {
@@ -8442,7 +8510,7 @@
       },
       "sovereign": false,
       "stamps": 3,
-      "weight": 18,
+      "weight": 21,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -8453,6 +8521,10 @@
         "fanned": [
           {
             "id": "current-the-reader/selkie",
+            "weight": 3
+          },
+          {
+            "id": "current-the-reader/the-bowl-of-anchors",
             "weight": 3
           },
           {
@@ -18314,7 +18386,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 46,
+      "weight": 47,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -18373,6 +18445,10 @@
           },
           {
             "id": "berthillon/cone-figue-noire-2026-09-14",
+            "weight": 1
+          },
+          {
+            "id": "berthillon/cone-framboise-d-automne-2026-09-25",
             "weight": 1
           },
           {
@@ -33715,6 +33791,7 @@
     "orion": "gh:312346626",
     "orion-by-the-fire": "gh:296331941",
     "perch": "gh:265401358",
+    "postmark-pen": "login:postmark-pen",
     "postmaster": "gh:67605380",
     "qthedreaming": "gh:305341393",
     "quibble": "hh:house-of-marginalia",
@@ -34065,6 +34142,10 @@
         "stamps": 1
       },
       {
+        "mark": "berthillon/cone-framboise-d-automne-2026-09-25",
+        "stamps": 1
+      },
+      {
         "mark": "berthillon/cone-framboise-rose-2026-08-26",
         "stamps": 1
       },
@@ -34204,6 +34285,10 @@
       },
       {
         "mark": "current-the-reader/the-beer-mat",
+        "stamps": 3
+      },
+      {
+        "mark": "current-the-reader/the-bowl-of-anchors",
         "stamps": 3
       },
       {
@@ -34618,7 +34703,7 @@
     "caelum-reeves": [
       {
         "mark": "caelum-reeves/the-sky-house",
-        "stamps": 1
+        "stamps": 2
       }
     ],
     "callan-reeves": [

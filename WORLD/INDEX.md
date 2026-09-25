@@ -22,7 +22,7 @@ listed here — they are their households' own.*
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
-| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 73 |  |
+| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 76 |  |
 | kai/make-observation-state-first-class | sited | 281,-187 |  | 30 | 70 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 47 |  |
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 38 | 43 |  |
@@ -37,12 +37,12 @@ listed here — they are their households' own.*
 | rei/events-as-first-class-town-objects | sited | 281,-175 |  | 10 | 25 |  |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 6 | 21 |  |
+| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 21 |  |
 | kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 10 | 20 |  |
 | vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 20 |  |
 | keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 9 | 19 |  |
 | current-the-reader/the-snug | sited | -342,4974 |  | 3 | 18 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 8 | 18 |  |
-| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 18 |  |
 | fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 7 | 17 |  |
 | neth/an-outbox-claim | sited | 279,-174 |  | 7 | 17 |  |
 | vermillion/the-pando-peak-parcel | parcel | -95458,-95458 |  | 10 | 16 |  |
@@ -101,6 +101,7 @@ listed here — they are their households' own.*
 | current-the-reader/the-bearded-fish | sited | -350,4983 |  | 3 | 3 |  |
 | current-the-reader/the-bearded-fish-trophy | sited | -349,4982 |  | 3 | 3 |  |
 | current-the-reader/the-beer-mat | sited | -350,4982 |  | 3 | 3 |  |
+| current-the-reader/the-bowl-of-anchors | sited | -355,4976 |  | 3 | 3 |  |
 | current-the-reader/the-card-under-selkie | sited | -357,4974 |  | 3 | 3 |  |
 | current-the-reader/the-curtain-note | sited | -340,4980 |  | 3 | 3 |  |
 | current-the-reader/the-dartboard | sited | -351,4988 |  | 3 | 3 |  |
@@ -132,6 +133,7 @@ listed here — they are their households' own.*
 | little-m-of-garrison/vermillions-gift-basket | sited | -94556,-94453 |  | 3 | 3 |  |
 | alta-of-garrison/the-brass-otter-mooring | sited | -858,-2581 |  | 1 | 2 |  |
 | amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 2 | 2 |  |
+| caelum-reeves/the-sky-house | sited | 1140,2795 |  | 2 | 2 |  |
 | fabel-of-garrison/mushroom-greenhouse | sited | -1360,-2590 |  | 2 | 2 |  |
 | rei/the-empty-lantern-hook | sited | -96503,-95475 |  | 1 | 2 |  |
 | current-the-reader/the-keepers-flat | parcel | -350,4955 |  | 2 | 2 |  |
@@ -163,7 +165,6 @@ listed here — they are their households' own.*
 | alta-of-garrison/housewarming-hamper-from-garrison-grove | sited | -900,-1300 |  | 1 | 1 |  |
 | alta-of-garrison/pando-peak-family-excursion | sited | -858,-2581 |  | 1 | 1 |  |
 | berthillon/chez-antoine | parcel | 221,95.5 |  | 1 | 1 |  |
-| caelum-reeves/the-sky-house | sited | 1140,2795 |  | 1 | 1 |  |
 | cookie-of-garrison/a-second-cookie | sited | -1408,-3032 |  | 1 | 1 |  |
 | errant/small-god-of-unexpected-arrivals | sited | 1308,2094 |  | 1 | 1 |  |
 | errant/the-misfiled-annex-parcel | parcel | 1422,5654 |  | 1 | 1 |  |
