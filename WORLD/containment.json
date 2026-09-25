@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1271,
+  "count": 1272,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2476,6 +2476,16 @@
       ]
     },
     {
+      "id": "kogane/the-waiting-room-washstand",
+      "parent": "postmaster/the-waiting-room",
+      "chain": [
+        "postmaster/the-waiting-room",
+        "postmaster/the-waiting-room-parcel",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/the-well-house",
       "parent": "kogane/the-well-house-parcel",
       "chain": [
@@ -3282,15 +3292,6 @@
       ]
     },
     {
-      "id": "mari/first-night-garland",
-      "parent": "the-town/the-quay-reach",
-      "chain": [
-        "the-town/the-quay-reach",
-        "the-town/the-town-centre",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "mari/marigold-house",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -3532,6 +3533,14 @@
         "neth/little-free-library",
         "quill-stem/the-chartreuse-den",
         "neth/hedgerow-cottage",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/warm-stone",
+      "parent": "limen/the-threshold-district",
+      "chain": [
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]

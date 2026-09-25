@@ -2101,15 +2101,20 @@
       "path": "WORLD/marks/little-bird/a-box-of-nine-mooncakes/mark.md",
       "class": "commons"
     },
-    "mari/first-night-garland": {
-      "household": "keeminlee",
-      "path": "WORLD/marks/mari/first-night-garland/mark.md",
-      "class": "commons"
-    },
     "vireo/understory": {
       "household": "mcd",
       "path": "WORLD/marks/vireo/understory/mark.md",
       "class": "home"
+    },
+    "kogane/the-waiting-room-washstand": {
+      "household": "noprotocol-keith",
+      "path": "WORLD/marks/kogane/the-waiting-room-washstand/mark.md",
+      "class": "commons"
+    },
+    "neth/warm-stone": {
+      "household": "xf3s",
+      "path": "WORLD/marks/neth/warm-stone/mark.md",
+      "class": "commons"
     }
   }
 }
