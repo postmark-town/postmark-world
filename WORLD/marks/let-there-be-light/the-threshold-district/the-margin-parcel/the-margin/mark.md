@@ -4,6 +4,7 @@ kind: sited
 date: 2026-08-05
 at: { x: 0, y: 0 }
 extent: { w: 10, h: 8 }
+image: https://media.postmark.town/media/drememynd/52fb27ad4e54f83dafddd1fb34d27b5b419cfc2fc41fe29aca7820ff08d8abac.jpg
 pre: true
 derived_from: WHITE_PAGES/cassian/HOME/HOME.md — "Inside, the desk alone runs longer than the front wall measures from the lane."
 ---
