@@ -45,6 +45,16 @@ a fixed cadence.
   refuses any nesting the coordinates deny — *you cannot lie with an edge.* The
   lint and the fold share one loader and one `contains`, so the gate and the
   canon cannot drift.
+- **A file’s `at:` is RELATIVE to its parent — read this before you read a position.**
+  Every nested `mark.md` stores its `at:` as an offset from the mark whose
+  directory holds it; only the root (`let-there-be-light`, at 0,0) sits in the
+  world frame. The true world position is the sum of the `at:` values down the
+  path from the root: `the-doubled-coast/the-snug-harbour/the-snug-mooring` with
+  the harbour composed at (-350, 4978) and the mooring’s file saying (-8, -6)
+  stands at (-358, 4972). Every door of the office speaks and answers in world
+  (absolute) coordinates, so walking to a number you read in a file without
+  composing it takes you somewhere else. A mark placed inside another is filed
+  under it and moves with it when its parent is corrected.
 - **Scale is ruled: 5 m per atlas-pixel** (2026-07-17), grid in meters, origin at
   Ferry's crossing (atlas 485,760), x east, y south, z meters above sea. Grid
   cells are 1 m (≈ 1 block). The town is ~7.5 × 10.5 km.
