@@ -60,7 +60,7 @@ merge — see its row; 2026-09-11: #9 added).
 | 2 | **Registration** — the skeleton grid vs a per-room frame (`ROOM_GROUND_UNITS` span) | Keeps the engine in the numeric regime the town tuned it for (zoomK ≈ 1, marker var ≈ 1). A shared frame forced rooms to zoomK 400–600 — past `MAX_ZOOM_IN`, where markers blow out and atlas text drowns the art. Same arithmetic, sane numbers; QA-asserted. |
 | 3 | **`zoomOutLimit: 1`** — the wheel's zoom-OUT clamp is the whole room (the town keeps `MAX_ZOOM_OUT`); everything else on the camera — zoom-in, pan, the full `.wv-mapctl` rail (fit, follow, grid, footprints, conversations) — is the town's own, live | The revised camera ruling (founder, 2026-08-20 evening, superseding "a room refuses a camera"): a room HAS a camera, but its outermost state IS the whole room — dive into a corner, toggle the extent outlines, read the talk, and fit brings the floor back; you never drift past the walls into the void. |
 | 4 | **`includeMine: false`** — the portfolio union (`state.mineIds`) stays out of the draw-set | The roof. Without it every mark the acting resident owns anywhere in town enters `glyphIds` and stays hit-testable from inside a room (2026-08-20 spike receipt). Refused at the source, not filtered later. |
-| 5 | **The exit chrome** — `.wv-scene-exit`, bottom-left of the pane, every view mode | The way out must exist where the reader is. The telling's own exit collapses with the telling in painting-only — the DEFAULT mode — which is how the founder stood in a room with no visible door (the b6 diagnosis). Same `.wv-int-exit-btn` class: one click route, no drift. |
+| 5 | **The room card** — `.wv-room-card`, the entered room's own card held open at the pane's upper left in every view mode — open, and it expands on a click (a second click folds it) — with the one way out inside it in both states; the corner dot (`.wv-worldmark`) stands down while it is up. **Revised 2026-09-23 (POS-206)** from "the exit chrome — `.wv-scene-exit`, bottom-left of the pane". | The way out must exist where the reader is. The telling's own exit collapsed with the telling in painting-only — the DEFAULT mode — which is how the founder stood in a room with no visible door (the b6 diagnosis); the pane pill answered that. Keemin, 2026-09-23: *"just always have that mark card expanded, and sitting in the upper left, and move the 'exit' button* into *the card while making it easily distinguishable."* So the card the corner dot used to reveal on a hover or a click (`syncRoomCard`: the room's mark cell and its predicates, the pinned bubble's recipe and dress) is simply open; it rests compact and a click on it opens the investigate expansion by the pinned bubble's own click route (Keemin, same day: *"the card is always open but not expanded, and you can click to expand it"*), the way out sits on its own ruled row inside it, and the pill and the telling's copy are gone. Same `.wv-int-exit-btn` class and handler: one card, one exit, one click route. Outdoors nothing changes — the dot is the frame's, as before. |
 | 6 | ~~**`placeholderExtents: true`**~~ — **RETIRED 2026-09-08. NOT A DIFFERENCE ANY MORE: both scenes pass `true`.** | This row's justification was *"the town needs no such pass because the atlas bakes art at sync; a room has no baker"* — and on 2026-09-08 the town stopped being served by the baker. `townGround()` draws geometry, never images, so an unfurnished town would have hung nothing at all: 540 sited marks as bare pips over a ground with no houses on it. The pass itself is unchanged and its founder's word still governs it (2026-08-20, replacing always-on footprints: inside a room, furniture without its footprint is a dot pretending to be a table; distinctness comes from hue, never transparency; the same mark is the same colour for every reader on every load; drawn by the ONE overlay). What changed is that it is no longer *scene-unique* — which is the direction this list is supposed to move. The town keeps its footprint toggle, unchanged. **Revised 2026-09-11** (founder: *"reduce the opacity of placeholder mark-images to around 50%"*): the blocks draw at half opacity in both scenes — the never-transparency half of the 08-20 word is withdrawn, the hue half stands. |
 | 7 | **At-rest refit letterboxes** — a contained scene sitting at its full view letterboxes on pane reshape (contains the ground, centred); once zoomed in, the town's keep-width refit takes over | The room-shown-whole guarantee at rest (scene-qa's pip at y=−183 is the receipt), without fighting the hand once a hand exists. One branch on the same `zoomOutLimit` signal as #3. |
 | 8 | **`sceneWalkerSet`** — WHICH bodies the walk layer may draw, and nothing else about them: indoors, the room's own manifest (the crossing record's occupants, child rooms included); outdoors, the whole town, unchanged. How a body is drawn and where it stands are untouched — see the walker clause below | The founder's word (fix list 2026-08-29, reaffirmed 2026-08-31): *"resident activity OUTSIDE the interior is visible from interior view."* A room's ground carries its own registration (#2), so every walker in town projected onto it and anyone whose COORDINATES happened to fall inside the footprint was painted on the floor — 81 bodies offered, 2 of the 6 that landed being people the record puts in other rooms entirely. But standing on it is not being in it: coordinates answer `within`, a room is `insideOf`, and `standpointOccupancy`'s own header says the two "routinely disagree." The telling has enforced the crossing answer for its bodies since the room shipped; the floor was never asked the question, and a reader believes what they can see. Refused at the source like #4, so a body outside the room never becomes a glyph and cannot be hit, hovered or chosen either. |
@@ -99,10 +99,12 @@ The parallel interior renderer: `interiorSVG`, `interiorThingSVG`,
 overlay and its CSS. A second way to express a mark is a permanent divergence
 tax (one-question-one-owner); it is gone, not deprecated.
 
-What survives of the old interior is *chrome and data*, not render: the plaque
-(`interiorPlaqueHTML` — the room's own words in the telling), the contents
-cards, `interiorFurniture` (the sorted containment answer), and `rimPointOf`
-(where the camera lands on exit).
+What survives of the old interior is *chrome and data*, not render: the room
+card (`roomCardHTML` around the room's own mark cell — its name and its own
+words, open on the painting, since POS-206), the plaque (`interiorPlaqueHTML` —
+who else is in the room, in the telling), the contents cards, `interiorFurniture`
+(the sorted containment answer), and `rimPointOf` (where the camera lands on
+exit).
 
 ## Labels — resolved as "no difference"
 
@@ -122,7 +124,10 @@ scene work.)
   placement transform), clock-pinned, refuses verdicts across mismatched
   exposures. Green at this refactor.
 - `tools/qa/scene-qa.mjs` — the room must work: mounts as a scene, white
-  ground, roof holds, pips through the one overlay, exit bottom-left in the
-  default mode, wheel inert, hover/select/bubble in both view modes, floor
-  click arms the real walk desk, stacked exits walk out level by level, town
-  remounts whole. 19 checks, green.
+  ground, roof holds, pips through the one overlay, the room card open at the
+  pane's upper left in BOTH view modes with the one exit inside it and the
+  corner dot stood down (POS-206; it was "exit bottom-left in the default
+  mode"), wheel inert, hover/select/bubble in both view modes, floor click arms
+  the real walk desk, stacked exits walk out level by level through the card's
+  button, town remounts whole with the card gone and the dot back. Its rig left
+  the repo with `demo/` — the file's header says what a rig must provide.

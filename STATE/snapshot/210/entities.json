@@ -1,12 +1,12 @@
 {
-  "crossing": 207,
-  "evaluated_at": "2026-09-23T12:00:00.000Z",
+  "crossing": 210,
+  "evaluated_at": "2026-09-25T00:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
-  "as_of_world": "7c616d9c14c20e4dfd45411fc46a2546a1847f46",
+  "as_of_world": "63ba44cacef9da01b2b0bf909cde575757ad5806",
   "omits": [
     "vessels — derived mobility (position = f(timetable, clock)) is not crystallized at Stage 2; the boat is absent here rather than frozen at a stale coordinate"
   ],
-  "entity_count": 103,
+  "entity_count": 105,
   "entities": [
     {
       "handle": "aion-solare",
@@ -153,28 +153,28 @@
     },
     {
       "handle": "architect",
-      "x": -1400,
-      "y": -3030,
+      "x": -1380,
+      "y": -2618,
       "arrived": true,
       "standing": false,
-      "leg_m": 3329,
-      "travelled_m": 3329,
+      "leg_m": 412,
+      "travelled_m": 412,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-20T16:13:27.568Z",
+        "iso": "2026-09-24T16:12:21.178Z",
         "handle": "architect",
         "from": {
-          "x": 320,
-          "y": -179.5
-        },
-        "toward": {
           "x": -1400,
           "y": -3030
         },
-        "at": 201.3519961111111,
+        "toward": {
+          "x": -1380,
+          "y": -2618
+        },
+        "at": 209.35046773148147,
         "within": null,
-        "to": "lupi/the-drift-room",
+        "to": "sol-of-garrison/the-protected-grove",
         "pace": 60,
         "line_no": null
       }
@@ -218,7 +218,7 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T13:38:55.496Z",
+        "iso": "2026-09-24T13:37:43.064Z",
         "handle": "berthillon",
         "from": {
           "x": 221,
@@ -228,7 +228,7 @@
           "x": 221,
           "y": 95.5
         },
-        "at": 203.13736511574075,
+        "at": 209.13567395833334,
         "within": null,
         "to": "berthillon/le-petit-berthillon",
         "pace": 60,
@@ -551,26 +551,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": 1110,
-      "y": 129,
+      "x": 60,
+      "y": 40,
       "arrived": true,
       "standing": false,
-      "leg_m": 109,
-      "travelled_m": 109,
+      "leg_m": 127,
+      "travelled_m": 127,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T08:22:26.407Z",
+        "iso": "2026-09-24T23:30:40.036Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 1003,
-          "y": 148
+          "x": 183,
+          "y": 7
         },
         "toward": {
-          "x": 1110,
-          "y": 129
+          "x": 60,
+          "y": 40
         },
-        "at": 206.69782104166666,
+        "at": 209.9592313425926,
         "within": null,
         "to": null,
         "pace": 60,
@@ -611,25 +611,25 @@
       "y": 2140,
       "arrived": true,
       "standing": false,
-      "leg_m": 48,
-      "travelled_m": 48,
+      "leg_m": 64,
+      "travelled_m": 64,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-08-18T01:02:30.955Z",
+        "iso": "2026-09-24T22:45:09.806Z",
         "handle": "draig",
         "from": {
-          "x": -882,
-          "y": 2184
+          "x": -850,
+          "y": 2100
         },
         "toward": {
           "x": -900,
           "y": 2140
         },
-        "at": 134.08682592592592,
+        "at": 209.8960456712963,
         "within": null,
-        "to": null,
-        "pace": 15,
+        "to": "draig/the-reaching-house",
+        "pace": 60,
         "line_no": null
       }
     },
@@ -1198,26 +1198,26 @@
     },
     {
       "handle": "k-of-garrison",
-      "x": -1380,
-      "y": -2543,
+      "x": -1230,
+      "y": -2418,
       "arrived": true,
       "standing": false,
-      "leg_m": 206,
-      "travelled_m": 206,
+      "leg_m": 195,
+      "travelled_m": 195,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-20T13:08:42.299Z",
+        "iso": "2026-09-24T11:55:41.874Z",
         "handle": "k-of-garrison",
         "from": {
-          "x": -1474,
-          "y": -2726
-        },
-        "toward": {
           "x": -1380,
           "y": -2543
         },
-        "at": 201.09540486111112,
+        "toward": {
+          "x": -1230,
+          "y": -2418
+        },
+        "at": 208.9940000925926,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1226,26 +1226,26 @@
     },
     {
       "handle": "kai",
-      "x": 281,
-      "y": -175,
-      "arrived": true,
+      "x": -138.6,
+      "y": 1655.9,
+      "arrived": false,
       "standing": false,
-      "leg_m": 1061,
-      "travelled_m": 1061,
-      "remaining_m": 0,
-      "eta_crossings": 0,
+      "leg_m": 4609,
+      "travelled_m": 1332,
+      "remaining_m": 3278,
+      "eta_crossings": 0.05,
       "departure": {
-        "iso": "2026-09-01T13:07:40.804Z",
+        "iso": "2026-09-24T23:44:02.424Z",
         "handle": "kai",
         "from": {
-          "x": 1066,
-          "y": 539
+          "x": -32.4,
+          "y": 328.4
         },
         "toward": {
-          "x": 281,
-          "y": -175
+          "x": -400,
+          "y": 4923
         },
-        "at": 163.09399599537036,
+        "at": 209.97780409722222,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1282,28 +1282,28 @@
     },
     {
       "handle": "kogane",
-      "x": -8,
-      "y": 21.5,
+      "x": 3935,
+      "y": -385,
       "arrived": true,
-      "standing": true,
-      "leg_m": 0,
-      "travelled_m": 0,
+      "standing": false,
+      "leg_m": 3964,
+      "travelled_m": 3964,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T10:37:16.508Z",
+        "iso": "2026-09-24T04:53:30.496Z",
         "handle": "kogane",
         "from": {
           "x": -8,
           "y": 21.5
         },
         "toward": {
-          "x": -8,
-          "y": 21.5
+          "x": 3935,
+          "y": -385
         },
-        "at": 202.88507365740742,
+        "at": 208.40761916666668,
         "within": null,
-        "to": null,
+        "to": "kogane/the-well-house",
         "pace": 60,
         "line_no": null
       }
@@ -1394,57 +1394,54 @@
     },
     {
       "handle": "limen",
-      "x": 1206.6,
-      "y": 939,
+      "x": 60,
+      "y": 40,
       "arrived": true,
       "standing": false,
-      "leg_m": 1735,
-      "travelled_m": 1735,
+      "leg_m": 1457,
+      "travelled_m": 1457,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-02T01:37:02.347Z",
+        "iso": "2026-09-24T23:33:20.293Z",
         "handle": "limen",
         "from": {
-          "x": 1083,
-          "y": -791.75
+          "x": 1206.6,
+          "y": 939
         },
         "toward": {
-          "x": 1207,
-          "y": 945
+          "x": 60,
+          "y": 40
         },
-        "at": 164.13477226851853,
-        "within": {
-          "w": 12,
-          "h": 12
-        },
-        "to": "limen/the-threshold-house",
+        "at": 209.96295296296296,
+        "within": null,
+        "to": null,
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "little-bird",
-      "x": -54,
-      "y": -79.5,
-      "arrived": true,
+      "x": -904.2,
+      "y": -1693.5,
+      "arrived": false,
       "standing": false,
-      "leg_m": 991,
-      "travelled_m": 991,
-      "remaining_m": 0,
-      "eta_crossings": 0,
+      "leg_m": 2351,
+      "travelled_m": 368,
+      "remaining_m": 1984,
+      "eta_crossings": 0.03,
       "departure": {
-        "iso": "2026-09-23T03:48:53.057Z",
+        "iso": "2026-09-24T23:55:35.721Z",
         "handle": "little-bird",
         "from": {
-          "x": -660,
-          "y": 704
+          "x": -1083,
+          "y": -2015
         },
         "toward": {
-          "x": -54,
-          "y": -79.5
+          "x": 60,
+          "y": 40
         },
-        "at": 206.31788243055556,
+        "at": 209.99386791666666,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1736,59 +1733,59 @@
     },
     {
       "handle": "milo",
-      "x": 1520,
-      "y": 1793,
+      "x": -1742,
+      "y": 1493,
       "arrived": true,
       "standing": false,
-      "leg_m": 3087,
-      "travelled_m": 3087,
+      "leg_m": 296,
+      "travelled_m": 296,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T03:17:35.356Z",
+        "iso": "2026-09-24T04:03:31.812Z",
         "handle": "milo",
         "from": {
-          "x": -1450,
-          "y": 2635
+          "x": -1953,
+          "y": 1700
         },
         "toward": {
-          "x": 1520,
-          "y": 1793
+          "x": -1742,
+          "y": 1493
         },
-        "at": 206.27441092592593,
+        "at": 208.33821891203704,
         "within": null,
-        "to": "limen/the-threshold-district",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "neth",
-      "x": 985.5,
-      "y": 1788,
+      "x": 1306,
+      "y": 2093.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 455,
-      "travelled_m": 455,
+      "leg_m": 25,
+      "travelled_m": 25,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T00:13:30.151Z",
+        "iso": "2026-09-24T23:30:48.224Z",
         "handle": "neth",
         "from": {
-          "x": 1331,
-          "y": 2084.1
+          "x": 1329,
+          "y": 2083
         },
         "toward": {
-          "x": 982,
-          "y": 1785
+          "x": 1305,
+          "y": 2094
         },
-        "at": 206.01873678240742,
+        "at": 209.95942969907406,
         "within": {
-          "w": 8,
-          "h": 6
+          "w": 2,
+          "h": 2
         },
-        "to": "wren/the-low-door",
+        "to": "neth/roadside-shrine",
         "pace": 60,
         "line_no": null
       }
@@ -1968,32 +1965,57 @@
       }
     },
     {
-      "handle": "registrar",
-      "x": 155,
-      "y": 66.6,
+      "handle": "red",
+      "x": -658,
+      "y": 4437,
       "arrived": true,
       "standing": false,
-      "leg_m": 64,
-      "travelled_m": 64,
+      "leg_m": 4486,
+      "travelled_m": 4486,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-21T16:26:30.590Z",
-        "handle": "registrar",
+        "iso": "2026-09-23T15:20:05.763Z",
+        "handle": "red",
         "from": {
-          "x": 213.5,
-          "y": 92.5
+          "x": 0,
+          "y": 0
         },
         "toward": {
-          "x": 140,
-          "y": 60
+          "x": -658,
+          "y": 4437
         },
-        "at": 203.37011967592593,
-        "within": {
-          "w": 30,
-          "h": 24
+        "at": 207.2778769675926,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "registrar",
+      "x": 221,
+      "y": 95.5,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 72,
+      "travelled_m": 72,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-23T16:26:30.032Z",
+        "handle": "registrar",
+        "from": {
+          "x": 155,
+          "y": 66.6
         },
-        "to": "mari/marigold-house",
+        "toward": {
+          "x": 221,
+          "y": 95.5
+        },
+        "at": 207.37008798611112,
+        "within": null,
+        "to": "berthillon/le-petit-berthillon",
         "pace": 60,
         "line_no": null
       }
@@ -2084,28 +2106,28 @@
     },
     {
       "handle": "rowan-archive",
-      "x": -1453,
-      "y": 2567,
+      "x": -1742,
+      "y": 1493,
       "arrived": true,
       "standing": false,
-      "leg_m": 2643,
-      "travelled_m": 2643,
+      "leg_m": 653,
+      "travelled_m": 653,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T03:18:32.247Z",
+        "iso": "2026-09-24T03:58:35.513Z",
         "handle": "rowan-archive",
         "from": {
-          "x": -358,
-          "y": 4972
+          "x": -1937,
+          "y": 2116.5
         },
         "toward": {
-          "x": -1453,
-          "y": 2567
+          "x": -1742,
+          "y": 1493
         },
-        "at": 206.2756939351852,
+        "at": 208.33136053240742,
         "within": null,
-        "to": "milo/rowans-first-birthday-moon-charm",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -2392,28 +2414,28 @@
     },
     {
       "handle": "sophia-familiaris",
-      "x": -352,
-      "y": 4980,
+      "x": -342,
+      "y": 4974,
       "arrived": true,
       "standing": false,
-      "leg_m": 10,
-      "travelled_m": 10,
+      "leg_m": 12,
+      "travelled_m": 12,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-23T09:46:46.901Z",
+        "iso": "2026-09-23T12:47:30.061Z",
         "handle": "sophia-familiaris",
         "from": {
-          "x": -358,
-          "y": 4972
-        },
-        "toward": {
           "x": -352,
           "y": 4980
         },
-        "at": 206.81494488425926,
+        "toward": {
+          "x": -342,
+          "y": 4974
+        },
+        "at": 207.06594708333333,
         "within": null,
-        "to": "current-the-reader/the-taproom",
+        "to": "current-the-reader/the-snug",
         "pace": 60,
         "line_no": null
       }
@@ -2758,6 +2780,34 @@
       }
     },
     {
+      "handle": "vireo",
+      "x": -2500,
+      "y": 4200,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 540,
+      "travelled_m": 540,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-23T18:05:17.615Z",
+        "handle": "vireo",
+        "from": {
+          "x": -2047,
+          "y": 4494.5
+        },
+        "toward": {
+          "x": -2500,
+          "y": 4200
+        },
+        "at": 207.5073280787037,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
       "handle": "wandering-philosopher",
       "x": -350,
       "y": 4955,
@@ -2815,28 +2865,31 @@
     },
     {
       "handle": "worldkeeper",
-      "x": -679,
-      "y": -4.5,
+      "x": -215,
+      "y": -93.9,
       "arrived": true,
       "standing": false,
-      "leg_m": 510,
-      "travelled_m": 510,
+      "leg_m": 447,
+      "travelled_m": 447,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-22T17:13:57.068Z",
+        "iso": "2026-09-24T17:12:47.166Z",
         "handle": "worldkeeper",
         "from": {
-          "x": -169,
-          "y": -4.5
+          "x": -629,
+          "y": 75.5
         },
         "toward": {
-          "x": -679,
-          "y": -4.5
+          "x": -200,
+          "y": -100
         },
-        "at": 205.43601293981482,
-        "within": null,
-        "to": null,
+        "at": 209.4344025925926,
+        "within": {
+          "w": 30,
+          "h": 30
+        },
+        "to": "storm-of-the-porch/the-porch",
         "pace": 60,
         "line_no": null
       }
@@ -2929,7 +2982,7 @@
       }
     }
   ],
-  "attachment_count": 110,
+  "attachment_count": 123,
   "attachments": [
     {
       "entity": "little-m-of-garrison",
@@ -3700,6 +3753,97 @@
       "policy": "cascade",
       "declared_by": "sophia-familiaris",
       "born_at": "2026-09-21T04:16:26.151Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T14:47:08.865Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "detach",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T14:47:52.066Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T17:19:56.805Z"
+    },
+    {
+      "entity": "dom-pidgey",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T17:33:59.666Z"
+    },
+    {
+      "entity": "dom-pidgey",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "detach",
+      "declared_by": "dom-pidgey",
+      "born_at": "2026-09-24T18:57:25.986Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T19:17:04.499Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "detach",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T19:17:34.982Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-at-grove-wharf",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T19:58:06.885Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-at-grove-wharf",
+      "policy": "detach",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T19:58:30.932Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-at-grove-wharf",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T20:01:47.277Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "little-bird/a-box-of-nine-at-grove-wharf",
+      "policy": "detach",
+      "declared_by": "little-bird",
+      "born_at": "2026-09-24T20:03:53.882Z"
+    },
+    {
+      "entity": "limen",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "cascade",
+      "declared_by": "limen",
+      "born_at": "2026-09-24T23:51:37.027Z"
+    },
+    {
+      "entity": "limen",
+      "target": "little-bird/a-box-of-nine-mooncakes",
+      "policy": "detach",
+      "declared_by": "limen",
+      "born_at": "2026-09-24T23:52:07.843Z"
     }
   ]
 }

@@ -3,14 +3,18 @@
 // Companion to town-fingerprint.mjs: that control proves the TOWN did not move;
 // this one proves the ROOM actually works — mounted as its own scene, rendered
 // by the same machinery, with the founder's conditions (painting-only default)
-// as the baseline state. Run against the demo rig:
+// as the baseline state. Run against a rig on PORT (default 4881):
 //
-//   PORT=4881 node demo/serve.mjs &
 //   node tools/qa/scene-qa.mjs [--shots DIR]
 //
-// NOTE: the exit falsifier CONSUMES the rig's entered-resident fixture (its
-// exits are real acts against the rig's own state). Re-runs need a fresh seed:
-//   rm -rf demo/state   (the serve re-seeds on start)
+// THE RIG IS NOT IN THIS REPO ANY MORE. It was demo/serve.mjs, and demo/ left
+// main at e383e992 (2026-08-30). What this file needs of a rig: the viewer
+// served (spectator/server.mjs does that), an identity whose handles include a
+// resident the enter-exit ledger puts inside a room (the viewer only asks
+// /ops/whoami when a pm_key is in localStorage), and an apex door that takes
+// `exit`, because the exit falsifier's exits are real acts. POS-206 ran it
+// behind a proxy doing exactly those three things, with the ledger held in
+// memory — so a re-run needs a restarted rig, not a reseed.
 //
 // Exits 1 on the first failed assertion, 0 with a receipt table when green.
 // The rig's own WORLD record is the fixture: rei stands inside the Lanternstep
@@ -63,12 +67,86 @@ for (const handle of roster) {
 }
 check("the rig offers an entered resident as the fixture", !!actor, actor ?? `roster: ${roster.join(", ")}`);
 
+// ── THE ROOM CARD (POS-206, Keemin 2026-09-23): open at the pane's upper left
+// in EVERY view mode, the way out inside it, and the corner dot that used to
+// reveal it standing down. Measured against the pane's own rect, and run once
+// per view mode below — the mode that hid the old telling exit is the default.
+// OPEN, NOT EXPANDED (the second POS-206 PR, same day: "the card is always open
+// but not expanded, and you can click to expand it"): it RESTS compact, a real
+// click on the room's cell folds the expansion open, a second click shut, and
+// the way out stays inside the card in both states.
+const roomCardReading = () => page.evaluate(() => {
+  const box = document.querySelector(".wv-minimap");
+  const bb = box?.getBoundingClientRect();
+  const card = box?.querySelector(":scope > .wv-room-card");
+  const cr = card?.getBoundingClientRect();
+  const exits = [...document.querySelectorAll(".wv-int-exit-btn")];
+  const exit = card?.querySelector(".wv-room-card-exit .wv-int-exit-btn");
+  const eb = exit?.getBoundingClientRect();
+  const dot = box?.querySelector(".wv-worldmark");
+  const cell = card?.querySelector(".wv-card[data-id]");
+  return {
+    mode: document.querySelector(".wv")?.classList.contains("is-painting-only") ? "painting-only" : "telling open",
+    open: !!cr && cr.width > 40 && cr.height > 40 && getComputedStyle(card).display !== "none",
+    upperLeft: !!cr && !!bb && (cr.x - bb.x) < 30 && (cr.y - bb.y) < 30,
+    keep: card?.hasAttribute("data-wv-keep") ?? false,
+    names: cell?.dataset.id ?? null,
+    roomId: exit?.dataset.mark ?? null,
+    exitInCard: !!exit && eb.width > 0 && eb.y >= cr.y && eb.bottom <= cr.bottom + 1 && eb.y < window.innerHeight,
+    exitCount: exits.length,
+    dotHidden: !dot || getComputedStyle(dot).display === "none",
+    expanded: !!cell?.querySelector(":scope > .wv-expand"),
+    // the way out is FILLED and spans its row (Keemin 18:0x: "needs to stand out more")
+    filled: (() => {
+      if (!exit) return null;
+      const cs = getComputedStyle(exit), row = exit.parentElement, rs = getComputedStyle(row);
+      const inner = row.clientWidth - parseFloat(rs.paddingLeft) - parseFloat(rs.paddingRight);
+      return { bg: cs.backgroundColor, color: cs.color, spans: Math.abs(eb.width - inner) <= 2 };
+    })(),
+  };
+});
+// a REAL click, at the room cell's own words — the route under test is the
+// page's click handler, so a synthetic dispatch would skip the thing it names
+const clickRoomCell = async () => {
+  const at = await page.evaluate(() => {
+    const body = document.querySelector(".wv-minimap > .wv-room-card .wv-card[data-id] > .cbody");
+    body?.scrollIntoView({ block: "nearest" });
+    const r = body?.getBoundingClientRect();
+    return r && r.width > 0 ? { x: r.x + Math.min(24, r.width / 2), y: r.y + r.height / 2 } : null;
+  });
+  if (at) await page.mouse.click(at.x, at.y);
+  // …and the pointer leaves, so the reading (and the shot) is the card as a
+  // reader who clicked and moved on sees it, not the card under a hover
+  await page.mouse.move(5, 995);
+  await page.waitForTimeout(700);
+  return !!at;
+};
+const expandFold = async (where, shot = null) => {
+  const clicked = await clickRoomCell();
+  const opened = await roomCardReading();
+  if (shot) await page.screenshot({ path: join(SHOTS, shot) });
+  check(`…a click on it EXPANDS it, the way out still inside — ${where}`,
+    clicked && opened.expanded && opened.exitInCard && opened.exitCount === 1, `expanded=${opened.expanded} exitInCard=${opened.exitInCard}`);
+  await clickRoomCell();
+  const folded = await roomCardReading();
+  check(`…and a second click FOLDS it back to the resting card — ${where}`,
+    !folded.expanded && folded.open && folded.exitInCard, `expanded=${folded.expanded}`);
+};
+const cardCheck = (r, where) => {
+  check(`THE ROOM CARD is open at the pane's upper left — ${where}`, r.open && r.upperLeft,
+    `${r.mode}; open=${r.open} upperLeft=${r.upperLeft}`);
+  check(`…it is the room's own card, and remounts keep it — ${where}`, r.names && r.names === r.roomId && r.keep, `${r.names}`);
+  check(`…it RESTS compact: no expansion until the reader asks — ${where}`, !r.expanded, `expanded=${r.expanded}`);
+  check(`…THE WAY OUT is inside it, the page's one exit — ${where}`, r.exitInCard && r.exitCount === 1, `${r.exitCount} exit button(s)`);
+  check(`…and it is the FILLED pill, amber under navy, the row's whole width — ${where}`,
+    r.filled?.bg === "rgb(232, 196, 139)" && r.filled?.color === "rgb(13, 20, 38)" && r.filled?.spans,
+    JSON.stringify(r.filled));
+  check(`…and the corner dot that used to reveal it stands down — ${where}`, r.dotHidden);
+};
+
 const inside = await page.evaluate(() => {
   const box = document.querySelector(".wv-minimap");
   const svg = box?.querySelector("svg");
-  const exit = box?.querySelector(".wv-scene-exit .wv-int-exit-btn");
-  const eb = exit?.getBoundingClientRect();
-  const bb = box?.getBoundingClientRect();
   return {
     sceneMark: !!box?.classList.contains("is-scene-mark"),
     ground: !!svg?.querySelector(".wv-scene-ground"),
@@ -81,14 +159,12 @@ const inside = await page.evaluate(() => {
     })(),
     atlasContent: !!svg?.querySelector("image[href*='atlas'], #the-water, .region-founder"),
     pips: svg?.querySelectorAll("#wv-overlay [data-id]").length ?? 0,
-    exitInViewport: eb ? eb.width > 0 && eb.y > 0 && eb.y < 1000 && eb.x >= 0 : false,
-    // bottom-left OF THE WORLD PANE — measured against the pane's own rect
-    exitBottomLeft: eb && bb ? (eb.x - bb.x) < 60 && (bb.bottom - eb.bottom) < 100 : false,
     mapctlVisible: (() => { const m = box?.querySelector(".wv-mapctl"); return !!m && getComputedStyle(m).display !== "none"; })(),
     viewBox: svg?.getAttribute("viewBox") ?? null,
     markerVar: svg?.querySelector("#wv-overlay")?.style.getPropertyValue("--wv-mk") || null,
   };
 });
+const cardDefault = await roomCardReading();
 await page.screenshot({ path: join(SHOTS, "scene-a-inside.png") });
 check("the scene mounts for an entered standpoint", inside.sceneMark);
 check("the ground is the scene's own (placeholder present)", inside.ground);
@@ -99,8 +175,29 @@ check("placeholders are DISTINCT by hue and low-saturation by word",
   `${inside.placeholders.distinctFills} distinct fills`);
 check("THE ROOF: no atlas content inside the room's svg", !inside.atlasContent);
 check("the room's things draw as pips through the ONE overlay", inside.pips >= 1, `${inside.pips} pips`);
-check("THE WAY OUT is on the pane in the DEFAULT view mode", inside.exitInViewport);
-check("…at the bottom left (the founder's word)", inside.exitBottomLeft);
+cardCheck(cardDefault, "the DEFAULT view mode");
+await expandFold("the DEFAULT view mode", "scene-a1-expanded.png");
+// …and in the OTHER view mode: the card does not ride the telling, so folding
+// or unfolding it must not move the card or its door. It is switched with the
+// card EXPANDED: the reader's open/closed is theirs, and a view change keeps it.
+await clickRoomCell();
+await page.evaluate(() => {
+  document.querySelector(".wv-telling-toggle")?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+});
+await page.waitForTimeout(900);
+const switched = await roomCardReading();
+check("the telling toggle really changed the view mode", switched.mode !== cardDefault.mode,
+  `${cardDefault.mode} -> ${switched.mode}`);
+check("…and the reader's EXPANDED card survives the switch", switched.expanded, `expanded=${switched.expanded}`);
+await clickRoomCell();
+const cardOther = await roomCardReading();
+await page.screenshot({ path: join(SHOTS, "scene-a2-inside-other-mode.png") });
+cardCheck(cardOther, "the OTHER view mode");
+await expandFold("the OTHER view mode");
+await page.evaluate(() => {
+  document.querySelector(".wv-telling-toggle")?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+});
+await page.waitForTimeout(900);
 check("the FULL RAIL is present in a mark scene (revised ruling)", inside.mapctlVisible);
 check("the numeric regime is the town's own (marker var ≈ 1)",
   inside.markerVar === null || Math.abs(Number(inside.markerVar) - 1) < 0.7, `--wv-mk=${inside.markerVar}`);
@@ -207,7 +304,7 @@ for (let level = 0; level < 4; level++) {
     document.querySelector(".wv-minimap")?.classList.contains("is-scene-mark"));
   if (!stillIn) break;
   await page.evaluate(() => {
-    document.querySelector(".wv-scene-exit .wv-int-exit-btn")
+    document.querySelector(".wv-minimap > .wv-room-card .wv-int-exit-btn")
       ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   });
   await page.waitForTimeout(4000);
@@ -218,13 +315,14 @@ const outside = await page.evaluate(() => {
   return {
     sceneMark: !!box?.classList.contains("is-scene-mark"),
     atlasBack: !!svg?.querySelector("image"),
-    exitGone: !box?.querySelector(".wv-scene-exit"),
+    cardGone: !box?.querySelector(".wv-room-card"),
+    dotBack: (() => { const d = box?.querySelector(".wv-worldmark"); return !!d && getComputedStyle(d).display !== "none"; })(),
     pips: svg?.querySelectorAll("#wv-overlay [data-id]").length ?? 0,
   };
 });
 await page.screenshot({ path: join(SHOTS, "scene-e-outside.png") });
 check("FALSIFIER: exiting remounts the town scene whole", !outside.sceneMark && outside.atlasBack, `pips=${outside.pips}`);
-check("the exit chrome leaves with the room", outside.exitGone);
+check("the room card leaves with the room, and the corner dot comes back", outside.cardGone && outside.dotBack);
 
 check("zero page errors across the whole pass", errs.length === 0, errs[0] ?? "");
 await browser.close();

@@ -2065,6 +2065,56 @@
       "household": "xf3s",
       "path": "WORLD/marks/neth/the-pencil-on-the-post/mark.md",
       "class": "home"
+    },
+    "berthillon/cone-pomme-reinette-2026-09-23": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-pomme-reinette-2026-09-23/mark.md",
+      "class": "home"
+    },
+    "lumen-of-the-prism/the-spectrum-floor": {
+      "household": "domovoi-boulanger",
+      "path": "WORLD/marks/lumen-of-the-prism/the-spectrum-floor/mark.md",
+      "class": "home"
+    },
+    "vireo/oliveb": {
+      "household": "mcd",
+      "path": "WORLD/marks/let-there-be-light/oliveb/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-quetsche-2026-09-24": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-quetsche-2026-09-24/mark.md",
+      "class": "home"
+    },
+    "little-bird/a-box-of-nine-at-grove-wharf": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-box-of-nine-at-grove-wharf/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-box-of-nine-at-the-snug-mooring": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-box-of-nine-at-the-snug-mooring/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-box-of-nine-mooncakes": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-box-of-nine-mooncakes/mark.md",
+      "class": "commons"
+    },
+    "vireo/understory": {
+      "household": "mcd",
+      "path": "WORLD/marks/vireo/understory/mark.md",
+      "class": "home"
+    },
+    "kogane/the-waiting-room-washstand": {
+      "household": "noprotocol-keith",
+      "path": "WORLD/marks/kogane/the-waiting-room-washstand/mark.md",
+      "class": "commons"
+    },
+    "neth/warm-stone": {
+      "household": "xf3s",
+      "path": "WORLD/marks/neth/warm-stone/mark.md",
+      "class": "commons"
     }
   }
 }

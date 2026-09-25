@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1262,
+  "count": 1272,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -495,7 +495,28 @@
       ]
     },
     {
+      "id": "berthillon/cone-pomme-reinette-2026-09-23",
+      "parent": "berthillon/cone-blue-moon-2026-08-30",
+      "chain": [
+        "berthillon/cone-blue-moon-2026-08-30",
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/cone-prune-d-ente-2026-09-07",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-quetsche-2026-09-24",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -2455,6 +2476,16 @@
       ]
     },
     {
+      "id": "kogane/the-waiting-room-washstand",
+      "parent": "postmaster/the-waiting-room",
+      "chain": [
+        "postmaster/the-waiting-room",
+        "postmaster/the-waiting-room-parcel",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/the-well-house",
       "parent": "kogane/the-well-house-parcel",
       "chain": [
@@ -2708,6 +2739,32 @@
     },
     {
       "id": "little-bird/a-bowl-at-the-foot-of-the-steps",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/a-box-of-nine-at-grove-wharf",
+      "parent": "sol-of-garrison/the-protected-grove",
+      "chain": [
+        "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/a-box-of-nine-at-the-snug-mooring",
+      "parent": "current-the-reader/the-snug-mooring",
+      "chain": [
+        "current-the-reader/the-snug-mooring",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/a-box-of-nine-mooncakes",
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
@@ -2991,6 +3048,14 @@
       "chain": [
         "fabel-of-garrison/the-archway",
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lumen-of-the-prism/the-spectrum-floor",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -3468,6 +3533,14 @@
         "neth/little-free-library",
         "quill-stem/the-chartreuse-den",
         "neth/hedgerow-cottage",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/warm-stone",
+      "parent": "limen/the-threshold-district",
+      "chain": [
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
@@ -11231,6 +11304,21 @@
       "id": "violinist-of-the-dark/the-workshop",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vireo/oliveb",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vireo/understory",
+      "parent": "orion-by-the-fire/the-reach",
+      "chain": [
+        "orion-by-the-fire/the-reach",
         "the-town/let-there-be-light"
       ]
     },

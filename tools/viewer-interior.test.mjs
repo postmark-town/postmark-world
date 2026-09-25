@@ -7,8 +7,9 @@
 // when it has one, overlaid with an svg art slot, mirroring the atlas's own
 // base-raster-svg structure. The custom interior renderer this file used to
 // test is gone; what remains under test here is the DATA path (occupancy →
-// room → furniture → radial), the plaque (telling chrome), the ground builder,
-// and the rim. The scene swap itself is exercised at the rig (scene-qa).
+// room → furniture → radial), the room card and the plaque (chrome), the
+// ground builder, and the rim. The scene swap itself is exercised at the rig
+// (scene-qa), and so is the room card on the painting in both view modes.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -17,7 +18,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   ROOM_GROUND_PAD, ROOM_GROUND_UNITS, SPECTATOR_ACTOR,
-  interiorFurniture, interiorPlaqueHTML, markImagePath,
+  interiorFurniture, interiorPlaqueHTML, markImagePath, roomCardHTML,
   placeholderExtentSVG, placeholderHue, rimPointOf, sceneArtSVG, roomGround, sceneRuleM, sceneWalkerSet, standpointOccupancy,
 } from "../spectator/viewer.mjs";
 import { polygonOf } from "./geometry.mjs";
@@ -28,6 +29,7 @@ import { fractionalCrossing } from "./walk.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
+const SOURCE = read("spectator/viewer.mjs");
 
 const world = assembleWorld({
   worldState: JSON.parse(read("WORLD/world-state.json")),
@@ -67,14 +69,87 @@ test("the real marks build a real interior — the Town Centre, entered", () => 
   assert.deepEqual(built.bodies, ["wright"]);
 });
 
-test("the plaque speaks in the ROOM's own words, not about it", () => {
+// ── the room card (POS-206, Keemin 2026-09-23: "just always have that mark
+// card expanded, and sitting in the upper left, and move the 'exit' button
+// *into* the card while making it easily distinguishable") ────────────────
+//
+// The room's head used to be the plaque's, at the top of the telling — which
+// folds away in painting-only, the default. It is now the room card's, open on
+// the painting. The card is the room's OWN mark cell (the one the corner dot
+// used to open), so what is pinned here is the card's frame: the head, the cell
+// passed through whole, and the way out on its own row.
+
+test("the room card speaks in the ROOM's own words, and the way out is INSIDE it", () => {
   const built = realInterior();
-  const html = interiorPlaqueHTML({ room: built.room, bodies: built.bodies, you: built.you, name: "The Town Centre" });
-  assert.match(html, /you are inside/i);
-  assert.match(html, /The Town Centre/);
-  assert.ok(built.room.body && built.room.body.length > 20, "the fixture room must have prose to plaque");
-  assert.match(html, /lamplit quay/, "the plaque is the mark's body text verbatim");
+  assert.ok(built.room.body && built.room.body.length > 20, "the fixture room must have prose to show");
+  // a stand-in for markCell carrying the room's real body: the frame must pass
+  // the cell through whole, never re-render the mark itself
+  const cellHTML = `<article class="wv-card" data-id="${built.room.id}"><div class="cbody">${built.room.body}</div></article>`;
+  const html = roomCardHTML({ roomId: built.room.id, cellHTML, exitLabel: "↤ step outside" });
+  assert.match(html, /you are inside/i, "the head says where you are");
+  assert.match(html, /lamplit quay/, "the card carries the mark's body text verbatim, through its own cell");
+  // ORDER: head, then the reading, then the one act — the exit is the card's last row
+  const head = html.indexOf("you are inside"), cell = html.indexOf('class="wv-card"'), exit = html.indexOf("wv-room-card-exit");
+  assert.ok(head >= 0 && head < cell && cell < exit, "head → cell → exit row");
+  // the SAME button the click route has always listened for, on the room it leaves
+  assert.match(html, /<div class="wv-int-exit wv-room-card-exit"><button type="button" class="ctl wv-int-exit-btn" data-mark="the-town\/the-town-centre">↤ step outside<\/button><\/div>$/,
+    "one exit, the card's own last row, the existing class and data-mark");
+  assert.equal(roomCardHTML({ roomId: null, cellHTML }), "", "no room, no card");
+});
+
+test("[pin] the page builds the card from the room's OWN mark cell, open but COMPACT, and it survives remounts", () => {
+  const fn = SOURCE.match(/function syncRoomCard\(boxEl, room, key = null\) \{[\s\S]*?\n  \}\n/);
+  assert.ok(fn, "syncRoomCard exists");
+  assert.match(fn[0], /card\.setAttribute\("data-wv-keep", ""\)/, "data-wv-keep: a scene remount keeps the card");
+  assert.match(fn[0], /card\.className = `wv-bubble wv-room-card \$\{markClasses\(mark\)\}`/, "the pinned bubble's own dress");
+  assert.match(fn[0], /cellHTML: markCell\(mark, \{ role: "fov" \}\)/, "the room's own mark cell — the card the corner dot used to open");
+  // OPEN, NOT EXPANDED (Keemin, 2026-09-23, the second POS-206 PR): the card
+  // rests compact, and the build never opens the expansion on its own
+  assert.doesNotMatch(fn[0], /_stack = \[room\.id\]/, "the build does not force the expansion open");
+  // the reader's open/closed survives a rebuild of the SAME room, and a new room starts compact
+  assert.match(fn[0], /const keptStack = card\.dataset\.room === room\.id\s*\?[^:]*\._stack[^:]*:\s*\[\];/, "the stack is kept only for the same room");
+  assert.match(fn[0], /if \(cell && keptStack\.length\) \{ cell\._stack = keptStack; renderExpansion\(cell\); \}/, "…and restored only when the reader had it open");
+  assert.ok(fn[0].indexOf("const keptStack") < fn[0].indexOf("card.innerHTML ="), "the stack is read BEFORE the rebuild replaces the cell");
+  assert.match(fn[0], /exitButtonLabel\(entered, nameOf\)/, "the exit still names the room a nested dweller lands in");
+  // A CLICK EXPANDS IT, BY THE PINNED BUBBLE'S OWN ROUTE — the card is a
+  // .wv-bubble, and a .wv-card inside a bubble toggles its stack on a click.
+  // One route: no second handler names the room card.
+  assert.match(SOURCE, /if \(b\.closest\("\.wv-bubble"\)\) \{\s*b\._stack = b\._stack\?\.length \? \[\] : \[b\.dataset\.id\];\s*renderExpansion\(b\);\s*return;\s*\}/,
+    "the bubble's click-to-expand route is the one that folds the card open and shut");
+  assert.doesNotMatch(SOURCE, /closest\("\.wv-room-card[^"]*"\).*_stack/, "no second expansion route for the room card");
+  // retired: the pane pill, and the telling's second copy of the button
+  assert.doesNotMatch(SOURCE, /wv-scene-exit/, "the bottom-left pill is gone, selector and all");
+  assert.equal((SOURCE.match(/class="ctl wv-int-exit-btn"/g) ?? []).length, 1, "ONE exit button in the source: the card's");
+  // the reveal is retired: indoors the dot stands down and the room never bubbles
+  assert.match(SOURCE, /\.wv-minimap\.is-scene-mark \.wv-worldmark \{ display:none; \}/, "the corner dot stands down indoors");
+  assert.match(SOURCE, /const onPane = \(id\) => \(id && id === sceneRoomId \? null : id\);/, "the mounted room is never a bubble");
+});
+
+test("[pin] the card's way out is the FILLED pill, and only the card's (Keemin: \"the step outside button needs to stand out more\")", () => {
+  const rule = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl \{([^}]*)\}/);
+  assert.ok(rule, "a modifier scoped to the card's exit row");
+  assert.match(rule[1], /background:#e8c48b/, "amber ground");
+  assert.match(rule[1], /color:#0d1426/, "the town's navy on it");
+  assert.match(rule[1], /width:100%/, "the whole width of its row");
+  assert.match(rule[1], /font-size:\.82rem/, "a step up in size");
+  assert.match(rule[1], /padding:\.7em 1em/, "and in padding");
+  const hover = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl:hover \{([^}]*)\}/);
+  assert.ok(hover && /background:#d4a862/.test(hover[1]), "hover deepens the ground");
+  // the crossing sheet's outline pill is untouched: the shared rule still dresses it
+  assert.match(SOURCE, /\n\.wv-int-exit \.ctl, \.wv-cross-row \.ctl \{[^}]*color:#e8c48b; background:rgba\(13,20,38,\.92\);/, "the shared outline pill is unchanged");
+  assert.doesNotMatch(SOURCE, /\n\.[^\n{]*wv-cross-row[^\n{]*\{[^}]*background:#e8c48b/, "no filled dress leaks onto the crossing sheet");
+  // same class, same glyph
+  assert.match(roomCardHTML({ roomId: "r", cellHTML: "", exitLabel: "↤ step outside" }), /class="ctl wv-int-exit-btn" data-mark="r">↤ step outside</);
+});
+
+test("the telling's plaque says who is here, and leaves the room's name and words to the card", () => {
+  const built = realInterior();
+  const html = interiorPlaqueHTML({ room: built.room, bodies: built.bodies, you: built.you });
   assert.match(html, /have it to yourself/, "alone is said plainly rather than left blank");
+  assert.doesNotMatch(html, /you are inside/i, "the head is the card's now");
+  assert.doesNotMatch(html, /lamplit quay/, "the room is not told twice on one screen");
+  assert.match(interiorPlaqueHTML({ room: built.room, bodies: ["wright", "rei"], you: "wright" }), /Also here: rei\./);
+  assert.equal(interiorPlaqueHTML({ room: built.room, bodies: [], you: "wright" }), "", "no company to report, no plaque");
 });
 
 // ── the ground (the ONE scene-unique element) ───────────────────────────────
@@ -398,13 +473,15 @@ test("a room with no extent cannot throw — the rim is its own point", () => {
 });
 
 // ── escaping ────────────────────────────────────────────────────────────────
-test("markup in a room's prose, name, or company cannot escape the plaque", () => {
-  const plaque = interiorPlaqueHTML({
-    room: { id: "r", body: '<b>bold</b> & "quoted"' }, name: "<i>Room</i>", bodies: ["<em>a</em>"],
-  });
-  assert.doesNotMatch(plaque, /<b>bold<\/b>/);
-  assert.doesNotMatch(plaque, /<i>Room<\/i>/);
-  assert.match(plaque, /&amp;/);
+test("markup in a room's id, its way-out label, or its company cannot escape the card or the plaque", () => {
+  const plaque = interiorPlaqueHTML({ room: { id: "r" }, bodies: ["<em>a</em>", "me"], you: "me" });
+  assert.doesNotMatch(plaque, /<em>a<\/em>/);
+  assert.match(plaque, /&lt;em&gt;/);
+  const card = roomCardHTML({ roomId: 'r"><b>x</b>', exitLabel: '<i>out</i> & "on"' });
+  assert.doesNotMatch(card, /<b>x<\/b>/);
+  assert.doesNotMatch(card, /<i>out<\/i>/);
+  assert.match(card, /data-mark="r&quot;&gt;&lt;b&gt;x&lt;\/b&gt;"/, "the id is escaped inside its attribute");
+  assert.match(card, /&amp;/);
 });
 
 // ── the way out names where it goes (Wright, 2026-08-21) ────────────────────
