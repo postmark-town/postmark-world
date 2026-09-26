@@ -8692,6 +8692,26 @@ export function mountViewer(appEl) {
     }
     const view = { ...full };
     mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, convoLayer, convoHoverLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    // THE PANE'S WIDTH IS KEPT, NOT MEASURED (POS-228). panePx is read four
+    // times a frame by the settle pass (thumbClassKey), right after
+    // applyCameraScale has written styles, so every read forced a layout: 13%
+    // of the main thread in part 1's pan. A ResizeObserver hands the width over
+    // when it changes — a reshaped window, the Telling folding, the svg leaving
+    // the page for a room (0, which panePx already answers as unknown) — and
+    // nothing in the frame loop measures it. A browser without the observer
+    // keeps measuring, as before.
+    if (typeof ResizeObserver === "function") {
+      const ctx = mapCtx;
+      ctx.paneW = svg.getBoundingClientRect().width;
+      const ro = new ResizeObserver((entries) => {
+        const e = entries[entries.length - 1];
+        ctx.paneW = e.borderBoxSize?.[0]?.inlineSize ?? e.contentRect.width;
+        // a room's svg that has left the page for good stops being watched;
+        // the town's is kept (townKeep) and comes back, so it stays observed
+        if (!svg.isConnected && townKeep?.ctx !== ctx) ro.disconnect();
+      });
+      ro.observe(svg);
+    }
     // a face or a card whose small copy is not there falls back to the
     // original it carries, once (#2940) — the cards live on the overlay, the
     // faces on the walk layer
@@ -9448,7 +9468,7 @@ export function mountViewer(appEl) {
   // no bigger than a Spectator's.
   const paintingWidthM = () => (mapCtx ? mapCtx.full.w * mapCtx.mPerPx : NaN);
   const panePx = () => {
-    const w = mapCtx?.svg?.getBoundingClientRect?.().width;
+    const w = mapCtx?.paneW ?? mapCtx?.svg?.getBoundingClientRect?.().width;
     return Number.isFinite(w) && w > 0 ? w : NaN;
   };
   const drawTier = () => tierFor(mapCtx?.zoomK, paintingWidthM(), state.drawDials);
@@ -9783,8 +9803,8 @@ export function mountViewer(appEl) {
       maxY: (mapCtx.view.y + mapCtx.view.h - mapCtx.originPx.y) * mapCtx.mPerPx,
     };
     const identity = markIdentity(m);
-    const bounds = mapCtx.svg.getBoundingClientRect();
-    const unit = bounds.width > 0 ? mapCtx.view.w / bounds.width : 1;
+    const paneW = panePx();
+    const unit = paneW > 0 ? mapCtx.view.w / paneW : 1;
     if (!markGeometryIntersectsViewport(target, worldViewport)) {
       const edgeWorld = edgePointToward(worldViewport, target.at, 18 * unit * mapCtx.mPerPx);
       if (!edgeWorld) return "";
@@ -9833,8 +9853,8 @@ export function mountViewer(appEl) {
     if (!w || ![w.x, w.y].every(Number.isFinite)) return "";
     const k = markerScale(mapCtx.zoomK);
     const p = { x: mapCtx.originPx.x + w.x / mapCtx.mPerPx, y: mapCtx.originPx.y + w.y / mapCtx.mPerPx };
-    const bounds = mapCtx.svg.getBoundingClientRect();
-    const unit = bounds.width > 0 ? mapCtx.view.w / bounds.width : 1;
+    const paneW = panePx();
+    const unit = paneW > 0 ? mapCtx.view.w / paneW : 1;
     const moving = w.moving ?? (!w.arrived && !w.standing);
     const where = moving
       ? `${w.remaining_m} m to go, ETA ${formatEtaCrossings(w.eta_crossings)}`
