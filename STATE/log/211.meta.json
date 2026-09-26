@@ -1,13 +1,13 @@
 {
   "crossing": 211,
   "covers_from": "2026-09-25T12:00:00.000Z",
-  "covers_to": "2026-09-25T12:02:07.666Z",
-  "complete": false,
-  "as_of_world": "6408352b2e2e5c93b3d9ee8dfe7edde37725d5fe",
-  "event_count": 0,
+  "covers_to": "2026-09-26T00:00:00.000Z",
+  "complete": true,
+  "as_of_world": "9a24eeed72ebc8c622776d25b610d31f78ce5c8a",
+  "event_count": 131,
   "counts": {
-    "departure": 0,
-    "attachment": 0,
-    "emission": 0
+    "departure": 74,
+    "attachment": 1,
+    "emission": 56
   }
 }
