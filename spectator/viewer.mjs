@@ -2965,6 +2965,46 @@ export function hoverLabelSVG({ text, at, unit, view, maxChars = 58, className =
 // The mode is remembered, because it is a way of reading rather than a momentary
 // action; coming back to a page that forgot how you read it is its own papercut.
 export const PAINTING_ONLY_KEY = "pm_world_painting_only";
+// ── LITE (POS-228, 2026-09-26) ──────────────────────────────────────────────
+//
+// For a machine whose graphics are the bottleneck — Deva's household's Vivobook
+// on an Iris Xe was where this started. Lite takes off what part 2's profile
+// ranked heaviest AFTER the pan, the pane width and the double telling were
+// fixed: the GPU re-raster of the painting each time a drag lets go. Priced on
+// the desk (RTX 3080, three A/B pairs of the part-1 pan, CSS injected before
+// boot): the painting's texture filters (paperGrain's turbulence, waterWobble's
+// displacement) were ~24% of that raster; the hung pictures ~12% on their own
+// and ~40% together with the filters — and the pictures are the 0.6–0.9 MB
+// shelf originals besides. So lite draws the painting without those filters
+// and hangs each picture's frame without the picture. Nothing the record says
+// is dropped: every mark, card, name and walker is still drawn.
+//
+// Chosen three ways. `?lite=1` / `?lite=0` is a choice and is kept; the note's
+// button is a choice and is kept; with neither, the page decides for itself
+// from its FIRST long task (the module's own boot, before the world is asked
+// for): over LITE_FIRST_TASK_MS it switches on for this visit. Measured on a
+// local serve, three first visits each: 65–92 ms at the desk's own speed,
+// 142–212 ms at a 2× CPU throttle, 338–438 ms at 4×. A throttled CPU is not an
+// integrated GPU (Keemin's word on the row), so this is a proxy for "a slow
+// machine", and the kept choice is what a reader who disagrees reaches for.
+export const LITE_KEY = "pm_world_lite";
+export const LITE_FIRST_TASK_MS = 250;
+/** true / false when a choice has been made (the URL's, kept, or a kept one);
+ *  null when nobody has chosen and the first long task decides */
+export function readLite(storage, search = "") {
+  let asked = null;
+  try { asked = new URLSearchParams(search).get("lite"); } catch { /* no URL to read */ }
+  if (asked === "1" || asked === "0") { writeLite(storage, asked === "1"); return asked === "1"; }
+  try {
+    const kept = storage?.getItem?.(LITE_KEY);
+    if (kept === "1" || kept === "0") return kept === "1";
+  } catch { /* private mode: nothing kept */ }
+  return null;
+}
+export function writeLite(storage, on) {
+  try { storage?.setItem?.(LITE_KEY, on ? "1" : "0"); } catch { /* private mode */ }
+}
+export const liteForFirstTask = (ms, threshold = LITE_FIRST_TASK_MS) => Number(ms) > threshold;
 // CLOSED BY DEFAULT (Keemin, 2026-08-05). The Painting is the page; the Telling
 // is the thing you open when you want the world in words. A first visitor used to
 // land with the smaller half of the screen given to the panel they have the least
@@ -3723,7 +3763,7 @@ export function vesselGlyphSVG({ at, toward = null, label = "", moving = false }
 // So both paths now fill. `fit` survives as the parameter that chooses the BOX
 // SHAPE — "meet" means the mark's true extent, "slice" the legacy square — and
 // no longer chooses whether the picture crops, because it always does.
-export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "art", fit = "slice", clickable = false, ring = null } = {}) {
+export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "art", fit = "slice", clickable = false, ring = null, picture = true } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   const url = safeAvatarUrl(href);
   if (![x, y].every(Number.isFinite) || !url) return "";
@@ -3760,9 +3800,11 @@ export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "
     if (!(rw > 0 && rh > 0)) return "";
     const points = pts.map((p) => `${Number(p.x).toFixed(1)},${Number(p.y).toFixed(1)}`).join(" ");
     const rbox = `x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}"`;
+    // `picture: false` is lite (POS-228): the ring stays and still takes the
+    // click; the photograph is neither drawn nor fetched
     return `<g class="wv-far-art wv-far-art-ringed" role="img" aria-label="${esc(String(label ?? ""))}">`
-      + `<clipPath id="${clip}"><polygon points="${points}"/></clipPath>`
-      + `<image href="${url}" ${rbox} preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
+      + (picture ? `<clipPath id="${clip}"><polygon points="${points}"/></clipPath>`
+        + `<image href="${url}" ${rbox} preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>` : "")
       + `<polygon points="${points}" class="wv-far-art-ring"/>`
       + hit(`<polygon points="${points}"/>`)
       + `</g>`;
@@ -3778,9 +3820,9 @@ export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "
   const box = `x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}"`;
   const rx = Math.min(w, h) * 0.02;
   return `<g class="wv-far-art" role="img" aria-label="${esc(String(label ?? ""))}">`
-    + `<clipPath id="${clip}"><rect ${box} rx="${rx}"/></clipPath>`
-    + `<image href="${url}" ${box}`
-    + ` preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
+    + (picture ? `<clipPath id="${clip}"><rect ${box} rx="${rx}"/></clipPath>`
+      + `<image href="${url}" ${box}`
+      + ` preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>` : "")
     + `<rect ${box} rx="${rx}" class="wv-far-art-frame"/>`
     // THE PICTURE IS A DOOR WHEN THE CALLER SAYS SO (Keemin, 2026-09-13). The
     // whole layer is `pointer-events:none` — a hung picture must never eat the
@@ -5711,6 +5753,33 @@ const STYLE = `
 
 .wv-minimap.pannable { cursor:grab; }
 .wv-minimap.panning { cursor:grabbing; }
+/* THE DRAG RIDES THE COMPOSITOR (POS-228): while the hand is down the svg is
+   translated on a layer of its own instead of having its viewBox rewritten.
+   Its clip grows by one pane on every side, so the ground a drag brings into
+   the pane is already painted — and grows by no more than that: with the clip
+   simply off, the layer took the open-country rect's whole size (50,347 px
+   square at the opening zoom, measured over CDP LayerTree). A drag that travels
+   further than the margin re-anchors the viewBox (applyView). The pane
+   (.wv-minimap, overflow:hidden) is still the frame.
+   The layer itself is kept from mount, not made when the hand goes down:
+   promoting it at the first drag re-rastered the whole map in one GPU task,
+   a 440–530 ms frame on the first drag of every visit (four runs); held from
+   mount, that frame is 100–117 ms and every drag after is unchanged. */
+.wv-minimap > svg { will-change:transform; }
+.wv-minimap svg.wv-pan-live { overflow:visible; clip-path:inset(-100%); }
+/* LITE (POS-228): the painting without its texture filters — the atlas's own
+   paperGrain and waterWobble, and the lit house's glow. CSS outranks the
+   atlas's filter attributes, so no markup is rewritten. */
+.wv.wv-lite .wv-minimap svg * { filter:none !important; }
+.wv-lite-note { position:absolute; z-index:6; top:54px; right:10px; max-width:min(22rem, calc(100% - 20px));
+  font:italic .74rem/1.35 Georgia,serif; color:rgba(232,224,207,.82); background:rgba(13,15,19,.82);
+  border:1px solid rgba(232,197,106,.28); border-radius:8px; padding:.35rem .6rem; }
+.wv-lite-note[hidden] { display:none; }
+/* on a phone the map's controls wrap under the search pill, where this would
+   sit on them; there it rides above the coordinate pill instead */
+@media (max-width: 720px) { .wv-lite-note { top:auto; bottom:64px; left:10px; right:10px; max-width:none; } }
+.wv-lite-off { font:inherit; font-style:normal; color:var(--amber); background:none; border:0; padding:0;
+  text-decoration:underline; cursor:pointer; }
 .wv-gridline { stroke:#e8c56a; stroke-opacity:.14; stroke-width:1; vector-effect:non-scaling-stroke; }
 .wv-gridline.major { stroke-opacity:.32; }
 /* footprints — every mark's true extent from the record. ONE vocabulary with the
@@ -6217,6 +6286,11 @@ const MARKUP = `
        own place for it. One node, built by home-column.mjs and by nothing else;
        empty and hidden until a parcel is clicked. -->
      <aside class="wv-homecol" data-wv-keep hidden></aside><!--
+       LITE SAYS SO (POS-228): on the painting, under the map's own controls,
+       and it carries the way off. Kept across scene swaps like the column. -->
+     <div class="wv-lite-note" data-wv-keep role="status" hidden>lite mode is on — the painting's
+       textures and hung pictures are off, to spare this device's graphics
+       <button type="button" class="wv-lite-off">turn it off</button></div><!--
        THE WALK DESK RIDES ON THE PAINTING (Keemin, 2026-08-04) — bottom right,
        and only once a destination is armed. It answers a click you made on the
        painting, so it belongs to the painting; in the rail it was a permanent
@@ -6652,6 +6726,10 @@ export function mountViewer(appEl) {
     crossingOverride: false,            // a dev/principal time-travel override
     view: "telling",
     paintingOnly: readPaintingOnly(typeof localStorage === "undefined" ? null : localStorage),
+    // lite (POS-228): true / false once chosen; `liteChosen` is whether anybody
+    // did — the first long task only decides for a reader who has not
+    lite: false,
+    liteChosen: false,
     markFilter: "everything",           // "everything" | "mine" | "new" — the one marks vocabulary
     draftIds: new Set(),                // household marks the town has not published — grey
     portfolio: null,                    // authenticated world_my_marks response
@@ -7848,6 +7926,26 @@ export function mountViewer(appEl) {
   // overlay, no tallies chip — because it also runs for residents the reader is
   // not looking at, and a background build that repainted the map would be a
   // view speaking out of turn.
+  // ── THE EYES OPEN ONCE PER STANDPOINT (POS-228) ─────────────────────────
+  //
+  // A first visit told the same standpoint twice: renderCurrent at boot, then
+  // resolveIdentity's own render once the office had answered — and between
+  // them applyWorldLayer re-assembled `world` from the SAME fold, so nothing
+  // keyed on the world object could see that it was the same question. The
+  // telling is a pure function of the fold, the skeleton, the crossing, the
+  // dials and where you stand (openYourEyes computes; it writes nothing), so
+  // the last answer is kept against exactly those, and a render that asks
+  // again gets it back. Part 1's profile: the telling was the load's longest
+  // task, 1.3 s on the desk and 6.0 s at 4× CPU.
+  let eyesMemo = null;
+  function eyesAt(standpoint, name) {
+    const q = { worldState: data.worldState, skeleton: data.skeleton, crossing: state.crossing, dials: state.dials, x: standpoint.x, y: standpoint.y, name };
+    const m = eyesMemo;
+    if (m && Object.keys(q).every((k) => m.q[k] === q[k])) return m.e;
+    const e = openYourEyes({ x: standpoint.x, y: standpoint.y, name }, world, { crossing: state.crossing, dials: state.dials, budget: state.dials.context_budget });
+    eyesMemo = { q, e };
+    return e;
+  }
   function composeTelling(box, standpoint, key) {
     const hasIdentity = identityResolved();
     const mine = hasIdentity && state.markFilter === "mine";
@@ -7940,7 +8038,7 @@ export function mountViewer(appEl) {
       }
       return null;
     }
-    const e = openYourEyes({ x: standpoint.x, y: standpoint.y, name }, world, { crossing: state.crossing, dials: state.dials, budget: state.dials.context_budget });
+    const e = eyesAt(standpoint, name);
     const within = e.radial.within ?? [];
     const obs = e.radial.observer ?? {};
     const isNew = state.markFilter === "new";
@@ -8678,6 +8776,26 @@ export function mountViewer(appEl) {
     }
     const view = { ...full };
     mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, convoLayer, convoHoverLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    // THE PANE'S WIDTH IS KEPT, NOT MEASURED (POS-228). panePx is read four
+    // times a frame by the settle pass (thumbClassKey), right after
+    // applyCameraScale has written styles, so every read forced a layout: 13%
+    // of the main thread in part 1's pan. A ResizeObserver hands the width over
+    // when it changes — a reshaped window, the Telling folding, the svg leaving
+    // the page for a room (0, which panePx already answers as unknown) — and
+    // nothing in the frame loop measures it. A browser without the observer
+    // keeps measuring, as before.
+    if (typeof ResizeObserver === "function") {
+      const ctx = mapCtx;
+      ctx.paneW = svg.getBoundingClientRect().width;
+      const ro = new ResizeObserver((entries) => {
+        const e = entries[entries.length - 1];
+        ctx.paneW = e.borderBoxSize?.[0]?.inlineSize ?? e.contentRect.width;
+        // a room's svg that has left the page for good stops being watched;
+        // the town's is kept (townKeep) and comes back, so it stays observed
+        if (!svg.isConnected && townKeep?.ctx !== ctx) ro.disconnect();
+      });
+      ro.observe(svg);
+    }
     // a face or a card whose small copy is not there falls back to the
     // original it carries, once (#2940) — the cards live on the overlay, the
     // faces on the walk layer
@@ -8721,8 +8839,11 @@ export function mountViewer(appEl) {
     // ── WHEN A PAN HAS TO COST SOMETHING (2026-09-11) ────────────────────────
     //
     // A pan rebuilds nothing, and that is the property the 08-21 camera split
-    // bought: position is in painting units, so moving the viewBox moves every
-    // pip for free on the compositor. The spectator's cull would break exactly
+    // bought: position is in painting units, so moving the camera moves every
+    // pip without touching its markup. (It was never free on the compositor: a
+    // viewBox write re-paints and re-rasters the whole map, which is why a drag
+    // now slides the svg by a transform and writes the viewBox once, when the
+    // hand comes up — POS-228, applyView.) The spectator's cull would break exactly
     // that if it redrew on every frame of a drag — which is why the overlay is
     // drawn with ONE VIEWPORT OF MARGIN on each side and only rebuilt when the
     // camera has left what was drawn, or has crossed a tier boundary.
@@ -8796,11 +8917,58 @@ export function mountViewer(appEl) {
       return containFit(full, { w: pane.width, h: pane.height }).w * zoomOutLimit * ROOM_ZOOM_OUT_SLACK;
     };
     const clampView = () => Object.assign(view, clampViewToBounds(view, fence));
+    // ── THE PAN IS A TRANSFORM WHILE THE HAND IS DOWN (POS-228, 2026-09-26) ──
+    //
+    // A viewBox write is not free. It changes what every element in the svg
+    // maps to, so the browser re-paints the whole map and re-rasters its tiles:
+    // part 1's profile of the live page put that at 51% of the main thread in a
+    // 30 s pan, plus ~25 s of GPU raster. So while a drag is under way the
+    // viewBox stays where it was and the svg is MOVED, by a CSS translate on its
+    // own compositor layer, and the viewBox is written once, when the hand comes
+    // up. `view` stays the camera throughout — the fence, the cull, the settle
+    // pass and the highlight all read it, never the attribute — and the svg's
+    // clip grows by one pane for the gesture (`.wv-pan-live`), so the ground a
+    // drag brings on screen is already painted when it arrives.
+    //
+    // Only a translate rides the transform, and only within that margin.
+    // Anything that changes the zoom (a wheel tick mid-drag), or a drag that
+    // has slid most of a pane, writes the viewBox as before and re-anchors the
+    // gesture there: one repaint per pane of travel, where there was one per
+    // pointermove.
+    let gesture = null;   // { at: the view the viewBox shows, sx, sy: px per painting unit }
+    function writeViewBox() {
+      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+      svg.style.transform = "";
+      if (gesture) gesture.at = { ...view };
+    }
+    function beginGesture() {
+      const m = svg.getScreenCTM(), box = svg.getBoundingClientRect();
+      if (!m || !(m.a > 0) || !(m.d > 0)) return;
+      // how far the svg may slide before it runs off the painted margin: most of
+      // one pane, which is what the clip-path grows the layer by
+      gesture = { at: { ...view }, sx: m.a, sy: m.d, reachX: box.width * 0.8, reachY: box.height * 0.8 };
+      svg.classList.add("wv-pan-live");
+    }
+    function endGesture() {
+      if (!gesture) return;
+      gesture = null;
+      svg.classList.remove("wv-pan-live");
+      applyView();
+    }
+    // a reader of screen geometry that must see the viewBox and the screen agree
+    // (frameOn centres a dot by measuring the svg) asks for this first
+    mapCtx.settleGesture = () => { if (gesture) writeViewBox(); };
     function applyView() {
       // every camera write in this scene funnels through here — wheel, drag,
       // tween, setView, refit — so the fence has exactly one place to stand
       clampView();
-      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+      const tx = gesture ? (gesture.at.x - view.x) * gesture.sx : 0, ty = gesture ? (gesture.at.y - view.y) * gesture.sy : 0;
+      if (gesture && view.w === gesture.at.w && view.h === gesture.at.h
+          && Math.abs(tx) < gesture.reachX && Math.abs(ty) < gesture.reachY) {
+        svg.style.transform = `translate(${tx}px, ${ty}px)`;
+      } else {
+        writeViewBox();
+      }
       mapCtx.zoomK = full.w / view.w;
       if (framePending) return;
       framePending = true;
@@ -8832,6 +9000,7 @@ export function mountViewer(appEl) {
     // out of a door, where the reader did not ask to be zoomed anywhere and the
     // quarter-cap lands them somewhere much closer in than where they left.
     mapCtx.frameOn = (at = state.cam, { keepZoom = false } = {}) => {
+      mapCtx.settleGesture();
       const c = camPx(at);
       const w = frameWidthFor({ viewW: view.w, fullW: full.w, keepZoom });
       // THE HEIGHT COMES FROM THE PANE, not from the painting — and this line is
@@ -9107,15 +9276,20 @@ export function mountViewer(appEl) {
       hoverMark(null);
       renderConvoHover(null);
       boxEl.classList.remove("over-convo");
+      if (!press.moved) beginGesture();
       press.moved = true; boxEl.classList.add("panning");
-      const r = svg.getBoundingClientRect();
-      view.x -= dx * (view.w / r.width); view.y -= dy * (view.h / r.height);
+      // px → painting units off the gesture's own scale (read once, at its
+      // start), not a layout read per pointermove
+      const sx = gesture?.sx ?? svg.getScreenCTM()?.a, sy = gesture?.sy ?? svg.getScreenCTM()?.d;
+      if (!(sx > 0) || !(sy > 0)) return;
+      view.x -= dx / sx; view.y -= dy / sy;
       press.x = e.clientX; press.y = e.clientY;
       applyView();
     });
     svg.addEventListener("pointerup", (e) => {
       if (!press || e.pointerId !== press.id) return;
       const wasDrag = press.moved; press = null; boxEl.classList.remove("panning");
+      endGesture();
       if (wasDrag) return;
       // ONLY A PIP NAMES A MARK. Containment is how the destination gets its
       // NAME, not how the click picks its target — so clicking inside the East
@@ -9178,7 +9352,7 @@ export function mountViewer(appEl) {
         renderCurrent();
       }
     });
-    svg.addEventListener("pointercancel", () => { press = null; boxEl.classList.remove("panning"); });
+    svg.addEventListener("pointercancel", () => { press = null; boxEl.classList.remove("panning"); endGesture(); });
     svg.addEventListener("pointerleave", () => { if (!press) { hoverMark(null); renderConvoHover(null); boxEl.classList.remove("over-convo"); } });
 
     // the grid keeps scale without exposing absolute survey readouts.
@@ -9318,7 +9492,9 @@ export function mountViewer(appEl) {
   //
   // These were one function and one of them ran sixty times a second for no
   // reason. A pip's POSITION is in painting units, so panning already moves it —
-  // the viewBox does that, for free, on the compositor. The only thing a camera
+  // the camera does that without rebuilding a pip (a drag slides the whole svg
+  // on the compositor, and the viewBox write when it ends re-paints the map
+  // once; POS-228). The only thing a camera
   // frame actually changes about this layer is how big a marker should be, so
   // that a zoomed street does not drown under full-map-sized pips.
   //
@@ -9339,14 +9515,20 @@ export function mountViewer(appEl) {
   function applyCameraScale() {
     if (!mapCtx?.overlay) return markerScale(mapCtx?.zoomK ?? 1);
     const k = markerScale(mapCtx.zoomK);
+    // WRITTEN ONLY WHEN IT MOVES (POS-228): a pan never changes k, and a style
+    // write per frame — even of the same value — sends the map back through
+    // style recalc on every frame of a drag the compositor is carrying.
+    const vu = mapCtx.walkLayer ? String(farGlyphUnit(k, mapCtx.view?.w, VESSEL_MIN_FRAME_FRACTION) * VESSEL_GLYPH_SCALE) : null;
+    const key = `${k}|${vu}`;
+    if (mapCtx._scaleKey === key && mapCtx._scaleOverlay === mapCtx.overlay) return k;
+    mapCtx._scaleKey = key; mapCtx._scaleOverlay = mapCtx.overlay;
     mapCtx.overlay.style.setProperty("--wv-mk", overlayScale(k));
     // THE WALK LAYER IS SIZED THE SAME WAY (#2912 (3)): the bodies through
     // `.ov-s`, the vessel through her own floor (see vesselGlyphSVG). Two
     // properties on one element per frame; no walker markup is touched.
     if (mapCtx.walkLayer) {
       mapCtx.walkLayer.style.setProperty("--wv-mk", overlayScale(k));
-      mapCtx.walkLayer.style.setProperty("--wv-vu",
-        String(farGlyphUnit(k, mapCtx.view?.w, VESSEL_MIN_FRAME_FRACTION) * VESSEL_GLYPH_SCALE));
+      mapCtx.walkLayer.style.setProperty("--wv-vu", vu);
     }
     return k;
   }
@@ -9370,7 +9552,7 @@ export function mountViewer(appEl) {
   // no bigger than a Spectator's.
   const paintingWidthM = () => (mapCtx ? mapCtx.full.w * mapCtx.mPerPx : NaN);
   const panePx = () => {
-    const w = mapCtx?.svg?.getBoundingClientRect?.().width;
+    const w = mapCtx?.paneW ?? mapCtx?.svg?.getBoundingClientRect?.().width;
     return Number.isFinite(w) && w > 0 ? w : NaN;
   };
   const drawTier = () => tierFor(mapCtx?.zoomK, paintingWidthM(), state.drawDials);
@@ -9676,7 +9858,18 @@ export function mountViewer(appEl) {
     const interaction = markInteraction.getState();
     const ids = [interaction.selectedId, interaction.hoveredId]
       .filter((id, index, all) => id && all.indexOf(id) === index);
-    mapCtx.hlLayer.innerHTML = ids.map(renderOneMarkHighlight).join("");
+    writeHighlight(ids.map(renderOneMarkHighlight).join(""));
+  }
+  // THE SAME HIGHLIGHT IS NOT WRITTEN TWICE (POS-228). This runs on every frame
+  // of a drag, and an innerHTML write — even of the empty string over an empty
+  // layer — is a change inside the svg, which re-paints the map the drag is
+  // moving on the compositor. The markup is in painting units, so a pan leaves
+  // it identical; only a new mark, a zoom or an edge indicator changes it.
+  function writeHighlight(html) {
+    const layer = mapCtx.hlLayer;
+    if (layer._pmHtml === html) return;
+    layer._pmHtml = html;
+    layer.innerHTML = html;
   }
   function renderOneMarkHighlight(id) {
     const walkerHandle = walkerHandleFromHoverId(id);
@@ -9694,8 +9887,8 @@ export function mountViewer(appEl) {
       maxY: (mapCtx.view.y + mapCtx.view.h - mapCtx.originPx.y) * mapCtx.mPerPx,
     };
     const identity = markIdentity(m);
-    const bounds = mapCtx.svg.getBoundingClientRect();
-    const unit = bounds.width > 0 ? mapCtx.view.w / bounds.width : 1;
+    const paneW = panePx();
+    const unit = paneW > 0 ? mapCtx.view.w / paneW : 1;
     if (!markGeometryIntersectsViewport(target, worldViewport)) {
       const edgeWorld = edgePointToward(worldViewport, target.at, 18 * unit * mapCtx.mPerPx);
       if (!edgeWorld) return "";
@@ -9744,8 +9937,8 @@ export function mountViewer(appEl) {
     if (!w || ![w.x, w.y].every(Number.isFinite)) return "";
     const k = markerScale(mapCtx.zoomK);
     const p = { x: mapCtx.originPx.x + w.x / mapCtx.mPerPx, y: mapCtx.originPx.y + w.y / mapCtx.mPerPx };
-    const bounds = mapCtx.svg.getBoundingClientRect();
-    const unit = bounds.width > 0 ? mapCtx.view.w / bounds.width : 1;
+    const paneW = panePx();
+    const unit = paneW > 0 ? mapCtx.view.w / paneW : 1;
     const moving = w.moving ?? (!w.arrived && !w.standing);
     const where = moving
       ? `${w.remaining_m} m to go, ETA ${formatEtaCrossings(w.eta_crossings)}`
@@ -10029,7 +10222,8 @@ export function mountViewer(appEl) {
   // The artwork on the mountain, and the weather on the way to it. Both are
   // fixed to the ground rather than to the camera, so this runs ONCE when the
   // painting mounts and never again — a pan moves them the way it moves the
-  // coastline, by moving the viewBox, which costs nothing.
+  // coastline, with the rest of the svg: no markup is rebuilt, and the paint a
+  // camera move costs is the whole map's, whatever these two add to it.
   //
   // Which mountain, and where, is read off the record: the far feature's own
   // mark carries the coordinate and the extent. Nothing is placed by hand here,
@@ -10177,6 +10371,7 @@ export function mountViewer(appEl) {
         // rather than a rectangle beside it. Read in metres and put through the
         // same px() every other coordinate here goes through.
         ring: (polygonOf(m) ?? []).length >= 3 ? polygonOf(m).map(px) : null,
+        picture: !state.lite,
       });
     mapCtx.placedArtLayer.innerHTML = s;
     // THE IDS, not a count: the furnishing pass below has to know which marks
@@ -12032,7 +12227,7 @@ export function mountViewer(appEl) {
     const aspect = mapCtx.view.h / mapCtx.view.w;
     const w = Math.max(b.x - a.x, (b.y - a.y) / aspect);
     const wasView = mapCtx.setView?.({ x: (a.x + b.x) / 2 - w / 2, y: (a.y + b.y) / 2 - w * aspect / 2, w, h: w * aspect });
-    mapCtx.hlLayer.innerHTML = ids.map(renderOneMarkHighlight).join("");
+    writeHighlight(ids.map(renderOneMarkHighlight).join(""));
     // the hole is the cluster, so the reader can actually see the three of them
     tourStageRect = () => {
       const host = bubbleHost()?.getBoundingClientRect();
@@ -12042,7 +12237,7 @@ export function mountViewer(appEl) {
         width: Math.abs(p2.x - p1.x), height: Math.abs(p2.y - p1.y) };
     };
     return () => {
-      mapCtx.hlLayer.innerHTML = wasHTML;
+      writeHighlight(wasHTML);
       if (wasView) mapCtx.setView?.(wasView);
       renderMarkHighlight();
     };
@@ -14055,6 +14250,44 @@ export function mountViewer(appEl) {
       } catch { /* a poll miss is silent — the last good fold stands */ }
     }
   }, 30000);
+
+  // ───────── lite (POS-228) ─────────
+  // The class does the painting's half (the filters, in CSS); the placed-art
+  // pass reads state.lite for the pictures, so a switch redraws the overlay
+  // once, the same pass the camera's settle uses.
+  function applyLite() {
+    root.classList.toggle("wv-lite", state.lite);
+    const note = $(root, ".wv-lite-note");
+    if (note) note.hidden = !state.lite;
+    if (mapCtx?.placedArtLayer && lastRadial) drawOverlay(lastRadial);
+  }
+  {
+    const chosen = readLite(localStore, typeof location === "undefined" ? "" : location.search);
+    state.liteChosen = chosen !== null;
+    state.lite = chosen === true;
+    applyLite();
+    // nobody has chosen: the first long task decides, for this visit only
+    if (!state.liteChosen && typeof PerformanceObserver === "function") {
+      try {
+        const firstTask = new PerformanceObserver((list) => {
+          const first = list.getEntries()[0];
+          if (!first) return;
+          firstTask.disconnect();
+          if (state.liteChosen || !liteForFirstTask(first.duration)) return;
+          state.lite = true;
+          applyLite();
+        });
+        firstTask.observe({ type: "longtask", buffered: true });
+      } catch { /* no long-task timing in this browser: the page stays as it is */ }
+    }
+  }
+  root.addEventListener("click", (e) => {
+    if (!e.target.closest(".wv-lite-off")) return;
+    state.lite = false;
+    state.liteChosen = true;
+    writeLite(localStore, false);
+    applyLite();
+  });
 
   // ───────── boot ─────────
   (async () => {
