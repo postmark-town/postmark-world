@@ -119,29 +119,104 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
   // points, same order, same summation — and a test pins that against the
   // original implementation rather than against a remembered number.
   //
-  // Ties keep the earlier control point, which is what the stable sort did: the
-  // comparisons below are strict, so an equal-distance latecomer never displaces
-  // the point that was already holding the seat.
+  // Ties keep the earlier control point, which is what the stable sort did: an
+  // equal distance is decided by the index, so a latecomer never displaces the
+  // point that was already holding the seat.
   const bestD2 = new Float64Array(K);
   const bestH = new Float64Array(K);
-  function elevationAt(x, y) {
-    let n = 0;
-    for (let i = 0; i < cps.length; i += 1) {
-      const c = cps[i];
-      const dx = x - c.x, dy = y - c.y;
-      const d2 = dx * dx + dy * dy;
-      if (n === K && !(d2 < bestD2[K - 1])) continue;   // cannot beat the worst held
-      let j = n < K ? n : K - 1;
-      while (j > 0 && d2 < bestD2[j - 1]) { bestD2[j] = bestD2[j - 1]; bestH[j] = bestH[j - 1]; j -= 1; }
-      bestD2[j] = d2; bestH[j] = c.h;
-      if (n < K) n += 1;
+  const bestI = new Int32Array(K);
+  let n = 0;
+  // one candidate into the beat, ordered by (distance, index) — the index only
+  // ever decides a tie, which the full scan below never meets out of order
+  function offer(i, x, y) {
+    const c = cps[i];
+    const dx = x - c.x, dy = y - c.y;
+    const d2 = dx * dx + dy * dy;
+    if (n === K && !(d2 < bestD2[K - 1] || (d2 === bestD2[K - 1] && i < bestI[K - 1]))) return;   // cannot beat the worst held
+    let j = n < K ? n : K - 1;
+    while (j > 0 && (d2 < bestD2[j - 1] || (d2 === bestD2[j - 1] && i < bestI[j - 1]))) {
+      bestD2[j] = bestD2[j - 1]; bestH[j] = bestH[j - 1]; bestI[j] = bestI[j - 1]; j -= 1;
     }
+    bestD2[j] = d2; bestH[j] = c.h; bestI[j] = i;
+    if (n < K) n += 1;
+  }
+  function weigh() {
     if (bestD2[0] === 0) return bestH[0];       // exactly on a control point
     let wsum = 0, hsum = 0;
     for (let i = 0; i < n; i += 1) { const w = 1 / Math.pow(bestD2[i], power / 2); wsum += w; hsum += w * bestH[i]; }
     return hsum / wsum;
   }
+  function scanAll(x, y) {
+    n = 0;
+    for (let i = 0; i < cps.length; i += 1) offer(i, x, y);
+    return weigh();
+  }
+  // ── A GRID OVER THE POINTS, SO A SAMPLE ASKS ITS NEIGHBOURS FIRST (POS-228) ──
+  //
+  // The beat above still visits every control point for every sample, and the
+  // telling takes tens of thousands of samples; part 1's profile of the live
+  // page put elevationAt at 9–14% of the main thread. So the points are
+  // bucketed into square cells, and a sample walks rings of cells outward from
+  // its own until the K it holds are CLOSER than anything a further ring could
+  // contain — then stops. A sample far from every cell (the outliers sit 96 km
+  // out) runs out of rings and takes the full scan, which is the old answer.
+  //
+  // THE ANSWER MUST NOT MOVE BY A BIT, and the reason it cannot is the stop
+  // rule. A point left unvisited is at least the ring's edge away, and the
+  // search only stops when the K-th distance held is strictly inside that edge
+  // (with a margin for the edge's own rounding) — so every point that could sit
+  // in the K, or tie with its last seat, was visited. Visiting order is by cell
+  // rather than by index, so ties are broken on the INDEX explicitly: the same
+  // (distance, index) order the stable sort kept, and the same order the full
+  // scan's strict comparisons keep. heightfield-selection.test.mjs holds both
+  // paths against the original sort.
+  const grid = cps.length > GRID_MIN_POINTS && cps.every((c) => Number.isFinite(c.x) && Number.isFinite(c.y))
+    ? buildGrid(cps, K) : null;
+  function elevationAt(x, y) {
+    if (!grid || !Number.isFinite(x) || !Number.isFinite(y)) return scanAll(x, y);
+    const { size, cells, maxRing } = grid;
+    const cx = Math.floor(x / size), cy = Math.floor(y / size);
+    n = 0;
+    for (let r = 0; r <= maxRing; r += 1) {
+      for (let gx = cx - r; gx <= cx + r; gx += 1) {
+        const edgeX = gx === cx - r || gx === cx + r;
+        for (let gy = cy - r; gy <= cy + r; gy += (edgeX || r === 0) ? 1 : 2 * r) {
+          const cell = cells.get(gx * GRID_KEY_SPAN + gy);
+          if (cell) for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
+        }
+      }
+      if (n < K) continue;
+      // the nearest a point outside the rings walked so far can be, less a
+      // hair for the rounding in the division that filed each point in a cell
+      const edge = Math.min(x - (cx - r) * size, (cx + r + 1) * size - x, y - (cy - r) * size, (cy + r + 1) * size - y) - size * 1e-9;
+      if (edge > 0 && bestD2[K - 1] < edge * edge) return weigh();
+    }
+    return scanAll(x, y);
+  }
   return { elevationAt, controlPoints: cps };
+}
+
+const GRID_MIN_POINTS = 64;       // below this the full scan is already cheap
+const GRID_KEY_SPAN = 1 << 21;    // cell (gx, gy) → one number key; a collision only merges two cells, never loses one
+// The cell is sized off the middle half of the points (the interquartile box
+// in x and in y), so the 96 km outliers cannot stretch it, to hold about K/4 of
+// them — measured on the town's 627 points over twenty tellings, ~350 m cells
+// ran 2.1–2.3× faster than the full scan, where 700 m and 240 m cells were
+// slower. The rings stop once walking them would visit more cells than half the
+// points: past that, the full scan is the cheaper way to the same answer.
+function buildGrid(cps, K) {
+  const iqr = (vals) => { const s = [...vals].sort((a, b) => a - b); return s[Math.floor(s.length * 0.75)] - s[Math.floor(s.length * 0.25)]; };
+  const area = Math.max(1, iqr(cps.map((c) => c.x)) * iqr(cps.map((c) => c.y)));
+  const size = Math.max(1, Math.sqrt((area * K) / cps.length));
+  const maxRing = Math.max(2, Math.floor((Math.sqrt(cps.length / 2) - 1) / 2));
+  const cells = new Map();
+  for (let i = 0; i < cps.length; i += 1) {
+    const key = Math.floor(cps[i].x / size) * GRID_KEY_SPAN + Math.floor(cps[i].y / size);
+    let cell = cells.get(key);
+    if (!cell) cells.set(key, (cell = []));
+    cell.push(i);
+  }
+  return { size, cells, maxRing };
 }
 
 // ───────────────────────── radial helpers ──────────────────────────────────

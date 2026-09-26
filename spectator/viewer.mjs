@@ -7862,6 +7862,26 @@ export function mountViewer(appEl) {
   // overlay, no tallies chip — because it also runs for residents the reader is
   // not looking at, and a background build that repainted the map would be a
   // view speaking out of turn.
+  // ── THE EYES OPEN ONCE PER STANDPOINT (POS-228) ─────────────────────────
+  //
+  // A first visit told the same standpoint twice: renderCurrent at boot, then
+  // resolveIdentity's own render once the office had answered — and between
+  // them applyWorldLayer re-assembled `world` from the SAME fold, so nothing
+  // keyed on the world object could see that it was the same question. The
+  // telling is a pure function of the fold, the skeleton, the crossing, the
+  // dials and where you stand (openYourEyes computes; it writes nothing), so
+  // the last answer is kept against exactly those, and a render that asks
+  // again gets it back. Part 1's profile: the telling was the load's longest
+  // task, 1.3 s on the desk and 6.0 s at 4× CPU.
+  let eyesMemo = null;
+  function eyesAt(standpoint, name) {
+    const q = { worldState: data.worldState, skeleton: data.skeleton, crossing: state.crossing, dials: state.dials, x: standpoint.x, y: standpoint.y, name };
+    const m = eyesMemo;
+    if (m && Object.keys(q).every((k) => m.q[k] === q[k])) return m.e;
+    const e = openYourEyes({ x: standpoint.x, y: standpoint.y, name }, world, { crossing: state.crossing, dials: state.dials, budget: state.dials.context_budget });
+    eyesMemo = { q, e };
+    return e;
+  }
   function composeTelling(box, standpoint, key) {
     const hasIdentity = identityResolved();
     const mine = hasIdentity && state.markFilter === "mine";
@@ -7954,7 +7974,7 @@ export function mountViewer(appEl) {
       }
       return null;
     }
-    const e = openYourEyes({ x: standpoint.x, y: standpoint.y, name }, world, { crossing: state.crossing, dials: state.dials, budget: state.dials.context_budget });
+    const e = eyesAt(standpoint, name);
     const within = e.radial.within ?? [];
     const obs = e.radial.observer ?? {};
     const isNew = state.markFilter === "new";
