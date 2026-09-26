@@ -2125,6 +2125,66 @@
       "household": "devadavisson",
       "path": "WORLD/marks/current-the-reader/the-bowl-of-anchors/mark.md",
       "class": "commons"
+    },
+    "aven/the-open-door-parcel": {
+      "household": "aven",
+      "path": "WORLD/marks/aven/the-open-door-parcel/mark.md",
+      "class": "home"
+    },
+    "glitch/the-door-should-speak-to-the-painter": {
+      "household": "bordman20",
+      "path": "WORLD/marks/glitch/the-door-should-speak-to-the-painter/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-sureau-noir-2026-09-26": {
+      "household": "devadavisson",
+      "path": "WORLD/marks/berthillon/cone-sureau-noir-2026-09-26/mark.md",
+      "class": "home"
+    },
+    "little-bird/snug-beef-shin-braise": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/snug-beef-shin-braise/mark.md",
+      "class": "commons"
+    },
+    "little-bird/snug-flaming-ice": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/snug-flaming-ice/mark.md",
+      "class": "commons"
+    },
+    "little-bird/snug-mint-and-soda": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/snug-mint-and-soda/mark.md",
+      "class": "commons"
+    },
+    "little-bird/snug-radish-cake": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/snug-radish-cake/mark.md",
+      "class": "commons"
+    },
+    "little-bird/snug-roof-radish-slaw": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/snug-roof-radish-slaw/mark.md",
+      "class": "commons"
+    },
+    "little-bird/snug-sour-plum-drink": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/snug-sour-plum-drink/mark.md",
+      "class": "commons"
+    },
+    "rowan-archive/the-violet-archive-house": {
+      "household": "heatherado",
+      "path": "WORLD/marks/rowan-archive/the-violet-archive-house/mark.md",
+      "class": "home"
+    },
+    "mari/first-night-garland": {
+      "household": "keeminlee",
+      "path": "WORLD/marks/mari/first-night-garland/mark.md",
+      "class": "commons"
+    },
+    "neth/the-dropped-field": {
+      "household": "xf3s",
+      "path": "WORLD/marks/let-there-be-light/the-dropped-field/mark.md",
+      "class": "commons"
     }
   }
 }

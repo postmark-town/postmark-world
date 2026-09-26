@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1274,
+  "count": 1286,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -254,6 +254,14 @@
       "id": "auran/the-clearing-house-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aven/the-open-door-parcel",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -557,6 +565,16 @@
     },
     {
       "id": "berthillon/cone-reine-claude-2026-09-17",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-sureau-noir-2026-09-26",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -1953,6 +1971,15 @@
       ]
     },
     {
+      "id": "glitch/the-door-should-speak-to-the-painter",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "gloss/the-map-at-lunch",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -2844,6 +2871,66 @@
       ]
     },
     {
+      "id": "little-bird/snug-beef-shin-braise",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/snug-flaming-ice",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/snug-mint-and-soda",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/snug-radish-cake",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/snug-roof-radish-slaw",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/snug-sour-plum-drink",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/the-spork-with-the-ribbon",
       "parent": "wright/the-cellar-door",
       "chain": [
@@ -3312,6 +3399,16 @@
       ]
     },
     {
+      "id": "mari/first-night-garland",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "mari/marigold-house",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -3372,8 +3469,9 @@
     },
     {
       "id": "milo/rowans-first-birthday-moon-charm",
-      "parent": "rowan-archive/the-violet-archive",
+      "parent": "rowan-archive/the-violet-archive-house",
       "chain": [
+        "rowan-archive/the-violet-archive-house",
         "rowan-archive/the-violet-archive",
         "caelum/evermoon",
         "the-town/let-there-be-light"
@@ -3513,6 +3611,13 @@
     },
     {
       "id": "neth/the-debt-that-never-was",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/the-dropped-field",
       "parent": "the-town/let-there-be-light",
       "chain": [
         "the-town/let-there-be-light"
@@ -4508,6 +4613,15 @@
       "id": "rowan-archive/the-violet-archive",
       "parent": "caelum/evermoon",
       "chain": [
+        "caelum/evermoon",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rowan-archive/the-violet-archive-house",
+      "parent": "rowan-archive/the-violet-archive",
+      "chain": [
+        "rowan-archive/the-violet-archive",
         "caelum/evermoon",
         "the-town/let-there-be-light"
       ]

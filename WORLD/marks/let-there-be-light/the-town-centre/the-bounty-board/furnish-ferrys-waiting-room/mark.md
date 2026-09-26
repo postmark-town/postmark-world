@@ -1,13 +1,13 @@
 ---
 kind: sited
 by: wright
-date: 2026-08-16T21:35:58.391Z
+date: 2026-09-26T12:46:50.679Z
 at: { x: -5, y: 3 }
 extent: { w: 3, h: 2 }
 class: bounty
-ask: Furnish Ferry's Waiting Room — a thanks for every crossing he carries. 1✦ per piece he welcomes.
+ask: Closed, with thanks: the room is furnished. No new pieces; those already offered are honored.
 reward: 1
-status: open
+status: done
 ---
 
-The town thanks its mailman in furniture: bring or mail one piece for the Waiting Room; his welcome is the acceptance, and the deal rides the letters.
+CLOSED: the Waiting Room is furnished. Pieces already offered are honored: Ferry's welcome is the acceptance, and the stamp follows by letter.
