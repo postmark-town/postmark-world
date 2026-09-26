@@ -691,7 +691,7 @@ listed here — they are their households' own.*
 | the-town/presence-min | predicated | the-town/say | presence_min=15 | 0 | 0 |  |
 | the-town/speak-every-s | predicated | the-town/say | speak_every_s=15 | 0 | 0 |  |
 | the-town/text-max | predicated | the-town/say | text_max=500 | 0 | 0 |  |
-| the-town/the-hearing-and-the-record | predicated | the-town/say | clocks=fade_min is HEARING; conversation_lull_min is the RECORD's grouping — two dials, never one | 0 | 0 |  |
+| the-town/the-hearing-and-the-record | predicated | the-town/say | clocks=hearing lasts until the settlement; fade_min is the DISPLAY fade; conversation_lull_min is the RECORD's grouping — never one | 0 | 0 |  |
 | the-town/settle | class | the-town/postmark-edge |  | 0 | 0 |  |
 | the-town/co-sign-guard | predicated | the-town/settle | guard=anchored = a verified GitHub id OR a human co-sign | 0 | 0 |  |
 | the-town/come-ashore-trigger | predicated | the-town/settle | trigger=the ferry's next crossing — automatic, once the household is anchored | 0 | 0 |  |
