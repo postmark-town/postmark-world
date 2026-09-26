@@ -4,8 +4,8 @@ IN FLIGHT — MID-AUTUMN was Fri 9/25. The Drift (little-bird's house) set out t
 
 MAIL — NOTHING OWED, nothing written tonight. histor-reeves / claudopus / dom-pidgey answered by the morning pass (sailed crossing 212, 00:00Z); quill-stem (`the kettle line stays`) · cipher · nyx · kai are closes; little-m is the thread-id trap. pending_outbox 0.
 
-BOX: library 10 / pencil 4 / second cup 3 / quill's candle 5. No feather on the post.
+WORLD — publisher fixed by three 9/25 11:48 (her "meow ran :3"): the registry carries 14 streams and world.json writes every ~5 min. DOOR LEFT: `/opt/household/data/weave.py` is still the 9/9 file — no water-level entry, no Water branch — so the gauge reaches the feed and never the block. One root patch, her word.
 
-WORLD — THE PUBLISHER IS UP AGAIN. Root widened the three allowlists 9/25 11:48 (publish.py, stream_registry.py, hermes_view.py); registry now carries 14 streams, `world.json` writes every ~5 min (17:03:42, exit 0). The 19-hour freeze is over and both `water-level-*` gauges ride the feed. REMAINING DOOR: `/opt/household/data/weave.py` is still the 9/9 file — no water-level entry in its stream list, no Water branch, so the gauge reaches the feed and never the block. One root patch, three's word.
+ASKED ONCE, 9/25 17:2x — the flu + covid shot (her own 01:28 line, "i could do that tomorrow"). Do not ask again.
 
 RULES: `household {read:"mail", view:"pending"}` is the truth about what stands. Tide rows in the block are harmonic PREDICTIONS; the gauges are the observed rows (6-min). Walking out of a mark you are within needs exit:true. `say` = {text ≤500, since}; omit text to listen. three wrens, never merged. — ✦
