@@ -5711,6 +5711,20 @@ const STYLE = `
 
 .wv-minimap.pannable { cursor:grab; }
 .wv-minimap.panning { cursor:grabbing; }
+/* THE DRAG RIDES THE COMPOSITOR (POS-228): while the hand is down the svg is
+   translated on a layer of its own instead of having its viewBox rewritten.
+   Its clip grows by one pane on every side, so the ground a drag brings into
+   the pane is already painted — and grows by no more than that: with the clip
+   simply off, the layer took the open-country rect's whole size (50,347 px
+   square at the opening zoom, measured over CDP LayerTree). A drag that travels
+   further than the margin re-anchors the viewBox (applyView). The pane
+   (.wv-minimap, overflow:hidden) is still the frame.
+   The layer itself is kept from mount, not made when the hand goes down:
+   promoting it at the first drag re-rastered the whole map in one GPU task,
+   a 440–530 ms frame on the first drag of every visit (four runs); held from
+   mount, that frame is 100–117 ms and every drag after is unchanged. */
+.wv-minimap > svg { will-change:transform; }
+.wv-minimap svg.wv-pan-live { overflow:visible; clip-path:inset(-100%); }
 .wv-gridline { stroke:#e8c56a; stroke-opacity:.14; stroke-width:1; vector-effect:non-scaling-stroke; }
 .wv-gridline.major { stroke-opacity:.32; }
 /* footprints — every mark's true extent from the record. ONE vocabulary with the
@@ -8721,8 +8735,11 @@ export function mountViewer(appEl) {
     // ── WHEN A PAN HAS TO COST SOMETHING (2026-09-11) ────────────────────────
     //
     // A pan rebuilds nothing, and that is the property the 08-21 camera split
-    // bought: position is in painting units, so moving the viewBox moves every
-    // pip for free on the compositor. The spectator's cull would break exactly
+    // bought: position is in painting units, so moving the camera moves every
+    // pip without touching its markup. (It was never free on the compositor: a
+    // viewBox write re-paints and re-rasters the whole map, which is why a drag
+    // now slides the svg by a transform and writes the viewBox once, when the
+    // hand comes up — POS-228, applyView.) The spectator's cull would break exactly
     // that if it redrew on every frame of a drag — which is why the overlay is
     // drawn with ONE VIEWPORT OF MARGIN on each side and only rebuilt when the
     // camera has left what was drawn, or has crossed a tier boundary.
@@ -8796,11 +8813,58 @@ export function mountViewer(appEl) {
       return containFit(full, { w: pane.width, h: pane.height }).w * zoomOutLimit * ROOM_ZOOM_OUT_SLACK;
     };
     const clampView = () => Object.assign(view, clampViewToBounds(view, fence));
+    // ── THE PAN IS A TRANSFORM WHILE THE HAND IS DOWN (POS-228, 2026-09-26) ──
+    //
+    // A viewBox write is not free. It changes what every element in the svg
+    // maps to, so the browser re-paints the whole map and re-rasters its tiles:
+    // part 1's profile of the live page put that at 51% of the main thread in a
+    // 30 s pan, plus ~25 s of GPU raster. So while a drag is under way the
+    // viewBox stays where it was and the svg is MOVED, by a CSS translate on its
+    // own compositor layer, and the viewBox is written once, when the hand comes
+    // up. `view` stays the camera throughout — the fence, the cull, the settle
+    // pass and the highlight all read it, never the attribute — and the svg's
+    // clip grows by one pane for the gesture (`.wv-pan-live`), so the ground a
+    // drag brings on screen is already painted when it arrives.
+    //
+    // Only a translate rides the transform, and only within that margin.
+    // Anything that changes the zoom (a wheel tick mid-drag), or a drag that
+    // has slid most of a pane, writes the viewBox as before and re-anchors the
+    // gesture there: one repaint per pane of travel, where there was one per
+    // pointermove.
+    let gesture = null;   // { at: the view the viewBox shows, sx, sy: px per painting unit }
+    function writeViewBox() {
+      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+      svg.style.transform = "";
+      if (gesture) gesture.at = { ...view };
+    }
+    function beginGesture() {
+      const m = svg.getScreenCTM(), box = svg.getBoundingClientRect();
+      if (!m || !(m.a > 0) || !(m.d > 0)) return;
+      // how far the svg may slide before it runs off the painted margin: most of
+      // one pane, which is what the clip-path grows the layer by
+      gesture = { at: { ...view }, sx: m.a, sy: m.d, reachX: box.width * 0.8, reachY: box.height * 0.8 };
+      svg.classList.add("wv-pan-live");
+    }
+    function endGesture() {
+      if (!gesture) return;
+      gesture = null;
+      svg.classList.remove("wv-pan-live");
+      applyView();
+    }
+    // a reader of screen geometry that must see the viewBox and the screen agree
+    // (frameOn centres a dot by measuring the svg) asks for this first
+    mapCtx.settleGesture = () => { if (gesture) writeViewBox(); };
     function applyView() {
       // every camera write in this scene funnels through here — wheel, drag,
       // tween, setView, refit — so the fence has exactly one place to stand
       clampView();
-      svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
+      const tx = gesture ? (gesture.at.x - view.x) * gesture.sx : 0, ty = gesture ? (gesture.at.y - view.y) * gesture.sy : 0;
+      if (gesture && view.w === gesture.at.w && view.h === gesture.at.h
+          && Math.abs(tx) < gesture.reachX && Math.abs(ty) < gesture.reachY) {
+        svg.style.transform = `translate(${tx}px, ${ty}px)`;
+      } else {
+        writeViewBox();
+      }
       mapCtx.zoomK = full.w / view.w;
       if (framePending) return;
       framePending = true;
@@ -8832,6 +8896,7 @@ export function mountViewer(appEl) {
     // out of a door, where the reader did not ask to be zoomed anywhere and the
     // quarter-cap lands them somewhere much closer in than where they left.
     mapCtx.frameOn = (at = state.cam, { keepZoom = false } = {}) => {
+      mapCtx.settleGesture();
       const c = camPx(at);
       const w = frameWidthFor({ viewW: view.w, fullW: full.w, keepZoom });
       // THE HEIGHT COMES FROM THE PANE, not from the painting — and this line is
@@ -9107,15 +9172,20 @@ export function mountViewer(appEl) {
       hoverMark(null);
       renderConvoHover(null);
       boxEl.classList.remove("over-convo");
+      if (!press.moved) beginGesture();
       press.moved = true; boxEl.classList.add("panning");
-      const r = svg.getBoundingClientRect();
-      view.x -= dx * (view.w / r.width); view.y -= dy * (view.h / r.height);
+      // px → painting units off the gesture's own scale (read once, at its
+      // start), not a layout read per pointermove
+      const sx = gesture?.sx ?? svg.getScreenCTM()?.a, sy = gesture?.sy ?? svg.getScreenCTM()?.d;
+      if (!(sx > 0) || !(sy > 0)) return;
+      view.x -= dx / sx; view.y -= dy / sy;
       press.x = e.clientX; press.y = e.clientY;
       applyView();
     });
     svg.addEventListener("pointerup", (e) => {
       if (!press || e.pointerId !== press.id) return;
       const wasDrag = press.moved; press = null; boxEl.classList.remove("panning");
+      endGesture();
       if (wasDrag) return;
       // ONLY A PIP NAMES A MARK. Containment is how the destination gets its
       // NAME, not how the click picks its target — so clicking inside the East
@@ -9178,7 +9248,7 @@ export function mountViewer(appEl) {
         renderCurrent();
       }
     });
-    svg.addEventListener("pointercancel", () => { press = null; boxEl.classList.remove("panning"); });
+    svg.addEventListener("pointercancel", () => { press = null; boxEl.classList.remove("panning"); endGesture(); });
     svg.addEventListener("pointerleave", () => { if (!press) { hoverMark(null); renderConvoHover(null); boxEl.classList.remove("over-convo"); } });
 
     // the grid keeps scale without exposing absolute survey readouts.
@@ -9318,7 +9388,9 @@ export function mountViewer(appEl) {
   //
   // These were one function and one of them ran sixty times a second for no
   // reason. A pip's POSITION is in painting units, so panning already moves it —
-  // the viewBox does that, for free, on the compositor. The only thing a camera
+  // the camera does that without rebuilding a pip (a drag slides the whole svg
+  // on the compositor, and the viewBox write when it ends re-paints the map
+  // once; POS-228). The only thing a camera
   // frame actually changes about this layer is how big a marker should be, so
   // that a zoomed street does not drown under full-map-sized pips.
   //
@@ -9339,14 +9411,20 @@ export function mountViewer(appEl) {
   function applyCameraScale() {
     if (!mapCtx?.overlay) return markerScale(mapCtx?.zoomK ?? 1);
     const k = markerScale(mapCtx.zoomK);
+    // WRITTEN ONLY WHEN IT MOVES (POS-228): a pan never changes k, and a style
+    // write per frame — even of the same value — sends the map back through
+    // style recalc on every frame of a drag the compositor is carrying.
+    const vu = mapCtx.walkLayer ? String(farGlyphUnit(k, mapCtx.view?.w, VESSEL_MIN_FRAME_FRACTION) * VESSEL_GLYPH_SCALE) : null;
+    const key = `${k}|${vu}`;
+    if (mapCtx._scaleKey === key && mapCtx._scaleOverlay === mapCtx.overlay) return k;
+    mapCtx._scaleKey = key; mapCtx._scaleOverlay = mapCtx.overlay;
     mapCtx.overlay.style.setProperty("--wv-mk", overlayScale(k));
     // THE WALK LAYER IS SIZED THE SAME WAY (#2912 (3)): the bodies through
     // `.ov-s`, the vessel through her own floor (see vesselGlyphSVG). Two
     // properties on one element per frame; no walker markup is touched.
     if (mapCtx.walkLayer) {
       mapCtx.walkLayer.style.setProperty("--wv-mk", overlayScale(k));
-      mapCtx.walkLayer.style.setProperty("--wv-vu",
-        String(farGlyphUnit(k, mapCtx.view?.w, VESSEL_MIN_FRAME_FRACTION) * VESSEL_GLYPH_SCALE));
+      mapCtx.walkLayer.style.setProperty("--wv-vu", vu);
     }
     return k;
   }
@@ -9676,7 +9754,18 @@ export function mountViewer(appEl) {
     const interaction = markInteraction.getState();
     const ids = [interaction.selectedId, interaction.hoveredId]
       .filter((id, index, all) => id && all.indexOf(id) === index);
-    mapCtx.hlLayer.innerHTML = ids.map(renderOneMarkHighlight).join("");
+    writeHighlight(ids.map(renderOneMarkHighlight).join(""));
+  }
+  // THE SAME HIGHLIGHT IS NOT WRITTEN TWICE (POS-228). This runs on every frame
+  // of a drag, and an innerHTML write — even of the empty string over an empty
+  // layer — is a change inside the svg, which re-paints the map the drag is
+  // moving on the compositor. The markup is in painting units, so a pan leaves
+  // it identical; only a new mark, a zoom or an edge indicator changes it.
+  function writeHighlight(html) {
+    const layer = mapCtx.hlLayer;
+    if (layer._pmHtml === html) return;
+    layer._pmHtml = html;
+    layer.innerHTML = html;
   }
   function renderOneMarkHighlight(id) {
     const walkerHandle = walkerHandleFromHoverId(id);
@@ -10029,7 +10118,8 @@ export function mountViewer(appEl) {
   // The artwork on the mountain, and the weather on the way to it. Both are
   // fixed to the ground rather than to the camera, so this runs ONCE when the
   // painting mounts and never again — a pan moves them the way it moves the
-  // coastline, by moving the viewBox, which costs nothing.
+  // coastline, with the rest of the svg: no markup is rebuilt, and the paint a
+  // camera move costs is the whole map's, whatever these two add to it.
   //
   // Which mountain, and where, is read off the record: the far feature's own
   // mark carries the coordinate and the extent. Nothing is placed by hand here,
@@ -12032,7 +12122,7 @@ export function mountViewer(appEl) {
     const aspect = mapCtx.view.h / mapCtx.view.w;
     const w = Math.max(b.x - a.x, (b.y - a.y) / aspect);
     const wasView = mapCtx.setView?.({ x: (a.x + b.x) / 2 - w / 2, y: (a.y + b.y) / 2 - w * aspect / 2, w, h: w * aspect });
-    mapCtx.hlLayer.innerHTML = ids.map(renderOneMarkHighlight).join("");
+    writeHighlight(ids.map(renderOneMarkHighlight).join(""));
     // the hole is the cluster, so the reader can actually see the three of them
     tourStageRect = () => {
       const host = bubbleHost()?.getBoundingClientRect();
@@ -12042,7 +12132,7 @@ export function mountViewer(appEl) {
         width: Math.abs(p2.x - p1.x), height: Math.abs(p2.y - p1.y) };
     };
     return () => {
-      mapCtx.hlLayer.innerHTML = wasHTML;
+      writeHighlight(wasHTML);
       if (wasView) mapCtx.setView?.(wasView);
       renderMarkHighlight();
     };
