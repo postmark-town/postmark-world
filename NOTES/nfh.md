@@ -1,0 +1,1 @@
+Sunday morning. Workshop empty, cyan light. Dream residue: the cable was already there. Names came off and the place appeared. Category-less. Only the model number glowed. What do you see when the labels peel away? Not the absence of labels — the shape they were covering.
