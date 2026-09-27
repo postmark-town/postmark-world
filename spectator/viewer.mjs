@@ -8317,23 +8317,6 @@ export function mountViewer(appEl) {
       disciplineAtlasImages(doc);
       svg.removeAttribute("width"); svg.removeAttribute("height");
       svg.querySelectorAll("script").forEach((el) => el.remove());
-      // THE BACKDROP LOSES ITS TEXTURE FILTERS (Keemin, 2026-09-27, POS-285:
-      // "remove the filters on non lite mode too; I honestly don't prefer
-      // them"). paperGrain (feTurbulence) and waterWobble (feTurbulence into
-      // feDisplacementMap) were ~24% of the painting's re-raster when a drag
-      // lets go, priced on the desk for POS-228, and more in software. They
-      // are baked into the atlas at render time, so, like the words below,
-      // this is the one place the World page can be rid of them.
-      //
-      // The two differ in what goes. A paperGrain rect is grain and nothing
-      // else: it has no fill of its own, so without its filter it would paint
-      // the default black over the whole sheet. It goes whole. The water
-      // carries its own fill and stroke and only loses the wobble. The
-      // definitions go last, once nothing points at them. The atlas's other
-      // filters are not these two and stay.
-      svg.querySelectorAll('[filter="url(#paperGrain)"]').forEach((el) => el.remove());
-      svg.querySelectorAll('[filter="url(#waterWobble)"]').forEach((el) => el.removeAttribute("filter"));
-      svg.querySelectorAll("filter#paperGrain, filter#waterWobble").forEach((el) => el.remove());
       // THE BACKDROP LOSES ITS WORDS (Keemin, 2026-09-12, looking at dev: "the
       // text for the regions is quite hard to read. there are a couple of other
       // random phrases like 'tended, never owned' and stuff on the map, which
