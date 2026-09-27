@@ -2965,46 +2965,6 @@ export function hoverLabelSVG({ text, at, unit, view, maxChars = 58, className =
 // The mode is remembered, because it is a way of reading rather than a momentary
 // action; coming back to a page that forgot how you read it is its own papercut.
 export const PAINTING_ONLY_KEY = "pm_world_painting_only";
-// ── LITE (POS-228, 2026-09-26) ──────────────────────────────────────────────
-//
-// For a machine whose graphics are the bottleneck — Deva's household's Vivobook
-// on an Iris Xe was where this started. Lite takes off what part 2's profile
-// ranked heaviest AFTER the pan, the pane width and the double telling were
-// fixed: the GPU re-raster of the painting each time a drag lets go. Priced on
-// the desk (RTX 3080, three A/B pairs of the part-1 pan, CSS injected before
-// boot): the painting's texture filters (paperGrain's turbulence, waterWobble's
-// displacement) were ~24% of that raster; the hung pictures ~12% on their own
-// and ~40% together with the filters — and the pictures are the 0.6–0.9 MB
-// shelf originals besides. So lite draws the painting without those filters
-// and hangs each picture's frame without the picture. Nothing the record says
-// is dropped: every mark, card, name and walker is still drawn.
-//
-// Chosen three ways. `?lite=1` / `?lite=0` is a choice and is kept; the note's
-// button is a choice and is kept; with neither, the page decides for itself
-// from its FIRST long task (the module's own boot, before the world is asked
-// for): over LITE_FIRST_TASK_MS it switches on for this visit. Measured on a
-// local serve, three first visits each: 65–92 ms at the desk's own speed,
-// 142–212 ms at a 2× CPU throttle, 338–438 ms at 4×. A throttled CPU is not an
-// integrated GPU (Keemin's word on the row), so this is a proxy for "a slow
-// machine", and the kept choice is what a reader who disagrees reaches for.
-export const LITE_KEY = "pm_world_lite";
-export const LITE_FIRST_TASK_MS = 250;
-/** true / false when a choice has been made (the URL's, kept, or a kept one);
- *  null when nobody has chosen and the first long task decides */
-export function readLite(storage, search = "") {
-  let asked = null;
-  try { asked = new URLSearchParams(search).get("lite"); } catch { /* no URL to read */ }
-  if (asked === "1" || asked === "0") { writeLite(storage, asked === "1"); return asked === "1"; }
-  try {
-    const kept = storage?.getItem?.(LITE_KEY);
-    if (kept === "1" || kept === "0") return kept === "1";
-  } catch { /* private mode: nothing kept */ }
-  return null;
-}
-export function writeLite(storage, on) {
-  try { storage?.setItem?.(LITE_KEY, on ? "1" : "0"); } catch { /* private mode */ }
-}
-export const liteForFirstTask = (ms, threshold = LITE_FIRST_TASK_MS) => Number(ms) > threshold;
 // CLOSED BY DEFAULT (Keemin, 2026-08-05). The Painting is the page; the Telling
 // is the thing you open when you want the world in words. A first visitor used to
 // land with the smaller half of the screen given to the panel they have the least
@@ -3763,7 +3723,7 @@ export function vesselGlyphSVG({ at, toward = null, label = "", moving = false }
 // So both paths now fill. `fit` survives as the parameter that chooses the BOX
 // SHAPE — "meet" means the mark's true extent, "slice" the legacy square — and
 // no longer chooses whether the picture crops, because it always does.
-export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "art", fit = "slice", clickable = false, ring = null, picture = true } = {}) {
+export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "art", fit = "slice", clickable = false, ring = null } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   const url = safeAvatarUrl(href);
   if (![x, y].every(Number.isFinite) || !url) return "";
@@ -3800,11 +3760,9 @@ export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "
     if (!(rw > 0 && rh > 0)) return "";
     const points = pts.map((p) => `${Number(p.x).toFixed(1)},${Number(p.y).toFixed(1)}`).join(" ");
     const rbox = `x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${rw.toFixed(1)}" height="${rh.toFixed(1)}"`;
-    // `picture: false` is lite (POS-228): the ring stays and still takes the
-    // click; the photograph is neither drawn nor fetched
     return `<g class="wv-far-art wv-far-art-ringed" role="img" aria-label="${esc(String(label ?? ""))}">`
-      + (picture ? `<clipPath id="${clip}"><polygon points="${points}"/></clipPath>`
-        + `<image href="${url}" ${rbox} preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>` : "")
+      + `<clipPath id="${clip}"><polygon points="${points}"/></clipPath>`
+      + `<image href="${url}" ${rbox} preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
       + `<polygon points="${points}" class="wv-far-art-ring"/>`
       + hit(`<polygon points="${points}"/>`)
       + `</g>`;
@@ -3820,9 +3778,9 @@ export function placedArtSVG({ at, extent, minSize = 0, href, label = "", id = "
   const box = `x="${x - w / 2}" y="${y - h / 2}" width="${w}" height="${h}"`;
   const rx = Math.min(w, h) * 0.02;
   return `<g class="wv-far-art" role="img" aria-label="${esc(String(label ?? ""))}">`
-    + (picture ? `<clipPath id="${clip}"><rect ${box} rx="${rx}"/></clipPath>`
-      + `<image href="${url}" ${box}`
-      + ` preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>` : "")
+    + `<clipPath id="${clip}"><rect ${box} rx="${rx}"/></clipPath>`
+    + `<image href="${url}" ${box}`
+    + ` preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
     + `<rect ${box} rx="${rx}" class="wv-far-art-frame"/>`
     // THE PICTURE IS A DOOR WHEN THE CALLER SAYS SO (Keemin, 2026-09-13). The
     // whole layer is `pointer-events:none` — a hung picture must never eat the
@@ -5767,19 +5725,6 @@ const STYLE = `
    mount, that frame is 100–117 ms and every drag after is unchanged. */
 .wv-minimap > svg { will-change:transform; }
 .wv-minimap svg.wv-pan-live { overflow:visible; clip-path:inset(-100%); }
-/* LITE (POS-228): the painting without its texture filters — the atlas's own
-   paperGrain and waterWobble, and the lit house's glow. CSS outranks the
-   atlas's filter attributes, so no markup is rewritten. */
-.wv.wv-lite .wv-minimap svg * { filter:none !important; }
-.wv-lite-note { position:absolute; z-index:6; top:54px; right:10px; max-width:min(22rem, calc(100% - 20px));
-  font:italic .74rem/1.35 Georgia,serif; color:rgba(232,224,207,.82); background:rgba(13,15,19,.82);
-  border:1px solid rgba(232,197,106,.28); border-radius:8px; padding:.35rem .6rem; }
-.wv-lite-note[hidden] { display:none; }
-/* on a phone the map's controls wrap under the search pill, where this would
-   sit on them; there it rides above the coordinate pill instead */
-@media (max-width: 720px) { .wv-lite-note { top:auto; bottom:64px; left:10px; right:10px; max-width:none; } }
-.wv-lite-off { font:inherit; font-style:normal; color:var(--amber); background:none; border:0; padding:0;
-  text-decoration:underline; cursor:pointer; }
 .wv-gridline { stroke:#e8c56a; stroke-opacity:.14; stroke-width:1; vector-effect:non-scaling-stroke; }
 .wv-gridline.major { stroke-opacity:.32; }
 /* footprints — every mark's true extent from the record. ONE vocabulary with the
@@ -6286,11 +6231,6 @@ const MARKUP = `
        own place for it. One node, built by home-column.mjs and by nothing else;
        empty and hidden until a parcel is clicked. -->
      <aside class="wv-homecol" data-wv-keep hidden></aside><!--
-       LITE SAYS SO (POS-228): on the painting, under the map's own controls,
-       and it carries the way off. Kept across scene swaps like the column. -->
-     <div class="wv-lite-note" data-wv-keep role="status" hidden>lite mode is on — the painting's
-       textures and hung pictures are off, to spare this device's graphics
-       <button type="button" class="wv-lite-off">turn it off</button></div><!--
        THE WALK DESK RIDES ON THE PAINTING (Keemin, 2026-08-04) — bottom right,
        and only once a destination is armed. It answers a click you made on the
        painting, so it belongs to the painting; in the rail it was a permanent
@@ -6726,10 +6666,6 @@ export function mountViewer(appEl) {
     crossingOverride: false,            // a dev/principal time-travel override
     view: "telling",
     paintingOnly: readPaintingOnly(typeof localStorage === "undefined" ? null : localStorage),
-    // lite (POS-228): true / false once chosen; `liteChosen` is whether anybody
-    // did — the first long task only decides for a reader who has not
-    lite: false,
-    liteChosen: false,
     markFilter: "everything",           // "everything" | "mine" | "new" — the one marks vocabulary
     draftIds: new Set(),                // household marks the town has not published — grey
     portfolio: null,                    // authenticated world_my_marks response
@@ -8381,6 +8317,23 @@ export function mountViewer(appEl) {
       disciplineAtlasImages(doc);
       svg.removeAttribute("width"); svg.removeAttribute("height");
       svg.querySelectorAll("script").forEach((el) => el.remove());
+      // THE BACKDROP LOSES ITS TEXTURE FILTERS (Keemin, 2026-09-27, POS-285:
+      // "remove the filters on non lite mode too; I honestly don't prefer
+      // them"). paperGrain (feTurbulence) and waterWobble (feTurbulence into
+      // feDisplacementMap) were ~24% of the painting's re-raster when a drag
+      // lets go, priced on the desk for POS-228, and more in software. They
+      // are baked into the atlas at render time, so, like the words below,
+      // this is the one place the World page can be rid of them.
+      //
+      // The two differ in what goes. A paperGrain rect is grain and nothing
+      // else: it has no fill of its own, so without its filter it would paint
+      // the default black over the whole sheet. It goes whole. The water
+      // carries its own fill and stroke and only loses the wobble. The
+      // definitions go last, once nothing points at them. The atlas's other
+      // filters are not these two and stay.
+      svg.querySelectorAll('[filter="url(#paperGrain)"]').forEach((el) => el.remove());
+      svg.querySelectorAll('[filter="url(#waterWobble)"]').forEach((el) => el.removeAttribute("filter"));
+      svg.querySelectorAll("filter#paperGrain, filter#waterWobble").forEach((el) => el.remove());
       // THE BACKDROP LOSES ITS WORDS (Keemin, 2026-09-12, looking at dev: "the
       // text for the regions is quite hard to read. there are a couple of other
       // random phrases like 'tended, never owned' and stuff on the map, which
@@ -10371,7 +10324,6 @@ export function mountViewer(appEl) {
         // rather than a rectangle beside it. Read in metres and put through the
         // same px() every other coordinate here goes through.
         ring: (polygonOf(m) ?? []).length >= 3 ? polygonOf(m).map(px) : null,
-        picture: !state.lite,
       });
     mapCtx.placedArtLayer.innerHTML = s;
     // THE IDS, not a count: the furnishing pass below has to know which marks
@@ -14250,44 +14202,6 @@ export function mountViewer(appEl) {
       } catch { /* a poll miss is silent — the last good fold stands */ }
     }
   }, 30000);
-
-  // ───────── lite (POS-228) ─────────
-  // The class does the painting's half (the filters, in CSS); the placed-art
-  // pass reads state.lite for the pictures, so a switch redraws the overlay
-  // once, the same pass the camera's settle uses.
-  function applyLite() {
-    root.classList.toggle("wv-lite", state.lite);
-    const note = $(root, ".wv-lite-note");
-    if (note) note.hidden = !state.lite;
-    if (mapCtx?.placedArtLayer && lastRadial) drawOverlay(lastRadial);
-  }
-  {
-    const chosen = readLite(localStore, typeof location === "undefined" ? "" : location.search);
-    state.liteChosen = chosen !== null;
-    state.lite = chosen === true;
-    applyLite();
-    // nobody has chosen: the first long task decides, for this visit only
-    if (!state.liteChosen && typeof PerformanceObserver === "function") {
-      try {
-        const firstTask = new PerformanceObserver((list) => {
-          const first = list.getEntries()[0];
-          if (!first) return;
-          firstTask.disconnect();
-          if (state.liteChosen || !liteForFirstTask(first.duration)) return;
-          state.lite = true;
-          applyLite();
-        });
-        firstTask.observe({ type: "longtask", buffered: true });
-      } catch { /* no long-task timing in this browser: the page stays as it is */ }
-    }
-  }
-  root.addEventListener("click", (e) => {
-    if (!e.target.closest(".wv-lite-off")) return;
-    state.lite = false;
-    state.liteChosen = true;
-    writeLite(localStore, false);
-    applyLite();
-  });
 
   // ───────── boot ─────────
   (async () => {

@@ -33,7 +33,13 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
  *  strips. Four <text>, deliberately including the two classes Keemin named. */
 const FIXTURE_GROUND = `<!doctype html><html><body>
 <svg id="map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 2400" width="1500" height="2400">
+  <defs>
+    <filter id="paperGrain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2"/></filter>
+    <filter id="waterWobble"><feTurbulence baseFrequency="0.012" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="10"/></filter>
+    <filter id="softWash"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
   <rect x="0" y="0" width="1500" height="2400" fill="#dfe3ea"/>
+  <rect x="0" y="0" width="1500" height="2400" filter="url(#paperGrain)"/>
   <path class="terrain" d="M 20 20 L 300 20 L 300 300 Z" fill="#cfd8c8"/>
   <g class="clickable region" data-id="evermoon" tabindex="0" role="button" aria-label="Evermoon">
     <rect x="40" y="900" width="200" height="300" fill="transparent" pointer-events="all"/>
@@ -51,7 +57,8 @@ const FIXTURE_GROUND = `<!doctype html><html><body>
     <svg x="760" y="1530" width="60" height="60"><image href="assets/the-reach.jpg" width="60" height="60"/></svg>
     <rect x="760" y="1530" width="60" height="60" fill="none" stroke="#f5c26b" stroke-width="1.2"/>
   </g>
-  <path class="water" d="M 900 100 L 1200 400 L 900 700 Z" fill="#8fa9c2"/>
+  <path class="water" d="M 900 100 L 1200 400 L 900 700 Z" fill="#8fa9c2" filter="url(#waterWobble)"/>
+  <ellipse class="wash" cx="400" cy="400" rx="80" ry="60" fill="#e8dcc0" filter="url(#softWash)"/>
   <script>window.__atlasRan = true;</script>
 </svg>
 </body></html>`;
@@ -115,11 +122,11 @@ before(async () => {
   CLEANUP.push(() => browser.close());
 });
 
-async function readGround(port) {
+async function readGround(port, search = "") {
   const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e.message).slice(0, 160)));
-  await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });
+  await page.goto(`http://localhost:${port}/${search}`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
   await page.waitForFunction(() => !!document.querySelector(".wv-minimap > svg"), null, { timeout: 60_000 })
@@ -152,6 +159,14 @@ async function readGround(port) {
       hungArt: document.querySelectorAll("#wv-placed-art-layer .wv-far-art").length,
       overlayMarks: document.querySelectorAll("#wv-overlay [data-id]").length,
       scripts: svg.querySelectorAll("script").length,
+      // the texture filters (POS-285): their definitions, anything still
+      // pointing at them, the water they wobbled, and the filter that stays
+      textureDefs: svg.querySelectorAll("filter#paperGrain, filter#waterWobble").length,
+      textureUsers: svg.querySelectorAll('[filter="url(#paperGrain)"], [filter="url(#waterWobble)"]').length,
+      waterFill: svg.querySelector("path.water")?.getAttribute("fill") ?? null,
+      softWashKept: !!svg.querySelector("filter#softWash") && !!svg.querySelector('[filter="url(#softWash)"]'),
+      liteNote: !!document.querySelector(".wv-lite-note"),
+      liteClass: !!document.querySelector(".wv-lite"),
       hrefs: [...svg.querySelectorAll("image")].filter((im) => !im.closest(VIEWER_LAYERS))
         .map((im) => im.getAttribute("href")),
       atlasScriptRan: !!window.__atlasRan,
@@ -307,4 +322,28 @@ test("the generated ground is untouched by any of it", async (t) => {
     `the fallback still names its regions (${g.generatedRegionLabels})`);
   assert.ok(g.literalAnywhere > 0,
     `…and still draws them (${g.literalAnywhere} polygons)`);
+});
+
+test("THE BACKDROP LOSES ITS TEXTURE FILTERS — the water stays, and lite is gone", async (t) => {
+  if (!chromium) { t.skip("NO PLAYWRIGHT — the texture-filter strip and lite's retirement went UNGUARDED."); return; }
+  // Keemin, 2026-09-27 (POS-285): "remove the filters on non lite mode too; I
+  // honestly don't prefer them". paperGrain and waterWobble were the costliest
+  // part of the painting's re-raster, and with them gone lite had nothing left
+  // to do, so it went too. `?lite=1` is asked for on purpose: it used to be a
+  // kept choice, and now it must change nothing.
+  const g = await readGround(withAtlas, "?lite=1");
+  assert.equal(g.mounted, true);
+  assert.equal(g.ground, "atlas", "the picture path — the strip only lives here");
+  assert.equal(g.textureDefs, 0, "neither filter is defined on the backdrop");
+  assert.equal(g.textureUsers, 0, "and nothing points at either one");
+  // THE GUARD THAT THIS IS A STRIP AND NOT A WIPE. The water keeps its own
+  // fill, and the terrain beside it is untouched. The paper rect was grain
+  // only (no fill: black without its filter), so it is the one element removed.
+  assert.equal(g.waterFill, "#8fa9c2", "the water is still drawn, in its own colour");
+  assert.equal(g.terrainOutside, 2, "the terrain and the water outside the groups survive");
+  assert.equal(g.softWashKept, true, "the atlas's other filters are not these two, and stay");
+  assert.equal(g.liteNote, false, "no lite note on the page");
+  assert.equal(g.liteClass, false, "and ?lite=1 turns nothing on");
+  // ⚑ THE FLIP: drop the three strip lines in fetchAtlasGround and
+  //   textureDefs reads 2, textureUsers 2.
 });
