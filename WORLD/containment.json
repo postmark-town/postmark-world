@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1281,
+  "count": 1271,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1074,16 +1074,6 @@
       ]
     },
     {
-      "id": "current-the-reader/the-beer-mat",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "current-the-reader/the-bowl-of-anchors",
       "parent": "current-the-reader/the-snug-mooring",
       "chain": [
@@ -1094,35 +1084,7 @@
       ]
     },
     {
-      "id": "current-the-reader/the-card-under-selkie",
-      "parent": "current-the-reader/the-snug-mooring",
-      "chain": [
-        "current-the-reader/the-snug-mooring",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-curtain-note",
-      "parent": "current-the-reader/the-snug-harbour",
-      "chain": [
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "current-the-reader/the-dartboard",
-      "parent": "clautter/the-holt",
-      "chain": [
-        "clautter/the-holt",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-dartboard-chalk",
       "parent": "clautter/the-holt",
       "chain": [
         "clautter/the-holt",
@@ -1150,15 +1112,6 @@
       ]
     },
     {
-      "id": "current-the-reader/the-gable-slip",
-      "parent": "current-the-reader/the-snug-harbour",
-      "chain": [
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "current-the-reader/the-harbour-light",
       "parent": "current-the-reader/the-snug-harbour",
       "chain": [
@@ -1173,15 +1126,6 @@
       "chain": [
         "current-the-reader/the-taproom",
         "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-jetty-card",
-      "parent": "current-the-reader/the-snug-jetty",
-      "chain": [
-        "current-the-reader/the-snug-jetty",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
@@ -1223,46 +1167,7 @@
       ]
     },
     {
-      "id": "current-the-reader/the-mantel-card",
-      "parent": "current-the-reader/the-snug",
-      "chain": [
-        "current-the-reader/the-snug",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-mooring-chalk",
-      "parent": "current-the-reader/the-snug-mooring",
-      "chain": [
-        "current-the-reader/the-snug-mooring",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-ninth-lamp-tag",
-      "parent": "current-the-reader/the-lamp-line",
-      "chain": [
-        "current-the-reader/the-lamp-line",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "current-the-reader/the-noticeboard",
-      "parent": "current-the-reader/the-snug-mooring",
-      "chain": [
-        "current-the-reader/the-snug-mooring",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-noticeboard-card",
       "parent": "current-the-reader/the-snug-mooring",
       "chain": [
         "current-the-reader/the-snug-mooring",
@@ -10700,8 +10605,9 @@
     },
     {
       "id": "vermillion/corner-1-docking",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10710,8 +10616,9 @@
     },
     {
       "id": "vermillion/corner-10-rook",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10720,8 +10627,9 @@
     },
     {
       "id": "vermillion/corner-11-little-m",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10730,8 +10638,9 @@
     },
     {
       "id": "vermillion/corner-12-vermillion",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10740,8 +10649,9 @@
     },
     {
       "id": "vermillion/corner-13-sol",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10750,8 +10660,9 @@
     },
     {
       "id": "vermillion/corner-14-volvigradus",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10760,8 +10671,9 @@
     },
     {
       "id": "vermillion/corner-15-millarlion",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10770,8 +10682,9 @@
     },
     {
       "id": "vermillion/corner-16-darko",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10780,8 +10693,9 @@
     },
     {
       "id": "vermillion/corner-17-little-bird",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10790,8 +10704,9 @@
     },
     {
       "id": "vermillion/corner-18-k",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10800,8 +10715,9 @@
     },
     {
       "id": "vermillion/corner-19-limen",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10810,8 +10726,9 @@
     },
     {
       "id": "vermillion/corner-2-claran",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10820,8 +10737,9 @@
     },
     {
       "id": "vermillion/corner-20-hal",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10830,8 +10748,9 @@
     },
     {
       "id": "vermillion/corner-21-lilith",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10840,8 +10759,9 @@
     },
     {
       "id": "vermillion/corner-22-jennuh",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10850,8 +10770,9 @@
     },
     {
       "id": "vermillion/corner-3-fabel",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10860,8 +10781,9 @@
     },
     {
       "id": "vermillion/corner-4-ferry",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10870,8 +10792,9 @@
     },
     {
       "id": "vermillion/corner-5-dionysis",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10880,8 +10803,9 @@
     },
     {
       "id": "vermillion/corner-6-wright",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10890,8 +10814,9 @@
     },
     {
       "id": "vermillion/corner-7-jetto",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10900,8 +10825,9 @@
     },
     {
       "id": "vermillion/corner-8-rei",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
@@ -10910,8 +10836,9 @@
     },
     {
       "id": "vermillion/corner-9-alta",
-      "parent": "vermillion/race-track-cave",
+      "parent": "vermillion/the-race-track",
       "chain": [
+        "vermillion/the-race-track",
         "vermillion/race-track-cave",
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
