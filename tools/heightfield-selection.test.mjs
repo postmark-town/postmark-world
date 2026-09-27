@@ -165,3 +165,53 @@ test("elevationAt is fast enough that sorting the world could not pass this", ()
   assert.ok(Number.isFinite(sink), "the samples were real");
   assert.ok(ms < 2000, `${N} samples over ${REAL_CPS.length} control points took ${ms.toFixed(0)}ms — the sort took far longer`);
 });
+
+// ── THE GRID (POS-228) ───────────────────────────────────────────────────────
+//
+// Past GRID_MIN_POINTS the field answers from a grid of cells instead of the
+// full scan. The tests above already hold the real town against the sort; these
+// go where a ring search could slip: ties split across cells, points on cell
+// edges, duplicates, samples far outside every cell, and the old scan itself.
+
+// a deterministic scatter (no Math.random: a failure must replay)
+function scatter(n, seed, spread) {
+  let s = seed >>> 0;
+  const u = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 0x100000000);
+  return Array.from({ length: n }, (_, i) => ({ x: Math.round((u() - 0.5) * spread), y: Math.round((u() - 0.5) * spread), h: Math.round(u() * 400) / 4, id: `p${i}` }));
+}
+
+test("the grid is bit-identical to the sort on a dense lattice full of ties", () => {
+  // every point on a 50 m lattice, so almost every sample is equidistant from
+  // several points in different cells, plus duplicates with other heights
+  const controlPoints = [];
+  for (let x = -1000; x <= 1000; x += 50) for (let y = -1000; y <= 1000; y += 50) controlPoints.push({ x, y, h: (x * 7 + y * 13) % 97 });
+  for (let i = 0; i < 40; i += 1) controlPoints.push({ x: -1000 + i * 50, y: 0, h: 500 + i });
+  const fast = buildHeightfield({ controlPoints }).elevationAt;
+  const slow = referenceHeightfield({ controlPoints });
+  for (let x = -1300; x <= 1300; x += 25) for (let y = -1300; y <= 1300; y += 25)
+    assert.equal(Object.is(fast(x, y), slow(x, y)), true, `disagreed at ${x},${y}`);
+});
+
+test("the grid is bit-identical to the sort on scattered points, near and far", () => {
+  for (const [n, seed] of [[65, 1], [200, 7], [900, 42]]) {
+    const controlPoints = [...scatter(n, seed, 16000), { x: -96858, y: -96838.3, h: 3 }, { x: 40000, y: 2, h: 9 }];
+    for (const k of [1, 8, 17]) {
+      const fast = buildHeightfield({ controlPoints, k }).elevationAt;
+      const slow = referenceHeightfield({ controlPoints, k });
+      for (let i = 0; i < 3000; i += 1) {
+        const x = ((i * 7919) % 30011) - 15005 + (i % 3) * 0.37, y = ((i * 104729) % 29989) - 14994 - (i % 5) * 0.11;
+        assert.equal(Object.is(fast(x, y), slow(x, y)), true, `n=${n} k=${k} disagreed at ${x},${y}`);
+      }
+      for (const [x, y] of [[-96858, -96838.3], [1e7, -1e7], [-50000, 50000], [0.5, -0.5]])
+        assert.equal(Object.is(fast(x, y), slow(x, y)), true, `n=${n} k=${k} disagreed far out at ${x},${y}`);
+    }
+  }
+});
+
+test("the grid still answers a sample that is not a finite number the way the scan did", () => {
+  const controlPoints = scatter(100, 3, 4000);
+  const fast = buildHeightfield({ controlPoints }).elevationAt;
+  const slow = referenceHeightfield({ controlPoints });
+  for (const [x, y] of [[Infinity, 0], [0, -Infinity], [NaN, 5]])
+    assert.equal(Object.is(fast(x, y), slow(x, y)), true, `disagreed at ${x},${y}`);
+});
