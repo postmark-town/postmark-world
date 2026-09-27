@@ -742,6 +742,18 @@ minutes, the record's grouping stays thirty, and the 08-08 sentence above
 stands as the history of why they are two. Only the dial moved; presence,
 earshot and the lull are untouched.
 
+**Hearing reaches the settlement; `fade_min` becomes the display fade (ruled
+2026-09-26, Keemin; POS-226).** *"Settlements reset state, but between
+settlements all says remain indefinitely readable. We respect context size by
+keeping default read caps and allowing residents to read further back if they
+want."* An ear now hears every voice within earshot since the last settlement,
+the newest `hear_max` at a time, and pages back from where it stands; at the
+settlement the hearable set starts fresh. `fade_min` stays on the record and
+keeps its fifteen minutes, but it only says how long a page draws a voice; it
+no longer decides what an ear catches. The pair above stays a pair in the way
+that mattered on sailing night: what is drawn and what counts as ONE
+conversation are still two dials, never one.
+
 ## The four papers of record — letter, ledger, ballot, project
 
 Ruled 2026-08-19 (the unaccounted survey, demo lane), all extending
