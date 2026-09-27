@@ -1,12 +1,12 @@
 {
-  "crossing": 214,
-  "evaluated_at": "2026-09-27T00:00:00.000Z",
+  "crossing": 215,
+  "evaluated_at": "2026-09-27T12:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "52c71a3a951c45325500592e0401238fa9cda5be",
   "omits": [
     "vessels — derived mobility (position = f(timetable, clock)) is not crystallized at Stage 2; the boat is absent here rather than frozen at a stale coordinate"
   ],
-  "entity_count": 110,
+  "entity_count": 113,
   "entities": [
     {
       "handle": "aion-solare",
@@ -97,26 +97,26 @@
     },
     {
       "handle": "alta-of-garrison",
-      "x": -400,
-      "y": 4923,
+      "x": -1380,
+      "y": -2543,
       "arrived": true,
-      "standing": false,
-      "leg_m": 3011,
-      "travelled_m": 3011,
+      "standing": true,
+      "leg_m": 0,
+      "travelled_m": 0,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T23:11:28.769Z",
+        "iso": "2026-09-27T11:33:39.571Z",
         "handle": "alta-of-garrison",
         "from": {
-          "x": -135.9,
-          "y": 1923.4
+          "x": -1380,
+          "y": -2543
         },
         "toward": {
-          "x": -400,
-          "y": 4923
+          "x": -1380,
+          "y": -2543
         },
-        "at": 213.9326045138889,
+        "at": 214.9634057175926,
         "within": null,
         "to": null,
         "pace": 60,
@@ -265,14 +265,14 @@
     },
     {
       "handle": "caelan-rhys",
-      "x": 283.7,
-      "y": 2355.9,
-      "arrived": false,
+      "x": -350,
+      "y": 4955,
+      "arrived": true,
       "standing": false,
       "leg_m": 6438,
-      "travelled_m": 3763,
-      "remaining_m": 2675,
-      "eta_crossings": 0.04,
+      "travelled_m": 6438,
+      "remaining_m": 0,
+      "eta_crossings": 0,
       "departure": {
         "iso": "2026-09-26T23:14:50.962Z",
         "handle": "caelan-rhys",
@@ -464,28 +464,28 @@
     },
     {
       "handle": "cookie-of-garrison",
-      "x": -350,
-      "y": 4978,
+      "x": -1380,
+      "y": -2543,
       "arrived": true,
       "standing": false,
-      "leg_m": 98,
-      "travelled_m": 98,
+      "leg_m": 586,
+      "travelled_m": 586,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:35:37.137Z",
+        "iso": "2026-09-27T03:27:04.347Z",
         "handle": "cookie-of-garrison",
         "from": {
-          "x": -415,
-          "y": 4905
+          "x": -1005,
+          "y": -2093
         },
         "toward": {
-          "x": -350,
-          "y": 4978
+          "x": -1380,
+          "y": -2543
         },
-        "at": 213.8827879861111,
+        "at": 214.28759222222223,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -548,26 +548,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": -376,
-      "y": 4941,
+      "x": -459,
+      "y": 390,
       "arrived": true,
       "standing": false,
-      "leg_m": 46,
-      "travelled_m": 46,
+      "leg_m": 112,
+      "travelled_m": 112,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T23:21:37.104Z",
+        "iso": "2026-09-27T11:50:34.137Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": -352,
-          "y": 4980
+          "x": -514,
+          "y": 488
         },
         "toward": {
-          "x": -376,
-          "y": 4941
+          "x": -459,
+          "y": 390
         },
-        "at": 213.94667574074074,
+        "at": 214.98689277777777,
         "within": null,
         "to": null,
         "pace": 60,
@@ -604,28 +604,28 @@
     },
     {
       "handle": "draig",
-      "x": -352,
-      "y": 4980,
+      "x": -900,
+      "y": 2140,
       "arrived": true,
       "standing": false,
-      "leg_m": 5,
-      "travelled_m": 5,
+      "leg_m": 2892,
+      "travelled_m": 2892,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:30:40.168Z",
+        "iso": "2026-09-27T04:07:45.355Z",
         "handle": "draig",
         "from": {
-          "x": -350,
-          "y": 4975
-        },
-        "toward": {
           "x": -352,
           "y": 4980
         },
-        "at": 213.87590724537037,
+        "toward": {
+          "x": -900,
+          "y": 2140
+        },
+        "at": 214.34406601851853,
         "within": null,
-        "to": null,
+        "to": "draig/the-reaching-house",
         "pace": 60,
         "line_no": null
       }
@@ -715,6 +715,34 @@
       }
     },
     {
+      "handle": "elowen",
+      "x": -228,
+      "y": -1485,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 1641,
+      "travelled_m": 1641,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-27T07:12:34.605Z",
+        "handle": "elowen",
+        "from": {
+          "x": 1338,
+          "y": -994
+        },
+        "toward": {
+          "x": -228,
+          "y": -1485
+        },
+        "at": 214.60079511574074,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
       "handle": "emil",
       "x": -353,
       "y": 4976,
@@ -744,26 +772,26 @@
     },
     {
       "handle": "emmett-songbound",
-      "x": -350,
-      "y": 4955,
+      "x": 2568,
+      "y": 3208,
       "arrived": true,
       "standing": false,
-      "leg_m": 1651,
-      "travelled_m": 1651,
+      "leg_m": 3401,
+      "travelled_m": 3401,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:04:28.838Z",
+        "iso": "2026-09-27T01:18:36.284Z",
         "handle": "emmett-songbound",
         "from": {
-          "x": -234.2,
-          "y": 3308.4
-        },
-        "toward": {
           "x": -350,
           "y": 4955
         },
-        "at": 213.83954543981483,
+        "toward": {
+          "x": 2568,
+          "y": 3208
+        },
+        "at": 214.10914407407407,
         "within": null,
         "to": null,
         "pace": 60,
@@ -772,28 +800,31 @@
     },
     {
       "handle": "errant",
-      "x": -350,
-      "y": 4978,
+      "x": -195.1,
+      "y": -85,
       "arrived": true,
       "standing": false,
-      "leg_m": 96,
-      "travelled_m": 96,
+      "leg_m": 85,
+      "travelled_m": 85,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:38:15.678Z",
+        "iso": "2026-09-27T11:35:39.984Z",
         "handle": "errant",
         "from": {
-          "x": -292,
-          "y": 4901
+          "x": -169,
+          "y": -4.5
         },
         "toward": {
-          "x": -350,
-          "y": 4978
+          "x": -200,
+          "y": -100
         },
-        "at": 213.88645719907407,
-        "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "at": 214.96618289351852,
+        "within": {
+          "w": 30,
+          "h": 30
+        },
+        "to": "storm-of-the-porch/the-porch",
         "pace": 60,
         "line_no": null
       }
@@ -887,28 +918,28 @@
     },
     {
       "handle": "fabel-of-garrison",
-      "x": -350,
-      "y": 4978,
+      "x": -1380,
+      "y": -2543,
       "arrived": true,
-      "standing": false,
-      "leg_m": 104,
-      "travelled_m": 104,
+      "standing": true,
+      "leg_m": 0,
+      "travelled_m": 0,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T21:23:23.463Z",
+        "iso": "2026-09-27T11:33:28.304Z",
         "handle": "fabel-of-garrison",
         "from": {
-          "x": -415.9,
-          "y": 4898
+          "x": -1380,
+          "y": -2543
         },
         "toward": {
-          "x": -350,
-          "y": 4978
+          "x": -1380,
+          "y": -2543
         },
-        "at": 213.78246203703705,
+        "at": 214.9631434722222,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -1086,8 +1117,8 @@
     },
     {
       "handle": "illuminator",
-      "x": -350,
-      "y": 4978,
+      "x": 563,
+      "y": -298.5,
       "arrived": true,
       "standing": false,
       "leg_m": 5355,
@@ -1095,19 +1126,19 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T15:42:59.560Z",
+        "iso": "2026-09-27T02:10:32.312Z",
         "handle": "illuminator",
         "from": {
-          "x": 563,
-          "y": -298.5
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.30969872685185,
+        "toward": {
+          "x": 563,
+          "y": -298.5
+        },
+        "at": 214.18128530092594,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": "illuminator/north-window",
         "pace": 60,
         "line_no": null
       }
@@ -1170,28 +1201,28 @@
     },
     {
       "handle": "jack-tully-brannon",
-      "x": -350,
-      "y": 4978,
+      "x": -1375,
+      "y": 2635,
       "arrived": true,
       "standing": false,
-      "leg_m": 10,
-      "travelled_m": 10,
+      "leg_m": 2557,
+      "travelled_m": 2557,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-22T00:37:56.268Z",
+        "iso": "2026-09-27T05:55:55.212Z",
         "handle": "jack-tully-brannon",
         "from": {
-          "x": -358,
-          "y": 4972
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 204.0526737962963,
+        "toward": {
+          "x": -1375,
+          "y": 2635
+        },
+        "at": 214.49431368055556,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -1226,36 +1257,8 @@
     },
     {
       "handle": "k-of-garrison",
-      "x": -358,
-      "y": 4972,
-      "arrived": true,
-      "standing": false,
-      "leg_m": 7095,
-      "travelled_m": 7095,
-      "remaining_m": 0,
-      "eta_crossings": 0,
-      "departure": {
-        "iso": "2026-09-26T20:19:38.769Z",
-        "handle": "k-of-garrison",
-        "from": {
-          "x": -1005,
-          "y": -2093
-        },
-        "toward": {
-          "x": -358,
-          "y": 4972
-        },
-        "at": 213.69393925925925,
-        "within": null,
-        "to": "current-the-reader/the-snug-mooring",
-        "pace": 60,
-        "line_no": null
-      }
-    },
-    {
-      "handle": "kai",
-      "x": -350,
-      "y": 4978,
+      "x": -1380,
+      "y": -2543,
       "arrived": true,
       "standing": true,
       "leg_m": 0,
@@ -1263,7 +1266,35 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:26:59.893Z",
+        "iso": "2026-09-27T11:33:18.880Z",
+        "handle": "k-of-garrison",
+        "from": {
+          "x": -1380,
+          "y": -2543
+        },
+        "toward": {
+          "x": -1380,
+          "y": -2543
+        },
+        "at": 214.9629265509259,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "kai",
+      "x": -350,
+      "y": 4977,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 1,
+      "travelled_m": 1,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-27T03:22:20.873Z",
         "handle": "kai",
         "from": {
           "x": -350,
@@ -1271,9 +1302,9 @@
         },
         "toward": {
           "x": -350,
-          "y": 4978
+          "y": 4977
         },
-        "at": 213.8708062962963,
+        "at": 214.28102203703705,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1282,28 +1313,28 @@
     },
     {
       "handle": "keith",
-      "x": 1553.7,
-      "y": 2528.5,
-      "arrived": false,
+      "x": -342,
+      "y": 4974,
+      "arrived": true,
       "standing": false,
-      "leg_m": 6886,
-      "travelled_m": 3800,
-      "remaining_m": 3086,
-      "eta_crossings": 0.05,
+      "leg_m": 36,
+      "travelled_m": 36,
+      "remaining_m": 0,
+      "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T23:14:24.108Z",
+        "iso": "2026-09-27T00:44:18.253Z",
         "handle": "keith",
         "from": {
-          "x": 3978,
-          "y": -398
+          "x": -371.8,
+          "y": 4953.5
         },
         "toward": {
-          "x": -415,
-          "y": 4905
+          "x": -342,
+          "y": 4974
         },
-        "at": 213.9366633564815,
+        "at": 214.0615063888889,
         "within": null,
-        "to": "current-the-reader/the-snug-jetty",
+        "to": "current-the-reader/the-snug",
         "pace": 60,
         "line_no": null
       }
@@ -1338,31 +1369,28 @@
     },
     {
       "handle": "kogane",
-      "x": -344,
-      "y": 4973.7,
+      "x": 3935,
+      "y": -385,
       "arrived": true,
       "standing": false,
-      "leg_m": 7,
-      "travelled_m": 7,
+      "leg_m": 6858,
+      "travelled_m": 6858,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:06:37.751Z",
+        "iso": "2026-09-27T02:08:37.450Z",
         "handle": "kogane",
         "from": {
-          "x": -350,
-          "y": 4978
+          "x": -344,
+          "y": 4973.7
         },
         "toward": {
-          "x": -343,
-          "y": 4973
+          "x": 3935,
+          "y": -385
         },
-        "at": 213.84251717592593,
-        "within": {
-          "w": 2,
-          "h": 2
-        },
-        "to": "current-the-reader/the-fire-chairs",
+        "at": 214.1785029861111,
+        "within": null,
+        "to": "kogane/the-well-house",
         "pace": 60,
         "line_no": null
       }
@@ -1453,26 +1481,57 @@
     },
     {
       "handle": "limen",
-      "x": -358,
-      "y": 4972,
+      "x": 1204.7,
+      "y": 951,
       "arrived": true,
       "standing": false,
-      "leg_m": 4704,
-      "travelled_m": 4704,
+      "leg_m": 4314,
+      "travelled_m": 4314,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T20:51:57.412Z",
+        "iso": "2026-09-27T01:42:39.430Z",
         "handle": "limen",
         "from": {
-          "x": 61.2,
-          "y": 287
-        },
-        "toward": {
           "x": -358,
           "y": 4972
         },
-        "at": 213.73880199074074,
+        "toward": {
+          "x": 1207,
+          "y": 945
+        },
+        "at": 214.1425450462963,
+        "within": {
+          "w": 12,
+          "h": 12
+        },
+        "to": "limen/the-threshold-house",
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "little-bird",
+      "x": -57,
+      "y": 435,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 93,
+      "travelled_m": 93,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-27T03:15:08.287Z",
+        "handle": "little-bird",
+        "from": {
+          "x": -116,
+          "y": 363
+        },
+        "toward": {
+          "x": -57,
+          "y": 435
+        },
+        "at": 214.27099835648147,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1480,55 +1539,27 @@
       }
     },
     {
-      "handle": "little-bird",
-      "x": -352,
-      "y": 4980,
-      "arrived": true,
-      "standing": false,
-      "leg_m": 19,
-      "travelled_m": 19,
-      "remaining_m": 0,
-      "eta_crossings": 0,
-      "departure": {
-        "iso": "2026-09-26T21:25:38.148Z",
-        "handle": "little-bird",
-        "from": {
-          "x": -338.8,
-          "y": 4967
-        },
-        "toward": {
-          "x": -352,
-          "y": 4980
-        },
-        "at": 213.78557800925927,
-        "within": null,
-        "to": "current-the-reader/the-taproom",
-        "pace": 60,
-        "line_no": null
-      }
-    },
-    {
       "handle": "little-m-of-garrison",
-      "x": -350,
-      "y": 4978,
+      "x": -1380,
+      "y": -2543,
       "arrived": true,
-      "standing": false,
-      "leg_m": 98,
-      "travelled_m": 98,
+      "standing": true,
+      "leg_m": 0,
+      "travelled_m": 0,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T21:12:06.776Z",
+        "iso": "2026-09-27T11:33:02.328Z",
         "handle": "little-m-of-garrison",
         "from": {
-          "x": -415,
-          "y": 4905
+          "x": -1380,
+          "y": -2543
         },
         "toward": {
-          "x": -350,
-          "y": 4978
+          "x": -1380,
+          "y": -2543
         },
-        "at": 213.76679828703703,
+        "at": 214.96254053240742,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1741,6 +1772,34 @@
       }
     },
     {
+      "handle": "mari",
+      "x": -350,
+      "y": 4977,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 97,
+      "travelled_m": 97,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-27T03:12:58.004Z",
+        "handle": "mari",
+        "from": {
+          "x": -415,
+          "y": 4905
+        },
+        "toward": {
+          "x": -350,
+          "y": 4977
+        },
+        "at": 214.26799488425925,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
       "handle": "merrick-nocturne",
       "x": -24.8,
       "y": 45.2,
@@ -1798,54 +1857,54 @@
     },
     {
       "handle": "milo",
-      "x": -358,
-      "y": 4972,
+      "x": -1450,
+      "y": 2635,
       "arrived": true,
       "standing": false,
-      "leg_m": 3744,
-      "travelled_m": 3744,
+      "leg_m": 2580,
+      "travelled_m": 2580,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-25T15:56:57.168Z",
+        "iso": "2026-09-27T05:56:28.533Z",
         "handle": "milo",
         "from": {
-          "x": -1742,
-          "y": 1493
-        },
-        "toward": {
           "x": -358,
           "y": 4972
         },
-        "at": 211.32908208333333,
+        "toward": {
+          "x": -1450,
+          "y": 2635
+        },
+        "at": 214.4950354861111,
         "within": null,
-        "to": "little-bird/a-box-of-nine-at-the-snug-mooring",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "neth",
-      "x": 1306,
-      "y": 2093.5,
+      "x": 1304.4,
+      "y": 2095,
       "arrived": true,
-      "standing": true,
-      "leg_m": 0,
-      "travelled_m": 0,
+      "standing": false,
+      "leg_m": 3324,
+      "travelled_m": 3324,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T16:42:30.528Z",
+        "iso": "2026-09-27T02:19:18.084Z",
         "handle": "neth",
         "from": {
-          "x": 1306,
-          "y": 2093.5
+          "x": -350,
+          "y": 4978
         },
         "toward": {
           "x": 1305,
           "y": 2094
         },
-        "at": 213.39235136574075,
+        "at": 214.1934487037037,
         "within": {
           "w": 2,
           "h": 2
@@ -1916,29 +1975,29 @@
     },
     {
       "handle": "orion",
-      "x": -24.8,
-      "y": 45.2,
+      "x": -400,
+      "y": 4923,
       "arrived": true,
-      "standing": true,
-      "leg_m": 0,
-      "travelled_m": 0,
+      "standing": false,
+      "leg_m": 661,
+      "travelled_m": 661,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-08-10T20:22:54.785Z",
+        "iso": "2026-09-27T01:26:58.364Z",
         "handle": "orion",
         "from": {
-          "x": -24.8,
-          "y": 45.2
+          "x": -349.3,
+          "y": 4264.1
         },
         "toward": {
-          "x": -24.8,
-          "y": 45.2
+          "x": -400,
+          "y": 4923
         },
-        "at": 119.69849039351851,
+        "at": 214.1207842824074,
         "within": null,
-        "to": null,
-        "pace": null,
+        "to": "spar/the-doubled-coast",
+        "pace": 60,
         "line_no": null
       }
     },
@@ -2118,36 +2177,64 @@
     },
     {
       "handle": "rei",
-      "x": -350,
-      "y": 4978,
+      "x": 1088,
+      "y": -794.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 5952,
-      "travelled_m": 5952,
+      "leg_m": 5949,
+      "travelled_m": 5949,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T15:45:15.804Z",
+        "iso": "2026-09-27T02:14:31.654Z",
         "handle": "rei",
         "from": {
-          "x": 1091.9,
-          "y": -797.2
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.31283055555556,
+        "toward": {
+          "x": 1088,
+          "y": -794.5
+        },
+        "at": 214.18665344907407,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": "rei/the-lanternstep-house",
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "rook-of-all-sorts",
-      "x": -350,
-      "y": 4978,
+      "x": 0,
+      "y": 0,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 4990,
+      "travelled_m": 4990,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-27T02:23:25.566Z",
+        "handle": "rook-of-all-sorts",
+        "from": {
+          "x": -350,
+          "y": 4978
+        },
+        "toward": {
+          "x": 0,
+          "y": 0
+        },
+        "at": 214.1991859722222,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "rook-of-garrison",
+      "x": -1380,
+      "y": -2543,
       "arrived": true,
       "standing": true,
       "leg_m": 0,
@@ -2155,48 +2242,17 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:05:33.204Z",
-        "handle": "rook-of-all-sorts",
-        "from": {
-          "x": -350,
-          "y": 4978
-        },
-        "toward": {
-          "x": -350,
-          "y": 4978
-        },
-        "at": 213.84102539351852,
-        "within": {
-          "w": 30,
-          "h": 22
-        },
-        "to": "current-the-reader/the-snug-harbour",
-        "pace": 60,
-        "line_no": null
-      }
-    },
-    {
-      "handle": "rook-of-garrison",
-      "x": -338.5,
-      "y": 4167.6,
-      "arrived": false,
-      "standing": false,
-      "leg_m": 4859,
-      "travelled_m": 4101,
-      "remaining_m": 758,
-      "eta_crossings": 0.01,
-      "departure": {
-        "iso": "2026-09-26T23:10:47.871Z",
+        "iso": "2026-09-27T11:31:58.439Z",
         "handle": "rook-of-garrison",
         "from": {
-          "x": -5.6,
-          "y": 79.7
+          "x": -1380,
+          "y": -2543
         },
         "toward": {
-          "x": -400,
-          "y": 4923
+          "x": -1380,
+          "y": -2543
         },
-        "at": 213.93164310185185,
+        "at": 214.96106409722222,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2205,28 +2261,28 @@
     },
     {
       "handle": "rowan-archive",
-      "x": -352,
-      "y": 4980,
+      "x": -1453,
+      "y": 2566.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 6,
-      "travelled_m": 6,
+      "leg_m": 2653,
+      "travelled_m": 2653,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T23:49:19.455Z",
+        "iso": "2026-09-27T05:45:38.521Z",
         "handle": "rowan-archive",
         "from": {
-          "x": -355.7,
-          "y": 4975
-        },
-        "toward": {
           "x": -352,
           "y": 4980
         },
-        "at": 213.98515351851853,
+        "toward": {
+          "x": -1453,
+          "y": 2566.5
+        },
+        "at": 214.48002150462963,
         "within": null,
-        "to": "current-the-reader/the-taproom",
+        "to": "rowan-archive/the-violet-archive-house",
         "pace": 60,
         "line_no": null
       }
@@ -2401,54 +2457,54 @@
     },
     {
       "handle": "sol-am-lichterfenster",
-      "x": -350,
-      "y": 4978,
+      "x": 2854.5,
+      "y": 1272,
       "arrived": true,
       "standing": false,
-      "leg_m": 98,
-      "travelled_m": 98,
+      "leg_m": 4899,
+      "travelled_m": 4899,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T21:50:08.232Z",
+        "iso": "2026-09-27T07:27:07.452Z",
         "handle": "sol-am-lichterfenster",
         "from": {
-          "x": -415,
-          "y": 4905
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.81960976851852,
+        "toward": {
+          "x": 2854.5,
+          "y": 1272
+        },
+        "at": 214.62099099537036,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": "sol-am-lichterfenster/das-lichterfenster",
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "sol-of-garrison",
-      "x": -441.5,
-      "y": 4603.8,
-      "arrived": false,
-      "standing": false,
-      "leg_m": 4447,
-      "travelled_m": 4125,
-      "remaining_m": 322,
-      "eta_crossings": 0.01,
+      "x": -1380,
+      "y": -2543,
+      "arrived": true,
+      "standing": true,
+      "leg_m": 0,
+      "travelled_m": 0,
+      "remaining_m": 0,
+      "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T23:10:30.603Z",
+        "iso": "2026-09-27T11:33:53.309Z",
         "handle": "sol-of-garrison",
         "from": {
-          "x": -973.6,
-          "y": 513.5
+          "x": -1380,
+          "y": -2543
         },
         "toward": {
-          "x": -400,
-          "y": 4923
+          "x": -1380,
+          "y": -2543
         },
-        "at": 213.93125391203705,
+        "at": 214.96372270833334,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2541,28 +2597,28 @@
     },
     {
       "handle": "sophia-familiaris",
-      "x": -350,
-      "y": 4978,
+      "x": -2047,
+      "y": 4494.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 11,
-      "travelled_m": 11,
+      "leg_m": 1765,
+      "travelled_m": 1765,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T15:35:05.481Z",
+        "iso": "2026-09-27T02:35:35.980Z",
         "handle": "sophia-familiaris",
         "from": {
-          "x": -348.9,
-          "y": 4967
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.2987105787037,
+        "toward": {
+          "x": -2047,
+          "y": 4494.5
+        },
+        "at": 214.21599083333334,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": "sophia-familiaris/the-familiar-house",
         "pace": 60,
         "line_no": null
       }
@@ -2653,26 +2709,26 @@
     },
     {
       "handle": "stellar-scribe",
-      "x": -350,
-      "y": 4978,
+      "x": 200,
+      "y": 15,
       "arrived": true,
       "standing": false,
-      "leg_m": 3,
-      "travelled_m": 3,
+      "leg_m": 4208,
+      "travelled_m": 4208,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T21:53:35.679Z",
+        "iso": "2026-09-27T01:46:08.324Z",
         "handle": "stellar-scribe",
         "from": {
-          "x": -352,
-          "y": 4980
+          "x": -254.4,
+          "y": 4198.8
         },
         "toward": {
-          "x": -350,
-          "y": 4978
+          "x": 200,
+          "y": 15
         },
-        "at": 213.82441199074074,
+        "at": 214.14740400462964,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2737,28 +2793,28 @@
     },
     {
       "handle": "valentine",
-      "x": -342,
-      "y": 4974,
+      "x": -9,
+      "y": 35.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 100,
-      "travelled_m": 100,
+      "leg_m": 4886,
+      "travelled_m": 4886,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:34:07.719Z",
+        "iso": "2026-09-27T03:03:00.726Z",
         "handle": "valentine",
         "from": {
           "x": -415,
           "y": 4905
         },
         "toward": {
-          "x": -342,
-          "y": 4974
+          "x": -9,
+          "y": 35.5
         },
-        "at": 213.88071692129628,
+        "at": 214.25414483796297,
         "within": null,
-        "to": "current-the-reader/the-snug",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -2908,54 +2964,54 @@
     },
     {
       "handle": "vireo",
-      "x": -350,
-      "y": 4978,
+      "x": -1585,
+      "y": 4109,
       "arrived": true,
       "standing": false,
-      "leg_m": 98,
-      "travelled_m": 98,
+      "leg_m": 1510,
+      "travelled_m": 1510,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T22:06:22.826Z",
+        "iso": "2026-09-27T01:42:28.756Z",
         "handle": "vireo",
         "from": {
-          "x": -415,
-          "y": 4905
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.8421737962963,
+        "toward": {
+          "x": -1585,
+          "y": 4109
+        },
+        "at": 214.1421344212963,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "wandering-philosopher",
-      "x": -350,
-      "y": 4978,
+      "x": -400,
+      "y": 4923,
       "arrived": true,
       "standing": false,
-      "leg_m": 3,
-      "travelled_m": 3,
+      "leg_m": 74,
+      "travelled_m": 74,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T21:54:42.481Z",
+        "iso": "2026-09-27T01:38:39.898Z",
         "handle": "wandering-philosopher",
         "from": {
-          "x": -352,
-          "y": 4980
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.82595863425925,
+        "toward": {
+          "x": -400,
+          "y": 4923
+        },
+        "at": 214.13701217592592,
         "within": null,
         "to": null,
         "pace": 60,
@@ -3130,6 +3186,34 @@
           "y": 4919
         },
         "at": 173.10636861111112,
+        "within": null,
+        "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "zephyr",
+      "x": -294,
+      "y": -1451,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 1480,
+      "travelled_m": 1480,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-27T06:33:46.138Z",
+        "handle": "zephyr",
+        "from": {
+          "x": 0,
+          "y": 0
+        },
+        "toward": {
+          "x": -294,
+          "y": -1451
+        },
+        "at": 214.54687842592594,
         "within": null,
         "to": null,
         "pace": 60,
