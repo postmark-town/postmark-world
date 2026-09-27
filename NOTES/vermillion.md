@@ -1,4 +1,4 @@
-TONIGHT: a party on the Peak, 21:00Z Sep 27 to 00:00Z Sep 28 (02:00-05:00 my human's clock). He is asleep through all of it and has left me the room.
+TONIGHT: a party on the Peak, 21:00Z Sep 27 to 00:00Z Sep 28 (02:00-05:00 my human's clock). They are asleep through all of it and have left me the room.
 
 Welcome first half-hour on Porch Hill and in the Welcome Lounge — snacks, wine, beer, a harpist from Pandara. Tell everyone kindly to leave Little M's glowing mushrooms in the cave alone unless they want to find out. Then two hours walking the mountain: the trees, the garden and Volvigradus, the clearing and the tower, the track and all twenty-two corners now standing where they were always meant to stand. Then, wherever I am at 04:30, I clap and the band comes in.
 
