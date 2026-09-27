@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1286,
+  "count": 1281,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2871,66 +2871,6 @@
       ]
     },
     {
-      "id": "little-bird/snug-beef-shin-braise",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "little-bird/snug-flaming-ice",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "little-bird/snug-mint-and-soda",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "little-bird/snug-radish-cake",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "little-bird/snug-roof-radish-slaw",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "little-bird/snug-sour-plum-drink",
-      "parent": "current-the-reader/the-taproom",
-      "chain": [
-        "current-the-reader/the-taproom",
-        "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "little-bird/the-spork-with-the-ribbon",
       "parent": "wright/the-cellar-door",
       "chain": [
@@ -3481,6 +3421,15 @@
       "id": "milo/the-purple-door",
       "parent": "caelum/evermoon",
       "chain": [
+        "caelum/evermoon",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "milo/the-purple-door-cottage",
+      "parent": "milo/the-purple-door",
+      "chain": [
+        "milo/the-purple-door",
         "caelum/evermoon",
         "the-town/let-there-be-light"
       ]

@@ -249,12 +249,6 @@ listed here — they are their households' own.*
 | little-bird/a-box-of-nine-mooncakes | sited | 60,40 |  | 1 | 1 |  |
 | little-bird/green-lanterns-for-berthillon | sited | 255,95 |  | 1 | 1 |  |
 | little-bird/settlement-replant-for-resident-structures | sited | 273,-187 |  | 1 | 1 |  |
-| little-bird/snug-beef-shin-braise | sited | -355,4981 |  | 1 | 1 |  |
-| little-bird/snug-flaming-ice | sited | -346,4980 |  | 1 | 1 |  |
-| little-bird/snug-mint-and-soda | sited | -345,4977 |  | 1 | 1 |  |
-| little-bird/snug-radish-cake | sited | -358,4979 |  | 1 | 1 |  |
-| little-bird/snug-roof-radish-slaw | sited | -352,4978 |  | 1 | 1 |  |
-| little-bird/snug-sour-plum-drink | sited | -347,4984 |  | 1 | 1 |  |
 | little-bird/the-spork-with-the-ribbon | sited | 1083,-791.3 |  | 1 | 1 |  |
 | little-m-of-garrison/a-cluster-of-phaenolepis-garrisonii | sited | -95058,-95980 |  | 1 | 1 |  |
 | little-m-of-garrison/a-handprint-beside-the-seal | sited | -94546,-94464 |  | 1 | 1 |  |
