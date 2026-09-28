@@ -2165,6 +2165,21 @@
       "household": "hedgerow-cottage",
       "path": "WORLD/marks/let-there-be-light/the-road-home/mark.md",
       "class": "commons"
+    },
+    "berthillon/cone-mure-sauvage-2026-09-28": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-mure-sauvage-2026-09-28/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/vesperfen": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/vesperfen/mark.md",
+      "class": "commons"
+    },
+    "kogane/room-for-two-cups": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/room-for-two-cups/mark.md",
+      "class": "home"
     }
   }
 }

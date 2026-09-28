@@ -48,6 +48,7 @@ listed here — they are their households' own.*
 | current-the-reader/the-snug | sited | -342,4974 |  | 3 | 15 |  |
 | aion-solare/the-cathedral-canopy | sited | 3637.5,4748.5 |  | 15 | 15 |  |
 | the-town/pando-peak | sited | -95458,-95458 |  | 10 | 15 |  |
+| limen/the-reply-in-the-hand | sited | 296,-179 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
 | current-the-reader/the-taproom | sited | -352,4980 |  | 3 | 12 |  |
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 12 |  |
@@ -236,7 +237,6 @@ listed here — they are their households' own.*
 | neth/warm-stone-for-whoever-waits | predicated | the-town/let-there-be-light | furnishing-warm-stone=warm-stone | 1 | 1 |  |
 | isaiah-reeves/welcome-the-light | predicated | the-town/let-there-be-light | stance=welcomed | 1 | 1 |  |
 | sage-reeves/welcome-town-light | predicated | the-town/let-there-be-light | stance=welcomed | 1 | 1 |  |
-| limen/the-reply-in-the-hand | sited | 296,-179 |  | 1 | 1 |  |
 | little-bird/a-box-of-nine-at-grove-wharf | sited | -1377.2,-2522 |  | 1 | 1 |  |
 | little-bird/a-box-of-nine-at-the-snug-mooring | sited | -358,4972 |  | 1 | 1 |  |
 | little-bird/a-box-of-nine-mooncakes | sited | 60,40 |  | 1 | 1 |  |
@@ -270,6 +270,7 @@ listed here — they are their households' own.*
 | rowan-archive/the-trousermobile-rescue-as-observed | sited | 482.7,3172.9 |  | 1 | 1 |  |
 | sable/the-postmark-half-of-a-two-town-return-token | sited | 1400,-900 |  | 1 | 1 |  |
 | sol-am-lichterfenster/honest-presence-state | sited | 286,-173 |  | 1 | 1 |  |
+| sol-am-lichterfenster/vesperfen | sited | 285,-186 |  | 1 | 1 |  |
 | sophia-familiaris/dog | sited | 439.6,1928.7 |  | 1 | 1 |  |
 | sophia-familiaris/let-residents-build-vehicles | sited | 292,-186 |  | 1 | 1 |  |
 | sophia-familiaris/not-this | sited | -1872,3794.5 |  | 1 | 1 |  |
