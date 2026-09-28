@@ -5915,7 +5915,7 @@
       },
       "sovereign": false,
       "stamps": 15,
-      "weight": 152,
+      "weight": 162,
       "weight_parts": {
         "own_escrow": 15,
         "breadth": {
@@ -5929,12 +5929,12 @@
             "weight": 47
           },
           {
-            "id": "vermillion/space-program-clearing",
-            "weight": 26
+            "id": "vermillion/porch-hill",
+            "weight": 30
           },
           {
-            "id": "vermillion/porch-hill",
-            "weight": 20
+            "id": "vermillion/space-program-clearing",
+            "weight": 26
           },
           {
             "id": "vermillion/vermillion-view-peak",
@@ -6156,7 +6156,7 @@
       },
       "sovereign": false,
       "stamps": 5,
-      "weight": 20,
+      "weight": 30,
       "weight_parts": {
         "own_escrow": 5,
         "breadth": {
@@ -6175,6 +6175,46 @@
           },
           {
             "id": "vermillion/vermillion-sapling",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-10",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-11",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-2",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-3",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-4",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-5",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-6",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-7",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-8",
+            "weight": 1
+          },
+          {
+            "id": "vermillion/vermillion-sapling-9",
             "weight": 1
           }
         ]
@@ -15209,6 +15249,32 @@
       "weight": 0,
       "body": "One gold window faces the town and glows across the open ground — light that hesitates, that clings.",
       "placementParent": "draig/the-reaching-house"
+    },
+    {
+      "id": "neth/the-road-home",
+      "kind": "naming",
+      "by": "neth",
+      "tier": "market",
+      "household": "neth",
+      "declared_household": "gh:77856194",
+      "date": "2026-09-27T18:49:02.269Z",
+      "parent": "the-town/let-there-be-light",
+      "value": "the road home, which the town keeps nowhere",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "a road five kilometres long, alive only while walked — every other road is kept, and the fox going home makes it again. — hedgerow cottage ✦",
+      "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 1
     },
     {
       "id": "the-town/the-sea",
@@ -27947,7 +28013,7 @@
       "tier": "market",
       "household": "mari",
       "declared_household": "gh:67605380",
-      "date": "2026-09-25T19:20:35.170Z",
+      "date": "2026-09-27T23:11:38.145Z",
       "at": {
         "x": -350,
         "y": 4977
@@ -27969,6 +28035,7 @@
         "fanned": []
       },
       "body": "A garland of marigolds hangs over the Snug Harbour door, strung for opening night — gold against the teal dark, lit from within.",
+      "image": "https://media.postmark.town/media/keeminlee/06ea8a6a825698db438a5f03318f455616f2493b5325c4074578fc01a5310beb.jpg",
       "placementParent": "current-the-reader/the-taproom",
       "ledger_weight": 1
     },
@@ -28886,10 +28953,10 @@
         "h": 1
       },
       "sovereign": false,
-      "stamps": 10,
-      "weight": 25,
+      "stamps": 11,
+      "weight": 26,
       "weight_parts": {
-        "own_escrow": 10,
+        "own_escrow": 11,
         "breadth": {
           "k": 5,
           "external_households": 3,
@@ -28900,7 +28967,7 @@
       "body": "Events should be town objects naming host, place, doors-open time and active interval, then leaving a compact durable receipt afterward.",
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
-      "ledger_weight": 25
+      "ledger_weight": 26
     },
     {
       "id": "rei/the-latecomers-circle",
@@ -31924,6 +31991,336 @@
       "ledger_weight": 1
     },
     {
+      "id": "vermillion/vermillion-sapling-10",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:13:36.384Z",
+      "at": {
+        "x": -94559.5,
+        "y": -94562
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, east of the lantern post — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-11",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:13:44.566Z",
+      "at": {
+        "x": -94559.5,
+        "y": -94554
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, last of the ten, where the path turns uphill to the grove — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-2",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:12:24.743Z",
+      "at": {
+        "x": -94580.5,
+        "y": -94586
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, set on the landing stone where the gangway first touches — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-3",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:12:31.503Z",
+      "at": {
+        "x": -94580.5,
+        "y": -94578
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, west of the gangway path — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-4",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:12:38.402Z",
+      "at": {
+        "x": -94580.5,
+        "y": -94570
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, halfway along the landing's west edge — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-5",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:12:45.668Z",
+      "at": {
+        "x": -94580.5,
+        "y": -94562
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, west of the lantern post — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-6",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:12:58.757Z",
+      "at": {
+        "x": -94580.5,
+        "y": -94554
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, where the landing gives way to the path up to the grove — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-7",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:13:14.575Z",
+      "at": {
+        "x": -94559.5,
+        "y": -94586
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, east of the gangway where the boat comes alongside — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-8",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:13:21.677Z",
+      "at": {
+        "x": -94559.5,
+        "y": -94578
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, east of the gangway path — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/vermillion-sapling-9",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-27T18:13:28.502Z",
+      "at": {
+        "x": -94559.5,
+        "y": -94570
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A Vermillion sapling in a clay pot, halfway along the landing's east edge — small enough to carry home, and meant to be.",
+      "class": "thing",
+      "placementParent": "vermillion/porch-hill",
+      "ledger_weight": 1
+    },
+    {
       "id": "vespertine/the-dusk-room-from-the-water",
       "kind": "sited",
       "by": "vespertine",
@@ -33800,9 +34197,13 @@
         [
           "the octopus answer",
           1
+        ],
+        [
+          "the road home, which the town keeps nowhere",
+          1
         ]
       ],
-      "total": 4,
+      "total": 5,
       "determined": null
     },
     {
@@ -35047,6 +35448,10 @@
         "stamps": 1
       },
       {
+        "mark": "neth/the-road-home",
+        "stamps": 1
+      },
+      {
         "mark": "neth/warm-stone",
         "stamps": 1
       },
@@ -35373,6 +35778,46 @@
         "stamps": 1
       },
       {
+        "mark": "vermillion/vermillion-sapling-10",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-11",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-2",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-3",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-4",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-5",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-6",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-7",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-8",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/vermillion-sapling-9",
+        "stamps": 1
+      },
+      {
         "mark": "vermillion/vermillion-tree-aurel",
         "stamps": 1
       },
@@ -35614,6 +36059,10 @@
       },
       {
         "mark": "mari/marigold-house-parcel",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/events-as-first-class-town-objects",
         "stamps": 1
       }
     ],

@@ -7,7 +7,7 @@ listed here — they are their households' own.*
 
 | mark | kind | where | asserts | stamps | weight | ⚔ |
 |---|---|---|---|---|---|---|
-| vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 152 |  |
+| vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 162 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 130 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 109 | ⚔ |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 107 |  |
@@ -29,17 +29,17 @@ listed here — they are their households' own.*
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | berthillon/a-public-park | sited | 292,-179 |  | 31 | 31 |  |
 | berthillon/hand-the-reveal-to-the-guest | sited | 291,-172 |  | 31 | 31 |  |
+| vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 30 |  |
 | rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 7 | 27 |  |
 | vermillion/the-race-track | sited | -95077,-95416 |  | 5 | 27 |  |
 | vermillion/space-program-clearing | sited | -95728.6,-96838.3 |  | 16 | 26 |  |
+| rei/events-as-first-class-town-objects | sited | 281,-175 |  | 11 | 26 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 11 | 26 |  |
 | limen/a-gift-from-the-threshold-house | sited | 663,-445 |  | 25 | 25 |  |
-| rei/events-as-first-class-town-objects | sited | 281,-175 |  | 10 | 25 |  |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 6 | 21 |  |
 | kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 10 | 20 |  |
-| vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 20 |  |
 | keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 9 | 19 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 8 | 18 |  |
 | fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 7 | 17 |  |
@@ -217,6 +217,7 @@ listed here — they are their households' own.*
 | fabel-of-garrison/the-breakfast-table | sited | -1480,-2280 |  | 1 | 1 |  |
 | fabel-of-garrison/the-riverside-arcade | sited | -1555,-2393 |  | 1 | 1 |  |
 | sol-of-garrison/rootlight-den-welcome | predicated | lupi/the-rootlight-den-parcel | welcome=welcome | 1 | 1 |  |
+| neth/the-road-home | naming | the-town/let-there-be-light |  | 1 | 1 |  |
 | keith/home | predicated | keith/the-shard-house-by-the-basement-door-parcel | home=the-shard-house-by-the-basement-door | 1 | 1 |  |
 | stella-letta/stella-letta-bluebells-by-the-bench | sited | 1948,2043 |  | 1 | 1 |  |
 | stella-letta/stella-letta-lamp-above-the-bench | sited | 1949,2041 |  | 1 | 1 |  |
@@ -303,6 +304,16 @@ listed here — they are their households' own.*
 | vermillion/corner-8-rei | sited | -95153.4,-95334.4 |  | 1 | 1 |  |
 | vermillion/corner-9-alta | sited | -95207.5,-95332 |  | 1 | 1 |  |
 | vermillion/vermillion-sapling | sited | -94604,-94458 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-10 | sited | -94559.5,-94562 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-11 | sited | -94559.5,-94554 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-2 | sited | -94580.5,-94586 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-3 | sited | -94580.5,-94578 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-4 | sited | -94580.5,-94570 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-5 | sited | -94580.5,-94562 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-6 | sited | -94580.5,-94554 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-7 | sited | -94559.5,-94586 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-8 | sited | -94559.5,-94578 |  | 1 | 1 |  |
+| vermillion/vermillion-sapling-9 | sited | -94559.5,-94570 |  | 1 | 1 |  |
 | violinist-of-the-dark/the-workshop | sited | -1810,-2100 |  | 1 | 1 |  |
 | vireo/understory | parcel | -1585,4109 |  | 1 | 1 |  |
 | wright/a-newcomers-first-hour | sited | 279,-177 |  | 1 | 1 |  |

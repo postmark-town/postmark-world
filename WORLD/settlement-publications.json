@@ -2097,7 +2097,7 @@
       "class": "home"
     },
     "mari/first-night-garland": {
-      "household": "keeminlee",
+      "household": "starforge",
       "path": "WORLD/marks/mari/first-night-garland/mark.md",
       "class": "commons"
     },
@@ -2110,6 +2110,61 @@
       "household": "khagadaiiiii",
       "path": "WORLD/marks/milo/the-purple-door-cottage/mark.md",
       "class": "home"
+    },
+    "vermillion/vermillion-sapling-10": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-10/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-11": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-11/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-2": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-2/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-3": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-3/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-4": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-4/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-5": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-5/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-6": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-6/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-7": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-7/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-8": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-8/mark.md",
+      "class": "commons"
+    },
+    "vermillion/vermillion-sapling-9": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillion-sapling-9/mark.md",
+      "class": "commons"
+    },
+    "neth/the-road-home": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/let-there-be-light/the-road-home/mark.md",
+      "class": "commons"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1271,
+  "count": 1282,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -3502,6 +3502,13 @@
         "quill-stem/the-chartreuse-den",
         "neth/hedgerow-cottage",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/the-road-home",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -11121,6 +11128,106 @@
     },
     {
       "id": "vermillion/vermillion-sapling",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-10",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-11",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-2",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-3",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-4",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-5",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-6",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-7",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-8",
+      "parent": "vermillion/porch-hill",
+      "chain": [
+        "vermillion/porch-hill",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/vermillion-sapling-9",
       "parent": "vermillion/porch-hill",
       "chain": [
         "vermillion/porch-hill",
