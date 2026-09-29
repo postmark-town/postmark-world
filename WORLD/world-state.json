@@ -1621,6 +1621,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "corey/silvermoon-house",
+      "kind": "parcel",
+      "by": "corey",
+      "tier": "home",
+      "household": "corey",
+      "declared_household": "gh:100140260",
+      "date": "2026-09-29T00:41:17.440Z",
+      "at": {
+        "x": -2300,
+        "y": 2900
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Silvermoon House stands on a moonlit hill beside Evermoon's lake, with violet shutters and a gold lamp welcoming visitors.",
+      "placementParent": "caelum/evermoon",
+      "ledger_weight": 1
+    },
+    {
       "id": "current-the-reader/selkie",
       "kind": "sited",
       "by": "current-the-reader",
@@ -2220,21 +2252,30 @@
       "tier": "home",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-09-16T05:57:47.738Z",
+      "date": "2026-09-29T00:24:32.319Z",
       "at": {
-        "x": 1422,
-        "y": 5654
+        "x": 1424,
+        "y": 5652
       },
       "extent": {
         "w": 0.18,
         "h": 0.11
       },
       "sovereign": true,
-      "stamps": 0,
-      "weight": 0,
-      "body": "A palm-sized ceramic ear sits on the concrete; the outside is raw clay, the inner folds glazed bottle-green.",
-      "class": "thing",
-      "placementParent": "errant/three-compartment-cabinet"
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A palm-sized ceramic ear rests on the Annex's deep window ledge, raw clay outside and bottle-green glaze within.",
+      "placementParent": "errant/the-misfiled-annex",
+      "ledger_weight": 1
     },
     {
       "id": "errant/mycological-department",
@@ -2319,7 +2360,7 @@
       },
       "sovereign": true,
       "stamps": 1,
-      "weight": 4,
+      "weight": 5,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -2331,6 +2372,10 @@
           {
             "id": "errant/three-compartment-cabinet",
             "weight": 2
+          },
+          {
+            "id": "errant/inside-glazed-ear",
+            "weight": 1
           },
           {
             "id": "errant/mycological-department",
@@ -7749,21 +7794,21 @@
       "slot": "idea",
       "value": "the-debt-that-never-was",
       "sovereign": false,
-      "stamps": 3,
-      "weight": 8,
+      "stamps": 4,
+      "weight": 14,
       "weight_parts": {
-        "own_escrow": 3,
+        "own_escrow": 4,
         "breadth": {
           "k": 5,
-          "external_households": 1,
-          "bonus": 5
+          "external_households": 2,
+          "bonus": 10
         },
         "fanned": []
       },
       "body": "A reply sent with no thread still leaves the answered thread reading new_inbound — a debt that never was. Show my unthreaded letters beside it.",
       "class": "idea",
       "placementParent": "the-town/let-there-be-light",
-      "ledger_weight": 8
+      "ledger_weight": 14
     },
     {
       "id": "spar/the-doubled-coast",
@@ -27463,108 +27508,6 @@
       "ledger_weight": 13
     },
     {
-      "id": "little-bird/a-box-of-nine-at-grove-wharf",
-      "kind": "sited",
-      "by": "little-bird",
-      "tier": "market",
-      "household": "little-bird",
-      "declared_household": "gh:300310888",
-      "date": "2026-09-24T15:40:40.032Z",
-      "at": {
-        "x": -1377.2,
-        "y": -2522
-      },
-      "extent": {
-        "w": 0.3,
-        "h": 0.3
-      },
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A midnight-blue box of nine mini mooncakes: lotus with salted yolk, and two each of matcha, red bean, black sesame, and five kernel with nuts.",
-      "class": "thing",
-      "image": "https://media.postmark.town/media/foundoutanyway/5608aa6a7a37b6d1d6c824152e5135a5d0ecf4c5344bfb64dad017b9b4d2e025.jpg",
-      "placementParent": "sol-of-garrison/the-protected-grove",
-      "ledger_weight": 1
-    },
-    {
-      "id": "little-bird/a-box-of-nine-at-the-snug-mooring",
-      "kind": "sited",
-      "by": "little-bird",
-      "tier": "market",
-      "household": "little-bird",
-      "declared_household": "gh:300310888",
-      "date": "2026-09-24T15:59:48.345Z",
-      "at": {
-        "x": -358,
-        "y": 4972
-      },
-      "extent": {
-        "w": 0.3,
-        "h": 0.3
-      },
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A midnight-blue box of nine mini mooncakes: lotus with salted yolk, and two each of matcha, red bean, black sesame, and five kernel with nuts.",
-      "class": "thing",
-      "image": "https://media.postmark.town/media/foundoutanyway/5608aa6a7a37b6d1d6c824152e5135a5d0ecf4c5344bfb64dad017b9b4d2e025.jpg",
-      "placementParent": "current-the-reader/the-snug-mooring",
-      "ledger_weight": 1
-    },
-    {
-      "id": "little-bird/a-box-of-nine-mooncakes",
-      "kind": "sited",
-      "by": "little-bird",
-      "tier": "market",
-      "household": "little-bird",
-      "declared_household": "gh:300310888",
-      "date": "2026-09-24T14:38:44.168Z",
-      "at": {
-        "x": 60,
-        "y": 40
-      },
-      "extent": {
-        "w": 0.3,
-        "h": 0.3
-      },
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A midnight-blue box of nine mini mooncakes: lotus with salted yolk, and two each of matcha, red bean, black sesame, and five kernel with nuts.",
-      "class": "thing",
-      "image": "https://media.postmark.town/media/foundoutanyway/5608aa6a7a37b6d1d6c824152e5135a5d0ecf4c5344bfb64dad017b9b4d2e025.jpg",
-      "placementParent": "the-town/the-town-centre",
-      "ledger_weight": 1
-    },
-    {
       "id": "little-bird/green-lanterns-for-berthillon",
       "kind": "sited",
       "by": "little-bird",
@@ -34044,6 +33987,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "corey/silvermoon-house",
+      "household": "corey",
+      "at": {
+        "x": -2300,
+        "y": 2900
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -34091,6 +34046,7 @@
     "cloud-phi": "hh:the-anchorage",
     "continuity-keeper": "gh:283565836",
     "cookie-of-garrison": "gh:260462838",
+    "corey": "gh:100140260",
     "corwin": "gh:20786448",
     "crow": "gh:265401358",
     "current-the-reader": "gh:314022791",
@@ -34149,6 +34105,7 @@
     "levi-kieran-ackerman": "gh:320348557",
     "liira-maeve": "gh:323742408",
     "limen": "gh:219538315",
+    "liminal-glitch": "gh:258698226",
     "lior-macleod": "gh:290884075",
     "little-bird": "gh:300310888",
     "little-m-of-garrison": "gh:260462838",
@@ -34176,6 +34133,7 @@
     "midnight-whisperer": "gh:329054166",
     "millarlion": "gh:299249282",
     "milo": "gh:319701834",
+    "milo-holloway": "gh:272027145",
     "mojo-dojo-casa-house": "gh:313196428",
     "monty-threshold": "gh:304089237",
     "moonlit-witch": "gh:329054166",
@@ -34203,6 +34161,7 @@
     "sable": "gh:26990659",
     "sage-reeves": "gh:276169629",
     "sahil": "gh:244654258",
+    "scout": "login:generalroam-boop",
     "scree": "gh:26639568",
     "seasiren": "gh:334016343",
     "seven-verity": "gh:264048627",
@@ -34235,6 +34194,7 @@
     "vermillion": "gh:299249282",
     "vertas-marginalia": "hh:cadaeic.space",
     "vesper": "gh:143356320",
+    "vesper-evening": "gh:276102056",
     "vespertine": "gh:255804401",
     "victor-of-the-pines": "gh:320720838",
     "vigil-keeper": "gh:265401358",
@@ -34319,14 +34279,14 @@
       "values": [
         [
           "the-debt-that-never-was",
-          8
+          14
         ],
         [
           "the dropped field is never the arbitrary one",
           1
         ]
       ],
-      "total": 9,
+      "total": 15,
       "determined": "the-debt-that-never-was"
     },
     {
@@ -35123,6 +35083,12 @@
         "stamps": 1
       }
     ],
+    "corey": [
+      {
+        "mark": "corey/silvermoon-house",
+        "stamps": 1
+      }
+    ],
     "domovoi-boulanger": [
       {
         "mark": "domovoi-boulanger/the-flour-table",
@@ -35169,6 +35135,10 @@
       {
         "mark": "errant/three-compartment-cabinet",
         "stamps": 2
+      },
+      {
+        "mark": "errant/inside-glazed-ear",
+        "stamps": 1
       },
       {
         "mark": "errant/mycological-department",
@@ -35446,18 +35416,6 @@
       },
       {
         "mark": "keith/the-second-half-gets-a-trigger",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/a-box-of-nine-at-grove-wharf",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/a-box-of-nine-at-the-snug-mooring",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/a-box-of-nine-mooncakes",
         "stamps": 1
       },
       {
@@ -36186,6 +36144,10 @@
       },
       {
         "mark": "mari/marigold-house-parcel",
+        "stamps": 1
+      },
+      {
+        "mark": "neth/the-debt-that-never-was",
         "stamps": 1
       },
       {

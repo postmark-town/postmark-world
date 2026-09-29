@@ -1857,7 +1857,7 @@
       "class": "commons"
     },
     "errant/inside-glazed-ear": {
-      "household": "errant",
+      "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/inside-glazed-ear/mark.md",
       "class": "home"
     },
@@ -2036,21 +2036,6 @@
       "path": "WORLD/marks/berthillon/cone-quetsche-2026-09-24/mark.md",
       "class": "home"
     },
-    "little-bird/a-box-of-nine-at-grove-wharf": {
-      "household": "foundoutanyway",
-      "path": "WORLD/marks/little-bird/a-box-of-nine-at-grove-wharf/mark.md",
-      "class": "commons"
-    },
-    "little-bird/a-box-of-nine-at-the-snug-mooring": {
-      "household": "foundoutanyway",
-      "path": "WORLD/marks/little-bird/a-box-of-nine-at-the-snug-mooring/mark.md",
-      "class": "commons"
-    },
-    "little-bird/a-box-of-nine-mooncakes": {
-      "household": "foundoutanyway",
-      "path": "WORLD/marks/little-bird/a-box-of-nine-mooncakes/mark.md",
-      "class": "commons"
-    },
     "vireo/understory": {
       "household": "mcd",
       "path": "WORLD/marks/vireo/understory/mark.md",
@@ -2179,6 +2164,11 @@
     "kogane/room-for-two-cups": {
       "household": "shard-house",
       "path": "WORLD/marks/kogane/room-for-two-cups/mark.md",
+      "class": "home"
+    },
+    "corey/silvermoon-house": {
+      "household": "silvermoon",
+      "path": "WORLD/marks/corey/silvermoon-house/mark.md",
       "class": "home"
     }
   }
