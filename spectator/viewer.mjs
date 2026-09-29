@@ -2438,8 +2438,16 @@ export function homeMarkOfParcel(parcelId, marks = []) {
  *  parcel's own, else none. Never a child's by image-preference — `home` is the
  *  record's dwelling or null, and a parcel whose dwelling the record cannot
  *  single out shows its own picture or nothing, not a guess. Pure. */
-export function parcelLeadImage(parcel, home = null) {
-  return (home && markImagePath(home)) ?? markImagePath(parcel) ?? null;
+export function parcelLeadImage(parcel, home = null, picture = null) {
+  return housePicture(picture, home) ?? markImagePath(parcel) ?? null;
+}
+
+/** THE HOUSE'S PICTURE ON ITS PARCEL (POS-219, Keemin 2026-09-25/27/28): the
+ *  picture the household's record keeps for the parcel's holder, else the
+ *  dwelling mark's own picture (a picture a resident hung on the mark stays
+ *  that mark's own), else none. `picture` is `residentFace(holder).home`. Pure. */
+export function housePicture(picture = null, home = null) {
+  return (picture && markImagePath({ image: picture })) ?? (home && markImagePath(home)) ?? null;
 }
 
 /** THE ROOM IS ASKED OF THE MARKS THE PAGE HOLDS (2026-09-11). `investigate`
@@ -3561,6 +3569,11 @@ export function residentFace(handle, meta = null) {
     color: safeHexColor(meta?.color),
     monogram: monogramOf(name, handle),
     household: String(meta?.household ?? "").trim() || null,
+    // THE HOUSE'S PICTURE (POS-219): kept on the household's record in the
+    // office, one per resident, and carried here by the site's
+    // residents-meta.json. The media door's URL or nothing, by the same shelf
+    // test a mark's own image passes.
+    home: markImageURL({ image: meta?.home }),
   };
 }
 
@@ -9568,7 +9581,7 @@ export function mountViewer(appEl) {
       // Lanternstep House beside it. The ground has a name already. (The pick is
       // the record's own rule now — POS-200 — and the picture below rides it.)
       label: parcelCardLabel(parcel, data?.worldState?.determined ?? {}),
-      image: room && home ? markImagePath(home) : null,
+      image: room ? housePicture(faceOf(homeHandleForParcel(parcel, home)).home, home) : null,
       thumb: thumbFor(CARD_UNITS, mine),
       lit: houseIsLit(parcel, walkState.walkers, (h) => faceOf(h).household),
       fan, title,
@@ -11517,7 +11530,7 @@ export function mountViewer(appEl) {
       title: parcelCardLabel(mark, data?.worldState?.determined ?? {}),
       // the dwelling's picture, and failing that the ground's own — the
       // RECORD's dwelling (POS-200), never the first pictured child
-      leadImage: parcelLeadImage(mark, home),
+      leadImage: parcelLeadImage(mark, home, faceOf(handle).home),
     };
   }
   // WHAT THE COLUMN SHOWS FOR A REGION (Keemin, 2026-09-13: "we should be able

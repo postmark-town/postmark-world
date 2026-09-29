@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import {
   OVERLAY_PIP_R, HOME_CARD, homeCardPath, markerScale,
   overlayHomeCardSVG, homeMarkOfParcel, houseIsLit, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
-  sceneArtSVG, parcelLeadImage, markImagePath,
+  sceneArtSVG, parcelLeadImage, markImagePath, housePicture,
 } from "../spectator/viewer.mjs";
 
 const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
@@ -113,10 +113,21 @@ test("[pin] the column's lead is parcelLeadImage — the dwelling's picture, els
   assert.equal(parcelLeadImage(pictured, { ...HOME, image: undefined }), markImagePath(pictured));
   assert.equal(parcelLeadImage(pictured, null), markImagePath(pictured), "no dwelling on the record: the ground's own");
   assert.equal(parcelLeadImage(PARCEL, null), null);
-  assert.match(SOURCE, /leadImage: parcelLeadImage\(mark, home\),/, "the column asks it");
+  assert.match(SOURCE, /leadImage: parcelLeadImage\(mark, home, faceOf\(handle\)\.home\),/, "the column asks it");
   assert.match(SOURCE, /const found = dwellingOf\(mark\.id\);/, "of the dwelling the record names");
   assert.match(SOURCE, /const home = dwellingOf\(parcel\.id\);/, "and the card beside it asks the same");
   // ⚑ THE FLIP: put `homeMarkOfParcel(mark.id, allMarks())` back in the column → reds.
+});
+
+test("[pin] the house's picture is the household record's, for the parcel's holder, before any mark's own (POS-219)", () => {
+  const kept = "https://media.postmark.town/media/jack/kept.jpg";
+  assert.equal(housePicture(kept, HOME), markImagePath({ image: kept }), "the record's picture wins over the dwelling's own");
+  assert.equal(housePicture(kept, null), markImagePath({ image: kept }), "and needs no dwelling mark at all (Marigold's case: no hanging)");
+  assert.equal(housePicture(null, HOME), markImagePath(HOME), "no picture on the record: the dwelling's own, as before");
+  assert.equal(housePicture(null, null), null);
+  const pictured = { ...PARCEL, image: "https://media.postmark.town/media/jack/ground.jpg" };
+  assert.equal(parcelLeadImage(pictured, HOME, kept), markImagePath({ image: kept }), "the column leads with it too");
+  assert.match(SOURCE, /image: room \? housePicture\(faceOf\(homeHandleForParcel\(parcel, home\)\)\.home, home\) : null,/, "the map's card asks it of the parcel's holder");
 });
 
 test("HOME: the household's walker at rest inside the parcel lights the frame", () => {
