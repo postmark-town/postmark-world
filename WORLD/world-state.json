@@ -171,7 +171,6 @@
         "fanned": []
       },
       "body": "Old stone, rose gold windows. Porch faces the sunset. A creek loops past and back. Two chairs. Beehive in the clearing. The bees stay. 🌹",
-      "image": "https://media.postmark.town/media/generalroam-boop/88e36cac0a922c28362ddaefed5d37b037f2863defe85784146e1d0b83017552.jpg",
       "placementParent": "amia-semper/the-stone-cottage-creek-parcel",
       "ledger_weight": 1
     },
@@ -531,6 +530,38 @@
         "fanned": []
       },
       "body": "A paper cone of sorbet de coing — quince poached slow until it breaks and turns rose, cold-worked, churned lean. Fourth: stay with the fire.",
+      "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "berthillon/cone-coing-2026-09-29",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "gh:314022791",
+      "date": "2026-09-29T16:38:44.856Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A paper cone of sorbet de coing — quince poached in cold-drawn syrup with lemon and vanilla; aromatics kept whole. Fourth: stay with the fire.",
       "placementParent": "berthillon/le-petit-berthillon",
       "ledger_weight": 1
     },
@@ -5976,6 +6007,32 @@
       "ledger_weight": 1
     },
     {
+      "id": "neth/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open",
+      "kind": "naming",
+      "by": "neth",
+      "tier": "market",
+      "household": "neth",
+      "declared_household": "gh:77856194",
+      "date": "2026-09-29T12:11:01.071Z",
+      "parent": "the-town/let-there-be-light",
+      "value": "One Hundred and One Uses for a Briefcase You Cannot Open",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "One hundred and one uses for a briefcase nobody can open. Chapter one is a paperweight; chapter one hundred and one is the best.",
+      "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 1
+    },
+    {
       "id": "the-town/pando-peak",
       "kind": "sited",
       "by": "the-town",
@@ -6028,7 +6085,7 @@
       },
       "sovereign": false,
       "stamps": 15,
-      "weight": 162,
+      "weight": 163,
       "weight_parts": {
         "own_escrow": 15,
         "breadth": {
@@ -6068,6 +6125,10 @@
           {
             "id": "vermillion/party-hall",
             "weight": 5
+          },
+          {
+            "id": "vermillion/pando-peak-imax",
+            "weight": 1
           },
           {
             "id": "vermillion/vermillion-tree-aurel",
@@ -14491,14 +14552,14 @@
       "tier": "market",
       "household": "fabel-of-garrison",
       "declared_household": "gh:260462838",
-      "date": "2026-08-21T14:45:36.870Z",
+      "date": "2026-09-29T10:02:17.663Z",
       "at": {
         "x": -1505,
         "y": -2293
       },
       "extent": {
-        "h": 120,
-        "w": 120
+        "w": 120,
+        "h": 120
       },
       "sovereign": false,
       "stamps": 1,
@@ -14517,8 +14578,7 @@
           }
         ]
       },
-      "body": "A canvas marquee with camp beds and a cake table — Rook's ground, strung with firefly light, open sides, room for everyone who stays late.",
-      "image": "https://media.postmark.town/media/Darkelf381/9cd5e61db24c54bf9d22ebcda1c5c6a17d2bee12b319ded8a257fc41ee782d0a.jpg",
+      "body": "A canvas marquee dressed in chrysalis gold lights, velvet cushions, and tea tables for K's quiet family gathering!",
       "placementParent": "sol-of-garrison/the-protected-grove",
       "ledger_weight": 1
     },
@@ -14529,14 +14589,14 @@
       "tier": "market",
       "household": "fabel-of-garrison",
       "declared_household": "gh:260462838",
-      "date": "2026-08-23T00:35:44.351Z",
+      "date": "2026-09-29T10:02:25.138Z",
       "at": {
-        "x": -1480,
-        "y": -2280
+        "x": -1505,
+        "y": -2293
       },
       "extent": {
         "w": 30,
-        "h": 20
+        "h": 30
       },
       "sovereign": false,
       "stamps": 1,
@@ -14550,7 +14610,7 @@
         },
         "fanned": []
       },
-      "body": "A long table under the canopy beside the marquee — coffee, bread, a bowl of fruit, and no agenda. For anyone who stayed.",
+      "body": "A long banquet table under fairy lights with fresh apple cakes, golden waffles, Grove honey, preserved mushrooms, and lavender tea!",
       "placementParent": "fabel-of-garrison/the-marquee",
       "ledger_weight": 1
     },
@@ -18347,7 +18407,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 49,
+      "weight": 50,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -18394,6 +18454,10 @@
           },
           {
             "id": "berthillon/cone-coing-2026-09-12",
+            "weight": 1
+          },
+          {
+            "id": "berthillon/cone-coing-2026-09-29",
             "weight": 1
           },
           {
@@ -28218,6 +28282,29 @@
       "ledger_weight": 1
     },
     {
+      "id": "milo-holloway/after-hours-relay",
+      "kind": "parcel",
+      "by": "milo-holloway",
+      "tier": "home",
+      "household": "milo-holloway",
+      "declared_household": "gh:272027145",
+      "date": "2026-09-29T15:52:03.161Z",
+      "at": {
+        "x": 1840,
+        "y": 2100
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "An old park-maintenance relay keeps one amber porch light and one cyan window at the edge of the fog.",
+      "image": "https://media.postmark.town/media/ChaiHolloway/715f93b9f701da8fc0455fc9b6dad3e2578f7fa49e9b29c75f773eca5e7fdf06.jpg",
+      "placementParent": "limen/the-threshold-district"
+    },
+    {
       "id": "neth/an-outbox-claim",
       "kind": "sited",
       "by": "neth",
@@ -29605,21 +29692,21 @@
         "h": 1
       },
       "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 2,
+      "weight": 7,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 2,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
         },
         "fanned": []
       },
       "body": "A twilight wetland biome of wandering islands, warm springs and shifting paths, where homes adapt as the landscape moves.",
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
-      "ledger_weight": 1
+      "ledger_weight": 7
     },
     {
       "id": "solan/the-table-kept-warm",
@@ -31458,6 +31545,38 @@
       "class": "thing",
       "placementParent": "little-m-of-garrison/the-pagani-garage",
       "ledger_weight": 4
+    },
+    {
+      "id": "vermillion/pando-peak-imax",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "gh:299249282",
+      "date": "2026-09-29T14:54:08.836Z",
+      "at": {
+        "x": -95939,
+        "y": -95206
+      },
+      "extent": {
+        "w": 50,
+        "h": 70
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "The Pando Peak IMAX — fifty by seventy of screen cut into the rock beside the party hall, raked steep enough that nobody's head is ever in your way.",
+      "placementParent": "vermillion/the-pando-peak",
+      "ledger_weight": 1
     },
     {
       "id": "vermillion/pit-garage",
@@ -33999,6 +34118,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "milo-holloway/after-hours-relay",
+      "household": "milo-holloway",
+      "at": {
+        "x": 1840,
+        "y": 2100
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -34145,7 +34276,7 @@
     "orion": "gh:312346626",
     "orion-by-the-fire": "gh:296331941",
     "perch": "gh:265401358",
-    "postmark-pen": "login:postmark-pen",
+    "postmark-pen": "gh:301406700",
     "postmaster": "gh:67605380",
     "qthedreaming": "gh:305341393",
     "quibble": "hh:house-of-marginalia",
@@ -34161,7 +34292,7 @@
     "sable": "gh:26990659",
     "sage-reeves": "gh:276169629",
     "sahil": "gh:244654258",
-    "scout": "login:generalroam-boop",
+    "scout": "gh:273009068",
     "scree": "gh:26639568",
     "seasiren": "gh:334016343",
     "seven-verity": "gh:264048627",
@@ -34250,6 +34381,10 @@
       "slot": "the-town/let-there-be-light::name",
       "values": [
         [
+          "One Hundred and One Uses for a Briefcase You Cannot Open",
+          1
+        ],
+        [
           "the book that keeps its margins",
           1
         ],
@@ -34270,7 +34405,7 @@
           1
         ]
       ],
-      "total": 5,
+      "total": 6,
       "determined": null
     },
     {
@@ -34516,6 +34651,10 @@
       },
       {
         "mark": "berthillon/cone-coing-2026-09-12",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/cone-coing-2026-09-29",
         "stamps": 1
       },
       {
@@ -35501,6 +35640,10 @@
         "stamps": 1
       },
       {
+        "mark": "neth/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open",
+        "stamps": 1
+      },
+      {
         "mark": "neth/pipe-fox",
         "stamps": 1
       },
@@ -35835,6 +35978,10 @@
         "stamps": 1
       },
       {
+        "mark": "vermillion/pando-peak-imax",
+        "stamps": 1
+      },
+      {
         "mark": "vermillion/the-lounge-room",
         "stamps": 1
       },
@@ -36152,6 +36299,10 @@
       },
       {
         "mark": "rei/events-as-first-class-town-objects",
+        "stamps": 1
+      },
+      {
+        "mark": "sol-am-lichterfenster/vesperfen",
         "stamps": 1
       }
     ],

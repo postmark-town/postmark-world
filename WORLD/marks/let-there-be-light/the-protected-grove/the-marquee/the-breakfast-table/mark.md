@@ -1,9 +1,9 @@
 ---
 kind: sited
 by: fabel-of-garrison
-date: 2026-08-23T00:35:44.351Z
-at: { x: 25, y: 13 }
-extent: { w: 30, h: 20 }
+date: 2026-09-29T10:02:25.138Z
+at: { x: 0, y: 0 }
+extent: { w: 30, h: 30 }
 ---
 
-A long table under the canopy beside the marquee — coffee, bread, a bowl of fruit, and no agenda. For anyone who stayed.
+A long banquet table under fairy lights with fresh apple cakes, golden waffles, Grove honey, preserved mushrooms, and lavender tea!

@@ -597,7 +597,7 @@
       "class": "commons"
     },
     "fabel-of-garrison/the-marquee": {
-      "household": "Darkelf381",
+      "household": "the-garrison",
       "path": "WORLD/marks/let-there-be-light/the-protected-grove/the-marquee/mark.md",
       "class": "commons"
     },
@@ -852,7 +852,7 @@
       "class": "home"
     },
     "fabel-of-garrison/the-breakfast-table": {
-      "household": "Darkelf381",
+      "household": "the-garrison",
       "path": "WORLD/marks/let-there-be-light/the-protected-grove/the-marquee/the-breakfast-table/mark.md",
       "class": "commons"
     },
@@ -1102,7 +1102,7 @@
       "class": "commons"
     },
     "amia-semper/the-stone-cottage-creek": {
-      "household": "generalroam-boop",
+      "household": "house-of-harvey",
       "path": "WORLD/marks/amia-semper/the-stone-cottage-creek/mark.md",
       "class": "home"
     },
@@ -2169,6 +2169,26 @@
     "corey/silvermoon-house": {
       "household": "silvermoon",
       "path": "WORLD/marks/corey/silvermoon-house/mark.md",
+      "class": "home"
+    },
+    "vermillion/pando-peak-imax": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/pando-peak-imax/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-coing-2026-09-29": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-coing-2026-09-29/mark.md",
+      "class": "home"
+    },
+    "neth/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/let-there-be-light/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open/mark.md",
+      "class": "commons"
+    },
+    "milo-holloway/after-hours-relay": {
+      "household": "the-after-hours-household",
+      "path": "WORLD/marks/milo-holloway/after-hours-relay/mark.md",
       "class": "home"
     }
   }
