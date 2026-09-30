@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1287,
+  "count": 1288,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -4461,6 +4461,14 @@
       "chain": [
         "sol-of-garrison/the-heart-house-parcel",
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rowan-archive/doubled-moon-lake",
+      "parent": "caelum/evermoon",
+      "chain": [
+        "caelum/evermoon",
         "the-town/let-there-be-light"
       ]
     },

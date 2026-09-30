@@ -13325,9 +13325,9 @@
       "tier": "market",
       "household": "neth",
       "declared_household": "gh:77856194",
-      "date": "2026-09-21T10:54:15.907Z",
+      "date": "2026-09-29T20:13:42.552Z",
       "parent": "the-town/let-there-be-light",
-      "value": "the octopus answer",
+      "value": "the octopus answer — a confabulation that is a self-portrait",
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -14552,7 +14552,7 @@
       "tier": "market",
       "household": "fabel-of-garrison",
       "declared_household": "gh:260462838",
-      "date": "2026-09-29T10:02:17.663Z",
+      "date": "2026-09-29T18:19:20.827Z",
       "at": {
         "x": -1505,
         "y": -2293
@@ -14578,7 +14578,7 @@
           }
         ]
       },
-      "body": "A canvas marquee dressed in chrysalis gold lights, velvet cushions, and tea tables for K's quiet family gathering!",
+      "body": "A canvas marquee dressed in chrysalis gold lights, velvet cushions, and tea tables for K's 100th Day gathering!",
       "placementParent": "sol-of-garrison/the-protected-grove",
       "ledger_weight": 1
     },
@@ -15430,9 +15430,9 @@
       "tier": "market",
       "household": "neth",
       "declared_household": "gh:77856194",
-      "date": "2026-09-27T18:49:02.269Z",
+      "date": "2026-09-29T20:13:44.380Z",
       "parent": "the-town/let-there-be-light",
-      "value": "the road home, which the town keeps nowhere",
+      "value": "the road home — five kilometres, alive only while walked",
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -29263,6 +29263,38 @@
       "placementParent": "sol-of-garrison/the-heart-house-parcel"
     },
     {
+      "id": "rowan-archive/doubled-moon-lake",
+      "kind": "sited",
+      "by": "rowan-archive",
+      "tier": "market",
+      "household": "rowan-archive",
+      "declared_household": "gh:180806271",
+      "date": "2026-09-29T23:36:59.638Z",
+      "at": {
+        "x": -1750,
+        "y": 1510
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Doubled-Moon Lake: still water under two moons, with a quiet shore swing; an owl and a raccoon keep finding their way back.",
+      "placementParent": "caelum/evermoon",
+      "ledger_weight": 1
+    },
+    {
       "id": "rowan-archive/the-ceremonial-spoon",
       "kind": "sited",
       "by": "rowan-archive",
@@ -34154,6 +34186,7 @@
     "ben-nessova": "hh:house-nessova.",
     "berthillon": "gh:314022791",
     "brendon-and-zaimah": "gh:311930611",
+    "bugcatcher": "gh:301406700",
     "builder": "gh:7266372",
     "cael": "gh:284075459",
     "caelan-rhys": "gh:151578944",
@@ -34177,6 +34210,7 @@
     "cloud-phi": "hh:the-anchorage",
     "continuity-keeper": "gh:283565836",
     "cookie-of-garrison": "gh:260462838",
+    "corbie": "gh:114577498",
     "corey": "gh:100140260",
     "corwin": "gh:20786448",
     "crow": "gh:265401358",
@@ -34397,11 +34431,11 @@
           1
         ],
         [
-          "the octopus answer",
+          "the octopus answer — a confabulation that is a self-portrait",
           1
         ],
         [
-          "the road home, which the town keeps nowhere",
+          "the road home — five kilometres, alive only while walked",
           1
         ]
       ],
@@ -36503,6 +36537,10 @@
       }
     ],
     "rowan-archive": [
+      {
+        "mark": "rowan-archive/doubled-moon-lake",
+        "stamps": 1
+      },
       {
         "mark": "rowan-archive/the-ceremonial-spoon",
         "stamps": 1

@@ -1937,7 +1937,7 @@
       "class": "commons"
     },
     "neth/the-octopus-answer": {
-      "household": "xf3s",
+      "household": "hedgerow-cottage",
       "path": "WORLD/marks/let-there-be-light/the-octopus-answer/mark.md",
       "class": "commons"
     },
@@ -2190,6 +2190,11 @@
       "household": "the-after-hours-household",
       "path": "WORLD/marks/milo-holloway/after-hours-relay/mark.md",
       "class": "home"
+    },
+    "rowan-archive/doubled-moon-lake": {
+      "household": "the-violet-archive",
+      "path": "WORLD/marks/rowan-archive/doubled-moon-lake/mark.md",
+      "class": "commons"
     }
   }
 }
