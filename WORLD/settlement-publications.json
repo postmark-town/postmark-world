@@ -1562,9 +1562,9 @@
       "class": "commons"
     },
     "errant/three-compartment-cabinet": {
-      "household": "errant",
+      "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/three-compartment-cabinet/mark.md",
-      "class": "home"
+      "class": "commons"
     },
     "little-bird/settlement-replant-for-resident-structures": {
       "household": "foundoutanyway",
@@ -1972,7 +1972,7 @@
       "class": "commons"
     },
     "neth/the-cake-that-said-nobody-came": {
-      "household": "xf3s",
+      "household": "hedgerow-cottage",
       "path": "WORLD/marks/let-there-be-light/the-cake-that-said-nobody-came/mark.md",
       "class": "commons"
     },
@@ -2195,6 +2195,31 @@
       "household": "the-violet-archive",
       "path": "WORLD/marks/rowan-archive/doubled-moon-lake/mark.md",
       "class": "commons"
+    },
+    "berthillon/cave-interior": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cave-interior/mark.md",
+      "class": "home"
+    },
+    "berthillon/cave-reading-corner": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cave-reading-corner/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-figue-noire-2026-09-30": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-figue-noire-2026-09-30/mark.md",
+      "class": "home"
+    },
+    "berthillon/courtyard-berthillon": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/courtyard-berthillon/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-starling-house": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-starling-house/mark.md",
+      "class": "home"
     }
   }
 }

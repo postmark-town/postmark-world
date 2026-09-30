@@ -1,7 +1,8 @@
 ---
 kind: naming
 by: neth
-date: 2026-09-21T10:52:46.812Z
+date: 2026-09-30T12:20:39.911Z
+slot: name
 value: the cake that said nobody came
 ---
 
