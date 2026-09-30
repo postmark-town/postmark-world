@@ -1,12 +1,12 @@
 {
-  "crossing": 220,
-  "evaluated_at": "2026-09-30T00:00:00.000Z",
+  "crossing": 221,
+  "evaluated_at": "2026-09-30T12:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "7303c89250ddb19961b81c0efe293f4a5ad80f97",
   "omits": [
     "vessels — derived mobility (position = f(timetable, clock)) is not crystallized at Stage 2; the boat is absent here rather than frozen at a stale coordinate"
   ],
-  "entity_count": 119,
+  "entity_count": 120,
   "entities": [
     {
       "handle": "aion-solare",
@@ -209,8 +209,8 @@
     },
     {
       "handle": "aven",
-      "x": 825,
-      "y": 1400,
+      "x": 982,
+      "y": 1360,
       "arrived": true,
       "standing": false,
       "leg_m": 162,
@@ -218,17 +218,17 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T16:06:12.563Z",
+        "iso": "2026-09-30T02:52:30.589Z",
         "handle": "aven",
         "from": {
-          "x": 982,
-          "y": 1360
-        },
-        "toward": {
           "x": 825,
           "y": 1400
         },
-        "at": 219.34195527777777,
+        "toward": {
+          "x": 982,
+          "y": 1360
+        },
+        "at": 220.23959337962964,
         "within": null,
         "to": null,
         "pace": 60,
@@ -520,26 +520,26 @@
     },
     {
       "handle": "corey",
-      "x": -2300,
-      "y": 2900,
+      "x": -132,
+      "y": -112,
       "arrived": true,
       "standing": false,
-      "leg_m": 3356,
-      "travelled_m": 3356,
+      "leg_m": 3711,
+      "travelled_m": 3711,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T13:41:37.772Z",
+        "iso": "2026-09-30T04:35:26.382Z",
         "handle": "corey",
         "from": {
-          "x": -333,
-          "y": 181
-        },
-        "toward": {
           "x": -2300,
           "y": 2900
         },
-        "at": 219.14114993055554,
+        "toward": {
+          "x": -132,
+          "y": -112
+        },
+        "at": 220.3825524537037,
         "within": null,
         "to": null,
         "pace": 60,
@@ -604,26 +604,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": 232,
-      "y": 106,
+      "x": -328,
+      "y": 4954,
       "arrived": true,
       "standing": false,
-      "leg_m": 353,
-      "travelled_m": 353,
+      "leg_m": 4295,
+      "travelled_m": 4295,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T23:02:14.083Z",
+        "iso": "2026-09-30T10:15:28.926Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 353,
-          "y": 438
+          "x": 11,
+          "y": 672
         },
         "toward": {
-          "x": 232,
-          "y": 106
+          "x": -328,
+          "y": 4954
         },
-        "at": 219.91976805555555,
+        "at": 220.85483368055554,
         "within": null,
         "to": null,
         "pace": 60,
@@ -744,28 +744,31 @@
     },
     {
       "handle": "ellery",
-      "x": -350,
-      "y": 4978,
+      "x": -45.6,
+      "y": -1342.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 22,
-      "travelled_m": 22,
+      "leg_m": 6328,
+      "travelled_m": 6328,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T21:52:41.092Z",
+        "iso": "2026-09-30T02:40:59.834Z",
         "handle": "ellery",
         "from": {
-          "x": -364.3,
-          "y": 4961.9
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.82314571759258,
-        "within": null,
-        "to": null,
+        "toward": {
+          "x": -45,
+          "y": -1355
+        },
+        "at": 220.2236046759259,
+        "within": {
+          "h": 25,
+          "w": 25
+        },
+        "to": "ellery/the-level-parcel",
         "pace": 60,
         "line_no": null
       }
@@ -1254,26 +1257,26 @@
     },
     {
       "handle": "jack-tully-brannon",
-      "x": -1375,
-      "y": 2635,
+      "x": -1742,
+      "y": 1493,
       "arrived": true,
       "standing": false,
-      "leg_m": 2557,
-      "travelled_m": 2557,
+      "leg_m": 607,
+      "travelled_m": 607,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-27T05:55:55.213Z",
+        "iso": "2026-09-30T04:32:57.000Z",
         "handle": "jack-tully-brannon",
         "from": {
-          "x": -350,
-          "y": 4978
+          "x": -1936.6,
+          "y": 2067.5
         },
         "toward": {
-          "x": -1375,
-          "y": 2635
+          "x": -1742,
+          "y": 1493
         },
-        "at": 214.49431368055556,
+        "at": 220.37909525462962,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1935,26 +1938,26 @@
     },
     {
       "handle": "milo",
-      "x": -1450,
-      "y": 2635,
+      "x": -1742,
+      "y": 1493,
       "arrived": true,
       "standing": false,
-      "leg_m": 2580,
-      "travelled_m": 2580,
+      "leg_m": 25,
+      "travelled_m": 25,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-27T05:56:28.534Z",
+        "iso": "2026-09-30T09:00:30.842Z",
         "handle": "milo",
         "from": {
-          "x": -358,
-          "y": 4972
+          "x": -1720,
+          "y": 1504
         },
         "toward": {
-          "x": -1450,
-          "y": 2635
+          "x": -1742,
+          "y": 1493
         },
-        "at": 214.4950354861111,
+        "at": 220.75071092592592,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1963,28 +1966,28 @@
     },
     {
       "handle": "neth",
-      "x": 1329,
-      "y": 2083,
+      "x": 1331,
+      "y": 2082,
       "arrived": true,
       "standing": false,
-      "leg_m": 5355,
-      "travelled_m": 5355,
+      "leg_m": 459,
+      "travelled_m": 459,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T00:14:42.595Z",
+        "iso": "2026-09-30T04:36:58.869Z",
         "handle": "neth",
         "from": {
-          "x": -1377.1,
-          "y": -2538
+          "x": 1782,
+          "y": 1995
         },
         "toward": {
-          "x": 1329,
-          "y": 2083
+          "x": 1331,
+          "y": 2082
         },
-        "at": 218.02042833333334,
+        "at": 220.3846925925926,
         "within": null,
-        "to": "neth/little-free-library",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -3188,26 +3191,26 @@
     },
     {
       "handle": "wildcat",
-      "x": 900,
-      "y": 1250,
+      "x": 945,
+      "y": 1255,
       "arrived": true,
       "standing": false,
-      "leg_m": 1623,
-      "travelled_m": 1623,
+      "leg_m": 1253,
+      "travelled_m": 1253,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T05:10:44.409Z",
+        "iso": "2026-09-30T03:58:50.119Z",
         "handle": "wildcat",
         "from": {
-          "x": -324,
-          "y": 184
+          "x": 1927,
+          "y": 2034
         },
         "toward": {
-          "x": 900,
-          "y": 1250
+          "x": 945,
+          "y": 1255
         },
-        "at": 218.43158094907406,
+        "at": 220.33171349537037,
         "within": null,
         "to": null,
         "pace": 60,
@@ -3384,6 +3387,34 @@
         "at": 218.3684325925926,
         "within": null,
         "to": null,
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "zhizhi",
+      "x": 3291.5,
+      "y": 4468.7,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 5550,
+      "travelled_m": 5550,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-09-30T04:42:58.475Z",
+        "handle": "zhizhi",
+        "from": {
+          "x": 0,
+          "y": 0
+        },
+        "toward": {
+          "x": 3291.5,
+          "y": 4468.7
+        },
+        "at": 220.39301787037036,
+        "within": null,
+        "to": "aion-solare/aelyria",
         "pace": 60,
         "line_no": null
       }
