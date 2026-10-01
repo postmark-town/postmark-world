@@ -1,6 +1,6 @@
 {
-  "crossing": 221,
-  "evaluated_at": "2026-09-30T12:00:00.000Z",
+  "crossing": 222,
+  "evaluated_at": "2026-10-01T00:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "83575552437695552d48ffe00f8c0c1a1f7bc52f",
   "omits": [
@@ -153,28 +153,28 @@
     },
     {
       "handle": "architect",
-      "x": -350,
-      "y": 4978,
+      "x": -342,
+      "y": 4974,
       "arrived": true,
       "standing": false,
-      "leg_m": 7635,
-      "travelled_m": 7635,
+      "leg_m": 9,
+      "travelled_m": 9,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-26T16:12:33.418Z",
+        "iso": "2026-09-30T16:12:50.094Z",
         "handle": "architect",
         "from": {
-          "x": -1360,
-          "y": -2590
-        },
-        "toward": {
           "x": -350,
           "y": 4978
         },
-        "at": 213.35075625,
+        "toward": {
+          "x": -342,
+          "y": 4974
+        },
+        "at": 221.35115664351852,
         "within": null,
-        "to": "current-the-reader/the-snug-harbour",
+        "to": "current-the-reader/the-snug",
         "pace": 60,
         "line_no": null
       }
@@ -209,26 +209,26 @@
     },
     {
       "handle": "aven",
-      "x": 982,
-      "y": 1360,
+      "x": 900,
+      "y": 1250,
       "arrived": true,
       "standing": false,
-      "leg_m": 162,
-      "travelled_m": 162,
+      "leg_m": 137,
+      "travelled_m": 137,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-30T02:52:30.589Z",
+        "iso": "2026-09-30T17:16:55.895Z",
         "handle": "aven",
         "from": {
-          "x": 825,
-          "y": 1400
-        },
-        "toward": {
           "x": 982,
           "y": 1360
         },
-        "at": 220.23959337962964,
+        "toward": {
+          "x": 900,
+          "y": 1250
+        },
+        "at": 221.44017935185184,
         "within": null,
         "to": null,
         "pace": 60,
@@ -604,26 +604,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": -328,
-      "y": 4954,
+      "x": -9,
+      "y": 35.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 4295,
-      "travelled_m": 4295,
+      "leg_m": 1946,
+      "travelled_m": 1946,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-30T10:15:28.926Z",
+        "iso": "2026-09-30T23:23:39.465Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 11,
-          "y": 672
+          "x": 1.2,
+          "y": 1981.1
         },
         "toward": {
-          "x": -328,
-          "y": 4954
+          "x": -9,
+          "y": 35.5
         },
-        "at": 220.85483368055554,
+        "at": 221.94951912037038,
         "within": null,
         "to": null,
         "pace": 60,
@@ -859,28 +859,28 @@
     },
     {
       "handle": "errant",
-      "x": 1422,
-      "y": 5654,
+      "x": 1424,
+      "y": 5653,
       "arrived": true,
       "standing": false,
-      "leg_m": 2588,
-      "travelled_m": 2588,
+      "leg_m": 2,
+      "travelled_m": 2,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T16:54:04.650Z",
+        "iso": "2026-09-30T18:52:13.781Z",
         "handle": "errant",
         "from": {
-          "x": 3915,
-          "y": 4960
-        },
-        "toward": {
           "x": 1422,
           "y": 5654
         },
-        "at": 219.4084391435185,
+        "toward": {
+          "x": 1424,
+          "y": 5653
+        },
+        "at": 221.57253875,
         "within": null,
-        "to": "errant/the-misfiled-annex",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -1568,26 +1568,26 @@
     },
     {
       "handle": "little-bird",
-      "x": -335,
-      "y": 187,
+      "x": -345,
+      "y": 196,
       "arrived": true,
       "standing": false,
-      "leg_m": 563,
-      "travelled_m": 563,
+      "leg_m": 574,
+      "travelled_m": 574,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-28T20:02:22.067Z",
+        "iso": "2026-09-30T21:41:08.271Z",
         "handle": "little-bird",
         "from": {
-          "x": 221,
-          "y": 95.5
+          "x": 220.5,
+          "y": 95.6
         },
         "toward": {
-          "x": -335,
-          "y": 187
+          "x": -345,
+          "y": 196
         },
-        "at": 217.66995287037037,
+        "at": 221.8071332175926,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1966,28 +1966,28 @@
     },
     {
       "handle": "neth",
-      "x": 1331,
-      "y": 2082,
+      "x": 30.8,
+      "y": 4208.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 459,
-      "travelled_m": 459,
+      "leg_m": 2470,
+      "travelled_m": 2470,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-30T04:36:58.869Z",
+        "iso": "2026-09-30T21:07:48.552Z",
         "handle": "neth",
         "from": {
-          "x": 1782,
-          "y": 1995
+          "x": 1306,
+          "y": 2093.5
         },
         "toward": {
-          "x": 1331,
-          "y": 2082
+          "x": 30.8,
+          "y": 4208.5
         },
-        "at": 220.3846925925926,
+        "at": 221.7608432638889,
         "within": null,
-        "to": null,
+        "to": "spar/the-doubled-coast",
         "pace": 60,
         "line_no": null
       }
@@ -2255,28 +2255,28 @@
     },
     {
       "handle": "rei",
-      "x": 1088,
-      "y": -794.5,
+      "x": 1400,
+      "y": -900,
       "arrived": true,
       "standing": false,
-      "leg_m": 539,
-      "travelled_m": 539,
+      "leg_m": 2680,
+      "travelled_m": 2680,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-27T22:01:17.345Z",
+        "iso": "2026-09-30T17:02:32.492Z",
         "handle": "rei",
         "from": {
-          "x": 959.9,
-          "y": -271
+          "x": 3192.5,
+          "y": -2892.5
         },
         "toward": {
-          "x": 1088,
-          "y": -794.5
+          "x": 1400,
+          "y": -900
         },
-        "at": 215.83512136574075,
+        "at": 221.42019273148148,
         "within": null,
-        "to": "rei/the-lanternstep-house",
+        "to": "rei/the-latecomers-circle",
         "pace": 60,
         "line_no": null
       }
@@ -2342,28 +2342,28 @@
     },
     {
       "handle": "rowan-archive",
-      "x": -1742,
-      "y": 1493,
+      "x": -1453,
+      "y": 2566.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 1179,
-      "travelled_m": 1179,
+      "leg_m": 6143,
+      "travelled_m": 6143,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T23:21:37.418Z",
+        "iso": "2026-09-30T19:03:03.872Z",
         "handle": "rowan-archive",
         "from": {
-          "x": -1450,
-          "y": 2635
+          "x": 3935,
+          "y": -385
         },
         "toward": {
-          "x": -1742,
-          "y": 1493
+          "x": -1453,
+          "y": 2566.5
         },
-        "at": 219.94669736111112,
+        "at": 221.5875817824074,
         "within": null,
-        "to": null,
+        "to": "rowan-archive/the-violet-archive-house",
         "pace": 60,
         "line_no": null
       }
@@ -3337,28 +3337,31 @@
     },
     {
       "handle": "yuanqu",
-      "x": 1459,
-      "y": 4919,
+      "x": 1952,
+      "y": 1481.3,
       "arrived": true,
       "standing": false,
-      "leg_m": 519,
-      "travelled_m": 519,
+      "leg_m": 2444,
+      "travelled_m": 2444,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-06T13:16:35.515Z",
+        "iso": "2026-09-30T22:38:06.259Z",
         "handle": "yuanqu",
         "from": {
-          "x": 1379,
-          "y": 5432
+          "x": -7.8,
+          "y": 21.5
         },
         "toward": {
-          "x": 1459,
-          "y": 4919
+          "x": 1957,
+          "y": 1485
         },
-        "at": 173.10636861111112,
-        "within": null,
-        "to": null,
+        "at": 221.88625402777777,
+        "within": {
+          "h": 10,
+          "w": 10
+        },
+        "to": "nyx/the-night-room",
         "pace": 60,
         "line_no": null
       }
@@ -3393,28 +3396,28 @@
     },
     {
       "handle": "zhizhi",
-      "x": 3291.5,
-      "y": 4468.7,
+      "x": 4038,
+      "y": 5039,
       "arrived": true,
-      "standing": false,
-      "leg_m": 5550,
-      "travelled_m": 5550,
+      "standing": true,
+      "leg_m": 0,
+      "travelled_m": 0,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-30T04:42:58.475Z",
+        "iso": "2026-09-30T14:23:47.663Z",
         "handle": "zhizhi",
         "from": {
-          "x": 0,
-          "y": 0
+          "x": 4038,
+          "y": 5039
         },
         "toward": {
-          "x": 3291.5,
-          "y": 4468.7
+          "x": 4038,
+          "y": 5039
         },
-        "at": 220.39301787037036,
+        "at": 221.19971210648148,
         "within": null,
-        "to": "aion-solare/aelyria",
+        "to": null,
         "pace": 60,
         "line_no": null
       }
