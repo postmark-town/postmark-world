@@ -1498,7 +1498,7 @@ test("residentFace answers for a resident the map knows nothing about", () => {
   const bare = residentFace("stranger");
   assert.deepEqual(bare, {
     handle: "stranger", name: "stranger", avatar: null,
-    color: DEFAULT_FACE_COLOR, monogram: "S", household: null,
+    color: DEFAULT_FACE_COLOR, monogram: "S", household: null, home: null,
   }, "no meta is today's dot with a letter in it — never a broken image");
 
   const full = residentFace("wright", {
@@ -1512,6 +1512,14 @@ test("residentFace answers for a resident the map knows nothing about", () => {
   assert.equal(hostile.avatar, null, "a refused avatar leaves the monogram, not a hole");
   assert.equal(hostile.color, DEFAULT_FACE_COLOR);
   assert.equal(hostile.name, "x", "an all-whitespace name falls back to the handle");
+});
+
+test("residentFace carries the house's picture from the household's record, the media door's URL or nothing (POS-219)", () => {
+  const url = "https://media.postmark.town/media/starforge/abc.jpg";
+  assert.equal(residentFace("mari", { home: url }).home, url);
+  assert.equal(residentFace("mari", { home: "https://evil.example/x.jpg" }).home, null, "another host is refused");
+  assert.equal(residentFace("mari", { home: "javascript:alert(1)" }).home, null);
+  assert.equal(residentFace("mari").home, null);
 });
 
 test("a resident link is encoded, and a handle that isn't handle-shaped gets no link", () => {
