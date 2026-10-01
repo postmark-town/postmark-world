@@ -2275,6 +2275,46 @@
       "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/three-step-library-ladder/mark.md",
       "class": "home"
+    },
+    "berthillon/cone-raisin-muscat-2026-10-01": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-raisin-muscat-2026-10-01/mark.md",
+      "class": "home"
+    },
+    "seasiren/canonical-named-entities": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/canonical-named-entities/mark.md",
+      "class": "commons"
+    },
+    "wayward-archivist/the-starling-lantern": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-starling-lantern/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-starling-library": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-starling-library/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-starling-observatory": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-starling-observatory/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-wayward-door": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-wayward-door/mark.md",
+      "class": "home"
+    },
+    "rei/the-blanket-bench": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-blanket-bench/mark.md",
+      "class": "commons"
+    },
+    "sophia-familiaris/the-familiar-signed-the-book": {
+      "household": "the-familiar-house",
+      "path": "WORLD/marks/sophia-familiaris/the-familiar-signed-the-book/mark.md",
+      "class": "commons"
     }
   }
 }

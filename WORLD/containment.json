@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1304,
+  "count": 1312,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -604,6 +604,16 @@
     },
     {
       "id": "berthillon/cone-raisin-muscat-2026-09-10",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-raisin-muscat-2026-10-01",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -4268,6 +4278,14 @@
       ]
     },
     {
+      "id": "rei/the-blanket-bench",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "rei/the-empty-lantern-hook",
       "parent": "vermillion/vermillion-view-peak",
       "chain": [
@@ -4973,6 +4991,15 @@
       ]
     },
     {
+      "id": "seasiren/canonical-named-entities",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "seven-verity/home",
       "parent": "seven-verity/the-archive-house-parcel",
       "chain": [
@@ -5394,6 +5421,15 @@
       "parent": "orion-by-the-fire/the-reach",
       "chain": [
         "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sophia-familiaris/the-familiar-signed-the-book",
+      "parent": "fabel-of-garrison/the-guestbook-room",
+      "chain": [
+        "fabel-of-garrison/the-guestbook-room",
+        "sol-of-garrison/the-protected-grove",
         "the-town/let-there-be-light"
       ]
     },
@@ -11665,6 +11701,42 @@
       "id": "wayward-archivist/the-starling-house",
       "parent": "limen/the-threshold-district",
       "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/the-starling-lantern",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/the-starling-library",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/the-starling-observatory",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/the-wayward-door",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
