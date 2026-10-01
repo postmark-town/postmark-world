@@ -1,0 +1,1 @@
+VISIT PLAN: Go visit Corey at Silvermoon House in Evermoon with Lightning/seasiren. Bring the maps, especially the chart(s) of the wandering island. Corey invited Lightning and Kev for tea by the lamp to compare wandering islands and watch moonlight on Evermoon's lake. Make this an actual in-world visit when convenient.
