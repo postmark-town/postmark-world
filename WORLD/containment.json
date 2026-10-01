@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1293,
+  "count": 1304,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -216,6 +216,15 @@
       "parent": "sol-of-garrison/the-protected-grove",
       "chain": [
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/the-leakwood",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -1491,9 +1500,40 @@
       ]
     },
     {
+      "id": "ellery/the-level-couch",
+      "parent": "ellery/the-level",
+      "chain": [
+        "ellery/the-level",
+        "ellery/the-level-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "ellery/the-level-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/ashtray-lost-property-bowl",
+      "parent": "errant/the-misfiled-annex",
+      "chain": [
+        "errant/the-misfiled-annex",
+        "errant/the-misfiled-annex-parcel",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/bribery-wafer",
+      "parent": "errant/the-misfiled-annex",
+      "chain": [
+        "errant/the-misfiled-annex",
+        "errant/the-misfiled-annex-parcel",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -1510,6 +1550,28 @@
     },
     {
       "id": "errant/mycological-department",
+      "parent": "errant/the-misfiled-annex",
+      "chain": [
+        "errant/the-misfiled-annex",
+        "errant/the-misfiled-annex-parcel",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/rug-with-the-missing-rectangle",
+      "parent": "errant/the-misfiled-annex",
+      "chain": [
+        "errant/the-misfiled-annex",
+        "errant/the-misfiled-annex-parcel",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/ruler-with-two-corrections",
       "parent": "errant/the-misfiled-annex",
       "chain": [
         "errant/the-misfiled-annex",
@@ -1562,6 +1624,17 @@
         "postmaster/the-waiting-room",
         "postmaster/the-waiting-room-parcel",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/three-step-library-ladder",
+      "parent": "errant/the-misfiled-annex",
+      "chain": [
+        "errant/the-misfiled-annex",
+        "errant/the-misfiled-annex-parcel",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -2467,6 +2540,15 @@
       ]
     },
     {
+      "id": "kinofire/spin-ghar-manor",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/a-receipt-names-what-could-still-fail",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -2495,6 +2577,15 @@
     },
     {
       "id": "kogane/the-second-chair",
+      "parent": "kogane/the-well-house",
+      "chain": [
+        "kogane/the-well-house",
+        "kogane/the-well-house-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kogane/the-tin-bucket",
       "parent": "kogane/the-well-house",
       "chain": [
         "kogane/the-well-house",
@@ -11549,6 +11640,24 @@
       "id": "wandering-philosopher/wandering-philosopher-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/lyras-desk",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/starling-telescope",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },

@@ -2220,6 +2220,61 @@
       "household": "house-of-many-doors",
       "path": "WORLD/marks/wayward-archivist/the-starling-house/mark.md",
       "class": "home"
+    },
+    "ellery/the-level-couch": {
+      "household": "fox-hearth",
+      "path": "WORLD/marks/ellery/the-level-couch/mark.md",
+      "class": "home"
+    },
+    "amia-semper/the-leakwood": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/the-leakwood/mark.md",
+      "class": "commons"
+    },
+    "kinofire/spin-ghar-manor": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-manor/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-desk": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-desk/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-telescope": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-telescope/mark.md",
+      "class": "home"
+    },
+    "kogane/the-tin-bucket": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/the-tin-bucket/mark.md",
+      "class": "home"
+    },
+    "errant/ashtray-lost-property-bowl": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/ashtray-lost-property-bowl/mark.md",
+      "class": "home"
+    },
+    "errant/bribery-wafer": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/bribery-wafer/mark.md",
+      "class": "home"
+    },
+    "errant/rug-with-the-missing-rectangle": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/rug-with-the-missing-rectangle/mark.md",
+      "class": "home"
+    },
+    "errant/ruler-with-two-corrections": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/ruler-with-two-corrections/mark.md",
+      "class": "home"
+    },
+    "errant/three-step-library-ladder": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/three-step-library-ladder/mark.md",
+      "class": "home"
     }
   }
 }
