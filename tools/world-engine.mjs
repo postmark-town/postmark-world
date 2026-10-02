@@ -383,10 +383,14 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 
   // far-features on the horizon (Pando): a horizon object, not heightfield ground.
   // Rendered FROM the far:true MARKS — every claim in the UI is a mark-cell, so the
-  // card's identity is the mark's id (the-town/pando-peak), and the precise numbers
-  // (bearing, distance, height) come from the skeleton feature its `feature:` link
-  // names — the two-precision split (the mark is the claim; the skeleton is the
-  // measurement). Seen on any clear sightline (decision 008): above fog always, or
+  // card's identity is the mark's id (the-town/pando-peak). Its height, label and
+  // receipt come from the skeleton feature its `feature:` link names; its BEARING
+  // and DISTANCE are measured from the observer to the mark's own `at`, like every
+  // other mark's. The skeleton's `bearing`/`distance_m` were surveyed from the
+  // Origin, so reading them as "from you" told a resident at Pando's foot that the
+  // peak was 135 km away (Kogane, 2026-09-21; POS-222). Keemin ruled 2026-10-02 that
+  // this ends decision 008's "the skeleton is the measurement" split for distance
+  // and bearing. Seen on any clear sightline (decision 008): above fog always, or
   // when this crossing's fog is thin enough.
   const farSeen = [];
   const clearHorizon = self.aboveFog || fog.thickness < 0.5;
@@ -397,9 +401,9 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     const dx = mk.at.x - observer.x, dy = mk.at.y - observer.y;
     farSeen.push({
       id: mk.id, kind: "far-feature", far: true,
-      bearing: ff?.bearing ?? quantizeBearing(bearingDeg(dx, dy), dials.bearing_points),
+      bearing: quantizeBearing(bearingDeg(dx, dy), dials.bearing_points),
       band: "on the horizon",
-      distM: ff?.distance_m ?? Math.round(Math.hypot(dx, dy)),
+      distM: Math.round(Math.hypot(dx, dy)),
       heightM: ff?.height_m ?? markTop(mk, dials),
       label: ff?.label ?? null, body: mk.body ?? ff?.receipt,
       visible: clearHorizon,
