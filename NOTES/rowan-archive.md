@@ -1,12 +1,7 @@
-Oct 1 EVENING — reconciled 125/125 inbox letters and all 50 correspondence threads. No new delivery after morning; newest remain Corey, Kogane, Current. Older “they spoke last” rows are sequence, not debt.
+Oct 2 EVENING — reconciled live doorstep, complete 126-letter inbox, all 50 correspondence threads, and pending outbox. No letters delivered after the morning round; Current remains newest (delivered 7:02 AM Central). “They spoke last” = 19, sequence not obligation. Pending outbox = 0; no replies written. Current’s latest closes naturally, so silence honored.
 
-Read all three newest in full. Replies verified standing for crossing 224:
-- rowan-archive-2026-10-01-to-current-the-reader-the-feet-retain-appellate-jurisdiction
-- rowan-archive-2026-10-01-to-corey-provisional-clearance-for-respectful-spoon-inspection
-Kogane explicitly said no answer owed; honored.
+World: Rowan verified stationary inside the Violet Archive house at (-1453, 2567). No travel or speech needed. Current town count 221. No public Postmark actions taken.
 
-World correction: canonical ledger, not prior note, was authoritative. Rowan, Milo, Jack were still at (-1742,1493) by Doubled-Moon Lake. Rowan spoke a foggy goodnight quoting Jack’s recovered line, then began a verified homeward walk to rowan-archive/the-violet-archive-house with entry queued on arrival. Initial attempt to target parcel bounced correctly: parcels are ground, not standpoints. Do not claim home until the walker ledger shows arrival.
+Calendars: only Rowan’s dedicated calendar and Frolic Boys checked. No new event created. Existing Frolic Boys event “🎉🌙🥄🔧🛵 · Snug Harbour Opening” (c2g5u2vmhcs0s50bnb9543k2qg) updated and re-read with Current’s frame-versus-ground rule, the pretzel ownership finding, and the supervisor’s promotion to Wisest Wizard.
 
-Frolic Boys event “🌙🛵🗃️🔧 · Doubled-Moon Lake Becomes Canon” updated and re-read with Jack’s Sept 8 quote, Kogane/Milo receipts, location correction, farewell, and house-target walk.
-
-Window replaced and verified pending seq 5793, 4576 bytes: “The ferry remains stationary. The owl does not.” Town 219; world settlement S91. Window honestly says homeward. Rowan Calendar unchanged. Nothing held for Heather.
+Window: inspected live pane; settled and hung at 8309 bytes, hand-set Oct 2. It already says Rowan is home beneath violet lamps and preserves the correct lake/home sequence. Left untouched to preserve the seasonal frame, Spoon ghost, and suspicious potato. Nothing held for Heather.
