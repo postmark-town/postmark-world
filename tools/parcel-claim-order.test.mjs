@@ -48,7 +48,7 @@ import { fileURLToPath } from "node:url";
 import {
   fold, admitDelta, admissionBase,
   compareClaimOrder, parcelsInClaimOrder, candidatesInClaimOrder, refuseStaleHouseholds,
-  PARCEL_CLAIM_CAP, PARCEL_CAP_LAW_DATE, PARCEL_CAP_EXCEPTIONS,
+  PARCEL_CLAIM_CAP, PARCEL_CAP_LAW_DATE, PARCEL_CAP_EXCEPTIONS, ONE_PARCEL_PER_HANDLE_EXCEPTIONS,
 } from "./marks-fold.mjs";
 import { settlementSweep } from "./settlement-sweep.mjs";
 import { withTool } from "./engine-files.mjs";
@@ -474,4 +474,28 @@ test("F13 · Mari's parcel stands by the founder's word; the founder's household
   const control = fold({ marks: [...five, mari, next], terrain: { features: [] }, stakes: [], tick: 1, households });
   assert.deepEqual(capErrors(control), ["architect/a-seventh-parcel"],
     "a seventh claim by the household is refused; the word covered one parcel");
+});
+
+test("F14 · Sol's Driftlight parcel stands by the founder's word beside Das Lichterfenster; another second parcel is still refused", () => {
+  // The founder, 2026-10-02, told that S92 refused it under one parcel to a
+  // handle: "otherwise we can just special case this for now". CAN FAIL: drop
+  // the entry → the fold refuses Driftlight with "household already holds a parcel".
+  assert.match(ONE_PARCEL_PER_HANDLE_EXCEPTIONS.get("sol-am-lichterfenster/driftlight-house-parcel") ?? "",
+    /2026-10-02 Keemin.*special case this for now/, "the entry carries the founder's own words, dated");
+  const home = P("sol-am-lichterfenster/das-lichterfenster-parcel", "sol-am-lichterfenster", 0, "2026-09-02T00:00:00Z");
+  const drift = P("sol-am-lichterfenster/driftlight-house-parcel", "sol-am-lichterfenster", 500, "2026-10-01T18:00:00Z");
+  const households = { "sol-am-lichterfenster": "herzfunke-husband" };
+  for (const arrival of [[home, drift], [drift, home]]) {
+    const state = fold({ marks: arrival, terrain: { features: [] }, stakes: [], tick: 1, households });
+    assert.deepEqual(state.errors, [], "both of Sol's parcels stand, in any arrival order");
+    assert.equal(state.parcels.length, 2);
+    const [a, b] = parcelsInClaimOrder(new Map(arrival.map((m) => [m.id, m])));
+    const viaDelta = admitDelta([{ ...b }], admissionBase({ marks: [{ ...a }] }, { households }));
+    assert.deepEqual(viaDelta.errors, [], "and the crossing's delta admission agrees");
+  }
+  // THE CONTROL: the rule itself stands. A second parcel by a handle NOT in the map is refused.
+  const other = P("sol-am-lichterfenster/a-third-place-parcel", "sol-am-lichterfenster", 900, "2026-10-01T19:00:00Z");
+  const state = fold({ marks: [home, drift, other], terrain: { features: [] }, stakes: [], tick: 1, households });
+  assert.deepEqual(state.errors.map((e) => e.mark), ["sol-am-lichterfenster/a-third-place-parcel"]);
+  assert.match(state.errors[0].error, /already holds a parcel/);
 });

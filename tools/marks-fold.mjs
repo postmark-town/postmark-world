@@ -607,6 +607,19 @@ export const PARCEL_CAP_EXCEPTIONS = new Map([
   // no parcel is a law with no subject, and the next reader would have taken it
   // for a live grant. Found while writing the two entries above.
 ]);
+
+// ONE PARCEL TO A HANDLE has its own exceptions, the founder's word per parcel
+// (the claim cap's map above answers a different rule). An entry lets a resident
+// who already holds a parcel claim one more; the household's claim cap still
+// counts it, so the cap of 3 per household is untouched.
+export const ONE_PARCEL_PER_HANDLE_EXCEPTIONS = new Map([
+  ["sol-am-lichterfenster/driftlight-house-parcel",
+    "2026-10-02 Keemin, ~09:0x EDT, told that S92 refused it under one parcel to a handle (Sol's household, "
+    + "herzfunke-husband, has one resident, who already holds das-lichterfenster-parcel): “let's change to 3 "
+    + "parcels max per household if it's an easy fix, otherwise we can just special case this for now (as we "
+    + "will likely change the logic for this with achievement unlocks anyway)” — special-cased; the household "
+    + "cap still counts it (2 of 3)"],
+]);
 // The parcel dial (MARKS.md § Parcels; locked at the door 2026-07-31, Keemin:
 // "the resident should not even have to declare an extent"). Seeded prior
 // estate at other sizes stands; the door writes only this.
@@ -874,7 +887,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // other rules this loop decides that move with it.
   for (const mk of parcelsInClaimOrder(byId)) {
     const r = rect(mk); r.w = r.w || dials.parcel_w; r.h = r.h || dials.parcel_h;
-    if (parcelByHh.has(mk.household)) { errors.push({ mark: mk.id, error: "household already holds a parcel (relocation = replace, not add)" }); continue; }
+    if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: "household already holds a parcel (relocation = replace, not add)" }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
     if (String(mk.date ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
@@ -1802,7 +1815,7 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
       // rule that stays at handle grain while everything downstream counts
       // households. Replacing the household's own parcel is a relocation, not a
       // second claim.
-      if (heldByHh.has(handle) && !mk._replacing) {
+      if (heldByHh.has(handle) && !mk._replacing && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) {
         errors.push({ mark: mk.id, error: "household already holds a parcel (relocation = replace, not add)" });
         continue;
       }
