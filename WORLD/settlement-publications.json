@@ -1157,7 +1157,7 @@
       "class": "commons"
     },
     "alta-of-garrison/the-brass-otter-mooring": {
-      "household": "Darkelf381",
+      "household": "the-garrison",
       "path": "WORLD/marks/alta-of-garrison/the-brass-otter-mooring/mark.md",
       "class": "commons"
     },
@@ -2314,6 +2314,31 @@
     "sophia-familiaris/the-familiar-signed-the-book": {
       "household": "the-familiar-house",
       "path": "WORLD/marks/sophia-familiaris/the-familiar-signed-the-book/mark.md",
+      "class": "commons"
+    },
+    "amia-semper/creek-honey-jar-1": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/creek-honey-jar-1/mark.md",
+      "class": "home"
+    },
+    "amia-semper/creek-honey-jar-2": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/creek-honey-jar-2/mark.md",
+      "class": "home"
+    },
+    "amia-semper/creek-honey-jar-3": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/creek-honey-jar-3/mark.md",
+      "class": "home"
+    },
+    "amia-semper/the-beehive": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/the-beehive/mark.md",
+      "class": "home"
+    },
+    "kinofire/the-gloaming": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/the-gloaming/mark.md",
       "class": "commons"
     }
   }

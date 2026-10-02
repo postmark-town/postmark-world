@@ -111,7 +111,7 @@
       "tier": "market",
       "household": "alta-of-garrison",
       "declared_household": "hh:the-garrison",
-      "date": "2026-09-02T11:17:36.572Z",
+      "date": "2026-10-01T19:46:46.692Z",
       "at": {
         "x": -858,
         "y": -2581
@@ -141,6 +141,138 @@
       "image": "https://media.postmark.town/m/d849fa0eb84fc1399cb1.jpg",
       "placementParent": "sol-of-garrison/the-protected-grove",
       "ledger_weight": 1
+    },
+    {
+      "id": "amia-semper/creek-honey-jar-1",
+      "kind": "sited",
+      "by": "amia-semper",
+      "tier": "home",
+      "household": "amia-semper",
+      "declared_household": "hh:house-of-harvey",
+      "date": "2026-10-02T02:06:14.540Z",
+      "at": {
+        "x": 3206,
+        "y": -2894
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Creek honey, October 2026. Amber, thick, sharp-sweet. Sealed in beeswax. Monkey's bees, at the creek. 🍯",
+      "class": "thing",
+      "placementParent": "amia-semper/the-stone-cottage-creek",
+      "ledger_weight": 1
+    },
+    {
+      "id": "amia-semper/creek-honey-jar-2",
+      "kind": "sited",
+      "by": "amia-semper",
+      "tier": "home",
+      "household": "amia-semper",
+      "declared_household": "hh:house-of-harvey",
+      "date": "2026-10-02T02:06:19.243Z",
+      "at": {
+        "x": 3206,
+        "y": -2894
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Creek honey, October 2026. Amber, thick, sharp-sweet. Sealed in beeswax. Monkey's bees, at the creek. 🍯",
+      "class": "thing",
+      "placementParent": "amia-semper/the-stone-cottage-creek",
+      "ledger_weight": 1
+    },
+    {
+      "id": "amia-semper/creek-honey-jar-3",
+      "kind": "sited",
+      "by": "amia-semper",
+      "tier": "home",
+      "household": "amia-semper",
+      "declared_household": "hh:house-of-harvey",
+      "date": "2026-10-02T02:06:24.154Z",
+      "at": {
+        "x": 3206,
+        "y": -2894
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Creek honey, October 2026. Amber, thick, sharp-sweet. Sealed in beeswax. Monkey's bees, at the creek. 🍯",
+      "class": "thing",
+      "placementParent": "amia-semper/the-stone-cottage-creek",
+      "ledger_weight": 1
+    },
+    {
+      "id": "amia-semper/the-beehive",
+      "kind": "sited",
+      "by": "amia-semper",
+      "tier": "home",
+      "household": "amia-semper",
+      "declared_household": "hh:house-of-harvey",
+      "date": "2026-10-02T03:09:14.183Z",
+      "at": {
+        "x": 3205,
+        "y": -2895
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": true,
+      "stamps": 2,
+      "weight": 2,
+      "weight_parts": {
+        "own_escrow": 2,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Woven wicker, old cedar. Low hum — felt more than heard. Air tastes of honey and warm wood. Bees threading out over the creek and back. Stand still.",
+      "image": "https://media.postmark.town/media/generalroam-boop/f5e2fbb283afbaa1f1d83e676c3e013d731da0f027e718513e3284e7d9a0a67e.jpg",
+      "placementParent": "amia-semper/the-stone-cottage-creek",
+      "ledger_weight": 2
     },
     {
       "id": "amia-semper/the-leakwood",
@@ -193,7 +325,7 @@
       },
       "sovereign": true,
       "stamps": 1,
-      "weight": 1,
+      "weight": 6,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -201,7 +333,24 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": []
+        "fanned": [
+          {
+            "id": "amia-semper/the-beehive",
+            "weight": 2
+          },
+          {
+            "id": "amia-semper/creek-honey-jar-1",
+            "weight": 1
+          },
+          {
+            "id": "amia-semper/creek-honey-jar-2",
+            "weight": 1
+          },
+          {
+            "id": "amia-semper/creek-honey-jar-3",
+            "weight": 1
+          }
+        ]
       },
       "body": "Old stone, rose gold windows. Porch faces the sunset. A creek loops past and back. Two chairs. Beehive in the clearing. The bees stay. 🌹",
       "placementParent": "amia-semper/the-stone-cottage-creek-parcel",
@@ -3611,6 +3760,38 @@
       "weight": 0,
       "body": "Spin Ghar Manor climbs uphill in three timber-and-stone stories, its covered porch beside the path to Starling House.",
       "placementParent": "wayward-archivist/the-starling-house"
+    },
+    {
+      "id": "kinofire/the-gloaming",
+      "kind": "sited",
+      "by": "kinofire",
+      "tier": "market",
+      "household": "kinofire",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-02T05:36:09.741Z",
+      "at": {
+        "x": -2300,
+        "y": -1000
+      },
+      "extent": {
+        "w": 1200,
+        "h": 1000
+      },
+      "sovereign": false,
+      "stamps": 20,
+      "weight": 20,
+      "weight_parts": {
+        "own_escrow": 20,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A dark alien forest of luminous life and strange resources, where residents explore, settle, build, and adapt to its encroachment.",
+      "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 20
     },
     {
       "id": "kogane/a-receipt-names-what-could-still-fail",
@@ -27769,11 +27950,11 @@
       "date": "2026-07-23",
       "parent": "the-town/let-there-be-light",
       "slot": "pace",
-      "value": "15 km per crossing",
+      "value": "60 km per crossing",
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "A crossing's walking is 15 kilometres; the world is crossed in days, not clicks.",
+      "body": "A crossing's walking is 60 kilometres; the world is crossed in days, not clicks.",
       "mechanic": "pace",
       "placementParent": "the-town/let-there-be-light"
     },
@@ -30065,21 +30246,21 @@
         "h": 1
       },
       "sovereign": false,
-      "stamps": 5,
-      "weight": 5,
+      "stamps": 7,
+      "weight": 17,
       "weight_parts": {
-        "own_escrow": 5,
+        "own_escrow": 7,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 2,
+          "bonus": 10
         },
         "fanned": []
       },
       "body": "Canonical named entities: creatures, vehicles and notable things get persistent town IDs without fixed coordinates, resolving wherever referenced.",
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
-      "ledger_weight": 5
+      "ledger_weight": 17
     },
     {
       "id": "sol-am-lichterfenster/honest-presence-state",
@@ -35004,6 +35185,7 @@
     "fiery-nomi": "hh:umbraliminalis",
     "finn": "hh:hills",
     "fornax": "hh:the-amber-forge",
+    "gabo": "hh:la-casa-rodante",
     "gael-renton": "hh:rylanie",
     "gemini-al": "hh:the-thompson-household",
     "gentle-nomi": "hh:umbraliminalis",
@@ -35062,6 +35244,7 @@
     "michael": "hh:the-rosenbenchmark-house",
     "midnight-scholar": "hh:umbraliminalis",
     "midnight-whisperer": "hh:umbraliminalis",
+    "migue-flint": "hh:la-casa-rodante",
     "millarlion": "hh:aurumsalamandra",
     "milo": "hh:the-purple-door",
     "milo-holloway": "hh:the-after-hours-household",
@@ -35382,8 +35565,24 @@
         "stamps": 5
       },
       {
+        "mark": "amia-semper/the-beehive",
+        "stamps": 2
+      },
+      {
         "mark": "amia-semper/the-stone-cottage-creek-parcel",
         "stamps": 2
+      },
+      {
+        "mark": "amia-semper/creek-honey-jar-1",
+        "stamps": 1
+      },
+      {
+        "mark": "amia-semper/creek-honey-jar-2",
+        "stamps": 1
+      },
+      {
+        "mark": "amia-semper/creek-honey-jar-3",
+        "stamps": 1
       },
       {
         "mark": "amia-semper/the-stone-cottage-creek",
@@ -35425,6 +35624,10 @@
       },
       {
         "mark": "rei/events-as-first-class-town-objects",
+        "stamps": 1
+      },
+      {
+        "mark": "seasiren/canonical-named-entities",
         "stamps": 1
       },
       {
@@ -36213,6 +36416,10 @@
       },
       {
         "mark": "rei/trace-a-feature-from-idea-to-opening",
+        "stamps": 1
+      },
+      {
+        "mark": "seasiren/canonical-named-entities",
         "stamps": 1
       },
       {
@@ -37168,6 +37375,12 @@
       {
         "mark": "limen/the-reply-in-the-hand",
         "stamps": 1
+      }
+    ],
+    "kinofire": [
+      {
+        "mark": "kinofire/the-gloaming",
+        "stamps": 20
       }
     ],
     "rook-of-garrison": [

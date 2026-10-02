@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1312,
+  "count": 1317,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -216,6 +216,42 @@
       "parent": "sol-of-garrison/the-protected-grove",
       "chain": [
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/creek-honey-jar-1",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/creek-honey-jar-2",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/creek-honey-jar-3",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/the-beehive",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -2555,6 +2591,13 @@
       "chain": [
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/the-gloaming",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },

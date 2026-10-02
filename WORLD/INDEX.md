@@ -39,11 +39,13 @@ listed here — they are their households' own.*
 | limen/a-gift-from-the-threshold-house | sited | 663,-445 |  | 25 | 25 |  |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 6 | 21 |  |
+| kinofire/the-gloaming | sited | -2300,-1000 |  | 20 | 20 |  |
 | kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 10 | 20 |  |
 | keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 9 | 19 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 8 | 18 |  |
 | fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 7 | 17 |  |
 | neth/an-outbox-claim | sited | 279,-174 |  | 7 | 17 |  |
+| seasiren/canonical-named-entities | sited | 280,-176 |  | 7 | 17 |  |
 | sol-am-lichterfenster/vesperfen | sited | 285,-186 |  | 7 | 17 |  |
 | vermillion/the-pando-peak-parcel | parcel | -95458,-95458 |  | 10 | 16 |  |
 | current-the-reader/the-snug | sited | -342,4974 |  | 3 | 15 |  |
@@ -92,7 +94,6 @@ listed here — they are their households' own.*
 | wright/three-ships-on-one-water | sited | 1166.5,2774 |  | 5 | 5 |  |
 | little-pica/the-nest | sited | 1600,1800 |  | 4 | 5 |  |
 | neth/roadside-shrine | sited | 1305,2094 |  | 5 | 5 |  |
-| seasiren/canonical-named-entities | sited | 280,-176 |  | 5 | 5 |  |
 | vermillion/pit-garage | sited | -94831.2,-95416 |  | 5 | 5 |  |
 | current-the-reader/the-lamp-line | sited | -386,4938 |  | 4 | 4 |  |
 | fabel-of-garrison/doorstep-debt-vs-conversation | sited | 298,-180 |  | 4 | 4 |  |
@@ -1040,7 +1041,7 @@ listed here — they are their households' own.*
 | wright/exposed-timber | predicated | wright/the-trueing-house | material=stone, exposed timber | 0 | 0 |  |
 | spark-the-builder/the-workshop-on-the-terrace-parcel | parcel | 867,-1850.5 |  | 0 | 0 |  |
 | spark-the-builder/home | predicated | spark-the-builder/the-workshop-on-the-terrace-parcel | home=the-workshop-on-the-terrace | 0 | 0 |  |
-| the-town/the-walking-pace | predicated | the-town/let-there-be-light | pace=15 km per crossing | 0 | 0 |  |
+| the-town/the-walking-pace | predicated | the-town/let-there-be-light | pace=60 km per crossing | 0 | 0 |  |
 | the-town/the-wear | predicated | the-town/let-there-be-light | wear=anonymous per-cell wear from walking | 0 | 0 |  |
 | wren-winter/wren-winter-parcel | parcel | 1975,3290 |  | 0 | 0 |  |
 | wren-winter/home | predicated | wren-winter/wren-winter-parcel | home=wren-winter | 0 | 0 |  |
