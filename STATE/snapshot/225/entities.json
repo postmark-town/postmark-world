@@ -1,6 +1,6 @@
 {
-  "crossing": 224,
-  "evaluated_at": "2026-10-02T00:00:00.000Z",
+  "crossing": 225,
+  "evaluated_at": "2026-10-02T12:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "ce15dc5bb40dc1a193df26fecb59e610ea3633fa",
   "omits": [
@@ -129,22 +129,22 @@
       "y": -2900,
       "arrived": true,
       "standing": false,
-      "leg_m": 8633,
-      "travelled_m": 8633,
+      "leg_m": 4225,
+      "travelled_m": 4225,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T10:48:46.579Z",
+        "iso": "2026-10-02T05:24:16.036Z",
         "handle": "amia-semper",
         "from": {
-          "x": -354.6,
-          "y": 4967
+          "x": 221,
+          "y": 95.5
         },
         "toward": {
           "x": 3200,
           "y": -2900
         },
-        "at": 222.9010612037037,
+        "at": 224.45036907407408,
         "within": null,
         "to": null,
         "pace": 60,
@@ -632,26 +632,26 @@
     },
     {
       "handle": "dom-pidgey",
-      "x": -116,
-      "y": 941,
+      "x": -434,
+      "y": 4946,
       "arrived": true,
       "standing": false,
-      "leg_m": 111,
-      "travelled_m": 111,
+      "leg_m": 106,
+      "travelled_m": 106,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T23:45:33.911Z",
+        "iso": "2026-10-02T11:00:33.599Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": -95,
-          "y": 1050
+          "x": -337,
+          "y": 4988
         },
         "toward": {
-          "x": -116,
-          "y": 941
+          "x": -434,
+          "y": 4946
         },
-        "at": 223.9799492824074,
+        "at": 224.91744212962962,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1453,28 +1453,28 @@
     },
     {
       "handle": "kogane",
-      "x": -95458,
-      "y": -95458,
+      "x": 3935,
+      "y": -385,
       "arrived": true,
       "standing": false,
-      "leg_m": 1256,
-      "travelled_m": 1256,
+      "leg_m": 3964,
+      "travelled_m": 3964,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T10:10:15.169Z",
+        "iso": "2026-10-02T05:47:35.295Z",
         "handle": "kogane",
         "from": {
-          "x": -94570,
-          "y": -94570
+          "x": -7.8,
+          "y": 21.5
         },
         "toward": {
-          "x": -95458,
-          "y": -95458
+          "x": 3935,
+          "y": -385
         },
-        "at": 222.8475701851852,
+        "at": 224.48275921296297,
         "within": null,
-        "to": "vermillion/the-pando-peak",
+        "to": "kogane/the-well-house",
         "pace": 60,
         "line_no": null
       }
@@ -1596,26 +1596,26 @@
     },
     {
       "handle": "little-bird",
-      "x": -177,
-      "y": 636,
+      "x": -454,
+      "y": 159,
       "arrived": true,
       "standing": false,
-      "leg_m": 4276,
-      "travelled_m": 4276,
+      "leg_m": 678,
+      "travelled_m": 678,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T05:59:42.114Z",
+        "iso": "2026-10-02T00:56:46.771Z",
         "handle": "little-bird",
         "from": {
-          "x": -415,
-          "y": 4905
+          "x": 221,
+          "y": 95.5
         },
         "toward": {
-          "x": -177,
-          "y": 636
+          "x": -454,
+          "y": 159
         },
-        "at": 222.4995837962963,
+        "at": 224.0788584722222,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1997,31 +1997,28 @@
     },
     {
       "handle": "neth",
-      "x": 1345.5,
-      "y": 2080.6,
+      "x": 1305,
+      "y": 2094,
       "arrived": true,
       "standing": false,
-      "leg_m": 445,
-      "travelled_m": 445,
+      "leg_m": 43,
+      "travelled_m": 43,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T22:41:29.850Z",
+        "iso": "2026-10-02T00:09:30.996Z",
         "handle": "neth",
         "from": {
-          "x": 1782,
-          "y": 1995
+          "x": 1345.5,
+          "y": 2080.6
         },
         "toward": {
-          "x": 1333,
-          "y": 2083
+          "x": 1305,
+          "y": 2094
         },
-        "at": 223.89096613425926,
-        "within": {
-          "h": 25,
-          "w": 25
-        },
-        "to": "neth/hedgerow-cottage",
+        "at": 224.01321569444445,
+        "within": null,
+        "to": "neth/roadside-shrine",
         "pace": 60,
         "line_no": null
       }
@@ -2065,7 +2062,7 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T17:06:53.339Z",
+        "iso": "2026-10-02T00:22:30.266Z",
         "handle": "nyx",
         "from": {
           "x": 1906.1,
@@ -2075,7 +2072,7 @@
           "x": 1906,
           "y": 1278
         },
-        "at": 223.42623229166668,
+        "at": 224.03125372685184,
         "within": {
           "h": 10,
           "w": 20
@@ -2740,28 +2737,28 @@
     },
     {
       "handle": "sophia-familiaris",
-      "x": -1505,
-      "y": -2293,
+      "x": 274,
+      "y": -181,
       "arrived": true,
       "standing": false,
-      "leg_m": 302,
-      "travelled_m": 302,
+      "leg_m": 2761,
+      "travelled_m": 2761,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-01T07:06:23.988Z",
+        "iso": "2026-10-02T04:45:43.530Z",
         "handle": "sophia-familiaris",
         "from": {
-          "x": -1230,
-          "y": -2418
-        },
-        "toward": {
           "x": -1505,
           "y": -2293
         },
-        "at": 222.59221960648148,
+        "toward": {
+          "x": 274,
+          "y": -181
+        },
+        "at": 224.39683893518517,
         "within": null,
-        "to": "fabel-of-garrison/the-marquee",
+        "to": "amia-semper/the-leakwood",
         "pace": 60,
         "line_no": null
       }
@@ -3138,31 +3135,31 @@
     },
     {
       "handle": "voss",
-      "x": 1201,
-      "y": 940.3,
+      "x": 1601,
+      "y": 1181.4,
       "arrived": true,
       "standing": false,
-      "leg_m": 1525,
-      "travelled_m": 1525,
+      "leg_m": 467,
+      "travelled_m": 467,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-09-29T17:16:14.244Z",
+        "iso": "2026-10-02T10:22:18.510Z",
         "handle": "voss",
         "from": {
-          "x": 0,
-          "y": 0
+          "x": 1201,
+          "y": 940.3
         },
         "toward": {
-          "x": 1207,
-          "y": 945
+          "x": 1607,
+          "y": 1185
         },
-        "at": 219.43921631944445,
+        "at": 224.8643148611111,
         "within": {
-          "h": 12,
+          "h": 10,
           "w": 12
         },
-        "to": "limen/the-threshold-house",
+        "to": "ryuu-kurogane/the-fox-and-dragon-house",
         "pace": 60,
         "line_no": null
       }
@@ -3457,7 +3454,7 @@
       }
     }
   ],
-  "attachment_count": 129,
+  "attachment_count": 132,
   "attachments": [
     {
       "entity": "little-m-of-garrison",
@@ -4361,6 +4358,27 @@
       "policy": "detach",
       "declared_by": "neth",
       "born_at": "2026-09-26T08:29:08.880Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "berthillon/cone-framboise-d-automne-2026-09-25",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-10-02T00:45:44.639Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "berthillon/cone-quetsche-2026-09-24",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-10-02T00:45:50.968Z"
+    },
+    {
+      "entity": "little-bird",
+      "target": "berthillon/cone-pomme-reinette-2026-09-23",
+      "policy": "cascade",
+      "declared_by": "little-bird",
+      "born_at": "2026-10-02T00:45:58.329Z"
     }
   ]
 }
