@@ -7,6 +7,8 @@
 //
 //   node tools/world-root-gen.mjs            # write WORLD/marks/let-there-be-light/**
 //   node tools/world-root-gen.mjs --dry      # print what it would write
+//   node tools/world-root-gen.mjs --law      # ONLY the root's four law predicates
+//                                            # (fog, fall, pace, wear) — see the frame gate
 //
 // RULINGS THIS OBEYS:
 // - The root mark is `let-there-be-light`: by: the-town, tier: constitution,
@@ -32,6 +34,7 @@ import { COORDS_FIELD, COORDS_RELATIVE, parseRecord } from "./marks-fold.mjs";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 const DRY = process.argv.includes("--dry");
+const LAW_ONLY = process.argv.includes("--law");
 const SKELETON = join(ROOT, "WORLD/skeleton.json");
 const ALL_MARKS = join(ROOT, "WORLD/marks");
 const MARKS_ROOT = join(ROOT, "WORLD/marks/let-there-be-light");
@@ -48,8 +51,13 @@ const skeleton = JSON.parse(readFileSync(SKELETON, "utf8"));
 // mark's offset as a world position, and (2) plant relocated terrain at world
 // numbers inside a parent's frame. Both would print success. So it stops here
 // instead, and says what it would take to let it run.
+//
+// `--law` IS FRAME-SAFE, and is the one run allowed past this gate (POS-223,
+// 2026-10-01). It writes only the root's four law predicates, and a predicate
+// carries no `at:` and no `extent:` — no number in any frame — so neither
+// failure above can happen: the root's record is not touched, and no terrain is.
 const ROOT_RECORD = join(MARKS_ROOT, "mark.md");
-if (existsSync(ROOT_RECORD)
+if (!LAW_ONLY && existsSync(ROOT_RECORD)
   && new RegExp(`^${COORDS_FIELD}:\\s*${COORDS_RELATIVE}\\s*$`, "m").test(readFileSync(ROOT_RECORD, "utf8"))) {
   console.error(`world-root-gen: REFUSING — this tree declares ${COORDS_FIELD}: ${COORDS_RELATIVE} and this generator still writes world coordinates.
 
@@ -223,7 +231,8 @@ const worldExtent = 320000; // ~±160 km: contains the on-map world and the far 
 // mark.md in place, so resident marks nested under a terrain mark (e.g. finn's
 // home under the-still-reach) are preserved. (A feature removed from the skeleton
 // leaves a stale mark.md — a rare manual cleanup, never worth deleting a subtree.)
-writeRootAndTerrain();
+if (LAW_ONLY) writeRootLaw();
+else writeRootAndTerrain();
 
 function allFeatures() {
   return [...(skeleton.features ?? []), ...(skeleton.far_features ?? [])];
@@ -236,6 +245,12 @@ function writeRootAndTerrain() {
     at: { x: 0, y: 0 }, extent: { w: worldExtent, h: worldExtent }, mechanic: "light",
   }, "Let there be light. Postmark's light comes from the northeast and dies in the southwest — the whole world its extent, every mark a child of the light.");
 
+  writeRootLaw();
+
+  writeTerrain();
+}
+
+function writeRootLaw() {
   // world-law predicates on the root (07-23: EVERYTHING diegetic is a mark; the
   // mechanic: field points at the machinery that keeps each law true). Values are
   // EXTRACTED from the skeleton's own numbers — never hand-typed twice.
@@ -258,7 +273,9 @@ function writeRootAndTerrain() {
     kind: "predicated", by: "the-town", tier: "constitution", date: LAW_DATE,
     slot: "wear", value: "anonymous per-cell wear from walking", mechanic: "wear",
   }, "Where feet repeat, a path appears. The record keeps the wear, never the walker.");
+}
 
+function writeTerrain() {
   // terrain marks, one per feature, directly under root
   for (const f of skeleton.features ?? []) {
     if (TRANSFERRED.has(f.id)) { skipped.push([f.id, TRANSFERRED.get(f.id)]); continue; } // spoken for

@@ -221,10 +221,10 @@ test("ancestor exclusion happens before the budget slice, so it costs no alongsi
   assert.ok(!inv.alongside.some((m) => m.id === "hh/the-house"), "the parent took none of those seats");
 });
 
-test("walk spends crossings at the ~15 km dial and records wear WITHOUT names", () => {
+test("walk spends crossings at the 60 km dial and records wear WITHOUT names", () => {
   const w = buildWorld({ crossing: 20 });
   const res = walk({ x: 0, y: 0, name: "someone" }, "NW", 30000, w);
-  assert.equal(res.crossings, 2, "30 km / 15 km per crossing = 2 crossings");
+  assert.equal(res.crossings, 0.5, "30 km / 60 km per crossing = half a crossing (008b; POS-223)");
   assert.ok(res.wearDelta.length > 0);
   for (const cell of res.wearDelta) {
     assert.deepEqual(Object.keys(cell).sort(), ["wear", "x", "y"], "wear carries only place + count — never a holder name");
