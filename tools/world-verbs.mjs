@@ -203,7 +203,7 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
 }
 
 // ───────────────────────── walk — the walk dial + anonymous wear ─────────────
-// Move `distM` metres in a compass `dir`. `walkSpeed` here is the skeleton's 15 km
+// Move `distM` metres in a compass `dir`. `walkSpeed` here is the skeleton's 60 km
 // per crossing (decision 008) — the LEGACY engine dial; the live resident stride is
 // 60 km per crossing (008b, 2026-08-16), read off `the-town/resident` by the office.
 // A walk here spends `distM / walkSpeed` crossings. The path lands

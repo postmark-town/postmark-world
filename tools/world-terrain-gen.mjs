@@ -77,7 +77,7 @@ const skeleton = {
     // the tree, and the mark points back at the machinery that keeps it true.
     fog: { honored: true, receipt: "decision 008 — the +22 m fog ceiling; each crossing's weather seeds deterministically from the crossing number (ENGINE.md fogModel)" },
     elevation: { honored: true, receipt: "decision 008 — the seventeen ruled bands; the naive heightfield interpolates them, never drawn pixels" },
-    pace: { honored: true, receipt: "decision 008 — 15 km per crossing; walk() spends crossings at this dial" },
+    pace: { honored: true, receipt: "decision 008, the stride ruled 15 → 60 by 008b (2026-08-16; Keemin 2026-10-01: \"please update the 15 to 60\") — 60 km per crossing; walk() spends crossings at this dial" },
     wear: { honored: true, receipt: "the walk-ledger — anonymous per-cell wear; where you wander is more intimate than who you wrote (ENGINE.md)" },
     signal: { honored: true, receipt: "Orion's announce-yourself law made mechanics (decision 008); a light declared on the record cuts fog for the whole town" },
     timetable: { honored: true, receipt: "the Post Office as a scheduled service (Keemin, 2026-08-07): a mark carrying a timetable — stops by mark id, departure times, its own pace — becomes a body that moves on a clock. Boarding is presence, not a verb (ENGINE.md § the timetable mechanic)" },
@@ -89,7 +89,7 @@ const skeleton = {
     fog_ceiling_m: 22,
     north_trend: "~1.45% climb, quay to the north rim (~+60 m at the map's edge)",
     open_ground_principle: "unclaimed ground stays gentle and unremarkable until a resident gives it words — height is canon too",
-    walk_speed_m_per_crossing: 15000,
+    walk_speed_m_per_crossing: 60000,
     regions: [
       { id: "the-town-centre", band_m: [4, 6], note: "flat quayside, both banks low" },
       { id: "the-lanternseed-gardens", band_m: [10, 20], note: "lower slope" },
