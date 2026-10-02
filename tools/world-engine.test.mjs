@@ -253,10 +253,36 @@ test("the horizon is told FROM the far:true mark — Pando is a mark-cell, not a
   const pando = e.fov.far.find((f) => f.label === "Pando Peak");
   assert.ok(pando, "Pando is on the horizon");
   assert.equal(pando.id, "the-town/pando-peak", "its identity is the MARK, not terrain:pando-peak");
-  assert.equal(pando.distM, 135000, "precise distance still comes from the skeleton feature via feature:");
-  assert.equal(pando.heightM, 4000, "precise height too — the mark is the claim, the skeleton the measurement");
+  // POS-222 (Keemin, 2026-10-02): distance and bearing are MEASURED from you to the
+  // mark's own `at`; the skeleton's 135000 was surveyed from the Origin.
+  assert.equal(pando.distM, Math.round(Math.hypot(95458, 95458)), "the distance is measured from the observer to the mark");
+  assert.equal(pando.heightM, 4000, "height still comes from the skeleton feature via feature:");
   const e2 = openYourEyes({ x: 0, y: 0 }, w, { crossing: 19 });
   assert.equal(e.tell(), e2.tell(), "the telling still replays byte-identical");
+});
+
+// POS-222 (Kogane, 2026-09-21): standing at (−94570, −94570), `nearby` answered
+// the-town/pando-peak at 135,000 m and vermillion/the-pando-peak, the same summit
+// at the same point, at 1,256 m. A far mark took its distance and bearing from
+// the skeleton feature, which was surveyed from the Origin. Keemin ruled
+// 2026-10-02: measured from you, like every mark. Two marks at one point answer
+// one distance and one bearing.
+test("a far mark with a skeleton feature and a plain mark at one point answer one distance and one bearing (POS-222)", () => {
+  const peak = { x: -95458, y: -95458 };
+  const terrain = { far_features: [{ id: "pando-peak", label: "Pando Peak", bearing: "NW", distance_m: 135000, height_m: 4000, receipt: "surveyed from the Origin" }], features: [], elevation: {} };
+  const w = worldOf([
+    { id: "the-town/pando-peak", kind: "sited", household: "the-town", far: true, feature: "pando-peak", at: peak, extent: { w: 4000, h: 4000 }, weight: 0, top_m: 4000 },
+    { id: "vermillion/the-pando-peak", kind: "sited", household: "vermillion", at: peak, extent: { w: 3600, h: 3600 }, weight: 0, top_m: 4000 },
+  ], terrain);
+  const fov = fieldOfView({ x: -94570, y: -94570 }, w, { crossing: 0 });
+  const far = fov.far.find((m) => m.id === "the-town/pando-peak");
+  const plain = fov.carried.find((m) => m.id === "vermillion/the-pando-peak");
+  assert.ok(far && plain, `both marks must be seen: far=${!!far} plain=${!!plain}`);
+  assert.equal(far.distM, plain.distM, "one point, one distance");
+  assert.equal(far.distM, 1256, "Kogane's measured 1,256 m");
+  assert.equal(far.bearing, plain.bearing, "one point, one bearing");
+  assert.equal(far.label, "Pando Peak", "the skeleton still names it");
+  assert.equal(far.heightM, 4000, "and still gives its height");
 });
 
 test("angular size uses the coverage silhouette for a points: mark; a rect is unchanged (rung 3)", () => {
