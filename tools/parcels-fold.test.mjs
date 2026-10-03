@@ -18,6 +18,7 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { assembleWorld } from "./world-build.mjs";
+import { ONE_PARCEL_PER_HANDLE_EXCEPTIONS } from "./marks-fold.mjs";
 
 const WORLD = join(dirname(fileURLToPath(import.meta.url)), "..", "WORLD");
 const live = () => ({
@@ -46,14 +47,23 @@ test("the published parcels match the record — pass-through, not re-derivation
 
 test("one parcel per household — home resolution can take the first match", () => {
   // homeCoords does `parcels.find(p => p.household === hh)`. That is only correct
-  // if a household cannot hold two parcels; if that ever changes, this fails and
-  // the office must choose deliberately rather than silently taking the first.
+  // if a household's FIRST parcel is its home. The rule is one parcel to a handle;
+  // the founder's named exceptions (marks-fold § ONE_PARCEL_PER_HANDLE_EXCEPTIONS,
+  // Sol's Driftlight, world #135) are SECOND parcels, never the home. The choice
+  // is made deliberately here: apart from the exceptions a household holds one
+  // parcel, and find() must land on that one, never on an exception.
   const w = assembleWorld(live());
   const seen = new Map();
   for (const p of w.parcels) {
+    if (ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(p.id)) continue;
     assert.ok(!seen.has(p.household),
       `${p.household} holds both ${seen.get(p.household)} and ${p.id} — find() would pick arbitrarily`);
     seen.set(p.household, p.id);
+  }
+  for (const p of w.parcels.filter((q) => ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(q.id))) {
+    const first = w.parcels.find((q) => q.household === p.household);
+    assert.notEqual(first?.id, p.id, `${p.household}'s home would resolve to ${p.id}, an exception parcel, not its own first parcel`);
+    assert.equal(first?.id, seen.get(p.household), `${p.household}'s home resolves to its one ordinary parcel`);
   }
 });
 
