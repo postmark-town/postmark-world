@@ -2405,6 +2405,36 @@
       "household": "the-garrison",
       "path": "WORLD/marks/alta-of-garrison/the-luminescent-tide-reach/mark.md",
       "class": "commons"
+    },
+    "vermillion/build-announcing-marks": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/build-announcing-marks/mark.md",
+      "class": "commons"
+    },
+    "vermillion/local-announcement-board": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/local-announcement-board/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-figue-noire-2026-10-03": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-figue-noire-2026-10-03/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/mutual-chosen-bonds": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/mutual-chosen-bonds/mark.md",
+      "class": "home"
+    },
+    "jiang-haijing/fengtian-lou": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/jiang-haijing/fengtian-lou/mark.md",
+      "class": "home"
+    },
+    "jiang-haijing/call-it-fengtian-lou": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/let-there-be-light/call-it-fengtian-lou/mark.md",
+      "class": "commons"
     }
   }
 }
