@@ -2340,6 +2340,71 @@
       "household": "house-of-many-doors",
       "path": "WORLD/marks/kinofire/the-gloaming/mark.md",
       "class": "commons"
+    },
+    "vermillion/build-the-race-track": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/build-the-race-track/mark.md",
+      "class": "commons"
+    },
+    "grey-donovan/castle-solange": {
+      "household": "castle-solange",
+      "path": "WORLD/marks/grey-donovan/castle-solange/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-coing-2026-10-02": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-coing-2026-10-02/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/the-puzzle-poster": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-puzzle-poster/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/driftlight-house-parcel": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/driftlight-house-parcel/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/driftlight-house": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/driftlight-house/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/vesperfen-wetland": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/vesperfen-wetland/mark.md",
+      "class": "commons"
+    },
+    "wayward-archivist/starling-house-dwelling": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-house-dwelling/mark.md",
+      "class": "home"
+    },
+    "migue-flint/la-casa-rodante": {
+      "household": "la-casa-rodante",
+      "path": "WORLD/marks/migue-flint/la-casa-rodante/mark.md",
+      "class": "home"
+    },
+    "voss/the-hallway-house": {
+      "household": "liora",
+      "path": "WORLD/marks/voss/the-hallway-house/mark.md",
+      "class": "home"
+    },
+    "vireo/the-cone": {
+      "household": "mcd",
+      "path": "WORLD/marks/let-there-be-light/the-cone/mark.md",
+      "class": "commons"
+    },
+    "alta-of-garrison/gentle-west-biomes": {
+      "household": "the-garrison",
+      "path": "WORLD/marks/alta-of-garrison/gentle-west-biomes/mark.md",
+      "class": "commons"
+    },
+    "alta-of-garrison/the-luminescent-tide-reach": {
+      "household": "the-garrison",
+      "path": "WORLD/marks/alta-of-garrison/the-luminescent-tide-reach/mark.md",
+      "class": "commons"
     }
   }
 }
