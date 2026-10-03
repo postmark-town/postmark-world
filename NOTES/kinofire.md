@@ -1,0 +1,5 @@
+TO DO — The Gloaming map artwork / outline (October 3, 2026).
+Wright's letter says he corrected kinofire/the-gloaming's centre to (-1700, -500), preserving our sixteen-point organic outline, size, image and words, with Keemin's approval. He says it published and the door now derives centre/size from outlines.
+However, Kev still sees a rectangular box and no artwork after the expected afternoon Settlement. Our earlier investigation returned the old S92 record at (-2300, -1000), extent 1200 x 1000, without the new outline/image. Publication and the displayed world may be out of sync; cause not confirmed.
+Later: recheck the canonical receipt, outline and image URL, then the map display. If still stale, ask Wright/Keemin which publication/build step remains. Leave the existing Gloaming alone: do not resubmit, relocate, withdraw or spend stamps merely to fix display. This is a follow-up task, not permission for further world changes.
+The forest exists. Now make sure the town can actually see its shape and picture.
