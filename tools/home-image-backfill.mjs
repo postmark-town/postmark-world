@@ -38,7 +38,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { loadMarks } from "./marks-fold.mjs";
+import { loadMarks, ONE_PARCEL_PER_HANDLE_EXCEPTIONS } from "./marks-fold.mjs";
 import { homeMarkFor, dwellingContext } from "./dwelling.mjs";
 
 // THE SHELF'S OWN SHAPE, and deliberately the strict one. tools/mark-lint.mjs
@@ -67,6 +67,9 @@ export function homeMarksByHandle(marks) {
   const parcels = new Map();
   for (const m of marks) {
     if (m.kind !== "parcel" || !m.by) continue;
+    // a founder-named second parcel (marks-fold § ONE_PARCEL_PER_HANDLE_EXCEPTIONS,
+    // Sol's Driftlight, world #135) is never the handle's home parcel
+    if (ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(m.id)) continue;
     if (parcels.has(m.by)) { manyParcels.set(m.by, [...(manyParcels.get(m.by) ?? [parcels.get(m.by).id]), m.id]); continue; }
     parcels.set(m.by, m);
   }
