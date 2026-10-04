@@ -887,7 +887,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // other rules this loop decides that move with it.
   for (const mk of parcelsInClaimOrder(byId)) {
     const r = rect(mk); r.w = r.w || dials.parcel_w; r.h = r.h || dials.parcel_h;
-    if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: "household already holds a parcel (relocation = replace, not add)" }); continue; }
+    if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: "this resident handle already holds a parcel (one parcel per handle, not per household; relocation = replace, not add)" }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
     if (String(mk.date ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
@@ -1816,7 +1816,7 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
       // households. Replacing the household's own parcel is a relocation, not a
       // second claim.
       if (heldByHh.has(handle) && !mk._replacing && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) {
-        errors.push({ mark: mk.id, error: "household already holds a parcel (relocation = replace, not add)" });
+        errors.push({ mark: mk.id, error: "this resident handle already holds a parcel (one parcel per handle, not per household; relocation = replace, not add)" });
         continue;
       }
       const held = countByCred.get(cred) ?? 0;

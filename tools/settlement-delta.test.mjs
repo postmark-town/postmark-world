@@ -296,7 +296,7 @@ test("THE RULED EXCEPTION — a household whose STALE TREE carries residue now S
   // THE FIXTURE IS REAL, or the assertion below is decoration: the sketchbook's
   // own tree must genuinely fold with an error, which is what the whole-tree
   // path would have quarantined it for.
-  assert.throws(() => foldRef(repo, "draft/house-a", []), /household already holds a parcel/,
+  assert.throws(() => foldRef(repo, "draft/house-a", []), /resident handle already holds a parcel/,
     "the sketchbook's stale tree really is inadmissible — that is the premise");
 
   const stakesPath = join(scratch("delta-stakes-"), "s.json");
@@ -328,7 +328,7 @@ test("THE OTHER HALF — a household whose PUBLISHED delta is genuinely bad stil
   const out = settlementSweep({ repo, stakesPath, mainBranch: "main" });
   assert.equal(out.quarantined.length, 1, "the bad row is offered, so the sketchbook is set aside");
   assert.equal(out.quarantined[0].household, "house-a");
-  assert.match(out.quarantined[0].detail, /household already holds a parcel/,
+  assert.match(out.quarantined[0].detail, /resident handle already holds a parcel/,
     "and the refusal is the fold's own sentence, not a new one invented by the fast path");
   // THE QUARANTINE IS STILL ONE SKETCHBOOK WIDE. house-b publishes nothing here
   // for its own lawful reason — its mark is a guest on alice's ground, so it
