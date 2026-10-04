@@ -57,9 +57,9 @@ ONTOLOGY question, never an economy question. The economy-parked rule does
 not reach it: building the read surfaces and machinery that make canon
 legible requires no economy reopening.
 
-**Roles from seniority, not containment — the proposed successor to
-parent-consent (2026-08-25, the founder's sitting; recorded here so it is
-never relitigated).** §9.2's parent-consent coupling assigned the `m` by
+**Roles from seniority, not containment — the successor to
+parent-consent (proposed 2026-08-25, the founder's sitting; RULED 2026-10-04;
+recorded here so it is never relitigated).** §9.2's parent-consent coupling assigned the `m` by
 CONTAINMENT — a role hung on geography, which the freeze made a derived view:
 a consent relation that recomputes with the fold is one nobody can stand on.
 The proposed successor: **contact is geometric, seniority is temporal, and
@@ -76,8 +76,14 @@ not containment."* Parent-consent's density mathematics stand unchanged; only
 the role assignment is proposed to move. Two calls reserved for the sitting
 that walks it: the fan-up target under positive `m` (proposed: the senior's
 whole extent, diffuse, keeping the anti-confetti rule), and per-mark vs
-per-cell seniority (proposed: per-cell). Status: PROPOSED, awaiting the
-founder's sitting — like incumbency-holds-ties above, and by the same hand.
+per-cell seniority (proposed: per-cell). **Status: RULED (Darko, 2026-10-04):** *"the veto capability should always lie
+with the chronological precedent that is geometrically either the parent or
+child or is generally touched by the mark that is chronologically coming
+later"*, and for market marks *"the opposition should always be based on
+density"*. Both reserved calls ruled as proposed: seniority is **per-cell**,
+and under positive `m` the fan-up goes to the senior's whole extent,
+**diffusely**. A parcel holder's veto is a different law and is untouched:
+absolute on their parcel whatever came first, the town alone sovereign over it.
 
 ## Granularity
 
