@@ -479,7 +479,7 @@ test("F13 · Mari's parcel stands by the founder's word; the founder's household
 test("F14 · Sol's Driftlight parcel stands by the founder's word beside Das Lichterfenster; another second parcel is still refused", () => {
   // The founder, 2026-10-02, told that S92 refused it under one parcel to a
   // handle: "otherwise we can just special case this for now". CAN FAIL: drop
-  // the entry → the fold refuses Driftlight with "this resident handle already holds a parcel".
+  // the entry → the fold refuses Driftlight with "this resident already holds a parcel".
   assert.match(ONE_PARCEL_PER_HANDLE_EXCEPTIONS.get("sol-am-lichterfenster/driftlight-house-parcel") ?? "",
     /2026-10-02 Keemin.*special case this for now/, "the entry carries the founder's own words, dated");
   const home = P("sol-am-lichterfenster/das-lichterfenster-parcel", "sol-am-lichterfenster", 0, "2026-09-02T00:00:00Z");
@@ -500,12 +500,12 @@ test("F14 · Sol's Driftlight parcel stands by the founder's word beside Das Lic
   assert.match(state.errors[0].error, /already holds a parcel/);
 });
 
-test("F15 · the one-parcel refusal names the rule it enforces: one parcel per HANDLE, not per household (POS-335)", () => {
+test("F15 · the one-parcel refusal names the rule it enforces: one parcel per RESIDENT, three per household (POS-335, POS-368)", () => {
   // Office Hours 2026-10-02, Q10: Sol's household read "household already holds
-  // a parcel" as a one-parcel-per-HOUSEHOLD rule. The check counts handles
-  // (MARKS.md § Parcels, "every resident-handle may hold one parcel"), so the
-  // sentence says so. CAN FAIL: put the old sentence back in either copy.
-  const SENTENCE = "this resident handle already holds a parcel (one parcel per handle, not per household; relocation = replace, not add)";
+  // a parcel" as a one-parcel-per-HOUSEHOLD rule. The check counts residents
+  // (the-town/one-per-resident, Darko 2026-10-04: "One parcel per resident, three
+  // per household"), so the sentence says both. CAN FAIL: put the old sentence back.
+  const SENTENCE = "this resident already holds a parcel; a household may hold up to three, one per resident (the-town/one-per-resident; relocation = replace, not add)";
   const households = { "an-owl": "the-roost", "a-wren": "the-roost" };
   const first = P("an-owl/first-parcel", "an-owl", 0, "2026-07-01T00:00:00Z");
   const second = P("an-owl/second-parcel", "an-owl", 500, "2026-07-02T00:00:00Z");

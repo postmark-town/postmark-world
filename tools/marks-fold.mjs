@@ -608,18 +608,44 @@ export const PARCEL_CAP_EXCEPTIONS = new Map([
   // for a live grant. Found while writing the two entries above.
 ]);
 
-// ONE PARCEL TO A HANDLE has its own exceptions, the founder's word per parcel
-// (the claim cap's map above answers a different rule). An entry lets a resident
-// who already holds a parcel claim one more; the household's claim cap still
-// counts it, so the cap of 3 per household is untouched.
-export const ONE_PARCEL_PER_HANDLE_EXCEPTIONS = new Map([
+// ── THE PARCEL LAW, WRITTEN DOWN (Darko, 2026-10-04; Linear POS-368) ─────────
+//
+// Two law marks in the Keeping Works say what this file enforces, and the test
+// tools/parcel-law.test.mjs holds the code to them:
+//
+//   the-town/claim-cap         value 3: a household holds at most three parcels
+//                              (ruled 2026-07-30, restated 2026-10-04) —
+//                              PARCEL_CLAIM_CAP above must equal it.
+//   the-town/one-per-resident  each parcel belongs to exactly one resident; a
+//                              resident holds at most one — the check below, and
+//                              its sentence names the law.
+//
+// Before 10-04 the cap lived only here, the only written law said "still one
+// parcel to a handle" (household-scope, 08-18), and this sentence said
+// "household already holds a parcel". A ruling is not done until its law mark
+// says it, and the code is tied to the law by a test.
+export const ONE_PER_RESIDENT_LAW = "the-town/one-per-resident";
+export const CLAIM_CAP_LAW = "the-town/claim-cap";
+export const ONE_PER_RESIDENT_REFUSAL =
+  "this resident already holds a parcel; a household may hold up to three, one per resident "
+  + `(${ONE_PER_RESIDENT_LAW}; relocation = replace, not add)`;
+
+// PRIOR ESTATE UNDER ONE PER RESIDENT — a second parcel a resident holds by the
+// founder's word, per parcel (the claim cap's map above answers a different
+// rule). It stands; the household's claim cap still counts it; and it is NEVER
+// anyone's home (Darko, 2026-10-04: Sol's Driftlight House "stands as prior
+// estate … it is never anyone's home") — the homes resolver skips it.
+export const ONE_PER_RESIDENT_PRIOR_ESTATE = new Map([
   ["sol-am-lichterfenster/driftlight-house-parcel",
-    "2026-10-02 Keemin, ~09:0x EDT, told that S92 refused it under one parcel to a handle (Sol's household, "
+    "PRIOR ESTATE, never a home (Darko, 2026-10-04, POS-368: one parcel per resident, three per household; "
+    + "Driftlight stands as prior estate). Granted 2026-10-02 Keemin, ~09:0x EDT, told that S92 refused it under one parcel to a handle (Sol's household, "
     + "herzfunke-husband, has one resident, who already holds das-lichterfenster-parcel): “let's change to 3 "
     + "parcels max per household if it's an easy fix, otherwise we can just special case this for now (as we "
     + "will likely change the logic for this with achievement unlocks anyway)” — special-cased; the household "
     + "cap still counts it (2 of 3)"],
 ]);
+/** The pre-10-04 name of the map above, kept so no reader breaks. */
+export const ONE_PARCEL_PER_HANDLE_EXCEPTIONS = ONE_PER_RESIDENT_PRIOR_ESTATE;
 // The parcel dial (MARKS.md § Parcels; locked at the door 2026-07-31, Keemin:
 // "the resident should not even have to declare an extent"). Seeded prior
 // estate at other sizes stands; the door writes only this.
@@ -851,11 +877,11 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // `1 human = 1 household = N residents = up to N GitHub accounts`. Every CONFLICT
   // rule in this fold scopes to the HOUSEHOLD — sovereignty, rivalry, consent —
   // because a conflict between two of one person's own residents is not a conflict
-  // at all. Exactly one rule stays at handle grain, by written law:
+  // at all. Exactly one rule stays at resident grain, by written law:
   //
-  //   "every resident-handle may hold one parcel"  — MARKS.md § Parcels
+  //   "a resident holds at most one parcel"  — the-town/one-per-resident (10-04)
   //
-  // so one-parcel-per keeps counting handles while the claim cap (3) and
+  // so one-parcel-per keeps counting residents (handles) while the claim cap (3) and
   // everything downstream count households. `by`/`household` on a record stay the
   // handle — that is what a resident is called, and what the telling says out loud
   // ("+3 more of vermillion's") — and the resolved household rides beside it as
@@ -873,7 +899,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   const credHh = (handle) => households?.[handle] ?? `solo:${handle}`;
   for (const mk of byId.values()) mk._cred = credHh(mk.household);
 
-  // admissibility: parcels never overlap (first-in-order wins), one per handle,
+  // admissibility: parcels never overlap (first-in-order wins), one per resident (the-town/one-per-resident),
   // and — the claim cap, ruled 2026-07-30 — at most PARCEL_CLAIM_CAP claims per
   // CREDENTIAL household for parcels dated after the law (prior estate stands);
   // predicated/naming must not target terrain with a rival intent (attach-only is fine —
@@ -887,7 +913,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // other rules this loop decides that move with it.
   for (const mk of parcelsInClaimOrder(byId)) {
     const r = rect(mk); r.w = r.w || dials.parcel_w; r.h = r.h || dials.parcel_h;
-    if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: "this resident handle already holds a parcel (one parcel per handle, not per household; relocation = replace, not add)" }); continue; }
+    if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: ONE_PER_RESIDENT_REFUSAL }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
     if (String(mk.date ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
@@ -1811,12 +1837,12 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
       const r = rect(mk);
       r.w = r.w || dials.parcel_w;
       r.h = r.h || dials.parcel_h;
-      // one parcel per HANDLE, by written law (MARKS.md § Parcels) — the one
-      // rule that stays at handle grain while everything downstream counts
+      // one parcel per RESIDENT, by written law (the-town/one-per-resident,
+      // 2026-10-04) — the one rule that stays at resident grain while everything downstream counts
       // households. Replacing the household's own parcel is a relocation, not a
       // second claim.
       if (heldByHh.has(handle) && !mk._replacing && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) {
-        errors.push({ mark: mk.id, error: "this resident handle already holds a parcel (one parcel per handle, not per household; relocation = replace, not add)" });
+        errors.push({ mark: mk.id, error: ONE_PER_RESIDENT_REFUSAL });
         continue;
       }
       const held = countByCred.get(cred) ?? 0;
