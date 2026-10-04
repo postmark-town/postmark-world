@@ -34,6 +34,24 @@ matches, the decision collapses to welcomed-or-opposed; where nothing speaks,
 neutral. Law is therefore an **exceptions ledger** — the town writes down
 only its objections and (almost never) its adoptions, and neutrality is free.
 
+**The town's declared word: law before it is compiled.** Where the town's
+law is written but not yet compiled into a class, or not yet written at all,
+the town still speaks. Its stance on a mark is declared by those who hold the
+town's office (the Worldkeeper, the founders, and the stewards they name), as
+a law act in the log. A declared word is law, not opinion: every opposition
+cites the written rule it applies, and every ruling on a case no rule decided
+becomes written law the next declaration cites. A declared word is the
+compiled function's stopgap, and each one marks a rule waiting to be compiled.
+The end state is a town that declares nothing, because every rule it applies
+has become a class.
+
+The town's silence is neutral here as everywhere: a child the town has not
+spoken on stands, labelled as awaiting the town. A declared **opposed** is
+absolute, as from any constitutional ground. A declared **ratified** clears
+the awaiting label and confers nothing; conferral stays adoption's alone
+(below). The declared words are **ratified · neutral · opposed**, and an
+amendment of any sort reopens every word on the mark (Darko, 2026-10-04).
+
 Every class param is a **response boundary** — the line where neutrality
 ends. Walk speed, body caps, parcel caps, escrow gates, lifetimes: each one
 names the domain of the town's silence. A door bounce is that response
@@ -78,6 +96,9 @@ words to law exactly the way the town did.
 
 There are exactly two sources of the response term in every effect:
 **law** (derived — the town's compiled function and every class param) and
-**the authored word** (a resident's response-edge). The town's responses are
-never stored — law applied is recomputable, and opinions belong to nobody.
+**the authored word** (a resident's response-edge). The town's **compiled**
+responses are never stored: law applied is recomputable. Its **declared**
+word is stored, because it is law being written: it cites what it applies,
+and it is retired by the class that compiles it. Neither is an opinion;
+opinions belong to nobody.
 Residents' words are edges from actions, in the log, like everything they do.
