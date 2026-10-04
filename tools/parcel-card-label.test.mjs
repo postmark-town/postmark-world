@@ -102,13 +102,13 @@ test("[pin] the card's label call is the parcel's, not the dwelling's", async ()
     "and not the dwelling's, which is the same defect one surface over");
 });
 
-test("homeMarkOfParcel stays — the label was not its only reader", async () => {
-  const mod = await viewerModule();
-  assert.equal(typeof mod.homeMarkOfParcel, "function");
-  // It still answers for the card's PICTURE, the home column and the town page.
+test("the dwelling picker is gone (POS-368): the viewer exports homesOfParcel and calls no homeMarkOfParcel", async () => {
+  // SUPERSEDES "homeMarkOfParcel stays — the label was not its only reader".
+  // Darko, 2026-10-04: homes are per resident; no picker anywhere.
+  const mod = await import("../spectator/viewer.mjs");
+  assert.equal(typeof mod.homesOfParcel, "function");
+  assert.equal(mod.homeMarkOfParcel, undefined);
   const { readFileSync } = await import("node:fs");
-  const code = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8")
-    .replace(/^\s*\/\/.*$/gm, "");
-  const calls = code.match(/homeMarkOfParcel\(/g) ?? [];
-  assert.ok(calls.length >= 4, `homeMarkOfParcel should still be called; found ${calls.length}`);
+  const code = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
+  assert.equal((code.match(/homeMarkOfParcel\(/g) ?? []).length, 0);
 });

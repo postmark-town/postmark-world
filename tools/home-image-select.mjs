@@ -217,7 +217,7 @@ if (isMain) {
     writeFileSync(join(OUT, "files", `${handle}.${rec.format}`), readFileSync(join(TOWN, rec.file)));
 
   const manifest = {
-    _note: "DERIVED from a town clone by tools/home-image-select.mjs — each household's lead HOME image, the file the resident's own page already leads with. Bytes for these entries are staged beside this file in files/<handle>.<format>. Consumed by office/tools/backfill-home-shelf.mjs (the shelf mint) and then tools/home-image-backfill.mjs (the parcel write).",
+    _note: "DERIVED from a town clone by tools/home-image-select.mjs — each household's lead HOME image, the file the resident's own page already leads with. Bytes for these entries are staged beside this file in files/<handle>.<format>. Consumed by office/tools/backfill-home-shelf.mjs (the shelf mint). The parcel write, tools/home-image-backfill.mjs, was deleted 2026-10-04 (POS-368): the picture lives on the household record since w41.",
     generated_from: norm(TOWN),
     counts: {
       handles: handles.length, selected: Object.keys(images).length,

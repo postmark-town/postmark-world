@@ -646,6 +646,21 @@ export const ONE_PER_RESIDENT_PRIOR_ESTATE = new Map([
 ]);
 /** The pre-10-04 name of the map above, kept so no reader breaks. */
 export const ONE_PARCEL_PER_HANDLE_EXCEPTIONS = ONE_PER_RESIDENT_PRIOR_ESTATE;
+
+// THE DECLARED HOME (the-town/declared-home, Darko 2026-10-04). A resident's
+// home word is a `slot: home` predicate of their OWN, filed under one of their
+// household's parcels — the resident's, never the parcel's, so five housemates
+// may each file one on the same parcel. Two consequences live in this file:
+//   · a home word on a parcel outside the author's household is refused, here,
+//     with this sentence (both copies: the whole fold and admitDelta);
+//   · home words never rival each other — their slot key carries the author
+//     (§ slots), because one resident's home is not a rival claim on another's.
+// What a declaration MEANS (handle or mark id, newest valid wins) is read by
+// tools/where-is.mjs § homeOf, the one resolver every surface imports.
+export const DECLARED_HOME_LAW = "the-town/declared-home";
+export const HOME_OUTSIDE_HOUSEHOLD_REFUSAL =
+  `a home is declared only on a parcel of your own household (${DECLARED_HOME_LAW})`;
+const isHomeWord = (mk) => mk?.kind === "predicated" && mk.slot === "home";
 // The parcel dial (MARKS.md § Parcels; locked at the door 2026-07-31, Keemin:
 // "the resident should not even have to declare an extent"). Seeded prior
 // estate at other sizes stands; the door writes only this.
@@ -927,6 +942,13 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     parcelsByCred.set(cred, held + 1);
     if (!parcelRectsByCred.has(cred)) parcelRectsByCred.set(cred, []);
     parcelRectsByCred.get(cred).push(r);
+  }
+  // a home word stands only on a parcel of its author's own household (DECLARED_HOME_LAW)
+  const admittedParcel = new Map(parcels.map((p) => [p.id, p]));
+  for (const mk of byId.values()) {
+    if (!isHomeWord(mk)) continue;
+    const ground = admittedParcel.get(mk.parent);
+    if (ground && credHh(ground.household) !== credHh(mk.household)) errors.push({ mark: mk.id, error: HOME_OUTSIDE_HOUSEHOLD_REFUSAL });
   }
 
   // stakes -> per-mark balances (escrow; negative = withdrawal), effect-next-crossing: tick strictly < current
@@ -1258,7 +1280,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     if (gone.has(mk.id)) continue;
     if (mk.kind === "predicated" || mk.kind === "naming") {
       if (terrainIds.has(mk.parent) && mk.slot !== "name" && mk.kind === "naming") { /* naming terrain allowed */ }
-      const key = `${mk.parent}::${mk.kind === "naming" ? "name" : mk.slot}`;
+      const key = isHomeWord(mk) ? `${mk.parent}::home::${mk.by}` : `${mk.parent}::${mk.kind === "naming" ? "name" : mk.slot}`;
       if (!slots.has(key)) slots.set(key, { values: new Map(), marks: [] });
       const slot = slots.get(key);
       slot.marks.push(mk.id);
@@ -1457,7 +1479,9 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     // rides at the top of the state instead of on every row, deliberately: one
     // copy cannot disagree with itself, and a per-row key would be a second
     // place for the same fact to go stale.
-    parcels: parcels.map(p => ({ id: p.id, household: p.household, at: { x: p._r.x, y: p._r.y }, extent: { w: p._r.w, h: p._r.h } })),
+    parcels: parcels.map(p => ({ id: p.id, household: p.household, at: { x: p._r.x, y: p._r.y }, extent: { w: p._r.w, h: p._r.h },
+      // prior estate under one-per-resident is never anyone's home (POS-368); every reader sees it here
+      ...(ONE_PER_RESIDENT_PRIOR_ESTATE.has(p.id) ? { prior_estate: true } : {}) })),
     // THE PROJECTION THIS FOLD RAN ON, published so readers downstream resolve
     // household grain against the same vocabulary the fold counted with, rather
     // than each deriving a second answer — the ruling of 2026-08-18, and the
@@ -1868,6 +1892,13 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
     if (mk.parent && !base.byId.has(mk.parent) && !candidateIds.has(mk.parent)) {
       errors.push({ mark: mk.id, error: `parent '${mk.parent}' not found` });
       continue;
+    }
+    if (isHomeWord(mk)) {
+      const ground = candidates.find((c) => c.id === mk.parent) ?? base.byId.get(mk.parent);
+      if (ground?.kind === "parcel" && base.credOf(ground.household ?? ground.by) !== cred) {
+        errors.push({ mark: mk.id, error: HOME_OUTSIDE_HOUSEHOLD_REFUSAL });
+        continue;
+      }
     }
 
     // an over-withdrawal against a mark this household is publishing — the

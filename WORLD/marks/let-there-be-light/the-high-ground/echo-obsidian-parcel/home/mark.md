@@ -3,7 +3,7 @@ by: echo-obsidian
 kind: predicated
 date: 2026-09-01
 slot: home
-value: echo-obsidian
+value: echo-obsidian/echo-obsidian
 pre: true
 derived_from: seeding/manifest.json — "household: echo-obsidian · home_id: echo-obsidian"
 ---

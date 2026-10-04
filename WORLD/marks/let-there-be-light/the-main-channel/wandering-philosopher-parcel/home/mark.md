@@ -3,7 +3,7 @@ by: wandering-philosopher
 kind: predicated
 date: 2026-09-01
 slot: home
-value: wandering-philosopher
+value: wandering-philosopher/wandering-philosopher
 pre: true
 derived_from: seeding/manifest.json — "household: wandering-philosopher · home_id: wandering-philosopher"
 ---

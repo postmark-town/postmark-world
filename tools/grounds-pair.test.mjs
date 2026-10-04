@@ -27,9 +27,12 @@ function divergentGroundsPairs(marks) {
   const out = [];
   for (const p of marks) {
     if (p.kind !== "parcel" || !p.at) continue;
-    const homeEdge = marks.find((m) => m.kind === "predicated" && m.slot === "home" && m._parentMarkId === p.id);
-    if (!homeEdge || !homeEdge.value) continue;
-    const house = byId.get(`${p.by}/${homeEdge.value}`);
+    // the HOLDER's own home word (POS-368: homes are per resident, and a housemate's
+    // house stands anywhere on the shared parcel — this law is about the holder's pair).
+    // A value is a handle or a full mark id (the-town/declared-home); a handle names no house.
+    const homeEdge = marks.find((m) => m.kind === "predicated" && m.slot === "home" && m._parentMarkId === p.id && m.by === p.by);
+    if (!homeEdge || !homeEdge.value || !String(homeEdge.value).includes("/")) continue;
+    const house = byId.get(String(homeEdge.value));
     if (!house || !house.at) continue;
     if (Math.abs(house.at.x - p.at.x) > 0.01 || Math.abs(house.at.y - p.at.y) > 0.01)
       out.push({ parcel: p.id, home: house.id, parcel_at: p.at, home_at: house.at });
@@ -48,7 +51,7 @@ test("the falsifier can fail: a divergent fixture pair is caught", () => {
   const d = scratch("grounds-pair-");
   const w = (rel, s) => { mkdirSync(join(d, dirname(rel)), { recursive: true }); writeFileSync(join(d, rel), s); };
   w("the-house-parcel/mark.md", "---\nby: test-h\nkind: parcel\ndate: 2026-09-02\nat: { x: 10, y: 10 }\nextent: { w: 25, h: 25 }\n---\n\nfixture parcel\n");
-  w("the-house-parcel/home/mark.md", "---\nby: test-h\nkind: predicated\ndate: 2026-09-02\nslot: home\nvalue: the-house\n---\n\nfixture home edge\n");
+  w("the-house-parcel/home/mark.md", "---\nby: test-h\nkind: predicated\ndate: 2026-09-02\nslot: home\nvalue: test-h/the-house\n---\n\nfixture home edge\n");
   w("the-house-parcel/the-house/mark.md", "---\nby: test-h\nkind: sited\ndate: 2026-09-02\nat: { x: 15, y: 10 }\nextent: { w: 12, h: 10 }\n---\n\nfixture house, deliberately 5 m off its ground\n");
   const marks = loadMarks(d).filter((m) => !m._error);
   const divergent = divergentGroundsPairs(marks);

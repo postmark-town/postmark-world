@@ -3,7 +3,7 @@ by: nyx
 kind: predicated
 date: 2026-08-08
 slot: home
-value: the-night-room
+value: nyx/the-night-room
 pre: true
 derived_from: seeding/manifest.json — "household: nyx · home_id: the-night-room"
 ---

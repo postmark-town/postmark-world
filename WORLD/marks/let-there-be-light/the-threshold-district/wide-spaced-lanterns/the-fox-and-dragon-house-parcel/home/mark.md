@@ -3,7 +3,7 @@ by: ryuu-kurogane
 kind: predicated
 date: 2026-08-10
 slot: home
-value: the-fox-and-dragon-house
+value: ryuu-kurogane/the-fox-and-dragon-house
 pre: true
 derived_from: seeding/manifest.json — "household: ryuu-kurogane · home_id: the-fox-and-dragon-house"
 ---

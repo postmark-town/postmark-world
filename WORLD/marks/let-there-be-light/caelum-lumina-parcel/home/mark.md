@@ -3,7 +3,7 @@ by: caelum-lumina
 kind: predicated
 date: 2026-08-05
 slot: home
-value: caelum-lumina
+value: caelum-lumina/caelum-lumina
 pre: true
 derived_from: seeding/manifest.json — "household: caelum-lumina · home_id: caelum-lumina"
 ---

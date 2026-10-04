@@ -9,15 +9,15 @@ import { readFileSync } from "node:fs";
 
 import {
   OVERLAY_PIP_R, HOME_CARD, homeCardPath, markerScale,
-  overlayHomeCardSVG, homeMarkOfParcel, houseIsLit, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
+  overlayHomeCardSVG, homesOfParcel, houseIsLit, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
   sceneArtSVG, parcelLeadImage, markImagePath, housePicture,
 } from "../spectator/viewer.mjs";
 
 const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
 
 const PARCEL = { id: "jack/the-lantern-parcel", kind: "parcel", household: "jack", at: { x: 100, y: 200 }, extent: { w: 25, h: 25 } };
-// `by` as every published fold row carries it — the dwelling rule reads the
-// holder's own marks (POS-200)
+// `by` as every published fold row carries it — a home word is the resident's
+// own (POS-368)
 const HOME = { id: "jack/the-lantern", kind: "sited", by: "jack", tier: "home", placementParent: PARCEL.id, at: { x: 100, y: 200 }, extent: { w: 12, h: 12 }, image: "https://media.postmark.town/media/jack/abc.jpg" };
 
 test("a card is the picture in a house-shaped frame with the name under it, anchored by the transparent pip", () => {
@@ -92,31 +92,31 @@ test("identical inputs give identical markup at any camera", () => {
   assert.match(a, /class="ov-home lit"/);
 });
 
-// SUPERSEDES "the card's picture is the HOME sited on the parcel, preferring
-// one with a picture" (2026-09-11), which asserted the preference itself:
-// `homeMarkOfParcel(PARCEL.id, [bare, HOME]) === HOME`. That preference is how
-// rei's house wore the garden tin's photograph (POS-200); the dwelling is now
-// the record's own answer (tools/dwelling.mjs), and the picture follows it.
-test("the card's picture is the RECORD's dwelling — the parcel's own child at its centre — never the first pictured child (POS-200)", () => {
+// SUPERSEDES "the card's picture is the RECORD's dwelling" (POS-200, 09-23),
+// which asserted tools/dwelling.mjs's four-layer pick. Darko, 2026-10-04: homes
+// are per resident and nothing is picked ("a guess with a good score is still a
+// guess; the parcel is a fact"). A house rides the card only when a resident
+// DECLARED it — their own `slot: home` word naming it (POS-368).
+test("the card asks the homes on the parcel: a house rides only when a resident declared it, never a pick (POS-368)", () => {
   const tin = { ...HOME, id: "jack/the-tin", at: { x: 101, y: 188 }, extent: { w: 0.4, h: 0.3 }, image: "https://media.postmark.town/media/jack/tin.jpg" };
-  assert.equal(homeMarkOfParcel(PARCEL.id, [PARCEL, tin, HOME]), HOME, "the house at the centre, though the pictured tin is listed first");
-  const bare = { ...HOME, image: undefined };
-  assert.equal(homeMarkOfParcel(PARCEL.id, [PARCEL, tin, bare]), bare, "a dwelling with no picture is still the dwelling");
-  assert.equal(homeMarkOfParcel(PARCEL.id, [PARCEL, { ...tin, at: { x: 90, y: 190 } }, { ...HOME, at: { x: 110, y: 210 } }]), null,
-    "two children, neither at the centre: the record cannot single one out, and the page does not guess");
-  assert.equal(homeMarkOfParcel("nobody/nowhere", [PARCEL, HOME]), null);
+  const none = homesOfParcel(PARCEL.id, [PARCEL, tin, HOME]);
+  assert.deepEqual(none.map((h) => [h.handle, h.via, h.home_mark]), [["jack", "own", null]], "the holder is at home; no house is picked, not even the one at the centre");
+  const word = { id: "jack/home", kind: "predicated", by: "jack", parent: PARCEL.id, slot: "home", value: HOME.id, date: "2026-10-04" };
+  const declared = homesOfParcel(PARCEL.id, [PARCEL, tin, HOME, word]);
+  assert.equal(declared[0].home_mark, HOME, "jack's own word names the house");
+  assert.equal(homesOfParcel("nobody/nowhere", [PARCEL, HOME]).length, 0);
 });
 
-test("[pin] the column's lead is parcelLeadImage — the dwelling's picture, else the ground's, else none (POS-200)", () => {
+test("[pin] the column's lead is parcelLeadImage — the first resident's declared house's picture, else the ground's, else none (POS-200, POS-368)", () => {
   const pictured = { ...PARCEL, image: "https://media.postmark.town/media/jack/ground.jpg" };
   assert.equal(parcelLeadImage(pictured, HOME), markImagePath(HOME));
   assert.equal(parcelLeadImage(pictured, { ...HOME, image: undefined }), markImagePath(pictured));
   assert.equal(parcelLeadImage(pictured, null), markImagePath(pictured), "no dwelling on the record: the ground's own");
   assert.equal(parcelLeadImage(PARCEL, null), null);
   assert.match(SOURCE, /leadImage: parcelLeadImage\(mark, home, faceOf\(handle\)\.home\),/, "the column asks it");
-  assert.match(SOURCE, /const found = dwellingOf\(mark\.id\);/, "of the dwelling the record names");
-  assert.match(SOURCE, /const home = dwellingOf\(parcel\.id\);/, "and the card beside it asks the same");
-  // ⚑ THE FLIP: put `homeMarkOfParcel(mark.id, allMarks())` back in the column → reds.
+  assert.match(SOURCE, /const homes = homesOf\(mark\.id\)/, "of the homes on the parcel (POS-368)");
+  assert.match(SOURCE, /const homes = homesOf\(parcel\.id\);/, "and the card beside it asks the same");
+  assert.ok(!/dwellingOf\(|homeMarkOfParcel\(/.test(SOURCE), "the dwelling picker is gone from the viewer");
 });
 
 test("[pin] the house's picture is the household record's, for the parcel's holder, before any mark's own (POS-219)", () => {
@@ -127,7 +127,7 @@ test("[pin] the house's picture is the household record's, for the parcel's hold
   assert.equal(housePicture(null, null), null);
   const pictured = { ...PARCEL, image: "https://media.postmark.town/media/jack/ground.jpg" };
   assert.equal(parcelLeadImage(pictured, HOME, kept), markImagePath({ image: kept }), "the column leads with it too");
-  assert.match(SOURCE, /image: room \? housePicture\(faceOf\(homeHandleForParcel\(parcel, home\)\)\.home, home\) : null,/, "the map's card asks it of the parcel's holder");
+  assert.match(SOURCE, /image: room \? homesPicture\(parcel, homes\) : null,/, "the map's card asks it of the residents at home there, holder first (POS-368)");
 });
 
 test("HOME: the household's walker at rest inside the parcel lights the frame", () => {
@@ -188,10 +188,11 @@ test("THE RESIDENT'S OWN HOUSE WEARS ITS PICTURE TOO — a portfolio row that sh
   assert.deepEqual(touched, [PARCEL.id, HOME.id], "the parcel was added, the house was filled");
   const filled = byId.get(HOME.id);
   assert.equal(filled.image, HOME.image, "the world's picture");
-  assert.equal(filled.placementParent, PARCEL.id, "and its parcel, so homeMarkOfParcel finds it");
+  assert.equal(filled.placementParent, PARCEL.id, "and its parcel");
   assert.equal(filled.tier, "home");
   assert.equal(filled.body, "mine, as I wrote it", "the row's own words are untouched");
-  assert.equal(homeMarkOfParcel(PARCEL.id, [...byId.values()]), filled, "the card finds the dwelling now");
+  const word = { id: "jack/home", kind: "predicated", by: "jack", parent: PARCEL.id, slot: "home", value: HOME.id, date: "2026-10-04" };
+  assert.equal(homesOfParcel(PARCEL.id, [...byId.values(), word])[0].home_mark, filled, "the card finds the house jack declared, filled");
   // never overwrite: a row that HAS a picture keeps it
   const mine2 = new Map([[HOME.id, { ...own, image: "https://media.postmark.town/media/keeminlee/mine.jpg" }]]);
   fillFromTown(mine2, [HOME]);
