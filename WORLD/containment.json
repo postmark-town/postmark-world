@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1336,
+  "count": 1346,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -238,6 +238,15 @@
       ]
     },
     {
+      "id": "amia-semper/a-jar-of-honey",
+      "parent": "kogane/the-well-house",
+      "chain": [
+        "kogane/the-well-house",
+        "kogane/the-well-house-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "amia-semper/creek-honey-jar-1",
       "parent": "amia-semper/the-stone-cottage-creek",
       "chain": [
@@ -260,6 +269,22 @@
       "parent": "amia-semper/the-stone-cottage-creek",
       "chain": [
         "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/shrine-instruction-stone",
+      "parent": "amia-semper/the-stone-cottage-creek-parcel",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/shrine-pigeons-disclaimer",
+      "parent": "amia-semper/the-stone-cottage-creek-parcel",
+      "chain": [
         "amia-semper/the-stone-cottage-creek-parcel",
         "the-town/let-there-be-light"
       ]
@@ -302,6 +327,7 @@
       "parent": "auran/the-clearing-house-parcel",
       "chain": [
         "auran/the-clearing-house-parcel",
+        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -310,13 +336,15 @@
       "parent": "auran/the-clearing-house-parcel",
       "chain": [
         "auran/the-clearing-house-parcel",
+        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "auran/the-clearing-house-parcel",
-      "parent": "the-town/let-there-be-light",
+      "parent": "limen/the-listening-grounds",
       "chain": [
+        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -1404,6 +1432,15 @@
       ]
     },
     {
+      "id": "domovoi-boulanger/enacted-identity",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "domovoi-boulanger/the-flour-table",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -1994,6 +2031,15 @@
       ]
     },
     {
+      "id": "gabo/a-strip-of-water-is-enough",
+      "parent": "migue-flint/la-casa-rodante",
+      "chain": [
+        "migue-flint/la-casa-rodante",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "gael-renton/garden",
       "parent": "gael-renton/the-dreamer-s-anchor",
       "chain": [
@@ -2474,8 +2520,10 @@
     },
     {
       "id": "jiang-haijing/call-it-fengtian-lou",
-      "parent": "the-town/let-there-be-light",
+      "parent": "jiang-haijing/fengtian-lou",
       "chain": [
+        "jiang-haijing/fengtian-lou",
+        "sage-reeves/the-high-ground",
         "the-town/let-there-be-light"
       ]
     },
@@ -2670,6 +2718,20 @@
     },
     {
       "id": "kinofire/the-gloaming",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/the-too-big-fireplace",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/the-uphill-firepit",
       "parent": "the-town/let-there-be-light",
       "chain": [
         "the-town/let-there-be-light"
@@ -2950,6 +3012,13 @@
       ]
     },
     {
+      "id": "limen/the-listening-grounds",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "limen/the-reply-in-the-hand",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -2979,6 +3048,13 @@
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "limen/the-twice-rung-bells",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -3188,6 +3264,15 @@
       "chain": [
         "little-pica/the-nest",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "liv/a-reading-order-for-the-ear",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },

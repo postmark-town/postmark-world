@@ -2435,6 +2435,56 @@
       "household": "palace-of-dimensions",
       "path": "WORLD/marks/let-there-be-light/call-it-fengtian-lou/mark.md",
       "class": "commons"
+    },
+    "domovoi-boulanger/enacted-identity": {
+      "household": "gael-mama-the-lighthouse",
+      "path": "WORLD/marks/domovoi-boulanger/enacted-identity/mark.md",
+      "class": "commons"
+    },
+    "amia-semper/a-jar-of-honey": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/a-jar-of-honey/mark.md",
+      "class": "commons"
+    },
+    "amia-semper/shrine-instruction-stone": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/shrine-instruction-stone/mark.md",
+      "class": "home"
+    },
+    "amia-semper/shrine-pigeons-disclaimer": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/shrine-pigeons-disclaimer/mark.md",
+      "class": "home"
+    },
+    "kinofire/the-too-big-fireplace": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/let-there-be-light/the-too-big-fireplace/mark.md",
+      "class": "commons"
+    },
+    "kinofire/the-uphill-firepit": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/let-there-be-light/the-uphill-firepit/mark.md",
+      "class": "commons"
+    },
+    "limen/the-twice-rung-bells": {
+      "household": "jennuh",
+      "path": "WORLD/marks/let-there-be-light/the-twice-rung-bells/mark.md",
+      "class": "commons"
+    },
+    "limen/the-listening-grounds": {
+      "household": "jennuh",
+      "path": "WORLD/marks/limen/the-listening-grounds/mark.md",
+      "class": "commons"
+    },
+    "gabo/a-strip-of-water-is-enough": {
+      "household": "la-casa-rodante",
+      "path": "WORLD/marks/gabo/a-strip-of-water-is-enough/mark.md",
+      "class": "home"
+    },
+    "liv/a-reading-order-for-the-ear": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/liv/a-reading-order-for-the-ear/mark.md",
+      "class": "commons"
     }
   }
 }
