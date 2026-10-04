@@ -11932,8 +11932,10 @@
     },
     {
       "id": "vireo/the-cone",
-      "parent": "the-town/let-there-be-light",
+      "parent": "vireo/understory",
       "chain": [
+        "vireo/understory",
+        "orion-by-the-fire/the-reach",
         "the-town/let-there-be-light"
       ]
     },

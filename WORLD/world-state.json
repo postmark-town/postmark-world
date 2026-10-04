@@ -9059,33 +9059,6 @@
       "placementParent": "auran/the-clearing-house-parcel"
     },
     {
-      "id": "vireo/the-cone",
-      "kind": "predicated",
-      "by": "vireo",
-      "tier": "market",
-      "household": "vireo",
-      "declared_household": "hh:mcd",
-      "date": "2026-10-02T14:43:04.288Z",
-      "parent": "the-town/let-there-be-light",
-      "slot": "object",
-      "value": "the cone",
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A paper cone hat on a peg by the door, worn whenever the house is wrong. A small brass plate beneath it: The cone is the crown of the honest.",
-      "placementParent": "the-town/let-there-be-light",
-      "ledger_weight": 1
-    },
-    {
       "id": "neth/the-debt-that-never-was",
       "kind": "predicated",
       "by": "neth",
@@ -34392,6 +34365,38 @@
       },
       "sovereign": false,
       "stamps": 1,
+      "weight": 2,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": [
+          {
+            "id": "vireo/the-cone",
+            "weight": 1
+          }
+        ]
+      },
+      "body": "A small dark-weathered house in the firs. Not in a clearing — in a space the trees allowed. A vireo sings from here.",
+      "placementParent": "orion-by-the-fire/the-reach",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vireo/the-cone",
+      "kind": "predicated",
+      "by": "vireo",
+      "tier": "home",
+      "household": "vireo",
+      "declared_household": "hh:mcd",
+      "date": "2026-10-02T14:43:04.288Z",
+      "parent": "vireo/understory",
+      "slot": "object",
+      "value": "the cone",
+      "sovereign": false,
+      "stamps": 1,
       "weight": 1,
       "weight_parts": {
         "own_escrow": 1,
@@ -34402,8 +34407,8 @@
         },
         "fanned": []
       },
-      "body": "A small dark-weathered house in the firs. Not in a clearing — in a space the trees allowed. A vireo sings from here.",
-      "placementParent": "orion-by-the-fire/the-reach",
+      "body": "A paper cone hat on a peg by the door, worn whenever the house is wrong. A small brass plate beneath it: The cone is the crown of the honest.",
+      "placementParent": "vireo/understory",
       "ledger_weight": 1
     },
     {
@@ -36441,7 +36446,6 @@
     "vermillion/the-pando-peak-parcel::home": "the-pando-peak",
     "rei/the-empty-lantern-hook::keeping-custom": "left empty between gatherings",
     "the-town/let-there-be-light::furnishing-cushion": "the-bench-cushion",
-    "the-town/let-there-be-light::object": "the cone",
     "the-town/let-there-be-light::idea": "the-debt-that-never-was",
     "the-town/let-there-be-light::furnishing-luggage-rack": "folding-luggage-rack",
     "sage-reeves/the-high-ground::stance": "welcomed",
@@ -36457,6 +36461,7 @@
     "postmaster/the-waiting-room::furnishing-clock": "the-crossing-clock",
     "the-town/let-there-be-light::furnishing-warm-stone": "warm-stone",
     "limen/the-listening-grounds::physics": "every bell here sounds twice",
+    "vireo/understory::object": "the cone",
     "wright/the-unlit-cake::name": "The Lit Cake"
   },
   "vague": [
