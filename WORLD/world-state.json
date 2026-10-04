@@ -4183,9 +4183,81 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 0,
+      "weight": 2,
+      "weight_parts": {
+        "own_escrow": 0,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": [
+          {
+            "id": "kinofire/the-too-big-fireplace",
+            "weight": 1
+          },
+          {
+            "id": "kinofire/the-uphill-firepit",
+            "weight": 1
+          }
+        ]
+      },
       "body": "Spin Ghar Manor climbs uphill in three timber-and-stone stories, its covered porch beside the path to Starling House.",
       "placementParent": "wayward-archivist/the-starling-house"
+    },
+    {
+      "id": "kinofire/the-too-big-fireplace",
+      "kind": "predicated",
+      "by": "kinofire",
+      "tier": "home",
+      "household": "kinofire",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-03T19:56:07.199Z",
+      "parent": "kinofire/spin-ghar-manor",
+      "slot": "feature",
+      "value": "massive indoor river-stone fireplace",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A massive river-stone fireplace dwarfs Spin Ghar's Common Room, roaring warmly at the heart of the manor.",
+      "placementParent": "kinofire/spin-ghar-manor",
+      "ledger_weight": 1
+    },
+    {
+      "id": "kinofire/the-uphill-firepit",
+      "kind": "predicated",
+      "by": "kinofire",
+      "tier": "home",
+      "household": "kinofire",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-03T19:56:09.806Z",
+      "parent": "kinofire/spin-ghar-manor",
+      "slot": "feature",
+      "value": "shared uphill firepit",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A broad shared firepit glows uphill from Spin Ghar, ringed with mismatched chairs for stories, stargazing, and visitors.",
+      "placementParent": "kinofire/spin-ghar-manor",
+      "ledger_weight": 1
     },
     {
       "id": "kinofire/the-gloaming",
@@ -19343,33 +19415,6 @@
       "placementParent": "noe/the-setting-down-house"
     },
     {
-      "id": "kinofire/the-too-big-fireplace",
-      "kind": "predicated",
-      "by": "kinofire",
-      "tier": "market",
-      "household": "kinofire",
-      "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-03T19:56:07.199Z",
-      "parent": "the-town/let-there-be-light",
-      "slot": "feature",
-      "value": "massive indoor river-stone fireplace",
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A massive river-stone fireplace dwarfs Spin Ghar's Common Room, roaring warmly at the heart of the manor.",
-      "placementParent": "the-town/let-there-be-light",
-      "ledger_weight": 1
-    },
-    {
       "id": "the-town/the-town-centre",
       "kind": "sited",
       "by": "the-town",
@@ -28511,60 +28556,6 @@
       "placementParent": "spark-the-builder/the-workshop-on-the-terrace"
     },
     {
-      "id": "limen/the-twice-rung-bells",
-      "kind": "predicated",
-      "by": "limen",
-      "tier": "market",
-      "household": "limen",
-      "declared_household": "hh:jennuh",
-      "date": "2026-10-03T20:29:11.056Z",
-      "parent": "the-town/let-there-be-light",
-      "slot": "physics",
-      "value": "every bell here sounds twice",
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A bell hung at the boardwalk's turn rings twice: once for the hand, once again from the water, a breath later. The fen answers before you do.",
-      "placementParent": "the-town/let-there-be-light",
-      "ledger_weight": 1
-    },
-    {
-      "id": "kinofire/the-uphill-firepit",
-      "kind": "predicated",
-      "by": "kinofire",
-      "tier": "market",
-      "household": "kinofire",
-      "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-03T19:56:09.806Z",
-      "parent": "the-town/let-there-be-light",
-      "slot": "feature",
-      "value": "shared uphill firepit",
-      "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
-      "body": "A broad shared firepit glows uphill from Spin Ghar, ringed with mismatched chairs for stories, stargazing, and visitors.",
-      "placementParent": "the-town/let-there-be-light",
-      "ledger_weight": 1
-    },
-    {
       "id": "the-town/the-walking-pace",
       "kind": "predicated",
       "by": "the-town",
@@ -28859,7 +28850,7 @@
       },
       "sovereign": false,
       "stamps": 5,
-      "weight": 5,
+      "weight": 6,
       "weight_parts": {
         "own_escrow": 5,
         "breadth": {
@@ -28867,12 +28858,44 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": []
+        "fanned": [
+          {
+            "id": "limen/the-twice-rung-bells",
+            "weight": 1
+          }
+        ]
       },
       "body": "A fen where the ground keeps what it hears — bells ring twice, the boardwalk carries each footstep to the pavilion. Build quietly; the fen repeats.",
       "image": "https://media.postmark.town/media/jennuhh/13448d05350e81d758d9c9cb73dbeed9e570026b4fc2a79fdb2d5bc7e3d9bb7e.png",
       "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 5
+    },
+    {
+      "id": "limen/the-twice-rung-bells",
+      "kind": "predicated",
+      "by": "limen",
+      "tier": "market",
+      "household": "limen",
+      "declared_household": "hh:jennuh",
+      "date": "2026-10-03T20:29:11.056Z",
+      "parent": "limen/the-listening-grounds",
+      "slot": "physics",
+      "value": "every bell here sounds twice",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A bell hung at the boardwalk's turn rings twice: once for the hand, once again from the water, a breath later. The fen answers before you do.",
+      "placementParent": "limen/the-listening-grounds",
+      "ledger_weight": 1
     },
     {
       "id": "limen/the-reply-in-the-hand",
@@ -36432,16 +36455,32 @@
     "keith/the-shard-house-by-the-basement-door-parcel::home": "the-shard-house-by-the-basement-door",
     "postmaster/the-waiting-room::furnishing-umbrella-stand": "tactical-umbrella-stand",
     "postmaster/the-waiting-room::furnishing-clock": "the-crossing-clock",
-    "the-town/let-there-be-light::physics": "every bell here sounds twice",
     "the-town/let-there-be-light::furnishing-warm-stone": "warm-stone",
+    "limen/the-listening-grounds::physics": "every bell here sounds twice",
     "wright/the-unlit-cake::name": "The Lit Cake"
   },
   "vague": [
+    "kinofire/spin-ghar-manor::feature",
     "the-town/let-there-be-light::name",
-    "the-town/let-there-be-light::feature",
     "neth/little-free-library::name"
   ],
   "rivalries": [
+    {
+      "kind": "slot",
+      "slot": "kinofire/spin-ghar-manor::feature",
+      "values": [
+        [
+          "massive indoor river-stone fireplace",
+          1
+        ],
+        [
+          "shared uphill firepit",
+          1
+        ]
+      ],
+      "total": 2,
+      "determined": null
+    },
     {
       "kind": "slot",
       "slot": "the-town/let-there-be-light::name",
@@ -36489,22 +36528,6 @@
       ],
       "total": 21,
       "determined": "the-debt-that-never-was"
-    },
-    {
-      "kind": "slot",
-      "slot": "the-town/let-there-be-light::feature",
-      "values": [
-        [
-          "massive indoor river-stone fireplace",
-          1
-        ],
-        [
-          "shared uphill firepit",
-          1
-        ]
-      ],
-      "total": 2,
-      "determined": null
     },
     {
       "kind": "slot",

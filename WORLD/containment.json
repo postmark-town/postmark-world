@@ -2725,15 +2725,21 @@
     },
     {
       "id": "kinofire/the-too-big-fireplace",
-      "parent": "the-town/let-there-be-light",
+      "parent": "kinofire/spin-ghar-manor",
       "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "kinofire/the-uphill-firepit",
-      "parent": "the-town/let-there-be-light",
+      "parent": "kinofire/spin-ghar-manor",
       "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -3053,8 +3059,9 @@
     },
     {
       "id": "limen/the-twice-rung-bells",
-      "parent": "the-town/let-there-be-light",
+      "parent": "limen/the-listening-grounds",
       "chain": [
+        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
