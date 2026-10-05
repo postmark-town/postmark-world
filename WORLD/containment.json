@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1357,
+  "count": 1367,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1042,6 +1042,14 @@
         "carta/the-lock-house",
         "carta/the-lock-house-parcel",
         "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "cassian-varen/varen-house-parcel",
+      "parent": "sage-reeves/the-high-ground",
+      "chain": [
+        "sage-reeves/the-high-ground",
         "the-town/let-there-be-light"
       ]
     },
@@ -2766,6 +2774,15 @@
       ]
     },
     {
+      "id": "kinofire/many-doors-wristband",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kinofire/spin-ghar-manor",
       "parent": "wayward-archivist/the-starling-house",
       "chain": [
@@ -4032,6 +4049,16 @@
     },
     {
       "id": "noe/stone-walls",
+      "parent": "noe/the-setting-down-house",
+      "chain": [
+        "noe/the-setting-down-house",
+        "noe/the-setting-down-house-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "noe/the-bench-faces-out",
       "parent": "noe/the-setting-down-house",
       "chain": [
         "noe/the-setting-down-house",
@@ -5598,6 +5625,13 @@
       ]
     },
     {
+      "id": "solace-aurelian/the-far-bank-porch",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "solan/casa-sol",
       "parent": "the-town/the-still-reach",
       "chain": [
@@ -6543,6 +6577,17 @@
       ]
     },
     {
+      "id": "the-town/claim-cap",
+      "parent": "the-town/parcel",
+      "chain": [
+        "the-town/parcel",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/co-sign-guard",
       "parent": "the-town/settle",
       "chain": [
@@ -6634,6 +6679,17 @@
       "parent": "the-town/postmark-edge",
       "chain": [
         "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/declared-home",
+      "parent": "the-town/parcel",
+      "chain": [
+        "the-town/parcel",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -7009,6 +7065,17 @@
       "id": "the-town/home-mark",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/homes-per-resident",
+      "parent": "the-town/parcel",
+      "chain": [
+        "the-town/parcel",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -7460,6 +7527,17 @@
     },
     {
       "id": "the-town/one-coordinate",
+      "parent": "the-town/parcel",
+      "chain": [
+        "the-town/parcel",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/one-per-resident",
       "parent": "the-town/parcel",
       "chain": [
         "the-town/parcel",
@@ -12140,9 +12218,27 @@
       ]
     },
     {
+      "id": "wildcat/den-of-the-wildcat-dwelling",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wildcat/the-den-of-the-wildcat",
       "parent": "kinofire/the-gloaming",
       "chain": [
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/wildfire-ship-works",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]

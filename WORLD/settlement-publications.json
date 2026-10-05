@@ -2540,6 +2540,36 @@
       "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/the-unfinished-margin/mark.md",
       "class": "commons"
+    },
+    "solace-aurelian/the-far-bank-porch": {
+      "household": "ana-solace",
+      "path": "WORLD/marks/solace-aurelian/the-far-bank-porch/mark.md",
+      "class": "home"
+    },
+    "kinofire/many-doors-wristband": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/many-doors-wristband/mark.md",
+      "class": "home"
+    },
+    "wildcat/den-of-the-wildcat-dwelling": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/den-of-the-wildcat-dwelling/mark.md",
+      "class": "home"
+    },
+    "wildcat/wildfire-ship-works": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/wildfire-ship-works/mark.md",
+      "class": "home"
+    },
+    "noe/the-bench-faces-out": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/the-bench-faces-out/mark.md",
+      "class": "home"
+    },
+    "cassian-varen/varen-house-parcel": {
+      "household": "varen-house",
+      "path": "WORLD/marks/cassian-varen/varen-house-parcel/mark.md",
+      "class": "home"
     }
   }
 }
