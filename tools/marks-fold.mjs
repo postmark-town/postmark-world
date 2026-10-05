@@ -836,7 +836,7 @@ export function householdKeyGrain(households) {
   return "mixed";
 }
 
-export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy" }) {
+export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy", townWords = null }) {
   const errors = [];
   const terrainIds = new Set((terrain?.features ?? []).map(f => "terrain:" + f.id));
   const byId = new Map();
@@ -1015,6 +1015,8 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // the law; this is only where it is asked.
   const consent = resolveConsent({
     byId, credOf: credHh, parcels, ownStamps: weightByMark, parentOf, rectOf: rect,
+    // the town's standing word per mark (POS-361), fed by the settlement; absent = silence
+    townWords,
   });
   errors.push(...consent.errors);
   const returned = consent.returned;
