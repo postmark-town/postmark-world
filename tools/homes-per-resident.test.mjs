@@ -16,6 +16,9 @@ import { fold, admitDelta, admissionBase, HOME_OUTSIDE_HOUSEHOLD_REFUSAL } from 
 import { homeOf, homesOnParcel, readHomeDeclaration } from "./where-is.mjs";
 import { homesOfParcel, householdHomeAt } from "../spectator/viewer.mjs";
 import { homeColumnModel } from "../spectator/home-column.mjs";
+import { readFileSync } from "node:fs";
+import { assembleWorld } from "./world-build.mjs";
+import { buildWorld } from "./world-poc.mjs";
 
 const P = (id, by, x, date) => ({
   id, by, household: by, kind: "parcel", tier: "market",
@@ -133,4 +136,32 @@ test("D6 · prior estate is never anyone's home: the fold marks it, and a declar
   assert.equal(home.parcel_id, das.id, "the home is Das Lichterfenster, never Driftlight");
   assert.equal(home.declaration_refused.id, "sol-am-lichterfenster/home");
   assert.match(home.declaration_refused.why, /prior estate/);
+});
+
+// D7 · THE READERS GET THE MAP (2026-10-05, town #3450). The worlds above are
+// fold outputs, which carry `households`; no live reader hands homeOf a fold.
+// The office and the Spectator hand it assembleWorld's world, and the PoC hands
+// it buildWorld's, and both arrived without the map, so Gabo of La Casa Rodante
+// (no parcel; Migue holds the household's) read "no home". Gabo's case, as each
+// reader builds it.
+const SKELETON = JSON.parse(readFileSync(new URL("../WORLD/skeleton.json", import.meta.url), "utf8"));
+const RODANTE = { gabo: "hh:la-casa-rodante", "migue-flint": "hh:la-casa-rodante" };
+const RODANTE_PARCEL = { ...P("migue-flint/la-casa-rodante", "migue-flint", -450, "2026-09-20T00:00:00Z"), at: { x: -450, y: 5480 } };
+
+test("D7 · a parcel-less housemate is at home on the household's parcel through assembleWorld (the office's and the Spectator's world)", () => {
+  const published = world([RODANTE_PARCEL], RODANTE);
+  const w = assembleWorld({ worldState: published, skeleton: SKELETON });
+  assert.deepEqual(w.households, RODANTE, "the fold's household map rides through the assembly, as the parcels do");
+  const home = homeOf("gabo", w);
+  assert.equal(home.placed, true, "Gabo is placed, not left at the Origin");
+  assert.equal(home.parcel_id, RODANTE_PARCEL.id);
+  assert.equal(home.via, "household");
+  assert.deepEqual(homesOnParcel(RODANTE_PARCEL.id, w).map((h) => [h.handle, h.via]),
+    [["migue-flint", "own"], ["gabo", "household"]], "the card names both residents, holder first");
+});
+
+test("D8 · buildWorld (the disk path) carries the published registry, WORLD/households.json", () => {
+  const registry = JSON.parse(readFileSync(new URL("../WORLD/households.json", import.meta.url), "utf8")).households;
+  const w = buildWorld({ crossing: 20 });
+  assert.deepEqual(w.households, registry, "the readers' map is the registry the crossing folds with");
 });
