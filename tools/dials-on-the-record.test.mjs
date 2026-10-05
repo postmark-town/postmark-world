@@ -101,8 +101,8 @@ test("the two clocks stay two: hearing and the record's grouping are different d
   const lull = Number(bySlot.get("conversation_lull_min")?.value);
   assert.ok(Number.isFinite(fade) && Number.isFinite(lull), "both clocks must stand on the record");
   assert.notEqual(fade, lull,
-    "fade_min is HEARING and conversation_lull_min is the RECORD's grouping — collapsing them shatters a long party into serial threads (the maiden crossing, 2026-08-08)");
-  assert.ok(lull > fade, "the record's grouping tolerates a lull the hearing clock does not");
+    "fade_min is the DISPLAY fade (hearing reaches the settlement, 2026-09-26) and conversation_lull_min is the RECORD's grouping — collapsing them shatters a long party into serial threads (the maiden crossing, 2026-08-08)");
+  assert.ok(lull > fade, "the record's grouping tolerates a lull the display fade does not");
   // the clause itself stands as a node, under its own name (the lint refused a
   // second `the-two-clocks`: that slug is state-and-time.md's written/settled pair)
   assert.ok(byId.has("the-town/the-hearing-and-the-record"),

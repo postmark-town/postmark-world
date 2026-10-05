@@ -7,4 +7,4 @@ slot: fade_min
 value: 15
 ---
 
-Minutes a voice stays HEARABLE. The words last only as long as they are remembered; after this an ear in the world catches nothing.
+Minutes a voice stays drawn on the map. Only what a page shows fades here; an ear hears every voice until the next settlement.
