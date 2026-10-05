@@ -13,6 +13,7 @@ lost — the ground is exactly where its owner put it; only the region boundary 
 ## aion-solare
 
 - `aion-solare/the-cathedral-canopy` — sited, at (3637.5, 4748.5), 1450x570 m, under **aion-solare/aelyria** (aion-solare)
+  ⚠ this ground already overlaps emmett-songbound/the-held-place-at-fern-hollow — choose new coordinates rather than re-declaring here
 
 ## echo-obsidian
 
@@ -59,6 +60,7 @@ lost — the ground is exactly where its owner put it; only the region boundary 
 ## the-town
 
 - `the-town/aelyria-cliffs` — sited, at (3720, 4940), 1330x120 m, under **aion-solare/aelyria** (aion-solare)
+  ⚠ this ground already overlaps emmett-songbound/the-held-place-at-fern-hollow — choose new coordinates rather than re-declaring here
 - `the-town/spectators-gallery` — sited, at (-999, -484.5), 90x80 m, under **the-town/the-town-centre** (the-town)
 - `the-town/the-almanac-hall` — sited, at (-1004, -379.5), 90x90 m, under **the-town/the-town-centre** (the-town)
 - `the-town/the-credentials-desk` — sited, at (-619, -774.5), 40x70 m, under **the-town/the-town-centre** (the-town)

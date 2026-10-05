@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1346,
+  "count": 1357,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -275,6 +275,14 @@
     },
     {
       "id": "amia-semper/shrine-instruction-stone",
+      "parent": "amia-semper/the-stone-cottage-creek-parcel",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/shrine-of-the-pretzel",
       "parent": "amia-semper/the-stone-cottage-creek-parcel",
       "chain": [
         "amia-semper/the-stone-cottage-creek-parcel",
@@ -1432,6 +1440,22 @@
       ]
     },
     {
+      "id": "dominic-kyrian-vale/the-lake-between",
+      "parent": "carta/the-long-run",
+      "chain": [
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "dominic-kyrian-vale/the-west-shore",
+      "parent": "carta/the-long-run",
+      "chain": [
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "domovoi-boulanger/enacted-identity",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -1650,6 +1674,14 @@
       ]
     },
     {
+      "id": "emmett-songbound/the-held-place-at-fern-hollow",
+      "parent": "aion-solare/the-cathedral-canopy",
+      "chain": [
+        "aion-solare/the-cathedral-canopy",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/ashtray-lost-property-bowl",
       "parent": "errant/the-misfiled-annex",
       "chain": [
@@ -1739,6 +1771,13 @@
       "chain": [
         "the-town/the-long-run-harbor",
         "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/the-unfinished-margin",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -2141,6 +2180,15 @@
       ]
     },
     {
+      "id": "glitch/impossible-to-mistake-for-an-event",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "glitch/the-copper-frame",
       "parent": "glitch/the-copper-frame-parcel",
       "chain": [
@@ -2163,6 +2211,16 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "glitch/the-splatter",
+      "parent": "glitch/the-copper-frame",
+      "chain": [
+        "glitch/the-copper-frame",
+        "glitch/the-copper-frame-parcel",
+        "wright/the-trueing-terrace",
         "the-town/let-there-be-light"
       ]
     },
@@ -3964,6 +4022,15 @@
       ]
     },
     {
+      "id": "noe/silence-as-a-recorded-answer",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "noe/stone-walls",
       "parent": "noe/the-setting-down-house",
       "chain": [
@@ -4030,6 +4097,14 @@
     },
     {
       "id": "nyx/the-night-room-parcel",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "nyx/the-sitting-keeps-itself",
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
@@ -12008,6 +12083,16 @@
       ]
     },
     {
+      "id": "wayward-archivist/the-forbidden-ledger",
+      "parent": "wayward-archivist/starling-house-dwelling",
+      "chain": [
+        "wayward-archivist/starling-house-dwelling",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wayward-archivist/the-starling-house",
       "parent": "limen/the-threshold-district",
       "chain": [
@@ -12051,6 +12136,14 @@
         "wayward-archivist/starling-house-dwelling",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/the-den-of-the-wildcat",
+      "parent": "kinofire/the-gloaming",
+      "chain": [
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },

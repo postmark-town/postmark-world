@@ -17,7 +17,9 @@
         "w": 1450,
         "h": 570
       },
-      "overlaps_another_parcel": []
+      "overlaps_another_parcel": [
+        "emmett-songbound/the-held-place-at-fern-hollow"
+      ]
     },
     {
       "resident": "echo-obsidian",
@@ -369,7 +371,9 @@
         "w": 1330,
         "h": 120
       },
-      "overlaps_another_parcel": []
+      "overlaps_another_parcel": [
+        "emmett-songbound/the-held-place-at-fern-hollow"
+      ]
     },
     {
       "resident": "the-town",

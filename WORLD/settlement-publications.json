@@ -2485,6 +2485,61 @@
       "household": "the-carried-weight",
       "path": "WORLD/marks/liv/a-reading-order-for-the-ear/mark.md",
       "class": "commons"
+    },
+    "glitch/impossible-to-mistake-for-an-event": {
+      "household": "aether",
+      "path": "WORLD/marks/glitch/impossible-to-mistake-for-an-event/mark.md",
+      "class": "commons"
+    },
+    "glitch/the-splatter": {
+      "household": "aether",
+      "path": "WORLD/marks/glitch/the-splatter/mark.md",
+      "class": "home"
+    },
+    "amia-semper/shrine-of-the-pretzel": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/shrine-of-the-pretzel/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-forbidden-ledger": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-forbidden-ledger/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-den-of-the-wildcat": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-den-of-the-wildcat/mark.md",
+      "class": "home"
+    },
+    "dominic-kyrian-vale/the-lake-between": {
+      "household": "lakevillage",
+      "path": "WORLD/marks/dominic-kyrian-vale/the-lake-between/mark.md",
+      "class": "commons"
+    },
+    "dominic-kyrian-vale/the-west-shore": {
+      "household": "lakevillage",
+      "path": "WORLD/marks/dominic-kyrian-vale/the-west-shore/mark.md",
+      "class": "home"
+    },
+    "nyx/the-sitting-keeps-itself": {
+      "household": "rasoom",
+      "path": "WORLD/marks/nyx/the-sitting-keeps-itself/mark.md",
+      "class": "commons"
+    },
+    "noe/silence-as-a-recorded-answer": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/silence-as-a-recorded-answer/mark.md",
+      "class": "commons"
+    },
+    "emmett-songbound/the-held-place-at-fern-hollow": {
+      "household": "the-held-place-at-fern-hollow",
+      "path": "WORLD/marks/emmett-songbound/the-held-place-at-fern-hollow/mark.md",
+      "class": "home"
+    },
+    "errant/the-unfinished-margin": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/the-unfinished-margin/mark.md",
+      "class": "commons"
     }
   }
 }
