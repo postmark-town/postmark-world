@@ -661,11 +661,49 @@ subtyping, which is why extends was the wrong word: an ADDRESS is not a kind
 of parcel, it is the paper the parcel is read from. The drawn edges:
 **`address tells parcel`** (the claim on ground), **`home tells home-mark`**
 (the dwelling — `home-mark extends mark`, minted with this ruling), and
-**`profile tells resident`**. Consequence carried by the home-images lane:
-a household's HOME art is the home-mark's canonical `image:` — the paper's
-picture becomes its world-thing's face. Papers with no world-side thing
-(window, mailbox, doorstep) draw no tells edge — a telling without a
-world-thing would be a pointer to nothing.
+**`profile tells resident`**. Papers with no world-side thing (window,
+mailbox, doorstep) draw no tells edge — a telling without a world-thing would
+be a pointer to nothing.
+
+**What the home is, amended 2026-09-25 and 2026-10-04.** The 08-21 shape read
+"a household's home" as one dwelling on one parcel, picked by the record, and
+hung the HOME art on that dwelling. Two rulings replace that reading; the
+edges above stand.
+
+- **The parcel is the home by default; a declared home is optional** (Keemin,
+  2026-09-25). No reader picks a dwelling for anyone: "a guess with a good
+  score is still a guess; the parcel is a fact" (Darko, 2026-10-04, on the
+  office's own picker, deleted). The house's picture lives on the household's
+  record, one per resident, and the map reads it from there.
+- **Homes are per resident, and many residents share a parcel by default**
+  (Darko, 2026-10-04: "A parcel shared by five housemates can be home to all
+  five. We need to design the system such that that is not only possible, but
+  the default."). A parcel holder's home is their own parcel. A resident with
+  no parcel of their own has the household's parcel as home; with several, the
+  household's first in claim order, and the answer says so (`via:
+  "household"`).
+- **A resident may declare a home.** The declaration is a `slot: home`
+  predicate *of the resident's own* (`by:` the resident) filed under one of
+  their household's parcels. Its `value` is the resident's own handle ("this
+  parcel is my home") or the id of a mark of theirs standing on that parcel
+  ("this house is my home"). The newest valid declaration wins; withdrawing it
+  returns the resident to the default. It belongs to the resident, never the
+  parcel — a field on the parcel could name only one home — so five housemates
+  may each declare on the same parcel, and their declarations rival no one's.
+  A declaration on a parcel outside the resident's household is refused. Prior
+  estate under one-per-resident (Sol's Driftlight House, 10-02) is never
+  anyone's home.
+
+**The parcel law, written down 2026-10-04** (Darko: "One parcel per resident,
+three per household. Yes."). A household holds at most three parcels (ruled
+2026-07-30; the cap lived only as a code constant until now). Each parcel
+belongs to exactly one resident, and a resident holds at most one. The 08-18
+sentence "Claiming is untouched — still one parcel to a handle" is amended to
+say both.
+
+Rendered in the world as `the-town/claim-cap`, `the-town/one-per-resident`,
+`the-town/homes-per-resident` and `the-town/declared-home` (children of
+`the-town/parcel`, beside the amended `the-town/household-scope`).
 
 ## The town bulletin — the town's own shelf
 
