@@ -61,7 +61,7 @@ import { createServer } from "node:net";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { townRegionMarks, homeMarkOfParcel, markImagePath } from "../spectator/viewer.mjs";
+import { townRegionMarks, homesOfParcel, markImagePath } from "../spectator/viewer.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -754,7 +754,9 @@ test("THE PICTURE WAITS FOR THE GROUND — a home card wears its art only where 
   // and no fewer (the rule saying no where the ground has room).
   // "has a picture" is the viewer's own word for it (`markImagePath`): a dwelling whose
   // image is a URL the shelf rule refuses draws no picture on purpose, and is not owed one
-  const pictured = (ids) => ids.filter((id) => !!markImagePath(homeMarkOfParcel(id, SERVED.marks)));
+  // POS-368: a card's picture is a resident's (holder first) — their record's, else the house they
+  // declared; no dwelling is picked. With no residents-meta served, the declared house's own picture.
+  const pictured = (ids) => ids.filter((id) => homesOfParcel(id, SERVED.parcels ? SERVED : SERVED.marks).some((h) => !!markImagePath(h.home_mark)));
   assert.deepEqual([...near.picturedIds].sort(), pictured(near.cardIds).sort(),
     `at street width every drawn card whose dwelling has a picture wears it, and no other `
     + `(drawn ${near.cardIds.join(", ")}; pictured ${near.picturedIds.join(", ") || "none"})`);

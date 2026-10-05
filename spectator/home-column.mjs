@@ -214,7 +214,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [] } = {}) {
   const who = String(handle ?? "").trim();
   const text = typeof door?.description === "string" ? door.description.trim() : "";
   const blocks = text ? parseHomeMarkdown(text) : [];
@@ -250,7 +250,25 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // reader who can act gets the same door the little card offers, on the same
     // verb. A spectator, or a column with no parcel behind it, gets no button.
     enter: parcelId && canEnter ? { parcelId: String(parcelId) } : null,
+    // EVERY RESIDENT WHOSE HOME THIS IS (POS-368, Darko 2026-10-04: "A parcel
+    // shared by five housemates can be home to all five"). One entry each, in
+    // the order the resolver gave (holder first), with their own picture from
+    // the household's record (a shelf URL or null) and how the home was found.
+    residents: (residents ?? []).filter((r) => r && String(r.handle ?? "").trim()).map((r) => ({
+      handle: String(r.handle).trim(),
+      via: r.via === "declared" ? "declared" : r.via === "own" ? "own" : "household",
+      picture: r.picture ?? null,
+      house: r.house ? String(r.house) : null,
+    })),
   };
+}
+
+/** The line under a resident's name in the homes strip: how this parcel came to
+ *  be their home, in a resident's words. */
+export function homeViaLine(r) {
+  if (r?.via === "declared") return r.house ? `declared: ${r.house}` : "declared this home";
+  if (r?.via === "own") return "their own parcel";
+  return "the household's parcel";
 }
 
 // ── the builder: real nodes, never a string of markup ────────────────────────
@@ -415,6 +433,36 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
     scroll.appendChild(figure);
   }
 
+  if (model.residents?.length) {
+    // THE HOMES STRIP (POS-368): every resident at home here, each with their
+    // own picture. Text through textContent, pictures through the shelf gate.
+    const strip = el(doc, "div", "wv-homecol-homes");
+    const head = el(doc, "div", "wv-homecol-homes-head");
+    head.textContent = model.residents.length === 1 ? "home to 1 resident" : `home to ${model.residents.length} residents`;
+    strip.appendChild(head);
+    for (const r of model.residents) {
+      const row = el(doc, "div", "wv-homecol-home");
+      row.setAttribute("data-handle", r.handle);
+      const src = r.picture && imagePath ? imagePath(r.picture) : null;
+      if (src) {
+        const img = el(doc, "img", "wv-homecol-home-pic");
+        img.setAttribute("alt", r.handle);
+        img.setAttribute("loading", "lazy");
+        img.addEventListener?.("error", () => img.remove());
+        img.src = src;
+        row.appendChild(img);
+      }
+      const who = el(doc, "span", "wv-homecol-home-who");
+      who.textContent = r.handle;
+      const via = el(doc, "span", "wv-homecol-home-via");
+      via.textContent = homeViaLine(r);
+      row.appendChild(who);
+      row.appendChild(via);
+      strip.appendChild(row);
+    }
+    scroll.appendChild(strip);
+  }
+
   if (model.byline) {
     const byline = el(doc, "div", "wv-homecol-byline");
     byline.textContent = model.byline;
@@ -482,6 +530,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       parcelId: view.parcelId ?? null,
       canEnter: !!view.canEnter,
       byline: view.byline ?? null,
+      residents: view.residents ?? [],
     }), { imagePath });
   };
 
@@ -555,6 +604,12 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-lead { margin:.9rem 0 0; }
 .wv-homecol-lead img { display:block; width:100%; border:1px solid var(--line); border-radius:4px; }
 .wv-homecol-byline { margin:.85rem 0 .1rem; color:var(--green); font-size:.76rem; }
+.wv-homecol-homes { margin:.7rem 0 .2rem; display:flex; flex-direction:column; gap:.35rem; }
+.wv-homecol-homes-head { color:var(--muted, #9aa); font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; }
+.wv-homecol-home { display:flex; align-items:center; gap:.5rem; font-size:.82rem; }
+.wv-homecol-home-pic { width:2.2rem; height:2.2rem; object-fit:cover; border-radius:4px; flex:none; }
+.wv-homecol-home-who { font-weight:600; }
+.wv-homecol-home-via { color:var(--muted, #9aa); font-size:.74rem; }
 .wv-homecol-body { color:var(--paper); font-size:.87rem; line-height:1.62; }
 .wv-homecol-body h1, .wv-homecol-body h2, .wv-homecol-body h3,
 .wv-homecol-body h4, .wv-homecol-body h5, .wv-homecol-body h6 {

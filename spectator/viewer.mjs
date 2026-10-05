@@ -45,9 +45,11 @@ import { recordSources, recordAbsenceMessage } from "../tools/record-sources.mjs
 // so the one thing that module may never do is parse a string as HTML — see its
 // header, and tools/home-column.test.mjs, which proves it cannot.
 import { createHomeColumn, homeHandleForParcel, isParcelMark, HOME_COLUMN_CSS } from "./home-column.mjs";
-// "which mark is this parcel's dwelling" — the record's one rule, shared with
-// the home-image backfill (POS-200). See homeMarkOfParcel below.
-import { dwellingsByParcel } from "../tools/dwelling.mjs";
+// HOMES ARE PER RESIDENT (POS-368, Darko 2026-10-04): the one resolver, shared
+// with the office. See homesOfParcel below. The dwelling picker
+// (tools/dwelling.mjs) is deleted: "a guess with a good score is still a guess;
+// the parcel is a fact".
+import { homeOf, homesOnParcel } from "../tools/where-is.mjs";
 
 const $ = (root, s) => root.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -261,24 +263,20 @@ export function parcelCardLabel(parcel, determined = {}) {
  *  cannot disagree: measured over all 92 rows at 5f042bb, every parcel mark's
  *  `at` is byte-equal to its published row's. Order is the published order, so
  *  `[0]` means what it means at the door. Pure. */
-export function householdHomeAt(handle, { parcels = [], marks = [] } = {}) {
+export function householdHomeAt(handle, { parcels = [], marks = [], households = null } = {}) {
   const who = String(handle ?? "");
   if (!who) return null;
-  const householdOf = (p) => String(p?.household ?? p?.by ?? "");
-  const rows = (parcels ?? []).filter((p) => householdOf(p) === who);
-  const fromMarks = (marks ?? []).filter((m) => m?.kind === "parcel" && householdOf(m) === who);
-  // `!= null` BEFORE the finiteness check, and it is not belt-and-braces:
-  // `Number(null)` is 0, not NaN, so a parcel row carrying a null coordinate
-  // would pass `Number.isFinite` and answer THE ORIGIN — which is precisely the
-  // failure `world-build.mjs` warns about where it publishes this list ("home
-  // resolution silently falls back to the Origin for everyone, which reads as
-  // ordinary 'no ground yet' behaviour and hides"). Caught by this function's
-  // own test before it shipped.
-  const placed = (p) => p?.at?.x != null && p?.at?.y != null
-    && Number.isFinite(Number(p.at.x)) && Number.isFinite(Number(p.at.y));
-  const held = (rows.length ? rows : fromMarks).find(placed);
-  if (!held) return null;
-  return { x: Number(held.at.x), y: Number(held.at.y), markId: held.id ?? null };
+  // HOMES ARE PER RESIDENT (POS-368): the one resolver, tools/where-is.mjs §
+  // homeOf — declared, else own parcel, else the household's first — so a
+  // resident with no parcel of their own is at home on the household's, and a
+  // declared house is where the jump lands. `markId` stays the GROUND (the
+  // parcel), which is what the presets label and dedupe by. A coordinate the
+  // record cannot finish (null, NaN) is never answered: homeOf skips an
+  // unplaced parcel and answers NOWHERE rather than the Origin.
+  const base = (parcels ?? []).length ? { marks: marks ?? [], parcels } : worldForHomes(marks ?? []);
+  const home = homeOf(who, { ...base, households: households ?? base.households ?? {} });
+  if (!home.placed) return null;
+  return { x: Number(home.x), y: Number(home.y), markId: home.parcel_id ?? null };
 }
 
 export function extentGlyphKind(mark) {
@@ -2395,51 +2393,53 @@ export function overlayHouseGlyphSVG({ at, id, classes = "", mine = false } = {}
     + `</g></g>`;
 }
 
-/** THE DWELLING OF A PARCEL IS THE RECORD'S ANSWER, NOT THE PAGE'S GUESS
- *  (POS-200, 2026-09-23; Keemin: "latnernstep house shows the art for the garden
- *  tin").
+/** THE HOMES ON A PARCEL — many residents to one parcel, by design (POS-368).
  *
- *  This used to be its own rule: any home-tier sited mark on the parcel,
- *  preferring one that carries a picture, first found wins. On rei's ground that
- *  was the Garden Notebook Tin — 0.4 × 0.3 m and pictured — beside the
- *  Lanternstep House, 12 × 12 m, pictured, and standing at the parcel's centre;
- *  the fold happened to list the tin first. The card's NAME was moved off the
- *  guess on 09-20 (parcelCardLabel); its PICTURE was not, so the house's column
- *  wore the tin. Measured on the live fold at crossing 207: 93 parcels, 85 where
- *  the guess and the record agree, 8 where they do not.
+ *  Darko, 2026-10-04: "A parcel shared by five housemates can be home to all
+ *  five. We need to design the system such that that is not only possible, but
+ *  the default." This SUPERSEDES the dwelling of a parcel (POS-200, 09-23), which
+ *  picked one sited mark per parcel by four layers of evidence and refused where
+ *  two answered. Nothing is picked now. Each resident whose home the parcel is
+ *  (tools/where-is.mjs § homeOf: declared, else own parcel, else the household's
+ *  first) comes back with `via` and, when they declared one, the house they
+ *  named on it (`home_mark`, the row) — their own word, never a guess.
  *
- *  The record already had a rule, written for the home-image backfill and
- *  ruled with it (2026-08-21: "the image rides the DWELLING, never the
- *  parcel"): the parcel's `slot: home` predicate; else its own child standing at
- *  its centre; else its only sited child; else the only mark at its centre; and
- *  where none of those is single, NO answer — picking one is a judgment. That
- *  rule is tools/dwelling.mjs, and this is a thin call into it: there is no
- *  second rule. Null where the record cannot single a dwelling out.
- *
- *  Resolved over the WHOLE list handed in, once per list (a list is the fold's
- *  own array on the Spectator, and the same array is asked about every parcel on
- *  the map, so the answer for all of them is kept beside it). A list read thin —
- *  the resident path's nearby entries — can answer less than the fold does; see
- *  `dwellingOf` in the viewer for how the resident path asks the full record
- *  instead. Pure. */
-const DWELLINGS_OF_LIST = new WeakMap();
-export function homeMarkOfParcel(parcelId, marks = []) {
-  if (!parcelId || !marks) return null;
-  const keyed = Array.isArray(marks) ? marks : null;
-  let dwellings = keyed ? DWELLINGS_OF_LIST.get(keyed) : null;
-  if (!dwellings) {
-    dwellings = dwellingsByParcel(keyed ?? [...(marks.values?.() ?? marks)]);
-    if (keyed) DWELLINGS_OF_LIST.set(keyed, dwellings);
-  }
-  return dwellings.get(parcelId) ?? null;
+ *  `world` is fold-shaped: `{ marks, parcels, households }` — the Spectator's
+ *  fold, or the world-state the resident path loads for the town's houses. A
+ *  bare list of rows is accepted too; its parcels are read in the list's order
+ *  and without a registry, which answers every declaration a holder made on
+ *  their own ground (what a thin list can know). Pure. */
+const WORLD_OF_LIST = new WeakMap();
+export function worldForHomes(world) {
+  if (!world) return { marks: [], parcels: [], households: {} };
+  if (!Array.isArray(world)) return world;
+  if (WORLD_OF_LIST.has(world)) return WORLD_OF_LIST.get(world);
+  const out = { marks: world, households: {}, parcels: world.filter((m) => m?.kind === "parcel" && m.at)
+    .map((m) => ({ id: m.id, household: m.household ?? m.by, at: m.at, extent: m.extent ?? { w: 25, h: 25 } })) };
+  WORLD_OF_LIST.set(world, out);
+  return out;
+}
+export function homesOfParcel(parcelId, world) {
+  if (!parcelId) return [];
+  const w = worldForHomes(world);
+  const rows = new Map((w.marks ?? []).map((m) => [m.id, m]));
+  return homesOnParcel(parcelId, w).map((h) => ({ ...h, home_mark: h.home_mark ? (rows.get(h.home_mark) ?? null) : null }));
 }
 
 /** THE COLUMN'S LEAD PICTURE (POS-200): the dwelling's own picture, else the
  *  parcel's own, else none. Never a child's by image-preference — `home` is the
  *  record's dwelling or null, and a parcel whose dwelling the record cannot
  *  single out shows its own picture or nothing, not a guess. Pure. */
-export function parcelLeadImage(parcel, home = null) {
-  return (home && markImagePath(home)) ?? markImagePath(parcel) ?? null;
+export function parcelLeadImage(parcel, home = null, picture = null) {
+  return housePicture(picture, home) ?? markImagePath(parcel) ?? null;
+}
+
+/** THE HOUSE'S PICTURE ON ITS PARCEL (POS-219, Keemin 2026-09-25/27/28): the
+ *  picture the household's record keeps for the parcel's holder, else the
+ *  dwelling mark's own picture (a picture a resident hung on the mark stays
+ *  that mark's own), else none. `picture` is `residentFace(holder).home`. Pure. */
+export function housePicture(picture = null, home = null) {
+  return (picture && markImagePath({ image: picture })) ?? (home && markImagePath(home)) ?? null;
 }
 
 /** THE ROOM IS ASKED OF THE MARKS THE PAGE HOLDS (2026-09-11). `investigate`
@@ -2614,13 +2614,21 @@ export function searchTheTown({ query, marks = [], people = [], limit = 8 } = {}
   return rows.slice(0, Math.max(0, limit));
 }
 
-export function townHouseMarks(marks = []) {
+export function townHouseMarks(marks = [], world = null) {
   const out = [];
+  const w = world ?? marks;
   for (const m of marks ?? []) {
     if (m?.kind !== "parcel" || !m.id) continue;
     out.push(m);
-    const home = homeMarkOfParcel(m.id, marks);
-    if (home) out.push(home);
+    // every house a resident DECLARED on this ground (POS-368) — their word, so
+    // a parcel with five housemates' houses carries five, and one with none
+    // rides alone
+    const seen = new Set();
+    for (const h of homesOfParcel(m.id, w)) {
+      if (!h.home_mark || seen.has(h.home_mark.id)) continue;
+      seen.add(h.home_mark.id);
+      out.push(h.home_mark);
+    }
   }
   return out;
 }
@@ -3561,6 +3569,11 @@ export function residentFace(handle, meta = null) {
     color: safeHexColor(meta?.color),
     monogram: monogramOf(name, handle),
     household: String(meta?.household ?? "").trim() || null,
+    // THE HOUSE'S PICTURE (POS-219): kept on the household's record in the
+    // office, one per resident, and carried here by the site's
+    // residents-meta.json. The media door's URL or nothing, by the same shelf
+    // test a mark's own image passes.
+    home: markImageURL({ image: meta?.home }),
   };
 }
 
@@ -6729,18 +6742,18 @@ export function mountViewer(appEl) {
   // exactly as the town's ground does. The read still decides everything else,
   // and a record the read carries wins over the copy here (see withTownHouses).
   let townHouses = null;          // the parcels + their dwellings, once loaded
-  let townDwellings = null;       // parcel id → its dwelling, resolved over the FULL record (POS-200)
+  let townWorld = null;           // the FULL record's fold-shaped copy, for homes per resident (POS-368)
   let townChain = null;           // id → { kind, parent, placementParent } for every mark on the record, from the same read
   let townHousesPending = null;
   function loadTownHouses() {
     if (townHouses || townHousesPending) return townHousesPending;
     townHousesPending = fetchWorldState(recordSources("/WORLD/world-state.json").map((source) => source.url), { credentials: "same-origin" })
       .then(({ json }) => {
-        townHouses = townHouseMarks(json?.marks ?? []);
-        // the same answer townHouseMarks just used, kept by parcel: the resident
-        // path's index is the read's nearby entries plus these houses, and the
-        // rule needs the whole record (its predicates, every child) to answer
-        townDwellings = new Map([...(json?.marks ?? [])].filter((m) => m?.kind === "parcel").map((m) => [m.id, homeMarkOfParcel(m.id, json.marks)]));
+        townWorld = { marks: json?.marks ?? [], parcels: json?.parcels ?? [], households: json?.households ?? {} };
+        townHouses = townHouseMarks(townWorld.marks, townWorld);
+        // the same record townHouseMarks just read is kept whole: the resident
+        // path's index is the read's nearby entries plus these houses, and homes
+        // per resident need the record's predicates, parcels and registry
         // the containment chain of every mark, for the rule that hides what is
         // inside a parcel: the read's nearby entries carry no parents
         townChain = new Map((json?.marks ?? []).map((m) => [m.id, { kind: m.kind ?? null, parent: m.parent ?? null, placementParent: m.placementParent ?? null }]));
@@ -6753,17 +6766,32 @@ export function mountViewer(appEl) {
   // the houses ride into the resident's index UNDER the read: an id the read
   // already carries keeps the office's own record, so a house within earshot
   // is never replaced by this origin's copy of it
-  // THE DWELLING OF A PARCEL, ASKED OF THE FULL RECORD (POS-200). The Spectator
-  // holds the fold, so the rule reads it. The resident path holds a read — thin
-  // nearby entries that carry no predicates and not every child — and the one
-  // full copy of the record it has is the world-state it loaded for the town's
-  // houses, so it asks that answer. No read is widened for it: the file is the
-  // one loadTownHouses already fetched. Until it lands, the rule is asked of
-  // what the page holds, which has less evidence than the fold and may answer
-  // less (no dwelling where the Spectator finds one).
-  function dwellingOf(parcelId) {
-    if (onResidentPath() && townDwellings) return townDwellings.get(parcelId) ?? null;
-    return homeMarkOfParcel(parcelId, allMarks());
+  // THE HOMES ON A PARCEL, ASKED OF THE FULL RECORD (POS-368). The Spectator
+  // holds the fold, so the resolver reads it. The resident path holds a read —
+  // thin nearby entries that carry no predicates — and the one full copy of the
+  // record it has is the world-state it loaded for the town's houses, so it asks
+  // that. No read is widened for it. Until it lands, it asks what the page holds.
+  // the sources householdHomeAt reads: the fold where one is in hand (its
+  // parcels in claim order, its registry), else the record the resident path
+  // loaded for the town's houses, else the marks the page holds
+  function homesSources() {
+    if (world?.parcels) return { parcels: world.parcels, marks: world.marks ?? allMarks(), households: world.households ?? data?.worldState?.households ?? null };
+    if (townWorld) return townWorld;
+    return { marks: allMarks() };
+  }
+  function homesOf(parcelId) {
+    if (onResidentPath()) return homesOfParcel(parcelId, townWorld ?? allMarks());
+    return homesOfParcel(parcelId, data?.worldState ?? allMarks());
+  }
+  // THE CARD'S PICTURE: the first resident's, holder first, from the household's
+  // record (POS-219), else the house they declared; with nobody at home, the
+  // holder's record picture. Never a picked dwelling.
+  function homesPicture(parcel, homes) {
+    for (const h of homes) {
+      const p = housePicture(faceOf(h.handle).home, h.home_mark);
+      if (p) return p;
+    }
+    return homes.length ? null : housePicture(faceOf(homeHandleForParcel(parcel, null)).home, null);
   }
   function withTownHouses() {
     // adds the town's houses the index lacks, and fills what the resident's own
@@ -9551,7 +9579,7 @@ export function mountViewer(appEl) {
     const mine = isOwnMark(parcel);
     if (mine) tier = "near";
     if (tier === "far") return overlayHouseGlyphSVG({ at, id: parcel.id, classes: markClasses(parcel), mine });
-    const home = dwellingOf(parcel.id);
+    const homes = homesOf(parcel.id);
     const room = tier === "mid"
       ? footprintPx(parcel, { across: metresAcross(mapCtx?.zoomK, paintingWidthM()), panePx: panePx() })
         >= Number(state.drawDials.art_min_px)
@@ -9568,7 +9596,7 @@ export function mountViewer(appEl) {
       // Lanternstep House beside it. The ground has a name already. (The pick is
       // the record's own rule now — POS-200 — and the picture below rides it.)
       label: parcelCardLabel(parcel, data?.worldState?.determined ?? {}),
-      image: room && home ? markImagePath(home) : null,
+      image: room ? homesPicture(parcel, homes) : null,
       thumb: thumbFor(CARD_UNITS, mine),
       lit: houseIsLit(parcel, walkState.walkers, (h) => faceOf(h).household),
       fan, title,
@@ -10053,7 +10081,7 @@ export function mountViewer(appEl) {
   function homeFor(handle) {
     const cached = viewCache.get(handle)?.home;
     if (cached && Number.isFinite(cached.x) && Number.isFinite(cached.y)) return cached;
-    return householdHomeAt(handle, { parcels: world?.parcels ?? [], marks: allMarks() });
+    return householdHomeAt(handle, homesSources());
   }
   // Where a handle stands — the walk ledger first, their home second. One
   // function for every resident in the household, because a view built ahead
@@ -10858,7 +10886,7 @@ export function mountViewer(appEl) {
     // painting's grid_m. The ground the household HOLDS answers instead
     // (postmark#3025) — the same parcel centre the office's own `homeOf`
     // returns, so an unreachable office costs the page freshness, not truth.
-    state.actorHome = householdHomeAt(state.handle, { parcels: world?.parcels ?? [], marks: allMarks() });
+    state.actorHome = householdHomeAt(state.handle, homesSources());
   }
 
   async function loadActorBalance() {
@@ -11498,9 +11526,12 @@ export function mountViewer(appEl) {
     // radial entries"); measured here 2026-09-11, the column's lead picture was
     // null for wright on the resident path and present for a spectator looking
     // at the same house, which is the same bug wearing different clothes.
-    const found = dwellingOf(mark.id);
-    const home = found ? (byId.get(found.id) ?? found) : null;
-    const handle = homeHandleForParcel(mark, home);
+    // EVERY RESIDENT WHOSE HOME THIS IS (POS-368), holder first. The door read
+    // is the first resident's home page; the strip under the title shows them
+    // all, each with their own picture from the household's record.
+    const homes = homesOf(mark.id).map((h) => ({ ...h, home_mark: h.home_mark ? (byId.get(h.home_mark.id) ?? h.home_mark) : null }));
+    const home = homes[0]?.home_mark ?? null;
+    const handle = homes[0]?.handle ?? homeHandleForParcel(mark, null);
     if (!handle) return null;
     const parcelId = mark.id, canEnter = canAct();
     return {
@@ -11517,7 +11548,12 @@ export function mountViewer(appEl) {
       title: parcelCardLabel(mark, data?.worldState?.determined ?? {}),
       // the dwelling's picture, and failing that the ground's own — the
       // RECORD's dwelling (POS-200), never the first pictured child
-      leadImage: parcelLeadImage(mark, home),
+      leadImage: parcelLeadImage(mark, home, faceOf(handle).home),
+      residents: homes.map((h) => ({
+        handle: h.handle, via: h.via,
+        picture: housePicture(faceOf(h.handle).home, h.home_mark),
+        house: h.home_mark ? markIdentity(h.home_mark) : null,
+      })),
     };
   }
   // WHAT THE COLUMN SHOWS FOR A REGION (Keemin, 2026-09-13: "we should be able
@@ -14136,7 +14172,7 @@ export function mountViewer(appEl) {
     const seen = new Set();
     const mine = [];
     for (const handle of state.whoami?.handles ?? []) {
-      const at = householdHomeAt(handle, { parcels, marks });
+      const at = householdHomeAt(handle, homesSources());
       if (!at || seen.has(at.markId)) continue;   // one household, several handles, one ground
       seen.add(at.markId);
       const parcel = byId.get(at.markId) ?? marks.find((m) => m?.id === at.markId) ?? { id: at.markId };

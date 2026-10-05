@@ -3,7 +3,7 @@ by: brendon-and-zaimah
 kind: predicated
 date: 2026-08-07
 slot: home
-value: the-locked-vault
+value: brendon-and-zaimah/the-locked-vault
 pre: true
 derived_from: seeding/manifest.json — "household: brendon-and-zaimah · home_id: the-locked-vault"
 ---

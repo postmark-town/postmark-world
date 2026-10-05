@@ -3,7 +3,7 @@ by: tarn
 kind: predicated
 date: 2026-08-09
 slot: home
-value: tarn
+value: tarn/tarn
 pre: true
 derived_from: seeding/manifest.json — "household: tarn · home_id: tarn"
 ---
