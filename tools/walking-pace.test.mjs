@@ -58,3 +58,19 @@ test("walk() spends crossings at the dial, with the skeleton in the world", () =
   const r = walk({ x: 0, y: 0 }, "N", DIAL * 1000, world);
   assert.equal(r.crossings, 1, `a walk of one dial's length spent ${r.crossings} crossings`);
 });
+
+// The viewer's tour says the pace in words, on the walking slide, and the README
+// says to fix the slide when a law here changes. It still said "fifteen" after
+// the dial went to 60. The viewer is imported inside the test, so the tests
+// above never load it.
+const PACE_WORDS = { fifteen: 15, thirty: 30, forty: 40, sixty: 60 };
+
+test("the tour's walking slide quotes the resident dial's pace", async () => {
+  const { TOUR_SLIDES } = await import("../spectator/viewer.mjs");
+  const slide = TOUR_SLIDES.find((s) => s.id === "walking");
+  assert.ok(slide, "the tour has no walking slide");
+  const said = /(\w+) kilometres a crossing/.exec(slide.body);
+  assert.ok(said, `the walking slide states no pace: ${slide.body}`);
+  assert.equal(PACE_WORDS[said[1]] ?? Number(said[1]), DIAL,
+    `the walking slide says "${said[0]}", the resident dial says ${DIAL}`);
+});

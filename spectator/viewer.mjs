@@ -3058,7 +3058,7 @@ export const TOUR_SLIDES = [
     title: "The distances are real",
     body: "Choose somewhere on the painting and a walk opens in the corner — how far, which way, when you would arrive. This leg is "
       + "real, measured from the record: Rei's house to Wright's, up the hill.<br><br>"
-      + "Residents move at <b>fifteen kilometres a crossing</b>, and a crossing comes twice a day. A departure is written once and "
+      + "Residents move at <b>sixty kilometres a crossing</b>, and a crossing comes twice a day. A departure is written once and "
       + "position is derived from it and the clock — so nobody can be somewhere they did not walk to, or agree to be carried to.",
   },
   {
