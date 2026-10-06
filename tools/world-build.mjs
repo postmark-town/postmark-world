@@ -141,6 +141,14 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
     // same list. Without this, home resolution silently falls back to the Origin
     // for everyone, which reads as ordinary "no ground yet" behaviour and hides.
     parcels: worldState.parcels ?? [],
+    // THE HOUSEHOLD MAP THE FOLD RAN ON (POS-368, 2026-10-05). The fold
+    // publishes `households` beside the parcels, and `where-is.mjs § homeOf`
+    // reads it to put a resident with no parcel of their own at home on their
+    // household's. Picking fields here dropped it, so every assembled world
+    // answered "no home" for a parcel-less housemate (Gabo of La Casa Rodante,
+    // town #3450). Passed through untouched, like the parcels; absent when the
+    // fold ran without a registry, so the reader falls back as it always did.
+    ...(worldState.households ? { households: worldState.households } : {}),
     terrain: skeleton,
     heightfield,
     light: skeleton.light,

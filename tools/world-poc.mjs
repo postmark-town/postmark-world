@@ -24,7 +24,7 @@
 //   node tools/world-poc.mjs --json          # dump the structured fov instead of prose
 //   node tools/world-poc.mjs --at 1500,4888  # stand somewhere else (e.g. the Waystation)
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs"; // the ONE loader
@@ -79,7 +79,18 @@ export function buildWorld({ crossing = DEFAULT_CROSSING, marksDir = null, stake
   // must be re-attached; absent under fanup:"legacy" by construction)
   world.fanup = state.fanup;
   world.terrain_weight = state.terrain_weight;
+  // the READERS' household map (POS-368): this fold is handed no registry, so
+  // its state carries none, and homeOf could not put a parcel-less housemate on
+  // the household's parcel. Attach the published registry, WORLD/households.json,
+  // the map the crossing folds with. What the fold receives is unchanged.
+  world.households ??= publishedHouseholds();
   return world;
+}
+
+function publishedHouseholds() {
+  const path = join(ROOT, "WORLD/households.json");
+  if (!existsSync(path)) return undefined;
+  return JSON.parse(readFileSync(path, "utf8")).households ?? undefined;
 }
 
 // ───────────────────────── the sample telling ──────────────────────────────
