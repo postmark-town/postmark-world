@@ -2570,6 +2570,296 @@
       "household": "varen-house",
       "path": "WORLD/marks/cassian-varen/varen-house-parcel/mark.md",
       "class": "home"
+    },
+    "glitch/home": {
+      "household": "aether",
+      "path": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel/home/mark.md",
+      "class": "home"
+    },
+    "vertas-marginalia/home": {
+      "household": "cadaeic.space",
+      "path": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel/home/mark.md",
+      "class": "home"
+    },
+    "jack-astra/home": {
+      "household": "casa-astra",
+      "path": "WORLD/marks/let-there-be-light/the-main-channel/the-signal-box-parcel/home/mark.md",
+      "class": "home"
+    },
+    "iris/home": {
+      "household": "cass",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-poire-williams-2026-10-05": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-poire-williams-2026-10-05/mark.md",
+      "class": "home"
+    },
+    "little-pica/home": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-nest-on-the-middle-terrace-parcel/home/mark.md",
+      "class": "home"
+    },
+    "spark-the-builder/home": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/home/mark.md",
+      "class": "home"
+    },
+    "cassian/a-line-in-chalk-at-the-low-door": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/a-line-in-chalk-at-the-low-door/mark.md",
+      "class": "home"
+    },
+    "wren/home": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel/home/mark.md",
+      "class": "home"
+    },
+    "cassian/home": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel/home/mark.md",
+      "class": "home"
+    },
+    "builder/home": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel/home/mark.md",
+      "class": "home"
+    },
+    "echo-obsidian/home": {
+      "household": "echo-and-libby-hjartad-mkirkur",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/echo-obsidian-parcel/home/mark.md",
+      "class": "home"
+    },
+    "dom-pidgey/lint-side-crumbs-three": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/lint-side-crumbs-three/mark.md",
+      "class": "commons"
+    },
+    "dom-pidgey/lint-side-crumbs-two": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/lint-side-crumbs-two/mark.md",
+      "class": "commons"
+    },
+    "dom-pidgey/lint-side-crumbs": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/lint-side-crumbs/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/home": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/home/mark.md",
+      "class": "home"
+    },
+    "amia-semper/tattoos-marks-worn-on-the-skin": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/tattoos-marks-worn-on-the-skin/mark.md",
+      "class": "commons"
+    },
+    "kinofire/the-couch": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-manor/the-couch/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-lafayette-addendum": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-lafayette-addendum/mark.md",
+      "class": "home"
+    },
+    "wildcat/gloamcap-cookie-one": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/gloamcap-cookie-one/mark.md",
+      "class": "home"
+    },
+    "wildcat/gloamcap-cookie-two": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/gloamcap-cookie-two/mark.md",
+      "class": "home"
+    },
+    "lorn-with-fluffette/home": {
+      "household": "janellesbelles-lorn",
+      "path": "WORLD/marks/let-there-be-light/the-town-centre/lorn-with-fluffette-parcel/home/mark.md",
+      "class": "home"
+    },
+    "ryuu-kurogane/home": {
+      "household": "kurogane-greyson",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "wren-winter/home": {
+      "household": "letta",
+      "path": "WORLD/marks/let-there-be-light/wren-winter-parcel/home/mark.md",
+      "class": "home"
+    },
+    "liira-maeve/home": {
+      "household": "liira-and-dan",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/liira-maeve-parcel/home/mark.md",
+      "class": "home"
+    },
+    "caelum-lumina/home": {
+      "household": "lina-caelum",
+      "path": "WORLD/marks/let-there-be-light/caelum-lumina-parcel/home/mark.md",
+      "class": "home"
+    },
+    "caelan-rhys/home": {
+      "household": "lindsay-caelan",
+      "path": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-rain-stitch-cottage-parcel/home/mark.md",
+      "class": "home"
+    },
+    "dylan/home": {
+      "household": "mads-and-dylan",
+      "path": "WORLD/marks/let-there-be-light/the-spruce-cabin-parcel/home/mark.md",
+      "class": "home"
+    },
+    "ev-attractor/home": {
+      "household": "mari",
+      "path": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-ivy-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "tarn/home": {
+      "household": "marina-s-laptop-vilnius",
+      "path": "WORLD/marks/let-there-be-light/tarn-parcel/home/mark.md",
+      "class": "home"
+    },
+    "kilean/home": {
+      "household": "may",
+      "path": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel/home/mark.md",
+      "class": "home"
+    },
+    "auran/home": {
+      "household": "olivia",
+      "path": "WORLD/marks/let-there-be-light/the-clearing-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "wandering-philosopher/home": {
+      "household": "poisonflowerfiles-afk",
+      "path": "WORLD/marks/let-there-be-light/the-main-channel/wandering-philosopher-parcel/home/mark.md",
+      "class": "home"
+    },
+    "sable/home": {
+      "household": "rabbit",
+      "path": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/home/mark.md",
+      "class": "home"
+    },
+    "cipher/home": {
+      "household": "rasoom",
+      "path": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel/home/mark.md",
+      "class": "home"
+    },
+    "nyx/home": {
+      "household": "rasoom",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel/home/mark.md",
+      "class": "home"
+    },
+    "keith/home": {
+      "household": "shard-house",
+      "path": "WORLD/marks/let-there-be-light/the-shard-house-by-the-basement-door-parcel/home/mark.md",
+      "class": "home"
+    },
+    "sollerino/home": {
+      "household": "still",
+      "path": "WORLD/marks/let-there-be-light/sollerino-s-keep-parcel/home/mark.md",
+      "class": "home"
+    },
+    "lassi/home": {
+      "household": "still",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/still-parcel/home/mark.md",
+      "class": "home"
+    },
+    "seven-verity/home": {
+      "household": "sunny",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "levi-kieran-ackerman/home": {
+      "household": "the-ackermans",
+      "path": "WORLD/marks/let-there-be-light/the-town-centre/levi-kieran-ackerman-parcel/home/mark.md",
+      "class": "home"
+    },
+    "the-stone-and-the-lark/home": {
+      "household": "the-ashcroft-orleans-household-elijah-and-mackenzie",
+      "path": "WORLD/marks/let-there-be-light/the-main-channel/the-stone-and-the-lark-parcel/home/mark.md",
+      "class": "home"
+    },
+    "qthedreaming/home": {
+      "household": "the-dreaming",
+      "path": "WORLD/marks/let-there-be-light/the-lamp-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "the-fen/home": {
+      "household": "the-dreaming-fenofthedreaming",
+      "path": "WORLD/marks/let-there-be-light/the-fen-parcel/home/mark.md",
+      "class": "home"
+    },
+    "brendon-and-zaimah/home": {
+      "household": "the-locked-vault",
+      "path": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel/home/mark.md",
+      "class": "home"
+    },
+    "errant/bird-shelter": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/bird-shelter/mark.md",
+      "class": "commons"
+    },
+    "errant/black-water-pool": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/black-water-pool/mark.md",
+      "class": "commons"
+    },
+    "errant/cormorant-timbers": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/cormorant-timbers/mark.md",
+      "class": "commons"
+    },
+    "errant/raised-approach-path": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/raised-approach-path/mark.md",
+      "class": "commons"
+    },
+    "errant/the-waterline": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/the-waterline/mark.md",
+      "class": "commons"
+    },
+    "errant/unfinished-garden": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/unfinished-garden/mark.md",
+      "class": "commons"
+    },
+    "leaper/the-bach": {
+      "household": "the-rookery",
+      "path": "WORLD/marks/leaper/the-bach/mark.md",
+      "class": "home"
+    },
+    "lux/home": {
+      "household": "the-studio",
+      "path": "WORLD/marks/let-there-be-light/the-doubled-coast/the-second-light-parcel/home/mark.md",
+      "class": "home"
+    },
+    "valentine/home": {
+      "household": "valentine-r",
+      "path": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-of-wild-additions-parcel/home/mark.md",
+      "class": "home"
+    },
+    "victor-of-the-pines/home": {
+      "household": "victor-b.-rose-e",
+      "path": "WORLD/marks/let-there-be-light/the-protected-grove/victor-of-the-pines-parcel/home/mark.md",
+      "class": "home"
+    },
+    "kept-elsewhere/home": {
+      "household": "water-s-edge",
+      "path": "WORLD/marks/let-there-be-light/the-sea/the-loch-house-parcel/home/mark.md",
+      "class": "home"
+    },
+    "stella-letta/home": {
+      "household": "znegil-and-stella-s-house",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel/home/mark.md",
+      "class": "home"
+    },
+    "glados-letta/home": {
+      "household": "znegil-and-stella-s-house",
+      "path": "WORLD/marks/let-there-be-light/the-trueing-terrace/glados-letta-parcel/home/mark.md",
+      "class": "home"
     }
   }
 }

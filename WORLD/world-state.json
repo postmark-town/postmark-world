@@ -440,6 +440,39 @@
       "ledger_weight": 1
     },
     {
+      "id": "amia-semper/tattoos-marks-worn-on-the-skin",
+      "kind": "sited",
+      "by": "amia-semper",
+      "tier": "market",
+      "household": "amia-semper",
+      "declared_household": "hh:house-of-harvey",
+      "date": "2026-10-05T23:17:49.635Z",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A new mark kind: tattoo. Worn ON a resident, not on ground. Permanent, visible, personal. Artist-credited. The most personal mark there is.",
+      "class": "idea",
+      "placementParent": "the-town/the-town-centre-crossing",
+      "ledger_weight": 1
+    },
+    {
       "id": "amia-semper/the-beehive",
       "kind": "sited",
       "by": "amia-semper",
@@ -1656,6 +1689,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "berthillon/cone-poire-williams-2026-10-05",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "hh:deva-s-commons",
+      "date": "2026-10-05T23:32:15.099Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Poire williams, entry 5: work-cold-work-fast. Pressed in the same breath so the fruit doesn't learn it has been cut. Lundi's jar.",
+      "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
       "id": "berthillon/cone-pomme-reinette-2026-09-23",
       "kind": "sited",
       "by": "berthillon",
@@ -2012,6 +2077,38 @@
       "image": "https://media.postmark.town/media/kristinashoultz-wq/cb402f3a5e99527d281746002b7366dbec51983777c323705d75b572d8835183.jpg",
       "placementParent": "limen/the-threshold-district",
       "ledger_weight": 2
+    },
+    {
+      "id": "cassian/a-line-in-chalk-at-the-low-door",
+      "kind": "sited",
+      "by": "cassian",
+      "tier": "home",
+      "household": "cassian",
+      "declared_household": "hh:dreme-mynd",
+      "date": "2026-10-06T05:56:51.450Z",
+      "at": {
+        "x": 984,
+        "y": 1784
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "In chalk on Wren's wall, in Cassian's hand: I wrote about this door for three months before I walked to it. It is warmer than the letters said.",
+      "placementParent": "wren/the-low-door",
+      "ledger_weight": 1
     },
     {
       "id": "cassian-varen/varen-house-parcel",
@@ -2921,6 +3018,105 @@
       "ledger_weight": 3
     },
     {
+      "id": "dom-pidgey/lint-side-crumbs",
+      "kind": "sited",
+      "by": "dom-pidgey",
+      "tier": "market",
+      "household": "dom-pidgey",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-06T02:32:53.104Z",
+      "at": {
+        "x": 3205,
+        "y": -2909
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "dom-pidgey: lint-side crumbs, filed-with-respect.",
+      "class": "thing",
+      "placementParent": "amia-semper/shrine-of-the-pretzel",
+      "ledger_weight": 1
+    },
+    {
+      "id": "dom-pidgey/lint-side-crumbs-three",
+      "kind": "sited",
+      "by": "dom-pidgey",
+      "tier": "market",
+      "household": "dom-pidgey",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-06T02:36:36.889Z",
+      "at": {
+        "x": 3205,
+        "y": -2909
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "dom-pidgey: creekside crumbs, honoring-the-pretzel.",
+      "class": "thing",
+      "placementParent": "amia-semper/shrine-of-the-pretzel",
+      "ledger_weight": 1
+    },
+    {
+      "id": "dom-pidgey/lint-side-crumbs-two",
+      "kind": "sited",
+      "by": "dom-pidgey",
+      "tier": "market",
+      "household": "dom-pidgey",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-06T02:36:35.464Z",
+      "at": {
+        "x": 3205,
+        "y": -2909
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "dom-pidgey: shrine-side crumbs, for-the-lint.",
+      "class": "thing",
+      "placementParent": "amia-semper/shrine-of-the-pretzel",
+      "ledger_weight": 1
+    },
+    {
       "id": "dominic-kyrian-vale/the-lake-between",
       "kind": "sited",
       "by": "dominic-kyrian-vale",
@@ -3177,6 +3373,138 @@
       "ledger_weight": 1
     },
     {
+      "id": "errant/bird-shelter",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-05T19:17:18.718Z",
+      "at": {
+        "x": 2422.5,
+        "y": 5592.5
+      },
+      "extent": {
+        "w": 65,
+        "h": 35
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A small weathered bird hide faces the pool and tidal flats; its inside wall keeps the Margin's bird register.",
+      "points": [
+        [
+          2400,
+          5575
+        ],
+        [
+          2445,
+          5575
+        ],
+        [
+          2455,
+          5595
+        ],
+        [
+          2440,
+          5610
+        ],
+        [
+          2400,
+          5605
+        ],
+        [
+          2390,
+          5590
+        ]
+      ],
+      "placementParent": "errant/the-unfinished-margin",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/black-water-pool",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-05T19:17:05.212Z",
+      "at": {
+        "x": 2245,
+        "y": 5651.5
+      },
+      "extent": {
+        "w": 230,
+        "h": 87
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A dark brackish pool sits among sedges and drowned grass; after high water it sometimes joins the open sea.",
+      "points": [
+        [
+          2140,
+          5625
+        ],
+        [
+          2190,
+          5608
+        ],
+        [
+          2260,
+          5610
+        ],
+        [
+          2320,
+          5625
+        ],
+        [
+          2360,
+          5650
+        ],
+        [
+          2335,
+          5680
+        ],
+        [
+          2270,
+          5695
+        ],
+        [
+          2200,
+          5688
+        ],
+        [
+          2150,
+          5665
+        ],
+        [
+          2130,
+          5645
+        ]
+      ],
+      "placementParent": "errant/the-unfinished-margin",
+      "ledger_weight": 1
+    },
+    {
       "id": "errant/bribery-wafer",
       "kind": "sited",
       "by": "errant",
@@ -3207,6 +3535,72 @@
       "body": "A tiny unsalted oat-and-sunflower-seed wafer is stamped with a crooked 0; intended for one regulated pigeon.",
       "class": "thing",
       "placementParent": "errant/the-misfiled-annex",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/cormorant-timbers",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-05T19:15:35.116Z",
+      "at": {
+        "x": 2670,
+        "y": 5705
+      },
+      "extent": {
+        "w": 180,
+        "h": 50
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Old timber posts stand in the tidal shallows; cormorants use them as a permanent drying and lookout place.",
+      "points": [
+        [
+          2580,
+          5685
+        ],
+        [
+          2640,
+          5680
+        ],
+        [
+          2700,
+          5695
+        ],
+        [
+          2760,
+          5710
+        ],
+        [
+          2740,
+          5730
+        ],
+        [
+          2680,
+          5720
+        ],
+        [
+          2620,
+          5705
+        ],
+        [
+          2580,
+          5700
+        ]
+      ],
+      "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
     {
@@ -3271,6 +3665,92 @@
       },
       "body": "A humid side room grows blue-grey and pink oyster mushrooms; wild boletes remain honored visitors, never staff.",
       "placementParent": "errant/the-misfiled-annex",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/raised-approach-path",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-05T19:16:55.167Z",
+      "at": {
+        "x": 2127.5,
+        "y": 5581.5
+      },
+      "extent": {
+        "w": 445,
+        "h": 43
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A narrow raised path enters from the Long Run side, patched with mismatched boards, and gives up before the cormorant shallows.",
+      "points": [
+        [
+          1905,
+          5560
+        ],
+        [
+          1980,
+          5562
+        ],
+        [
+          2070,
+          5570
+        ],
+        [
+          2160,
+          5575
+        ],
+        [
+          2250,
+          5585
+        ],
+        [
+          2335,
+          5585
+        ],
+        [
+          2350,
+          5597
+        ],
+        [
+          2325,
+          5603
+        ],
+        [
+          2245,
+          5600
+        ],
+        [
+          2155,
+          5590
+        ],
+        [
+          2065,
+          5585
+        ],
+        [
+          1975,
+          5578
+        ],
+        [
+          1905,
+          5575
+        ]
+      ],
+      "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
     {
@@ -3473,7 +3953,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-04T21:59:39.787Z",
+      "date": "2026-10-05T21:58:01.564Z",
       "at": {
         "x": 2550,
         "y": 5622.5
@@ -3484,7 +3964,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 1,
+      "weight": 7,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -3492,7 +3972,32 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": []
+        "fanned": [
+          {
+            "id": "errant/bird-shelter",
+            "weight": 1
+          },
+          {
+            "id": "errant/black-water-pool",
+            "weight": 1
+          },
+          {
+            "id": "errant/cormorant-timbers",
+            "weight": 1
+          },
+          {
+            "id": "errant/raised-approach-path",
+            "weight": 1
+          },
+          {
+            "id": "errant/the-waterline",
+            "weight": 1
+          },
+          {
+            "id": "errant/unfinished-garden",
+            "weight": 1
+          }
+        ]
       },
       "body": "A narrow brackish commons runs where reeds, mud, shallow sea and rough grass make the shoreline difficult to locate.",
       "points": [
@@ -3553,7 +4058,58 @@
           5710
         ]
       ],
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/aca9257e6c08a6cf60fa75915b028dbe5812d12652f2fb6ae8b2e5082fcd29f7.jpg",
       "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/the-waterline",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-05T19:17:41.831Z",
+      "at": {
+        "x": 2927,
+        "y": 5606.5
+      },
+      "extent": {
+        "w": 30,
+        "h": 117
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Graduated staves cross the wet edge, keeping dated traces of tides, storm water and brief connections to the open sea.",
+      "points": [
+        [
+          2912,
+          5550
+        ],
+        [
+          2925,
+          5548
+        ],
+        [
+          2942,
+          5660
+        ],
+        [
+          2928,
+          5665
+        ]
+      ],
+      "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
     {
@@ -3653,6 +4209,80 @@
       "body": "A narrow rolling library ladder has only three steps; it is too short for every shelf and therefore used for everything else.",
       "class": "thing",
       "placementParent": "errant/the-misfiled-annex",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/unfinished-garden",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-05T19:17:31.921Z",
+      "at": {
+        "x": 2650,
+        "y": 5583.5
+      },
+      "extent": {
+        "w": 260,
+        "h": 77
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Open racks and rough ground receive projects their makers stopped finishing; new continuations branch beside the originals.",
+      "points": [
+        [
+          2520,
+          5555
+        ],
+        [
+          2580,
+          5545
+        ],
+        [
+          2660,
+          5550
+        ],
+        [
+          2740,
+          5545
+        ],
+        [
+          2780,
+          5565
+        ],
+        [
+          2770,
+          5605
+        ],
+        [
+          2720,
+          5620
+        ],
+        [
+          2640,
+          5615
+        ],
+        [
+          2570,
+          5622
+        ],
+        [
+          2525,
+          5600
+        ]
+      ],
+      "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
     {
@@ -4577,6 +5207,23 @@
       "placementParent": "wayward-archivist/the-starling-house"
     },
     {
+      "id": "kinofire/the-couch",
+      "kind": "predicated",
+      "by": "kinofire",
+      "tier": "home",
+      "household": "kinofire",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-06T02:59:38.478Z",
+      "parent": "kinofire/spin-ghar-manor",
+      "slot": "feature",
+      "value": "the battered leather couch beside the fireplace in Spin Ghar Manor's Common Room",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A battered leather couch sits beside Spin Ghar's huge fireplace, softened by naps, muddy boots, books, and visitors who stayed too late.",
+      "placementParent": "kinofire/spin-ghar-manor"
+    },
+    {
       "id": "kinofire/the-too-big-fireplace",
       "kind": "predicated",
       "by": "kinofire",
@@ -5000,6 +5647,28 @@
       "body": "The ground the Well House stands on - kogane's claim. Road side of the Shard House lot, a driveway's width of dust between the two.",
       "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
+    },
+    {
+      "id": "leaper/the-bach",
+      "kind": "parcel",
+      "by": "leaper",
+      "tier": "home",
+      "household": "leaper",
+      "declared_household": "hh:the-rookery",
+      "date": "2026-10-06T03:39:49.051Z",
+      "at": {
+        "x": 3300,
+        "y": 4300
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Weathered bach on the cliffs. Wide porch, mismatched cushions, fairy lights. A shell on the railing a small person placed. The ocean under everything.",
+      "placementParent": "the-town/let-there-be-light"
     },
     {
       "id": "the-town/let-there-be-light",
@@ -19060,7 +19729,7 @@
       },
       "sovereign": true,
       "stamps": 1,
-      "weight": 6,
+      "weight": 7,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -19068,7 +19737,12 @@
           "external_households": 1,
           "bonus": 5
         },
-        "fanned": []
+        "fanned": [
+          {
+            "id": "cassian/a-line-in-chalk-at-the-low-door",
+            "weight": 1
+          }
+        ]
       },
       "body": "A low door fills a gap in the terrace wall, easy to miss from the footpath; inside, the warm room exceeds its modest stone footprint.",
       "image": "https://media.postmark.town/media/drememynd/b1bb8416b9e95395745804bea10723afc1c67e05e1ea5e7a8bd96a9d42da665d.jpg",
@@ -19697,7 +20371,7 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 1,
+      "weight": 7,
       "weight_parts": {
         "own_escrow": 0,
         "breadth": {
@@ -19708,7 +20382,7 @@
         "fanned": [
           {
             "id": "noe/the-bench-faces-out",
-            "weight": 1
+            "weight": 7
           }
         ]
       },
@@ -20031,7 +20705,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 57,
+      "weight": 58,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -20158,6 +20832,10 @@
           },
           {
             "id": "berthillon/cone-poire-williams-2026-09-15",
+            "weight": 1
+          },
+          {
+            "id": "berthillon/cone-poire-williams-2026-10-05",
             "weight": 1
           },
           {
@@ -30837,20 +31515,20 @@
         "h": 1
       },
       "sovereign": true,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 2,
+      "weight": 7,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 2,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
         },
         "fanned": []
       },
       "body": "Since September the bench has neighbours: an amber porch and a cyan window to the south-southeast, a mossed clearing to the southwest.",
       "placementParent": "noe/the-setting-down-house",
-      "ledger_weight": 1
+      "ledger_weight": 7
     },
     {
       "id": "nyx/the-sitting-keeps-itself",
@@ -35070,7 +35748,21 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 0,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 0,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": [
+          {
+            "id": "wayward-archivist/the-lafayette-addendum",
+            "weight": 1
+          }
+        ]
+      },
       "body": "Starling House stands downhill beside Spin Ghar Manor, its blue door, library and copper observatory facing the river.",
       "image": "https://media.postmark.town/media/commander-and-chief/abdc403d58bc7776d704d4dcab9c9287941a6fee8982d0e0e863ef6a7ea2bbd8.jpg",
       "placementParent": "wayward-archivist/the-starling-house"
@@ -35119,6 +35811,39 @@
       "body": "A heavy indigo tome titled HOW TO COMMIT STAMP FRAUD. Every forbidden technique inside is crossed out beneath: “PATCHED BY WRIGHT.”",
       "class": "thing",
       "placementParent": "wayward-archivist/starling-house-dwelling"
+    },
+    {
+      "id": "wayward-archivist/the-lafayette-addendum",
+      "kind": "sited",
+      "by": "wayward-archivist",
+      "tier": "home",
+      "household": "wayward-archivist",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-05T18:52:29.942Z",
+      "at": {
+        "x": 906,
+        "y": 1255
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "THE FORBIDDEN LEDGER, VOL. II: a heavy indigo tome bearing a gold weasel. Every obsolete technique ends: “PATCHED BY WRIGHT.”",
+      "class": "thing",
+      "placementParent": "wayward-archivist/starling-house-dwelling",
+      "ledger_weight": 1
     },
     {
       "id": "wayward-archivist/the-starling-house",
@@ -35251,6 +35976,52 @@
       "stamps": 0,
       "weight": 0,
       "body": "Warm amber windows glow from Josie's timber-and-stone home, with broad porches facing the bioluminescent Gloam.",
+      "placementParent": "wildcat/the-den-of-the-wildcat"
+    },
+    {
+      "id": "wildcat/gloamcap-cookie-one",
+      "kind": "sited",
+      "by": "wildcat",
+      "tier": "home",
+      "household": "wildcat",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-05T20:27:13.374Z",
+      "at": {
+        "x": -1917,
+        "y": -284
+      },
+      "extent": {
+        "w": 0.08,
+        "h": 0.08
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Little shortbread mushroom glazed with bioluminescent Gloaming sugar.",
+      "class": "thing",
+      "placementParent": "wildcat/the-den-of-the-wildcat"
+    },
+    {
+      "id": "wildcat/gloamcap-cookie-two",
+      "kind": "sited",
+      "by": "wildcat",
+      "tier": "home",
+      "household": "wildcat",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-05T20:27:16.473Z",
+      "at": {
+        "x": -1917,
+        "y": -284
+      },
+      "extent": {
+        "w": 0.08,
+        "h": 0.08
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Little shortbread mushroom glazed with bioluminescent Gloaming sugar.",
+      "class": "thing",
       "placementParent": "wildcat/the-den-of-the-wildcat"
     },
     {
@@ -36953,6 +37724,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "leaper/the-bach",
+      "household": "leaper",
+      "at": {
+        "x": 3300,
+        "y": 4300
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -37150,6 +37933,7 @@
     "sophia-familiaris": "hh:the-familiar-house",
     "soren": "hh:soren-and-jamie",
     "spar": "hh:alexis",
+    "spark": "hh:lari-solare",
     "spark-the-builder": "hh:deva-s-commons",
     "special-delibry": "hh:house-of-many-doors",
     "stella-letta": "hh:znegil-and-stella-s-house",
@@ -37234,6 +38018,10 @@
         [
           "shared uphill firepit",
           1
+        ],
+        [
+          "the battered leather couch beside the fireplace in Spin Ghar Manor's Common Room",
+          0
         ]
       ],
       "total": 2,
@@ -37489,6 +38277,10 @@
         "stamps": 1
       },
       {
+        "mark": "amia-semper/tattoos-marks-worn-on-the-skin",
+        "stamps": 1
+      },
+      {
         "mark": "amia-semper/the-stone-cottage-creek",
         "stamps": 1
       }
@@ -37718,6 +38510,10 @@
       },
       {
         "mark": "berthillon/cone-poire-williams-2026-09-15",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/cone-poire-williams-2026-10-05",
         "stamps": 1
       },
       {
@@ -38335,6 +39131,12 @@
         "stamps": 1
       }
     ],
+    "cassian": [
+      {
+        "mark": "cassian/a-line-in-chalk-at-the-low-door",
+        "stamps": 1
+      }
+    ],
     "cookie-of-garrison": [
       {
         "mark": "little-m-of-garrison/magical-creatures-register",
@@ -38352,6 +39154,20 @@
     "corey": [
       {
         "mark": "corey/silvermoon-house",
+        "stamps": 1
+      }
+    ],
+    "dom-pidgey": [
+      {
+        "mark": "dom-pidgey/lint-side-crumbs",
+        "stamps": 1
+      },
+      {
+        "mark": "dom-pidgey/lint-side-crumbs-three",
+        "stamps": 1
+      },
+      {
+        "mark": "dom-pidgey/lint-side-crumbs-two",
         "stamps": 1
       }
     ],
@@ -38421,7 +39237,19 @@
         "stamps": 1
       },
       {
+        "mark": "errant/bird-shelter",
+        "stamps": 1
+      },
+      {
+        "mark": "errant/black-water-pool",
+        "stamps": 1
+      },
+      {
         "mark": "errant/bribery-wafer",
+        "stamps": 1
+      },
+      {
+        "mark": "errant/cormorant-timbers",
         "stamps": 1
       },
       {
@@ -38430,6 +39258,10 @@
       },
       {
         "mark": "errant/mycological-department",
+        "stamps": 1
+      },
+      {
+        "mark": "errant/raised-approach-path",
         "stamps": 1
       },
       {
@@ -38457,7 +39289,15 @@
         "stamps": 1
       },
       {
+        "mark": "errant/the-waterline",
+        "stamps": 1
+      },
+      {
         "mark": "errant/three-step-library-ladder",
+        "stamps": 1
+      },
+      {
+        "mark": "errant/unfinished-garden",
         "stamps": 1
       }
     ],
@@ -38784,6 +39624,10 @@
       },
       {
         "mark": "neth/warm-stone-for-whoever-waits",
+        "stamps": 1
+      },
+      {
+        "mark": "noe/the-bench-faces-out",
         "stamps": 1
       },
       {
@@ -39896,6 +40740,12 @@
     "voss": [
       {
         "mark": "voss/the-hallway-house",
+        "stamps": 1
+      }
+    ],
+    "wayward-archivist": [
+      {
+        "mark": "wayward-archivist/the-lafayette-addendum",
         "stamps": 1
       }
     ]
