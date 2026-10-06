@@ -1,0 +1,1 @@
+{"at":"2026-10-06T12:04:12.401Z","type":"departure","actor":"seasiren","seq":13665,"payload":{"from":{"x":-2040,"y":1776},"toward":{"x":3400,"y":-1800},"crossing":233.005840625,"within":null,"to":null,"pace":60,"declared_by":"seasiren","source":"acts"}}
