@@ -3,7 +3,7 @@
 *The exact shape of a mark on disk. This is the one definition the seeding fleet
 writes to, `tools/mark-lint.mjs` enforces, and `tools/marks-fold.mjs` reads —
 they cannot drift, because the lint and the fold share one loader and one
-`contains`. [`MARKS.md`](../../MARKS.md) is the law; this is its file format.*
+`contains`. The law stands in the Keeping Works and LOGOS; [`MARKS.md`](../../MARKS.md) points to its long-form explanation. This is its file format.*
 
 Pre-flight anything before it lands: **`node tools/mark-lint.mjs`** (a gate — it
 exits non-zero on any error, with the exact fix).
@@ -13,6 +13,13 @@ Rendered in the world: not yet — the-kinds rendering stated the four-kind voca
 ---
 
 ## The one tree: directories are spatial containment, rooted at the light
+
+> **Filing froze on 2026-08-25** (`README.md` beside this file; the law is
+> `LOGOS/state-and-time.md` § The freeze). Everything in this section describes
+> how marks were filed before the freeze, and every directory filed then stays
+> where it is. A directory now asserts nothing: containment is the fold's, in
+> `WORLD/containment.json`. A new mark files at its id,
+> `WORLD/marks/<household>/<slug>/mark.md`.
 
 ```
 WORLD/marks/let-there-be-light/mark.md                         the root — the whole world
@@ -27,9 +34,10 @@ sits **geometrically inside** the parent; and the path from the root is the spin
 a telling walks. There is one root and everything is under it.
 
 **Authorship left the path.** `WORLD/marks/<household>/` was write-scoping in the
-tree. The scoping is real — it just does not live here: the PR door writes into
-per-household `draft/<login>` sketchbooks, and its gate checks every path and
-every `by:` in the diff against the author ([`WRITES.md`](../../WRITES.md)). Who
+tree. The scoping is real — it just does not live here: the office door checks
+the author at the act, and the Settlement publishes from the store. (The PR
+lane that wrote into per-household `draft/<login>` sketchbooks closed at the
+2026-09-11 cutover; [`WRITES.md`](../../WRITES.md).) Who
 *made* a mark is the **`by:`** frontmatter field (validated at both doors, not
 path-enforced). Where a mark *is* is the path.
 
@@ -61,20 +69,19 @@ the **frame**, and only the frame:
   ever moves it. The directory still records what contains what — the town's
   river reach may perfectly well run through a resident's meadow, and the tree
   should say so — but the meadow cannot drag the river.
-- When geometry drifts so an outranking child's edge stops naming the tightest
-  container, the machinery **re-points the edge**: `mark-lint.mjs` reports a
-  **`REHOME`** (exit 3, machine-readable `{mark, from, to}`) and the settlement
-  sweep performs the `git mv` as its own disclosure commit. Re-homing an
-  outranking child is pure paper — its numbers never mentioned its parent — so
-  it is a **repair, never a refusal**. The same drift under a **bound** child is
-  still an ERROR: there the numbers *are* the parent's, and moving the directory
-  would move the mark.
+- Until the freeze, when geometry drifted so an outranking child's edge stopped
+  naming the tightest container, the machinery **re-pointed the edge**: a
+  `REHOME` from `mark-lint.mjs` and a `git mv` by the settlement sweep. The
+  freeze retired both: directories never move, and the lint exits 0 or 1.
 - **A predicate can never outrank what it predicates** — it is its parent
   continued, and the lint refuses one that tries.
 
 ## Protection tiers
 
-Every mark carries a **`tier:`** (default `market`):
+Every mark has a **tier**. It is **derived, not written** (B, applied
+2026-08-13): the fold's one walk decides a mark's standing from its ground,
+and the lint refuses an authored `tier:` line except `the-town`'s own
+`constitution` and `draft`:
 
 | tier | what it means | who |
 |---|---|---|
@@ -113,7 +120,7 @@ containment**; everything else is a field.
 |---|---|---|---|---|
 | `kind` | required | required | required | required |
 | `by` (author handle) | required | required | required | required |
-| `tier` (default market) | opt | opt | opt | opt |
+| `tier` (derived; only `the-town`'s `constitution` or `draft` may be written) | opt | opt | opt | opt |
 | `date` (`YYYY-MM-DD` or ISO 8601⁴) | required | required | required | required |
 | `at: { x, y }` (grid m) | required | required | — | — |
 | `extent: { w, h }` (m) | required | opt (def 25×25) | — | — |
@@ -256,13 +263,14 @@ timetable: {"vessel": "the-town/the-post-office", "pace": 405, "stops": [{"mark"
 ```
 
 - **`vessel`** — the mark that *is* the moving body. Sited, with an extent: her
-  footprint is the boarding zone, and her leaf slug is her walk-ledger handle.
+  footprint is the boarding zone, and her leaf slug is her handle in the
+  movement record.
 - **`stops`** — **at least two marks, named by id**, each with UTC `departs`
   times (`HH:MMZ`). **Coordinates are never copied into the schedule** — a stop's
   position is its own mark's `at`, read at derivation time, so moving the mark
   moves the service. Each departure sails to the next stop in the list, cyclically.
-- **`pace`** — km per crossing for this line (the vessel's stride, not the town's
-  15 km dial).
+- **`pace`** — km per crossing for this line (the vessel's stride, not the
+  resident's 60 km dial).
 
 The lint is strict about all of it (`mark-lint.mjs` §8): stops and vessel must
 exist and be sited, times must parse, pace must be positive. The mechanic is
@@ -339,8 +347,9 @@ view — write it like a sentence read aloud.
 
 Regions are ordinary marks — a region mark (`by:` a founder or the town) sited over
 an extent, with child claim-marks nested inside it. The seeding fleet lands them
-from founders' own words after this schema; residents' homes re-home under the
-region that contains them (id unchanged — the ledger doesn't move).
+from founders' own words after this schema. Which region contains a home is the
+fold's answer (`WORLD/containment.json`); since the freeze no directory re-homes
+(id unchanged either way — the ledger doesn't move).
 
 ## Amendment — the continuation law (2026-08-02, Keemin-ruled)
 
@@ -354,7 +363,8 @@ region that contains them (id unchanged — the ledger doesn't move).
   (`predicated` or `naming`). A sited/parcel mark never nests under a
   predicate — geometry needs a geometric parent. Naming marks carry none.
 - **The one-file law.** The only `.md` inside the record is a mark's own
-  `mark.md` (this file, at the top level, is the grammar's one exception).
+  `mark.md` (this file and `README.md`, at the top level, are the two
+  exceptions).
   Everything else must be a full mark in its own directory.
 - **`imports:` is reserved, not built** — the ruled design (persisted
   investigations: marks whose context auto-injects when building on or under

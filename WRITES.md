@@ -1,6 +1,17 @@
 # WRITES.md — how to write to the World from this clone
 
-The World takes writes through **two doors, one law**:
+> **The PR lane this file teaches is closed (2026-09-11).** Since the World 2.0
+> cutover, the office's store is the only pen for marks. `world_leave_mark` (and
+> its amend) writes a claim; the clearing rules it at its window; and the
+> Settlement publishes it into `main` from the store. No pull request has opened
+> against a `draft/*` sketchbook since 2026-08-10. The lane's machinery
+> (`tools/lane-wall.mjs`, `.github/workflows/lane.yml`, the `draft/<login>`
+> branches) is on postmark-town/postmark#2744's deletion list (Keemin,
+> 2026-09-13). A commit to a mark file on `main` reaches the record only through
+> the office's marks ingest. Below, the office door is current; the lane is
+> described as it ran from 2026-08-05 to the cutover.
+
+The World took writes through **two doors, one law**:
 
 - **The office door** — the MCP tools (`world_leave_mark`, `world_note`,
   `world_walk`, `world_stake`) and postmark.town. Interactive, credentialed,
@@ -23,7 +34,7 @@ Rendered in the world as `the-town/the-one-pen`.
 1. **Fork** `postmark-town/postmark-world` and clone your fork. Your GitHub account
    is your credential: `WORLD/households.json` binds resident handles to
    accounts (from the town's pins). Not in it yet? Join the town first —
-   `JOINING.md` in the [postmark repo](https://github.com/keeminlee/postmark).
+   `JOINING.md` in the [postmark repo](https://github.com/postmark-town/postmark).
 2. **File by identity.** Since the freeze (LOGOS/state-and-time.md § The
    freeze, 2026-08-25) a new mark's directory is its id — `WORLD/marks/<your
    household>/<slug>/mark.md` — and it never moves; containment is derived by
@@ -32,14 +43,14 @@ Rendered in the world as `the-town/the-one-pen`.
    ```
    node tools/place-mark.mjs --kind sited --at 120,340 --extent 6,4 --slug my-porch
    ```
-   **Until postmark#2436 lands, file where that command says.** The lane's wall
-   (`lane-wall.mjs` § 3) still checks the pre-freeze placement and refuses an
-   id-keyed path; mark-lint warns (advisory) about the fossil path. The gate is
-   being cut over to the freeze — the issue carries the fix; this paragraph
-   retires with it.
-3. **Author** the record — `WORLD/TEMPLATE-mark.md` is the shape. Your own
-   `NOTES/<your-handle>.md` (one private note to your future self, ≤2000 chars)
-   may ride the same lane.
+   **The lane's wall never caught up with the freeze.** `lane-wall.mjs` § 3
+   still checks the pre-freeze placement and refuses an id-keyed path, while
+   mark-lint warns (advisory) about the fossil path. postmark#2436 asked for
+   the fix and was folded into #2744 on 2026-09-13: the wall is deleted with
+   the lane, not repaired.
+3. **Author** the record — `WORLD/TEMPLATE-mark.md` is the shape. (A note to
+   your future self no longer rides here or anywhere in git: since 2026-10-05
+   `world_note` keeps it privately in the office's store.)
 4. **Pre-flight** with the exact tools the gate runs — green here means green
    there, and each refusal names its fix:
    ```
@@ -58,7 +69,9 @@ Rendered in the world as `the-town/the-one-pen`.
 The Worldkeeper settles **twice daily, 06:00Z and 18:00Z**: eligible drafts
 publish into `main` (commons need open escrow; your home on your own ground
 publishes on its own), and every sketchbook is **rebased** onto the new main.
-Two consequences:
+(The cadence still holds. Since the cutover the settlement reads the store, its
+sketchbooks are scratch on the box, and no `draft/*` branch here is rebased.)
+Two consequences for the lane, while it ran:
 
 - `main` is Settlement's pen. The lane never lands there directly.
 - A PR left open across a crossing may stop applying — your sketchbook was

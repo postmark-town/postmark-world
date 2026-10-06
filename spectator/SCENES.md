@@ -77,15 +77,15 @@ two lawful askers — the same seam the telling itself has always had.
 the glance, click precedence (faces → chooser → wash → mark → open ground),
 contested-click choosers, the walk desk and leg preview, stake sheets, say,
 bubbles, highlight, footprint/grid toggles, walkers (positions from the same
-poll — a body the walk ledger places stands there; the plaque, not the floor,
-carries ledger-occupancy for the unplaced).
+poll — a body the movement record places stands there; the plaque, not the
+floor, carries record-occupancy for the unplaced).
 
 That walker clause stands unamended, and it is worth saying why, because it was
 briefly mistaken for the licence behind #8 and it is not one. It answers *where a
 body stands* and *who the plaque speaks for*, and both answers survive #8 intact:
-a drawn body still stands exactly where the ledger puts it — including outside
+a drawn body still stands exactly where the movement record puts it — including outside
 the wall, which is why 8 bodies draw in the Protected Grove while only 4 land on
-its floor — and an in-room body the ledger never placed is still the plaque's to
+its floor — and an in-room body the record never placed is still the plaque's to
 carry, not the floor's. **Which** bodies are eligible to be drawn at all is a
 different question, one this list simply never asked; #8 is where it is asked now.
 
@@ -108,14 +108,14 @@ exit).
 
 ## Labels — resolved as "no difference"
 
-The viewer draws **no labels in either scene**: the town's place-names are the
-atlas's OWN baked text (art, not viewer), and names in both scenes ride hover,
-bubbles, and cards — identical machinery. The old floor's `labelPlacer` names
-were a viewer-side second label system; deleted with it. If room names ever get
-baked into a room's ground art, that is ground authorship, the same way the
-atlas does it. (Counter-scaling the atlas's own labels at deep zoom remains an
-atlas-side unlock, noted in the `MAX_ZOOM_IN` comment — town art work, not
-scene work.)
+The viewer draws **no mark labels in either scene**: names in both scenes ride
+hover, bubbles, and cards — identical machinery. The old floor's `labelPlacer`
+names were a viewer-side second label system; deleted with it. The town's
+place-names were the atlas's own baked text until the atlas left on 2026-09-08;
+since then the town's ground draws the twelve region names itself, from the
+region marks' ids (`townGround`, `.wv-tg-region-label`), and the house names do
+not come back. That is ground authorship, part of difference #1, not a label
+system: if room names ever get drawn into a room's ground, it is the same thing.
 
 ## The controls
 
