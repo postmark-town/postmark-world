@@ -34,8 +34,8 @@ roots and one portal are not physical buildings:
 
 | root | current marks | role |
 |---|---:|---|
-| `postmark-node` | 89 | the node families and their classes |
-| `postmark-edge` | 51 | declarable relations and action residues |
+| `postmark-node` | 98 | the node families and their classes |
+| `postmark-edge` | 58 | declarable relations and action residues |
 | `postmark-rules` | 48 | stipulations and their implementation questions |
 | `postmark-invariant` | 25 | standing questions asked of the town |
 | `postmark-derived` | 17 | answers computed at read/save time |
@@ -49,12 +49,12 @@ filesystem shallower; the hierarchy carries meaning.
 
 ## Current census
 
-As read on 2026-09-03 from main at `441580e38`:
+As read on 2026-10-06 from main at `73fc717a` (first read 2026-09-03 at `441580e38`: 362 files, 153 class, 166 predicated):
 
-- **362** `mark.md` files
+- **378** `mark.md` files
 - **43** sited marks
-- **153** class marks
-- **166** predicated marks
+- **155** class marks
+- **180** predicated marks
 - **45** direct child branches: 37 sited, 7 class, 1 portal predicate
 
 This is a receipt, not a dial. The tree governs when the numbers change.

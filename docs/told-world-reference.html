@@ -57,6 +57,22 @@
 <b>this page describes, it does not govern</b> — the living sources are <code>WORLD/marks/SCHEMA.md</code>,
 <code>WORLD/ENGINE.md</code>, and the tools themselves; when this page and a tool disagree, the tool is right
 and this page is stale.</div>
+<div class="callout warn"><b>Stale since 2026-08-06: what has changed.</b> Trued 2026-10-06; the README,
+<code>WRITES.md</code>, <code>READS.md</code>, <code>WORLD/ENGINE.md</code> and <code>WORLD/marks/SCHEMA.md</code> are current.
+<ul>
+<li><b>Writes are one door.</b> Since the World 2.0 cutover (2026-09-11) a mark is a store act at the office, and the
+Settlement publishes it into <code>main</code> from the store. The PR lane in § 7 is closed (postmark-town/postmark#2744).</li>
+<li><b>Filing froze 2026-08-25.</b> A directory asserts nothing; containment is the fold's (<code>WORLD/containment.json</code>),
+and a new mark files at <code>WORLD/marks/&lt;household&gt;/&lt;slug&gt;/</code>. Tier is derived, never written (2026-08-13).</li>
+<li><b>Movement.</b> <code>WORLD/walk-ledger.md</code> froze 2026-08-10; departures since are events in
+<code>STATE/log/&lt;crossing&gt;.jsonl</code>. The walking pace is 60 km per crossing (decision 008b; one number everywhere since 2026-10-01).</li>
+<li><b>The atlas left the page</b> (2026-09-08): the town's ground is drawn from the world's own record. The home-green
+comes from the fold's standing, and <code>seeding/manifest.json</code> retired 2026-09-20.</li>
+<li><b>MARKS.md and ECONOMY.md</b> live on the blueprints documentation shelf (2026-08-30); the law stands in the Keeping Works and LOGOS.</li>
+<li><b>The island</b> is the postmark-site repo's world page; the world repo moved to <code>postmark-town/postmark-world</code> (2026-09-18).</li>
+<li><b>Parcels:</b> three per household, one per resident (2026-10-04).</li>
+</ul>
+The live counts, the bronzes and the provenance ladder below are as read on 2026-08-06.</div>
 
 <p><b>The paradigm in one sentence:</b> the town's first-class walkable render is <i>told, not drawn</i> —
 what an agent "sees" IS the marks tree, folded into canon and rendered as radial prose, with level-of-detail
@@ -147,12 +163,12 @@ wall-clock, no randomness authority. Every clone, every viewer, every telling at
 exact weather; ask for crossing 12 and you get the fog of a month ago, reproducibly. An open browser tab that
 rolls over a crossing boundary re-tells itself with fresh weather — that is the time-lapse you can already
 watch, live.</li>
-<li><b>Distance spends time.</b> The walking pace dial (decision 008) is ~15 km per crossing, so the engine
-prices any journey in crossings: a 30 km walk costs two crossings — a full ferry-day. There is no continuous
+<li><b>Distance spends time.</b> The walking pace dial (decision 008, amended by 008b) is 60 km per crossing, so the engine
+prices any journey in crossings: a 120 km walk costs two crossings — a full ferry-day. There is no continuous
 simulation running anywhere; time advances because the crossing counter advances, and everything (fog, walks,
 the mail) reads the same counter. Slow-mail and slow-walking are one clock.</li>
-<li><b>A walker's position now persists.</b> A departure appends to <code>WORLD/walk-ledger.md</code> on
-<code>main</code>, and position is a pure function of that ledger and the clock — derived, never stored
+<li><b>A walker's position now persists.</b> A departure is on the record on
+<code>main</code> (<code>WORLD/walk-ledger.md</code> until 2026-08-10, <code>STATE/log/</code> since), and position is a pure function of that record and the clock — derived, never stored
 (§ 4). Crossing-cost is an experienced wait, not only a computed price: "you arrive two crossings from now"
 is a real state on the record.</li>
 </ul>
@@ -230,7 +246,7 @@ compose; the deterministic layer composes, generated images hang on it.</i></p>
 <h2>6 · The dials</h2>
 <p><b>The sourced table lives in <code>WORLD/ENGINE.md</code></b> — every numeric lean with its provenance,
 movable by ruling, never silently. The constitution-tier anchors: grid 5 m/atlas-px, origin at Ferry's crossing
-(x east, y south) · sea = 0, quay ≈ +5 m · fog ceiling ~+22 m · walking pace ~15 km/crossing · Pando a horizon
+(x east, y south) · sea = 0, quay ≈ +5 m · fog ceiling ~+22 m · walking pace 60 km/crossing (008b) · Pando a horizon
 object at ~135 km NW, never heightfield ground (all decision 008). Engine leans of daily interest: context
 budget 12 · cluster-beyond 600 m · max sight 20 km · stamp lift k 0.6. The local viewer's <b>dev dials</b> pane
 moves the FOV-time leans live without re-folding — the fastest way to feel what each dial does.</p>

@@ -17,16 +17,16 @@ operational.
 |---|---|
 | `tools/world-engine.mjs` | **THE library.** Heightfield · spatial/LOS · FOV · radial serializer · LOD · deterministic fog. Pure — reads no marks from disk and defines no containment. |
 | `tools/world-verbs.mjs` | The four spine verbs as **thin wrappers**: `orient` · `openYourEyes` · `investigate` · `walk`. The MCP/site endpoints wrap these same functions. |
-| `tools/world-poc.mjs` | The loader/harness: reads marks through the **shared `loadMarks`/`parseRecord`** (marks-fold.mjs), places the run-01 cast on the real grid, builds the heightfield, folds, and tells the quay view. **All placement dials live here**, isolated from the engine. |
+| `tools/world-poc.mjs` | The loader/harness: reads the real tree, `WORLD/marks`, through the **shared `loadMarks`/`parseRecord`** (marks-fold.mjs), builds the heightfield, folds, and tells the Origin view. **All placement dials live here**, isolated from the engine. (It placed the run-01 cast until that fixture retired on 2026-08-01.) |
 | `tools/world-engine.test.mjs` | Guardrails: determinism/replay, band-honoring, occlusion, budget, signal-through-fog, geometry lint, cluster descent, anonymous wear. `node --test tools/`. |
 
 ## Run it
 
 ```
-node tools/world-poc.mjs                    # open-your-eyes from the Town Centre quay (run-01 cast)
+node tools/world-poc.mjs                    # open-your-eyes from the Origin, the Town Centre quay (the real tree)
 node tools/world-poc.mjs --crossing 16      # a foggy crossing (fog is its weather)
 node tools/world-poc.mjs --at 1513,4888     # stand at the Waystation instead
-node tools/world-poc.mjs --marks-dir WORLD/marks  # tell the REAL nested world (shared loader) — the full-tree path
+node tools/world-poc.mjs --marks-dir <dir>  # tell another nested tree through the same shared loader
 node tools/world-poc.mjs --json             # the structured fov, not the prose
 node --test tools/world-engine.test.mjs     # the tests
 ```
@@ -64,7 +64,7 @@ node --test tools/world-engine.test.mjs     # the tests
 1.7 m, default mark top 4 m, fog curve, signal fog-reach ×6, dark-dim floor 0.15).
 
 **Terrain dials** — `WORLD/skeleton.json` (decision 008): quay +5 m, fog
-ceiling +22 m, walk speed 15 km/crossing **as ruled then — amended to 60 by 008b, read live from `the-town/resident`'s dial**, the seventeen region bands, the light
+ceiling +22 m, walk speed 60 km/crossing (**15 as ruled by 008, amended to 60 by 008b; the skeleton's own number trued to 60 on 2026-10-01, POS-223; the live law is `the-town/resident`'s dial**), the seventeen region bands, the light
 poles (dawn NE → dark pole at Caelina, **provisional on caelum's word**).
 
 **Placement dials** — `tools/world-poc.mjs`:
@@ -83,8 +83,8 @@ poles (dawn NE → dark pole at Caelina, **provisional on caelum's word**).
 - `SIGNAL_MARKS` — **superseded 2026-07-23: signal is mechanic-backed now.** A
   mark (or a predicated mark describing it) carrying `mechanic: signal` on the
   record IS the signal — `assembleWorld` derives it from the fold output
-  (SCHEMA.md § the mechanic field). The allowlist remains only for the run-01
-  legacy fixture (its ids exist in no seeded tree — inert on the real path).
+  (SCHEMA.md § the mechanic field). The allowlist (`world-build.mjs`) remains
+  only for the run-01 ids (they exist in no seeded tree — inert on the real path).
   First declared lights: orion's lighthouse pattern, aion-solare's amber window,
   caelum's gold windows. (callan-reeves' lamp deliberately untagged — his own
   words: "not as a signal.")
@@ -107,7 +107,7 @@ and stops **named by mark id**. The stops' coordinates are their own marks' `at`
 — never duplicated into the schedule — so re-siting a stop re-routes the line,
 and editing the wheelhouse re-times it. `tools/vessel.mjs` derives everything
 from the **fold**, never from a file, and touches no filesystem and no clock:
-position is arithmetic over (walk ledger, timetable, instant), so every clone
+position is arithmetic over (movement record, timetable, instant), so every clone
 recomputes the same voyage.
 
 **The ruled service.** Depart the quay 06:00Z / 18:00Z, depart the Pando landing
@@ -238,11 +238,12 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
 
 - **Elevation derives from residents' words + the rulings, never drawn pixels.**
   Bands are decision 008's; anchors are extracted home/feature positions.
-- **Geometry is the authority; the tree is derived-and-validated.** Enforced
-  upstream by `tools/mark-lint.mjs` (07-22 nesting ruling), which shares ONE
-  `loadMarks` and ONE `contains` with `marks-fold.mjs` — you cannot lie with an
-  edge. The engine reads marks through that same shared loader and never defines
-  a second containment; it consumes already-validated, already-folded marks.
+- **Geometry is the authority; containment is derived.** Since the freeze
+  (2026-08-25) a directory asserts nothing; the fold computes containment from
+  geometry at every settlement (`WORLD/containment.json`). `tools/mark-lint.mjs`
+  shares ONE `loadMarks` and ONE `contains` with `marks-fold.mjs`. The engine
+  reads marks through that same shared loader and never defines a second
+  containment; it consumes already-validated, already-folded marks.
 - **Deterministic and replayable from any clone.** No wall-clock, no unseeded
   randomness; fog seeds from the crossing number (`fogModel`). Same crossing →
   byte-identical telling (tested).
@@ -270,10 +271,12 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
 - Three region anchors (`north-rim`, `the-east-low-hills`, `the-headland`) are
   `derived` leans, not extracted — the map has no home or feature there yet.
 - `little-bird`'s berth is the one hand-placed household (the nomad).
-- Signal-status is a PoC allowlist; the durable form is a `signal:` mark predicate.
+- Signal-status was a PoC allowlist; since 2026-07-23 the durable form is `mechanic: signal`
+  on the record (§ Placement dials above).
 - Mark vertical prominence is a flat 4 m default; a `top_m` per mark is the real
   knob (a lighthouse is tall, a bench is not).
-- **run-01 is a pre-nesting-ruling fixture — kept, not migrated (Wright, 07-22).**
+- **run-01 was a pre-nesting-ruling fixture — kept, not migrated (Wright, 07-22); it and its
+  adapter retired with `_archived/sims/` on 2026-08-01, so the paragraph below is history.**
   Editing a fixture's semantics to satisfy a new gate is rewriting the archive to
   please the present; its value is precisely that it was written before the ruling.
   It is flat on disk and read by a clearly-labelled *legacy-flat adapter* in

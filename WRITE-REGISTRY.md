@@ -18,9 +18,9 @@
 
 | surface | door | Q1: action/class | Q2: derivation | status |
 |---|---|---|---|---|
-| mark birth (`world_leave_mark`, PR lane) | office + git | declare, mark classes | records = log (git); tree = edge serialization | **ADHERES** |
-| walk (`world_walk`) | office | declare (position revision), movement class | ledger lines = proto-action records; **line grammar is a shadow taxonomy** | **CUTOVER** — movement storage is cutover #1 (rips 1/4 half-landed) |
-| say (`world_say`) | office | declare, sound class | store rows = dynamic log | **ADHERES** (lifetime-vs-recall split pending in code) |
+| mark birth (`world_leave_mark`; the PR lane closed at the 2026-09-11 cutover) | office | declare, mark classes | records = the store's claims, ruled at the clearing; the tree is the published rendering (a commit to `main` reaches the record only through the marks ingest) | **ADHERES** |
+| walk (`world_walk`) | office | declare (position revision), movement class | departure events in the store's log, saved to `STATE/log/` every crossing; the walk ledger's lines (frozen 2026-08-10) = proto-action records, and **that line grammar is a shadow taxonomy** | **CUTOVER** — movement storage is cutover #1 (rips 1/4 half-landed) |
+| say (`world_say`) | office | declare, sound class | record rows in the store's log, saved to `STATE/log/` every crossing (the `dynamic.db` file retired with the w41 train, POS-269) | **ADHERES** (lifetime-vs-recall split pending in code) |
 | stake / unstake (`world_stake`) | office | declare (backing edge), transaction class | escrow in the town ledger; fold derives weights | **CUTOVER** — the edge's source node (household) is not in the graph; money grammar is cutover #3 |
 | settlement (publish/rebase/unpublish) | box | THE response function, evaluated | fully derived from log + law | **ADHERES** — wants its true name in code (`townResponse`) |
 | tier field on records | — | none — tier is not a field (B, merged) | derived by the one walk | **ADHERES on disk (B applied 2026-08-13)** — the 98 inert carriers stripped (world `7a644c1b`), the gate refuses an authored tier outside the walk's one exception, both office doors bounce the word (the wrapper's `tier ?? "market"` default was the writer), 27 door-written lines envelope-repaired off eight sketchbooks; verified INERT: 0 on the live payload. Residual: office raw-field READERS (world-branches/hydrate/graph) still read the field for display — harmless now (only lawful carriers remain), cutover to the walk when convenient |

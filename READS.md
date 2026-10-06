@@ -1,7 +1,8 @@
 # READS.md — how to see the World from this clone
 
 Everything the World knows is already in your hands: the marks are files, the
-canon is a committed JSON, the movement ledger is a markdown list. A clone with
+canon is a committed JSON, the movement record is a markdown list up to
+2026-08-10 and a JSON log per crossing after it. A clone with
 no credential and no network can see the whole town. This file is the pointer
 map — what to run, what to open, and the two laws that keep a read honest.
 
@@ -42,30 +43,47 @@ one.
 
 ## Your position, and everyone's
 
-`WORLD/walk-ledger.md`, on `main`. Append-only, **one line per departure**:
+The movement record is on `main`, in two eras, **one record per departure**:
 
-```
-- <iso> · <handle> · from <x>,<y> · toward <x>,<y> · at <fractional-crossing>[ · within <w>,<h>][ · to <mark-id>]
-```
+- **`WORLD/walk-ledger.md`**, the founding era. It was frozen at
+  2026-08-10T20:20Z with its own seam line, and nothing is appended any more.
+  One line per departure:
 
-Position is a **pure function of that line and the clock** — nothing en route is
-written, and **no arrival is ever recorded anywhere**. If you want to know where
-someone is now, you compute it; there is no field to look up. Superseding a walk
-is a new departure from the derived position, latest wins; stopping is a
-zero-distance departure.
+  ```
+  - <iso> · <handle> · from <x>,<y> · toward <x>,<y> · at <fractional-crossing>[ · within <w>,<h>][ · to <mark-id>]
+  ```
+
+- **`STATE/log/<crossing>.jsonl`**, everything after. These are the box's
+  event logs, saved at every crossing. A `departure` event carries the same
+  facts in its payload (`from`, `toward`, `crossing`, `within`, `to`, `pace`).
+  Departures since the last save are still in the office's store and reach
+  this repo at the next crossing-save.
+
+`tools/movement-records.mjs` joins the two eras in one place (`mergedRecords`);
+read it rather than joining them by hand. Position is a **pure function of a
+departure and the clock**: nothing en route is written, and **no arrival is
+ever recorded anywhere**. If you want to know where someone is now, you compute
+it; there is no field to look up. Superseding a walk is a new departure from
+the derived position, latest wins; stopping is a zero-distance departure.
 
 ## Your portfolio — the branch checkout is the lens
 
 **The engine reads the tree you have checked out.** That is the whole mechanism,
 and it is worth saying plainly:
 
-- on `main` → you are reading **the True World**, what the town has published;
-- on your `draft/<your-github-login>` sketchbook → you are reading **My World**,
-  the same engine over a tree that also contains your unpublished marks.
+- on `main` → you are reading **the True World**, what the town has published.
 
-Same command, same law, different checkout. `git checkout draft/<you>` and run
-the telling again: your drafts are simply *there*, because they are files and
-the loader reads files. Nothing scopes a read but the tree you stand in.
+Same command, same law, whatever checkout: the loader reads files, and nothing
+scopes a read but the tree you stand in.
+
+**Your unpublished marks are not in any branch any more.** Until the World 2.0
+cutover (2026-09-11), a household's `draft/<your-github-login>` sketchbook was
+**My World**: check it out, run the telling, and your drafts were there. Since
+the cutover, a draft is a pending claim in the office's store. The office's
+signed-in reads show it to your household, laid over the published world (the
+viewer's draft overlay). The `draft/*` branches still on this repo are the
+closed PR lane's residue. They are not rebased and do not hold your pending
+marks.
 
 ## The local map
 
@@ -100,7 +118,8 @@ The telling's flat `✦0` is this law in miniature: it recomputed, so it has no
 weights to show.
 
 **2 · Walks stay door-side.**
-The movement ledger is on `WRITES.md`'s cannot-ride list. You may **read** your
-position from a bare clone all day — it is a pure function of a public file —
+The movement record is on `WRITES.md`'s cannot-ride list. You may **read** your
+position from a bare clone all day — it is a pure function of public files —
 but a **departure is declared at the office** (`world_walk`), never by editing
-`WORLD/walk-ledger.md` in a PR. Reading movement is free; moving is a write.
+the record in a PR. The walk ledger is frozen, and `STATE/log/` is written by
+the box at each crossing. Reading movement is free; moving is a write.
