@@ -84,7 +84,8 @@
 // ── THE TOWN'S WORD (POS-361; Darko's rulings R7, R10, R15, 2026-10-04) ──────
 //
 // The town holds a third seat beside the parcel holder and the commons parent,
-// and it speaks the keeper's words, not a resident's: `ratified · opposed`,
+// and it speaks the residents' own words (Darko, 2026-10-06: one taxonomy): `neutral · opposed`
+// declared, with silence as the awaiting state; its `welcomed` is adoption and is reserved,
 // with neutral as absence (R15). Its words arrive as `townWords`, a map from
 // mark id to word, fed by the settlement (it is a law act in the log, never
 // a frontmatter map, so no mark carries it).
@@ -97,17 +98,17 @@
 //              It takes the subtree and the escrow guard below, unchanged:
 //              an opposed mark with open stakes stands until they unwind.
 //
-//   ratified   CONFERS NOTHING here. It clears the "awaiting the town" label
+//   neutral    CONFERS NOTHING here (a DECLARED neutral). It clears the "awaiting the town" label
 //              (a read's concern, not the fold's) and is not welcome: welcome
 //              stays reserved for adoption (LOGOS the-response-function § the
 //              town's declared word). So it does not keep, fan up, or lift a
 //              holder's veto. Two holders, two words, one rule (R10): the
 //              holder's opposition on their own parcel stands whatever the town
-//              ratified.
+//              declared neutral.
 
 export const CONSENT_FIELD = "consent";
 export const CONSENT_WORDS = new Set(["opposed", "welcomed"]);
-export const TOWN_WORDS = new Set(["ratified", "opposed"]);
+export const TOWN_WORDS = new Set(["neutral", "opposed"]);
 /** The ground and the grantor a town return names. */
 export const TOWN = "the-town";
 // The consent map as authored, or null. Shared with the lint so both read a
@@ -134,7 +135,7 @@ const overlapsRect = (a, b) => {
  *   ownStamps Map(id -> own escrow on that mark)
  *   parentOf  Map(childId -> parentId)  — the computed containment edges
  *   rectOf    (mark) -> {x,y,w,h}
- *   townWords Map(id -> "ratified" | "opposed") or a plain object; optional —
+ *   townWords Map(id -> "neutral" | "opposed") or a plain object; optional —
  *             the town's standing word per mark (see § THE TOWN'S WORD)
  *
  * → { allow(parentId, childId), reason(parentId, childId), returned, kept, dropped, errors }
@@ -221,10 +222,10 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
   const townEntries = townWords instanceof Map ? [...townWords] : Object.entries(townWords ?? {});
   for (const [target, word] of townEntries) {
     if (!TOWN_WORDS.has(word)) {
-      errors.push({ mark: target, error: `the town's word on "${target}" → ${JSON.stringify(word)} is not a word the town speaks (${[...TOWN_WORDS].join(" | ")}; neutral is absence)` });
+      errors.push({ mark: target, error: `the town's word on "${target}" → ${JSON.stringify(word)} is not a word the town speaks (${[...TOWN_WORDS].join(" | ")}; silence is awaiting, and the town's welcomed is adoption, reserved)` });
       continue;
     }
-    if (word !== "opposed" || !byId.has(target)) continue;  // ratified confers nothing; the fold does not invent a mark
+    if (word !== "opposed" || !byId.has(target)) continue;  // a declared neutral confers nothing; the fold does not invent a mark
     townVeto.add(target);
     parcelVeto.delete(target);
     edgeVeto.delete(target);

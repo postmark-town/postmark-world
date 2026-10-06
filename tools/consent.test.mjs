@@ -299,21 +299,21 @@ test("the town over a holder: one return, and it names the town (the town's oppo
   assert.equal(state.returned[0].authority, "the town (absolute)");
 });
 
-test("TWO HOLDERS, TWO WORDS: the town's ratified confers nothing — it lifts no holder's veto, keeps nothing, fans up nothing", () => {
+test("TWO HOLDERS, TWO WORDS: the town's declared neutral confers nothing — it lifts no holder's veto, keeps nothing, fans up nothing", () => {
   const vetoed = fold({
     marks: [parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }), sited("hall", "foreign", 0, 0, 100, 100)],
-    terrain, tick: 1, stakes: [], townWords: { "foreign/hall": "ratified" },
+    terrain, tick: 1, stakes: [], townWords: { "foreign/hall": "neutral" },
   });
   assert.equal(vetoed.returned.length, 1);
-  assert.equal(vetoed.returned[0].authority, "parcel (absolute)", "the holder's opposition stands whatever the town ratified");
+  assert.equal(vetoed.returned[0].authority, "parcel (absolute)", "the holder's opposition stands whatever the town declared");
 
   const plain = [sited("big", "town", 0, 0, 200, 200), sited("bench", "foreign", 0, 0, 2, 2)];
   const stakes = [stake("a", "town/big", 1), stake("b", "foreign/bench", 5)];
   const before = fold({ marks: plain, terrain, tick: 1, stakes });
-  const after = fold({ marks: plain, terrain, tick: 1, stakes, townWords: { "foreign/bench": "ratified", "town/big": "ratified" } });
+  const after = fold({ marks: plain, terrain, tick: 1, stakes, townWords: { "foreign/bench": "neutral", "town/big": "neutral" } });
   assert.deepEqual(after.returned, []);
   assert.deepEqual(after.marks.map((m) => [m.id, m.weight, m.kept ?? null]), before.marks.map((m) => [m.id, m.weight, m.kept ?? null]),
-    "ratified changes no weight and keeps nothing: welcome stays reserved for adoption");
+    "a declared neutral changes no weight and keeps nothing: welcome stays reserved for adoption");
 });
 
 test("the town's word is no density: an opposition elsewhere moves no other mark's weight or fan-up", () => {
