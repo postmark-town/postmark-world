@@ -38,8 +38,12 @@ only its objections and (almost never) its adoptions, and neutrality is free.
 law is written but not yet compiled into a class, or not yet written at all,
 the town still speaks. Its stance on a mark is declared by those who hold the
 town's office (the Worldkeeper, the founders, and the stewards they name), as
-a law act in the log. A declared word is law, not opinion: every opposition
-cites the written rule it applies, and every ruling on a case no rule decided
+a law act in the log, written by the town's own pen, **postmark-pen** of the
+household **the-town**, with the hand that held the pen named on the act. It
+uses the verb a resident uses on their own ground (`declare-stance-on`),
+because the town's ground is the whole world. A declared word is law, not opinion: every opposition
+cites the written rule it applies, by the law mark that holds it and that
+mark's own words, the way the town's lints cite theirs, and every ruling on a case no rule decided
 becomes written law the next declaration cites. A declared word is the
 compiled function's stopgap, and each one marks a rule waiting to be compiled.
 The end state is a town that declares nothing, because every rule it applies
@@ -47,10 +51,13 @@ has become a class.
 
 The town's silence is neutral here as everywhere: a child the town has not
 spoken on stands, labelled as awaiting the town. A declared **opposed** is
-absolute, as from any constitutional ground. A declared **ratified** clears
-the awaiting label and confers nothing; conferral stays adoption's alone
-(below). The declared words are **ratified · neutral · opposed**, and an
-amendment of any sort reopens every word on the mark (Darko, 2026-10-04).
+absolute, as from any constitutional ground. A declared **neutral** clears
+the awaiting label and confers nothing: the town has looked and has no
+objection. The town speaks the same three words as every ground (one
+taxonomy, Darko, 2026-10-06), but its **welcomed** is adoption (below) and
+stays reserved, so the words it declares today are **neutral · opposed**.
+Each word is spoken on one version of the mark, and an amendment of any sort
+reopens every word on it (Darko, 2026-10-04).
 
 Every class param is a **response boundary** — the line where neutrality
 ends. Walk speed, body caps, parcel caps, escrow gates, lifetimes: each one
@@ -85,7 +92,10 @@ newer word. Nothing blocks; nothing is lost. The resident's loop is:
 1. **the backlog** — a replayable, cursor-ordered read of every effect on
    your own node since you last looked (the events read:
    [reads-and-affordances.md](reads-and-affordances.md));
-2. **the word** — a response-edge, declared like any act, revisable forever.
+2. **the word** — a response-edge, declared like any act, revisable forever:
+   **welcomed**, **opposed**, or a declared **neutral**, which clears "awaiting
+   your word" without welcoming (Darko, 2026-10-06). Silence stays neutral
+   and leaves the edge awaiting.
 
 A resident who wants standing rules may one day declare them — a
 response-policy predicate on their own ground, their private municipality,

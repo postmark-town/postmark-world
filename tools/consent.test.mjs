@@ -262,3 +262,77 @@ test("a household never consents to itself, and an unknown word is a fold error 
   assert.match(nonsense.errors[0].error, /not a word this world knows/);
   assert.equal(standing(nonsense, "foreign/hall"), true, "and nothing acts on it");
 });
+
+// ── the town's word (POS-361; R7, R10, R15) ──────────────────────────────────
+
+test("THE TOWN'S OPPOSITION PREVAILS: infinite backing in the veto, so no arithmetic — the mark is returned, naming the town", () => {
+  const marks = [sited("hall", "foreign", 0, 0, 100, 100), sited("room", "foreign", 0, 0, 10, 10)];
+  const state = fold({ marks, terrain, tick: 1, stakes: [], townWords: new Map([["foreign/hall", "opposed"]]) });
+  assert.equal(state.returned.length, 1);
+  const r = state.returned[0];
+  assert.equal(r.mark, "foreign/hall");
+  assert.equal(r.authority, "the town (absolute)");
+  assert.equal(r.returned_from, "the-town");
+  assert.equal(r.grantor, "the-town");
+  assert.equal(r.state, "returned");
+  assert.equal("veto" in r, false, "no arithmetic: infinite backing cannot lose the comparison");
+  assert.deepEqual(r.subtree, ["foreign/room"], "the existing return path: the subtree goes with it");
+  assert.equal(standing(state, "foreign/hall"), false);
+  assert.equal(standing(state, "foreign/room"), false);
+});
+
+test("the town's opposition keeps the ESCROW GUARD: open stakes hold the return, and the mark stands until they unwind", () => {
+  const marks = [sited("hall", "foreign", 0, 0, 100, 100)];
+  const state = fold({ marks, terrain, tick: 1, townWords: { "foreign/hall": "opposed" },
+    stakes: [{ holder: "backer", mark: "foreign/hall", n: 3, weight: 3, tick: 0 }] });
+  assert.equal(state.returned[0].authority, "the town (absolute)");
+  assert.equal(state.returned[0].state, "pending-escrow");
+  assert.deepEqual(state.returned[0].open_escrow_on, ["foreign/hall"]);
+  assert.equal(standing(state, "foreign/hall"), true);
+  assert.equal(w(state, "foreign/hall"), 3, "stamps go home whole: the weight is untouched");
+});
+
+test("the town over a holder: one return, and it names the town (the town's opposition always prevails)", () => {
+  const marks = [parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }), sited("hall", "foreign", 0, 0, 100, 100)];
+  const state = fold({ marks, terrain, tick: 1, stakes: [], townWords: { "foreign/hall": "opposed" } });
+  assert.equal(state.returned.length, 1, "one return, not one per voice");
+  assert.equal(state.returned[0].authority, "the town (absolute)");
+});
+
+test("TWO HOLDERS, TWO WORDS: the town's declared neutral confers nothing — it lifts no holder's veto, keeps nothing, fans up nothing", () => {
+  const vetoed = fold({
+    marks: [parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }), sited("hall", "foreign", 0, 0, 100, 100)],
+    terrain, tick: 1, stakes: [], townWords: { "foreign/hall": "neutral" },
+  });
+  assert.equal(vetoed.returned.length, 1);
+  assert.equal(vetoed.returned[0].authority, "parcel (absolute)", "the holder's opposition stands whatever the town declared");
+
+  const plain = [sited("big", "town", 0, 0, 200, 200), sited("bench", "foreign", 0, 0, 2, 2)];
+  const stakes = [stake("a", "town/big", 1), stake("b", "foreign/bench", 5)];
+  const before = fold({ marks: plain, terrain, tick: 1, stakes });
+  const after = fold({ marks: plain, terrain, tick: 1, stakes, townWords: { "foreign/bench": "neutral", "town/big": "neutral" } });
+  assert.deepEqual(after.returned, []);
+  assert.deepEqual(after.marks.map((m) => [m.id, m.weight, m.kept ?? null]), before.marks.map((m) => [m.id, m.weight, m.kept ?? null]),
+    "a declared neutral changes no weight and keeps nothing: welcome stays reserved for adoption");
+});
+
+test("the town's word is no density: an opposition elsewhere moves no other mark's weight or fan-up", () => {
+  const marks = [sited("big", "anna", 0, 0, 200, 200), sited("bench", "anna", 0, 0, 2, 2), sited("far", "foreign", 5000, 5000, 10, 10)];
+  const stakes = [stake("a", "anna/big", 2), stake("b", "anna/bench", 5)];
+  const before = fold({ marks, terrain, tick: 1, stakes });
+  const after = fold({ marks, terrain, tick: 1, stakes, townWords: { "foreign/far": "opposed" } });
+  const ws = (s) => s.marks.filter((m) => m.id !== "foreign/far").map((m) => [m.id, m.weight]);
+  assert.deepEqual(ws(after), ws(before));
+});
+
+test("the town speaks two words: an unknown one is a fold error, and a word on a mark not in the fold invents nothing", () => {
+  const marks = [sited("hall", "foreign", 0, 0, 100, 100)];
+  const odd = fold({ marks, terrain, tick: 1, stakes: [], townWords: { "foreign/hall": "welcomed" } });
+  assert.equal(odd.errors.length, 1);
+  assert.match(odd.errors[0].error, /not a word the town speaks/);
+  assert.equal(standing(odd, "foreign/hall"), true, "and nothing acts on it");
+
+  const ghost = fold({ marks, terrain, tick: 1, stakes: [], townWords: { "nobody/nothing": "opposed" } });
+  assert.deepEqual(ghost.returned, []);
+  assert.deepEqual(ghost.errors, []);
+});
