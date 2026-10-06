@@ -4,7 +4,7 @@ by: the-town
 tier: constitution
 date: 2026-08-14
 class: declare-stance-on
-version: 5
+version: 6
 extends: postmark-edge
 dials: {}
 implements: []
@@ -12,4 +12,4 @@ affordances: []
 source: LOGOS/the-response-function.md
 ---
 
-A stance is a revisable word on an edge — welcomed or opposed, latest wins; neutral is never stored, it is absence. The ground's holder speaks.
+A stance is a revisable word on an edge: welcomed, opposed or a declared neutral, latest wins; silence leaves it awaiting. The ground's holder speaks.
