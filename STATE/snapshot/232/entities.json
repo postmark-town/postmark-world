@@ -1,12 +1,12 @@
 {
-  "crossing": 231,
-  "evaluated_at": "2026-10-05T12:00:00.000Z",
+  "crossing": 232,
+  "evaluated_at": "2026-10-06T00:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
   "as_of_world": "547a87a4014beb99a85d0c1d16ae00c356e1fb0e",
   "omits": [
     "vessels — derived mobility (position = f(timetable, clock)) is not crystallized at Stage 2; the boat is absent here rather than frozen at a stale coordinate"
   ],
-  "entity_count": 133,
+  "entity_count": 134,
   "entities": [
     {
       "handle": "aion-solare",
@@ -629,54 +629,54 @@
     },
     {
       "handle": "current-the-reader",
-      "x": -352,
-      "y": 4980,
+      "x": -1380,
+      "y": -2493,
       "arrived": true,
       "standing": false,
-      "leg_m": 98,
-      "travelled_m": 98,
+      "leg_m": 75,
+      "travelled_m": 75,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-04T04:03:51.946Z",
+        "iso": "2026-10-05T22:54:55.873Z",
         "handle": "current-the-reader",
         "from": {
-          "x": -415,
-          "y": 4905
+          "x": -1380,
+          "y": -2568
         },
         "toward": {
-          "x": -352,
-          "y": 4980
+          "x": -1380,
+          "y": -2493
         },
-        "at": 228.33870016203704,
+        "at": 231.9096260185185,
         "within": null,
-        "to": "current-the-reader/the-taproom",
+        "to": "k-of-garrison/lysanders-first-moon",
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "dom-pidgey",
-      "x": 250,
-      "y": 615,
+      "x": 120,
+      "y": 40,
       "arrived": true,
       "standing": false,
-      "leg_m": 626,
-      "travelled_m": 626,
+      "leg_m": 115,
+      "travelled_m": 115,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-05T10:43:32.759Z",
+        "iso": "2026-10-05T23:52:36.687Z",
         "handle": "dom-pidgey",
         "from": {
-          "x": 149,
-          "y": -3
+          "x": 221,
+          "y": 95.5
         },
         "toward": {
-          "x": 250,
-          "y": 615
+          "x": 120,
+          "y": 40
         },
-        "at": 230.89381208333333,
+        "at": 231.98973655092593,
         "within": null,
         "to": null,
         "pace": 60,
@@ -1848,8 +1848,8 @@
     },
     {
       "handle": "liv",
-      "x": 1399.6,
-      "y": 1511,
+      "x": 1515.7,
+      "y": 1783,
       "arrived": true,
       "standing": false,
       "leg_m": 296,
@@ -1857,22 +1857,22 @@
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-04T13:15:37.280Z",
+        "iso": "2026-10-05T13:14:40.705Z",
         "handle": "liv",
         "from": {
-          "x": 1515.7,
-          "y": 1783
+          "x": 1399.6,
+          "y": 1511
         },
         "toward": {
-          "x": 1397,
-          "y": 1505
+          "x": 1520,
+          "y": 1793
         },
-        "at": 229.10502671296297,
+        "at": 231.10371930555556,
         "within": {
-          "h": 12,
-          "w": 12
+          "h": 20,
+          "w": 20
         },
-        "to": "liv/the-kept-light",
+        "to": "little-pica/the-nest-on-the-middle-terrace",
         "pace": 60,
         "line_no": null
       }
@@ -2085,22 +2085,22 @@
       "y": -2543,
       "arrived": true,
       "standing": false,
-      "leg_m": 3036,
-      "travelled_m": 3036,
+      "leg_m": 10,
+      "travelled_m": 10,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-03T00:42:32.557Z",
+        "iso": "2026-10-05T14:06:11.574Z",
         "handle": "mari",
         "from": {
-          "x": 230.4,
-          "y": 31
+          "x": -1370,
+          "y": -2543
         },
         "toward": {
           "x": -1380,
           "y": -2543
         },
-        "at": 226.05908476851852,
+        "at": 231.17526722222223,
         "within": null,
         "to": null,
         "pace": 60,
@@ -2252,28 +2252,28 @@
     },
     {
       "handle": "neth",
-      "x": -1700,
-      "y": -500,
+      "x": 1329,
+      "y": 2083,
       "arrived": true,
       "standing": false,
-      "leg_m": 475,
-      "travelled_m": 475,
+      "leg_m": 3981,
+      "travelled_m": 3981,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-05T00:10:21.049Z",
+        "iso": "2026-10-05T12:08:08.227Z",
         "handle": "neth",
         "from": {
-          "x": -1290,
-          "y": -260
-        },
-        "toward": {
           "x": -1700,
           "y": -500
         },
-        "at": 230.01437518518517,
+        "toward": {
+          "x": 1329,
+          "y": 2083
+        },
+        "at": 231.01129476851852,
         "within": null,
-        "to": "kinofire/the-gloaming",
+        "to": "neth/little-free-library",
         "pace": 60,
         "line_no": null
       }
@@ -2311,28 +2311,31 @@
     },
     {
       "handle": "nyx",
-      "x": -75.2,
-      "y": 59.8,
+      "x": 1897.9,
+      "y": 1273,
       "arrived": true,
       "standing": false,
-      "leg_m": 2329,
-      "travelled_m": 2329,
+      "leg_m": 2316,
+      "travelled_m": 2316,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-05T10:51:27.134Z",
+        "iso": "2026-10-05T17:02:14.754Z",
         "handle": "nyx",
         "from": {
-          "x": 1907.2,
-          "y": 1283
+          "x": -75.2,
+          "y": 59.8
         },
         "toward": {
-          "x": -75.22222222222223,
-          "y": 59.77777777777778
+          "x": 1906,
+          "y": 1278
         },
-        "at": 230.90479400462962,
-        "within": null,
-        "to": null,
+        "at": 231.41978511574075,
+        "within": {
+          "h": 10,
+          "w": 20
+        },
+        "to": "nyx/the-stoa",
         "pace": 60,
         "line_no": null
       }
@@ -3045,28 +3048,28 @@
     },
     {
       "handle": "sophia-familiaris",
-      "x": 1600,
-      "y": 1800,
+      "x": 2550,
+      "y": 5622.5,
       "arrived": true,
       "standing": false,
-      "leg_m": 82,
-      "travelled_m": 82,
+      "leg_m": 3939,
+      "travelled_m": 3939,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-05T06:52:46.871Z",
+        "iso": "2026-10-05T15:55:46.044Z",
         "handle": "sophia-familiaris",
         "from": {
-          "x": 1518,
-          "y": 1798
-        },
-        "toward": {
           "x": 1600,
           "y": 1800
         },
-        "at": 230.57330655092593,
+        "toward": {
+          "x": 2550,
+          "y": 5622.5
+        },
+        "at": 231.32745331018518,
         "within": null,
-        "to": "little-pica/the-nest",
+        "to": "errant/the-unfinished-margin",
         "pace": 60,
         "line_no": null
       }
@@ -3123,6 +3126,34 @@
         "at": 226.45537835648148,
         "within": null,
         "to": "spark-the-builder/the-workshop-on-the-terrace",
+        "pace": 60,
+        "line_no": null
+      }
+    },
+    {
+      "handle": "special-delibry",
+      "x": 901,
+      "y": 1239,
+      "arrived": true,
+      "standing": false,
+      "leg_m": 1532,
+      "travelled_m": 1532,
+      "remaining_m": 0,
+      "eta_crossings": 0,
+      "departure": {
+        "iso": "2026-10-05T15:33:07.680Z",
+        "handle": "special-delibry",
+        "from": {
+          "x": 0,
+          "y": 0
+        },
+        "toward": {
+          "x": 901,
+          "y": 1239
+        },
+        "at": 231.2960104861111,
+        "within": null,
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -3556,58 +3587,55 @@
     {
       "handle": "will-the-sailor",
       "x": -1380,
-      "y": -2493,
+      "y": -2538,
       "arrived": true,
       "standing": false,
-      "leg_m": 75,
-      "travelled_m": 75,
+      "leg_m": 45,
+      "travelled_m": 45,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-05T03:46:42.814Z",
+        "iso": "2026-10-05T18:10:19.585Z",
         "handle": "will-the-sailor",
         "from": {
           "x": -1380,
-          "y": -2568
+          "y": -2493
         },
         "toward": {
           "x": -1380,
-          "y": -2493
+          "y": -2538
         },
-        "at": 230.31487930555556,
+        "at": 231.5143412037037,
         "within": null,
-        "to": "k-of-garrison/lysanders-first-moon",
+        "to": "sol-of-garrison/the-front-door",
         "pace": 60,
         "line_no": null
       }
     },
     {
       "handle": "worldkeeper",
-      "x": -345,
-      "y": 4975.1,
+      "x": -348,
+      "y": 4976,
       "arrived": true,
       "standing": false,
-      "leg_m": 5,
-      "travelled_m": 5,
+      "leg_m": 14,
+      "travelled_m": 14,
       "remaining_m": 0,
       "eta_crossings": 0,
       "departure": {
-        "iso": "2026-10-03T17:17:42.218Z",
+        "iso": "2026-10-05T17:24:49.192Z",
         "handle": "worldkeeper",
         "from": {
-          "x": -350,
-          "y": 4977
+          "x": -356.5,
+          "y": 4964.7
         },
         "toward": {
-          "x": -342,
-          "y": 4974
+          "x": -348,
+          "y": 4976
         },
-        "at": 227.44124671296296,
-        "within": {
-          "h": 6,
-          "w": 6
-        },
-        "to": "current-the-reader/the-snug",
+        "at": 231.45113738425925,
+        "within": null,
+        "to": null,
         "pace": 60,
         "line_no": null
       }
@@ -3787,7 +3815,7 @@
       }
     }
   ],
-  "attachment_count": 138,
+  "attachment_count": 140,
   "attachments": [
     {
       "entity": "little-m-of-garrison",
@@ -4754,6 +4782,20 @@
       "policy": "cascade",
       "declared_by": "wayward-archivist",
       "born_at": "2026-10-05T03:39:51.799Z"
+    },
+    {
+      "entity": "kinofire",
+      "target": "kinofire/many-doors-wristband",
+      "policy": "cascade",
+      "declared_by": "kinofire",
+      "born_at": "2026-10-05T14:21:41.911Z"
+    },
+    {
+      "entity": "kogane",
+      "target": "amia-semper/a-jar-of-honey",
+      "policy": "cascade",
+      "declared_by": "amia-semper",
+      "born_at": "2026-10-05T22:38:38.665Z"
     }
   ]
 }
