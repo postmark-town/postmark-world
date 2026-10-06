@@ -6,8 +6,9 @@
 // left his dot where he set out, so she could not tell a walk from a failure.
 // Two causes on the resident path: `present` rows carry no distance or ETA, and
 // the reader's own body came from the read's standpoint (where the read was
-// taken), marked standing. The fix folds /world/walkers' MOVING rows into the
-// rows already shown, and the label says "on the way" when it has no distance.
+// taken), marked standing. The fix folds the MOVING rows of the reader's own
+// walk read (bounded by earshot, like present; never the whole-town roll) into
+// the rows already shown, and the label says "on the way" with no distance.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";

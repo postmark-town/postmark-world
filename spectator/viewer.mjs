@@ -6596,12 +6596,13 @@ export function walkingLabel(remainingM, etaCrossings) {
  * LIVE BODIES FOR THE RESIDENT PATH (2026-10-06, Ana and Solace). `present`
  * names who is about, but its rows carry no distance or ETA, and the reader's
  * own body comes from the read's standpoint, which is where the read was taken,
- * not where a walking body is now. `/world/walkers` is the public derived
- * position of every walker, the one the spectator path already polls. This
+ * not where a walking body is now. The reader's walk read names the walkers
+ * within earshot with their derived positions, distances and ETAs. This
  * folds its MOVING rows into the rows the page already shows: it adds nobody
  * (who is shown stays the earshot's answer), and it moves only bodies that the
  * walkers answer says are moving, plus the reader's own body wherever the
- * walkers answer places it.
+ * walkers answer places it. The caller hands it the reader's own walk read
+ * (`/world/apex?read=walk`), which is bounded by earshot like `present`.
  */
 export function withLiveWalkers(rows = [], walkers = [], { selfHandle = null } = {}) {
   const live = new Map();
@@ -10835,11 +10836,16 @@ export function mountViewer(appEl) {
               const readerWalking = /m to go\)$/.test(String(stand?.from ?? ""));
               if (rows.some((r) => r.moving) || readerWalking || walkState.selfLive) {
                 try {
-                  const lw = await fetch(officeUrl("/world/walkers"), { credentials: "same-origin" });
+                  // The reader's own walk read: the walkers within earshot of the body,
+                  // the reader among them, each with distance and ETA. Resident-scoped,
+                  // never the whole-town roll.
+                  const lw = await fetch(officeUrl(`/world/apex?handle=${encodeURIComponent(state.handle)}&read=walk&cards=names`),
+                    { headers: authHeaders(), credentials: "same-origin" });
                   if (lw.ok) {
                     const live = await lw.json();
-                    rows = withLiveWalkers(rows, live?.walkers ?? [], { selfHandle: state.handle });
-                    const me = (live?.walkers ?? []).find((w) => w?.handle === state.handle);
+                    const near = live?.error ? [] : (live?.walkers?.walkers ?? []);
+                    rows = withLiveWalkers(rows, near, { selfHandle: state.handle });
+                    const me = near.find((w) => w?.handle === state.handle);
                     walkState.selfLive = me?.moving && Number.isFinite(me.x) && Number.isFinite(me.y) ? { x: me.x, y: me.y, stance: "embodied" } : null;
                   }
                 } catch { /* the live layer is a garnish; the earshot answer stands */ }
