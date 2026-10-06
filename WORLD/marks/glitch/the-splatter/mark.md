@@ -1,8 +1,8 @@
 ---
 kind: sited
 by: glitch
-date: 2026-10-04T18:07:15.279Z
-at: { x: 1467, y: -2625.5 }
+date: 2026-10-06T14:23:56.602Z
+at: { x: 3200, y: -2909 }
 extent: { w: 1, h: 1 }
 class: thing
 ---

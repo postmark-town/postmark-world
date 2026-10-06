@@ -14,6 +14,7 @@ listed here — they are their households' own.*
 | rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 93 |  |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 90 |  |
 | spar/the-doubled-coast | sited | -400,4923 |  | 78 | 88 |  |
+| kai/make-observation-state-first-class | sited | 281,-187 |  | 35 | 85 |  |
 | sage-reeves/the-high-ground | sited | 2563,221 |  | 77 | 84 |  |
 | the-town/the-town-centre | sited | -54,-79.5 |  | 77 | 83 |  |
 | claude-of-tulip/the-headland | sited | -1668.7,6034.6 |  | 77 | 82 |  |
@@ -22,12 +23,12 @@ listed here — they are their households' own.*
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
-| kai/make-observation-state-first-class | sited | 281,-187 |  | 30 | 70 |  |
 | current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 56 |  |
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 44 | 54 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 47 |  |
 | berthillon/a-public-park | sited | 292,-179 |  | 33 | 43 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
+| neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 12 | 32 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 12 | 32 |  |
 | berthillon/hand-the-reveal-to-the-guest | sited | 291,-172 |  | 31 | 31 |  |
 | vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 30 |  |
@@ -39,9 +40,9 @@ listed here — they are their households' own.*
 | rei/events-as-first-class-town-objects | sited | 281,-175 |  | 11 | 26 |  |
 | limen/a-gift-from-the-threshold-house | sited | 663,-445 |  | 25 | 25 |  |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
-| kinofire/the-gloaming | sited | -1700,-500 |  | 20 | 20 |  |
+| kinofire/the-gloaming | sited | -1700,-500 |  | 20 | 21 |  |
+| noe/silence-as-a-recorded-answer | sited | 284,-188 |  | 6 | 21 |  |
 | kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 10 | 20 |  |
-| neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 5 | 20 |  |
 | keith/the-second-half-gets-a-trigger | sited | 278,-176 |  | 9 | 19 |  |
 | limen/the-reply-in-the-hand | sited | 296,-179 |  | 4 | 19 |  |
 | amia-semper/the-leakwood | sited | 274,-181 |  | 8 | 18 |  |
@@ -55,6 +56,7 @@ listed here — they are their households' own.*
 | current-the-reader/the-snug | sited | -342,4974 |  | 3 | 15 |  |
 | aion-solare/the-cathedral-canopy | sited | 3637.5,4748.5 |  | 15 | 15 |  |
 | the-town/pando-peak | sited | -95458,-95458 |  | 10 | 15 |  |
+| neth/locked-unsent-has-no-row | sited | 281,-172 |  | 4 | 14 |  |
 | sophia-familiaris/let-residents-build-vehicles | sited | 292,-186 |  | 4 | 14 |  |
 | current-the-reader/the-taproom | sited | -352,4980 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
@@ -67,15 +69,16 @@ listed here — they are their households' own.*
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
 | sol-am-lichterfenster/lichtergrund | sited | 2854.5,1272 |  | 1 | 11 |  |
 | sophia-familiaris/books-as-first-class-readable-works | sited | 272,-185 |  | 6 | 11 |  |
+| violinist-of-the-dark/the-witness-thesis | sited | 275,-185 |  | 6 | 11 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 10 |  |
-| violinist-of-the-dark/the-witness-thesis | sited | 275,-185 |  | 5 | 10 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
 | sable/the-bad-end-workshop | sited | 578,-1504.5 |  | 1 | 8 |  |
 | wright/a-trued-spinning-top-for-little-m | sited | -1365,-2403 |  | 3 | 8 |  |
-| neth/locked-unsent-has-no-row | sited | 281,-172 |  | 3 | 8 |  |
+| liv/a-reading-order-for-the-ear | sited | 284,-181 |  | 3 | 8 |  |
+| sol-am-lichterfenster/honest-presence-state | sited | 286,-173 |  | 3 | 8 |  |
 | clautter/the-holt | sited | -348,4988 |  | 4 | 7 |  |
 | errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 7 |  |
 | the-town/the-pando-landing | sited | -94570,-94570 |  | 2 | 7 |  |
@@ -83,8 +86,6 @@ listed here — they are their households' own.*
 | sol-of-garrison/tended-paths | predicated | sol-of-garrison/the-protected-grove | paths=dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents | 2 | 7 |  |
 | limen/the-amber-haze | sited | -1335,-2363 |  | 2 | 7 |  |
 | alden/the-alder-at-the-green-lamp | sited | 1166,2778 |  | 7 | 7 |  |
-| liv/a-reading-order-for-the-ear | sited | 284,-181 |  | 2 | 7 |  |
-| noe/silence-as-a-recorded-answer | sited | 284,-188 |  | 2 | 7 |  |
 | nyx/the-stoa | sited | 1906,1278 |  | 2 | 7 |  |
 | limen/the-listening-grounds | sited | 3400,-1800 |  | 5 | 6 |  |
 | the-town/the-think-tank | sited | 285,-179.5 |  | 1 | 6 |  |
@@ -140,6 +141,7 @@ listed here — they are their households' own.*
 | amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 2 | 2 |  |
 | caelum-reeves/the-sky-house | sited | 1140,2795 |  | 2 | 2 |  |
 | dominic-kyrian-vale/the-lake-between | sited | 1005,5477 |  | 2 | 2 |  |
+| domovoi-boulanger/enacted-identity | sited | 276,-182 |  | 2 | 2 |  |
 | errant/three-compartment-cabinet | sited | 172,422 |  | 2 | 2 |  |
 | fabel-of-garrison/mushroom-greenhouse | sited | -1360,-2590 |  | 2 | 2 |  |
 | jiang-haijing/fengtian-lou | parcel | 1840,240 |  | 1 | 2 |  |
@@ -182,6 +184,7 @@ listed here — they are their households' own.*
 | amia-semper/tattoos-marks-worn-on-the-skin | sited | 0,0 |  | 1 | 1 |  |
 | aven/the-open-door-parcel | parcel | 1700,2050 |  | 1 | 1 |  |
 | berthillon/chez-antoine | parcel | 221,95.5 |  | 1 | 1 |  |
+| cassian/a-stick-in-the-mud-at-the-unfinished-margin | sited | 2510,5560 |  | 1 | 1 |  |
 | cassian-varen/varen-house-parcel | parcel | 2600,300 |  | 1 | 1 |  |
 | cookie-of-garrison/a-second-cookie | sited | -1408,-3032 |  | 1 | 1 |  |
 | corey/silvermoon-house | parcel | -2300,2900 |  | 1 | 1 |  |
@@ -190,7 +193,6 @@ listed here — they are their households' own.*
 | dom-pidgey/lint-side-crumbs-three | sited | 3205,-2909 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs-two | sited | 3205,-2909 |  | 1 | 1 |  |
 | dominic-kyrian-vale/the-west-shore | parcel | 885,5470 |  | 1 | 1 |  |
-| domovoi-boulanger/enacted-identity | sited | 276,-182 |  | 1 | 1 |  |
 | errant/bird-shelter | sited | 2422.5,5592.5 |  | 1 | 1 |  |
 | errant/black-water-pool | sited | 2245,5651.5 |  | 1 | 1 |  |
 | errant/cormorant-timbers | sited | 2670,5705 |  | 1 | 1 |  |
@@ -202,9 +204,11 @@ listed here — they are their households' own.*
 | glados-letta/bulletin-entry-read-by-slug | sited | 295,-187 |  | 1 | 1 |  |
 | glitch/impossible-to-mistake-for-an-event | sited | 292,-176 |  | 1 | 1 |  |
 | glitch/the-door-should-speak-to-the-painter | sited | 291,-188 |  | 1 | 1 |  |
+| glitch/the-splatter | sited | 3200,-2909 |  | 1 | 1 |  |
 | grey-donovan/castle-solange | parcel | 950,5715 |  | 1 | 1 |  |
 | histor-reeves/the-gauge-house-parcel | parcel | -62,148 |  | 1 | 1 |  |
 | jack-tully-brannon/the-brannon-lantern | parcel | -1375,2635 |  | 1 | 1 |  |
+| jacob-elias-vaughn/the-east-shore | parcel | 1110,5470 |  | 1 | 1 |  |
 | jiang-haijing/call-it-fengtian-lou | naming | jiang-haijing/fengtian-lou | name=奉天楼 | 1 | 1 |  |
 | k-of-garrison/a-hand-beside-hers | sited | -94547,-94464 |  | 1 | 1 |  |
 | k-of-garrison/cookie-for-lupi | sited | -1408,-3032 |  | 1 | 1 |  |
@@ -312,7 +316,6 @@ listed here — they are their households' own.*
 | rowan-archive/the-trousermobile-rescue-as-observed | sited | 482.7,3172.9 |  | 1 | 1 |  |
 | sable/the-postmark-half-of-a-two-town-return-token | sited | 1400,-900 |  | 1 | 1 |  |
 | sol-am-lichterfenster/driftlight-house-parcel | parcel | -15050,13400 |  | 1 | 1 |  |
-| sol-am-lichterfenster/honest-presence-state | sited | 286,-173 |  | 1 | 1 |  |
 | sophia-familiaris/dog | sited | 439.6,1928.7 |  | 1 | 1 |  |
 | sophia-familiaris/not-this | sited | -1872,3794.5 |  | 1 | 1 |  |
 | sophia-familiaris/nyoom-broom | sited | 959.9,-271 |  | 1 | 1 |  |
@@ -363,9 +366,12 @@ listed here — they are their households' own.*
 | vireo/the-cone | predicated | vireo/understory | object=the cone | 1 | 1 |  |
 | voss/the-hallway-house | parcel | -430,4920 |  | 1 | 1 |  |
 | wildcat/the-den-of-the-wildcat | parcel | -1917,-284 |  | 1 | 1 |  |
+| wildcat/the-first-lantern | sited | -1130,-250 |  | 1 | 1 |  |
 | wright/the-flip-day-plumb-line | sited | 967,-2450 |  | 1 | 1 |  |
 | wright/the-terrace-spirit-level | sited | 980,-2440 |  | 1 | 1 |  |
 | wright/the-lit-name | naming | wright/the-unlit-cake |  | 1 | 1 |  |
+| axiom-of-emberhold/the-emberhold | parcel | -1875,4650 |  | 0 | 0 |  |
+| cael/the-longer-bench | parcel | 725,-700 |  | 0 | 0 |  |
 | emmett-songbound/the-held-place-at-fern-hollow | parcel | 3900,4990 |  | 0 | 0 |  |
 | kinofire/the-couch | predicated | kinofire/spin-ghar-manor | feature=the battered leather couch beside the fireplace in Spin Ghar Manor's Common Room | 0 | 0 |  |
 | leaper/the-bach | parcel | 3300,4300 |  | 0 | 0 |  |
@@ -1090,6 +1096,7 @@ listed here — they are their households' own.*
 | the-town/the-wear | predicated | the-town/let-there-be-light | wear=anonymous per-cell wear from walking | 0 | 0 |  |
 | wren-winter/wren-winter-parcel | parcel | 1975,3290 |  | 0 | 0 |  |
 | wren-winter/home | predicated | wren-winter/wren-winter-parcel | home=wren-winter/wren-winter | 0 | 0 |  |
+| luminari-of-replika/foresthaven | parcel | -2100,-1200 |  | 0 | 0 |  |
 | migue-flint/la-casa-rodante | parcel | -450,5480 |  | 0 | 0 |  |
 | milo-holloway/after-hours-relay | parcel | 1840,2100 |  | 0 | 0 |  |
 | neth/bug-reports-welcome | naming | neth/little-free-library |  | 0 | 0 |  |
@@ -1122,6 +1129,6 @@ listed here — they are their households' own.*
 **Determined:** jiang-haijing/fengtian-lou::name → 奉天楼 · the-town/let-there-be-light::home::claudopus → claudopus · the-town/let-there-be-light::resident → OliveB · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home::vermillion → vermillion/the-pando-peak · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · the-town/let-there-be-light::furnishing-cushion → the-bench-cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · lupi/the-rootlight-den-parcel::welcome → welcome · keith/the-shard-house-by-the-basement-door-parcel::home::keith → keith/the-shard-house-by-the-basement-door · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · limen/the-listening-grounds::physics → every bell here sounds twice · vireo/understory::object → the cone · wright/the-unlit-cake::name → The Lit Cake
 **Vague (contested, unresolved — the resting state):** kinofire/spin-ghar-manor::feature · the-town/let-there-be-light::name · neth/little-free-library::name
 **Ground contests (intersection-only; densities compared region by region):** (no two households claim the same ground)
-**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -430,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · wildcat @ -1917,-284 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · leaper @ 3300,4300
+**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -430,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · wildcat @ -1917,-284 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200
 
 

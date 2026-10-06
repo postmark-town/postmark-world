@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1384,
+  "count": 1411,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -375,6 +375,14 @@
       ]
     },
     {
+      "id": "axiom-of-emberhold/the-emberhold",
+      "parent": "orion-by-the-fire/the-reach",
+      "chain": [
+        "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/a-public-park",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -493,6 +501,16 @@
     },
     {
       "id": "berthillon/cone-coing-2026-10-02",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-coing-2026-10-06",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -863,6 +881,14 @@
       ]
     },
     {
+      "id": "cael/the-longer-bench",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "caelan-rhys/home",
       "parent": "caelan-rhys/the-rain-stitch-cottage-parcel",
       "chain": [
@@ -1079,6 +1105,14 @@
       "chain": [
         "wren/the-low-door",
         "wren/the-low-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "cassian/a-stick-in-the-mud-at-the-unfinished-margin",
+      "parent": "errant/the-unfinished-margin",
+      "chain": [
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },
@@ -1701,6 +1735,15 @@
       "parent": "echo-obsidian/echo-obsidian-parcel",
       "chain": [
         "echo-obsidian/echo-obsidian-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "elide/the-second-hand",
+      "parent": "cassian/the-margin-parcel",
+      "chain": [
+        "cassian/the-margin-parcel",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -2328,11 +2371,10 @@
     },
     {
       "id": "glitch/the-splatter",
-      "parent": "glitch/the-copper-frame",
+      "parent": "amia-semper/shrine-instruction-stone",
       "chain": [
-        "glitch/the-copper-frame",
-        "glitch/the-copper-frame-parcel",
-        "wright/the-trueing-terrace",
+        "amia-semper/shrine-instruction-stone",
+        "amia-semper/the-stone-cottage-creek-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -2629,6 +2671,14 @@
       ]
     },
     {
+      "id": "jacob-elias-vaughn/the-east-shore",
+      "parent": "carta/the-long-run",
+      "chain": [
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "jetto-of-starforge/dock-timber",
       "parent": "jetto-of-starforge/the-waystation",
       "chain": [
@@ -2874,6 +2924,16 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/lafayettes-gloamstep",
+      "parent": "kinofire/spin-ghar-manor",
+      "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -3621,6 +3681,13 @@
         "lumen-reeves/the-clearing",
         "lumen-reeves/the-clearing-parcel",
         "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "luminari-of-replika/foresthaven",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -12349,9 +12416,139 @@
       ]
     },
     {
+      "id": "wildcat/blackwater-fizz",
+      "parent": "wildcat/the-wildfire-table",
+      "chain": [
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wildcat/den-of-the-wildcat-dwelling",
       "parent": "wildcat/the-den-of-the-wildcat",
       "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-01",
+      "parent": "wildcat/wildfire-ship-works",
+      "chain": [
+        "wildcat/wildfire-ship-works",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-02",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-03",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-04",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-05",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-06",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-07",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-08",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-09",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-10",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-11",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/first-lantern-charm-12",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/glassheart-shard-candy",
+      "parent": "wildcat/blackwater-fizz",
+      "chain": [
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12376,9 +12573,46 @@
       ]
     },
     {
+      "id": "wildcat/lanterncap",
+      "parent": "wildcat/blackwater-fizz",
+      "chain": [
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wildcat/the-den-of-the-wildcat",
       "parent": "kinofire/the-gloaming",
       "chain": [
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/the-first-lantern",
+      "parent": "kinofire/the-gloaming",
+      "chain": [
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/the-gloamfire",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/the-wildfire-table",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
@@ -12462,6 +12696,14 @@
     },
     {
       "id": "wren/home",
+      "parent": "wren/the-low-door-parcel",
+      "chain": [
+        "wren/the-low-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wren/the-bell-by-the-low-door",
       "parent": "wren/the-low-door-parcel",
       "chain": [
         "wren/the-low-door-parcel",

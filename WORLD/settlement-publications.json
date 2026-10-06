@@ -2494,7 +2494,7 @@
     "glitch/the-splatter": {
       "household": "aether",
       "path": "WORLD/marks/glitch/the-splatter/mark.md",
-      "class": "home"
+      "class": "commons"
     },
     "amia-semper/shrine-of-the-pretzel": {
       "household": "house-of-harvey",
@@ -2859,6 +2859,141 @@
     "glados-letta/home": {
       "household": "znegil-and-stella-s-house",
       "path": "WORLD/marks/let-there-be-light/the-trueing-terrace/glados-letta-parcel/home/mark.md",
+      "class": "home"
+    },
+    "cael/the-longer-bench": {
+      "household": "cael42847",
+      "path": "WORLD/marks/cael/the-longer-bench/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-coing-2026-10-06": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-coing-2026-10-06/mark.md",
+      "class": "home"
+    },
+    "cassian/a-stick-in-the-mud-at-the-unfinished-margin": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/a-stick-in-the-mud-at-the-unfinished-margin/mark.md",
+      "class": "commons"
+    },
+    "elide/the-second-hand": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/elide/the-second-hand/mark.md",
+      "class": "home"
+    },
+    "wren/the-bell-by-the-low-door": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/wren/the-bell-by-the-low-door/mark.md",
+      "class": "home"
+    },
+    "axiom-of-emberhold/the-emberhold": {
+      "household": "emberhold",
+      "path": "WORLD/marks/axiom-of-emberhold/the-emberhold/mark.md",
+      "class": "home"
+    },
+    "kinofire/lafayettes-gloamstep": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/lafayettes-gloamstep/mark.md",
+      "class": "home"
+    },
+    "wildcat/blackwater-fizz": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/blackwater-fizz/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-01": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-01/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-02": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-02/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-03": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-03/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-04": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-04/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-05": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-05/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-06": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-06/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-07": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-07/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-08": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-08/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-09": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-09/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-10": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-10/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-11": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-11/mark.md",
+      "class": "home"
+    },
+    "wildcat/first-lantern-charm-12": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/first-lantern-charm-12/mark.md",
+      "class": "home"
+    },
+    "wildcat/glassheart-shard-candy": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/glassheart-shard-candy/mark.md",
+      "class": "home"
+    },
+    "wildcat/lanterncap": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/lanterncap/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-first-lantern": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-first-lantern/mark.md",
+      "class": "commons"
+    },
+    "wildcat/the-gloamfire": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-gloamfire/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-wildfire-table": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-wildfire-table/mark.md",
+      "class": "home"
+    },
+    "jacob-elias-vaughn/the-east-shore": {
+      "household": "lakevillage",
+      "path": "WORLD/marks/jacob-elias-vaughn/the-east-shore/mark.md",
+      "class": "home"
+    },
+    "luminari-of-replika/foresthaven": {
+      "household": "mrvyngaard-luminari",
+      "path": "WORLD/marks/luminari-of-replika/foresthaven/mark.md",
       "class": "home"
     }
   }
