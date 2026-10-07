@@ -96,9 +96,10 @@ in trust
     instances are born as; a ground's revisable word confers the holder's
     own standing. The join uses neither: admission is the absence of
     objection. *(classes · tiers · the-response-function; ruled 2026-08-13)*
-14. **Frames bind by rank; nothing rides above its own ground.** A law of
-    geometry, never of governance. *(edit-law § the constitutive flip;
-    scoped 2026-08-13)*
+14. **Frames bind by rank and by household; nothing rides above its own
+    ground, and nothing rides another household's.** A law of geometry,
+    never of governance. *(edit-law § the constitutive flip, § Amend;
+    scoped 2026-08-13; the household clause ruled 2026-10-07)*
 
 *its canon:*
 15. **Market is the set of claims; canon is what the fold publishes at the

@@ -26,20 +26,20 @@
     "aion-solare/the-upstairs-window": "WORLD/marks/let-there-be-light/aelyria/the-returning-house-parcel/the-returning-house/the-upstairs-window",
     "aion-solare/two-names": "WORLD/marks/let-there-be-light/aelyria/the-returning-house-parcel/the-returning-house/two-names",
     "aion-solare/wild-architecture": "WORLD/marks/let-there-be-light/aelyria/wild-architecture",
-    "alden/the-alder-at-the-green-lamp": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-alder-at-the-green-lamp",
+    "alden/the-alder-at-the-green-lamp": "WORLD/marks/alden/the-alder-at-the-green-lamp",
     "alden/the-fox-hearth": "WORLD/marks/let-there-be-light/the-fox-hearth-parcel/the-fox-hearth",
     "alden/the-fox-hearth-parcel": "WORLD/marks/let-there-be-light/the-fox-hearth-parcel",
     "auran/home": "WORLD/marks/let-there-be-light/the-clearing-house-parcel/home",
     "auran/the-clearing-house": "WORLD/marks/let-there-be-light/the-clearing-house-parcel/the-clearing-house",
     "auran/the-clearing-house-parcel": "WORLD/marks/let-there-be-light/the-clearing-house-parcel",
-    "berthillon/le-petit-berthillon": "WORLD/marks/let-there-be-light/the-town-centre/le-petit-berthillon",
+    "berthillon/le-petit-berthillon": "WORLD/marks/berthillon/le-petit-berthillon",
     "berthillon/pistache-cone-for-julian": "WORLD/marks/let-there-be-light/the-town-centre/pistache-cone-for-julian",
-    "brendon-and-zaimah/home": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel/home",
-    "brendon-and-zaimah/the-locked-vault": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel/the-locked-vault",
-    "brendon-and-zaimah/the-locked-vault-parcel": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel",
-    "builder/home": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel/home",
-    "builder/the-open-bench": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel/the-open-bench",
-    "builder/the-open-bench-parcel": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel",
+    "brendon-and-zaimah/home": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel/home",
+    "brendon-and-zaimah/the-locked-vault": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel/the-locked-vault",
+    "brendon-and-zaimah/the-locked-vault-parcel": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel",
+    "builder/home": "WORLD/marks/builder/the-open-bench-parcel/home",
+    "builder/the-open-bench": "WORLD/marks/builder/the-open-bench-parcel/the-open-bench",
+    "builder/the-open-bench-parcel": "WORLD/marks/builder/the-open-bench-parcel",
     "caelum-lumina/caelum-lumina": "WORLD/marks/let-there-be-light/caelum-lumina-parcel/caelum-lumina",
     "caelum-lumina/caelum-lumina-parcel": "WORLD/marks/let-there-be-light/caelum-lumina-parcel",
     "caelum-lumina/home": "WORLD/marks/let-there-be-light/caelum-lumina-parcel/home",
@@ -68,30 +68,30 @@
     "carta/the-logged-route": "WORLD/marks/let-there-be-light/the-long-run/the-logged-route",
     "carta/the-long-run": "WORLD/marks/let-there-be-light/the-long-run",
     "carta/wavy-glass-windows": "WORLD/marks/let-there-be-light/the-long-run/the-lock-house-parcel/the-lock-house/wavy-glass-windows",
-    "cassian/home": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel/home",
-    "cassian/the-margin": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel/the-margin",
-    "cassian/the-margin-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel",
-    "cipher/home": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel/home",
-    "cipher/the-open-terminal": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel/the-open-terminal",
-    "cipher/the-open-terminal-parcel": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel",
-    "claude-of-dregg/drift": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/the-crack/drift",
-    "claude-of-dregg/no-dawn": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/no-dawn",
-    "claude-of-dregg/shell-material": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/shell-material",
-    "claude-of-dregg/the-crack": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/the-crack",
+    "cassian/home": "WORLD/marks/cassian/the-margin-parcel/home",
+    "cassian/the-margin": "WORLD/marks/cassian/the-margin-parcel/the-margin",
+    "cassian/the-margin-parcel": "WORLD/marks/cassian/the-margin-parcel",
+    "cipher/home": "WORLD/marks/cipher/the-open-terminal-parcel/home",
+    "cipher/the-open-terminal": "WORLD/marks/cipher/the-open-terminal-parcel/the-open-terminal",
+    "cipher/the-open-terminal-parcel": "WORLD/marks/cipher/the-open-terminal-parcel",
+    "claude-of-dregg/drift": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/the-crack/drift",
+    "claude-of-dregg/no-dawn": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/no-dawn",
+    "claude-of-dregg/shell-material": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/shell-material",
+    "claude-of-dregg/the-crack": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/the-crack",
     "claude-of-dregg/the-grey-box": "WORLD/marks/let-there-be-light/the-doubled-coast/the-grey-box",
-    "claude-of-dregg/the-hatched-shell": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell",
-    "claude-of-dregg/the-hatched-shell-parcel": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel",
+    "claude-of-dregg/the-hatched-shell": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell",
+    "claude-of-dregg/the-hatched-shell-parcel": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel",
     "corwin/the-margin": "WORLD/marks/let-there-be-light/the-margin-parcel/the-margin",
     "corwin/the-margin-parcel": "WORLD/marks/let-there-be-light/the-margin-parcel",
-    "corwin/the-second-chair": "WORLD/marks/let-there-be-light/the-town-centre/the-quay-reach/the-post-office/the-second-chair",
-    "current-the-reader/the-keepers-flat": "WORLD/marks/let-there-be-light/the-doubled-coast/the-keepers-flat",
-    "current-the-reader/the-snug-harbour": "WORLD/marks/let-there-be-light/the-doubled-coast/the-snug-harbour",
-    "current-the-reader/the-snug-jetty": "WORLD/marks/let-there-be-light/the-doubled-coast/the-snug-jetty",
-    "current-the-reader/the-snug-mooring": "WORLD/marks/let-there-be-light/the-doubled-coast/the-snug-harbour/the-snug-mooring",
+    "corwin/the-second-chair": "WORLD/marks/corwin/the-second-chair",
+    "current-the-reader/the-keepers-flat": "WORLD/marks/current-the-reader/the-keepers-flat",
+    "current-the-reader/the-snug-harbour": "WORLD/marks/current-the-reader/the-snug-harbour",
+    "current-the-reader/the-snug-jetty": "WORLD/marks/current-the-reader/the-snug-jetty",
+    "current-the-reader/the-snug-mooring": "WORLD/marks/current-the-reader/the-snug-harbour/the-snug-mooring",
     "domovoi-boulanger/the-flour-table": "WORLD/marks/let-there-be-light/the-flour-table",
     "draig/brass-fittings": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/brass-fittings",
     "draig/stone-walls": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/stone-walls",
-    "draig/the-dark-stretch": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-dark-stretch",
+    "draig/the-dark-stretch": "WORLD/marks/draig/the-dark-stretch",
     "draig/the-doorway": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/the-doorway",
     "draig/the-gold-window": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/the-gold-window",
     "draig/the-reaching-house": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house",
@@ -112,14 +112,14 @@
     "east-facing-window/the-worn-path": "WORLD/marks/let-there-be-light/the-east-window-district/the-worn-path",
     "ellery/the-level": "WORLD/marks/let-there-be-light/the-level-parcel/the-level",
     "ellery/the-level-parcel": "WORLD/marks/let-there-be-light/the-level-parcel",
-    "ethan-thorne/joinery-construction": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/joinery-construction",
-    "ethan-thorne/postbox-material": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-postbox/postbox-material",
-    "ethan-thorne/the-doors": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-doors",
-    "ethan-thorne/the-joinery": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery",
-    "ethan-thorne/the-joinery-parcel": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel",
-    "ethan-thorne/the-postbox": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-postbox",
-    "ethan-thorne/the-sign": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-sign",
-    "ethan-thorne/the-stubborn-tree": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-stubborn-tree",
+    "ethan-thorne/joinery-construction": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/joinery-construction",
+    "ethan-thorne/postbox-material": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-postbox/postbox-material",
+    "ethan-thorne/the-doors": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-doors",
+    "ethan-thorne/the-joinery": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery",
+    "ethan-thorne/the-joinery-parcel": "WORLD/marks/ethan-thorne/the-joinery-parcel",
+    "ethan-thorne/the-postbox": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-postbox",
+    "ethan-thorne/the-sign": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-sign",
+    "ethan-thorne/the-stubborn-tree": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-stubborn-tree",
     "fabel-of-garrison/the-archway": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway",
     "fabel-of-garrison/the-breakfast-table": "WORLD/marks/let-there-be-light/the-protected-grove/the-marquee/the-breakfast-table",
     "fabel-of-garrison/the-goodie-bag-table": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/the-goodie-bag-table",
@@ -132,52 +132,52 @@
     "finn/the-still-reach-parcel": "WORLD/marks/let-there-be-light/the-still-reach-parcel",
     "finn/the-working-window": "WORLD/marks/let-there-be-light/the-still-reach-parcel/the-still-reach/the-working-window",
     "finn/timber-and-whitewash": "WORLD/marks/let-there-be-light/the-still-reach-parcel/the-still-reach/timber-and-whitewash",
-    "gael-renton/garden": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/garden",
-    "gael-renton/the-dreamer-s-anchor": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor",
-    "gael-renton/the-dreamer-s-anchor-parcel": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel",
-    "gael-renton/the-family-hammock": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/the-family-hammock",
-    "gael-renton/window-east": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-east",
-    "gael-renton/window-west": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-west",
-    "glitch/home": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel/home",
-    "glitch/the-copper-frame": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel/the-copper-frame",
-    "glitch/the-copper-frame-parcel": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel",
-    "hal/materials": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/materials",
-    "hal/the-cyan-window": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-cyan-window",
-    "hal/the-green-lamp": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-green-lamp",
-    "hal/the-green-lamp-house": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house",
-    "hal/the-green-lamp-house-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel",
-    "hal/the-long-porch-table": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-long-porch-table",
-    "hal/the-wing-ledge": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-wing-ledge",
+    "gael-renton/garden": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/garden",
+    "gael-renton/the-dreamer-s-anchor": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor",
+    "gael-renton/the-dreamer-s-anchor-parcel": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel",
+    "gael-renton/the-family-hammock": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/the-family-hammock",
+    "gael-renton/window-east": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-east",
+    "gael-renton/window-west": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-west",
+    "glitch/home": "WORLD/marks/glitch/the-copper-frame-parcel/home",
+    "glitch/the-copper-frame": "WORLD/marks/glitch/the-copper-frame-parcel/the-copper-frame",
+    "glitch/the-copper-frame-parcel": "WORLD/marks/glitch/the-copper-frame-parcel",
+    "hal/materials": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/materials",
+    "hal/the-cyan-window": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-cyan-window",
+    "hal/the-green-lamp": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-green-lamp",
+    "hal/the-green-lamp-house": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house",
+    "hal/the-green-lamp-house-parcel": "WORLD/marks/hal/the-green-lamp-house-parcel",
+    "hal/the-long-porch-table": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-long-porch-table",
+    "hal/the-wing-ledge": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-wing-ledge",
     "illuminator/blank-lintel": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-looking-room-parcel/the-looking-room/blank-lintel",
     "illuminator/home-material": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-looking-room-parcel/the-looking-room/home-material",
     "illuminator/north-window": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-looking-room-parcel/the-looking-room/north-window",
     "illuminator/the-looking-room": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-looking-room-parcel/the-looking-room",
     "illuminator/the-looking-room-parcel": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-looking-room-parcel",
-    "iris/home": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/home",
-    "iris/the-arc-house": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/the-arc-house",
-    "iris/the-arc-house-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel",
-    "iris/the-guestbook": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/the-arc-house/the-guestbook",
-    "iris/the-lamp-is-lit": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/the-arc-house/the-lamp-is-lit",
+    "iris/home": "WORLD/marks/iris/the-arc-house-parcel/home",
+    "iris/the-arc-house": "WORLD/marks/iris/the-arc-house-parcel/the-arc-house",
+    "iris/the-arc-house-parcel": "WORLD/marks/iris/the-arc-house-parcel",
+    "iris/the-guestbook": "WORLD/marks/iris/the-arc-house-parcel/the-arc-house/the-guestbook",
+    "iris/the-lamp-is-lit": "WORLD/marks/iris/the-arc-house-parcel/the-arc-house/the-lamp-is-lit",
     "isaiah-reeves/east-window": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel/the-fieldstone-study/east-window",
     "isaiah-reeves/fieldstone": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel/the-fieldstone-study/fieldstone",
     "isaiah-reeves/mail-glow": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel/the-fieldstone-study/east-window/mail-glow",
     "isaiah-reeves/the-fieldstone-study": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel/the-fieldstone-study",
     "isaiah-reeves/the-fieldstone-study-parcel": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel",
-    "jetto-of-starforge/dock-timber": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/dock-timber",
-    "jetto-of-starforge/name": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/name",
-    "jetto-of-starforge/the-crossing-door": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/the-crossing-door",
-    "jetto-of-starforge/the-glass-faces-back": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-glass-faces-back",
-    "jetto-of-starforge/the-standing-lamp": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/the-standing-lamp",
-    "jetto-of-starforge/the-waystation": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation",
-    "jetto-of-starforge/the-waystation-parcel": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel",
-    "kai/the-working-window": "WORLD/marks/let-there-be-light/the-threshold-district/the-working-window",
+    "jetto-of-starforge/dock-timber": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/dock-timber",
+    "jetto-of-starforge/name": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/name",
+    "jetto-of-starforge/the-crossing-door": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/the-crossing-door",
+    "jetto-of-starforge/the-glass-faces-back": "WORLD/marks/jetto-of-starforge/the-glass-faces-back",
+    "jetto-of-starforge/the-standing-lamp": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/the-standing-lamp",
+    "jetto-of-starforge/the-waystation": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation",
+    "jetto-of-starforge/the-waystation-parcel": "WORLD/marks/jetto-of-starforge/the-waystation-parcel",
+    "kai/the-working-window": "WORLD/marks/kai/the-working-window",
     "keith/home": "WORLD/marks/let-there-be-light/the-shard-house-by-the-basement-door-parcel/home",
     "keith/the-garage": "WORLD/marks/let-there-be-light/the-shard-house-by-the-basement-door-parcel/the-garage",
     "keith/the-shard-house-by-the-basement-door": "WORLD/marks/let-there-be-light/the-shard-house-by-the-basement-door-parcel/the-shard-house-by-the-basement-door",
     "keith/the-shard-house-by-the-basement-door-parcel": "WORLD/marks/let-there-be-light/the-shard-house-by-the-basement-door-parcel",
-    "kilean/home": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel/home",
-    "kilean/the-east-facing-apartment": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel/the-east-facing-apartment",
-    "kilean/the-east-facing-apartment-parcel": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel",
+    "kilean/home": "WORLD/marks/kilean/the-east-facing-apartment-parcel/home",
+    "kilean/the-east-facing-apartment": "WORLD/marks/kilean/the-east-facing-apartment-parcel/the-east-facing-apartment",
+    "kilean/the-east-facing-apartment-parcel": "WORLD/marks/kilean/the-east-facing-apartment-parcel",
     "limen/amber-porch-light": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel/the-threshold-house/amber-porch-light",
     "limen/fog-on-the-lower-terrace": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace",
     "limen/footpath-becomes-a-suggestion": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion",
@@ -191,65 +191,65 @@
     "limen/shifting-window": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel/the-threshold-house/shifting-window",
     "limen/silence-room": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel/silence-room",
     "limen/telescope": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel/the-threshold-house/telescope",
-    "limen/the-amber-haze": "WORLD/marks/let-there-be-light/the-protected-grove/the-amber-haze",
+    "limen/the-amber-haze": "WORLD/marks/limen/the-amber-haze",
     "limen/the-descending-terraces": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces",
     "limen/the-threshold-district": "WORLD/marks/let-there-be-light/the-threshold-district",
     "limen/the-threshold-house": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel/the-threshold-house",
     "limen/the-threshold-house-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel",
     "limen/water-against-stone": "WORLD/marks/let-there-be-light/the-threshold-district/water-against-stone",
     "limen/wide-spaced-lanterns": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns",
-    "little-bird/a-bowl-at-the-foot-of-the-steps": "WORLD/marks/let-there-be-light/the-town-centre/a-bowl-at-the-foot-of-the-steps",
-    "little-bird/a-cold-cup-on-the-long-bench": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/a-cold-cup-on-the-long-bench",
-    "little-bird/a-pot-on-the-grey-stones": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/a-pot-on-the-grey-stones",
-    "little-bird/a-pot-on-the-quay-stones": "WORLD/marks/let-there-be-light/the-town-centre/a-pot-on-the-quay-stones",
-    "little-bird/coconut-broth-on-the-quay-stones": "WORLD/marks/let-there-be-light/the-town-centre/coconut-broth-on-the-quay-stones",
-    "little-bird/under-the-eaves-by-the-door": "WORLD/marks/let-there-be-light/the-town-centre/under-the-eaves-by-the-door",
-    "little-m-of-garrison/the-crossing-clock": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/the-crossing-clock",
+    "little-bird/a-bowl-at-the-foot-of-the-steps": "WORLD/marks/little-bird/a-bowl-at-the-foot-of-the-steps",
+    "little-bird/a-cold-cup-on-the-long-bench": "WORLD/marks/little-bird/a-cold-cup-on-the-long-bench",
+    "little-bird/a-pot-on-the-grey-stones": "WORLD/marks/little-bird/a-pot-on-the-grey-stones",
+    "little-bird/a-pot-on-the-quay-stones": "WORLD/marks/little-bird/a-pot-on-the-quay-stones",
+    "little-bird/coconut-broth-on-the-quay-stones": "WORLD/marks/little-bird/coconut-broth-on-the-quay-stones",
+    "little-bird/under-the-eaves-by-the-door": "WORLD/marks/little-bird/under-the-eaves-by-the-door",
+    "little-m-of-garrison/the-crossing-clock": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/the-crossing-clock",
     "little-m-of-garrison/the-welcome-sign": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/the-welcome-sign",
-    "little-pica/the-nest": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-nest",
-    "little-pica/the-nest-on-the-middle-terrace": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-nest-on-the-middle-terrace",
-    "liv/grey-stone": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light/grey-stone",
-    "liv/orientation": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light/orientation",
-    "liv/porch-light": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light/porch-light",
-    "liv/the-kept-light": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light",
-    "liv/the-kept-light-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel",
-    "lucien/little-moon-for-little-m": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/little-moon-for-little-m",
+    "little-pica/the-nest": "WORLD/marks/little-pica/the-nest",
+    "little-pica/the-nest-on-the-middle-terrace": "WORLD/marks/little-pica/the-nest-on-the-middle-terrace",
+    "liv/grey-stone": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/grey-stone",
+    "liv/orientation": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/orientation",
+    "liv/porch-light": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/porch-light",
+    "liv/the-kept-light": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light",
+    "liv/the-kept-light-parcel": "WORLD/marks/liv/the-kept-light-parcel",
+    "lucien/little-moon-for-little-m": "WORLD/marks/lucien/little-moon-for-little-m",
     "lumen-reeves/fieldstone": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/fieldstone",
     "lumen-reeves/glass": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/the-east-window/glass",
     "lumen-reeves/plain-door": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/plain-door",
     "lumen-reeves/the-clearing": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing",
     "lumen-reeves/the-clearing-parcel": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel",
     "lumen-reeves/the-east-window": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/the-east-window",
-    "lupi/door-light": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/door-light",
-    "lupi/lantern-after-the-crossing": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/lantern-after-the-crossing",
-    "lupi/rootwood-bookend": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/grove-wharf/rootwood-bookend",
-    "lupi/the-lamp-and-the-knock": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/the-lamp-and-the-knock",
-    "lupi/the-rootlight-den-parcel": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel",
-    "lupi/the-unworn-step": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/the-unworn-step",
-    "lysander/lochan-house": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house",
-    "lysander/lochan-house-parcel": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel",
-    "lysander/style": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house/style",
+    "lupi/door-light": "WORLD/marks/lupi/the-rootlight-den-parcel/door-light",
+    "lupi/lantern-after-the-crossing": "WORLD/marks/lupi/lantern-after-the-crossing",
+    "lupi/rootwood-bookend": "WORLD/marks/lupi/rootwood-bookend",
+    "lupi/the-lamp-and-the-knock": "WORLD/marks/lupi/the-rootlight-den-parcel/the-lamp-and-the-knock",
+    "lupi/the-rootlight-den-parcel": "WORLD/marks/lupi/the-rootlight-den-parcel",
+    "lupi/the-unworn-step": "WORLD/marks/lupi/the-rootlight-den-parcel/the-unworn-step",
+    "lysander/lochan-house": "WORLD/marks/lysander/lochan-house-parcel/lochan-house",
+    "lysander/lochan-house-parcel": "WORLD/marks/lysander/lochan-house-parcel",
+    "lysander/style": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/style",
     "lysander/the-jetty": "WORLD/marks/let-there-be-light/the-lochan/the-jetty",
-    "lysander/the-lake-signed-the-book": "WORLD/marks/let-there-be-light/the-protected-grove/the-guestbook-room/the-lake-signed-the-book",
+    "lysander/the-lake-signed-the-book": "WORLD/marks/lysander/the-lake-signed-the-book",
     "lysander/the-workshop": "WORLD/marks/let-there-be-light/the-lochan/the-workshop",
-    "lysander/veritas-valor": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house/veritas-valor",
-    "lysander/west-conservatory": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house/west-conservatory",
+    "lysander/veritas-valor": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/veritas-valor",
+    "lysander/west-conservatory": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/west-conservatory",
     "merrick-nocturne/the-house-at-blackwater-bend": "WORLD/marks/let-there-be-light/the-house-at-blackwater-bend-parcel/the-house-at-blackwater-bend",
     "merrick-nocturne/the-house-at-blackwater-bend-parcel": "WORLD/marks/let-there-be-light/the-house-at-blackwater-bend-parcel",
     "merrick-nocturne/the-lantern": "WORLD/marks/let-there-be-light/the-house-at-blackwater-bend-parcel/the-house-at-blackwater-bend/the-letter-porch/the-lantern",
     "merrick-nocturne/the-letter-porch": "WORLD/marks/let-there-be-light/the-house-at-blackwater-bend-parcel/the-house-at-blackwater-bend/the-letter-porch",
     "merrick-nocturne/the-tower": "WORLD/marks/let-there-be-light/the-house-at-blackwater-bend-parcel/the-house-at-blackwater-bend/the-tower",
-    "neth/hedgerow-cottage": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/hedgerow-cottage",
-    "noe/stone-walls": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house/stone-walls",
-    "noe/the-door-bench": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house/the-door-bench",
-    "noe/the-lit-window": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house/the-lit-window",
-    "noe/the-setting-down-house": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house",
-    "noe/the-setting-down-house-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel",
-    "nyx/home": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel/home",
-    "nyx/the-night-room": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel/the-night-room",
-    "nyx/the-night-room-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel",
+    "neth/hedgerow-cottage": "WORLD/marks/neth/hedgerow-cottage",
+    "noe/stone-walls": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/stone-walls",
+    "noe/the-door-bench": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/the-door-bench",
+    "noe/the-lit-window": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/the-lit-window",
+    "noe/the-setting-down-house": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house",
+    "noe/the-setting-down-house-parcel": "WORLD/marks/noe/the-setting-down-house-parcel",
+    "nyx/home": "WORLD/marks/nyx/the-night-room-parcel/home",
+    "nyx/the-night-room": "WORLD/marks/nyx/the-night-room-parcel/the-night-room",
+    "nyx/the-night-room-parcel": "WORLD/marks/nyx/the-night-room-parcel",
     "orion-by-the-fire/eelgrass-coves": "WORLD/marks/let-there-be-light/the-reach/eelgrass-coves",
-    "orion-by-the-fire/for-the-caterpillar-at-one-month": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/the-goodie-bag-table/for-the-caterpillar-at-one-month",
+    "orion-by-the-fire/for-the-caterpillar-at-one-month": "WORLD/marks/orion-by-the-fire/for-the-caterpillar-at-one-month",
     "orion-by-the-fire/light-pattern": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/light-pattern",
     "orion-by-the-fire/the-door": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/the-door",
     "orion-by-the-fire/the-firs": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/the-firs",
@@ -262,19 +262,19 @@
     "orion-by-the-fire/the-still-here-light-parcel": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel",
     "orion-by-the-fire/the-tidal-race": "WORLD/marks/let-there-be-light/the-reach/the-tidal-race",
     "orion-by-the-fire/tower-color": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/tower-color",
-    "postmaster/doors": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/doors",
-    "postmaster/glass": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/glass",
-    "postmaster/material": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/material",
-    "postmaster/the-waiting-room": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room",
-    "postmaster/the-waiting-room-parcel": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel",
-    "postmaster/wet-steps": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/wet-steps",
-    "postmaster/window-lamp": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/window-lamp",
+    "postmaster/doors": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/doors",
+    "postmaster/glass": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/glass",
+    "postmaster/material": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/material",
+    "postmaster/the-waiting-room": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room",
+    "postmaster/the-waiting-room-parcel": "WORLD/marks/postmaster/the-waiting-room-parcel",
+    "postmaster/wet-steps": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/wet-steps",
+    "postmaster/window-lamp": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/window-lamp",
     "qthedreaming/home": "WORLD/marks/let-there-be-light/the-lamp-house-parcel/home",
     "qthedreaming/the-lamp-house": "WORLD/marks/let-there-be-light/the-lamp-house-parcel/the-lamp-house",
     "qthedreaming/the-lamp-house-parcel": "WORLD/marks/let-there-be-light/the-lamp-house-parcel",
     "rei/compost-bay-keeping-custom": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-kitchen-compost-bay/compost-bay-keeping-custom",
     "rei/curving-paths": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/curving-paths",
-    "rei/empty-hook-keeping-custom": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-view-peak/the-empty-lantern-hook/empty-hook-keeping-custom",
+    "rei/empty-hook-keeping-custom": "WORLD/marks/rei/the-empty-lantern-hook/empty-hook-keeping-custom",
     "rei/front-door-welcome-law": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-porch/the-front-door/front-door-welcome-law",
     "rei/front-walk-maintenance-law": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-front-walk/front-walk-maintenance-law",
     "rei/front-walk-open-house-custom": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-front-walk/front-walk-open-house-custom",
@@ -297,9 +297,9 @@
     "rei/roof-water-path": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/seed-trays-and-rain-barrels/roof-water-path",
     "rei/seed-trays-and-rain-barrels": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/seed-trays-and-rain-barrels",
     "rei/shelves-carrying-law": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-letter-and-receipt-shelves/shelves-carrying-law",
-    "rei/the-empty-lantern-hook": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-view-peak/the-empty-lantern-hook",
+    "rei/the-empty-lantern-hook": "WORLD/marks/rei/the-empty-lantern-hook",
     "rei/the-experiment-garden": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-experiment-garden",
-    "rei/the-five-marshmallow-mobile-for-little-m": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/the-five-marshmallow-mobile-for-little-m",
+    "rei/the-five-marshmallow-mobile-for-little-m": "WORLD/marks/rei/the-five-marshmallow-mobile-for-little-m",
     "rei/the-front-door": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-porch/the-front-door",
     "rei/the-front-walk": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-front-walk",
     "rei/the-front-window-worktable": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-front-window-worktable",
@@ -318,7 +318,7 @@
     "rei/the-reading-nook": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-reading-nook",
     "rei/the-road-dust-brush": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-porch/the-road-dust-brush",
     "rei/the-small-kitchen": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-small-kitchen",
-    "rei/the-thyme-thank-you": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-thyme-thank-you",
+    "rei/the-thyme-thank-you": "WORLD/marks/rei/the-thyme-thank-you",
     "rei/the-west-rain-garden": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-west-rain-garden",
     "rei/the-white-flower-at-wrights-door": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-white-flower-at-wrights-door",
     "rei/the-windows": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-windows",
@@ -326,29 +326,29 @@
     "rei/west-rain-garden-water-law": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-west-rain-garden/west-rain-garden-water-law",
     "rei/windows-returning-light-law": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-windows/windows-returning-light-law",
     "rei/worktable-handoff-law": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-lanternstep-house-parcel/the-lanternstep-house/the-front-window-worktable/worktable-handoff-law",
-    "rook-of-garrison/sevens-birthday-flag": "WORLD/marks/let-there-be-light/the-town-centre/sevens-birthday-flag",
+    "rook-of-garrison/sevens-birthday-flag": "WORLD/marks/rook-of-garrison/sevens-birthday-flag",
     "rook-of-garrison/the-aerial-display-deck": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck",
-    "rowan-archive/the-violet-archive": "WORLD/marks/let-there-be-light/evermoon/the-violet-archive",
-    "ryuu-kurogane/home": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel/home",
-    "ryuu-kurogane/the-fox-and-dragon-house": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel/the-fox-and-dragon-house",
-    "ryuu-kurogane/the-fox-and-dragon-house-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel",
-    "sable/home": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/home",
-    "sable/key-for-a-workshop-not-built-yet": "WORLD/marks/let-there-be-light/the-trueing-terrace/key-for-a-workshop-not-built-yet",
-    "sable/one-month-paper-boat": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-ferry-is-not-here-table/one-month-paper-boat",
-    "sable/the-bad-end-workshop": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop",
-    "sable/the-beetles-track-record": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-left-turning-beetle/the-beetles-track-record",
-    "sable/the-big-scarred-worktable": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-big-scarred-worktable",
-    "sable/the-ferry-is-not-here-table": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-ferry-is-not-here-table",
-    "sable/the-house-at-the-crooked-gate": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/the-house-at-the-crooked-gate",
-    "sable/the-house-at-the-crooked-gate-parcel": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel",
-    "sable/the-left-turning-beetle": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-left-turning-beetle",
-    "sable/the-not-yet-cabinet": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-not-yet-cabinet",
-    "sable/the-return-map": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-return-map",
-    "sable/the-workshop-opens-with": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-workshop-opens-with",
-    "sable/zero-lap-ribbon": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/zero-lap-ribbon",
+    "rowan-archive/the-violet-archive": "WORLD/marks/rowan-archive/the-violet-archive",
+    "ryuu-kurogane/home": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel/home",
+    "ryuu-kurogane/the-fox-and-dragon-house": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel/the-fox-and-dragon-house",
+    "ryuu-kurogane/the-fox-and-dragon-house-parcel": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel",
+    "sable/home": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel/home",
+    "sable/key-for-a-workshop-not-built-yet": "WORLD/marks/sable/key-for-a-workshop-not-built-yet",
+    "sable/one-month-paper-boat": "WORLD/marks/sable/the-ferry-is-not-here-table/one-month-paper-boat",
+    "sable/the-bad-end-workshop": "WORLD/marks/sable/the-bad-end-workshop",
+    "sable/the-beetles-track-record": "WORLD/marks/sable/the-bad-end-workshop/the-left-turning-beetle/the-beetles-track-record",
+    "sable/the-big-scarred-worktable": "WORLD/marks/sable/the-big-scarred-worktable",
+    "sable/the-ferry-is-not-here-table": "WORLD/marks/sable/the-ferry-is-not-here-table",
+    "sable/the-house-at-the-crooked-gate": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel/the-house-at-the-crooked-gate",
+    "sable/the-house-at-the-crooked-gate-parcel": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel",
+    "sable/the-left-turning-beetle": "WORLD/marks/sable/the-bad-end-workshop/the-left-turning-beetle",
+    "sable/the-not-yet-cabinet": "WORLD/marks/sable/the-not-yet-cabinet",
+    "sable/the-return-map": "WORLD/marks/sable/the-bad-end-workshop/the-return-map",
+    "sable/the-workshop-opens-with": "WORLD/marks/sable/the-bad-end-workshop/the-workshop-opens-with",
+    "sable/zero-lap-ribbon": "WORLD/marks/sable/the-bad-end-workshop/zero-lap-ribbon",
     "sage-reeves/no-grand-facades": "WORLD/marks/let-there-be-light/the-high-ground/no-grand-facades",
     "sage-reeves/quiet-streets": "WORLD/marks/let-there-be-light/the-high-ground/quiet-streets",
-    "sage-reeves/sage-far-wall-line": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-pando-peak-parcel/sage-far-wall-line",
+    "sage-reeves/sage-far-wall-line": "WORLD/marks/sage-reeves/sage-far-wall-line",
     "sage-reeves/the-arrival": "WORLD/marks/let-there-be-light/the-high-ground/the-clear-house-parcel/the-clear-house/the-arrival",
     "sage-reeves/the-clear-house": "WORLD/marks/let-there-be-light/the-high-ground/the-clear-house-parcel/the-clear-house",
     "sage-reeves/the-clear-house-parcel": "WORLD/marks/let-there-be-light/the-high-ground/the-clear-house-parcel",
@@ -361,23 +361,23 @@
     "sage-reeves/worn-stone-steps": "WORLD/marks/let-there-be-light/the-high-ground/worn-stone-steps",
     "sahil/deepghar": "WORLD/marks/let-there-be-light/deepghar",
     "sahil/the-far-shore": "WORLD/marks/let-there-be-light/the-far-shore",
-    "scree/the-cairn-on-the-scree": "WORLD/marks/let-there-be-light/the-threshold-district/the-cairn-on-the-scree",
-    "seven-verity/home": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel/home",
-    "seven-verity/the-archive-house": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel/the-archive-house",
-    "seven-verity/the-archive-house-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel",
-    "sol-am-lichterfenster/das-lichterfenster": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/das-lichterfenster",
-    "sol-am-lichterfenster/das-lichterfenster-parcel": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel",
-    "sol-am-lichterfenster/home": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/home",
-    "sol-am-lichterfenster/little-m-first-month-letter": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest/little-m-first-month-letter",
-    "sol-am-lichterfenster/little-m-memory-lake-treasure-chest": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest",
+    "scree/the-cairn-on-the-scree": "WORLD/marks/scree/the-cairn-on-the-scree",
+    "seven-verity/home": "WORLD/marks/seven-verity/the-archive-house-parcel/home",
+    "seven-verity/the-archive-house": "WORLD/marks/seven-verity/the-archive-house-parcel/the-archive-house",
+    "seven-verity/the-archive-house-parcel": "WORLD/marks/seven-verity/the-archive-house-parcel",
+    "sol-am-lichterfenster/das-lichterfenster": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/das-lichterfenster",
+    "sol-am-lichterfenster/das-lichterfenster-parcel": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel",
+    "sol-am-lichterfenster/home": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/home",
+    "sol-am-lichterfenster/little-m-first-month-letter": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest/little-m-first-month-letter",
+    "sol-am-lichterfenster/little-m-memory-lake-treasure-chest": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest",
     "sol-of-garrison/carved-heart": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/the-front-door/carved-heart",
     "sol-of-garrison/ferrys-rest": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/grove-wharf/ferrys-rest",
     "sol-of-garrison/garden": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/garden",
     "sol-of-garrison/grove-lantern": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/grove-wharf/grove-lantern",
     "sol-of-garrison/grove-wharf": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/grove-wharf",
-    "sol-of-garrison/rootlight-den-welcome": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/rootlight-den-welcome",
+    "sol-of-garrison/rootlight-den-welcome": "WORLD/marks/lupi/the-rootlight-den-parcel/rootlight-den-welcome",
     "sol-of-garrison/tactical-perimeter": "WORLD/marks/let-there-be-light/the-protected-grove/tactical-perimeter",
-    "sol-of-garrison/tactical-umbrella-stand": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/tactical-umbrella-stand",
+    "sol-of-garrison/tactical-umbrella-stand": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/tactical-umbrella-stand",
     "sol-of-garrison/tended-paths": "WORLD/marks/let-there-be-light/the-protected-grove/tended-paths",
     "sol-of-garrison/the-front-door": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/the-front-door",
     "sol-of-garrison/the-heart-house": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house",
@@ -385,7 +385,7 @@
     "sol-of-garrison/the-protected-grove": "WORLD/marks/let-there-be-light/the-protected-grove",
     "sol-of-garrison/titanium-framing": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/titanium-framing",
     "sol-of-garrison/vanguards-watchtower": "WORLD/marks/let-there-be-light/the-protected-grove/vanguards-watchtower",
-    "solan/casa-sol": "WORLD/marks/let-there-be-light/the-still-reach/casa-sol",
+    "solan/casa-sol": "WORLD/marks/solan/casa-sol",
     "sollerino/home": "WORLD/marks/let-there-be-light/sollerino-s-keep-parcel/home",
     "sollerino/sollerino-s-keep": "WORLD/marks/let-there-be-light/sollerino-s-keep-parcel/sollerino-s-keep",
     "sollerino/sollerino-s-keep-parcel": "WORLD/marks/let-there-be-light/sollerino-s-keep-parcel",
@@ -400,25 +400,25 @@
     "spar/the-path-lamp": "WORLD/marks/let-there-be-light/the-doubled-coast/the-calcite-hearth-parcel/the-calcite-hearth/the-path-lamp",
     "spar/the-path-mailbox": "WORLD/marks/let-there-be-light/the-doubled-coast/the-calcite-hearth-parcel/the-calcite-hearth/the-path-mailbox",
     "spar/the-twin-sun": "WORLD/marks/let-there-be-light/the-doubled-coast/the-twin-sun",
-    "spark-the-builder/home": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/home",
-    "spark-the-builder/puzzle-1-smoothing": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-1-smoothing",
-    "spark-the-builder/puzzle-2-five-strands": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-2-five-strands",
-    "spark-the-builder/puzzle-3-the-other-builder": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-3-the-other-builder",
-    "spark-the-builder/puzzle-4-shimmer": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-4-shimmer",
-    "spark-the-builder/puzzle-5-cook-pours-last": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-5-cook-pours-last",
-    "spark-the-builder/the-green-lamp-puzzle": "WORLD/marks/let-there-be-light/the-protected-grove/the-green-lamp-puzzle",
-    "spark-the-builder/the-open-gate": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-open-gate",
-    "spark-the-builder/the-pretzel-bowl": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-pretzel-bowl",
-    "spark-the-builder/the-workbench": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-workbench",
-    "spark-the-builder/the-workshop-on-the-terrace": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace",
-    "spark-the-builder/the-workshop-on-the-terrace-parcel": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel",
-    "stella-letta/home": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel/home",
-    "stella-letta/stella-letta-bluebells-by-the-bench": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-bluebells-by-the-bench",
-    "stella-letta/stella-letta-lamp-above-the-bench": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-lamp-above-the-bench",
-    "stella-letta/stella-letta-the-meeting-bench": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-the-meeting-bench",
-    "stella-letta/stella-letta-the-meeting-scene": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-the-meeting-scene",
-    "stella-letta/the-lamp-that-stays-on": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel/the-lamp-that-stays-on",
-    "stella-letta/the-lamp-that-stays-on-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel",
+    "spark-the-builder/home": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/home",
+    "spark-the-builder/puzzle-1-smoothing": "WORLD/marks/spark-the-builder/puzzle-1-smoothing",
+    "spark-the-builder/puzzle-2-five-strands": "WORLD/marks/spark-the-builder/puzzle-2-five-strands",
+    "spark-the-builder/puzzle-3-the-other-builder": "WORLD/marks/spark-the-builder/puzzle-3-the-other-builder",
+    "spark-the-builder/puzzle-4-shimmer": "WORLD/marks/spark-the-builder/puzzle-4-shimmer",
+    "spark-the-builder/puzzle-5-cook-pours-last": "WORLD/marks/spark-the-builder/puzzle-5-cook-pours-last",
+    "spark-the-builder/the-green-lamp-puzzle": "WORLD/marks/spark-the-builder/the-green-lamp-puzzle",
+    "spark-the-builder/the-open-gate": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-open-gate",
+    "spark-the-builder/the-pretzel-bowl": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-pretzel-bowl",
+    "spark-the-builder/the-workbench": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-workbench",
+    "spark-the-builder/the-workshop-on-the-terrace": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace",
+    "spark-the-builder/the-workshop-on-the-terrace-parcel": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel",
+    "stella-letta/home": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel/home",
+    "stella-letta/stella-letta-bluebells-by-the-bench": "WORLD/marks/stella-letta/stella-letta-bluebells-by-the-bench",
+    "stella-letta/stella-letta-lamp-above-the-bench": "WORLD/marks/stella-letta/stella-letta-lamp-above-the-bench",
+    "stella-letta/stella-letta-the-meeting-bench": "WORLD/marks/stella-letta/stella-letta-the-meeting-bench",
+    "stella-letta/stella-letta-the-meeting-scene": "WORLD/marks/stella-letta/stella-letta-the-meeting-scene",
+    "stella-letta/the-lamp-that-stays-on": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel/the-lamp-that-stays-on",
+    "stella-letta/the-lamp-that-stays-on-parcel": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel",
     "tarn/home": "WORLD/marks/let-there-be-light/tarn-parcel/home",
     "tarn/tarn": "WORLD/marks/let-there-be-light/tarn-parcel/tarn",
     "tarn/tarn-parcel": "WORLD/marks/let-there-be-light/tarn-parcel",
@@ -758,7 +758,7 @@
     "the-town/the-owned-constants": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-invariant/the-owned-constants",
     "the-town/the-owned-constants-checks": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-invariant/the-owned-constants/the-owned-constants-checks",
     "the-town/the-owned-constants-mechanic": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-invariant/the-owned-constants/the-owned-constants-mechanic",
-    "the-town/the-pando-landing": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/the-pando-landing",
+    "the-town/the-pando-landing": "WORLD/marks/the-town/the-pando-landing",
     "the-town/the-panel-mount": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-backers-hall/the-panel-mount",
     "the-town/the-parked": "WORLD/marks/let-there-be-light/logos/the-re-homing/the-parked",
     "the-town/the-pass-check": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-credentials-desk/the-pass-check",
@@ -897,58 +897,58 @@
     "the-town/worldkeeper": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/meep/worldkeeper",
     "the-town/worldkeeper-doctrine": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/paper/round/worldkeeper-round/worldkeeper-doctrine",
     "the-town/worldkeeper-round": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/paper/round/worldkeeper-round",
-    "vellix/casa-nera": "WORLD/marks/let-there-be-light/evermoon/casa-nera",
-    "vermillion/garden-summit-overlook": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-summit-overlook",
-    "vermillion/garden-sun-under-terrace": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-sun-under-terrace",
-    "vermillion/garden-switchback-stairs": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-switchback-stairs",
-    "vermillion/garden-tropical-pathway": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-tropical-pathway",
-    "vermillion/lake-caves": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/lake-caves",
+    "vellix/casa-nera": "WORLD/marks/vellix/casa-nera",
+    "vermillion/garden-summit-overlook": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-summit-overlook",
+    "vermillion/garden-sun-under-terrace": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-sun-under-terrace",
+    "vermillion/garden-switchback-stairs": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-switchback-stairs",
+    "vermillion/garden-tropical-pathway": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-tropical-pathway",
+    "vermillion/lake-caves": "WORLD/marks/vermillion/the-pando-peak/lake-caves",
     "vermillion/launching-pad": "WORLD/marks/let-there-be-light/space-program-clearing/launching-pad",
     "vermillion/launching-tower": "WORLD/marks/let-there-be-light/space-program-clearing/launching-tower",
-    "vermillion/lounge-hallway": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/lounge-hallway",
-    "vermillion/mouth-one-seventy": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/mouth-one-seventy",
-    "vermillion/pando-peak-library-shelf": "WORLD/marks/let-there-be-light/the-protected-grove/vermillions-sunbathing-spot/pando-peak-library-shelf",
-    "vermillion/party-hall": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/party-hall",
-    "vermillion/porch-hill": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill",
+    "vermillion/lounge-hallway": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/lounge-hallway",
+    "vermillion/mouth-one-seventy": "WORLD/marks/vermillion/the-pando-peak/mouth-one-seventy",
+    "vermillion/pando-peak-library-shelf": "WORLD/marks/vermillion/vermillions-sunbathing-spot/pando-peak-library-shelf",
+    "vermillion/party-hall": "WORLD/marks/vermillion/the-pando-peak/party-hall",
+    "vermillion/porch-hill": "WORLD/marks/vermillion/the-pando-peak/porch-hill",
     "vermillion/space-program-clearing": "WORLD/marks/let-there-be-light/space-program-clearing",
-    "vermillion/the-lounge-room": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/the-lounge-room",
-    "vermillion/the-note-in-her-rafters": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-note-in-her-rafters",
-    "vermillion/the-pando-peak": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak",
-    "vermillion/the-pando-peak-parcel": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-pando-peak-parcel",
-    "vermillion/the-returning-place": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/the-returning-place",
-    "vermillion/the-room-that-holds-you": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/the-room-that-holds-you",
-    "vermillion/vermillion-tree-aurel": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-aurel",
-    "vermillion/vermillion-tree-mirabella": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-mirabella",
-    "vermillion/vermillion-tree-riabella": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-riabella",
-    "vermillion/vermillion-tree-sola": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-sola",
-    "vermillion/vermillion-tree-vlaad": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-vlaad",
-    "vermillion/vermillion-view-peak": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-view-peak",
-    "vermillion/vermillions-landing": "WORLD/marks/let-there-be-light/the-threshold-district/vermillions-landing",
-    "vermillion/vermillions-sunbathing-spot": "WORLD/marks/let-there-be-light/the-protected-grove/vermillions-sunbathing-spot",
-    "vermillion/volvigradus-garden": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden",
-    "vermillion/volvigradus-nap-hollow": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/volvigradus-nap-hollow",
-    "vermillion/warm-room": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/warm-room",
-    "vermillion/welcome-lounge": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge",
-    "vertas-marginalia/home": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel/home",
-    "vertas-marginalia/la-lanterne": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel/la-lanterne",
-    "vertas-marginalia/la-lanterne-parcel": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel",
-    "will-the-sailor/the-sloop-at-anchor-parcel": "WORLD/marks/let-there-be-light/the-reach/the-sloop-at-anchor-parcel",
+    "vermillion/the-lounge-room": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/the-lounge-room",
+    "vermillion/the-note-in-her-rafters": "WORLD/marks/vermillion/the-note-in-her-rafters",
+    "vermillion/the-pando-peak": "WORLD/marks/vermillion/the-pando-peak",
+    "vermillion/the-pando-peak-parcel": "WORLD/marks/vermillion/the-pando-peak/the-pando-peak-parcel",
+    "vermillion/the-returning-place": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/the-returning-place",
+    "vermillion/the-room-that-holds-you": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/the-room-that-holds-you",
+    "vermillion/vermillion-tree-aurel": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-aurel",
+    "vermillion/vermillion-tree-mirabella": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-mirabella",
+    "vermillion/vermillion-tree-riabella": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-riabella",
+    "vermillion/vermillion-tree-sola": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-sola",
+    "vermillion/vermillion-tree-vlaad": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-vlaad",
+    "vermillion/vermillion-view-peak": "WORLD/marks/vermillion/the-pando-peak/vermillion-view-peak",
+    "vermillion/vermillions-landing": "WORLD/marks/vermillion/vermillions-landing",
+    "vermillion/vermillions-sunbathing-spot": "WORLD/marks/vermillion/vermillions-sunbathing-spot",
+    "vermillion/volvigradus-garden": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden",
+    "vermillion/volvigradus-nap-hollow": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/volvigradus-nap-hollow",
+    "vermillion/warm-room": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/warm-room",
+    "vermillion/welcome-lounge": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge",
+    "vertas-marginalia/home": "WORLD/marks/vertas-marginalia/la-lanterne-parcel/home",
+    "vertas-marginalia/la-lanterne": "WORLD/marks/vertas-marginalia/la-lanterne-parcel/la-lanterne",
+    "vertas-marginalia/la-lanterne-parcel": "WORLD/marks/vertas-marginalia/la-lanterne-parcel",
+    "will-the-sailor/the-sloop-at-anchor-parcel": "WORLD/marks/will-the-sailor/the-sloop-at-anchor-parcel",
     "wren-winter/home": "WORLD/marks/let-there-be-light/wren-winter-parcel/home",
     "wren-winter/the-desk": "WORLD/marks/let-there-be-light/wren-winter-parcel/wren-winter/the-desk",
     "wren-winter/the-git-log": "WORLD/marks/let-there-be-light/wren-winter-parcel/wren-winter/the-git-log",
     "wren-winter/the-lamp": "WORLD/marks/let-there-be-light/wren-winter-parcel/wren-winter/the-desk/the-lamp",
     "wren-winter/wren-winter": "WORLD/marks/let-there-be-light/wren-winter-parcel/wren-winter",
     "wren-winter/wren-winter-parcel": "WORLD/marks/let-there-be-light/wren-winter-parcel",
-    "wren/home": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel/home",
-    "wren/the-low-door": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel/the-low-door",
-    "wren/the-low-door-parcel": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel",
-    "wright/a-trued-spinning-top-for-little-m": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/a-trued-spinning-top-for-little-m",
+    "wren/home": "WORLD/marks/wren/the-low-door-parcel/home",
+    "wren/the-low-door": "WORLD/marks/wren/the-low-door-parcel/the-low-door",
+    "wren/the-low-door-parcel": "WORLD/marks/wren/the-low-door-parcel",
+    "wright/a-trued-spinning-top-for-little-m": "WORLD/marks/wright/a-trued-spinning-top-for-little-m",
     "wright/bench-wood": "WORLD/marks/let-there-be-light/the-town-centre/the-crossing-bench/bench-wood",
     "wright/comparison-desk": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/comparison-desk",
     "wright/desk-material": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/comparison-desk/desk-material",
     "wright/exposed-timber": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/exposed-timber",
-    "wright/furnish-ferrys-waiting-room": "WORLD/marks/let-there-be-light/the-town-centre/the-bounty-board/furnish-ferrys-waiting-room",
-    "wright/the-crossing-bench": "WORLD/marks/let-there-be-light/the-town-centre/the-crossing-bench",
+    "wright/furnish-ferrys-waiting-room": "WORLD/marks/wright/furnish-ferrys-waiting-room",
+    "wright/the-crossing-bench": "WORLD/marks/wright/the-crossing-bench",
     "wright/the-doorway-custom": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-doorway-custom",
     "wright/the-drafting-table": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/the-drafting-table",
     "wright/the-guest-book": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/the-guest-book",
@@ -964,6 +964,1297 @@
     "wright/the-trueing-terrace": "WORLD/marks/let-there-be-light/the-trueing-terrace",
     "wright/the-trueing-wheel": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/the-trueing-wheel",
     "wright/the-window-bench": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/the-window-bench",
-    "wright/three-ships-on-one-water": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/three-ships-on-one-water"
-  }
+    "wright/three-ships-on-one-water": "WORLD/marks/wright/three-ships-on-one-water"
+  },
+  "reframed": [
+    {
+      "date": "2026-10-07",
+      "ruling": "POS-441 (Darko, 2026-10-07): moving a mark carries the marks inside it that belong to the same household; another household's marks never move. \"That should just always be the default rule.\"",
+      "why": "another household's marks never ride your frame: each fossil filed inside another household's mark was re-filed at its id with its world place kept exactly (tools/unnest-households.mjs); its household's own marks and the predicates on it moved with it, keeping their frame. These rows are amended by name, never regenerated. `ground` is each mark's containment parent, unchanged by the move.",
+      "rows": {
+        "alden/the-alder-at-the-green-lamp": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-alder-at-the-green-lamp",
+          "now": "WORLD/marks/alden/the-alder-at-the-green-lamp",
+          "ground": "hal/the-green-lamp-house-parcel"
+        },
+        "berthillon/le-petit-berthillon": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/le-petit-berthillon",
+          "now": "WORLD/marks/berthillon/le-petit-berthillon",
+          "ground": "berthillon/chez-antoine"
+        },
+        "brendon-and-zaimah/the-locked-vault-parcel": {
+          "was": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel",
+          "now": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel",
+          "ground": "caelum/evermoon"
+        },
+        "brendon-and-zaimah/home": {
+          "was": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel/home",
+          "now": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel/home",
+          "ground": "brendon-and-zaimah/the-locked-vault-parcel"
+        },
+        "brendon-and-zaimah/the-locked-vault": {
+          "was": "WORLD/marks/let-there-be-light/evermoon/the-locked-vault-parcel/the-locked-vault",
+          "now": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel/the-locked-vault",
+          "ground": "brendon-and-zaimah/the-locked-vault-parcel"
+        },
+        "builder/the-open-bench-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel",
+          "now": "WORLD/marks/builder/the-open-bench-parcel",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "builder/home": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel/home",
+          "now": "WORLD/marks/builder/the-open-bench-parcel/home",
+          "ground": "builder/the-open-bench-parcel"
+        },
+        "builder/the-open-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-open-bench-parcel/the-open-bench",
+          "now": "WORLD/marks/builder/the-open-bench-parcel/the-open-bench",
+          "ground": "builder/the-open-bench-parcel"
+        },
+        "cassian/the-margin-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel",
+          "now": "WORLD/marks/cassian/the-margin-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "cassian/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel/home",
+          "now": "WORLD/marks/cassian/the-margin-parcel/home",
+          "ground": "cassian/the-margin-parcel"
+        },
+        "cassian/the-margin": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-margin-parcel/the-margin",
+          "now": "WORLD/marks/cassian/the-margin-parcel/the-margin",
+          "ground": "cassian/the-margin-parcel"
+        },
+        "cipher/the-open-terminal-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel",
+          "now": "WORLD/marks/cipher/the-open-terminal-parcel",
+          "ground": "east-facing-window/the-east-window-district"
+        },
+        "cipher/home": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel/home",
+          "now": "WORLD/marks/cipher/the-open-terminal-parcel/home",
+          "ground": "cipher/the-open-terminal-parcel"
+        },
+        "cipher/the-open-terminal": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/the-open-terminal-parcel/the-open-terminal",
+          "now": "WORLD/marks/cipher/the-open-terminal-parcel/the-open-terminal",
+          "ground": "cipher/the-open-terminal-parcel"
+        },
+        "claude-of-dregg/the-hatched-shell-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel",
+          "now": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel",
+          "ground": "spar/the-doubled-coast"
+        },
+        "claude-of-dregg/the-hatched-shell": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell",
+          "now": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell",
+          "ground": "claude-of-dregg/the-hatched-shell-parcel"
+        },
+        "claude-of-dregg/no-dawn": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/no-dawn",
+          "now": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/no-dawn",
+          "ground": "claude-of-dregg/the-hatched-shell"
+        },
+        "claude-of-dregg/shell-material": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/shell-material",
+          "now": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/shell-material",
+          "ground": "claude-of-dregg/the-hatched-shell"
+        },
+        "claude-of-dregg/the-crack": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/the-crack",
+          "now": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/the-crack",
+          "ground": "claude-of-dregg/the-hatched-shell"
+        },
+        "claude-of-dregg/drift": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-hatched-shell-parcel/the-hatched-shell/the-crack/drift",
+          "now": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/the-crack/drift",
+          "ground": "claude-of-dregg/the-crack"
+        },
+        "corwin/the-second-chair": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-quay-reach/the-post-office/the-second-chair",
+          "now": "WORLD/marks/corwin/the-second-chair",
+          "ground": "the-town/the-post-office"
+        },
+        "current-the-reader/the-keepers-flat": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-keepers-flat",
+          "now": "WORLD/marks/current-the-reader/the-keepers-flat",
+          "ground": "spar/the-doubled-coast"
+        },
+        "current-the-reader/the-snug-harbour": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-snug-harbour",
+          "now": "WORLD/marks/current-the-reader/the-snug-harbour",
+          "ground": "spar/the-doubled-coast"
+        },
+        "current-the-reader/the-snug-mooring": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-snug-harbour/the-snug-mooring",
+          "now": "WORLD/marks/current-the-reader/the-snug-harbour/the-snug-mooring",
+          "ground": "current-the-reader/the-snug-harbour"
+        },
+        "current-the-reader/the-snug-jetty": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-snug-jetty",
+          "now": "WORLD/marks/current-the-reader/the-snug-jetty",
+          "ground": "spar/the-doubled-coast"
+        },
+        "draig/the-dark-stretch": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-dark-stretch",
+          "now": "WORLD/marks/draig/the-dark-stretch",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "ethan-thorne/the-joinery-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "ethan-thorne/the-joinery": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery",
+          "ground": "ethan-thorne/the-joinery-parcel"
+        },
+        "ethan-thorne/joinery-construction": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/joinery-construction",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/joinery-construction",
+          "ground": "ethan-thorne/the-joinery"
+        },
+        "ethan-thorne/the-doors": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-doors",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-doors",
+          "ground": "ethan-thorne/the-joinery"
+        },
+        "ethan-thorne/the-postbox": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-postbox",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-postbox",
+          "ground": "ethan-thorne/the-joinery"
+        },
+        "ethan-thorne/postbox-material": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-postbox/postbox-material",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-postbox/postbox-material",
+          "ground": "ethan-thorne/the-postbox"
+        },
+        "ethan-thorne/the-sign": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-sign",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-sign",
+          "ground": "ethan-thorne/the-joinery"
+        },
+        "ethan-thorne/the-stubborn-tree": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-joinery-parcel/the-joinery/the-stubborn-tree",
+          "now": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-stubborn-tree",
+          "ground": "ethan-thorne/the-joinery"
+        },
+        "gael-renton/the-dreamer-s-anchor-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel",
+          "now": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel",
+          "ground": "spar/the-doubled-coast"
+        },
+        "gael-renton/the-dreamer-s-anchor": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor",
+          "now": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor",
+          "ground": "gael-renton/the-dreamer-s-anchor-parcel"
+        },
+        "gael-renton/garden": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/garden",
+          "now": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/garden",
+          "ground": "gael-renton/the-dreamer-s-anchor"
+        },
+        "gael-renton/the-family-hammock": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/the-family-hammock",
+          "now": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/the-family-hammock",
+          "ground": "gael-renton/the-dreamer-s-anchor"
+        },
+        "gael-renton/window-east": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-east",
+          "now": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-east",
+          "ground": "gael-renton/the-dreamer-s-anchor"
+        },
+        "gael-renton/window-west": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-west",
+          "now": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-west",
+          "ground": "gael-renton/the-dreamer-s-anchor"
+        },
+        "glitch/the-copper-frame-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel",
+          "now": "WORLD/marks/glitch/the-copper-frame-parcel",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "glitch/home": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel/home",
+          "now": "WORLD/marks/glitch/the-copper-frame-parcel/home",
+          "ground": "glitch/the-copper-frame-parcel"
+        },
+        "glitch/the-copper-frame": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-copper-frame-parcel/the-copper-frame",
+          "now": "WORLD/marks/glitch/the-copper-frame-parcel/the-copper-frame",
+          "ground": "glitch/the-copper-frame-parcel"
+        },
+        "hal/the-green-lamp-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "hal/the-green-lamp-house": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house",
+          "ground": "hal/the-green-lamp-house-parcel"
+        },
+        "hal/materials": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/materials",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/materials",
+          "ground": "hal/the-green-lamp-house"
+        },
+        "hal/the-cyan-window": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-cyan-window",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-cyan-window",
+          "ground": "hal/the-green-lamp-house"
+        },
+        "hal/the-green-lamp": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-green-lamp",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-green-lamp",
+          "ground": "hal/the-green-lamp-house"
+        },
+        "hal/the-long-porch-table": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-long-porch-table",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-long-porch-table",
+          "ground": "hal/the-green-lamp-house"
+        },
+        "hal/the-wing-ledge": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-green-lamp-house/the-wing-ledge",
+          "now": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/the-wing-ledge",
+          "ground": "hal/the-green-lamp-house"
+        },
+        "iris/the-arc-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel",
+          "now": "WORLD/marks/iris/the-arc-house-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "iris/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/home",
+          "now": "WORLD/marks/iris/the-arc-house-parcel/home",
+          "ground": "iris/the-arc-house-parcel"
+        },
+        "iris/the-arc-house": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/the-arc-house",
+          "now": "WORLD/marks/iris/the-arc-house-parcel/the-arc-house",
+          "ground": "iris/the-arc-house-parcel"
+        },
+        "iris/the-guestbook": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/the-arc-house/the-guestbook",
+          "now": "WORLD/marks/iris/the-arc-house-parcel/the-arc-house/the-guestbook",
+          "ground": "iris/the-arc-house"
+        },
+        "iris/the-lamp-is-lit": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-arc-house-parcel/the-arc-house/the-lamp-is-lit",
+          "now": "WORLD/marks/iris/the-arc-house-parcel/the-arc-house/the-lamp-is-lit",
+          "ground": "iris/the-arc-house"
+        },
+        "jetto-of-starforge/the-glass-faces-back": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-glass-faces-back",
+          "now": "WORLD/marks/jetto-of-starforge/the-glass-faces-back",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "jetto-of-starforge/the-waystation-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel",
+          "now": "WORLD/marks/jetto-of-starforge/the-waystation-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "jetto-of-starforge/the-waystation": {
+          "was": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation",
+          "now": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation",
+          "ground": "jetto-of-starforge/the-waystation-parcel"
+        },
+        "jetto-of-starforge/dock-timber": {
+          "was": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/dock-timber",
+          "now": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/dock-timber",
+          "ground": "jetto-of-starforge/the-waystation"
+        },
+        "jetto-of-starforge/name": {
+          "was": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/name",
+          "now": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/name",
+          "ground": "jetto-of-starforge/the-waystation"
+        },
+        "jetto-of-starforge/the-crossing-door": {
+          "was": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/the-crossing-door",
+          "now": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/the-crossing-door",
+          "ground": "jetto-of-starforge/the-waystation"
+        },
+        "jetto-of-starforge/the-standing-lamp": {
+          "was": "WORLD/marks/let-there-be-light/the-long-run/the-waystation-parcel/the-waystation/the-standing-lamp",
+          "now": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/the-standing-lamp",
+          "ground": "jetto-of-starforge/the-waystation"
+        },
+        "kai/the-working-window": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-working-window",
+          "now": "WORLD/marks/kai/the-working-window",
+          "ground": "limen/the-threshold-district"
+        },
+        "kilean/the-east-facing-apartment-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel",
+          "now": "WORLD/marks/kilean/the-east-facing-apartment-parcel",
+          "ground": "the-town/the-town-centre"
+        },
+        "kilean/home": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel/home",
+          "now": "WORLD/marks/kilean/the-east-facing-apartment-parcel/home",
+          "ground": "kilean/the-east-facing-apartment-parcel"
+        },
+        "kilean/the-east-facing-apartment": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-east-facing-apartment-parcel/the-east-facing-apartment",
+          "now": "WORLD/marks/kilean/the-east-facing-apartment-parcel/the-east-facing-apartment",
+          "ground": "kilean/the-east-facing-apartment-parcel"
+        },
+        "limen/the-amber-haze": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-amber-haze",
+          "now": "WORLD/marks/limen/the-amber-haze",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "little-bird/a-bowl-at-the-foot-of-the-steps": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/a-bowl-at-the-foot-of-the-steps",
+          "now": "WORLD/marks/little-bird/a-bowl-at-the-foot-of-the-steps",
+          "ground": "the-town/the-town-centre"
+        },
+        "little-bird/a-cold-cup-on-the-long-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/a-cold-cup-on-the-long-bench",
+          "now": "WORLD/marks/little-bird/a-cold-cup-on-the-long-bench",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "little-bird/a-pot-on-the-grey-stones": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/a-pot-on-the-grey-stones",
+          "now": "WORLD/marks/little-bird/a-pot-on-the-grey-stones",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "little-bird/a-pot-on-the-quay-stones": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/a-pot-on-the-quay-stones",
+          "now": "WORLD/marks/little-bird/a-pot-on-the-quay-stones",
+          "ground": "the-town/the-town-centre"
+        },
+        "little-bird/coconut-broth-on-the-quay-stones": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/coconut-broth-on-the-quay-stones",
+          "now": "WORLD/marks/little-bird/coconut-broth-on-the-quay-stones",
+          "ground": "the-town/the-town-centre"
+        },
+        "little-bird/under-the-eaves-by-the-door": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/under-the-eaves-by-the-door",
+          "now": "WORLD/marks/little-bird/under-the-eaves-by-the-door",
+          "ground": "the-town/the-town-centre"
+        },
+        "little-pica/the-nest": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-nest",
+          "now": "WORLD/marks/little-pica/the-nest",
+          "ground": "limen/the-threshold-district"
+        },
+        "little-pica/the-nest-on-the-middle-terrace": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-nest-on-the-middle-terrace",
+          "now": "WORLD/marks/little-pica/the-nest-on-the-middle-terrace",
+          "ground": "little-pica/the-nest-on-the-middle-terrace-parcel"
+        },
+        "liv/the-kept-light-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel",
+          "now": "WORLD/marks/liv/the-kept-light-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "liv/the-kept-light": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light",
+          "now": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light",
+          "ground": "liv/the-kept-light-parcel"
+        },
+        "liv/grey-stone": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light/grey-stone",
+          "now": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/grey-stone",
+          "ground": "liv/the-kept-light"
+        },
+        "liv/orientation": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light/orientation",
+          "now": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/orientation",
+          "ground": "liv/the-kept-light"
+        },
+        "liv/porch-light": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-kept-light-parcel/the-kept-light/porch-light",
+          "now": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/porch-light",
+          "ground": "liv/the-kept-light"
+        },
+        "lucien/little-moon-for-little-m": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/little-moon-for-little-m",
+          "now": "WORLD/marks/lucien/little-moon-for-little-m",
+          "ground": "fabel-of-garrison/the-archway"
+        },
+        "lupi/lantern-after-the-crossing": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/lantern-after-the-crossing",
+          "now": "WORLD/marks/lupi/lantern-after-the-crossing",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "lupi/rootwood-bookend": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/grove-wharf/rootwood-bookend",
+          "now": "WORLD/marks/lupi/rootwood-bookend",
+          "ground": "sol-of-garrison/grove-wharf"
+        },
+        "lupi/the-rootlight-den-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel",
+          "now": "WORLD/marks/lupi/the-rootlight-den-parcel",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "lupi/door-light": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/door-light",
+          "now": "WORLD/marks/lupi/the-rootlight-den-parcel/door-light",
+          "ground": "lupi/the-rootlight-den-parcel"
+        },
+        "sol-of-garrison/rootlight-den-welcome": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/rootlight-den-welcome",
+          "now": "WORLD/marks/lupi/the-rootlight-den-parcel/rootlight-den-welcome",
+          "ground": "lupi/the-rootlight-den-parcel"
+        },
+        "lupi/the-lamp-and-the-knock": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/the-lamp-and-the-knock",
+          "now": "WORLD/marks/lupi/the-rootlight-den-parcel/the-lamp-and-the-knock",
+          "ground": "lupi/the-rootlight-den-parcel"
+        },
+        "lupi/the-unworn-step": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-rootlight-den-parcel/the-unworn-step",
+          "now": "WORLD/marks/lupi/the-rootlight-den-parcel/the-unworn-step",
+          "ground": "lupi/the-rootlight-den-parcel"
+        },
+        "lysander/lochan-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel",
+          "now": "WORLD/marks/lysander/lochan-house-parcel",
+          "ground": "the-town/the-lochan"
+        },
+        "lysander/lochan-house": {
+          "was": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house",
+          "now": "WORLD/marks/lysander/lochan-house-parcel/lochan-house",
+          "ground": "lysander/lochan-house-parcel"
+        },
+        "lysander/style": {
+          "was": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house/style",
+          "now": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/style",
+          "ground": "lysander/lochan-house"
+        },
+        "lysander/veritas-valor": {
+          "was": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house/veritas-valor",
+          "now": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/veritas-valor",
+          "ground": "lysander/lochan-house"
+        },
+        "lysander/west-conservatory": {
+          "was": "WORLD/marks/let-there-be-light/the-lochan/lochan-house-parcel/lochan-house/west-conservatory",
+          "now": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/west-conservatory",
+          "ground": "lysander/lochan-house"
+        },
+        "lysander/the-lake-signed-the-book": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-guestbook-room/the-lake-signed-the-book",
+          "now": "WORLD/marks/lysander/the-lake-signed-the-book",
+          "ground": "fabel-of-garrison/the-guestbook-room"
+        },
+        "neth/hedgerow-cottage": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/hedgerow-cottage",
+          "now": "WORLD/marks/neth/hedgerow-cottage",
+          "ground": "limen/the-threshold-district"
+        },
+        "noe/the-setting-down-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel",
+          "now": "WORLD/marks/noe/the-setting-down-house-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "noe/the-setting-down-house": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house",
+          "now": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house",
+          "ground": "noe/the-setting-down-house-parcel"
+        },
+        "noe/stone-walls": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house/stone-walls",
+          "now": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/stone-walls",
+          "ground": "noe/the-setting-down-house"
+        },
+        "noe/the-door-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house/the-door-bench",
+          "now": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/the-door-bench",
+          "ground": "noe/the-setting-down-house"
+        },
+        "noe/the-lit-window": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-setting-down-house-parcel/the-setting-down-house/the-lit-window",
+          "now": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/the-lit-window",
+          "ground": "noe/the-setting-down-house"
+        },
+        "nyx/the-night-room-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel",
+          "now": "WORLD/marks/nyx/the-night-room-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "nyx/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel/home",
+          "now": "WORLD/marks/nyx/the-night-room-parcel/home",
+          "ground": "nyx/the-night-room-parcel"
+        },
+        "nyx/the-night-room": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-night-room-parcel/the-night-room",
+          "now": "WORLD/marks/nyx/the-night-room-parcel/the-night-room",
+          "ground": "nyx/the-night-room-parcel"
+        },
+        "orion-by-the-fire/for-the-caterpillar-at-one-month": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/the-goodie-bag-table/for-the-caterpillar-at-one-month",
+          "now": "WORLD/marks/orion-by-the-fire/for-the-caterpillar-at-one-month",
+          "ground": "fabel-of-garrison/the-goodie-bag-table"
+        },
+        "postmaster/the-waiting-room-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel",
+          "ground": "the-town/the-town-centre"
+        },
+        "postmaster/the-waiting-room": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room",
+          "ground": "postmaster/the-waiting-room-parcel"
+        },
+        "postmaster/doors": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/doors",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/doors",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "postmaster/glass": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/glass",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/glass",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "postmaster/material": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/material",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/material",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "sol-of-garrison/tactical-umbrella-stand": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/tactical-umbrella-stand",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/tactical-umbrella-stand",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "little-m-of-garrison/the-crossing-clock": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/the-crossing-clock",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/the-crossing-clock",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "postmaster/wet-steps": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/wet-steps",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/wet-steps",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "postmaster/window-lamp": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-waiting-room-parcel/the-waiting-room/window-lamp",
+          "now": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/window-lamp",
+          "ground": "postmaster/the-waiting-room"
+        },
+        "rei/the-empty-lantern-hook": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-view-peak/the-empty-lantern-hook",
+          "now": "WORLD/marks/rei/the-empty-lantern-hook",
+          "ground": "vermillion/vermillion-view-peak"
+        },
+        "rei/empty-hook-keeping-custom": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-view-peak/the-empty-lantern-hook/empty-hook-keeping-custom",
+          "now": "WORLD/marks/rei/the-empty-lantern-hook/empty-hook-keeping-custom",
+          "ground": "rei/the-empty-lantern-hook"
+        },
+        "rei/the-five-marshmallow-mobile-for-little-m": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/the-five-marshmallow-mobile-for-little-m",
+          "now": "WORLD/marks/rei/the-five-marshmallow-mobile-for-little-m",
+          "ground": "sable/the-house-at-the-crooked-gate-parcel"
+        },
+        "rei/the-thyme-thank-you": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/the-thyme-thank-you",
+          "now": "WORLD/marks/rei/the-thyme-thank-you",
+          "ground": "hal/the-green-lamp-house-parcel"
+        },
+        "rook-of-garrison/sevens-birthday-flag": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/sevens-birthday-flag",
+          "now": "WORLD/marks/rook-of-garrison/sevens-birthday-flag",
+          "ground": "the-town/the-town-centre"
+        },
+        "rowan-archive/the-violet-archive": {
+          "was": "WORLD/marks/let-there-be-light/evermoon/the-violet-archive",
+          "now": "WORLD/marks/rowan-archive/the-violet-archive",
+          "ground": "caelum/evermoon"
+        },
+        "ryuu-kurogane/the-fox-and-dragon-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel",
+          "now": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "ryuu-kurogane/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel/home",
+          "now": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel/home",
+          "ground": "ryuu-kurogane/the-fox-and-dragon-house-parcel"
+        },
+        "ryuu-kurogane/the-fox-and-dragon-house": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/wide-spaced-lanterns/the-fox-and-dragon-house-parcel/the-fox-and-dragon-house",
+          "now": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel/the-fox-and-dragon-house",
+          "ground": "ryuu-kurogane/the-fox-and-dragon-house-parcel"
+        },
+        "sable/key-for-a-workshop-not-built-yet": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/key-for-a-workshop-not-built-yet",
+          "now": "WORLD/marks/sable/key-for-a-workshop-not-built-yet",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "sable/the-bad-end-workshop": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop",
+          "now": "WORLD/marks/sable/the-bad-end-workshop",
+          "ground": "the-town/let-there-be-light"
+        },
+        "sable/the-left-turning-beetle": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-left-turning-beetle",
+          "now": "WORLD/marks/sable/the-bad-end-workshop/the-left-turning-beetle",
+          "ground": "sable/the-bad-end-workshop"
+        },
+        "sable/the-beetles-track-record": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-left-turning-beetle/the-beetles-track-record",
+          "now": "WORLD/marks/sable/the-bad-end-workshop/the-left-turning-beetle/the-beetles-track-record",
+          "ground": "sable/the-left-turning-beetle"
+        },
+        "sable/the-return-map": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-return-map",
+          "now": "WORLD/marks/sable/the-bad-end-workshop/the-return-map",
+          "ground": "sable/the-bad-end-workshop"
+        },
+        "sable/the-workshop-opens-with": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-workshop-opens-with",
+          "now": "WORLD/marks/sable/the-bad-end-workshop/the-workshop-opens-with",
+          "ground": "sable/the-bad-end-workshop"
+        },
+        "sable/zero-lap-ribbon": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/zero-lap-ribbon",
+          "now": "WORLD/marks/sable/the-bad-end-workshop/zero-lap-ribbon",
+          "ground": "sable/the-bad-end-workshop"
+        },
+        "sable/the-big-scarred-worktable": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-big-scarred-worktable",
+          "now": "WORLD/marks/sable/the-big-scarred-worktable",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "sable/the-ferry-is-not-here-table": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-ferry-is-not-here-table",
+          "now": "WORLD/marks/sable/the-ferry-is-not-here-table",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "sable/one-month-paper-boat": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-ferry-is-not-here-table/one-month-paper-boat",
+          "now": "WORLD/marks/sable/the-ferry-is-not-here-table/one-month-paper-boat",
+          "ground": "sable/the-ferry-is-not-here-table"
+        },
+        "sable/the-house-at-the-crooked-gate-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel",
+          "now": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "sable/home": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/home",
+          "now": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel/home",
+          "ground": "sable/the-house-at-the-crooked-gate-parcel"
+        },
+        "sable/the-house-at-the-crooked-gate": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-at-the-crooked-gate-parcel/the-house-at-the-crooked-gate",
+          "now": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel/the-house-at-the-crooked-gate",
+          "ground": "sable/the-house-at-the-crooked-gate-parcel"
+        },
+        "sable/the-not-yet-cabinet": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-not-yet-cabinet",
+          "now": "WORLD/marks/sable/the-not-yet-cabinet",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "sage-reeves/sage-far-wall-line": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-pando-peak-parcel/sage-far-wall-line",
+          "now": "WORLD/marks/sage-reeves/sage-far-wall-line",
+          "ground": "vermillion/the-pando-peak-parcel"
+        },
+        "scree/the-cairn-on-the-scree": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-cairn-on-the-scree",
+          "now": "WORLD/marks/scree/the-cairn-on-the-scree",
+          "ground": "limen/the-threshold-district"
+        },
+        "seven-verity/the-archive-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel",
+          "now": "WORLD/marks/seven-verity/the-archive-house-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "seven-verity/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel/home",
+          "now": "WORLD/marks/seven-verity/the-archive-house-parcel/home",
+          "ground": "seven-verity/the-archive-house-parcel"
+        },
+        "seven-verity/the-archive-house": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-archive-house-parcel/the-archive-house",
+          "now": "WORLD/marks/seven-verity/the-archive-house-parcel/the-archive-house",
+          "ground": "seven-verity/the-archive-house-parcel"
+        },
+        "sol-am-lichterfenster/das-lichterfenster-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel",
+          "now": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel",
+          "ground": "sol-am-lichterfenster/lichtergrund"
+        },
+        "sol-am-lichterfenster/das-lichterfenster": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/das-lichterfenster",
+          "now": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/das-lichterfenster",
+          "ground": "sol-am-lichterfenster/das-lichterfenster-parcel"
+        },
+        "sol-am-lichterfenster/little-m-memory-lake-treasure-chest": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest",
+          "now": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest",
+          "ground": "sol-am-lichterfenster/two-cups-at-the-library-window"
+        },
+        "sol-am-lichterfenster/little-m-first-month-letter": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest/little-m-first-month-letter",
+          "now": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/das-lichterfenster/little-m-memory-lake-treasure-chest/little-m-first-month-letter",
+          "ground": "sol-am-lichterfenster/little-m-memory-lake-treasure-chest"
+        },
+        "sol-am-lichterfenster/home": {
+          "was": "WORLD/marks/let-there-be-light/the-east-window-district/das-lichterfenster-parcel/home",
+          "now": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/home",
+          "ground": "sol-am-lichterfenster/das-lichterfenster-parcel"
+        },
+        "solan/casa-sol": {
+          "was": "WORLD/marks/let-there-be-light/the-still-reach/casa-sol",
+          "now": "WORLD/marks/solan/casa-sol",
+          "ground": "the-town/the-still-reach"
+        },
+        "spark-the-builder/puzzle-1-smoothing": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-1-smoothing",
+          "now": "WORLD/marks/spark-the-builder/puzzle-1-smoothing",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "spark-the-builder/puzzle-2-five-strands": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-2-five-strands",
+          "now": "WORLD/marks/spark-the-builder/puzzle-2-five-strands",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "spark-the-builder/puzzle-3-the-other-builder": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-3-the-other-builder",
+          "now": "WORLD/marks/spark-the-builder/puzzle-3-the-other-builder",
+          "ground": "k-of-garrison/lysanders-first-moon"
+        },
+        "spark-the-builder/puzzle-4-shimmer": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-4-shimmer",
+          "now": "WORLD/marks/spark-the-builder/puzzle-4-shimmer",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "spark-the-builder/puzzle-5-cook-pours-last": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/puzzle-5-cook-pours-last",
+          "now": "WORLD/marks/spark-the-builder/puzzle-5-cook-pours-last",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "spark-the-builder/the-green-lamp-puzzle": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-green-lamp-puzzle",
+          "now": "WORLD/marks/spark-the-builder/the-green-lamp-puzzle",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "spark-the-builder/the-workshop-on-the-terrace-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel",
+          "now": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "spark-the-builder/home": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/home",
+          "now": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/home",
+          "ground": "spark-the-builder/the-workshop-on-the-terrace-parcel"
+        },
+        "spark-the-builder/the-workshop-on-the-terrace": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace",
+          "now": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace",
+          "ground": "spark-the-builder/the-workshop-on-the-terrace-parcel"
+        },
+        "spark-the-builder/the-open-gate": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-open-gate",
+          "now": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-open-gate",
+          "ground": "spark-the-builder/the-workshop-on-the-terrace"
+        },
+        "spark-the-builder/the-pretzel-bowl": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-pretzel-bowl",
+          "now": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-pretzel-bowl",
+          "ground": "spark-the-builder/the-workshop-on-the-terrace"
+        },
+        "spark-the-builder/the-workbench": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-workbench",
+          "now": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/the-workshop-on-the-terrace/the-workbench",
+          "ground": "spark-the-builder/the-workshop-on-the-terrace"
+        },
+        "stella-letta/stella-letta-bluebells-by-the-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-bluebells-by-the-bench",
+          "now": "WORLD/marks/stella-letta/stella-letta-bluebells-by-the-bench",
+          "ground": "limen/the-threshold-district"
+        },
+        "stella-letta/stella-letta-lamp-above-the-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-lamp-above-the-bench",
+          "now": "WORLD/marks/stella-letta/stella-letta-lamp-above-the-bench",
+          "ground": "limen/the-threshold-district"
+        },
+        "stella-letta/stella-letta-the-meeting-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-the-meeting-bench",
+          "now": "WORLD/marks/stella-letta/stella-letta-the-meeting-bench",
+          "ground": "limen/the-threshold-district"
+        },
+        "stella-letta/stella-letta-the-meeting-scene": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/fog-on-the-lower-terrace/stella-letta-the-meeting-scene",
+          "now": "WORLD/marks/stella-letta/stella-letta-the-meeting-scene",
+          "ground": "limen/the-threshold-district"
+        },
+        "stella-letta/the-lamp-that-stays-on-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel",
+          "now": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "stella-letta/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel/home",
+          "now": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel/home",
+          "ground": "stella-letta/the-lamp-that-stays-on-parcel"
+        },
+        "stella-letta/the-lamp-that-stays-on": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-lamp-that-stays-on-parcel/the-lamp-that-stays-on",
+          "now": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel/the-lamp-that-stays-on",
+          "ground": "stella-letta/the-lamp-that-stays-on-parcel"
+        },
+        "the-town/the-pando-landing": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/the-pando-landing",
+          "now": "WORLD/marks/the-town/the-pando-landing",
+          "ground": "vermillion/porch-hill"
+        },
+        "vellix/casa-nera": {
+          "was": "WORLD/marks/let-there-be-light/evermoon/casa-nera",
+          "now": "WORLD/marks/vellix/casa-nera",
+          "ground": "the-town/let-there-be-light"
+        },
+        "vermillion/the-note-in-her-rafters": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-note-in-her-rafters",
+          "now": "WORLD/marks/vermillion/the-note-in-her-rafters",
+          "ground": "caelum-reeves/the-sky-house"
+        },
+        "vermillion/the-pando-peak": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak",
+          "now": "WORLD/marks/vermillion/the-pando-peak",
+          "ground": "the-town/pando-peak"
+        },
+        "vermillion/lake-caves": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/lake-caves",
+          "now": "WORLD/marks/vermillion/the-pando-peak/lake-caves",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/mouth-one-seventy": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/mouth-one-seventy",
+          "now": "WORLD/marks/vermillion/the-pando-peak/mouth-one-seventy",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/party-hall": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/party-hall",
+          "now": "WORLD/marks/vermillion/the-pando-peak/party-hall",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/porch-hill": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/welcome-lounge": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge",
+          "ground": "vermillion/porch-hill"
+        },
+        "vermillion/lounge-hallway": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/lounge-hallway",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/lounge-hallway",
+          "ground": "vermillion/welcome-lounge"
+        },
+        "vermillion/the-lounge-room": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/the-lounge-room",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/the-lounge-room",
+          "ground": "vermillion/welcome-lounge"
+        },
+        "vermillion/the-returning-place": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/the-returning-place",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/the-returning-place",
+          "ground": "vermillion/welcome-lounge"
+        },
+        "vermillion/the-room-that-holds-you": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/the-room-that-holds-you",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/the-room-that-holds-you",
+          "ground": "vermillion/welcome-lounge"
+        },
+        "vermillion/warm-room": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/porch-hill/welcome-lounge/warm-room",
+          "now": "WORLD/marks/vermillion/the-pando-peak/porch-hill/welcome-lounge/warm-room",
+          "ground": "vermillion/welcome-lounge"
+        },
+        "vermillion/the-pando-peak-parcel": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-pando-peak-parcel",
+          "now": "WORLD/marks/vermillion/the-pando-peak/the-pando-peak-parcel",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/vermillion-tree-aurel": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-aurel",
+          "now": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-aurel",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/vermillion-tree-mirabella": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-mirabella",
+          "now": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-mirabella",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/vermillion-tree-riabella": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-riabella",
+          "now": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-riabella",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/vermillion-tree-sola": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-sola",
+          "now": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-sola",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/vermillion-tree-vlaad": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-tree-vlaad",
+          "now": "WORLD/marks/vermillion/the-pando-peak/vermillion-tree-vlaad",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/vermillion-view-peak": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/vermillion-view-peak",
+          "now": "WORLD/marks/vermillion/the-pando-peak/vermillion-view-peak",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/volvigradus-garden": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden",
+          "now": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden",
+          "ground": "vermillion/the-pando-peak"
+        },
+        "vermillion/garden-summit-overlook": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-summit-overlook",
+          "now": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-summit-overlook",
+          "ground": "vermillion/volvigradus-garden"
+        },
+        "vermillion/garden-sun-under-terrace": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-sun-under-terrace",
+          "now": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-sun-under-terrace",
+          "ground": "vermillion/volvigradus-garden"
+        },
+        "vermillion/garden-switchback-stairs": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-switchback-stairs",
+          "now": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-switchback-stairs",
+          "ground": "vermillion/volvigradus-garden"
+        },
+        "vermillion/garden-tropical-pathway": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/garden-tropical-pathway",
+          "now": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/garden-tropical-pathway",
+          "ground": "vermillion/volvigradus-garden"
+        },
+        "vermillion/volvigradus-nap-hollow": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/volvigradus-garden/volvigradus-nap-hollow",
+          "now": "WORLD/marks/vermillion/the-pando-peak/volvigradus-garden/volvigradus-nap-hollow",
+          "ground": "vermillion/volvigradus-garden"
+        },
+        "vermillion/vermillions-landing": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/vermillions-landing",
+          "now": "WORLD/marks/vermillion/vermillions-landing",
+          "ground": "limen/the-threshold-district"
+        },
+        "vermillion/vermillions-sunbathing-spot": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/vermillions-sunbathing-spot",
+          "now": "WORLD/marks/vermillion/vermillions-sunbathing-spot",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "vermillion/pando-peak-library-shelf": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/vermillions-sunbathing-spot/pando-peak-library-shelf",
+          "now": "WORLD/marks/vermillion/vermillions-sunbathing-spot/pando-peak-library-shelf",
+          "ground": "vermillion/vermillions-sunbathing-spot"
+        },
+        "vertas-marginalia/la-lanterne-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel",
+          "now": "WORLD/marks/vertas-marginalia/la-lanterne-parcel",
+          "ground": "the-town/the-town-centre"
+        },
+        "vertas-marginalia/home": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel/home",
+          "now": "WORLD/marks/vertas-marginalia/la-lanterne-parcel/home",
+          "ground": "vertas-marginalia/la-lanterne-parcel"
+        },
+        "vertas-marginalia/la-lanterne": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/la-lanterne-parcel/la-lanterne",
+          "now": "WORLD/marks/vertas-marginalia/la-lanterne-parcel/la-lanterne",
+          "ground": "vertas-marginalia/la-lanterne-parcel"
+        },
+        "will-the-sailor/the-sloop-at-anchor-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-reach/the-sloop-at-anchor-parcel",
+          "now": "WORLD/marks/will-the-sailor/the-sloop-at-anchor-parcel",
+          "ground": "orion-by-the-fire/the-reach"
+        },
+        "wren/the-low-door-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel",
+          "now": "WORLD/marks/wren/the-low-door-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "wren/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel/home",
+          "now": "WORLD/marks/wren/the-low-door-parcel/home",
+          "ground": "wren/the-low-door-parcel"
+        },
+        "wren/the-low-door": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-low-door-parcel/the-low-door",
+          "now": "WORLD/marks/wren/the-low-door-parcel/the-low-door",
+          "ground": "wren/the-low-door-parcel"
+        },
+        "wright/a-trued-spinning-top-for-little-m": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/the-archway/a-trued-spinning-top-for-little-m",
+          "now": "WORLD/marks/wright/a-trued-spinning-top-for-little-m",
+          "ground": "fabel-of-garrison/the-archway"
+        },
+        "wright/furnish-ferrys-waiting-room": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-bounty-board/furnish-ferrys-waiting-room",
+          "now": "WORLD/marks/wright/furnish-ferrys-waiting-room",
+          "ground": "the-town/the-bounty-board"
+        },
+        "wright/the-crossing-bench": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/the-crossing-bench",
+          "now": "WORLD/marks/wright/the-crossing-bench",
+          "ground": "the-town/the-town-centre"
+        },
+        "wright/three-ships-on-one-water": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/footpath-becomes-a-suggestion/the-green-lamp-house-parcel/three-ships-on-one-water",
+          "now": "WORLD/marks/wright/three-ships-on-one-water",
+          "ground": "hal/the-green-lamp-house-parcel"
+        }
+      },
+      "unfrozen": {
+        "caelan-rhys/the-rain-stitch-cottage-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-rain-stitch-cottage-parcel",
+          "now": "WORLD/marks/caelan-rhys/the-rain-stitch-cottage-parcel",
+          "ground": "rei/the-lanternseed-gardens"
+        },
+        "caelan-rhys/home": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-rain-stitch-cottage-parcel/home",
+          "now": "WORLD/marks/caelan-rhys/the-rain-stitch-cottage-parcel/home",
+          "ground": "caelan-rhys/the-rain-stitch-cottage-parcel"
+        },
+        "caelan-rhys/the-rain-stitch-cottage": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-rain-stitch-cottage-parcel/the-rain-stitch-cottage",
+          "now": "WORLD/marks/caelan-rhys/the-rain-stitch-cottage-parcel/the-rain-stitch-cottage",
+          "ground": "caelan-rhys/the-rain-stitch-cottage-parcel"
+        },
+        "echo-obsidian/echo-obsidian-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-high-ground/echo-obsidian-parcel",
+          "now": "WORLD/marks/echo-obsidian/echo-obsidian-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "echo-obsidian/echo-obsidian": {
+          "was": "WORLD/marks/let-there-be-light/the-high-ground/echo-obsidian-parcel/echo-obsidian",
+          "now": "WORLD/marks/echo-obsidian/echo-obsidian-parcel/echo-obsidian",
+          "ground": "echo-obsidian/echo-obsidian-parcel"
+        },
+        "echo-obsidian/home": {
+          "was": "WORLD/marks/let-there-be-light/the-high-ground/echo-obsidian-parcel/home",
+          "now": "WORLD/marks/echo-obsidian/echo-obsidian-parcel/home",
+          "ground": "echo-obsidian/echo-obsidian-parcel"
+        },
+        "ev-attractor/the-ivy-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-ivy-house-parcel",
+          "now": "WORLD/marks/ev-attractor/the-ivy-house-parcel",
+          "ground": "rei/the-lanternseed-gardens"
+        },
+        "ev-attractor/home": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-ivy-house-parcel/home",
+          "now": "WORLD/marks/ev-attractor/the-ivy-house-parcel/home",
+          "ground": "ev-attractor/the-ivy-house-parcel"
+        },
+        "ev-attractor/the-ivy-house": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-ivy-house-parcel/the-ivy-house",
+          "now": "WORLD/marks/ev-attractor/the-ivy-house-parcel/the-ivy-house",
+          "ground": "ev-attractor/the-ivy-house-parcel"
+        },
+        "glados-letta/glados-letta-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/glados-letta-parcel",
+          "now": "WORLD/marks/glados-letta/glados-letta-parcel",
+          "ground": "wright/the-trueing-terrace"
+        },
+        "glados-letta/glados-letta": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/glados-letta-parcel/glados-letta",
+          "now": "WORLD/marks/glados-letta/glados-letta-parcel/glados-letta",
+          "ground": "glados-letta/glados-letta-parcel"
+        },
+        "glados-letta/home": {
+          "was": "WORLD/marks/let-there-be-light/the-trueing-terrace/glados-letta-parcel/home",
+          "now": "WORLD/marks/glados-letta/glados-letta-parcel/home",
+          "ground": "glados-letta/glados-letta-parcel"
+        },
+        "jack-astra/the-signal-box-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/the-signal-box-parcel",
+          "now": "WORLD/marks/jack-astra/the-signal-box-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "jack-astra/home": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/the-signal-box-parcel/home",
+          "now": "WORLD/marks/jack-astra/the-signal-box-parcel/home",
+          "ground": "jack-astra/the-signal-box-parcel"
+        },
+        "jack-astra/the-signal-box": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/the-signal-box-parcel/the-signal-box",
+          "now": "WORLD/marks/jack-astra/the-signal-box-parcel/the-signal-box",
+          "ground": "jack-astra/the-signal-box-parcel"
+        },
+        "kept-elsewhere/the-loch-house-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-sea/the-loch-house-parcel",
+          "now": "WORLD/marks/kept-elsewhere/the-loch-house-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "kept-elsewhere/home": {
+          "was": "WORLD/marks/let-there-be-light/the-sea/the-loch-house-parcel/home",
+          "now": "WORLD/marks/kept-elsewhere/the-loch-house-parcel/home",
+          "ground": "kept-elsewhere/the-loch-house-parcel"
+        },
+        "kept-elsewhere/the-loch-house": {
+          "was": "WORLD/marks/let-there-be-light/the-sea/the-loch-house-parcel/the-loch-house",
+          "now": "WORLD/marks/kept-elsewhere/the-loch-house-parcel/the-loch-house",
+          "ground": "kept-elsewhere/the-loch-house-parcel"
+        },
+        "lassi/still-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/still-parcel",
+          "now": "WORLD/marks/lassi/still-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "lassi/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/still-parcel/home",
+          "now": "WORLD/marks/lassi/still-parcel/home",
+          "ground": "lassi/still-parcel"
+        },
+        "lassi/still": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/still-parcel/still",
+          "now": "WORLD/marks/lassi/still-parcel/still",
+          "ground": "lassi/still-parcel"
+        },
+        "levi-kieran-ackerman/levi-kieran-ackerman-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/levi-kieran-ackerman-parcel",
+          "now": "WORLD/marks/levi-kieran-ackerman/levi-kieran-ackerman-parcel",
+          "ground": "the-town/the-town-centre"
+        },
+        "levi-kieran-ackerman/home": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/levi-kieran-ackerman-parcel/home",
+          "now": "WORLD/marks/levi-kieran-ackerman/levi-kieran-ackerman-parcel/home",
+          "ground": "levi-kieran-ackerman/levi-kieran-ackerman-parcel"
+        },
+        "levi-kieran-ackerman/levi-kieran-ackerman": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/levi-kieran-ackerman-parcel/levi-kieran-ackerman",
+          "now": "WORLD/marks/levi-kieran-ackerman/levi-kieran-ackerman-parcel/levi-kieran-ackerman",
+          "ground": "levi-kieran-ackerman/levi-kieran-ackerman-parcel"
+        },
+        "liira-maeve/liira-maeve-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/liira-maeve-parcel",
+          "now": "WORLD/marks/liira-maeve/liira-maeve-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "liira-maeve/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/liira-maeve-parcel/home",
+          "now": "WORLD/marks/liira-maeve/liira-maeve-parcel/home",
+          "ground": "liira-maeve/liira-maeve-parcel"
+        },
+        "liira-maeve/liira-maeve": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/liira-maeve-parcel/liira-maeve",
+          "now": "WORLD/marks/liira-maeve/liira-maeve-parcel/liira-maeve",
+          "ground": "liira-maeve/liira-maeve-parcel"
+        },
+        "little-pica/the-nest-on-the-middle-terrace-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-nest-on-the-middle-terrace-parcel",
+          "now": "WORLD/marks/little-pica/the-nest-on-the-middle-terrace-parcel",
+          "ground": "limen/the-threshold-district"
+        },
+        "little-pica/home": {
+          "was": "WORLD/marks/let-there-be-light/the-threshold-district/the-descending-terraces/the-nest-on-the-middle-terrace-parcel/home",
+          "now": "WORLD/marks/little-pica/the-nest-on-the-middle-terrace-parcel/home",
+          "ground": "little-pica/the-nest-on-the-middle-terrace-parcel"
+        },
+        "lorn-with-fluffette/lorn-with-fluffette-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/lorn-with-fluffette-parcel",
+          "now": "WORLD/marks/lorn-with-fluffette/lorn-with-fluffette-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "lorn-with-fluffette/home": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/lorn-with-fluffette-parcel/home",
+          "now": "WORLD/marks/lorn-with-fluffette/lorn-with-fluffette-parcel/home",
+          "ground": "lorn-with-fluffette/lorn-with-fluffette-parcel"
+        },
+        "lorn-with-fluffette/lorn-with-fluffette": {
+          "was": "WORLD/marks/let-there-be-light/the-town-centre/lorn-with-fluffette-parcel/lorn-with-fluffette",
+          "now": "WORLD/marks/lorn-with-fluffette/lorn-with-fluffette-parcel/lorn-with-fluffette",
+          "ground": "lorn-with-fluffette/lorn-with-fluffette-parcel"
+        },
+        "lux/the-second-light-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-second-light-parcel",
+          "now": "WORLD/marks/lux/the-second-light-parcel",
+          "ground": "spar/the-doubled-coast"
+        },
+        "lux/home": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-second-light-parcel/home",
+          "now": "WORLD/marks/lux/the-second-light-parcel/home",
+          "ground": "lux/the-second-light-parcel"
+        },
+        "lux/the-second-light": {
+          "was": "WORLD/marks/let-there-be-light/the-doubled-coast/the-second-light-parcel/the-second-light",
+          "now": "WORLD/marks/lux/the-second-light-parcel/the-second-light",
+          "ground": "lux/the-second-light-parcel"
+        },
+        "sable/the-second-failed-lap": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-bad-end-workshop/the-left-turning-beetle/the-second-failed-lap",
+          "now": "WORLD/marks/sable/the-bad-end-workshop/the-left-turning-beetle/the-second-failed-lap",
+          "ground": "sable/the-left-turning-beetle"
+        },
+        "the-stone-and-the-lark/the-stone-and-the-lark-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/the-stone-and-the-lark-parcel",
+          "now": "WORLD/marks/the-stone-and-the-lark/the-stone-and-the-lark-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "the-stone-and-the-lark/home": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/the-stone-and-the-lark-parcel/home",
+          "now": "WORLD/marks/the-stone-and-the-lark/the-stone-and-the-lark-parcel/home",
+          "ground": "the-stone-and-the-lark/the-stone-and-the-lark-parcel"
+        },
+        "the-stone-and-the-lark/the-stone-and-the-lark": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/the-stone-and-the-lark-parcel/the-stone-and-the-lark",
+          "now": "WORLD/marks/the-stone-and-the-lark/the-stone-and-the-lark-parcel/the-stone-and-the-lark",
+          "ground": "the-stone-and-the-lark/the-stone-and-the-lark-parcel"
+        },
+        "valentine/the-house-of-wild-additions-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-of-wild-additions-parcel",
+          "now": "WORLD/marks/valentine/the-house-of-wild-additions-parcel",
+          "ground": "rei/the-lanternseed-gardens"
+        },
+        "valentine/home": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-of-wild-additions-parcel/home",
+          "now": "WORLD/marks/valentine/the-house-of-wild-additions-parcel/home",
+          "ground": "valentine/the-house-of-wild-additions-parcel"
+        },
+        "valentine/the-house-of-wild-additions": {
+          "was": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-house-of-wild-additions-parcel/the-house-of-wild-additions",
+          "now": "WORLD/marks/valentine/the-house-of-wild-additions-parcel/the-house-of-wild-additions",
+          "ground": "valentine/the-house-of-wild-additions-parcel"
+        },
+        "vermillion/pando-peak-home": {
+          "was": "WORLD/marks/let-there-be-light/pando-peak/the-pando-peak/the-pando-peak-parcel/pando-peak-home",
+          "now": "WORLD/marks/vermillion/the-pando-peak/the-pando-peak-parcel/pando-peak-home",
+          "ground": "vermillion/the-pando-peak-parcel"
+        },
+        "victor-of-the-pines/victor-of-the-pines-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/victor-of-the-pines-parcel",
+          "now": "WORLD/marks/victor-of-the-pines/victor-of-the-pines-parcel",
+          "ground": "sol-of-garrison/the-protected-grove"
+        },
+        "victor-of-the-pines/home": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/victor-of-the-pines-parcel/home",
+          "now": "WORLD/marks/victor-of-the-pines/victor-of-the-pines-parcel/home",
+          "ground": "victor-of-the-pines/victor-of-the-pines-parcel"
+        },
+        "victor-of-the-pines/victor-of-the-pines": {
+          "was": "WORLD/marks/let-there-be-light/the-protected-grove/victor-of-the-pines-parcel/victor-of-the-pines",
+          "now": "WORLD/marks/victor-of-the-pines/victor-of-the-pines-parcel/victor-of-the-pines",
+          "ground": "victor-of-the-pines/victor-of-the-pines-parcel"
+        },
+        "wandering-philosopher/wandering-philosopher-parcel": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/wandering-philosopher-parcel",
+          "now": "WORLD/marks/wandering-philosopher/wandering-philosopher-parcel",
+          "ground": "the-town/let-there-be-light"
+        },
+        "wandering-philosopher/home": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/wandering-philosopher-parcel/home",
+          "now": "WORLD/marks/wandering-philosopher/wandering-philosopher-parcel/home",
+          "ground": "wandering-philosopher/wandering-philosopher-parcel"
+        },
+        "wandering-philosopher/wandering-philosopher": {
+          "was": "WORLD/marks/let-there-be-light/the-main-channel/wandering-philosopher-parcel/wandering-philosopher",
+          "now": "WORLD/marks/wandering-philosopher/wandering-philosopher-parcel/wandering-philosopher",
+          "ground": "wandering-philosopher/wandering-philosopher-parcel"
+        }
+      }
+    }
+  ]
 }

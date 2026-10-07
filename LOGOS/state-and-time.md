@@ -1,7 +1,8 @@
 # State and time — the log, the witnesses, the epochs
 
-*Structure is relative; history is absolute. Marks ride their frames; the
-past rides nothing.*
+*Structure is relative; history is absolute. Your own household's marks ride
+your frame; others keep their place, and their containment follows geometry;
+the past rides nothing.*
 
 Rendered in the world as `the-town/the-witnessed-instant` (named `the-tense`
 until the homonym ruling, 2026-08-19 — the word "tense" now belongs solely to
@@ -127,5 +128,12 @@ What this repeals and what it keeps:
 - Zero migration, by design: the existing tree stands exactly as filed on the
   freeze date (a fossil, labeled as such), and the id-keyed layout arrives
   organically through every mark filed after it. No rename storm, ever.
+- **The household un-nesting (ruled 2026-10-07, POS-441: "That should just
+  always be the default rule").** The marks the fossil had filed inside
+  ANOTHER household's mark (100 on the ruling date) were re-filed once at
+  their ids, each keeping its world place exactly, and the manifest records
+  those rows as amended, by name and date. It is a decision about a named,
+  closed set, never a regeneration; the verb is `tools/unnest-households.mjs`,
+  and the lint refuses a mark framed by another household's mark.
 
 Rendered in the world as `the-town/the-frozen-filing` (planted 2026-08-25).

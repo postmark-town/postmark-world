@@ -71,8 +71,11 @@ standing, or permission is ever derived from it
 
 An amend is a superseding declaration on your own node — the log is never
 edited; canon shows the latest admitted claim; every prior version remains
-history. Geometry moved? The containment edge re-declares and the frame
-follows. Children riding your frame follow per *their* words and ranks.
+history. Geometry moved? **Your own household's marks inside it move with it,
+in the same act, keeping their place relative to it; another household's
+marks never move: they keep their place, and their containment follows
+geometry** (ruled 2026-10-07: "That should just always be the default
+rule"). The act names what it carried and what stayed.
 Backers keep or withdraw their weight in the open — a visible amendment plus
 revisable responses is the whole guard against bait-and-switch; the law adds
 no lock.
