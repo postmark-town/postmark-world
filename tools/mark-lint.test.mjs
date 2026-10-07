@@ -163,6 +163,10 @@ function fidelityRepo() {
   // detail: "Filing is frozen as of 2026-08-25. A mark's directory is its
   // historical filing: it carries no claim, and it never moves again."
   copyFileSync(join(REPO_SRC, "WORLD", "filing-freeze.json"), join(repo, "WORLD", "filing-freeze.json"));
+  // …and so does the household registry (POS-441, 2026-10-07): the household
+  // gate reads whose each mark is, and a whole-tree copy without it is a tree
+  // that gate cannot read.
+  copyFileSync(join(REPO_SRC, "WORLD", "households.json"), join(repo, "WORLD", "households.json"));
   return repo;
 }
 
@@ -248,7 +252,10 @@ test("an advisory warning never takes the CLEAN word — a WARN-only tree is CLE
   // one mark born after the freeze, filed at the fossil root: the exact advisory
   // (mark-lint.mjs § the frozen filing, "ADVISORY while the office door still
   // writes at the fossil root") that held K's moon out of S53.
-  const stray = join(repo, "WORLD", "marks", "let-there-be-light", "the-protected-grove", "an-advised-draft");
+  // Filed at the fossil root ITSELF, not inside a resident's mark: filed inside
+  // sol's grove it would ride another household's mark, which is an ERROR since
+  // POS-441 (2026-10-07) and not the advisory this test is about.
+  const stray = join(repo, "WORLD", "marks", "let-there-be-light", "an-advised-draft");
   mkdirSync(stray, { recursive: true });
   writeFileSync(join(stray, "mark.md"),
     "---\nkind: sited\nby: testerhh\ndate: 2026-09-01\nat: { x: 0, y: 0 }\nextent: { w: 1, h: 1 }\n---\n\nA draft the office door filed at the old root.\n");

@@ -190,31 +190,40 @@ test("the list names nothing that is not a mark under a ringed region", () => {
   assert.equal(OUTSIDERS.count, OUTSIDERS.rows.length, "the artifact's own count must match its rows");
 });
 
-// ── THE NAMED CASE, INVERTED ─────────────────────────────────────────────────
+// ── THE NAMED CASE, INVERTED, THEN RE-FILED ──────────────────────────────────
 // It used to read "sable stands inside rei's lanternseed gardens, and the ring
 // is what puts him there" — the 08-22 ruling, "I'd love to have sable in the
 // gardens… I think we can draw the polygon to fit around him and include him
-// still." The founder superseded that tonight in favour of the atlas trace, and
-// this is the same case held to the new law rather than quietly deleted: sable
-// is the KNOWN displaced resident, so he must appear on the list by name. If
-// the pure trace somehow still contains him, this says so, and that is a
-// finding worth reading rather than a test worth passing.
-test("THE NAMED CASE: sable is on the heads-up list, by name, with his ground unmoved", () => {
+// still." The founder superseded that on 08-24 in favour of the atlas trace, and
+// sable became the KNOWN displaced resident, named on the heads-up list.
+//
+// THEN THE HOUSEHOLD UN-NESTING (POS-441, ruled by Darko 2026-10-07: "That should
+// just always be the default rule"). Sable's parcel was filed inside rei's
+// gardens — another household's mark — so it rode them, and the un-nesting
+// re-filed it at its own id with its place kept exactly. The heads-up list is
+// "filed under a ringed region and standing outside its ring"; sable is filed
+// under no region now, so he leaves the list for the reason the list exists to
+// state, and the case is held to THAT law rather than deleted: his ground is
+// still exactly where he put it, it is still outside the gardens' ring, the
+// declaring act's receipt names his re-filing, and nothing lists him.
+test("THE NAMED CASE: sable's parcel, re-filed at its id by the un-nesting, stands where it stood, outside the gardens' ring, and off the list", () => {
   const gardens = bySlug("the-lanternseed-gardens");
   const parcel = byId.get("sable/the-house-at-the-crooked-gate-parcel");
   assert.ok(parcel, "sable's parcel is in the record");
   assert.equal(parcel.by, "sable");
-  assert.ok(groundUnder(gardens.id).some((m) => m.id === parcel.id), "…still standing in the gardens' subtree — the tree did not change, the boundary did");
-
-  const row = OUTSIDERS.rows.find((r) => r.mark === parcel.id);
-  assert.ok(row, "sable's parcel must be named on the outsider list — he is the known case the old bend was written for");
-  assert.equal(row.resident, "sable");
-  assert.equal(row.region, gardens.id);
-  // The ground is exactly where sable put it. The whole promise of the pivot is
-  // that nothing moved except the line on the map.
-  assert.deepEqual({ x: rect(parcel).x, y: rect(parcel).y }, { x: row.at.x, y: row.at.y },
-    "the list must report the ground where it actually stands, to the half-metre the record keeps");
-  assert.equal(rectInsideRing(polygonOf(gardens), rect(parcel)), false, "…and he is genuinely outside the traced ring, which is why he is listed");
+  // The ground is exactly where sable put it — the position the 08-24 list
+  // reported for him, to the half-metre the record keeps.
+  assert.deepEqual({ x: rect(parcel).x, y: rect(parcel).y }, { x: 588, y: -1494.5 }, "nothing moved");
+  assert.equal(rectInsideRing(polygonOf(gardens), rect(parcel)), false, "…and he is still outside the traced ring");
+  // The filing changed, by a declared act whose receipt names it.
+  assert.ok(!groundUnder(gardens.id).some((m) => m.id === parcel.id), "re-filed: no longer filed in the gardens' subtree");
+  const freeze = JSON.parse(readFileSync(join(ROOT, "WORLD/filing-freeze.json"), "utf8"));
+  const receipt = (freeze.reframed ?? []).map((b) => b.rows?.[parcel.id] ?? b.unfrozen?.[parcel.id]).find(Boolean);
+  assert.ok(receipt, "the un-nesting's receipt names sable's parcel");
+  assert.match(receipt.was, /\/the-lanternseed-gardens\/the-house-at-the-crooked-gate-parcel$/, "it was filed in the gardens");
+  assert.equal(receipt.now, "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel", "and is filed at its id now");
+  assert.equal(OUTSIDERS.rows.find((r) => r.mark === parcel.id), undefined,
+    "so the heads-up list, which names marks filed under a region and outside its ring, names him no longer");
 });
 
 // ── FALSIFIER (c): THE RINGS TILE ────────────────────────────────────────────

@@ -112,7 +112,15 @@ test("RECORDS ARE OFFSETS: record + parent centre = store, exactly", () => {
     ["rei/the-lanternseed-gardens", "the-town/let-there-be-light", { x: 1338, y: -994.5 }],
     ["rei/the-lanternstep-house-parcel", "rei/the-lanternseed-gardens", { x: -250, y: 200 }],
     ["rei/the-lanternstep-house", "rei/the-lanternstep-house-parcel", { x: 0, y: 0 }],
-    ["wright/the-crossing-bench", "the-town/the-town-centre", { x: 87, y: 83 }],
+    // RE-PINNED 2026-10-07 (the household un-nesting, POS-441, ruled by Darko:
+    // "That should just always be the default rule"). The bench is Wright's and
+    // the town centre is the town's, so the bench rode another household's frame;
+    // the un-nesting re-filed it at its id, where the WORLD is its frame. The law
+    // this case holds is unchanged — the record is an offset and the store is
+    // that offset plus its frame's centre — and so is the bench's place: the old
+    // pin composed (87, 83) + the centre's (-54, -79.5) = (33, 3.5), and the new
+    // one composes (33, 3.5) + the root's (0, 0) = the same (33, 3.5).
+    ["wright/the-crossing-bench", "the-town/let-there-be-light", { x: 33, y: 3.5 }],
   ];
   const authoredById = new Map(AUTHORED.map((m) => [m.id, m]));
   for (const [id, parent, offset] of cases) {

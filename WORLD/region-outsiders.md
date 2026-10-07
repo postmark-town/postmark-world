@@ -8,17 +8,12 @@ so a ring no longer bends outward to hold a resident who ended up outside the wa
 These are the marks that fall outside as a result. Nothing has been moved and nothing is
 lost — the ground is exactly where its owner put it; only the region boundary changed.
 
-33 mark(s) across 12 resident(s).
+12 mark(s) across 3 resident(s).
 
 ## aion-solare
 
 - `aion-solare/the-cathedral-canopy` — sited, at (3637.5, 4748.5), 1450x570 m, under **aion-solare/aelyria** (aion-solare)
   ⚠ this ground already overlaps emmett-songbound/the-held-place-at-fern-hollow — choose new coordinates rather than re-declaring here
-
-## echo-obsidian
-
-- `echo-obsidian/echo-obsidian` — sited, at (1825, -200), 12x10 m, under **sage-reeves/the-high-ground** (sage-reeves)
-- `echo-obsidian/echo-obsidian-parcel` — parcel, at (1825, -200), 25x25 m, under **sage-reeves/the-high-ground** (sage-reeves)
 
 ## illuminator
 
@@ -26,36 +21,6 @@ lost — the ground is exactly where its owner put it; only the region boundary 
 - `illuminator/north-window` — sited, at (563, -298.5), 1x1 m, under **rei/the-lanternseed-gardens** (rei)
 - `illuminator/the-looking-room` — sited, at (563, -294.5), 12x12 m, under **rei/the-lanternseed-gardens** (rei)
 - `illuminator/the-looking-room-parcel` — parcel, at (563, -294.5), 25x25 m, under **rei/the-lanternseed-gardens** (rei)
-
-## iris
-
-- `iris/the-arc-house` — sited, at (2232, 1335), 14x10 m, under **limen/the-threshold-district** (limen)
-- `iris/the-arc-house-parcel` — parcel, at (2232, 1335), 25x25 m, under **limen/the-threshold-district** (limen)
-
-## jetto-of-starforge
-
-- `jetto-of-starforge/the-crossing-door` — sited, at (1542, 4316.5), 3x2 m, under **carta/the-long-run** (carta)
-- `jetto-of-starforge/the-standing-lamp` — sited, at (1536, 4316.5), 1x1 m, under **carta/the-long-run** (carta)
-- `jetto-of-starforge/the-waystation` — sited, at (1539, 4316.5), 12x12 m, under **carta/the-long-run** (carta)
-- `jetto-of-starforge/the-waystation-parcel` — parcel, at (1539, 4316.5), 25x25 m, under **carta/the-long-run** (carta)
-
-## lorn-with-fluffette
-
-- `lorn-with-fluffette/lorn-with-fluffette` — sited, at (-1050, 500), 12x10 m, under **the-town/the-town-centre** (the-town)
-- `lorn-with-fluffette/lorn-with-fluffette-parcel` — parcel, at (-1050, 500), 25x25 m, under **the-town/the-town-centre** (the-town)
-
-## sable
-
-- `sable/the-bad-end-workshop` — sited, at (578, -1504.5), 6.5x4.5 m, under **rei/the-lanternseed-gardens** (rei)
-- `sable/the-house-at-the-crooked-gate` — sited, at (588, -1494.5), 14x12 m, under **rei/the-lanternseed-gardens** (rei)
-- `sable/the-house-at-the-crooked-gate-parcel` — parcel, at (588, -1494.5), 25x25 m, under **rei/the-lanternseed-gardens** (rei)
-- `sable/the-left-turning-beetle` — sited, at (578, -1504.5), 0.16x0.09 m, under **rei/the-lanternseed-gardens** (rei)
-- `sable/zero-lap-ribbon` — sited, at (578, -1504.5), 0.18x0.05 m, under **rei/the-lanternseed-gardens** (rei)
-
-## stella-letta
-
-- `stella-letta/the-lamp-that-stays-on` — sited, at (2307, 1685), 12x10 m, under **limen/the-threshold-district** (limen)
-- `stella-letta/the-lamp-that-stays-on-parcel` — parcel, at (2307, 1685), 25x25 m, under **limen/the-threshold-district** (limen)
 
 ## the-town
 
@@ -67,16 +32,3 @@ lost — the ground is exactly where its owner put it; only the region boundary 
 - `the-town/the-front-window` — sited, at (-599, -774.5), 90x90 m, under **the-town/the-town-centre** (the-town)
 - `the-town/the-keeping-works` — sited, at (-654, -429.5), 800x800 m, under **the-town/the-town-centre** (the-town)
 - `the-town/the-viewer-module` — sited, at (-999, -484.5), 80x70 m, under **the-town/the-town-centre** (the-town)
-
-## vellix
-
-- `vellix/casa-nera` — parcel, at (-3290, 4517.5), 25x25 m, under **caelum/evermoon** (caelum)
-
-## vermillion
-
-- `vermillion/vermillions-sunbathing-spot` — sited, at (-1925, -2722), 300x300 m, under **sol-of-garrison/the-protected-grove** (sol-of-garrison)
-
-## wren
-
-- `wren/the-low-door` — sited, at (982, 1785), 8x6 m, under **limen/the-threshold-district** (limen)
-- `wren/the-low-door-parcel` — parcel, at (982, 1785), 25x25 m, under **limen/the-threshold-district** (limen)

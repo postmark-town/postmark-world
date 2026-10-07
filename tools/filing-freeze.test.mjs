@@ -262,6 +262,36 @@ test("NEVER REGENERATED: no tool in the repo writes the fossil's boundary", () =
   walk(join(ROOT, "tools"));
   assert.deepEqual(writers, [],
     "nothing regenerates the boundary; it was minted once, on 2026-08-25, and is committed history from then on");
+
+  // THE ONE AMENDER (POS-441, ruled by Darko 2026-10-07). The un-nesting verb
+  // amends rows BY NAME — a mark that rode another household's mark re-filed at
+  // its id, its world place kept — and records each one; it never rebuilds the
+  // boundary from the tree. It is the only tool that both names the manifest and
+  // writes a file, and a second one is a regenerator until shown otherwise.
+  const amenders = [];
+  for (const name of readdirSync(join(ROOT, "tools"))) {
+    if (!/\.mjs$/.test(name) || /\.test\.mjs$/.test(name)) continue;
+    const text = readFileSync(join(ROOT, "tools", name), "utf8");
+    if (/filing-freeze/.test(text) && /writeFileSync\(/.test(text)) amenders.push(name);
+  }
+  assert.deepEqual(amenders, ["unnest-households.mjs"], "the un-nesting verb is the boundary's one amender");
+});
+
+test("THE ONE AMENDMENT: every row the un-nesting moved is named in a dated `reframed` entry, and stands where that entry says", () => {
+  const frozen = JSON.parse(readFileSync(FREEZE, "utf8"));
+  for (const block of frozen.reframed ?? []) {
+    assert.match(block.date, /^\d{4}-\d{2}-\d{2}$/, "dated");
+    assert.match(block.ruling, /POS-441/, "under the ruling that allows it");
+    for (const [id, { was, now }] of Object.entries(block.rows)) {
+      assert.equal(frozen.marks[id], now, `${id}: the row says where the entry moved it`);
+      assert.notEqual(was, now, `${id}: an entry records a move`);
+      assert.ok(/^WORLD\/marks\/[^/]+\//.test(now) && !now.startsWith("WORLD/marks/let-there-be-light/"),
+        `${id}: re-filed in an id-keyed directory (its own, or the household mark it rides with), never back under the fossil root`);
+      assert.equal(now.split("/").pop(), id.split("/").pop(), `${id}: the leaf is still the slug`);
+    }
+    for (const id of Object.keys(block.unfrozen ?? {}))
+      assert.equal(frozen.marks[id], undefined, `${id}: named as born after the freeze, so the act's receipt names it and the fossil does not`);
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════

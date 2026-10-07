@@ -808,12 +808,21 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
       return { dx: tx - fx, dy: ty - fy };
     };
     const bById = new Map(B.map((m) => [m.id, m]));
-    const reshapedFramerOf = (id) => {
+    // THE CARRIER IS ASKED OF EITHER TREE (POS-441, 2026-10-07). The household
+    // un-nesting re-filed another household's marks at their ids, places kept,
+    // so a mark a region carried in the 08-22 reshape may no longer be filed
+    // under that region today — while the ref still files it there. The
+    // question is whether the region carried it, which the ref's own filing
+    // answers; a mark re-filed under a region after the ref (lysander's jetty)
+    // is answered by today's. The delta below must still match to the metre.
+    const aById = new Map(A.map((m) => [m.id, m]));
+    const framerIn = (map, id) => {
       const seen = new Set();
-      let p = bById.get(id)?._parentMarkId;
-      while (p && !seen.has(p)) { if (RESHAPED_BY_DECLARED_ACT.has(p)) return p; seen.add(p); p = bById.get(p)?._parentMarkId; }
+      let p = map.get(id)?._parentMarkId;
+      while (p && !seen.has(p)) { if (RESHAPED_BY_DECLARED_ACT.has(p)) return p; seen.add(p); p = map.get(p)?._parentMarkId; }
       return null;
     };
+    const reshapedFramerOf = (id) => framerIn(bById, id) ?? framerIn(aById, id);
     const carriedByAReshapedRegion = (id, aAt, bAt) => {
       const framer = reshapedFramerOf(id);
       if (!framer) return false;
@@ -886,6 +895,11 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
     // prose has said all along. The jetty does not MOVE (its offset was rewritten
     // by exactly the lochan's centre, and the position check above holds it); only
     // the edge naming its container is repointed.
+    const ROOT_ID = "the-town/let-there-be-light";
+    const REFILED_GROUND = new Map();
+    for (const block of (() => { try { return JSON.parse(readFileSync(join(ROOT, "WORLD/filing-freeze.json"), "utf8")).reframed ?? []; } catch { return []; } })())
+      for (const rows of [block.rows ?? {}, block.unfrozen ?? {}])
+        for (const [id, r] of Object.entries(rows)) REFILED_GROUND.set(id, r.ground ?? null);
     const REHOMED_BY_DECLARED_ACT = new Map([
       ["lysander/the-jetty", { from: null, to: "the-town/the-lochan" }],
       // THE PARTY'S GATHERING PLACE, declared 2026-08-29. The parlor is a
@@ -988,6 +1002,14 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
       // frames (limen's terraces, rei's experiment garden) and the eleven marks
       // filed on them.
       if (lawfullyWithdrawn.has(before) || WITHDRAWN_BY_DECLARED_ACT.has(before)) continue;
+      // ── RE-FILED BY THE HOUSEHOLD UN-NESTING (POS-441, ruled 2026-10-07) ──────
+      // The un-nesting re-filed another household's marks at their ids, places
+      // kept, so a mark the re-shape had displaced is no longer filed in the
+      // region it stands outside and leaves the outsiders list the allowance
+      // above reads. Its declaring act's receipt (filing-freeze.json `reframed`)
+      // names the ground it stood on when it was re-filed, which the verb's own
+      // falsifier proved unchanged; the answer must still be that ground.
+      if (REFILED_GROUND.has(m.id) && REFILED_GROUND.get(m.id) === (after ?? ROOT_ID)) continue;
       assert.equal(after, before, `placementParent moved for ${m.id}`);
     }
   } finally {

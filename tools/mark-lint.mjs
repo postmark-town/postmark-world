@@ -35,6 +35,7 @@ import {
 } from "./marks-fold.mjs";
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter } from "./consent.mjs";
+import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -572,6 +573,44 @@ if (declaredCoords(marks) === COORDS_RELATIVE) {
     const composed = fileToWorld(rec._fileAt, o);
     if (composed.x !== rec.at.x || composed.y !== rec.at.y)
       err(rec, `the loader placed this mark at ${rec.at.x},${rec.at.y}, but the frame law composes ${rec._fileAt.x},${rec._fileAt.y} on origin ${o.x},${o.y} to ${composed.x},${composed.y} — the two disagree. This is a MACHINERY BUG in tools/marks-fold.mjs, not a defect in this record; do not edit the mark to silence it`);
+  }
+}
+
+// 6c. NOTHING RIDES ANOTHER HOUSEHOLD'S MARK (POS-441, ruled by Darko
+// 2026-10-07: "That should just always be the default rule"). LOGOS/edit-law.md
+// § Amend: "Your own household's marks inside it move with it, in the same act,
+// keeping their place relative to it; another household's marks never move:
+// they keep their place, and their containment follows geometry." A nested
+// file's numbers are an offset from its frame, so a mark filed inside another
+// household's mark rides it — and that is the one thing the ruling forbids. The
+// question is household-frames.mjs's, the same one the remedy asks.
+//
+// JURISDICTION, as gate A's: this repository's own tree is held to the registry
+// it carries (WORLD/households.json, re-derived from the town each settlement);
+// a fixture tree is held only when it brings a registry with --households, because
+// a synthetic world's handles were never anyone's household. This repository's
+// own tree WITHOUT its registry is the loud case, as a missing manifest is: it is
+// the one condition under which the gate silently stops, so it is said.
+//
+// A WARNING, NEVER A REFUSAL (Wright, 2026-10-07, under R5: "Silence publishes,
+// everywhere; governance takes away … a refusal cannot hold anyone's marks").
+// The sweep runs this lint every crossing and the registry is re-derived every
+// settlement, so a household that SPLITS turns a same-household frame into
+// another household's under a standing tree — and an error here would refuse the
+// whole town's crossing for a fact no resident changed. The red Darko's Q5 means
+// ("by hand, on the red, for now") is the standing test,
+// tools/household-frames.test.mjs, in the World suite that CI and the keeper
+// read, beside this warning line in the crossing's receipt. The operator round
+// reads them and runs the remedy, one command that moves nothing:
+// `node tools/unnest-households.mjs` re-files each named mark at its id with its
+// world place kept exactly.
+{
+  const HH_GATE = args.includes("--households") ? opt("--households") : (OWN_TREE ? join(REPO, "WORLD/households.json") : null);
+  if (HH_GATE && !existsSync(HH_GATE))
+    findings.push({ sev: "WARN", file: "WORLD/households.json", msg: `no household registry at ${String(HH_GATE).replace(/\\/g, "/").replace(/^.*\/WORLD\//, "WORLD/")} — the household gate did not run. Without the registry nobody's household is known, and a tree that cannot say whose a mark is is not held to "another household's marks never move"` });
+  else if (HH_GATE) {
+    for (const r of crossHouseholdRiders(marks, householdResolver(HH_GATE)))
+      warn(r.rec, `this mark rides ${r.frame} (${r.frameHousehold}), another household's mark: it is filed inside it, so its numbers are an offset from that mark's centre and moving that mark would move it. Another household's marks never move — "they keep their place, and their containment follows geometry" (LOGOS/edit-law.md § Amend, ruled 2026-10-07). Re-file it at its id with its place kept: node tools/unnest-households.mjs`);
   }
 }
 
