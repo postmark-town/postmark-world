@@ -289,6 +289,8 @@ test("THE ONE AMENDMENT: every row the un-nesting moved is named in a dated `ref
         `${id}: re-filed in an id-keyed directory (its own, or the household mark it rides with), never back under the fossil root`);
       assert.equal(now.split("/").pop(), id.split("/").pop(), `${id}: the leaf is still the slug`);
     }
+    for (const id of Object.keys(block.unfrozen ?? {}))
+      assert.equal(frozen.marks[id], undefined, `${id}: named as born after the freeze, so the act's receipt names it and the fossil does not`);
   }
 });
 

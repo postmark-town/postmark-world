@@ -43,7 +43,7 @@
 // lint's household gate (mark-lint.mjs § 6c) reds — a household that splits in
 // the registry can turn a same-household frame into another household's.
 
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, containmentMap } from "./marks-fold.mjs";
@@ -89,7 +89,7 @@ export function unnestHouseholds({ repo, households = null, date, ruling, dryRun
   // the lint's error to report), and the verb does not guess between them.
   const taken = plan.filter((p) => existsSync(join(repo, p.to)));
   if (taken.length) throw new UnnestRefusal(`${taken.length} id path(s) already exist: ${taken.map((p) => p.to).join(", ")}`, { taken });
-  if (dryRun || !movers.length) return { dryRun, movers: plan, rewritten: [], paths_changed: [], manifest_rows: [], registry_rows: [] };
+  if (dryRun || !movers.length) return { dryRun, movers: plan, rewritten: [], paths_changed: [], manifest_rows: [], unfrozen_rows: [], registry_rows: [] };
 
   const before = snapshotWorld(marksDir);
   const containBefore = new Map(containmentMap(recsBefore).marks.map((m) => [m.id, m.parent]));
@@ -99,6 +99,17 @@ export function unnestHouseholds({ repo, households = null, date, ruling, dryRun
     const to = join(marksDir, m.by, m.rec.slug);
     mkdirSync(dirname(to), { recursive: true });
     renameSync(m.rec._dir, to);
+  }
+  // A HUSK this emptied goes with it (the sweep's own second pass, 2026-09-16):
+  // a seat whose record left canon stood only as the filing of the marks under
+  // it, and when those were another household's and have left, nothing is
+  // beneath it. `rmdirSync` removes an EMPTY directory and nothing else, walking
+  // up only while each one is empty.
+  for (const m of movers) {
+    for (let seat = dirname(m.rec._dir); posix(seat).startsWith(posix(marksDir) + "/"); seat = dirname(seat)) {
+      if (!existsSync(seat) || readdirSync(seat).length) break;
+      rmdirSync(seat);
+    }
   }
   const rewritten = keepWorldAcross(marksDir, before);
 
@@ -124,15 +135,25 @@ export function unnestHouseholds({ repo, households = null, date, ruling, dryRun
   }
 
   // ── the path-keyed records follow the paths ───────────────────────────────
-  const pathsChanged = recsAfter.filter((r) => pathBefore.get(r.id) !== filedAt(r)).map((r) => ({ id: r.id, was: pathBefore.get(r.id), now: filedAt(r) }));
+  // Each moved filing is recorded with the GROUND it stood on (its containment
+  // parent, which the falsifier above just proved unchanged), so a reader that
+  // used to key an allowance on a mark's filing can key it on this receipt.
+  const pathsChanged = recsAfter.filter((r) => pathBefore.get(r.id) !== filedAt(r))
+    .map((r) => ({ id: r.id, was: pathBefore.get(r.id), now: filedAt(r), ground: containAfter.get(r.id) ?? null }));
   const manifest = JSON.parse(readFileSync(freezePath, "utf8"));
-  const manifestRows = pathsChanged.filter((p) => manifest.marks?.[p.id] !== undefined && manifest.marks[p.id] === p.was);
-  if (manifestRows.length) {
+  const isFossilRow = (p) => manifest.marks?.[p.id] !== undefined && manifest.marks[p.id] === p.was;
+  const manifestRows = pathsChanged.filter(isFossilRow);
+  const unfrozenRows = pathsChanged.filter((p) => !isFossilRow(p));
+  if (pathsChanged.length) {
     for (const p of manifestRows) manifest.marks[p.id] = p.now;
+    const receipt = (rows) => Object.fromEntries(rows.map((p) => [p.id, { was: p.was, now: p.now, ground: p.ground }]));
     manifest.reframed = [...(Array.isArray(manifest.reframed) ? manifest.reframed : []), {
       date, ruling,
-      why: "another household's marks never ride your frame: each fossil filed inside another household's mark was re-filed at its id with its world place kept exactly (tools/unnest-households.mjs); its household's own marks and the predicates on it moved with it, keeping their frame. These rows are amended by name, never regenerated.",
-      rows: Object.fromEntries(manifestRows.map((p) => [p.id, { was: p.was, now: p.now }])),
+      why: "another household's marks never ride your frame: each fossil filed inside another household's mark was re-filed at its id with its world place kept exactly (tools/unnest-households.mjs); its household's own marks and the predicates on it moved with it, keeping their frame. These rows are amended by name, never regenerated. `ground` is each mark's containment parent, unchanged by the move.",
+      rows: receipt(manifestRows),
+      // marks born after the freeze have no fossil row, but their filing moved by
+      // the same act, and the act's receipt names them too
+      ...(unfrozenRows.length ? { unfrozen: receipt(unfrozenRows) } : {}),
     }];
     rewriteJson(freezePath, manifest);
   }
@@ -146,7 +167,7 @@ export function unnestHouseholds({ repo, households = null, date, ruling, dryRun
     if (registryRows.length) rewriteJson(registryPath, registry);
   }
 
-  return { dryRun, movers: plan, rewritten, paths_changed: pathsChanged, manifest_rows: manifestRows, registry_rows: registryRows };
+  return { dryRun, movers: plan, rewritten, paths_changed: pathsChanged, manifest_rows: manifestRows, unfrozen_rows: unfrozenRows, registry_rows: registryRows };
 }
 
 // ── the command ──────────────────────────────────────────────────────────────
@@ -162,7 +183,7 @@ if (resolve(process.argv[1] ?? "") === resolve(fileURLToPath(import.meta.url))) 
     console.log(`${r.dryRun ? "DRY RUN · " : ""}${r.movers.length} mark(s) framed by another household's mark`);
     for (const m of r.movers) console.log(`  ${m.id}  (rode ${m.frame})  ${m.from} -> ${m.to}`);
     if (!r.dryRun && r.movers.length)
-      console.log(`numbers rewritten by the reparent verb: ${r.rewritten.length} · paths changed: ${r.paths_changed.length} · manifest rows amended: ${r.manifest_rows.length} · registry paths: ${r.registry_rows.length} · positions changed: 0 (checked)`);
+      console.log(`numbers rewritten by the reparent verb: ${r.rewritten.length} · paths changed: ${r.paths_changed.length} · manifest rows amended: ${r.manifest_rows.length} (+${r.unfrozen_rows.length} post-freeze filings named) · registry paths: ${r.registry_rows.length} · positions changed: 0 (checked)`);
   } catch (e) {
     if (!(e instanceof UnnestRefusal)) throw e;
     console.error(`REFUSED: ${e.message}`);

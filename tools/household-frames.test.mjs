@@ -113,7 +113,8 @@ test("THE VERB: the other household's mark leaves for its id, its own marks go w
   assert.equal(Object.keys(manifest.marks).length, manifest.count, "rows are amended, never added or dropped");
   assert.deepEqual(manifest.reframed.map((b) => [b.date, b.ruling, Object.keys(b.rows).sort()]),
     [["2026-10-07", "POS-441 (fixture)", ["hal/the-house", "hal/the-parcel"]]], "each amended row is named, with the date and the ruling");
-  assert.deepEqual(manifest.reframed[0].rows["hal/the-house"], { was: "WORLD/marks/let-there-be-light/the-district/the-parcel/the-house", now: "WORLD/marks/hal/the-parcel/the-house" });
+  assert.deepEqual(manifest.reframed[0].rows["hal/the-house"], { was: "WORLD/marks/let-there-be-light/the-district/the-parcel/the-house", now: "WORLD/marks/hal/the-parcel/the-house", ground: "hal/the-parcel" });
+  assert.equal(manifest.reframed[0].rows["hal/the-parcel"].ground, "limen/the-district", "the receipt names the ground each re-filed mark stood on, unchanged by the move");
 
   const registry = JSON.parse(readFileSync(tree.registry, "utf8")).published;
   assert.equal(registry["hal/the-house"].path, "WORLD/marks/hal/the-parcel/the-house/mark.md", "the sweep's unpublish pass reads this path: it follows the move");
@@ -122,6 +123,22 @@ test("THE VERB: the other household's mark leaves for its id, its own marks go w
   const again = unnestHouseholds({ repo: tree.dir, date: "2026-10-08", ruling: "again" });
   assert.equal(again.movers.length, 0, "run again, it finds nothing to do");
   assert.equal(JSON.parse(readFileSync(tree.freeze, "utf8")).reframed.length, 1, "and writes no second entry");
+});
+
+test("a HUSK the verb empties goes with it: a seat whose record left canon, holding only another household's mark, is removed once that mark leaves — and a seat with anything left in it stays", (t) => {
+  const tree = districtTree(t);
+  // limen's terrace left canon (its mark.md is gone) and stands only as the filing
+  // of what is beneath it: hal's bench, and in a second husk, wren's own step.
+  const put = (rel, text) => { const f = join(tree.marks, rel, "mark.md"); mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, text); };
+  put("let-there-be-light/the-district/the-terrace/the-bench", record({ by: "hal", at: { x: 40, y: 40 }, extent: { w: 2, h: 2 }, body: "hal's bench" }));
+  put("let-there-be-light/the-district/the-other-terrace/the-step", record({ by: "wren", at: { x: 60, y: 60 }, extent: { w: 2, h: 2 }, body: "wren's step" }));
+  const placeBefore = placeOf(tree.marks);
+  const r = unnestHouseholds({ repo: tree.dir, date: "2026-10-07", ruling: "POS-441 (fixture)" });
+  assert.deepEqual(r.movers.map((m) => m.id).sort(), ["hal/the-bench", "hal/the-parcel"]);
+  assert.equal(existsSync(join(tree.marks, "let-there-be-light", "the-district", "the-terrace")), false, "the emptied husk is gone");
+  assert.ok(existsSync(join(tree.marks, "let-there-be-light", "the-district", "the-other-terrace", "the-step", "mark.md")), "a husk still filing its own household's mark stays");
+  assert.ok(existsSync(join(tree.marks, "let-there-be-light", "the-district", "mark.md")), "the district itself is untouched");
+  assert.deepEqual(placeOf(tree.marks), placeBefore, "and nothing moved");
 });
 
 test("the verb refuses, writing nothing, when the id path is already a seat", (t) => {
