@@ -145,3 +145,27 @@ test("lane-wall: an unregistered author is refused with the registry-lag hint, a
   assert.equal(carol.ok, false);
   assert.match(carol.violations[0].hint, /no handles are registered|not one of your residents/);
 });
+
+test("lane-wall: a change is judged as the record stood — rewriting another household's mark under your own name is refused", (t) => {
+  const { put, wall, commit, git } = fixture(t);
+  const porchPath = "WORLD/marks/let-there-be-light/alice-parcel/porch/mark.md";
+  const porch = (by, body) => record({ by, at: { x: 110, y: 110 }, extent: { w: 4, h: 4 }, body });
+  // alice's porch is on main before either PR branches
+  git("switch", "-q", "main");
+  put(porchPath, porch("alice", "a porch on her own ground"));
+  commit("alice's porch");
+
+  git("switch", "-q", "-C", "pr-head", "main");
+  put(porchPath, porch("mallory", "mallory's words under alice's path"));
+  commit("mallory rewrites alice's porch as her own");
+  const taken = wall(3, "malloryhub");
+  assert.equal(taken.ok, false, "the record was alice's before the change");
+  assert.match(taken.violations[0].defect, /"alice" is not yours to change/);
+
+  // the control shot: alice changing her own porch's words passes
+  git("switch", "-q", "-C", "pr-head", "main");
+  put(porchPath, porch("alice", "a porch with a blue door"));
+  commit("alice rewords her porch");
+  const own = wall(1, "alicehub");
+  assert.equal(own.ok, true, JSON.stringify(own.violations ?? []));
+});

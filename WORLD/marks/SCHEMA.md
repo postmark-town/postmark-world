@@ -150,6 +150,8 @@ hand-authored mark may stay day-precise. Validated by `marks-fold.mjs`
 mark. You may write it about **your own parcel's ground** (the domain is anything
 that *overlaps* the parcel, not only what sits inside it) or about **what stands
 inside your own mark**, and about nobody's mark but another household's. A
+parcel's word reaches only marks laid **after** the parcel, and never the town's
+own marks (Darko, 2026-10-05); the lint names a word it ignores. A
 `welcomed` mark fans its weight up and comes back carrying `kept: true`; an
 `opposed` mark is **returned** — it leaves the fold, with its subtree, into
 `world-state.json`'s `returned[]`, which names every member. On parcel ground the

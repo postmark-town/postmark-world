@@ -11,9 +11,11 @@ const sited = (id, by, x, y, w, h, extra = {}) => ({
   id: `${by}/${id}`, slug: id, by, household: by, kind: "sited", tier: "market",
   at: { x, y }, extent: { w, h }, date: "2026-08-10", body: id, ...extra,
 });
+// A parcel is dated before the sited default: its word reaches only what came
+// after it (Darko, 2026-10-05), so the vetoes below are on newcomers.
 const parcel = (id, by, x, y, extra = {}) => ({
   id: `${by}/${id}`, slug: id, by, household: by, kind: "parcel", tier: "market",
-  at: { x, y }, extent: { w: 25, h: 25 }, date: "2026-08-10", body: id, ...extra,
+  at: { x, y }, extent: { w: 25, h: 25 }, date: "2026-08-01", body: id, ...extra,
 });
 const stake = (holder, mark, n) => ({ holder, mark, n, weight: n, tick: 0 });
 const w = (state, id) => state.marks.find((m) => m.id === id)?.weight;
@@ -136,6 +138,52 @@ test("THE STRADDLER: a foreign mark merely OVERLAPPING a parcel answers the parc
   const consented = fold({ marks: [parcel("home", "holder", 0, 0), marks[1]], terrain, tick: 1, stakes: [] });
   assert.equal(standing(consented, "foreign/hall"), true, "without the word it simply stands");
   assert.equal(consented.returned.length, 0);
+});
+
+test("THE TOWN'S OWN REGION: a holder's opposed word does not reach it, and every mark inside it stands", () => {
+  // The town centre is constitution ground, 2000x2000 at the origin, older than
+  // every parcel. A parcel inside it says "opposed" to the centre. Before, the
+  // centre was returned with its whole subtree (two other households' marks)
+  // and no error. The town alone is sovereign over the parcel.
+  const centre = sited("the-town-centre", "the-town", 0, 0, 2000, 2000, { tier: "constitution", date: "2026-07-23" });
+  const marks = [
+    centre,
+    parcel("home", "holder", 0, 0, { consent: { "the-town/the-town-centre": "opposed" } }),
+    sited("bench", "third", 300, 300, 4, 4),
+    sited("shop", "fourth", -300, -300, 10, 10),
+  ];
+  const state = fold({ marks, terrain, tick: 1, stakes: [] });
+  assert.deepEqual(state.returned, [], "nothing is returned");
+  for (const id of ["the-town/the-town-centre", "third/bench", "fourth/shop", "holder/home"])
+    assert.equal(standing(state, id), true, `${id} stands`);
+  assert.deepEqual(state.errors, []);
+
+  // a town mark laid AFTER the parcel is still the town's: the date does not open it
+  const later = fold({ marks: [
+    parcel("home", "holder", 0, 0, { consent: { "the-town/new-quay": "opposed" } }),
+    sited("new-quay", "the-town", 10, 0, 40, 40, { date: "2026-09-01" }),
+  ], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(later, "the-town/new-quay"), true, "a younger town mark stands against the holder's word");
+  assert.deepEqual(later.returned, []);
+});
+
+test("A PARCEL SPEAKS ONLY ON WHAT CAME AFTER IT: an older neighbour stands, a newcomer is returned", () => {
+  const word = { consent: { "foreign/hall": "opposed" } };
+  const hallAt = (date) => sited("hall", "foreign", 52.5, 0, 100, 100, { date });
+  const onElder = fold({ marks: [parcel("home", "holder", 0, 0, word), hallAt("2026-07-20")], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(onElder, "foreign/hall"), true, "the hall was there first, so the parcel's word does not reach it");
+  assert.deepEqual(onElder.returned, []);
+
+  const onTwin = fold({ marks: [parcel("home", "holder", 0, 0, word), hallAt("2026-08-01")], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(onTwin, "foreign/hall"), true, "the same instant is not after");
+
+  const undated = fold({ marks: [parcel("home", "holder", 0, 0, word), hallAt(undefined)], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(undated, "foreign/hall"), true, "a date that proves nothing reaches nothing");
+
+  // the control shot: the same hall laid a day after the parcel
+  const onNewcomer = fold({ marks: [parcel("home", "holder", 0, 0, word), hallAt("2026-08-02")], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(onNewcomer, "foreign/hall"), false, "a newcomer on the parcel answers its holder");
+  assert.equal(onNewcomer.returned[0].authority, "parcel (absolute)");
 });
 
 test("a parcel's word is ABSOLUTE where a commons parent's is EARNED — the same unstaked grantor, two outcomes", () => {

@@ -313,3 +313,19 @@ test("image: only the town's own media shelf hangs on a mark (2026-08-15)", () =
   assert.match(out, /the-smuggled-poster[\s\S]*?image: must be one https:\/\/media\.postmark\.town/, "the off-shelf URL is refused by name");
   assert.doesNotMatch(out, /the-postcard\b[^\n]*image:/, "the shelf's own URL passes");
 });
+
+test("a parcel's word: the town's own mark and an older mark are named as ignored; a newcomer is not", () => {
+  const { dir, root } = fixtureTree();
+  const put = (slug, fm, body) => {
+    mkdirSync(join(root, slug), { recursive: true });
+    writeFileSync(join(root, slug, "mark.md"), `---\n${fm}\n---\n\n${body}\n`);
+  };
+  put("the-old-quay", "kind: sited\nby: the-town\ndate: 2026-07-23\nat: { x: 60, y: 60 }\nextent: { w: 40, h: 40 }", "The town's quay.");
+  put("the-elder-shed", "kind: sited\nby: elderhh\ndate: 2026-07-25\nat: { x: 66, y: 66 }\nextent: { w: 10, h: 10 }", "A shed that was here first.");
+  put("the-new-shed", "kind: sited\nby: newhh\ndate: 2026-08-20\nat: { x: 54, y: 54 }\nextent: { w: 10, h: 10 }", "A shed laid after the parcel.");
+  put("holder-parcel", 'kind: parcel\nby: holderhh\ndate: 2026-08-10\nat: { x: 60, y: 60 }\nextent: { w: 25, h: 25 }\nconsent: {"the-town/the-old-quay": "opposed", "elderhh/the-elder-shed": "opposed", "newhh/the-new-shed": "opposed"}', "My parcel.");
+  const out = runLint(dir);
+  assert.match(out, /"the-town\/the-old-quay" is the town's own mark — ignored/, "the town's mark is named");
+  assert.match(out, /"elderhh\/the-elder-shed" did not come after this parcel — ignored/, "the elder is named");
+  assert.doesNotMatch(out, /"newhh\/the-new-shed"[^\n]*ignored/, "the newcomer is a word the parcel may say");
+});
