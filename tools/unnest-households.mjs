@@ -50,6 +50,26 @@ import { fileURLToPath } from "node:url";
 import { loadMarks, containmentMap } from "./marks-fold.mjs";
 import { snapshotWorld, keepWorldAcross } from "./reparent-keep-world.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
+import { deriveOutsiders, outsidersJson, outsidersMarkdown } from "./region-outsiders.mjs";
+import { rectInsideRing, polygonOf, overlapArea } from "./geometry.mjs";
+
+/**
+ * THE HEADS-UP LIST FOLLOWS THE FILING. `WORLD/region-outsiders.{json,md}` is a
+ * view the fold emits of this tree (marks-fold.mjs, the same three calls): a mark
+ * filed under a ringed region and standing outside its ring. Re-filing a mark at
+ * its id takes it out from under the region, so the committed view would name
+ * marks it no longer describes until the next fold — and region-rings.test.mjs
+ * holds the committed file to the tree. So the verb re-derives it, exactly as the
+ * fold would, and nothing else of the fold's output.
+ */
+export function refreshOutsiders(repo) {
+  const json = join(repo, "WORLD", "region-outsiders.json"), md = join(repo, "WORLD", "region-outsiders.md");
+  if (!existsSync(json)) return null;
+  const rows = deriveOutsiders(loadMarks(join(repo, "WORLD", "marks")), { rectInsideRing, polygonOf, overlapArea });
+  writeFileSync(json, JSON.stringify(outsidersJson(rows), null, 2) + "\n");
+  writeFileSync(md, outsidersMarkdown(rows));
+  return rows.length;
+}
 
 export class UnnestRefusal extends Error {
   constructor(message, detail = {}) { super(message); this.name = "UnnestRefusal"; this.detail = detail; }
@@ -168,7 +188,8 @@ export function unnestHouseholds({ repo, households = null, date, ruling, dryRun
     if (registryRows.length) rewriteJson(registryPath, registry);
   }
 
-  return { dryRun, movers: plan, rewritten, paths_changed: pathsChanged, manifest_rows: manifestRows, unfrozen_rows: unfrozenRows, registry_rows: registryRows };
+  const outsiders = refreshOutsiders(repo);
+  return { dryRun, movers: plan, rewritten, paths_changed: pathsChanged, manifest_rows: manifestRows, unfrozen_rows: unfrozenRows, registry_rows: registryRows, outsiders };
 }
 
 // ── the command ──────────────────────────────────────────────────────────────
