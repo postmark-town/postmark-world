@@ -34,7 +34,7 @@ import {
   containmentParents,
 } from "./marks-fold.mjs";
 import { markStanding } from "./mark-standing.mjs";
-import { consentMap, CONSENT_WORDS, CONSENT_FIELD } from "./consent.mjs";
+import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter } from "./consent.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -716,6 +716,16 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
       // a word needs ground under it: a parcel's authority runs over whatever
       // OVERLAPS it (a neighbour straddling the fence answers the same law as one
       // sitting wholly inside), so "no overlap at all" is the only empty case.
+      // a parcel's reach (consent.mjs § opposed): the town's own marks never,
+      // and otherwise only what came after the parcel.
+      if (isParcel && townOwnedMark(t)) {
+        warn(rec, `${CONSENT_FIELD}: "${target}" is the town's own mark — ignored. The town alone is sovereign over your parcel; a holder's word reaches what is laid on their ground, never the town's`);
+        continue;
+      }
+      if (isParcel && !cameAfter(t, rec)) {
+        warn(rec, `${CONSENT_FIELD}: "${target}" did not come after this parcel — ignored. A parcel speaks only on marks laid after it; the holders of an older mark speak on newcomers, never the reverse`);
+        continue;
+      }
       if (isParcel) {
         const pr = rect(rec); pr.w = pr.w || 25; pr.h = pr.h || 25;
         if (!t.at || overlapArea(pr, rect(t)) <= 0)
