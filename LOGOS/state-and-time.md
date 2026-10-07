@@ -134,6 +134,7 @@ What this repeals and what it keeps:
   their ids, each keeping its world place exactly, and the manifest records
   those rows as amended, by name and date. It is a decision about a named,
   closed set, never a regeneration; the verb is `tools/unnest-households.mjs`,
-  and the lint refuses a mark framed by another household's mark.
+  and a mark framed by another household's mark reds the World's standing
+  test and is named, as a warning, in the crossing's lint.
 
 Rendered in the world as `the-town/the-frozen-filing` (planted 2026-08-25).

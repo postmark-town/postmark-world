@@ -40,8 +40,9 @@
 //      stale one would silently keep a zero-stake commons published.
 //
 // Run once on the ruling date over the whole tree, and again by hand whenever the
-// lint's household gate (mark-lint.mjs § 6c) reds — a household that splits in
-// the registry can turn a same-household frame into another household's.
+// standing test (tools/household-frames.test.mjs) reds or the lint's household
+// warning (mark-lint.mjs § 6c) appears in a crossing's receipt — a household that
+// splits in the registry can turn a same-household frame into another household's.
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";

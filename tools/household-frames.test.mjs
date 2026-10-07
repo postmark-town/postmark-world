@@ -152,14 +152,14 @@ test("the verb refuses, writing nothing, when the id path is already a seat", (t
   assert.equal(readFileSync(tree.freeze, "utf8"), freezeBefore, "the manifest is untouched");
 });
 
-test("THE GATE: the lint refuses a mark framed by another household's mark and passes once it is re-filed; a fixture with no registry is not in its jurisdiction", (t) => {
+test("THE GATE: the lint WARNS of a mark framed by another household's mark — never refuses the crossing (R5) — and goes quiet once it is re-filed; a fixture with no registry is not in its jurisdiction", (t) => {
   const tree = districtTree(t);
   const red = lintHousehold(tree);
-  assert.deepEqual(red.map((f) => [f.sev, f.file]), [["ERROR", "WORLD/marks/let-there-be-light/the-district/the-parcel"]],
-    "hal's parcel rides limen's district: refused; wren's lamp rides her own household's: passed");
+  assert.deepEqual(red.map((f) => [f.sev, f.file]), [["WARN", "WORLD/marks/let-there-be-light/the-district/the-parcel"]],
+    "hal's parcel rides limen's district: warned (the standing test above is the red); wren's lamp rides her own household's: silent");
   assert.match(red[0].msg, /rides limen\/the-district \(hh:jennuh\)/);
-  assert.match(red[0].msg, /node tools\/unnest-households\.mjs/, "the refusal names its remedy");
+  assert.match(red[0].msg, /node tools\/unnest-households\.mjs/, "the warning names its remedy");
   assert.deepEqual(lintHousehold(tree, false), [], "no --households on a synthetic tree: the gate does not run");
   unnestHouseholds({ repo: tree.dir, date: "2026-10-07", ruling: "POS-441 (fixture)" });
-  assert.deepEqual(lintHousehold(tree), [], "after the verb: nothing to refuse");
+  assert.deepEqual(lintHousehold(tree), [], "after the verb: nothing to warn of");
 });
