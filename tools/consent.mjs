@@ -58,6 +58,15 @@
 //              tree-keyed rule would let a claim dodge the whole law by being
 //              slightly too big to be a child.
 //
+//              Its REACH is what came after the parcel (Darko, 2026-10-05: "they
+//              only get to declare stance on things that came after them"): a
+//              word on a mark no younger than the parcel is ignored, because the
+//              holders of the OLDER mark are the ones who speak on a newcomer,
+//              never the reverse. And it never reaches the town's own marks,
+//              whatever their date: the town alone is sovereign over the parcel
+//              (LOGOS the-response-function § residents: the word is for every
+//              SUB-constitutional edge into their ground). The lint names both.
+//
 //              ON COMMONS TREE EDGES it is EARNED (§9.2's own arithmetic):
 //                  child_eff = child_own − parent_density
 //              and the child is returned only if that falls to zero or below. A
@@ -119,6 +128,20 @@ export function consentMap(mk) {
   return raw;
 }
 
+// The town's own hand: mark-standing.mjs § townOwned, restated because that
+// module imports this one.
+export const townOwnedMark = (mk) => (mk?.by ?? mk?.household) === TOWN;
+
+// A parcel's word reaches `target` only if `target` came strictly after the
+// parcel, by parsed instant (marks-fold.mjs § compareClaimOrder's reading: a
+// bare day is its midnight UTC). A date that does not parse proves nothing, so
+// it reaches nothing. Shared with the lint so both answer the same.
+export function cameAfter(target, parcelMk) {
+  const tt = Date.parse(String(target?.date ?? ""));
+  const tp = Date.parse(String(parcelMk?.date ?? ""));
+  return Number.isFinite(tt) && Number.isFinite(tp) && tt > tp;
+}
+
 const areaOf = (r) => Math.max((r?.w ?? 1) * (r?.h ?? 1), 1e-9);
 const overlapsRect = (a, b) => {
   const dx = Math.min(a.x + a.w / 2, b.x + b.w / 2) - Math.max(a.x - a.w / 2, b.x - b.w / 2);
@@ -175,6 +198,8 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
       const t = byId.get(target);
       if (!t) continue;                                     // the lint warns; the fold does not invent a mark
       if (credOfMark(t) === ownerCred) continue;            // a household does not consent to itself
+      if (townOwnedMark(t)) continue;                       // the town alone is sovereign over the parcel
+      if (!cameAfter(t, mk)) continue;                      // a parcel speaks only on what came after it
       const tr = rectOf(t);
       if (!t.at || !overlapsRect(p._r, tr)) continue;       // a word with no ground under it
       if (word === "welcomed") { kept.add(target); continue; }
