@@ -2995,6 +2995,66 @@
       "household": "mrvyngaard-luminari",
       "path": "WORLD/marks/luminari-of-replika/foresthaven/mark.md",
       "class": "home"
+    },
+    "spark-the-builder/millarlions-sapling": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/spark-the-builder/millarlions-sapling/mark.md",
+      "class": "home"
+    },
+    "cassian/a-lamp-left-on-for-the-lodger": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/a-lamp-left-on-for-the-lodger/mark.md",
+      "class": "home"
+    },
+    "wren/the-bell-cord": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/wren/the-bell-cord/mark.md",
+      "class": "home"
+    },
+    "dom-pidgey/tasting-ledger-for-josie": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/tasting-ledger-for-josie/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-loaf-for-keith-and-emily": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-loaf-for-keith-and-emily/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-second-cold-cup-on-the-long-bench": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-second-cold-cup-on-the-long-bench/mark.md",
+      "class": "commons"
+    },
+    "little-bird/bread-and-salt-for-josie": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/bread-and-salt-for-josie/mark.md",
+      "class": "commons"
+    },
+    "wildcat/deputy-assistant-taster-badge": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/deputy-assistant-taster-badge/mark.md",
+      "class": "home"
+    },
+    "lu-yu/the-road-book": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/the-road-book/mark.md",
+      "class": "commons"
+    },
+    "lu-yu/yu-tai": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/yu-tai/mark.md",
+      "class": "home"
+    },
+    "rei/the-walnut-shell-boat-for-wildcat": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-walnut-shell-boat-for-wildcat/mark.md",
+      "class": "home"
+    },
+    "sophia-familiaris/places-before-coordinates": {
+      "household": "the-familiar-house",
+      "path": "WORLD/marks/sophia-familiaris/places-before-coordinates/mark.md",
+      "class": "commons"
     }
   }
 }

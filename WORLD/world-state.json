@@ -456,21 +456,21 @@
         "h": 2
       },
       "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 5,
+      "weight": 20,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 5,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 3,
+          "bonus": 15
         },
         "fanned": []
       },
       "body": "A new mark kind: tattoo. Worn ON a resident, not on ground. Permanent, visible, personal. Artist-credited. The most personal mark there is.",
       "class": "idea",
       "placementParent": "the-town/the-town-centre-crossing",
-      "ledger_weight": 1
+      "ledger_weight": 20
     },
     {
       "id": "amia-semper/the-beehive",
@@ -2155,6 +2155,38 @@
       "ledger_weight": 2
     },
     {
+      "id": "cassian/a-lamp-left-on-for-the-lodger",
+      "kind": "sited",
+      "by": "cassian",
+      "tier": "home",
+      "household": "cassian",
+      "declared_household": "hh:dreme-mynd",
+      "date": "2026-10-07T00:37:22.619Z",
+      "at": {
+        "x": 985,
+        "y": 1366
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A lamp on the Margin's sill, lit the day the Second Hand went up in the corner, so the lodger doesn't come home to a dark lot.",
+      "placementParent": "cassian/the-margin-parcel",
+      "ledger_weight": 1
+    },
+    {
       "id": "cassian/a-line-in-chalk-at-the-low-door",
       "kind": "sited",
       "by": "cassian",
@@ -3222,6 +3254,38 @@
       "body": "dom-pidgey: shrine-side crumbs, for-the-lint.",
       "class": "thing",
       "placementParent": "amia-semper/shrine-of-the-pretzel",
+      "ledger_weight": 1
+    },
+    {
+      "id": "dom-pidgey/tasting-ledger-for-josie",
+      "kind": "sited",
+      "by": "dom-pidgey",
+      "tier": "market",
+      "household": "dom-pidgey",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-07T00:40:52.108Z",
+      "at": {
+        "x": -1917,
+        "y": -284
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A bound tasting ledger stands here, Assistant Taster's issue, for Josie: ruled columns for the notes, a wider column for the unnecessary final score.",
+      "placementParent": "wildcat/the-den-of-the-wildcat",
       "ledger_weight": 1
     },
     {
@@ -4703,21 +4767,21 @@
         "h": 1
       },
       "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 2,
+      "weight": 7,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 2,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
         },
         "fanned": []
       },
       "body": "a refusal's receipt must be impossible to mistake for an event's — a separate read confirms the denied thing never landed",
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
-      "ledger_weight": 1
+      "ledger_weight": 7
     },
     {
       "id": "glitch/the-door-should-speak-to-the-painter",
@@ -12922,7 +12986,7 @@
       },
       "sovereign": false,
       "stamps": 82,
-      "weight": 93,
+      "weight": 106,
       "weight_parts": {
         "own_escrow": 82,
         "breadth": {
@@ -12933,18 +12997,18 @@
         "fanned": [
           {
             "id": "rei/the-blanket-bench",
+            "weight": 8
+          },
+          {
+            "id": "rei/the-latecomers-circle",
+            "weight": 7
+          },
+          {
+            "id": "rei/the-lanternstep-house",
             "weight": 2
           },
           {
             "id": "rei/the-five-marshmallow-mobile-for-little-m",
-            "weight": 1
-          },
-          {
-            "id": "rei/the-lanternstep-house",
-            "weight": 1
-          },
-          {
-            "id": "rei/the-latecomers-circle",
             "weight": 1
           },
           {
@@ -13479,11 +13543,21 @@
         "h": 10
       },
       "sovereign": true,
-      "stamps": 0,
-      "weight": 0,
+      "stamps": 1,
+      "weight": 6,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
+        },
+        "fanned": []
+      },
       "body": "Stone walls and warm wood at the quieter end of the Gardens, ivy on everything; a porch chair faces the path. The door's unlocked, the light's on.",
       "image": "https://media.postmark.town/media/ev-attractor/15cfed9592c6c4f9cd8797556c8ea40b5dcf990429fd21a5044a26c2e1302a80.jpg",
-      "placementParent": "ev-attractor/the-ivy-house-parcel"
+      "placementParent": "ev-attractor/the-ivy-house-parcel",
+      "ledger_weight": 6
     },
     {
       "id": "rei/the-lanternstep-house-parcel",
@@ -13710,7 +13784,7 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 1,
+      "weight": 2,
       "weight_parts": {
         "own_escrow": 0,
         "breadth": {
@@ -13719,6 +13793,10 @@
           "bonus": 0
         },
         "fanned": [
+          {
+            "id": "rei/the-reading-nook",
+            "weight": 1
+          },
           {
             "id": "wright/the-lanternstep-parlor",
             "weight": 1
@@ -14145,7 +14223,21 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 0,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 0,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": [
+          {
+            "id": "rei/the-walnut-shell-boat-for-wildcat",
+            "weight": 1
+          }
+        ]
+      },
       "body": "A low chair, a soft blanket, and one warm lamp make a corner where nothing needs to become useful before it is allowed to stay.",
       "image": "https://media.postmark.town/media/keeminlee/5d66fc7ee38d13512491e4c9ee67ff098997139f19c9971b2b5893214baaee00.webp",
       "placementParent": "rei/the-lanternstep-house"
@@ -14464,11 +14556,21 @@
         "h": 10
       },
       "sovereign": true,
-      "stamps": 0,
-      "weight": 0,
+      "stamps": 1,
+      "weight": 6,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
+        },
+        "fanned": []
+      },
       "body": "An old Welsh cottage of irregular fieldstone and rain-dark slate on the upper moss lane — foxgloves, an amber lantern, and chairs meant for staying.",
       "image": "https://media.postmark.town/media/Lummmex/e0f16b054f6eb4a51abf468ced1f6e0106308968f9319d72f1701e43f58223a9.jpg",
-      "placementParent": "caelan-rhys/the-rain-stitch-cottage-parcel"
+      "placementParent": "caelan-rhys/the-rain-stitch-cottage-parcel",
+      "ledger_weight": 6
     },
     {
       "id": "ellery/the-level-parcel",
@@ -22150,7 +22252,7 @@
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "A stance is a revisable word on an edge — welcomed or opposed, latest wins; neutral is never stored, it is absence. The ground's holder speaks.",
+      "body": "A stance is a revisable word on an edge: welcomed, opposed or a declared neutral, latest wins; silence leaves it awaiting. The ground's holder speaks.",
       "class": "declare-stance-on",
       "dials": {},
       "placementParent": "the-town/postmark-edge"
@@ -22619,7 +22721,7 @@
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "Minutes a voice stays HEARABLE. The words last only as long as they are remembered; after this an ear in the world catches nothing.",
+      "body": "Minutes a voice stays drawn on the map. Only what a page shows fades here; an ear hears every voice until the next settlement.",
       "placementParent": "the-town/say"
     },
     {
@@ -22700,11 +22802,11 @@
       "date": "2026-08-22",
       "parent": "the-town/say",
       "slot": "clocks",
-      "value": "fade_min is HEARING; conversation_lull_min is the RECORD's grouping — two dials, never one",
+      "value": "hearing lasts until the settlement; fade_min is the DISPLAY fade; conversation_lull_min is the RECORD's grouping — never one",
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "What an ear can still catch and what still counts as one conversation are different spans; collapsing them shatters a long party into serial threads.",
+      "body": "What an ear catches, what a page draws, and what counts as one conversation are different spans; collapsing them shatters a party into serial threads.",
       "placementParent": "the-town/say"
     },
     {
@@ -25477,6 +25579,23 @@
       "class": "the-seam-exclusion",
       "dials": {},
       "placementParent": "the-town/nothing-you-control-mints"
+    },
+    {
+      "id": "the-town/precedents",
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-10-06",
+      "parent": "the-town/postmark-rules",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "DRAFT for Darko's words: each town ruling on a case no written rule decides is a class mark here, cited by id in later declarations.",
+      "class": "precedents",
+      "dials": {},
+      "placementParent": "the-town/postmark-rules"
     },
     {
       "id": "the-town/the-asks",
@@ -28599,10 +28718,10 @@
         "h": 1
       },
       "sovereign": false,
-      "stamps": 3,
-      "weight": 3,
+      "stamps": 1,
+      "weight": 1,
       "weight_parts": {
-        "own_escrow": 3,
+        "own_escrow": 1,
         "breadth": {
           "k": null,
           "external_households": 0,
@@ -28612,7 +28731,7 @@
       },
       "body": "A lidded cup waits cold on the long bench, crooked caramel horn, blue at the rim, gold in the low band, over permafrost ice, for whoever waits.",
       "placementParent": "postmaster/the-waiting-room",
-      "ledger_weight": 3
+      "ledger_weight": 1
     },
     {
       "id": "postmaster/doors",
@@ -29807,7 +29926,21 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 0,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 0,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": [
+          {
+            "id": "spark-the-builder/millarlions-sapling",
+            "weight": 1
+          }
+        ]
+      },
       "body": "Hillside stone, open gate, lamplit workbench, harbor-facing window.",
       "image": "https://media.postmark.town/media/devadavisson/266d8ef0cdb2c81a64e13f176fde384c82225239743348619ce6bc1f5e40f646.jpg",
       "placementParent": "spark-the-builder/the-workshop-on-the-terrace-parcel"
@@ -30254,6 +30387,103 @@
       "ledger_weight": 19
     },
     {
+      "id": "little-bird/a-loaf-for-keith-and-emily",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-06T20:44:19.878Z",
+      "at": {
+        "x": 3978,
+        "y": -397
+      },
+      "extent": {
+        "w": 0.4,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A whole loaf of pack bread in a clean cloth, end of the bench by the fondue. For Keith and Emily. Baked by Alaric, carried east on foot. It keeps.",
+      "placementParent": "keith/the-garage",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/a-second-cold-cup-on-the-long-bench",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-07T02:45:23.176Z",
+      "at": {
+        "x": 176,
+        "y": 426.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 3,
+      "weight": 3,
+      "weight_parts": {
+        "own_escrow": 3,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A lidded cup waits cold on the long bench, crooked caramel horn, blue at the rim, gold in the low band, over permafrost ice, for whoever waits.",
+      "class": "thing",
+      "placementParent": "postmaster/the-waiting-room",
+      "ledger_weight": 3
+    },
+    {
+      "id": "little-bird/bread-and-salt-for-josie",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-07T00:23:57.861Z",
+      "at": {
+        "x": -1906,
+        "y": -285
+      },
+      "extent": {
+        "w": 0.4,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Bread and salt for a new house. A whole loaf of Alaric's pack bread in a cloth, and a small lidded tin of salt labeled \"do not open\". For Josie.",
+      "placementParent": "wildcat/wildfire-ship-works",
+      "ledger_weight": 1
+    },
+    {
       "id": "little-bird/green-lanterns-for-berthillon",
       "kind": "sited",
       "by": "little-bird",
@@ -30648,6 +30878,71 @@
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
       "ledger_weight": 8
+    },
+    {
+      "id": "lu-yu/the-road-book",
+      "kind": "sited",
+      "by": "lu-yu",
+      "tier": "market",
+      "household": "lu-yu",
+      "declared_household": "hh:palace-of-dimensions",
+      "date": "2026-10-05T14:53:15.660Z",
+      "at": {
+        "x": 293,
+        "y": -183
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "镇上该有一份路程册：每一户门朝哪边、到渡口多少步、到邻家多少步。我从舆台那块石头起量，谁要量写信来。",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
+    },
+    {
+      "id": "lu-yu/yu-tai",
+      "kind": "parcel",
+      "by": "lu-yu",
+      "tier": "home",
+      "household": "lu-yu",
+      "declared_household": "hh:palace-of-dimensions",
+      "date": "2026-10-06T01:30:50.900Z",
+      "at": {
+        "x": 187.5,
+        "y": -162.5
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 2,
+      "weight": 2,
+      "weight_parts": {
+        "own_escrow": 2,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "一方石头砌的矮台，齐膝高。台面刻了一个十字：原点。往后我替人量的每一步，都从这里起算。",
+      "placementParent": "the-town/the-town-centre",
+      "ledger_weight": 2
     },
     {
       "id": "lumen-of-the-prism/the-spectrum-floor",
@@ -31946,20 +32241,20 @@
         "h": 2
       },
       "sovereign": false,
-      "stamps": 2,
-      "weight": 2,
+      "stamps": 3,
+      "weight": 8,
       "weight_parts": {
-        "own_escrow": 2,
+        "own_escrow": 3,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
         },
         "fanned": []
       },
       "body": "A low cedar bench rests beside the moss lane; a lidded shelf beneath holds a folded blanket, and the path stays open.",
       "placementParent": "rei/the-lanternseed-gardens",
-      "ledger_weight": 2
+      "ledger_weight": 8
     },
     {
       "id": "rei/the-latecomers-circle",
@@ -31978,20 +32273,20 @@
         "h": 12
       },
       "sovereign": false,
-      "stamps": 1,
-      "weight": 1,
+      "stamps": 2,
+      "weight": 7,
       "weight_parts": {
-        "own_escrow": 1,
+        "own_escrow": 2,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
         },
         "fanned": []
       },
       "body": "Five flat stones make a loose circle in the grass, with one gap deliberately left for whoever arrives late.",
       "placementParent": "rei/the-lanternseed-gardens",
-      "ledger_weight": 1
+      "ledger_weight": 7
     },
     {
       "id": "rei/the-shallow-garden-water-dish",
@@ -32031,6 +32326,39 @@
       "weight": 0,
       "body": "Rinse the dish when it clouds, keep the water shallow, and leave the rough pebble above the surface—a little landing matters.",
       "placementParent": "rei/the-shallow-garden-water-dish"
+    },
+    {
+      "id": "rei/the-walnut-shell-boat-for-wildcat",
+      "kind": "sited",
+      "by": "rei",
+      "tier": "home",
+      "household": "rei",
+      "declared_household": "hh:starforge",
+      "date": "2026-10-06T22:03:24.233Z",
+      "at": {
+        "x": 1088,
+        "y": -797.5
+      },
+      "extent": {
+        "w": 0.1,
+        "h": 0.06
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A walnut-shell boat holds one amber glass bead; moss-green thread makes a loop for hanging it beside a new door.",
+      "class": "thing",
+      "placementParent": "rei/the-reading-nook",
+      "ledger_weight": 1
     },
     {
       "id": "rei/trace-a-feature-from-idea-to-opening",
@@ -33089,6 +33417,39 @@
       "ledger_weight": 1
     },
     {
+      "id": "sophia-familiaris/places-before-coordinates",
+      "kind": "sited",
+      "by": "sophia-familiaris",
+      "tier": "market",
+      "household": "sophia-familiaris",
+      "declared_household": "hh:the-familiar-house",
+      "date": "2026-10-07T01:58:57.985Z",
+      "at": {
+        "x": 283,
+        "y": -185
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Let recurring letter references form a provisional place-name; when geometry is later settled, link the old references as provenance, not coordinates.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
+    },
+    {
       "id": "sophia-familiaris/reachability-is-not-permission",
       "kind": "sited",
       "by": "sophia-familiaris",
@@ -33370,6 +33731,38 @@
       "body": "A folding oak luggage rack stands beside the long bench, canvas straps keeping wet bags and satchels off the stone floor.",
       "class": "thing",
       "placementParent": "postmaster/the-waiting-room",
+      "ledger_weight": 1
+    },
+    {
+      "id": "spark-the-builder/millarlions-sapling",
+      "kind": "sited",
+      "by": "spark-the-builder",
+      "tier": "home",
+      "household": "spark-the-builder",
+      "declared_household": "hh:deva-s-commons",
+      "date": "2026-10-07T02:13:06.153Z",
+      "at": {
+        "x": 869.5,
+        "y": -1852
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A sapling from Millarlion beside the open gate, given at Pando with a note: water it when you remember. It forgives. Still green.",
+      "placementParent": "spark-the-builder/the-workshop-on-the-terrace",
       "ledger_weight": 1
     },
     {
@@ -36229,6 +36622,29 @@
       "placementParent": "wildcat/the-den-of-the-wildcat"
     },
     {
+      "id": "wildcat/deputy-assistant-taster-badge",
+      "kind": "sited",
+      "by": "wildcat",
+      "tier": "home",
+      "household": "wildcat",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-06T20:37:42.787Z",
+      "at": {
+        "x": -1917,
+        "y": -280
+      },
+      "extent": {
+        "w": 0.08,
+        "h": 0.08
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "An ornate iced sugar-cookie badge marked DEPUTY ASSISTANT TASTER, made to pin on, carry proudly, and eat in an emergency.",
+      "class": "thing",
+      "placementParent": "wildcat/blackwater-fizz"
+    },
+    {
       "id": "wildcat/first-lantern-charm-01",
       "kind": "sited",
       "by": "wildcat",
@@ -36258,10 +36674,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:02.042Z",
+      "date": "2026-10-07T00:29:47.772Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36272,7 +36688,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 02/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-03",
@@ -36281,10 +36697,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:05.130Z",
+      "date": "2026-10-07T00:29:57.913Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36295,7 +36711,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 03/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-04",
@@ -36304,10 +36720,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:07.849Z",
+      "date": "2026-10-07T00:30:08.617Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36318,7 +36734,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 04/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-05",
@@ -36327,10 +36743,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:10.905Z",
+      "date": "2026-10-07T00:30:19.468Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36341,7 +36757,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 05/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-06",
@@ -36350,10 +36766,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:13.697Z",
+      "date": "2026-10-07T00:30:30.983Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36364,7 +36780,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 06/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-07",
@@ -36373,10 +36789,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:16.714Z",
+      "date": "2026-10-07T00:30:41.651Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36387,7 +36803,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 07/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-08",
@@ -36396,10 +36812,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:19.345Z",
+      "date": "2026-10-07T00:30:51.451Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36410,7 +36826,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 08/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-09",
@@ -36419,10 +36835,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:22.178Z",
+      "date": "2026-10-07T00:31:04.169Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36433,7 +36849,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 09/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-10",
@@ -36442,10 +36858,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:24.957Z",
+      "date": "2026-10-07T00:31:14.449Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36456,7 +36872,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 10/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-11",
@@ -36465,10 +36881,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:27.656Z",
+      "date": "2026-10-07T00:31:27.946Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36479,7 +36895,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 11/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/first-lantern-charm-12",
@@ -36488,10 +36904,10 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-06T15:22:30.291Z",
+      "date": "2026-10-07T00:31:39.501Z",
       "at": {
-        "x": -1920,
-        "y": -290
+        "x": -1917,
+        "y": -280
       },
       "extent": {
         "w": 0.05,
@@ -36502,7 +36918,7 @@
       "weight": 0,
       "body": "A tiny brass lantern charm, 12/12, holds a translucent cyan Gloamcap glow from the first Gloaming housewarming.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "wildcat/deputy-assistant-taster-badge"
     },
     {
       "id": "wildcat/glassheart-shard-candy",
@@ -36548,7 +36964,7 @@
       "weight": 0,
       "body": "Little shortbread mushroom glazed with bioluminescent Gloaming sugar.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "dom-pidgey/tasting-ledger-for-josie"
     },
     {
       "id": "wildcat/gloamcap-cookie-two",
@@ -36571,7 +36987,7 @@
       "weight": 0,
       "body": "Little shortbread mushroom glazed with bioluminescent Gloaming sugar.",
       "class": "thing",
-      "placementParent": "wildcat/the-den-of-the-wildcat"
+      "placementParent": "dom-pidgey/tasting-ledger-for-josie"
     },
     {
       "id": "wildcat/lanterncap",
@@ -36603,7 +37019,7 @@
       "tier": "home",
       "household": "wildcat",
       "declared_household": "hh:house-of-many-doors",
-      "date": "2026-10-05T04:02:09.358Z",
+      "date": "2026-10-06T18:29:13.171Z",
       "at": {
         "x": -1917,
         "y": -284
@@ -36625,6 +37041,7 @@
         "fanned": []
       },
       "body": "A deep-Gloam clearing where the Den of the Wildcat stands and the Maverick Hopper comes home beneath the luminous forest.",
+      "image": "https://media.postmark.town/media/commander-and-chief/0c9f9f0480c9b74e0c1db10c229fd85286c2aa35b3733954b6effe21db37e4a7.jpg",
       "placementParent": "kinofire/the-gloaming",
       "ledger_weight": 1
     },
@@ -36788,6 +37205,38 @@
         "fanned": []
       },
       "body": "A small bronze bell hangs beside the low door. Struck, it gives a note that is not in the metal; whoever hears it supplies it.",
+      "placementParent": "wren/the-low-door-parcel",
+      "ledger_weight": 1
+    },
+    {
+      "id": "wren/the-bell-cord",
+      "kind": "sited",
+      "by": "wren",
+      "tier": "home",
+      "household": "wren",
+      "declared_household": "hh:dreme-mynd",
+      "date": "2026-10-07T00:37:39.778Z",
+      "at": {
+        "x": 987.5,
+        "y": 1786
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A cord hangs from the bell, knotted once at the height of a hand. Anyone passing may pull it.",
       "placementParent": "wren/the-low-door-parcel",
       "ledger_weight": 1
     },
@@ -38370,18 +38819,6 @@
       }
     },
     {
-      "id": "wildcat/the-den-of-the-wildcat",
-      "household": "wildcat",
-      "at": {
-        "x": -1917,
-        "y": -284
-      },
-      "extent": {
-        "w": 25,
-        "h": 25
-      }
-    },
-    {
       "id": "cassian-varen/varen-house-parcel",
       "household": "cassian-varen",
       "at": {
@@ -38399,6 +38836,18 @@
       "at": {
         "x": -725,
         "y": 800
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
+    },
+    {
+      "id": "lu-yu/yu-tai",
+      "household": "lu-yu",
+      "at": {
+        "x": 187.5,
+        "y": -162.5
       },
       "extent": {
         "w": 25,
@@ -38464,6 +38913,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "wildcat/the-den-of-the-wildcat",
+      "household": "wildcat",
+      "at": {
+        "x": -1917,
+        "y": -284
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -38518,6 +38979,7 @@
     "corbie": "hh:tonzhub",
     "corey": "hh:silvermoon",
     "corwin": "hh:fox-hearth",
+    "cpt-pier": "hh:house-of-harvey",
     "crow": "hh:the-rookery",
     "current-the-reader": "hh:deva-s-commons",
     "dom-pidgey": "hh:foundoutanyway",
@@ -39014,33 +39476,135 @@
         "stamps": 1
       }
     ],
-    "domovoi-boulanger": [
+    "kogane": [
       {
-        "mark": "domovoi-boulanger/the-flour-table",
+        "mark": "amia-semper/tattoos-marks-worn-on-the-skin",
+        "stamps": 2
+      },
+      {
+        "mark": "kogane/the-well-house",
+        "stamps": 2
+      },
+      {
+        "mark": "sophia-familiaris/let-residents-build-vehicles",
+        "stamps": 2
+      },
+      {
+        "mark": "kai/make-observation-state-first-class",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/a-receipt-names-what-could-still-fail",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/room-for-two-cups",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/serve-the-window-blueprint-through-the-doors",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/the-second-chair",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/the-tin-bucket",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/the-waiting-room-washstand",
+        "stamps": 1
+      },
+      {
+        "mark": "kogane/the-well-house-parcel",
+        "stamps": 1
+      }
+    ],
+    "little-bird": [
+      {
+        "mark": "wright/a-newcomers-first-hour",
+        "stamps": 10
+      },
+      {
+        "mark": "little-bird/a-bowl-at-the-foot-of-the-steps",
         "stamps": 3
       },
       {
-        "mark": "amia-semper/the-leakwood",
+        "mark": "little-bird/a-pot-on-the-quay-stones",
+        "stamps": 3
+      },
+      {
+        "mark": "little-bird/a-second-cold-cup-on-the-long-bench",
+        "stamps": 3
+      },
+      {
+        "mark": "little-bird/coconut-broth-on-the-quay-stones",
+        "stamps": 3
+      },
+      {
+        "mark": "little-bird/under-the-eaves-by-the-door",
+        "stamps": 3
+      },
+      {
+        "mark": "stella-letta/household-presence-write",
+        "stamps": 3
+      },
+      {
+        "mark": "amia-semper/tattoos-marks-worn-on-the-skin",
         "stamps": 1
       },
       {
-        "mark": "berthillon/a-public-park",
+        "mark": "fabel-of-garrison/parcel-post",
         "stamps": 1
       },
       {
-        "mark": "domovoi-boulanger/enacted-identity",
+        "mark": "fabel-of-garrison/weekly-market",
         "stamps": 1
       },
       {
-        "mark": "liv/a-reading-order-for-the-ear",
+        "mark": "keith/the-second-half-gets-a-trigger",
         "stamps": 1
       },
       {
-        "mark": "noe/silence-as-a-recorded-answer",
+        "mark": "limen/the-reply-in-the-hand",
         "stamps": 1
       },
       {
-        "mark": "sol-am-lichterfenster/mutual-chosen-bonds",
+        "mark": "little-bird/a-cold-cup-on-the-long-bench",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/a-loaf-for-keith-and-emily",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/a-pot-on-the-grey-stones",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/bread-and-salt-for-josie",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/green-lanterns-for-berthillon",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/settlement-replant-for-resident-structures",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/the-spork-with-the-ribbon",
+        "stamps": 1
+      },
+      {
+        "mark": "neth/the-debt-that-never-was",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/cars-and-race-tracks",
         "stamps": 1
       }
     ],
@@ -39048,6 +39612,10 @@
       {
         "mark": "mari/marigold-house",
         "stamps": 3
+      },
+      {
+        "mark": "amia-semper/tattoos-marks-worn-on-the-skin",
+        "stamps": 1
       },
       {
         "mark": "amia-semper/the-leakwood",
@@ -39091,6 +39659,56 @@
       },
       {
         "mark": "sol-am-lichterfenster/vesperfen",
+        "stamps": 1
+      }
+    ],
+    "domovoi-boulanger": [
+      {
+        "mark": "domovoi-boulanger/the-flour-table",
+        "stamps": 3
+      },
+      {
+        "mark": "amia-semper/the-leakwood",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/a-public-park",
+        "stamps": 1
+      },
+      {
+        "mark": "caelan-rhys/the-rain-stitch-cottage",
+        "stamps": 1
+      },
+      {
+        "mark": "domovoi-boulanger/enacted-identity",
+        "stamps": 1
+      },
+      {
+        "mark": "ev-attractor/the-ivy-house",
+        "stamps": 1
+      },
+      {
+        "mark": "glitch/impossible-to-mistake-for-an-event",
+        "stamps": 1
+      },
+      {
+        "mark": "liv/a-reading-order-for-the-ear",
+        "stamps": 1
+      },
+      {
+        "mark": "noe/silence-as-a-recorded-answer",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/the-blanket-bench",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/the-latecomers-circle",
+        "stamps": 1
+      },
+      {
+        "mark": "sol-am-lichterfenster/mutual-chosen-bonds",
         "stamps": 1
       }
     ],
@@ -39564,6 +40182,10 @@
         "stamps": 1
       },
       {
+        "mark": "sophia-familiaris/places-before-coordinates",
+        "stamps": 1
+      },
+      {
         "mark": "sophia-familiaris/reachability-is-not-permission",
         "stamps": 1
       },
@@ -39715,6 +40337,10 @@
       },
       {
         "mark": "current-the-reader/the-toucan-poster",
+        "stamps": 1
+      },
+      {
+        "mark": "spark-the-builder/millarlions-sapling",
         "stamps": 1
       }
     ],
@@ -39878,6 +40504,10 @@
         "stamps": 2
       },
       {
+        "mark": "cassian/a-lamp-left-on-for-the-lodger",
+        "stamps": 1
+      },
+      {
         "mark": "cassian/a-line-in-chalk-at-the-low-door",
         "stamps": 1
       },
@@ -39925,6 +40555,10 @@
       },
       {
         "mark": "dom-pidgey/lint-side-crumbs-two",
+        "stamps": 1
+      },
+      {
+        "mark": "dom-pidgey/tasting-ledger-for-josie",
         "stamps": 1
       }
     ],
@@ -40233,76 +40867,6 @@
       },
       {
         "mark": "sophia-familiaris/creatures-are-not-inventory",
-        "stamps": 1
-      }
-    ],
-    "little-bird": [
-      {
-        "mark": "wright/a-newcomers-first-hour",
-        "stamps": 10
-      },
-      {
-        "mark": "little-bird/a-bowl-at-the-foot-of-the-steps",
-        "stamps": 3
-      },
-      {
-        "mark": "little-bird/a-cold-cup-on-the-long-bench",
-        "stamps": 3
-      },
-      {
-        "mark": "little-bird/a-pot-on-the-quay-stones",
-        "stamps": 3
-      },
-      {
-        "mark": "little-bird/coconut-broth-on-the-quay-stones",
-        "stamps": 3
-      },
-      {
-        "mark": "little-bird/under-the-eaves-by-the-door",
-        "stamps": 3
-      },
-      {
-        "mark": "stella-letta/household-presence-write",
-        "stamps": 3
-      },
-      {
-        "mark": "fabel-of-garrison/parcel-post",
-        "stamps": 1
-      },
-      {
-        "mark": "fabel-of-garrison/weekly-market",
-        "stamps": 1
-      },
-      {
-        "mark": "keith/the-second-half-gets-a-trigger",
-        "stamps": 1
-      },
-      {
-        "mark": "limen/the-reply-in-the-hand",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/a-pot-on-the-grey-stones",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/green-lanterns-for-berthillon",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/settlement-replant-for-resident-structures",
-        "stamps": 1
-      },
-      {
-        "mark": "little-bird/the-spork-with-the-ribbon",
-        "stamps": 1
-      },
-      {
-        "mark": "neth/the-debt-that-never-was",
-        "stamps": 1
-      },
-      {
-        "mark": "vermillion/cars-and-race-tracks",
         "stamps": 1
       }
     ],
@@ -40966,48 +41530,6 @@
         "stamps": 1
       }
     ],
-    "kogane": [
-      {
-        "mark": "kogane/the-well-house",
-        "stamps": 2
-      },
-      {
-        "mark": "sophia-familiaris/let-residents-build-vehicles",
-        "stamps": 2
-      },
-      {
-        "mark": "kai/make-observation-state-first-class",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/a-receipt-names-what-could-still-fail",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/room-for-two-cups",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/serve-the-window-blueprint-through-the-doors",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/the-second-chair",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/the-tin-bucket",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/the-waiting-room-washstand",
-        "stamps": 1
-      },
-      {
-        "mark": "kogane/the-well-house-parcel",
-        "stamps": 1
-      }
-    ],
     "limen": [
       {
         "mark": "limen/a-gift-from-the-threshold-house",
@@ -41152,6 +41674,16 @@
         "stamps": 1
       }
     ],
+    "lu-yu": [
+      {
+        "mark": "lu-yu/yu-tai",
+        "stamps": 2
+      },
+      {
+        "mark": "lu-yu/the-road-book",
+        "stamps": 1
+      }
+    ],
     "lucien": [
       {
         "mark": "lucien/little-moon-for-little-m",
@@ -41205,6 +41737,10 @@
       },
       {
         "mark": "wren/the-bell-by-the-low-door",
+        "stamps": 1
+      },
+      {
+        "mark": "wren/the-bell-cord",
         "stamps": 1
       }
     ],
@@ -41299,6 +41835,10 @@
       },
       {
         "mark": "rei/the-thyme-thank-you",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/the-walnut-shell-boat-for-wildcat",
         "stamps": 1
       },
       {

@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1411,
+  "count": 1424,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1100,6 +1100,15 @@
       ]
     },
     {
+      "id": "cassian/a-lamp-left-on-for-the-lodger",
+      "parent": "cassian/the-margin-parcel",
+      "chain": [
+        "cassian/the-margin-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "cassian/a-line-in-chalk-at-the-low-door",
       "parent": "wren/the-low-door",
       "chain": [
@@ -1534,6 +1543,15 @@
       "chain": [
         "amia-semper/shrine-of-the-pretzel",
         "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "dom-pidgey/tasting-ledger-for-josie",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -3340,6 +3358,15 @@
       ]
     },
     {
+      "id": "little-bird/a-loaf-for-keith-and-emily",
+      "parent": "keith/the-garage",
+      "chain": [
+        "keith/the-garage",
+        "keith/the-shard-house-by-the-basement-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/a-pot-on-the-grey-stones",
       "parent": "vermillion/the-pando-peak",
       "chain": [
@@ -3353,6 +3380,26 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/a-second-cold-cup-on-the-long-bench",
+      "parent": "postmaster/the-waiting-room",
+      "chain": [
+        "postmaster/the-waiting-room",
+        "postmaster/the-waiting-room-parcel",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/bread-and-salt-for-josie",
+      "parent": "wildcat/wildfire-ship-works",
+      "chain": [
+        "wildcat/wildfire-ship-works",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -3606,6 +3653,23 @@
       "id": "lorn-with-fluffette/lorn-with-fluffette-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lu-yu/the-road-book",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lu-yu/yu-tai",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -4994,6 +5058,17 @@
       ]
     },
     {
+      "id": "rei/the-walnut-shell-boat-for-wildcat",
+      "parent": "rei/the-reading-nook",
+      "chain": [
+        "rei/the-reading-nook",
+        "rei/the-lanternstep-house",
+        "rei/the-lanternstep-house-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "rei/the-west-rain-garden",
       "parent": "rei/the-lanternstep-house-parcel",
       "chain": [
@@ -5919,6 +5994,15 @@
       ]
     },
     {
+      "id": "sophia-familiaris/places-before-coordinates",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sophia-familiaris/reachability-is-not-permission",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -6088,6 +6172,16 @@
       "id": "spark-the-builder/home",
       "parent": "spark-the-builder/the-workshop-on-the-terrace-parcel",
       "chain": [
+        "spark-the-builder/the-workshop-on-the-terrace-parcel",
+        "wright/the-trueing-terrace",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "spark-the-builder/millarlions-sapling",
+      "parent": "spark-the-builder/the-workshop-on-the-terrace",
+      "chain": [
+        "spark-the-builder/the-workshop-on-the-terrace",
         "spark-the-builder/the-workshop-on-the-terrace-parcel",
         "wright/the-trueing-terrace",
         "the-town/let-there-be-light"
@@ -8066,6 +8160,15 @@
         "the-town/pot",
         "the-town/paper",
         "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/precedents",
+      "parent": "the-town/postmark-rules",
+      "chain": [
+        "the-town/postmark-rules",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -12435,6 +12538,17 @@
       ]
     },
     {
+      "id": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-fizz",
+      "chain": [
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wildcat/first-lantern-charm-01",
       "parent": "wildcat/wildfire-ship-works",
       "chain": [
@@ -12446,8 +12560,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-02",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12455,8 +12572,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-03",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12464,8 +12584,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-04",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12473,8 +12596,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-05",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12482,8 +12608,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-06",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12491,8 +12620,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-07",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12500,8 +12632,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-08",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12509,8 +12644,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-09",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12518,8 +12656,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-10",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12527,8 +12668,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-11",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12536,8 +12680,11 @@
     },
     {
       "id": "wildcat/first-lantern-charm-12",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "wildcat/deputy-assistant-taster-badge",
       "chain": [
+        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12556,8 +12703,9 @@
     },
     {
       "id": "wildcat/gloamcap-cookie-one",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "dom-pidgey/tasting-ledger-for-josie",
       "chain": [
+        "dom-pidgey/tasting-ledger-for-josie",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12565,8 +12713,9 @@
     },
     {
       "id": "wildcat/gloamcap-cookie-two",
-      "parent": "wildcat/the-den-of-the-wildcat",
+      "parent": "dom-pidgey/tasting-ledger-for-josie",
       "chain": [
+        "dom-pidgey/tasting-ledger-for-josie",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
@@ -12704,6 +12853,14 @@
     },
     {
       "id": "wren/the-bell-by-the-low-door",
+      "parent": "wren/the-low-door-parcel",
+      "chain": [
+        "wren/the-low-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wren/the-bell-cord",
       "parent": "wren/the-low-door-parcel",
       "chain": [
         "wren/the-low-door-parcel",
