@@ -35,6 +35,7 @@ import {
 } from "./marks-fold.mjs";
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD } from "./consent.mjs";
+import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -572,6 +573,33 @@ if (declaredCoords(marks) === COORDS_RELATIVE) {
     const composed = fileToWorld(rec._fileAt, o);
     if (composed.x !== rec.at.x || composed.y !== rec.at.y)
       err(rec, `the loader placed this mark at ${rec.at.x},${rec.at.y}, but the frame law composes ${rec._fileAt.x},${rec._fileAt.y} on origin ${o.x},${o.y} to ${composed.x},${composed.y} — the two disagree. This is a MACHINERY BUG in tools/marks-fold.mjs, not a defect in this record; do not edit the mark to silence it`);
+  }
+}
+
+// 6c. NOTHING RIDES ANOTHER HOUSEHOLD'S MARK (POS-441, ruled by Darko
+// 2026-10-07: "That should just always be the default rule"). LOGOS/edit-law.md
+// § Amend: "Your own household's marks inside it move with it, in the same act,
+// keeping their place relative to it; another household's marks never move:
+// they keep their place, and their containment follows geometry." A nested
+// file's numbers are an offset from its frame, so a mark filed inside another
+// household's mark rides it — and that is the one thing the ruling forbids. The
+// question is household-frames.mjs's, the same one the remedy asks.
+//
+// JURISDICTION, as gate A's: this repository's own tree is held to the registry
+// it carries (WORLD/households.json, re-derived from the town each settlement);
+// a fixture tree is held only when it brings a registry with --households, because
+// a synthetic world's handles were never anyone's household.
+//
+// THE REMEDY is one command and it moves nothing: `node tools/unnest-households.mjs`
+// re-files each named mark at its id with its world place kept exactly. A red
+// here after a settlement means the registry changed under a standing tree (a
+// household split, a handle that moved house), and the remedy is still that one
+// command, run by hand on the red (Darko, 2026-10-07, POS-441 Q5).
+{
+  const HH_GATE = args.includes("--households") ? opt("--households") : (OWN_TREE ? join(REPO, "WORLD/households.json") : null);
+  if (HH_GATE) {
+    for (const r of crossHouseholdRiders(marks, householdResolver(HH_GATE)))
+      err(r.rec, `this mark rides ${r.frame} (${r.frameHousehold}), another household's mark: it is filed inside it, so its numbers are an offset from that mark's centre and moving that mark would move it. Another household's marks never move — "they keep their place, and their containment follows geometry" (LOGOS/edit-law.md § Amend, ruled 2026-10-07). Re-file it at its id with its place kept: node tools/unnest-households.mjs`);
   }
 }
 
