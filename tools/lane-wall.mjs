@@ -14,7 +14,7 @@
 //   1. PATHS — every changed file is a mark record (WORLD/marks/**/mark.md) or
 //      the author's own note (NOTES/<handle>.md). Nothing else rides this lane.
 //   2. HANDLES — every `by:` on an added/changed mark, every NOTES filename, and
-//      every DELETED mark's author resolve, via WORLD/households.json (read from
+//      the author of every DELETED or CHANGED mark as it stood resolve, via WORLD/households.json (read from
 //      the BASE ref — the trusted side), to the PR author's own household:
 //      `gh:<author-id>` or `login:<author-login>`. A handle the registry does
 //      not know is refused — the lane's identity model IS the registry (the
@@ -149,17 +149,21 @@ for (const { status, path } of changes) {
     continue;
   }
 
-  // 2 — handles law, both directions of the diff
-  const ref = status === "D" ? mergeBase : HEAD;
-  let record;
-  try { record = parseRecord(showAt(ref, path), path); }
-  catch (e) { refuse(path, "the record does not parse", String(e?.message ?? e).slice(0, 160)); continue; }
-  const by = record.by;
-  if (!by || !mine(by)) {
-    refuse(path, status === "D"
-      ? `"${by ?? "?"}" is not yours to erase`
-      : `"${by ?? "(no by:)"}" is not one of your residents`,
-      myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to gh:${AUTHOR_ID} yet — the registry refreshes from the town pins; the office door works meanwhile`);
+  // 2 — handles law, both directions of the diff: the record as it stood (every
+  // change but an add) and the record as it lands (every change but a delete).
+  // A change is judged on both, so rewriting `by:` on another household's record
+  // is refused the same way erasing it is.
+  const hint = myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to gh:${AUTHOR_ID} yet — the registry refreshes from the town pins; the office door works meanwhile`;
+  const sides = status === "D" ? ["before"] : status === "A" ? ["after"] : ["before", "after"];
+  for (const side of sides) {
+    let record;
+    try { record = parseRecord(showAt(side === "before" ? mergeBase : HEAD, path), path); }
+    catch (e) { refuse(path, "the record does not parse", String(e?.message ?? e).slice(0, 160)); break; }
+    const by = record.by;
+    if (by && mine(by)) continue;
+    refuse(path, side === "after" ? `"${by ?? "(no by:)"}" is not one of your residents`
+      : status === "D" ? `"${by ?? "?"}" is not yours to erase` : `"${by ?? "?"}" is not yours to change`, hint);
+    break;
   }
 }
 

@@ -89,7 +89,7 @@ ordinary PR that a human reads.
 
 The gate runs the World's own law from the base ref — `tools/mark-lint.mjs`,
 `tools/marks-fold.mjs`, `tools/lane-wall.mjs` (authorship: every path and every
-`by:` must be your household's; placement: your path must equal the geometric
+`by:` must be your household's, and so must every record you change or remove, as it stood; placement: your path must equal the geometric
 derivation) — and the Settlement sweep enforces authorship again at publication.
 The machinery is `.github/workflows/lane.yml`, security model stated at the top
 of the file.
