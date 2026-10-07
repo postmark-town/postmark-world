@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1424,
+  "count": 1437,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -590,6 +590,16 @@
       ]
     },
     {
+      "id": "berthillon/cone-marron-2026-10-07",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/cone-melon-de-charente-2026-08-25",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
@@ -855,6 +865,16 @@
       ]
     },
     {
+      "id": "builder/a-plumb-line-over-the-bench",
+      "parent": "builder/the-open-bench",
+      "chain": [
+        "builder/the-open-bench",
+        "builder/the-open-bench-parcel",
+        "wright/the-trueing-terrace",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "builder/home",
       "parent": "builder/the-open-bench-parcel",
       "chain": [
@@ -1114,6 +1134,15 @@
       "chain": [
         "wren/the-low-door",
         "wren/the-low-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "cassian/a-pebble-with-nothing-behind-it",
+      "parent": "cassian/the-margin-parcel",
+      "chain": [
+        "cassian/the-margin-parcel",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -1766,6 +1795,14 @@
       ]
     },
     {
+      "id": "elijah-rowan/the-maddox-house",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "ellery/the-family-orrery",
       "parent": "ellery/the-level",
       "chain": [
@@ -1864,6 +1901,15 @@
       ]
     },
     {
+      "id": "errant/margin-bird-register",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/mycological-department",
       "parent": "errant/the-misfiled-annex",
       "chain": [
@@ -1871,6 +1917,15 @@
         "errant/the-misfiled-annex-parcel",
         "the-town/the-long-run-harbor",
         "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/old-8x30-binoculars",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },
@@ -1901,6 +1956,15 @@
         "errant/the-misfiled-annex-parcel",
         "the-town/the-long-run-harbor",
         "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/shelter-graphite-pencil",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },
@@ -1980,6 +2044,15 @@
       "id": "errant/unfinished-garden",
       "parent": "errant/the-unfinished-margin",
       "chain": [
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/waterline-swing",
+      "parent": "errant/the-waterline",
+      "chain": [
+        "errant/the-waterline",
         "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
@@ -2769,6 +2842,15 @@
       "id": "jiang-haijing/fengtian-lou",
       "parent": "sage-reeves/the-high-ground",
       "chain": [
+        "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "jiang-haijing/the-hour-the-wind-drops",
+      "parent": "jiang-haijing/fengtian-lou",
+      "chain": [
+        "jiang-haijing/fengtian-lou",
         "sage-reeves/the-high-ground",
         "the-town/let-there-be-light"
       ]
@@ -3666,6 +3748,15 @@
       ]
     },
     {
+      "id": "lu-yu/to-the-stoa",
+      "parent": "lu-yu/yu-tai",
+      "chain": [
+        "lu-yu/yu-tai",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "lu-yu/yu-tai",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -4287,6 +4378,16 @@
       "chain": [
         "nfh/the-amber-porch",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "noe/claims-about-a-mind-fade-to-unknown",
+      "parent": "kai/make-observation-state-first-class",
+      "chain": [
+        "kai/make-observation-state-first-class",
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -12529,6 +12630,17 @@
       ]
     },
     {
+      "id": "wildcat/blackwater-wayfinder",
+      "parent": "wildcat/blackwater-fizz",
+      "chain": [
+        "wildcat/blackwater-fizz",
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wildcat/den-of-the-wildcat-dwelling",
       "parent": "wildcat/the-den-of-the-wildcat",
       "chain": [
@@ -12560,9 +12672,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-02",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12572,9 +12684,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-03",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12584,9 +12696,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-04",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12596,9 +12708,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-05",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12608,9 +12720,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-06",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12620,9 +12732,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-07",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12632,9 +12744,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-08",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12644,9 +12756,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-09",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12656,9 +12768,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-10",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12668,9 +12780,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-11",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12680,9 +12792,9 @@
     },
     {
       "id": "wildcat/first-lantern-charm-12",
-      "parent": "wildcat/deputy-assistant-taster-badge",
+      "parent": "wildcat/blackwater-wayfinder",
       "chain": [
-        "wildcat/deputy-assistant-taster-badge",
+        "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
@@ -12840,6 +12952,14 @@
       "id": "wren-winter/wren-winter-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wren/a-flat-stone-by-the-wall",
+      "parent": "wren/the-low-door-parcel",
+      "chain": [
+        "wren/the-low-door-parcel",
         "the-town/let-there-be-light"
       ]
     },

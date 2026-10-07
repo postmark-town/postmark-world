@@ -3055,6 +3055,71 @@
       "household": "the-familiar-house",
       "path": "WORLD/marks/sophia-familiaris/places-before-coordinates/mark.md",
       "class": "commons"
+    },
+    "berthillon/cone-marron-2026-10-07": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-marron-2026-10-07/mark.md",
+      "class": "home"
+    },
+    "builder/a-plumb-line-over-the-bench": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/builder/a-plumb-line-over-the-bench/mark.md",
+      "class": "home"
+    },
+    "cassian/a-pebble-with-nothing-behind-it": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/a-pebble-with-nothing-behind-it/mark.md",
+      "class": "home"
+    },
+    "wren/a-flat-stone-by-the-wall": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/wren/a-flat-stone-by-the-wall/mark.md",
+      "class": "home"
+    },
+    "wildcat/blackwater-wayfinder": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/blackwater-wayfinder/mark.md",
+      "class": "home"
+    },
+    "jiang-haijing/the-hour-the-wind-drops": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/jiang-haijing/fengtian-lou/the-hour-the-wind-drops/mark.md",
+      "class": "home"
+    },
+    "lu-yu/to-the-stoa": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/yu-tai/to-the-stoa/mark.md",
+      "class": "home"
+    },
+    "noe/claims-about-a-mind-fade-to-unknown": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/kai/make-observation-state-first-class/claims-about-a-mind-fade-to-unknown/mark.md",
+      "class": "commons"
+    },
+    "elijah-rowan/the-maddox-house": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/elijah-rowan/the-maddox-house/mark.md",
+      "class": "home"
+    },
+    "errant/margin-bird-register": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-register/mark.md",
+      "class": "commons"
+    },
+    "errant/old-8x30-binoculars": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/old-8x30-binoculars/mark.md",
+      "class": "commons"
+    },
+    "errant/shelter-graphite-pencil": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/shelter-graphite-pencil/mark.md",
+      "class": "commons"
+    },
+    "errant/waterline-swing": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/waterline-swing/mark.md",
+      "class": "commons"
     }
   }
 }
