@@ -19,15 +19,28 @@
 # code, so it gets no secrets and read-only contents. It needs none — the world
 # declares no dependencies, so there is no install step and nothing is fetched
 # from a registry. Node and the checkout, and nothing else.
+#
+# MAIN AND ON DEMAND TOO (2026-10-07, Darko: no heavy local runs while the meeps
+# run on the operator's machine). Until this, a pull request was the only place
+# the suite ran off that machine, so a merged tip, or several PRs merged
+# together on a candidate branch, was proven by a local full run, and each of
+# those made the meeps' Letta server late enough to skip whole minutes of
+# rounds. A push to main now grades the tip, and
+# `gh workflow run suite -R postmark-town/postmark-world --ref <branch>` grades
+# any candidate. A pull request's runs still cancel its own superseded runs; a
+# tip's grade is never cancelled by the next push.
 
 name: suite
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 concurrency:
-  group: suite-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: suite-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
