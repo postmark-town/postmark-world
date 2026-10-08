@@ -825,12 +825,27 @@ export const PARCEL_EXTENT_M = 25;
  * first, which matches how `> PARCEL_CAP_LAW_DATE` already treats it: an absent
  * date is not post-law, so it is never the refusal.
  */
+// ── THE FIRST CLAIM, NOT THE LATEST DATE (POS-364 review, 2026-10-08) ─────────
+//
+// Every leave and every amendment restamps a record's `date` (the office's door,
+// and the store's materialize replaces the record's data on amend). Ordered by
+// `date`, moving a held parcel would send it to the back of its household's
+// claims: the parcel it was would lose its slot to one claimed after it, and a
+// pre-law parcel moved today would count as post-law. A claim's place is when it
+// was FIRST claimed. A record may carry that instant as `claimed_at` (the
+// office's settlement fold reads it from the mark's origin claim; a tree record
+// carries none, and its `date` is the only instant there is), and the claim
+// order and the cap's law date both read it first.
+export const CLAIMED_AT_FIELD = "claimed_at";
+/** A record's claim instant: when it was first claimed if the record says, else its date. */
+export const claimInstant = (mk) => mk?.[CLAIMED_AT_FIELD] ?? mk?.date;
+
 export function compareClaimOrder(a, b) {
-  const ta = Date.parse(String(a?.date ?? ""));
-  const tb = Date.parse(String(b?.date ?? ""));
+  const ta = Date.parse(String(claimInstant(a) ?? ""));
+  const tb = Date.parse(String(claimInstant(b) ?? ""));
   if (Number.isFinite(ta) && Number.isFinite(tb) && ta !== tb) return ta - tb;
   if (Number.isFinite(ta) !== Number.isFinite(tb)) return Number.isFinite(ta) ? 1 : -1;
-  const sa = String(a?.date ?? ""), sb = String(b?.date ?? "");
+  const sa = String(claimInstant(a) ?? ""), sb = String(claimInstant(b) ?? "");
   if (sa !== sb) return sa.localeCompare(sb);
   return String(a?.id ?? "").localeCompare(String(b?.id ?? ""));
 }
@@ -996,7 +1011,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: ONE_PER_RESIDENT_REFUSAL }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
-    if (String(mk.date ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
+    if (String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
       errors.push({ mark: mk.id, error: `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)` });
       continue;
     }
@@ -1937,7 +1952,7 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
         continue;
       }
       const held = countByCred.get(cred) ?? 0;
-      if (!mk._replacing && String(mk.date ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
+      if (!mk._replacing && String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
         errors.push({ mark: mk.id, error: `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)` });
         continue;
       }

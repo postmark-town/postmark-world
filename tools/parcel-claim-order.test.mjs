@@ -518,3 +518,26 @@ test("F15 · the one-parcel refusal names the rule it enforces: one parcel per R
   const both = fold({ marks: [first, housemate], terrain: { features: [] }, stakes: [], tick: 1, households });
   assert.deepEqual(both.errors, [], "two handles of one household hold one parcel each");
 });
+
+// ── THE FIRST CLAIM, NOT THE LATEST DATE (POS-364 review, 2026-10-08) ────────
+// An amendment restamps `date`. The order and the cap's law date read
+// `claimed_at` (the first claim) when a record carries it.
+
+test("an AMENDED parcel keeps its place: ordered by when it was first claimed, the fourth is the one over the cap", () => {
+  const moved = { ...P("ha/first", "ha", 50, "2026-10-09T00:00:00Z"), claimed_at: "2026-08-01T00:00:00Z" };
+  const marks = [moved, ...CLAIMS.slice(1)];
+  const s = fold({ marks, terrain: { features: [] }, stakes: [], tick: 1, households: HOUSEHOLDS });
+  assert.deepEqual(s.errors.map((e) => e.mark), ["hd/fourth"], "the parcel claimed last is over the cap, not the one that moved");
+  // THE CONTROL: without the first claim, the move sends ha/first to the back (the defect).
+  const restamped = fold({ marks: [{ ...moved, claimed_at: undefined }, ...CLAIMS.slice(1)], terrain: { features: [] }, stakes: [], tick: 1, households: HOUSEHOLDS });
+  assert.deepEqual(restamped.errors.map((e) => e.mark), ["ha/first"]);
+});
+
+test("a PRE-LAW parcel moved today is still prior estate: the cap's law date reads the first claim", () => {
+  const pre = (id, h, x, day) => ({ ...P(id, h, x, "2026-10-08T00:00:00Z"), claimed_at: `2026-07-${day}T00:00:00Z` });
+  const marks = [pre("ha/one", "ha", 0, "01"), pre("hb/two", "hb", 100, "02"), pre("hc/three", "hc", 200, "03"), pre("hd/four", "hd", 300, "04")];
+  const s = fold({ marks, terrain: { features: [] }, stakes: [], tick: 1, households: HOUSEHOLDS });
+  assert.deepEqual(s.errors, [], "four pre-law parcels stand, though each was amended after the law");
+  const restamped = fold({ marks: marks.map((m) => ({ ...m, claimed_at: undefined })), terrain: { features: [] }, stakes: [], tick: 1, households: HOUSEHOLDS });
+  assert.equal(restamped.errors.length, 1, "read by the restamped date, the fourth would be capped");
+});
