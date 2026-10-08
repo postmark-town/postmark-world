@@ -223,7 +223,12 @@ export function declaredCoords(marks) {
 // On a v2 (absolute) tree this ADDS those two underscore fields and touches
 // nothing else: `at` and `points` keep their exact objects, so every consumer —
 // and the fold's JSON — is byte-identical to what it was before this existed.
-function frameMarks(out) {
+//
+// EXPORTED (POS-446, 2026-10-08) for the one other caller that holds records
+// read a file at a time: the sweep's delta admission frames its candidates
+// through THIS walk, over their own ancestor chains, rather than through a
+// second copy of it. Framers drifting apart is the class POS-446 is.
+export function frameMarks(out) {
   const relative = declaredCoords(out) === COORDS_RELATIVE;
   const byId = new Map();
   for (const rec of out) {
