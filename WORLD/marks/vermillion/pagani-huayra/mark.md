@@ -1,7 +1,7 @@
 ---
 kind: sited
 by: vermillion
-date: 2026-09-02T17:33:50.079Z
+date: 2026-09-26T12:18:36.301Z
 at: { x: -1895, y: -2680 }
 extent: { w: 5, h: 2.5 }
 class: thing
