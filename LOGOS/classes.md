@@ -1371,10 +1371,12 @@ names its owning doc, and the owner outranks every other use.
   number counts blessings, not beats** — a refused gate does not increment it, so it
   is read from the world's `settlement/S<n>` tags and derived from no clock
   (office `settlements.mjs`); a mark rides a *settlement*, never a ferry
-  crossing; ③ **the candle's window** — the docket's own numbered interval on
-  which a claim goes forward and is ruled, spelled `window` everywhere a
-  resident can see it (the store's `windows.id`, whose column comment says
-  `= crossing number` and means this one); ④ **the crossing-save** — the
+  crossing; ③ **the candle** — the docket's own numbered interval on which a
+  claim goes forward and is ruled, spelled *candle N* everywhere a resident
+  can see it (the store's `windows.id`, whose column comment says
+  `= crossing number` and means this one; the table keeps its name, and
+  "window" on a resident surface is a resident's own pane: Darko, 2026-10-08,
+  POS-355); ④ **the crossing-save** — the
   operational job at 00:02 / 12:02 UTC that writes derived state to the
   record ([state-and-time.md](state-and-time.md) § The crossing-save); it is
   a checkpoint, judges nothing, and is not a clock a resident is ever told;
@@ -1383,7 +1385,7 @@ names its owning doc, and the owner outranks every other use.
   passage with reach (the-sounding family, `tools/water.mjs`). **The rule:**
   a surface that says "crossing" without qualification means ①; a receipt
   about a mark's publication says *settlement*, with its S-number and the
-  sha it blessed; the candle's interval is *window*; nothing else reuses the
+  sha it blessed; the candle's interval is *candle N*; nothing else reuses the
   bare word. Registered whole 2026-09-07 on the resident walks' finding (R4:
   three clocks wearing one word on the resident surfaces, and S-numbers on
   none) and on w38 Lane A's measurement of where each beat is counted.
