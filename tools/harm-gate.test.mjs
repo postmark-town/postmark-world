@@ -11,7 +11,8 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlin
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { harmGate, defaultBase } from "./harm-gate.mjs";
+import { harmGate, harmGateOnSnapshots, defaultBase } from "./harm-gate.mjs";
+import { snapshotFromTree } from "./marks-fold.mjs";
 import { withTool } from "./engine-files.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -211,4 +212,59 @@ test("THE 09-16 RETURN, REPLAYED: fifty lawful returns are no harm; one return t
   const red = harmGate({ repo: scratch, sweep: { unpublished: report.unpublished.filter((r) => r.id !== forgotten[0]) }, lint: false });
   assert.equal(red.ok, false);
   assert.deepEqual(names(red, "lost").rows, [`${forgotten[0]}: gone, and no act names it`], "exactly the forgotten mark, and nothing else");
+});
+
+// ── POS-363: THE GATE ON A SNAPSHOT PAIR ANSWERS AS THE GATE ON THE TREE ─────
+//
+// The World is the store's snapshot (R1, R2), so the gate judges two snapshot
+// exports and the window's acts. Each case below is one the tree's gate already
+// pins; the pair must reach the same verdict and name the same rows, lint included
+// (mark-lint reads the after snapshot through the loader's seam).
+
+function pairOf(t, f, change) {
+  const dir = mkdtempSync(join(tmpdir(), "postmark-harm-pair-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const before = join(dir, "before.json"), after = join(dir, "after.json");
+  writeFileSync(before, JSON.stringify(snapshotFromTree(join(f.repo, "WORLD", "marks"), { settlement: "before" })));
+  change();
+  writeFileSync(after, JSON.stringify(snapshotFromTree(join(f.repo, "WORLD", "marks"), { settlement: "after" })));
+  return { before, after };
+}
+const verdictOf = (out) => out.checks.map((c) => [c.name, c.ok, c.rows]);
+
+test("SNAPSHOT PAIR · LOST: the same verdict and the same row as the tree's gate, and the act clears it the same way", (t) => {
+  const f = fixture(t);
+  const pair = pairOf(t, f, () => {
+    rmSync(dirname(join(f.repo, f.paths.lamp)), { recursive: true, force: true });
+    f.unregister("alice/the-lamp");
+    f.fold();
+    f.commit("settlement: sweep 0 published, 0 unpublished, 0 left drafted, 0 withdrawn, 0 quarantined, 0 dropped, 0 re-framed");
+  });
+  const tree = harmGate({ repo: f.repo, sweep: {}, stakes: f.stakesPath });
+  const snap = harmGateOnSnapshots({ repo: f.repo, ...pair, acts: {}, stakes: f.stakesPath });
+  assert.equal(snap.ok, false);
+  assert.deepEqual(verdictOf(snap).filter(([n]) => n !== "escrow"), verdictOf(tree).filter(([n]) => n !== "escrow"));
+  const green = harmGateOnSnapshots({ repo: f.repo, ...pair, acts: { unpublished: [{ id: "alice/the-lamp" }] }, stakes: f.stakesPath });
+  assert.equal(green.ok, true, JSON.stringify(green.checks.filter((c) => !c.ok)));
+});
+
+test("SNAPSHOT PAIR · MOVED: an unnamed move is harm on the pair as on the tree; the author's published edit is not", (t) => {
+  const f = fixture(t);
+  const pair = pairOf(t, f, () => {
+    f.put(f.paths.lamp, record({ by: "alice", at: { x: 260, y: 200 }, extent: { w: 2, h: 2 }, body: "a lamp, moved" }));
+    f.fold();
+    f.commit("settlement: sweep 1 published, 0 unpublished, 0 left drafted, 0 withdrawn, 0 quarantined, 0 dropped, 0 re-framed");
+  });
+  const red = harmGateOnSnapshots({ repo: f.repo, ...pair, acts: {}, lint: false });
+  assert.match(names(red, "moved").rows.join("\n"), /^alice\/the-lamp: 1200,2200 -> 1260,2200 \(no act names it\)$/m);
+  assert.deepEqual(names(red, "moved").rows, names(harmGate({ repo: f.repo, sweep: {}, lint: false }), "moved").rows);
+  assert.equal(harmGateOnSnapshots({ repo: f.repo, ...pair, acts: { published: [{ id: "alice/the-lamp" }] }, lint: false }).ok, true);
+});
+
+test("SNAPSHOT PAIR · ESCROW: the gate folds the after snapshot itself with the window's stakes, and a stampless fold is harm", (t) => {
+  const f = fixture(t);
+  const pair = pairOf(t, f, () => {});
+  const ok = harmGateOnSnapshots({ repo: f.repo, ...pair, acts: {}, stakes: f.stakesPath, lint: false });
+  assert.equal(names(ok, "escrow").ok, true, JSON.stringify(names(ok, "escrow")));
+  assert.match(names(ok, "escrow").note, /fold stamps [1-9]/, "the stakes reached the gate's fold");
 });

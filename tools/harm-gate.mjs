@@ -33,13 +33,15 @@
 // could not read — which is never a pass.
 //
 //   node tools/harm-gate.mjs --repo <sweep clone> --sweep <sweep.json> --base <ref> [--stakes <file>] [--json]
+//   node tools/harm-gate.mjs --snapshot-before <export> --snapshot-after <export> --sweep <the window's acts> [--stakes <file>] [--json]
+//                                  the same five checks over a snapshot pair (POS-363; harmGateOnSnapshots)
 
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { loadMarks, rect, overlapArea } from "./marks-fold.mjs";
+import { loadMarks, loadSnapshot, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -78,21 +80,64 @@ export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = 
   const baseRef = base ?? defaultBase(repo);
   const before = marksAt(repo, baseRef);
   const after = byId(loadMarks(join(repo, "WORLD", "marks")));
+  const statePath = join(repo, "WORLD", "world-state.json");
+  if (!existsSync(statePath)) throw new Error("could not gate: no WORLD/world-state.json — the fold did not run, so escrow cannot be read");
+  const state = JSON.parse(readFileSync(statePath, "utf8"));
+  const lintRun = lint ? lintVerdict(repo) : null;
+  return { ...judge({ before, after, sweep, state, stakes: stakes ? stakesFrom(stakes) : null, lint: lintRun }), base: baseRef };
+}
+
+// ── THE GATE ON A SNAPSHOT PAIR (POS-363; R1, R2) ───────────────────────────
+//
+// The World is the store's sealed snapshot, so the gate judges two snapshots
+// (the settlement it starts from and the one the window sealed) plus the
+// window's acts (published, unpublished, withdrawn, reframed: the sweep
+// report's shape, which is what the window did). The same five checks as the
+// tree, through the same judgement below. The fold of the new snapshot is the
+// gate's own (with the window's stakes), since a snapshot carries no
+// world-state.json; lint runs over the new snapshot through the loader's seam
+// (WORLD_SNAPSHOT), so mark-lint reads exactly the marks the gate judges.
+export function harmGateOnSnapshots({ repo = join(HERE, ".."), before, after, acts = {}, stakes = null, lint = true } = {}) {
+  const read = (x) => (typeof x === "string" ? loadSnapshot(x) : structuredClone(x ?? []));
+  const was = byId(read(before)), now = read(after);
+  const stakeRows = stakes ? (typeof stakes === "string" ? stakesFrom(stakes) : stakes) : [];
+  const state = fold({ marks: structuredClone(now), terrain: null, stakes: stakeRows });
+  const lintRun = lint && typeof after === "string" ? lintVerdict(repo, { [SNAPSHOT_ENV]: after, [SNAPSHOT_ROOT_ENV]: repo }) : null;
+  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: "snapshot" };
+}
+
+function stakesFrom(path) {
+  const parsed = JSON.parse(readFileSync(path, "utf8"));
+  return Array.isArray(parsed) ? parsed : (parsed?.stakes ?? []);
+}
+
+/** mark-lint's verdict, run as the gate has always run it; `env` adds to the child's (the snapshot seam). */
+function lintVerdict(repo, env = {}) {
+  const r = spawnSync(process.execPath, [join(repo, "tools", "mark-lint.mjs"), "--json"], { cwd: repo, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, ...env } });
+  if (r.error || ![0, 1].includes(r.status)) throw new Error(`could not gate: mark-lint ${r.error ? r.error.message : `exited ${r.status}`}: ${String(r.stderr || r.stdout).trim().slice(0, 300)}`);
+  let verdict; try { verdict = JSON.parse(r.stdout); } catch { throw new Error(`could not gate: mark-lint did not answer in JSON: ${String(r.stdout).trim().slice(0, 300)}`); }
+  return verdict;
+}
+
+/**
+ * The five checks over two marks maps, the declared acts, the after fold's state
+ * and (optionally) the stakes and a lint verdict. PURE. The tree's gate and the
+ * snapshot pair's gate are this one judgement.
+ */
+export function judge({ before, after, sweep = {}, state = {}, stakes = null, lint = null }) {
   const published = ids(sweep.published), unpublished = ids(sweep.unpublished), withdrawn = ids(sweep.withdrawn);
   const checks = [];
   const check = (name, rows, note = null) => { checks.push({ name, ok: rows.length === 0, count: rows.length, rows: rows.slice(0, 40), ...(note ? { note } : {}) }); };
 
   // 1 · lint
-  if (lint) {
-    const r = spawnSync(process.execPath, [join(repo, "tools", "mark-lint.mjs"), "--json"], { cwd: repo, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-    if (r.error || ![0, 1].includes(r.status)) throw new Error(`could not gate: mark-lint ${r.error ? r.error.message : `exited ${r.status}`}: ${String(r.stderr || r.stdout).trim().slice(0, 300)}`);
-    let verdict; try { verdict = JSON.parse(r.stdout); } catch { throw new Error(`could not gate: mark-lint did not answer in JSON: ${String(r.stdout).trim().slice(0, 300)}`); }
+  if (lint && !lint.skipped) {
+    const verdict = lint;
     const findings = Array.isArray(verdict.findings) ? verdict.findings : [];
     const errors = findings.filter((f) => String(f.sev ?? f.severity ?? "").toUpperCase() === "ERROR");
     const count = Number.isFinite(verdict.errors) ? verdict.errors : errors.length;
     check("lint", count ? (errors.length ? errors.map((f) => `${f.file ?? f.id ?? "?"}: ${String(f.msg ?? f.message ?? "").slice(0, 160)}`) : [`${count} error(s)`]) : []);
   } else {
-    checks.push({ name: "lint", ok: true, count: 0, rows: [], note: "not run (--no-lint)" });
+    checks.push({ name: "lint", ok: true, count: 0, rows: [], note: lint?.skipped ?? "not run (--no-lint)" });
   }
 
   // 2 · moved
@@ -120,15 +165,11 @@ export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = 
 
   // 4 · escrow — the fold's own errors, and the stampless fold
   {
-    const statePath = join(repo, "WORLD", "world-state.json");
-    if (!existsSync(statePath)) throw new Error("could not gate: no WORLD/world-state.json — the fold did not run, so escrow cannot be read");
-    const state = JSON.parse(readFileSync(statePath, "utf8"));
     const rows = (Array.isArray(state.errors) ? state.errors : []).map((e) => `fold error: ${typeof e === "string" ? e : JSON.stringify(e).slice(0, 160)}`);
     const stamps = (state.marks ?? []).reduce((a, m) => a + (Number(m.stamps) || 0), 0);
     let stakeRows = null;
     if (stakes) {
-      const parsed = JSON.parse(readFileSync(stakes, "utf8"));
-      const list = Array.isArray(parsed) ? parsed : (parsed?.stakes ?? []);
+      const list = stakes;
       stakeRows = list.filter((s) => (Number(s.n) || 0) > 0 && after.has(s.mark)).length;
       if (stakeRows > 0 && stamps === 0) rows.push(`${stakeRows} stake row(s) name standing marks and the fold carries 0 stamps — it folded stampless`);
     }
@@ -148,7 +189,7 @@ export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = 
     check("parcels", rows, `${parcels.length} standing parcel(s)`);
   }
 
-  return { ok: checks.every((c) => c.ok), base: baseRef, before: before.size, after: after.size, checks };
+  return { ok: checks.every((c) => c.ok), before: before.size, after: after.size, checks };
 }
 
 function main(argv) {
@@ -157,8 +198,15 @@ function main(argv) {
   const sweepPath = opt("--sweep");
   if (!sweepPath) { console.error("harm-gate: could not gate — no --sweep <sweep.json>: the sweep's report is the list of declared acts"); process.exit(2); }
   let sweep; try { sweep = JSON.parse(readFileSync(sweepPath, "utf8")); } catch (e) { console.error(`harm-gate: could not gate — ${sweepPath} unreadable: ${e.message}`); process.exit(2); }
+  // A snapshot pair (POS-363): --snapshot-before and --snapshot-after are snapshot exports; --sweep is the window's acts.
+  const pair = opt("--snapshot-after") ? { before: opt("--snapshot-before"), after: opt("--snapshot-after") } : null;
+  if (pair && !pair.before) { console.error("harm-gate: could not gate — --snapshot-after needs --snapshot-before: the gate judges a pair"); process.exit(2); }
   let out;
-  try { out = harmGate({ repo, sweep, base: opt("--base"), stakes: opt("--stakes"), lint: !argv.includes("--no-lint") }); }
+  try {
+    out = pair
+      ? harmGateOnSnapshots({ repo, ...pair, acts: sweep, stakes: opt("--stakes"), lint: !argv.includes("--no-lint") })
+      : harmGate({ repo, sweep, base: opt("--base"), stakes: opt("--stakes"), lint: !argv.includes("--no-lint") });
+  }
   catch (e) { console.error(`harm-gate: ${e.message}`); process.exit(2); }
   for (const c of out.checks) console.error(`harm-gate: ${c.ok ? "ok  " : "HARM"} ${c.name}${c.note ? ` (${c.note})` : ""}${c.count ? ` — ${c.count}:` : ""}${c.rows.slice(0, 5).map((r) => `\n    ${r}`).join("")}${c.count > 5 ? `\n    … and ${c.count - 5} more` : ""}`);
   console.error(`harm-gate: ${out.ok ? "NO HARM" : "HARM NAMED"} — base ${out.base}, ${out.before} mark(s) before, ${out.after} after`);
