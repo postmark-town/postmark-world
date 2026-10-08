@@ -29,10 +29,10 @@ import {
   // something only a MOVE ever needed, and the settlement no longer moves one.
   admissionBase, admitDelta,   // §4: the delta admission, in place of a fold per sketchbook
   refuseStaleHouseholds,       // the registry-freshness construction (2026-09-09)
-  // ...and three of them came back for one job that is not a move: a candidate
-  // read one file at a time is in its FILE's frame, and admission judges it in
-  // the world's (POS-446, § candidateInWorld below).
-  COORDS_RELATIVE, declaredCoords, fileToWorld, ringToWorld, standingRank,
+  // The loader's own framing walk, for a candidate read one file at a time: it
+  // is in its FILE's frame, and admission judges it in the world's (POS-446,
+  // § candidateInWorld below).
+  frameMarks,
 } from "./marks-fold.mjs";
 // THE REPARENT VERB (POS-102 · postmark#2865, 2026-09-16): a structural edit —
 // a frame's record leaving canon or returning — never moves what stands on it.
@@ -505,77 +505,52 @@ export function enclosingMarkId(repo, branch, mainBranch, path) {
 }
 
 /**
- * THE FRAME A REF DECLARES (POS-446): whether its files are written relative
- * to the mark that frames them, and the root record, whose own numbers are
- * the world's and whose centre frames anything no ancestor binds. Read off the
- * root RECORD, as `declaredCoords` reads it in the loader; the folded state
- * does not carry `coords`.
- */
-export function frameAtRef(repo, ref) {
-  const rootPath = `${MARKS_PREFIX}${WORLD_ROOT_SLUG}/mark.md`;
-  if (!hasObject(repo, `${ref}:${rootPath}`)) return { relative: false, root: null };
-  const root = recordAt(repo, ref, rootPath);
-  return { relative: declaredCoords([root]) === COORDS_RELATIVE, root };
-}
-
-/**
- * Each candidate's `at`/`points` composed into the world's frame, in place.
+ * Each candidate's `at`/`points` composed into the world's frame, in place,
+ * BY THE LOADER (POS-446).
  *
- * The walk is `frameMarks`' own (marks-fold.mjs § frameOriginOf), asked of the
- * path's directory ancestors instead of a loaded tree: the nearest ancestor
- * with a centre that BINDS the record (a predicate or naming mark is bound by
- * any; otherwise rank >= the record's own), else the root's centre. An
- * ancestor's centre is its world `at` — from this sketchbook's own candidates
- * first (a family crossing together frames on its own parent), then canon's
- * fold. Ancestors are found exactly as `enclosingMarkId` finds them, branch
- * first, and that floor is the one the office's framer (world-drain.mjs §
- * originForPath) walks to when it writes the file, so the two convert against
- * the same mark.
+ * `frameMarks` is the walk `loadMarks` runs over a whole tree. A candidate's
+ * frame depends only on its own directory ancestors and the root, so the walk
+ * is handed exactly those, each read raw at the ref (`recordAt`: the file's
+ * own numbers) with the directory edge `loadMarks` would have given it —
+ * branch first, so a family crossing together frames on its parent's NEW
+ * place, then main. The candidates themselves are in the list, so the walk
+ * frames them in place; nothing here knows what a frame is.
  */
-export function candidateInWorld(candidates, { repo, branch, mainBranch, root, byId, pathOf }) {
-  const rootCentre = root?.at && Number.isFinite(root.at.x) ? { x: root.at.x, y: root.at.y } : { x: 0, y: 0 };
-  const own = new Map(candidates.map((c) => [c.id, c]));
-  const framed = new Set();
-  const centreOf = (id) => {
-    const c = own.get(id);
-    if (c) { frame(c); return c.at && Number.isFinite(c.at.x) ? c.at : null; }
-    const m = byId.get(id);
-    return m?.at && Number.isFinite(m.at.x) ? m.at : null;
+export function candidateInWorld(candidates, { repo, branch, mainBranch, pathOf }) {
+  const MARK = "/mark.md";
+  const rootPath = `${MARKS_PREFIX}${WORLD_ROOT_SLUG}${MARK}`;
+  const byPath = new Map();
+  for (const c of candidates) { const p = pathOf.get(c.id); if (p) byPath.set(p, c); }
+  const readRaw = (path) => {
+    for (const ref of [branch, mainBranch]) {
+      if (!hasObject(repo, `${ref}:${path}`)) continue;
+      try { return recordAt(repo, ref, path); } catch { return null; }
+    }
+    return null;
   };
-  const ancestorsOf = (path) => {
-    const parts = String(path).replace(/\\/g, "/").split("/");
-    const ids = [];
+  // the nearest ancestor directory holding a mark.md, as loadMarks' walk passes it down
+  const parentPathOf = (path) => {
+    const parts = path.split("/");
     for (let depth = parts.length - 2; depth > 3; depth--) {
-      const ancestor = `${parts.slice(0, depth).join("/")}/mark.md`;
-      for (const ref of [branch, mainBranch]) {
-        if (!hasObject(repo, `${ref}:${ancestor}`)) continue;
-        const rec = recordAt(repo, ref, ancestor);
-        if (rec?.id) { ids.push(rec.id); break; }
-      }
+      const ancestor = `${parts.slice(0, depth).join("/")}${MARK}`;
+      if (byPath.has(ancestor) || hasObject(repo, `${branch}:${ancestor}`) || hasObject(repo, `${mainBranch}:${ancestor}`)) return ancestor;
     }
-    return ids;
+    return null;
   };
-  const frame = (c) => {
-    if (framed.has(c.id)) return;
-    framed.add(c.id);   // before the walk: a cycle answers the next ancestor, never loops
-    const path = pathOf.get(c.id);
-    if (!path) return;
-    const continued = c.kind === "predicated" || c.kind === "naming";
-    const rank = standingRank(c, byId);
-    let origin = rootCentre;
-    for (const id of ancestorsOf(path)) {
-      const at = centreOf(id);
-      if (at && (continued || standingRank(own.get(id) ?? byId.get(id), byId) >= rank)) { origin = at; break; }
+  const queue = [...byPath.keys()];
+  for (let i = 0; i < queue.length; i++) {
+    const up = parentPathOf(queue[i]);
+    if (up && !byPath.has(up)) {
+      const rec = readRaw(up);
+      if (rec) { byPath.set(up, rec); queue.push(up); }
     }
-    if (c.at && Number.isFinite(c.at.x)) {
-      c._fileAt = { x: c.at.x, y: c.at.y };
-      c.at = fileToWorld(c.at, origin);
-    }
-    const point = (p) => (Array.isArray(p) ? Number.isFinite(p[0]) && Number.isFinite(p[1]) : Number.isFinite(p?.x) && Number.isFinite(p?.y));
-    if (Array.isArray(c.points) && c.points.length && c.points.every(point)) c.points = ringToWorld(c.points, origin);
-    c._origin = origin;
-  };
-  for (const c of candidates) frame(c);
+  }
+  if (!byPath.has(rootPath)) { const root = readRaw(rootPath); if (root) byPath.set(rootPath, root); }
+  for (const [path, rec] of byPath) {
+    const up = parentPathOf(path);
+    rec._parentMarkId = up ? byPath.get(up)?.id ?? null : null;
+  }
+  frameMarks([...byPath.values()]);
   return candidates;
 }
 
@@ -1180,7 +1155,6 @@ export function settlementSweep({
   const mainState = foldRef(repo, mainBranch, stakes);
   const admitBase = admissionBase(mainState, { households: wallRegistry.households, stakes });
   const mainFolded = new Map(mainState.marks.map((mark) => [mark.id, mark]));
-  const mainFrame = frameAtRef(repo, mainBranch);
 
   for (const branch of branches) {
     const household = branch.slice("draft/".length);
@@ -1233,14 +1207,12 @@ export function settlementSweep({
     // clearing, both had it at (-1408, -3032) on her own ground, `home`. The
     // store locked it; the file never received it.
     //
-    // The frame is the loader's own rule (marks-fold.mjs § frameMarks): the
-    // nearest enclosing positioned mark that binds the record, else the root's
-    // centre, composed with fileToWorld. The file's own numbers ride as
-    // `_fileAt`, exactly as `loadMarks` keeps them. A tree that declares no
-    // relative frame is untouched.
-    if (mainFrame.relative) candidateInWorld(candidates, {
-      repo, branch, mainBranch, root: mainFrame.root, byId: mainFolded, pathOf: pathOfCandidate,
-    });
+    // The frame is the LOADER'S OWN WALK (marks-fold.mjs § frameMarks), run
+    // over the candidates and their directory ancestors read raw at the ref —
+    // never a second copy of it. The file's own numbers ride as `_fileAt`,
+    // exactly as `loadMarks` keeps them; a tree that declares no relative
+    // frame keeps its numbers, as the loader leaves them.
+    candidateInWorld(candidates, { repo, branch, mainBranch, pathOf: pathOfCandidate });
 
     // THE QUARANTINE, and it is deliberately the FIRST thing in the sketchbook,
     // exactly as when it was a whole-tree fold: nothing is read, published,

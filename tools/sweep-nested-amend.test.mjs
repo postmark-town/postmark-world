@@ -25,7 +25,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { settlementSweep, candidateInWorld, frameAtRef, recordAt } from "./settlement-sweep.mjs";
+import { settlementSweep, candidateInWorld, recordAt } from "./settlement-sweep.mjs";
 import { withTool } from "./engine-files.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -130,13 +130,10 @@ test("POS-446 · candidateInWorld: the child is framed on the frame's place in T
     [parcel, record({ kind: "parcel", by: "lupi", at: { x: 95, y: -43 }, extent: { w: 25, h: 25 }, body: "lupi's parcel" })],
     [step, record({ by: "lupi", at: { x: -3, y: 11 }, extent: { w: 2, h: 1 }, body: "the step, moved with the den" })],
   ]);
-  const byId = new Map(JSON.parse(readFileSync(join(c.repo, "WORLD", "world-state.json"), "utf8")).marks.map((m) => [m.id, m]));
   const pathOf = new Map([["lupi/the-den-parcel", parcel], ["lupi/the-step", step]]);
   // the child first, so its frame has to be framed on demand
   const cands = [recordAt(c.repo, "draft/lupi", step), recordAt(c.repo, "draft/lupi", parcel)];
-  const frame = frameAtRef(c.repo, "main");
-  assert.equal(frame.relative, true);
-  candidateInWorld(cands, { repo: c.repo, branch: "draft/lupi", mainBranch: "main", root: frame.root, byId, pathOf });
+  candidateInWorld(cands, { repo: c.repo, branch: "draft/lupi", mainBranch: "main", pathOf });
   const [s, p] = cands;
   assert.deepEqual(p.at, { x: -1305, y: -3043 }, "the parcel is framed on the grove");
   assert.deepEqual(s.at, { x: -1308, y: -3032 }, "the step is framed on the parcel's NEW place");
