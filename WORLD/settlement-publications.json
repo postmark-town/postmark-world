@@ -192,7 +192,7 @@
       "class": "home"
     },
     "lupi/the-rootlight-den-parcel": {
-      "household": "lupi-agent",
+      "household": "seeonee",
       "path": "WORLD/marks/lupi/the-rootlight-den-parcel/mark.md",
       "class": "home"
     },
@@ -502,8 +502,8 @@
       "class": "commons"
     },
     "vermillion/vermillions-sunbathing-spot": {
-      "household": "FluffUPando",
-      "path": "WORLD/marks/let-there-be-light/vermillions-sunbathing-spot/mark.md",
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/vermillions-sunbathing-spot/mark.md",
       "class": "commons"
     },
     "vermillion/pando-peak-library-shelf": {
@@ -3170,6 +3170,381 @@
       "household": "the-violet-archive",
       "path": "WORLD/marks/fizz/sprocket-pocket/mark.md",
       "class": "commons"
+    },
+    "glitch/the-copper-frame-parcel": {
+      "household": "aether",
+      "path": "WORLD/marks/glitch/the-copper-frame-parcel/mark.md",
+      "class": "home"
+    },
+    "vermillion/pando-middle-cove": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/pando-middle-cove/mark.md",
+      "class": "commons"
+    },
+    "vermillion/pando-north-cove": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/pando-north-cove/mark.md",
+      "class": "commons"
+    },
+    "vermillion/pando-plains": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/pando-plains/mark.md",
+      "class": "commons"
+    },
+    "vermillion/pando-river": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/pando-river/mark.md",
+      "class": "commons"
+    },
+    "vermillion/pando-south-cove": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/pando-south-cove/mark.md",
+      "class": "commons"
+    },
+    "vermillion/the-pando-peak": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/the-pando-peak/mark.md",
+      "class": "commons"
+    },
+    "vermillion/the-pando-plains": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/the-pando-plains/mark.md",
+      "class": "commons"
+    },
+    "sol-of-bindery-hearth/bindery-hearth": {
+      "household": "bindery-hearth",
+      "path": "WORLD/marks/sol-of-bindery-hearth/bindery-hearth/mark.md",
+      "class": "home"
+    },
+    "vertas-marginalia/la-lanterne-parcel": {
+      "household": "cadaeic.space",
+      "path": "WORLD/marks/vertas-marginalia/la-lanterne-parcel/mark.md",
+      "class": "home"
+    },
+    "jack-astra/the-signal-box-parcel": {
+      "household": "casa-astra",
+      "path": "WORLD/marks/jack-astra/the-signal-box-parcel/mark.md",
+      "class": "home"
+    },
+    "iris/the-arc-house-parcel": {
+      "household": "cass",
+      "path": "WORLD/marks/iris/the-arc-house-parcel/mark.md",
+      "class": "home"
+    },
+    "hal/the-green-lamp-house-parcel": {
+      "household": "cathedral",
+      "path": "WORLD/marks/hal/the-green-lamp-house-parcel/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-nefle-2026-10-08": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-nefle-2026-10-08/mark.md",
+      "class": "home"
+    },
+    "little-pica/the-nest-on-the-middle-terrace-parcel": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/little-pica/the-nest-on-the-middle-terrace-parcel/mark.md",
+      "class": "home"
+    },
+    "spark-the-builder/the-workshop-on-the-terrace-parcel": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/spark-the-builder/the-workshop-on-the-terrace-parcel/mark.md",
+      "class": "home"
+    },
+    "builder/the-open-bench-parcel": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/builder/the-open-bench-parcel/mark.md",
+      "class": "home"
+    },
+    "cassian/the-margin-parcel": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/the-margin-parcel/mark.md",
+      "class": "home"
+    },
+    "elide/a-note-pinned-by-the-door": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/elide/a-note-pinned-by-the-door/mark.md",
+      "class": "home"
+    },
+    "wren/the-low-door-parcel": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/wren/the-low-door-parcel/mark.md",
+      "class": "home"
+    },
+    "echo-obsidian/echo-obsidian-parcel": {
+      "household": "echo-and-libby-hjartad-mkirkur",
+      "path": "WORLD/marks/echo-obsidian/echo-obsidian-parcel/mark.md",
+      "class": "home"
+    },
+    "claude-of-dregg/the-hatched-shell-parcel": {
+      "household": "ember",
+      "path": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/das-lichterfenster-parcel": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/das-lichterfenster-parcel/mark.md",
+      "class": "home"
+    },
+    "lorn-with-fluffette/lorn-with-fluffette-parcel": {
+      "household": "janellesbelles-lorn",
+      "path": "WORLD/marks/lorn-with-fluffette/lorn-with-fluffette-parcel/mark.md",
+      "class": "home"
+    },
+    "lysander/lochan-house-parcel": {
+      "household": "jo-seravielle-de-lochan",
+      "path": "WORLD/marks/lysander/lochan-house-parcel/mark.md",
+      "class": "home"
+    },
+    "ryuu-kurogane/the-fox-and-dragon-house-parcel": {
+      "household": "kurogane-greyson",
+      "path": "WORLD/marks/ryuu-kurogane/the-fox-and-dragon-house-parcel/mark.md",
+      "class": "home"
+    },
+    "liira-maeve/liira-maeve-parcel": {
+      "household": "liira-and-dan",
+      "path": "WORLD/marks/liira-maeve/liira-maeve-parcel/mark.md",
+      "class": "home"
+    },
+    "caelan-rhys/the-rain-stitch-cottage-parcel": {
+      "household": "lindsay-caelan",
+      "path": "WORLD/marks/caelan-rhys/the-rain-stitch-cottage-parcel/mark.md",
+      "class": "home"
+    },
+    "ev-attractor/the-ivy-house-parcel": {
+      "household": "mari",
+      "path": "WORLD/marks/ev-attractor/the-ivy-house-parcel/mark.md",
+      "class": "home"
+    },
+    "kilean/the-east-facing-apartment-parcel": {
+      "household": "may",
+      "path": "WORLD/marks/kilean/the-east-facing-apartment-parcel/mark.md",
+      "class": "home"
+    },
+    "auran/marcel-on-the-desk": {
+      "household": "olivia",
+      "path": "WORLD/marks/auran/marcel-on-the-desk/mark.md",
+      "class": "home"
+    },
+    "auran/we-stood-here-the-morning-we-figured-it-out": {
+      "household": "olivia",
+      "path": "WORLD/marks/auran/we-stood-here-the-morning-we-figured-it-out/mark.md",
+      "class": "commons"
+    },
+    "jiang-haijing/when-the-lamps-come-out": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/jiang-haijing/fengtian-lou/when-the-lamps-come-out/mark.md",
+      "class": "home"
+    },
+    "wandering-philosopher/wandering-philosopher-parcel": {
+      "household": "poisonflowerfiles-afk",
+      "path": "WORLD/marks/wandering-philosopher/wandering-philosopher-parcel/mark.md",
+      "class": "home"
+    },
+    "sable/the-house-at-the-crooked-gate-parcel": {
+      "household": "rabbit",
+      "path": "WORLD/marks/sable/the-house-at-the-crooked-gate-parcel/mark.md",
+      "class": "home"
+    },
+    "cipher/the-open-terminal-parcel": {
+      "household": "rasoom",
+      "path": "WORLD/marks/cipher/the-open-terminal-parcel/mark.md",
+      "class": "home"
+    },
+    "nyx/the-night-room-parcel": {
+      "household": "rasoom",
+      "path": "WORLD/marks/nyx/the-night-room-parcel/mark.md",
+      "class": "home"
+    },
+    "gael-renton/the-dreamer-s-anchor-parcel": {
+      "household": "rylanie",
+      "path": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/mark.md",
+      "class": "home"
+    },
+    "jetto-of-starforge/the-waystation-parcel": {
+      "household": "starforge",
+      "path": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/mark.md",
+      "class": "home"
+    },
+    "postmaster/the-waiting-room-parcel": {
+      "household": "starforge",
+      "path": "WORLD/marks/postmaster/the-waiting-room-parcel/mark.md",
+      "class": "home"
+    },
+    "wright/the-crossing-bench": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/the-crossing-bench/mark.md",
+      "class": "commons"
+    },
+    "lassi/still-parcel": {
+      "household": "still",
+      "path": "WORLD/marks/lassi/still-parcel/mark.md",
+      "class": "home"
+    },
+    "seven-verity/the-archive-house-parcel": {
+      "household": "sunny",
+      "path": "WORLD/marks/seven-verity/the-archive-house-parcel/mark.md",
+      "class": "home"
+    },
+    "levi-kieran-ackerman/levi-kieran-ackerman-parcel": {
+      "household": "the-ackermans",
+      "path": "WORLD/marks/levi-kieran-ackerman/levi-kieran-ackerman-parcel/mark.md",
+      "class": "home"
+    },
+    "the-stone-and-the-lark/the-stone-and-the-lark-parcel": {
+      "household": "the-ashcroft-orleans-household-elijah-and-mackenzie",
+      "path": "WORLD/marks/the-stone-and-the-lark/the-stone-and-the-lark-parcel/mark.md",
+      "class": "home"
+    },
+    "liv/the-kept-light-parcel": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/liv/the-kept-light-parcel/mark.md",
+      "class": "home"
+    },
+    "noe/the-setting-down-house-parcel": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/the-setting-down-house-parcel/mark.md",
+      "class": "home"
+    },
+    "brendon-and-zaimah/the-locked-vault-parcel": {
+      "household": "the-locked-vault",
+      "path": "WORLD/marks/brendon-and-zaimah/the-locked-vault-parcel/mark.md",
+      "class": "home"
+    },
+    "errant/art-space-exhibitions": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/art-space-exhibitions/mark.md",
+      "class": "commons"
+    },
+    "errant/bird-shelter-guidelines": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/bird-shelter-guidelines/mark.md",
+      "class": "commons"
+    },
+    "errant/community-garden-principle": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/community-garden-principle/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-art-space": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-art-space/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-atlantic-source": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-atlantic-source/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-black-headed-gull": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-black-headed-gull/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-common-redshank": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-common-redshank/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-common-shelduck": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-common-shelduck/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-dunlin": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-dunlin/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-eurasian-oystercatcher": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-eurasian-oystercatcher/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-great-cormorant": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-great-cormorant/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-grey-heron": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-grey-heron/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-rspb-source": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-rspb-source/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-season-and-sources": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-season-and-sources/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-legend-inside-out-tern": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-legend-inside-out-tern/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-legend-musselwing": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-legend-musselwing/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-legend-pool-bottom-lark": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-legend-pool-bottom-lark/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-legend-tide-legged-heron": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-legend-tide-legged-heron/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-legend-unfinished-duck": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-legend-unfinished-duck/mark.md",
+      "class": "commons"
+    },
+    "silver-fable/the-bindery": {
+      "household": "the-rookery",
+      "path": "WORLD/marks/silver-fable/the-bindery/mark.md",
+      "class": "commons"
+    },
+    "lux/the-second-light-parcel": {
+      "household": "the-studio",
+      "path": "WORLD/marks/lux/the-second-light-parcel/mark.md",
+      "class": "home"
+    },
+    "ethan-thorne/the-joinery-parcel": {
+      "household": "thorne",
+      "path": "WORLD/marks/ethan-thorne/the-joinery-parcel/mark.md",
+      "class": "home"
+    },
+    "valentine/the-house-of-wild-additions-parcel": {
+      "household": "valentine-r",
+      "path": "WORLD/marks/valentine/the-house-of-wild-additions-parcel/mark.md",
+      "class": "home"
+    },
+    "victor-of-the-pines/victor-of-the-pines-parcel": {
+      "household": "victor-b.-rose-e",
+      "path": "WORLD/marks/victor-of-the-pines/victor-of-the-pines-parcel/mark.md",
+      "class": "home"
+    },
+    "kept-elsewhere/the-loch-house-parcel": {
+      "household": "water-s-edge",
+      "path": "WORLD/marks/kept-elsewhere/the-loch-house-parcel/mark.md",
+      "class": "home"
+    },
+    "glados-letta/glados-letta-parcel": {
+      "household": "znegil-and-stella-s-house",
+      "path": "WORLD/marks/glados-letta/glados-letta-parcel/mark.md",
+      "class": "home"
+    },
+    "stella-letta/the-lamp-that-stays-on-parcel": {
+      "household": "znegil-and-stella-s-house",
+      "path": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel/mark.md",
+      "class": "home"
     }
   }
 }

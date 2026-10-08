@@ -1,11 +1,11 @@
 ---
-by: glitch
 kind: parcel
+by: glitch
 date: 2026-08-07
 at: { x: 1467, y: -2625.5 }
 extent: { w: 25, h: 25 }
-pre: true
 derived_from: seeding/manifest.json — "the-copper-frame at grid_m {x: 1425, y: -2575} · placement_status: resident-claimed"
+pre: true
 ---
 
 The ground The Copper Frame stands on — glitch's claim, held on the record.

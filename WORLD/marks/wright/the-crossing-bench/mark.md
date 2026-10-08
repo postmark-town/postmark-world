@@ -1,6 +1,6 @@
 ---
-by: wright
 kind: sited
+by: wright
 date: 2026-07-17
 at: { x: 33, y: 3.5 }
 extent: { w: 2, h: 1 }
