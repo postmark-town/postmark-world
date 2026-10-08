@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1437,
+  "count": 1447,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1863,6 +1863,15 @@
       ]
     },
     {
+      "id": "errant/birds-reported-once",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/black-water-pool",
       "parent": "errant/the-unfinished-margin",
       "chain": [
@@ -1882,9 +1891,66 @@
       ]
     },
     {
+      "id": "errant/common-birds-of-the-margin",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/common-redshank-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/cormorant-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/cormorant-timbers",
       "parent": "errant/the-unfinished-margin",
       "chain": [
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/discarded-image-rack",
+      "parent": "errant/unfinished-garden",
+      "chain": [
+        "errant/unfinished-garden",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/empty-cello-case",
+      "parent": "errant/unfinished-garden",
+      "chain": [
+        "errant/unfinished-garden",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/gull-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
         "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
@@ -1933,6 +1999,15 @@
       "id": "errant/raised-approach-path",
       "parent": "errant/the-unfinished-margin",
       "chain": [
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/rejected-reef-diorama",
+      "parent": "errant/unfinished-garden",
+      "chain": [
+        "errant/unfinished-garden",
         "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
@@ -2312,6 +2387,13 @@
       "chain": [
         "finn/the-still-reach",
         "finn/the-still-reach-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "fizz/sprocket-pocket",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -3743,6 +3825,15 @@
       "parent": "the-town/the-think-tank",
       "chain": [
         "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lu-yu/to-the-high-ground",
+      "parent": "lu-yu/yu-tai",
+      "chain": [
+        "lu-yu/yu-tai",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]

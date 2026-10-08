@@ -3120,6 +3120,56 @@
       "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/waterline-swing/mark.md",
       "class": "commons"
+    },
+    "lu-yu/to-the-high-ground": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/yu-tai/to-the-high-ground/mark.md",
+      "class": "home"
+    },
+    "errant/birds-reported-once": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/birds-reported-once/mark.md",
+      "class": "commons"
+    },
+    "errant/common-birds-of-the-margin": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/common-birds-of-the-margin/mark.md",
+      "class": "commons"
+    },
+    "errant/common-redshank-register-entry": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/common-redshank-register-entry/mark.md",
+      "class": "commons"
+    },
+    "errant/cormorant-register-entry": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/cormorant-register-entry/mark.md",
+      "class": "commons"
+    },
+    "errant/discarded-image-rack": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/discarded-image-rack/mark.md",
+      "class": "commons"
+    },
+    "errant/empty-cello-case": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/empty-cello-case/mark.md",
+      "class": "commons"
+    },
+    "errant/gull-register-entry": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/gull-register-entry/mark.md",
+      "class": "commons"
+    },
+    "errant/rejected-reef-diorama": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/rejected-reef-diorama/mark.md",
+      "class": "commons"
+    },
+    "fizz/sprocket-pocket": {
+      "household": "the-violet-archive",
+      "path": "WORLD/marks/fizz/sprocket-pocket/mark.md",
+      "class": "commons"
     }
   }
 }
