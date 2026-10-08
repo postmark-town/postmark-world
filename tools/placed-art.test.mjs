@@ -494,7 +494,20 @@ test("PANDO: the anchor hangs and the pictured child under it is covered — one
   // the shape that does NOT move: two marks at one place, the child hung off
   // the anchor, both big enough to be hung.
   assert.ok(child?.image, "the mountain's picture is on the record");
-  assert.equal(anchor.placementParent, "the-town/let-there-be-light", "the anchor hangs off the root");
+  assert.ok(anchor, "the mountain's anchor is on the record");
+  // Containing ground can lawfully arrive between the root and the anchor.
+  // Test the finite chain to ground, not September's direct-root placement.
+  const byId = new Map(WORLD.marks.map((m) => [m.id, m]));
+  assert.ok(byId.has("the-town/let-there-be-light"), "the ancestry's root exists");
+  const seen = new Set([anchor.id]);
+  let parent = anchor.placementParent;
+  while (parent !== "the-town/let-there-be-light") {
+    assert.ok(parent && byId.has(parent), "the anchor's ancestry reaches existing ground");
+    assert.ok(!seen.has(parent), "the anchor's ancestry has no cycle");
+    assert.notEqual(parent, child.id, "the pictured child cannot contain its anchor");
+    seen.add(parent);
+    parent = byId.get(parent).placementParent;
+  }
   assert.equal(child.placementParent, "the-town/pando-peak", "…and the child hangs off the anchor");
   assert.ok(span(anchor) >= SPECTATOR_DRAW_DEFAULTS.placed_art_min_m, "the anchor clears the dial");
   assert.ok(span(child) >= SPECTATOR_DRAW_DEFAULTS.placed_art_min_m, "and so does the child");

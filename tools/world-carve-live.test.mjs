@@ -54,6 +54,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs";
+import { rect, marksContain } from "./geometry.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD/marks"));
@@ -276,39 +277,86 @@ test("the carve is an OVERLAY on the real world — not one claim on disk was mo
 
 // ── STAGE 3: the default table, on a world that has written no words ─────────
 
-test("NOTHING ELSE MOVES: with no consent word anywhere, exactly the predicted weights change and no mark is returned", () => {
-  // The live world carries no `consent:` map yet, so this is the default table
-  // alone. These NINE are the whole of what it moves. The numbers were predicted
-  // before the build from the shape of the tree; any tenth line here, or any of
-  // these nine landing elsewhere, means the table is doing something unruled.
-  //
-  // The list was EIGHT while the town's containers carried a class-law +1. Losing
-  // that law moved three of them again and added the-town-centre, which had not
-  // appeared before because its 12 happened to survive the earlier table intact —
-  // a mover a stale expected-set would have let through in silence.
-  const expected = {
-    // The three the-town containers, which briefly had an automatic +1 from
-    // everything sited within them and now have nothing: a region is an ordinary
-    // marketplace mark, and 18 / 18 / 0 is what each is actually backed for.
-    "the-town/let-there-be-light": 18,           // was 147
-    "the-town/pando-peak": 18,                   // was 108
-    "the-town/the-town-centre": 0,               // was 12  ← the ninth mover
-    "vermillion/the-pando-peak": 69,             // was 90
-    "vermillion/porch-hill": 15,                 // was 22
-    "vermillion/vermillion-view-peak": 12,       // was 14
-    "sol-of-garrison/the-protected-grove": 7,    // was 10
-    "limen/the-threshold-district": 10,          // was 11
-    "limen/footpath-becomes-a-suggestion": 0,    // was 1
-  };
-  for (const [id, weight] of Object.entries(expected)) {
-    // A mark that has LEFT canon has no weight to predict — limen's footpath is
-    // on the 09-16 return list, and returns when the reparent verb ships. Whether
-    // it left lawfully is the tier falsifier's question (nothing vanishes without
-    // a declaring act), not this table's; an absent id is skipped by name here,
-    // and a present one must still land exactly (2026-09-16).
-    if (!marks.some((m) => m.id === id)) continue;
-    assert.equal(w(id), weight, id);
+// Independent ledger-contribution walks, not fold/consent's fan-up or its
+// output weights/parents. Geometry primitives have their own controls. A row
+// stops at the first household boundary, which new ground may lawfully change.
+function silentWeights(input, rows, houses, ground, tick) {
+  const byId = new Map(input.map((m) => [m.id, m]));
+  const terrainIds = new Set((ground?.features ?? []).map((f) => `terrain:${f.id}`));
+  const parent = new Map();
+  const sited = input.filter((m) => m.kind === "sited");
+  for (const child of sited) {
+    const cr = rect(child);
+    const candidates = sited.filter((p) => p.id !== child.id &&
+      rect(p).w * rect(p).h > cr.w * cr.h && marksContain(p, child));
+    candidates.sort((a, b) => rect(a).w * rect(a).h - rect(b).w * rect(b).h);
+    if (candidates.length) parent.set(child.id, candidates[0].id);
   }
+  for (const m of input) {
+    assert.equal(Object.keys(m.consent ?? {}).length, 0, `${m.id}: the premise is silence`);
+    if (["predicated", "naming", "class"].includes(m.kind) && m.parent) parent.set(m.id, m.parent);
+  }
+  const expected = new Map([...byId.keys(), ...terrainIds].map((id) => [id, 0]));
+  const house = (id) => houses?.[byId.get(id)?.household] ?? `solo:${byId.get(id)?.household}`;
+  for (const row of rows) {
+    if ((tick > 0 && row.tick >= tick) || !expected.has(row.mark)) continue;
+    const amount = row.weight ?? row.n;
+    let id = row.mark;
+    const seen = new Set();
+    while (id) {
+      assert.ok(!seen.has(id), `${row.mark}: no cyclic weight ancestry`);
+      seen.add(id);
+      expected.set(id, expected.get(id) + amount);
+      const up = parent.get(id);
+      if (!up || (!terrainIds.has(up) && house(up) !== house(id))) break;
+      assert.ok(expected.has(up), `${id}: a parent exists`);
+      id = up;
+    }
+  }
+  return expected;
+}
+
+test("silent contribution walks stop at new cross-house ground, compose same-house edges, and honor effective ticks", () => {
+  const input = [
+    { id: "a/root", household: "a", kind: "sited", at: { x: 0, y: 0 }, extent: { w: 100, h: 100 } },
+    { id: "b/middle", household: "b", kind: "sited", at: { x: 0, y: 0 }, extent: { w: 20, h: 20 } },
+    { id: "a/leaf", household: "a", kind: "sited", at: { x: 0, y: 0 }, extent: { w: 2, h: 2 } },
+    { id: "a/name", household: "a", kind: "naming", parent: "a/leaf" },
+  ];
+  const rows = [
+    { mark: "a/name", n: 2, weight: 7, tick: 0 },
+    { mark: "a/name", n: -1, weight: -1, tick: 0 },
+    { mark: "a/name", n: 100, weight: 100, tick: 1 },
+  ];
+  // Literal answers falsify BOTH the oracle and the production mechanism. In
+  // particular, taking the new middle ground away reconnects the leaf to root.
+  const cases = [
+    [input, { a: "one", b: "two" }, [0, 0, 6, 6]],
+    [input, { a: "one", b: "one" }, [6, 6, 6, 6]],
+    [input.filter((m) => m.id !== "b/middle"), { a: "one" }, [6, 6, 6]],
+    [input, {}, [0, 0, 6, 6]], // missing household bindings remain distinct solo handles
+  ];
+  for (const [source, houses, numbers] of cases) {
+    const expected = new Map(source.map((m, i) => [m.id, numbers[i]]));
+    assert.deepEqual(silentWeights(source, rows, houses, {}, 1), expected);
+    const actual = fold({ marks: source, terrain: {}, stakes: rows, households: houses, tick: 1 });
+    assert.deepEqual(actual.errors, []);
+    assert.deepEqual(new Map(actual.marks.map((m) => [m.id, m.weight])), expected);
+  }
+  const unweighted = [{ mark: "a/name", n: 3, tick: 0 }];
+  const solo = { a: "one", b: "two" };
+  const expected = new Map(input.map((m, i) => [m.id, [0, 0, 3, 3][i]]));
+  assert.deepEqual(silentWeights(input, unweighted, solo, {}, 1), expected);
+  const actual = fold({ marks: input, terrain: {}, stakes: unweighted, households: solo, tick: 1 });
+  assert.deepEqual(actual.errors, []);
+  assert.deepEqual(new Map(actual.marks.map((m) => [m.id, m.weight])), expected);
+});
+
+test("NOTHING ELSE MOVES: with no consent word anywhere, exactly the predicted weights change and no mark is returned", () => {
+  const expected = silentWeights(marks, stakes, households, terrain, 1);
+  assert.deepEqual(new Set(state.marks.map((m) => m.id)), new Set(marks.map((m) => m.id)),
+    "no mark disappears or appears under the silent table");
+  for (const m of state.marks) assert.equal(m.weight, expected.get(m.id), m.id);
 
   assert.equal(state.returned.length, 0, "nobody has spoken, so nobody is returned");
   assert.equal(state.marks.filter((m) => m.kept).length, 0, "and nobody is kept");
