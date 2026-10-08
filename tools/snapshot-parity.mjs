@@ -15,10 +15,9 @@
 //   --files     the test files; default: every tools/*.test.mjs that reads the live
 //               tree's marks (the loader, or WORLD/marks by path) — see filesReadingTheTree
 //
-// THE FILING-PATH TESTS. A test that reads mark files or their filing paths
-// (WORLD/marks/<…>/mark.md, settlement-publications.json's `path`, the freeze
-// manifest) reads the tree whatever the switch says, so it is the same run both
-// ways and proves nothing about a snapshot. Those are listed separately
+// THE FILING-PATH TESTS. A test that reads a record's filing (`_dir`, `_path`,
+// the freeze's filing map) asks the tree a question a snapshot has no answer
+// to: a snapshot carries no directory. Those are listed separately
 // (`filing_path`), because they retire with POS-365 (git becomes the
 // settlement's printout, and a filing path stops being a fact about the World).
 //
@@ -37,7 +36,10 @@ const ROOT = join(HERE, "..");
 
 const READS_LOADER = /\bloadMarks\s*\(/;
 const READS_TREE = /WORLD\/marks|["']WORLD["']\s*,\s*["']marks["']/;
-const READS_FILING = /mark\.md|settlement-publications\.json|seeding\/manifest|frozenFiling|filedPath|_path\b/;
+// A record's FILING, read off the loader's records (`_dir`, `_path`) or the freeze's
+// filing map. Measured on S99 (POS-363): the two live-tree files that differ because
+// a snapshot carries no directory both read `_dir`. Writing mark.md into a fixture is not this.
+const READS_FILING = /\b_dir\b|\b_path\b|frozenFiling|filedPath/;
 
 /** Every test file that reads the live tree's marks, and which of them also read filings by path. PURE over the sources. */
 export function filesReadingTheTree(sources) {
@@ -53,16 +55,18 @@ export function filesReadingTheTree(sources) {
 
 /** A TAP run's verdict per test: `Map(name -> "ok" | "not ok")`, subtests included by their nesting. PURE. */
 export function tapVerdicts(tap) {
+  // A subtest's verdict line comes BEFORE its parent's, so the parents are read
+  // off the `# Subtest: <name>` lines node's TAP writes ahead of each test.
   const out = new Map();
   const stack = [];
   for (const line of String(tap).split(/\r?\n/)) {
+    const sub = /^(\s*)# Subtest: (.*)$/.exec(line);
+    if (sub) { const d = sub[1].length / 4; stack.length = d; stack[d] = sub[2]; continue; }
     const m = /^(\s*)(ok|not ok) \d+ - (.*?)(?:\s+#\s+(SKIP|TODO).*)?$/.exec(line);
     if (!m) continue;
     const depth = m[1].length / 4;
-    stack.length = depth;
-    const name = [...stack, m[3]].join(" > ");
+    const name = [...stack.slice(0, depth), m[3]].join(" > ");
     out.set(name, m[4] ? m[4].toLowerCase() : m[2]);
-    stack[depth] = m[3];
   }
   return out;
 }

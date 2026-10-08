@@ -96,3 +96,17 @@ test("the switch names the repo it stands for: without WORLD_SNAPSHOT_ROOT, or n
   assert.equal(snapshotFor(LIVE, { [SNAPSHOT_ENV]: path, [SNAPSHOT_ROOT_ENV]: ROOT }), path, "this repo named: the switch");
   withEnv(path, () => assert.ok(loadMarks(LIVE).length > 100, "a root naming another repo leaves this tree read from disk"), join(ROOT, "..", "elsewhere"));
 });
+
+test("the parity run reads TAP per test, nested, and names each test whose verdict differs", async () => {
+  const { tapVerdicts, difference, filesReadingTheTree } = await import("./snapshot-parity.mjs");
+  const tree = tapVerdicts(["# Subtest: a", "    ok 1 - inner", "ok 1 - a", "ok 2 - b", "not ok 3 - c", "ok 4 - d # SKIP no clone"].join("\n"));
+  assert.deepEqual([...tree], [["a > inner", "ok"], ["a", "ok"], ["b", "ok"], ["c", "not ok"], ["d", "skip"]]);
+  const snap = tapVerdicts(["# Subtest: a", "    not ok 1 - inner", "ok 1 - a", "ok 2 - b", "not ok 3 - c", "ok 4 - d # SKIP no clone", "ok 5 - e"].join("\n"));
+  assert.deepEqual(difference(tree, snap), [{ test: "a > inner", tree: "ok", snapshot: "not ok" }, { test: "e", tree: "absent", snapshot: "ok" }]);
+  const found = filesReadingTheTree([
+    ["tools/a.test.mjs", "loadMarks(join(ROOT, 'WORLD', 'marks'))"],
+    ["tools/b.test.mjs", "loadMarks(dir); m._dir.includes('x')"],
+    ["tools/c.test.mjs", "nothing about the world"],
+  ]);
+  assert.deepEqual(found, { reads: ["tools/a.test.mjs", "tools/b.test.mjs"], filing: ["tools/b.test.mjs"] });
+});
