@@ -25,7 +25,7 @@
 // produce — a read-side orphan, flagged 2026-07-23, closed by this pass.)
 
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
-import { dirname, join, basename } from "node:path";
+import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
 
@@ -310,6 +310,53 @@ export function frameMarks(out) {
 // written in (see § the frame above) — `at` is world, `_fileAt` is what the file
 // says, `_origin` is the centre those file numbers are written against.
 export function loadMarks(dir) {
+  const snapshot = snapshotFor(dir);
+  if (snapshot) return loadSnapshot(snapshot);
+  return loadTreeMarks(dir);
+}
+
+// ---------- THE SNAPSHOT SEAM (POS-363; Darko's rulings R1-R2, 10-04) ----------
+// The World is the store's sealed snapshot, and git is its printout (R2,
+// POS-365). This is the one seam that lets everything that reads the world's
+// marks read a snapshot instead of the tree: WORLD_SNAPSHOT names a snapshot
+// export, and loadMarks of THIS repo's own WORLD/marks answers from it. A
+// fixture directory, a scratch extraction or another checkout is never switched:
+// only the live tree is the thing a snapshot stands in for.
+//
+// A snapshot export is one JSON document: { format, settlement?, digest?, marks },
+// where marks are the records loadMarks returns (world coordinates, the fold's
+// input), in the order the fold reads them. snapshotFromTree builds one from a
+// tree; the office builds one from the store (src/world-snapshot.mjs §
+// snapshotFoldArgs). A document of any other format refuses: a snapshot that
+// cannot be read is never read as an empty world.
+export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";
+export const SNAPSHOT_FORMAT = "postmark-world-snapshot/1";
+const LIVE_MARKS = resolve(ROOT, "WORLD", "marks");
+
+/** The snapshot to read for `dir`, or null: only when WORLD_SNAPSHOT is set and `dir` is this repo's own WORLD/marks. */
+export function snapshotFor(dir, env = process.env) {
+  const path = String(env?.[SNAPSHOT_ENV] ?? "").trim();
+  if (!path) return null;
+  return resolve(String(dir)) === LIVE_MARKS ? path : null;
+}
+
+/** A snapshot export's marks: fresh copies, in the export's order. Throws on any other shape. */
+export function loadSnapshot(path) {
+  let doc;
+  try { doc = JSON.parse(readFileSync(path, "utf8")); }
+  catch (e) { throw new Error(`${SNAPSHOT_ENV}: ${path} could not be read as a snapshot export (${e.message})`); }
+  if (doc?.format !== SNAPSHOT_FORMAT) throw new Error(`${SNAPSHOT_ENV}: ${path} is not a ${SNAPSHOT_FORMAT} export (format ${JSON.stringify(doc?.format ?? null)})`);
+  if (!Array.isArray(doc.marks)) throw new Error(`${SNAPSHOT_ENV}: ${path} carries no marks array`);
+  return structuredClone(doc.marks);
+}
+
+/** A snapshot export built from a tree: the records the tree's loader returns, as the export carries them. */
+export function snapshotFromTree(dir, meta = {}) {
+  return { format: SNAPSHOT_FORMAT, ...meta, marks: JSON.parse(JSON.stringify(loadTreeMarks(dir))) };
+}
+
+/** The tree's marks, read from disk (the loader before the seam, unchanged). */
+export function loadTreeMarks(dir) {
   const out = [];
   if (!existsSync(dir)) return out;
   for (const entry of readdirSync(dir)) {
