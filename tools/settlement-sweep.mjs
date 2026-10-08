@@ -29,6 +29,10 @@ import {
   // something only a MOVE ever needed, and the settlement no longer moves one.
   admissionBase, admitDelta,   // §4: the delta admission, in place of a fold per sketchbook
   refuseStaleHouseholds,       // the registry-freshness construction (2026-09-09)
+  // ...and three of them came back for one job that is not a move: a candidate
+  // read one file at a time is in its FILE's frame, and admission judges it in
+  // the world's (POS-446, § candidateInWorld below).
+  COORDS_RELATIVE, declaredCoords, fileToWorld, ringToWorld, standingRank,
 } from "./marks-fold.mjs";
 // THE REPARENT VERB (POS-102 · postmark#2865, 2026-09-16): a structural edit —
 // a frame's record leaving canon or returning — never moves what stands on it.
@@ -498,6 +502,81 @@ export function enclosingMarkId(repo, branch, mainBranch, path) {
     }
   }
   return null;
+}
+
+/**
+ * THE FRAME A REF DECLARES (POS-446): whether its files are written relative
+ * to the mark that frames them, and the root record, whose own numbers are
+ * the world's and whose centre frames anything no ancestor binds. Read off the
+ * root RECORD, as `declaredCoords` reads it in the loader; the folded state
+ * does not carry `coords`.
+ */
+export function frameAtRef(repo, ref) {
+  const rootPath = `${MARKS_PREFIX}${WORLD_ROOT_SLUG}/mark.md`;
+  if (!hasObject(repo, `${ref}:${rootPath}`)) return { relative: false, root: null };
+  const root = recordAt(repo, ref, rootPath);
+  return { relative: declaredCoords([root]) === COORDS_RELATIVE, root };
+}
+
+/**
+ * Each candidate's `at`/`points` composed into the world's frame, in place.
+ *
+ * The walk is `frameMarks`' own (marks-fold.mjs § frameOriginOf), asked of the
+ * path's directory ancestors instead of a loaded tree: the nearest ancestor
+ * with a centre that BINDS the record (a predicate or naming mark is bound by
+ * any; otherwise rank >= the record's own), else the root's centre. An
+ * ancestor's centre is its world `at` — from this sketchbook's own candidates
+ * first (a family crossing together frames on its own parent), then canon's
+ * fold. Ancestors are found exactly as `enclosingMarkId` finds them, branch
+ * first, and that floor is the one the office's framer (world-drain.mjs §
+ * originForPath) walks to when it writes the file, so the two convert against
+ * the same mark.
+ */
+export function candidateInWorld(candidates, { repo, branch, mainBranch, root, byId, pathOf }) {
+  const rootCentre = root?.at && Number.isFinite(root.at.x) ? { x: root.at.x, y: root.at.y } : { x: 0, y: 0 };
+  const own = new Map(candidates.map((c) => [c.id, c]));
+  const framed = new Set();
+  const centreOf = (id) => {
+    const c = own.get(id);
+    if (c) { frame(c); return c.at && Number.isFinite(c.at.x) ? c.at : null; }
+    const m = byId.get(id);
+    return m?.at && Number.isFinite(m.at.x) ? m.at : null;
+  };
+  const ancestorsOf = (path) => {
+    const parts = String(path).replace(/\\/g, "/").split("/");
+    const ids = [];
+    for (let depth = parts.length - 2; depth > 3; depth--) {
+      const ancestor = `${parts.slice(0, depth).join("/")}/mark.md`;
+      for (const ref of [branch, mainBranch]) {
+        if (!hasObject(repo, `${ref}:${ancestor}`)) continue;
+        const rec = recordAt(repo, ref, ancestor);
+        if (rec?.id) { ids.push(rec.id); break; }
+      }
+    }
+    return ids;
+  };
+  const frame = (c) => {
+    if (framed.has(c.id)) return;
+    framed.add(c.id);   // before the walk: a cycle answers the next ancestor, never loops
+    const path = pathOf.get(c.id);
+    if (!path) return;
+    const continued = c.kind === "predicated" || c.kind === "naming";
+    const rank = standingRank(c, byId);
+    let origin = rootCentre;
+    for (const id of ancestorsOf(path)) {
+      const at = centreOf(id);
+      if (at && (continued || standingRank(own.get(id) ?? byId.get(id), byId) >= rank)) { origin = at; break; }
+    }
+    if (c.at && Number.isFinite(c.at.x)) {
+      c._fileAt = { x: c.at.x, y: c.at.y };
+      c.at = fileToWorld(c.at, origin);
+    }
+    const point = (p) => (Array.isArray(p) ? Number.isFinite(p[0]) && Number.isFinite(p[1]) : Number.isFinite(p?.x) && Number.isFinite(p?.y));
+    if (Array.isArray(c.points) && c.points.length && c.points.every(point)) c.points = ringToWorld(c.points, origin);
+    c._origin = origin;
+  };
+  for (const c of candidates) frame(c);
+  return candidates;
 }
 
 export function recordAt(repo, ref, path) {
@@ -1101,6 +1180,7 @@ export function settlementSweep({
   const mainState = foldRef(repo, mainBranch, stakes);
   const admitBase = admissionBase(mainState, { households: wallRegistry.households, stakes });
   const mainFolded = new Map(mainState.marks.map((mark) => [mark.id, mark]));
+  const mainFrame = frameAtRef(repo, mainBranch);
 
   for (const branch of branches) {
     const household = branch.slice("draft/".length);
@@ -1111,9 +1191,11 @@ export function settlementSweep({
     // carries no record, and a row the sketchbook never touched is main's own
     // amendment showing through a stale copy (the supersession reading below).
     const candidates = [];
+    const pathOfCandidate = new Map();
     for (const delta of deltas) {
       if (delta.status === "D" || !delta.branchTouched) continue;
       const rec = recordAt(repo, branch, delta.path);
+      if (rec) pathOfCandidate.set(rec.id, delta.path);
       if (rec) candidates.push({
         ...rec,
         // THE DIRECTORY EDGE, which `recordAt` does not carry because it reads
@@ -1136,6 +1218,29 @@ export function settlementSweep({
         _replacing: mainFolded.has(rec.id),
       });
     }
+
+    // THE CANDIDATES IN THE WORLD'S FRAME (POS-446, 2026-10-08). `recordAt`
+    // reads one file, and a nested file's `at`/`points` are an OFFSET from
+    // the mark that frames it (`coords: relative`). `admitDelta` judges every
+    // view in the world's frame — its containment, its sovereignty and so the
+    // class `classifyMark` reads below — so a nested candidate handed over raw
+    // was judged at its offset, as if it stood next to the world's origin.
+    //
+    // THE INSTANCE: lupi's door amends of `lupi/the-unworn-step` (acts 7330
+    // and 7470, S76 and S78). The file says (-3, 11) under her parcel; read as
+    // world, that is the Quay Reach, so the amend classed `market` and was
+    // KEPT for "commons needs escrow > 0" — while main's fold, and the store's
+    // clearing, both had it at (-1408, -3032) on her own ground, `home`. The
+    // store locked it; the file never received it.
+    //
+    // The frame is the loader's own rule (marks-fold.mjs § frameMarks): the
+    // nearest enclosing positioned mark that binds the record, else the root's
+    // centre, composed with fileToWorld. The file's own numbers ride as
+    // `_fileAt`, exactly as `loadMarks` keeps them. A tree that declares no
+    // relative frame is untouched.
+    if (mainFrame.relative) candidateInWorld(candidates, {
+      repo, branch, mainBranch, root: mainFrame.root, byId: mainFolded, pathOf: pathOfCandidate,
+    });
 
     // THE QUARANTINE, and it is deliberately the FIRST thing in the sketchbook,
     // exactly as when it was a whole-tree fold: nothing is read, published,
