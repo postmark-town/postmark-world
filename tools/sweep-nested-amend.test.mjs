@@ -15,6 +15,8 @@
 //      exempts nothing that was not exempt;
 //   3. a sketchbook that carries the frame AND its child frames the child on
 //      the frame's NEW place.
+//   4. the same, asked of candidateInWorld directly: a stale parcel rect in
+//      admission can still call the child home, so (3) alone cannot see it.
 
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -23,7 +25,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { settlementSweep } from "./settlement-sweep.mjs";
+import { settlementSweep, candidateInWorld, frameAtRef, recordAt } from "./settlement-sweep.mjs";
 import { withTool } from "./engine-files.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -119,4 +121,24 @@ test("POS-446 · a sketchbook carrying a frame and its child frames the child on
   assert.deepEqual(out.left_drafted, [], "neither is KEPT");
   assert.deepEqual(out.published.map((r) => [r.id, r.class]).sort(), [["lupi/the-den-parcel", "home"], ["lupi/the-step", "home"]]);
   assert.deepEqual(c.worldAt("lupi/the-step").at, { x: -1308, y: -3032 }, "the step stands on the parcel's new place");
+});
+
+test("POS-446 · candidateInWorld: the child is framed on the frame's place in THIS sketchbook, not canon's", (t) => {
+  const c = crossingRepo(t, "postmark-nested-unit-");
+  const { parcel, step } = town(c);
+  c.sketch("lupi", [
+    [parcel, record({ kind: "parcel", by: "lupi", at: { x: 95, y: -43 }, extent: { w: 25, h: 25 }, body: "lupi's parcel" })],
+    [step, record({ by: "lupi", at: { x: -3, y: 11 }, extent: { w: 2, h: 1 }, body: "the step, moved with the den" })],
+  ]);
+  const byId = new Map(JSON.parse(readFileSync(join(c.repo, "WORLD", "world-state.json"), "utf8")).marks.map((m) => [m.id, m]));
+  const pathOf = new Map([["lupi/the-den-parcel", parcel], ["lupi/the-step", step]]);
+  // the child first, so its frame has to be framed on demand
+  const cands = [recordAt(c.repo, "draft/lupi", step), recordAt(c.repo, "draft/lupi", parcel)];
+  const frame = frameAtRef(c.repo, "main");
+  assert.equal(frame.relative, true);
+  candidateInWorld(cands, { repo: c.repo, branch: "draft/lupi", mainBranch: "main", root: frame.root, byId, pathOf });
+  const [s, p] = cands;
+  assert.deepEqual(p.at, { x: -1305, y: -3043 }, "the parcel is framed on the grove");
+  assert.deepEqual(s.at, { x: -1308, y: -3032 }, "the step is framed on the parcel's NEW place");
+  assert.deepEqual(s._fileAt, { x: -3, y: 11 }, "and keeps its file's own numbers beside it");
 });
