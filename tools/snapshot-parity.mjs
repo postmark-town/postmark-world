@@ -30,7 +30,7 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "n
 import { dirname, join, relative } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { snapshotFromTree, SNAPSHOT_ENV } from "./marks-fold.mjs";
+import { snapshotFromTree, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -98,14 +98,14 @@ async function main(argv) {
     const found = filesReadingTheTree(sources);
     const files = opt("--files") ? opt("--files").split(",").map((s) => s.trim()).filter(Boolean) : found.reads;
     const n = Math.max(1, Number(opt("--concurrency", 2)));
-    const base = { ...process.env }; delete base[SNAPSHOT_ENV];
+    const base = { ...process.env }; delete base[SNAPSHOT_ENV]; delete base[SNAPSHOT_ROOT_ENV];
     const results = [];
     let next = 0;
     await Promise.all(Array.from({ length: n }, async () => {
       while (next < files.length) {
         const file = files[next++];
         const tree = await runFile(file, base);
-        const snap = await runFile(file, { ...base, [SNAPSHOT_ENV]: snapshot });
+        const snap = await runFile(file, { ...base, [SNAPSHOT_ENV]: snapshot, [SNAPSHOT_ROOT_ENV]: ROOT });
         const rows = difference(tapVerdicts(tree.tap), tapVerdicts(snap.tap));
         const counts = (m) => ({ tests: m.size, fail: [...m.values()].filter((v) => v === "not ok").length });
         results.push({ file, filing_path: found.filing.includes(file), tree: counts(tapVerdicts(tree.tap)), snapshot: counts(tapVerdicts(snap.tap)), differ: rows });

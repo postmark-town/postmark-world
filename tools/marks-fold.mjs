@@ -331,12 +331,25 @@ export function loadMarks(dir) {
 // cannot be read is never read as an empty world.
 export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";
 export const SNAPSHOT_FORMAT = "postmark-world-snapshot/1";
+// THE REPO IT STANDS FOR. A switch read from the environment is inherited by
+// every child, and many of this repo's tests run the engine inside a FIXTURE
+// repo that copies tools/ (marks-fold.mjs included), where "this repo's own
+// WORLD/marks" is the fixture's. Measured: the first parity run switched twelve
+// files' fixtures onto the town's snapshot. So the switch names the repo whose
+// tree the snapshot stands in for, and every other repo reads its own tree.
+export const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";
 const LIVE_MARKS = resolve(ROOT, "WORLD", "marks");
 
-/** The snapshot to read for `dir`, or null: only when WORLD_SNAPSHOT is set and `dir` is this repo's own WORLD/marks. */
+/**
+ * The snapshot to read for `dir`, or null: only when WORLD_SNAPSHOT names an
+ * export, WORLD_SNAPSHOT_ROOT names THIS repo, and `dir` is this repo's own
+ * WORLD/marks. Without the root the switch reads nothing: a snapshot is never
+ * applied to a repo nobody named.
+ */
 export function snapshotFor(dir, env = process.env) {
   const path = String(env?.[SNAPSHOT_ENV] ?? "").trim();
-  if (!path) return null;
+  const root = String(env?.[SNAPSHOT_ROOT_ENV] ?? "").trim();
+  if (!path || !root || resolve(root) !== resolve(ROOT)) return null;
   return resolve(String(dir)) === LIVE_MARKS ? path : null;
 }
 

@@ -41,7 +41,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { loadMarks, loadSnapshot, fold, rect, overlapArea, SNAPSHOT_ENV } from "./marks-fold.mjs";
+import { loadMarks, loadSnapshot, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -102,7 +102,7 @@ export function harmGateOnSnapshots({ repo = join(HERE, ".."), before, after, ac
   const was = byId(read(before)), now = read(after);
   const stakeRows = stakes ? (typeof stakes === "string" ? stakesFrom(stakes) : stakes) : [];
   const state = fold({ marks: structuredClone(now), terrain: null, stakes: stakeRows });
-  const lintRun = lint && typeof after === "string" ? lintVerdict(repo, { [SNAPSHOT_ENV]: after }) : null;
+  const lintRun = lint && typeof after === "string" ? lintVerdict(repo, { [SNAPSHOT_ENV]: after, [SNAPSHOT_ROOT_ENV]: repo }) : null;
   return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: "snapshot" };
 }
 

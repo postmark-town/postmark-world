@@ -11,16 +11,17 @@ import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import {
-  loadMarks, loadTreeMarks, loadSnapshot, snapshotFor, snapshotFromTree, SNAPSHOT_ENV, SNAPSHOT_FORMAT,
+  loadMarks, loadTreeMarks, loadSnapshot, snapshotFor, snapshotFromTree, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV, SNAPSHOT_FORMAT,
 } from "./marks-fold.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LIVE = join(ROOT, "WORLD", "marks");
 
-function withEnv(value, fn) {
-  const before = process.env[SNAPSHOT_ENV];
-  if (value == null) delete process.env[SNAPSHOT_ENV]; else process.env[SNAPSHOT_ENV] = value;
-  try { return fn(); } finally { if (before === undefined) delete process.env[SNAPSHOT_ENV]; else process.env[SNAPSHOT_ENV] = before; }
+function withEnv(value, fn, root = ROOT) {
+  const before = [process.env[SNAPSHOT_ENV], process.env[SNAPSHOT_ROOT_ENV]];
+  const set = (k, v) => { if (v == null) delete process.env[k]; else process.env[k] = v; };
+  set(SNAPSHOT_ENV, value); set(SNAPSHOT_ROOT_ENV, value == null ? null : root);
+  try { return fn(); } finally { set(SNAPSHOT_ENV, before[0]); set(SNAPSHOT_ROOT_ENV, before[1]); }
 }
 
 function scratch(t) {
@@ -82,4 +83,16 @@ test("each read is a fresh copy: a caller that stamps the records cannot change 
   const first = loadSnapshot(path);
   first[0].kind = "stamped";
   assert.equal(loadSnapshot(path)[0].kind, "sited");
+});
+
+test("the switch names the repo it stands for: without WORLD_SNAPSHOT_ROOT, or naming another repo, nothing is switched", (t) => {
+  // The first parity run (POS-363) found the switch, inherited through the
+  // environment, applied to FIXTURE repos that copy tools/: twelve files'
+  // fixtures read the town's snapshot as their own tree.
+  const path = join(scratch(t), "snap.json");
+  writeFileSync(path, JSON.stringify({ format: SNAPSHOT_FORMAT, marks: [] }));
+  assert.equal(snapshotFor(LIVE, { [SNAPSHOT_ENV]: path }), null, "no root named: no switch");
+  assert.equal(snapshotFor(LIVE, { [SNAPSHOT_ENV]: path, [SNAPSHOT_ROOT_ENV]: join(ROOT, "..", "some-fixture-repo") }), null, "another repo named: no switch");
+  assert.equal(snapshotFor(LIVE, { [SNAPSHOT_ENV]: path, [SNAPSHOT_ROOT_ENV]: ROOT }), path, "this repo named: the switch");
+  withEnv(path, () => assert.ok(loadMarks(LIVE).length > 100, "a root naming another repo leaves this tree read from disk"), join(ROOT, "..", "elsewhere"));
 });
