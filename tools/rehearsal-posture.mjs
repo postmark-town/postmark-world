@@ -108,9 +108,11 @@ export const ALLOWED_TOOL_ENV = ["BOT_EMAIL", "BOT_NAME", "WORLD_SNAPSHOT", "WOR
 /**
  * The files check 6 reads: the two tools the job runs, and the seam both of
  * them load the marks through (Wright's review of world#165: the snapshot keys
- * reached the gate through marks-fold.mjs, which no check read).
+ * reached the gate through marks-fold.mjs, which no check read). Since POS-371
+ * also the baseline, which runs the base's own sweep before this tree's and
+ * hands those children the runner's environment as the sweep step always has.
  */
-export const ENV_CONSUMERS = ["tools/settlement-sweep.mjs", "tools/harm-gate.mjs", "tools/marks-fold.mjs"];
+export const ENV_CONSUMERS = ["tools/settlement-sweep.mjs", "tools/harm-gate.mjs", "tools/marks-fold.mjs", "tools/rehearsal-baseline.mjs"];
 
 /** Keys whose presence in the job would mean it can reach a store or a pen. */
 export const DENIED_RUNTIME_ENV = [
