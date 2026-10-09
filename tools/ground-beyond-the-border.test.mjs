@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { assembleWorld, atlasBoxOf, deriveHomeControlPoints, groundReach, groundsBeyondTheBorder } from "./world-build.mjs";
+import { assembleWorld, atlasBoxOf, deriveHomeControlPoints, groundReach, groundsBeyondTheBorder, withGroundBeyondTheBorder } from "./world-build.mjs";
 import { townGround } from "../spectator/viewer.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -96,6 +96,39 @@ test("a ground that reaches the atlas is refused, and grounds need the border de
   assert.throws(() => groundsBeyondTheBorder({ ...SKELETON, features: [...TODAY.features, touching] }), /reaches the atlas/);
   const noBox = { ...SKELETON, _grid: { ...SKELETON._grid, atlas_box_m: undefined } };
   assert.throws(() => groundsBeyondTheBorder(noBox), /needs the border/);
+});
+
+// A ground at the closest lawful distance: its outer foot ring 1 m past the
+// border. Here the rings alone cannot hold the atlas, so this is where the atlas
+// box's own branch and the border's zero points each have to do their job (the
+// north crag, 137 m out, is held by its rings alone; measured 2026-10-09).
+test("a ground at the closest lawful distance: the atlas and the border still hold", () => {
+  const r = CRAG.foot_gap_m + 60 + 1;
+  const near = { ...CRAG, id: "near-test-ground", ring_m: [
+    { x: 1000, y: ATLAS.y0 - r - 300 }, { x: 1400, y: ATLAS.y0 - r - 300 },
+    { x: 1400, y: ATLAS.y0 - r }, { x: 1000, y: ATLAS.y0 - r },
+  ] };
+  const sk = { ...SKELETON, features: [...TODAY.features, near] };
+  const hf = assembleWorld({ worldState, skeleton: sk }).heightfield;
+  for (let x = 800; x <= 1600; x += 10) {
+    for (const y of [ATLAS.y0, ATLAS.y0 + 5, ATLAS.y0 + 50, ATLAS.y0 + 200])
+      assert.equal(hf.elevationAt(x, y), today.elevationAt(x, y), `the atlas moved at {${x}, ${y}}`);
+    const jump = Math.abs(hf.elevationAt(x, ATLAS.y0 - 0.01) - hf.elevationAt(x, ATLAS.y0));
+    assert.ok(jump < 0.05, `a ${jump.toFixed(3)} m step across the border at x ${x}`);
+  }
+  assert.ok(Math.abs(hf.elevationAt(1200, ATLAS.y0 - r - 150) - CRAG.top_m) < 1.5, "and the near ground still stands at its top");
+});
+
+// The promise BY CONSTRUCTION, not by geometry: inside the atlas box the answer
+// is the base field's whatever the grounds say. Pinned directly, because with
+// every lawful ground the foot rings already hold the atlas on their own (the two
+// cases above stay green without this branch; measured 2026-10-09).
+test("inside the atlas box the answer is the base field's, whatever the grounds say", () => {
+  const base = { controlPoints: [], elevationAt: () => 10 };
+  const g = { id: "pin", kind: "ground", ring_m: [{ x: 0, y: 0 }, { x: 400, y: 0 }, { x: 400, y: 400 }, { x: 0, y: 400 }], top_m: 200, foot_gap_m: 40 };
+  const hf = withGroundBeyondTheBorder(base, [g], { x0: 100, x1: 300, y0: 100, y1: 300 }); // a box drawn over the ground's top
+  assert.equal(hf.elevationAt(200, 200), 10, "inside the box: the base, not the ground");
+  assert.ok(Math.abs(hf.elevationAt(50, 50) - 200) < 1, "outside it: the ground");
 });
 
 test("with no ground the heightfield is today's own object, untouched", () => {

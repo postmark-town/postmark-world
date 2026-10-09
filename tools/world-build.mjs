@@ -132,19 +132,20 @@ export function deriveHomeControlPoints(marks, { grounds = [] } = {}) {
 //   elevationAt(x, y) = base(x, y)                   inside the atlas box (today's field)
 //                     = base(x, y) + offset(x, y)    beyond the border
 //
-// where `offset` is the same IDW over: each ground's top lattice at
-// (top_m − base), two rings at 0 around its foot (foot_gap_m and
-// foot_gap_m + GROUND_SKIRT_M out from its box), and the atlas's border at 0
-// every BORDER_SEAM_M. So the top stands at top_m, the foot meets the ground
-// that was already there, the border meets the atlas exactly (no seam), and
-// open country away from any ground is untouched. A ground must lie wholly
+// where `offset` is the same IDW over each ground's top lattice at
+// (top_m − base) and two rings at 0 around its foot (foot_gap_m and
+// foot_gap_m + GROUND_SKIRT_M out from its box). So the top stands at top_m,
+// and past the outer ring every point's nearest offset points are zeros: the
+// foot meets the ground that was already there, open country is untouched, and
+// the border meets the atlas with no seam (measured; a seam of zero points along
+// the border was tried and changed nothing, so it is not here). The atlas box’s
+// own branch makes the promise true by construction rather than by geometry. A ground must lie wholly
 // beyond the border, foot rings included; one that reaches the atlas is a
 // defect and is refused here, as it is in world-terrain-gen.mjs.
 export const GROUND_LATTICE_M = 20;     // the top's sampling step
 export const GROUND_FOOT_DEG = 3;       // the foot rings' angular step
 export const GROUND_SKIRT_M = 60;       // the second foot ring, this far past the first
 export const GROUND_FOOT_GAP_M = 40;    // default foot gap: the cliff's steepness dial
-export const BORDER_SEAM_M = 25;        // the atlas border's zero points, this far apart
 
 /** The atlas box the skeleton declares (`_grid.atlas_box_m`), or null. */
 export function atlasBoxOf(skeleton) {
@@ -197,8 +198,8 @@ export function groundsBeyondTheBorder(skeleton) {
   return grounds;
 }
 
-/** The offset field's points: each ground's top lattice and foot rings, and the border at 0. */
-export function groundOffsetPoints(grounds, atlas, baseAt) {
+/** The offset field's points: each ground's top lattice and its two foot rings at 0. */
+export function groundOffsetPoints(grounds, baseAt) {
   const pts = [];
   for (const g of grounds) {
     const b = boxOfRing(g.ring_m);
@@ -216,14 +217,12 @@ export function groundOffsetPoints(grounds, atlas, baseAt) {
       }
     }
   }
-  for (let x = atlas.x0; x <= atlas.x1; x += BORDER_SEAM_M) pts.push({ x, y: atlas.y0, h: 0 }, { x, y: atlas.y1, h: 0 });
-  for (let y = atlas.y0 + BORDER_SEAM_M; y < atlas.y1; y += BORDER_SEAM_M) pts.push({ x: atlas.x0, y, h: 0 }, { x: atlas.x1, y, h: 0 });
   return pts;
 }
 
 /** Today's heightfield inside the atlas; today's plus the grounds' offset beyond it. */
 export function withGroundBeyondTheBorder(base, grounds, atlas) {
-  const offset = buildHeightfield({ controlPoints: groundOffsetPoints(grounds, atlas, base.elevationAt) });
+  const offset = buildHeightfield({ controlPoints: groundOffsetPoints(grounds, base.elevationAt) });
   return {
     // controlPoints stay the base's: the region ids world-verbs reads are the atlas's own
     controlPoints: base.controlPoints,
