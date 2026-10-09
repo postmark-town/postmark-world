@@ -10890,8 +10890,11 @@ export function mountViewer(appEl) {
       const { originPx, mPerPx, view } = mapCtx;
       const paneW = panePx();
       const unit = paneW > 0 ? view.w / paneW : 1;
+      // the top edge sits below the map's control row (about 50 px of the pane
+      // drawn over the painting), so a chevron there is not hidden under it
+      const top = 40 * unit;
       const viewport = {
-        minX: (view.x - originPx.x) * mPerPx, minY: (view.y - originPx.y) * mPerPx,
+        minX: (view.x - originPx.x) * mPerPx, minY: (view.y + top - originPx.y) * mPerPx,
         maxX: (view.x + view.w - originPx.x) * mPerPx, maxY: (view.y + view.h - originPx.y) * mPerPx,
       };
       const edges = housemateEdges({ walkers: walkState.lastDrawn ?? [], handles, viewport, inset: 18 * unit * mPerPx });
@@ -10902,10 +10905,10 @@ export function mountViewer(appEl) {
         const labelWidth = Math.max(60, Math.min(220, label.length * 7 + 12)) * unit;
         const labelHeight = 21 * unit;
         const labelX = Math.max(view.x + 4 * unit, Math.min(view.x + view.w - labelWidth - 4 * unit, at.x - labelWidth / 2));
-        const labelY = Math.max(view.y + 4 * unit, Math.min(view.y + view.h - labelHeight - 4 * unit,
+        const labelY = Math.max(view.y + top + 4 * unit, Math.min(view.y + view.h - labelHeight - 4 * unit,
           at.y < view.y + view.h / 2 ? at.y + 12 * unit : at.y - labelHeight - 12 * unit));
         html += `<g class="wv-edge-indicator wv-edge-housemate" data-handle="${esc(e.handle)}" style="color:${esc(face.color)}">`
-          + `<path d="M0 -5 L2.8 4 L0 2.1 L-2.8 4 Z" transform="translate(${at.x} ${at.y}) rotate(${e.bearingDeg}) scale(${1.6 * unit})"/>`
+          + `<path d="M0 -5 L2.8 4 L0 2.1 L-2.8 4 Z" transform="translate(${at.x} ${at.y}) rotate(${e.bearingDeg}) scale(${2.2 * unit})"/>`
           + `<rect x="${labelX}" y="${labelY}" width="${labelWidth}" height="${labelHeight}" rx="${3 * unit}"/>`
           + `<text x="${labelX + 6 * unit}" y="${labelY + 14.5 * unit}" font-size="${11 * unit}">${esc(label)}</text></g>`;
       }
