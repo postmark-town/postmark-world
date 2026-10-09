@@ -63,7 +63,7 @@ test("housemateEdges points at a housemate off the viewport, and at nobody else"
 
 // ── the page ───────────────────────────────────────────────────────────────
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }
@@ -229,7 +229,7 @@ const readBodies = (page, mate) => page.evaluate((mateHandle) => {
 }, mate);
 
 const skipReason = "playwright is absent, so the page's bodies go unguarded: "
-  + "npm i in G:/Wright-HQ or install playwright here";
+  + "run npm ci here (playwright is this package's devDependency)";
 
 test("1. acting as a resident draws the same bodies the Spectator draws", async (t) => {
   if (!chromium) return t.skip(skipReason);
