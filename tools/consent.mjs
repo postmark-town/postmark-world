@@ -78,10 +78,29 @@
 //
 // A vetoed mark is RETURNED: it leaves the fold into a first-class `returned[]`
 // output beside `errors[]`, naming the mark, the ground or parent it was returned
-// from, and its state. Its subtree goes with it, and every member is disclosed by
-// name. The subtree is the opposed household's OWN marks under it (POS-477): what
-// another household, or the town, stands on that ground stays. There is no silent drop anywhere in this file — a resident whose mark
-// stops appearing is owed the sentence saying why.
+// from, and its state. What leaves with it is `subtree`, and every member is
+// disclosed by name. There is no silent drop anywhere in this file — a resident
+// whose mark stops appearing is owed the sentence saying why.
+//
+// A STANCE RETURN TAKES THE OPPOSED MARK ALONE (Darko's ruling B, 2026-10-09,
+// POS-362). The whole mark returns, never clipped; the marks nested in it do
+// not go with it. Each one with a place of its own (a sited mark) keeps its
+// world position and is reparented to the next mark that contains it, or to
+// open ground (marks-fold.mjs § ruling B), and is named in the return's
+// `stays`. Its own children stay with it. A child that overlaps the opposer's
+// older ground is a mark over that ground in its own right: it awaits that
+// household and can be opposed on its own. What still leaves is the mark
+// CONTINUED: a predicated or naming mark whose parent is the returned mark has
+// no extent of its own (§ the commons tree edge: "it is its parent continued"),
+// so it has nowhere to stay.
+//
+// A LAW RETURN TAKES ITS SUBTREE, as before ruling B, which does not cover it.
+// A town opposition the settlement writes for a limit (R11: the household cap,
+// one-per-resident) arrives in `townLaws`, and its subtree is every mark of the
+// opposed household under it, sited or not.
+//
+// Either way the subtree is the opposed household's OWN marks (POS-477): what
+// another household, or the town, stands on that ground stays.
 //
 // ── THE ESCROW GUARD ─────────────────────────────────────────────────────────
 //
@@ -105,7 +124,7 @@
 //              fan-up, standing or any other use of density), so the existing
 //              return path carries it." With infinite backing, the comparison
 //              cannot fail, so a town opposition is a return with no arithmetic.
-//              It takes the subtree and the escrow guard below, unchanged:
+//              It takes the return path and the escrow guard below, unchanged:
 //              an opposed mark with open stakes stands until they unwind.
 //
 //   neutral    CONFERS NOTHING here (a DECLARED neutral). It clears the "awaiting the town" label
@@ -119,6 +138,8 @@
 export const CONSENT_FIELD = "consent";
 export const CONSENT_WORDS = new Set(["opposed", "welcomed"]);
 export const TOWN_WORDS = new Set(["neutral", "opposed"]);
+/** Ruling B (2026-10-09): a stance return takes the opposed mark alone. A reader of an older engine finds this absent. */
+export const STANCE_RETURNS_ALONE = true;
 /** The ground and the grantor a town return names. */
 export const TOWN = "the-town";
 // The consent map as authored, or null. Shared with the lint so both read a
@@ -161,10 +182,15 @@ const overlapsRect = (a, b) => {
  *   rectOf    (mark) -> {x,y,w,h}
  *   townWords Map(id -> "neutral" | "opposed") or a plain object; optional —
  *             the town's standing word per mark (see § THE TOWN'S WORD)
+ *   townLaws  Map(id -> law mark id) or a plain object; optional — the town's
+ *             oppositions that cite a limit (R11), which take their subtree
+ *             (see § A LAW RETURN TAKES ITS SUBTREE)
  *
- * → { allow(parentId, childId), reason(parentId, childId), returned, kept, dropped, errors }
+ * → { allow(parentId, childId), reason(parentId, childId), returned, kept, dropped, alone, errors }
+ *   `alone`: the marks returned without their positioned children, whose
+ *   children the fold reparents (ruling B)
  */
-export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rectOf, townWords = null }) {
+export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rectOf, townWords = null, townLaws = null }) {
   const errors = [];
   const kept = new Set();
   const words = new Map();      // `${grantorId} ${targetId}` -> word
@@ -256,10 +282,21 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
     parcelVeto.delete(target);
     edgeVeto.delete(target);
   }
+  // A limit is the town's opposition citing its law: a veto like any town word,
+  // returned with its subtree (§ A LAW RETURN TAKES ITS SUBTREE).
+  const lawReturn = new Set();
+  for (const [target] of townLaws instanceof Map ? [...townLaws] : Object.entries(townLaws ?? {})) {
+    if (!byId.has(target)) continue;
+    lawReturn.add(target);
+    townVeto.add(target);
+    parcelVeto.delete(target);
+    edgeVeto.delete(target);
+  }
 
   // ---- returns, with the subtree and the escrow guard ----
   const children = new Map();
   for (const [c, p] of parentOf) { if (!children.has(p)) children.set(p, []); children.get(p).push(c); }
+  const positioned = (mk) => !!mk?.at && (mk.kind === "sited" || mk.kind === "parcel");
   // A SUBTREE IS THE OPPOSED HOUSEHOLD'S OWN (POS-477). `parentOf` holds the
   // geometric containment edge (the smallest sited mark around a mark, the edge
   // published as `placementParent`), so an opposed mark's descendants include
@@ -269,23 +306,30 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
   // answers for the opposed mark's own household: the walk still descends the
   // whole tree, and carries only that household's marks (by credential, as
   // every household comparison here is). Everyone else's stays where it stands.
-  const subtreeOf = (id) => {
+  //
+  // RULING B: a stance return's walk stops at every child with a place of its
+  // own. That child stays (named in `stays`), and so does everything under it.
+  // What the walk still carries is the mark continued, its predicates and names.
+  const subtreeOf = (id, { whole }) => {
     const out = [];
+    const stays = [];
     const cred = credOfMark(byId.get(id));
     const walk = (n, seen) => {
       for (const c of children.get(n) ?? []) {
         if (seen.has(c)) continue;
         seen.add(c);
+        if (!whole && positioned(byId.get(c))) { if (n === id) stays.push(c); continue; }
         if (credOfMark(byId.get(c)) === cred) out.push(c);
         walk(c, seen);
       }
     };
     walk(id, new Set([id]));
-    return out;
+    return { subtree: out, stays: stays.sort() };
   };
 
   const returned = [];
   const dropped = new Set();
+  const alone = new Set();
   const vetoed = [
     ...[...townVeto].map((id) => ({ id, kind: "town", ground: TOWN, grantor: TOWN, detail: null })),
     ...[...parcelVeto].map(([id, v]) => ({ id, kind: "parcel", ground: v.parcel, grantor: v.grantor, detail: null })),
@@ -295,7 +339,8 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
 
   for (const v of vetoed) {
     if (dropped.has(v.id)) continue;                        // already leaving with an ancestor
-    const subtree = subtreeOf(v.id);
+    const whole = lawReturn.has(v.id);
+    const { subtree, stays } = subtreeOf(v.id, { whole });
     const staked = [v.id, ...subtree].filter((id) => own(id) > 0);
     const entry = {
       mark: v.id,
@@ -304,12 +349,17 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
       authority: v.kind === "town" ? "the town (absolute)" : v.kind === "parcel" ? "parcel (absolute)" : "commons edge (earned)",
       grantor: v.grantor,
       subtree,
+      ...(stays.length ? { stays } : {}),
       state: staked.length ? "pending-escrow" : "returned",
       ...(v.detail ? { veto: v.detail } : {}),
       ...(staked.length ? { open_escrow_on: staked } : {}),
     };
     returned.push(entry);
-    if (!staked.length) { dropped.add(v.id); for (const s of subtree) dropped.add(s); }
+    if (!staked.length) {
+      dropped.add(v.id);
+      for (const s of subtree) dropped.add(s);
+      if (!whole) alone.add(v.id);
+    }
   }
 
   // ---- the edge table the fan-up asks ----
@@ -327,5 +377,5 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
     return r === "structural" || r === "welcomed";
   };
 
-  return { allow, reason, returned, kept, dropped, errors };
+  return { allow, reason, returned, kept, dropped, alone, errors };
 }

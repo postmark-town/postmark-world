@@ -957,7 +957,7 @@ export function householdKeyGrain(households) {
   return "mixed";
 }
 
-export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy", townWords = null }) {
+export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy", townWords = null, townLaws = null }) {
   const errors = [];
   const terrainIds = new Set((terrain?.features ?? []).map(f => "terrain:" + f.id));
   const byId = new Map();
@@ -1145,6 +1145,8 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     byId, credOf: credHh, parcels, ownStamps: weightByMark, parentOf, rectOf: rect,
     // the town's standing word per mark (POS-361), fed by the settlement; absent = silence
     townWords,
+    // the town's oppositions that cite a limit (R11), fed by the settlement: they take their subtree
+    townLaws,
   });
   errors.push(...consent.errors);
   const returned = consent.returned;
@@ -1152,6 +1154,45 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // `returned[]` above, with its ground, its grantor and every member of its subtree
   // named — but from here down it is not part of the world.
   const gone = consent.dropped;
+
+  // ── RULING B: A STANCE RETURN TAKES THE OPPOSED MARK ALONE (Darko, 2026-10-09) ──
+  // consent.mjs § A STANCE RETURN TAKES THE OPPOSED MARK ALONE. The records here
+  // carry WORLD positions (the loader composed each through its frame, and the
+  // store's rows are world-framed), so a child that stays keeps its place with
+  // nothing rewritten; what moves is its edge. Each positioned mark whose parent
+  // was returned alone is reparented to the next mark that contains it among
+  // the marks still standing, or to open ground: the fan-up edge (the smallest
+  // sited container, as above) and the published one (`placementParent`, the
+  // smallest container of either kind), both. Grandchildren keep their own
+  // parent. A law return's ground is not touched: it took its subtree.
+  if (consent.alone?.size) {
+    const standing = [...byId.values()].filter((mk) => !gone.has(mk.id));
+    const standingSited = standing.filter((mk) => mk.kind === "sited");
+    const root = worldRootOf([...byId.values()]);
+    const smallestSitedAround = (b) => {
+      const rb = rect(b);
+      let best = null, bestArea = Infinity;
+      for (const a of standingSited) {
+        if (a === b) continue;
+        const ra = rect(a), area = ra.w * ra.h;
+        if (area > rb.w * rb.h && marksContain(a, b) && area < bestArea) { best = a; bestArea = area; }
+      }
+      return best ? best.id : null;
+    };
+    for (const mk of standing) {
+      if (mk.kind === "sited" && consent.alone.has(parentOf.get(mk.id))) {
+        const up = smallestSitedAround(mk);
+        if (up) parentOf.set(mk.id, up); else parentOf.delete(mk.id);
+      }
+      if ((mk.kind === "sited" || mk.kind === "parcel") && mk.at && consent.alone.has(containedBy.get(mk.id))) {
+        const up = containmentParentOf(mk, standing, root);
+        containedBy.set(mk.id, up);
+        mk._containedBy = up ?? null;
+      }
+    }
+    children.clear();
+    for (const [c, p] of parentOf) { if (!children.has(p)) children.set(p, []); children.get(p).push(c); }
+  }
   // Terrain is the town's ground and binds without stamps (MARKS.md § the terrain
   // tier), so a predicate attached to a terrain feature fans up into it by class,
   // exactly as it does into the world root. Terrain carries no household to compare.
