@@ -311,6 +311,66 @@ test("a household never consents to itself, and an unknown word is a fold error 
   assert.equal(standing(nonsense, "foreign/hall"), true, "and nothing acts on it");
 });
 
+// ── a subtree carries only its own household's marks (POS-477) ───────────────
+//
+// THE LIVE CASE, S100: the-town/pando-peak (constitution, 4 km, with its
+// picture) stands inside vermillion/pando-plains (a resident's sited market
+// mark, 15.3 by 13.5 km, ringed). The fold's containment edge (smallest sited
+// mark containing it, the same edge published as `placementParent`) makes the
+// peak a CHILD of the plains, so opposing the plains walked the peak, and
+// everything standing in it, out of the world with it. An opposition answers
+// for the opposed mark's own household: another household's marks, and the
+// town's own, stay where they stand (POS-364's B, for limits, is the same rule).
+
+const PANDO_PICTURE = "https://media.postmark.town/media/FluffUPando/a6ceee3b3ae567a4c98f38dead4219e7152853df710749f162fe9fcaab77a2e7.jpg";
+const PANDO_PLAINS_RING = [[-87460,-95460],[-87610,-93950],[-88480,-92630],[-89500,-91460],[-90560,-90290],[-92100,-89580],[-93900,-89710],[-95460,-89930],[-97060,-89550],[-99000,-89260],[-100720,-89900],[-101770,-91220],[-102430,-92630],[-102760,-94050],[-102660,-95460],[-102430,-96800],[-102170,-98180],[-101380,-99440],[-100040,-100290],[-98690,-101110],[-97280,-102190],[-95460,-102730],[-93680,-102030],[-92410,-100790],[-91240,-99910],[-89890,-99200],[-88740,-98180],[-87940,-96900]];
+const pandoMarks = (extra = []) => [
+  // as S100 has them (WORLD/marks/let-there-be-light/pando-peak, vermillion/pando-plains, vermillion/the-pando-peak)
+  sited("pando-peak", "the-town", -95458, -95458, 4000, 4000, { tier: "constitution", date: "2026-07-22", far: true, feature: "pando-peak", image: PANDO_PICTURE }),
+  sited("pando-plains", "vermillion", -95110, -95995, 15300, 13470, { date: "2026-10-08T06:55:12.255Z", points: PANDO_PLAINS_RING }),
+  sited("the-pando-peak", "vermillion", -95458, -95458, 3600, 3600, { date: "2026-07-24", image: PANDO_PICTURE }),
+  // another household's mark on the plains, outside the peak
+  sited("picnic", "third", -99000, -96000, 10, 10),
+  ...extra,
+];
+const pandoStays = (state, why) => {
+  const peak = state.marks.find((m) => m.id === "the-town/pando-peak");
+  assert.ok(peak, `the town's pando-peak stands (${why})`);
+  assert.equal(peak.image, PANDO_PICTURE, `and keeps its picture (${why})`);
+  assert.equal(standing(state, "third/picnic"), true, `another household's mark stands (${why})`);
+};
+
+test("POS-477 · THE TOWN OPPOSES vermillion/pando-plains: the plains leave with vermillion's own marks; the town's pando-peak, its picture and a third household's mark stay", () => {
+  const state = fold({ marks: pandoMarks(), terrain, tick: 1, stakes: [], townWords: new Map([["vermillion/pando-plains", "opposed"]]) });
+  assert.equal(state.returned.length, 1);
+  const r = state.returned[0];
+  assert.equal(r.mark, "vermillion/pando-plains");
+  assert.equal(r.state, "returned");
+  assert.deepEqual(r.subtree, ["vermillion/the-pando-peak"], "the subtree is the opposed household's own marks, and only those");
+  assert.equal(standing(state, "vermillion/pando-plains"), false);
+  assert.equal(standing(state, "vermillion/the-pando-peak"), false, "vermillion's own mark on that ground leaves with it");
+  pandoStays(state, "the town's word");
+});
+
+test("POS-477 · A PARCEL HOLDER OPPOSES vermillion/pando-plains: the same, the town's mark and every other household's stay", () => {
+  const holder = parcel("home", "holder", -99000, -99000, { consent: { "vermillion/pando-plains": "opposed" } });
+  const state = fold({ marks: pandoMarks([holder]), terrain, tick: 1, stakes: [] });
+  const r = state.returned.find((x) => x.mark === "vermillion/pando-plains");
+  assert.ok(r, "the plains came after the parcel and overlap it, so the holder's word returns them");
+  assert.equal(r.authority, "parcel (absolute)");
+  assert.deepEqual(r.subtree, ["vermillion/the-pando-peak"]);
+  pandoStays(state, "a parcel's word");
+  assert.equal(standing(state, "holder/home"), true);
+});
+
+test("POS-477 · another household's stake inside the subtree no longer holds the return: it is not the opposed household's to carry", () => {
+  const state = fold({ marks: pandoMarks(), terrain, tick: 1, townWords: { "vermillion/pando-plains": "opposed" },
+    stakes: [{ holder: "backer", mark: "the-town/pando-peak", n: 5, weight: 5, tick: 0 }] });
+  assert.equal(state.returned[0].state, "returned", "the town's mark stays either way, so its stamps stay with it");
+  pandoStays(state, "a staked town mark");
+  assert.equal(standing(state, "vermillion/pando-plains"), false);
+});
+
 // ── the town's word (POS-361; R7, R10, R15) ──────────────────────────────────
 
 test("THE TOWN'S OPPOSITION PREVAILS: infinite backing in the veto, so no arithmetic — the mark is returned, naming the town", () => {
