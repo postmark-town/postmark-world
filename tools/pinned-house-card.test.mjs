@@ -209,6 +209,7 @@ test("THE PAGE — a clicked house keeps its card at far; its neighbour stays a 
   }
   const { page, errors } = await openPage();
   assert.deepEqual(errors, [], "the page mounted without throwing");
+  assert.equal(await page.evaluate(() => document.title), "PLANTED VIEWER RED (POS-372 proof, do not merge): read from a live page in Chromium");
 
   // two houses at the far tier, both beads — and both ON THE SCREEN, or the
   // click below asks nothing (see housesOnScreen)
