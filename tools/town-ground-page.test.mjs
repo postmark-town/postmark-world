@@ -71,8 +71,9 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
 const expectedRegions = townRegionMarks(SERVED.marks).length;
 
-// Playwright is not a dependency of this package and must not become one — the
-// world is browser-pure and its suite runs anywhere node does. It is resolved
+// Playwright is a devDependency only (POS-372, ruled 09-14): CI installs it and
+// the browser, the box installs nothing and stays browser-free, and the world's
+// runtime stays browser-pure. It is resolved
 // the same way tools/qa/scene-qa.mjs and tools/qa/town-fingerprint.mjs resolve
 // it, and when it is absent this file SKIPS WITH ITS REASON SAID OUT LOUD.
 //
@@ -82,7 +83,7 @@ const expectedRegions = townRegionMarks(SERVED.marks).length;
 // end. The two source-text regexes in tools/town-ground.test.mjs remain as a
 // cheap second guard for that case — labelled there as exactly that, a guard
 // that proves a line was typed and nothing more.
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }

@@ -102,7 +102,7 @@ test("YOURS IS BIGGER THAN THEIRS, AND NOT BY SO MUCH THAT IT SWALLOWS THEM", ()
 
 // ── the page ───────────────────────────────────────────────────────────────
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }

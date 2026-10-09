@@ -150,7 +150,7 @@ test("[pin] the rule reads the whole record and is bounded by the viewport, not 
 
 // ── and now the page, because the above only proves lines were typed ────────
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }

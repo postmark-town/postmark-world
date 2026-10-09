@@ -308,7 +308,7 @@ test("an <image> with no data-orig is not the fallback's business; a target with
 // repo (the page imports spectator/viewer.mjs itself) that answers 200 to the
 // original and to ONE copy, 404 to the other, and counts what was asked.
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }
