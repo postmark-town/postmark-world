@@ -175,9 +175,16 @@ jobs:
       # charge it to, or more than five refusing; exit 2 is "could not ask
       # main". Neither is a pass. The count is asserted again afterwards, for
       # the same reason the fetch step asserts it.
+      #
+      # MAIN IS THE MERGE'S FIRST PARENT, not the event's base sha. Measured on
+      # #173: the event said 33fbe353 while the merge GitHub built was onto
+      # ee017ae4, so asking the event's sha would ask an older main than the
+      # one this pull request lands on.
       - name: the sketchbooks main itself refuses, set aside
         run: |
-          node tools/rehearsal-baseline.mjs --repo . --base '${{ github.event.pull_request.base.sha }}' --scratch "$RUNNER_TEMP/baseline" --out "$RUNNER_TEMP/baseline.json"
+          main_now=$(git rev-parse HEAD^1)
+          echo "main as this merge sees it: $main_now (the event's base: ${{ github.event.pull_request.base.sha }})"
+          node tools/rehearsal-baseline.mjs --repo . --base "$main_now" --scratch "$RUNNER_TEMP/baseline" --out "$RUNNER_TEMP/baseline.json"
           books=$(git for-each-ref --format='%(refname)' 'refs/remotes/origin/draft/' | wc -l)
           if [ "$books" -eq 0 ]; then
             echo "::error::every sketchbook refuses on main itself, so this job would sweep an empty crossing and report it green. That wants a person." >&2
