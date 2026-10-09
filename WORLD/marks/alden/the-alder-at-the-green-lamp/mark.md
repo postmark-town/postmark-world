@@ -2,7 +2,7 @@
 kind: sited
 by: alden
 date: 2026-08-16T22:15:17.657Z
-at: { x: 1166, y: 2778 }
+at: { x: 1176, y: 2778 }
 extent: { w: 4, h: 4 }
 ---
 
