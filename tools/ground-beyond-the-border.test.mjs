@@ -92,7 +92,10 @@ test("a mark standing on the ground is not a control point (it cannot pull the a
 });
 
 test("a ground that reaches the atlas is refused, and grounds need the border declared", () => {
-  const touching = { ...CRAG, id: "too-near", ring_m: CRAG.ring_m.map((p) => ({ x: p.x, y: p.y + 500 })) };
+  // its ring 50 m past the border, so its foot rings reach back over the edge
+  const touching = { ...CRAG, id: "too-near", ring_m: [
+    { x: 1000, y: ATLAS.y0 - 350 }, { x: 1400, y: ATLAS.y0 - 350 }, { x: 1400, y: ATLAS.y0 - 50 }, { x: 1000, y: ATLAS.y0 - 50 },
+  ] };
   assert.throws(() => groundsBeyondTheBorder({ ...SKELETON, features: [...TODAY.features, touching] }), /reaches the atlas/);
   const noBox = { ...SKELETON, _grid: { ...SKELETON._grid, atlas_box_m: undefined } };
   assert.throws(() => groundsBeyondTheBorder(noBox), /needs the border/);

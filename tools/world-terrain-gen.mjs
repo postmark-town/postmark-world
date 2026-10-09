@@ -67,7 +67,7 @@ const ATLAS_BOX_M = { x0: -ORIGIN.x * K, x1: (MAP_W - ORIGIN.x) * K, y0: -ORIGIN
 // never moves the atlas. A ground that reaches the atlas is refused below.
 const GROUNDS = [
   { id: "the-north-crag", kind: "ground",
-    ring_m: [{ x: 2397.5, y: -4347.5 }, { x: 2917.5, y: -4347.5 }, { x: 2917.5, y: -3927.5 }, { x: 2397.5, y: -3927.5 }],
+    ring_m: [{ x: 3590, y: -5710 }, { x: 4110, y: -5710 }, { x: 4110, y: -5290 }, { x: 3590, y: -5290 }],
     top_m: 150, foot_gap_m: 40,
     receipt: "a flat-topped crag past the map's north edge, 150 m at its top, its cliffs falling to the land around it within ~40 m; the first ground beyond the border (Darko, 2026-10-09). Dials: top_m, foot_gap_m (steepness)" },
 ];
