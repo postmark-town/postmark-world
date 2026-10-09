@@ -336,7 +336,7 @@ test("A FLOOR UNDER OMISSION: every skeleton feature that has geometry is ON the
 
   const missing = [];
   for (const f of skeleton.features ?? []) {
-    if (!hasGeometry(f)) continue;
+    if (!hasGeometry(f) || f.kind === "ground") continue; // ground beyond the border: excluded by kind, below
     const asFeature = svg.includes(`data-src="feature:${f.id}"`);
     const asWater = svg.includes(`data-feature="${f.id}"`);
     if (!asFeature && !asWater) missing.push(f.id);
@@ -353,9 +353,16 @@ test("A FLOOR UNDER OMISSION: every skeleton feature that has geometry is ON the
     "ferrys-route carries no geometry — if it ever does, this test starts requiring it on the ground");
   assert.doesNotMatch(svg, /data-src="feature:ferrys-route"/, "and nothing is drawn for it meanwhile");
 
+  // GROUND BEYOND THE BORDER is the second exclusion, by KIND and with its reason:
+  // it is height, not drawing (tools/world-build.mjs § GROUND BEYOND THE BORDER),
+  // and drawing it would paint land past the map's edge that the map has never
+  // shown. So it is asserted OFF the sheet, not merely skipped.
+  const grounds = (skeleton.features ?? []).filter((f) => f.kind === "ground");
+  for (const g of grounds) assert.doesNotMatch(svg, new RegExp(`data-src="feature:${g.id}"`), `${g.id} is height, not drawing`);
+
   // the count is stated so a feature vanishing from the SKELETON is also visible
-  const geometric = (skeleton.features ?? []).filter(hasGeometry);
-  assert.equal(geometric.length, 12, `twelve of the thirteen features have a shape (${geometric.length})`);
+  const geometric = (skeleton.features ?? []).filter((f) => hasGeometry(f) && f.kind !== "ground");
+  assert.equal(geometric.length, 12, `twelve of the drawn features have a shape (${geometric.length})`);
 });
 
 test("…and the floor CAN fail: a feature dropped from the filter is caught", () => {
