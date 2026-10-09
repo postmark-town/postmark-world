@@ -118,6 +118,25 @@ const skeleton = {
     orthogonality: "the light gradient (E-W) runs roughly orthogonal to the altitude/river gradient (N-S) — the town's two great fields form a coordinate system; every place a (light, altitude) pair (decision 008)",
     night_enclaves: (candA.zones || []).filter(z => z.kind === "night").map(z => ({ id: z.id, center_m: m(z.cx, z.cy), rx_m: z.rx * K, ry_m: z.ry * K, receipt: z.receipt })),
   },
+  // THE MISTS (POS-466, ruled 2026-10-09; tools/world-engine.mjs mistsAt). Pinned
+  // here, not derived from the atlas or the record, so a regenerate writes the
+  // same wall and no past crossing is re-told. Every value is a dial, movable by
+  // ruling, never silently.
+  mists: {
+    _ruling: "POS-466, ruled by Darko 2026-10-09 (LOGOS/classes.md § The emission lines): a border band with a place. The wall stands at the border and creeps in on a crossing schedule; it occludes everything behind it, with no ceiling; its fringe shortens sight on the clear side; its veil dims every light. No household's parcel is covered, but the one ruled under. Before the schedule's first crossing there are no Mists and every telling is the one it always was.",
+    border_m: { minX: -4600, minY: -4600, maxX: 5350, maxY: 9700, receipt: "the box round every parcel on the map (x -3302.5..4050, y -3312.5..8412.5 on 2026-10-09) widened 1300 m on each side, so neither the wall nor its fringe reaches a parcel at any keyframe" },
+    clearings_m: [
+      { id: "driftlight", x: -15050, y: 13400, r_m: 600, receipt: "a household's parcel 15 km past the border keeps open ground round it: its corners stand 582 m from the wall, past the 400 m fringe" },
+    ],
+    fringe_m: 400,
+    wall_sight_m: 20,
+    density: { from: 0.55, to: 0.95, power: 2, receipt: "thickens slowly at first and faster as the last crossing nears" },
+    schedule: [
+      { crossing: 244, front_m: 0, veil: 0.1 },
+      { crossing: 272, front_m: 390, veil: 0.3 },
+      { crossing: 282, front_m: 780, veil: 0.5 },
+    ],
+  },
   far_features: [
     { id: "pando-peak", kind: "mountain-horizon", label: "Pando Peak", bearing: "NW", distance_m: 135000, height_m: 4000,
       days_out_on_foot: "4-5", crossings_out: 9,

@@ -273,33 +273,43 @@ export function fogModel(crossing, dials = DIALS) {
 // border as a WALL, and on a schedule keyed to the crossing number the wall
 // creeps in from the edges, or pulls back past them.
 //
-// The record is `skeleton.mists` (it reaches every reader as `world.terrain`):
+// The record is `skeleton.mists` (it reaches every reader as `world.terrain`;
+// tools/world-terrain-gen.mjs emits it, so a regenerate keeps it):
 //
-//   border_m   { minX, minY, maxX, maxY }  the map's edge, pinned as dated config.
-//              It is never derived from what the record happens to draw today,
-//              because a border that moved with the record would re-tell past
-//              crossings.
-//   fringe_m   the translucent haze on the map side of the wall
+//   border_m   { minX, minY, maxX, maxY }  where the wall stands at front 0,
+//              pinned as dated config. It is never derived from what the record
+//              happens to draw today, because a border that moved with the
+//              record would re-tell past crossings.
+//   clearings_m  [{ id, x, y, r_m }]  clear ground the wall never takes: a
+//              household's land standing far past the border keeps a circle of
+//              open air round it (ruled 2026-10-09: no parcel is covered but the
+//              one ruled under). Clearings do not creep.
+//   fringe_m   the translucent haze on the clear side of the wall
 //   wall_sight_m  how far a body standing INSIDE the wall can see
-//   schedule   [{ crossing, front_m, density, veil }, …] in crossing order.
-//              front_m is how far the wall stands in from the border: a number
-//              for every side, or { n, e, s, w }. Positive means the wall has
-//              crept onto the map; negative means it has pulled back past the
-//              edge. density [0..1] is the fringe's thickness where it meets
-//              the wall; veil [0..1] is the daylight the Mists take (lightLevelAt).
+//   schedule   [{ crossing, front_m, veil }, …] in crossing order. front_m is
+//              how far the wall stands in from the border: a number for every
+//              side, or { n, e, s, w }. Positive means the wall has crept onto
+//              the map; negative means it has pulled back past the edge. veil
+//              [0..1] is the share of all light the Mists take (lightLevelAt).
+//              Between two entries both move linearly; after the last they hold.
+//   density    { from, to, power }  the fringe's thickness where it meets the
+//              wall, eased from the schedule's first crossing to its last:
+//              from + (to − from) · u^power, u the share of the span gone. A
+//              power above 1 thickens slowly at first and faster as the last
+//              crossing nears.
 //
-// Between two entries every number moves linearly with the crossing; after the
-// last it holds; BEFORE THE FIRST THERE ARE NO MISTS. mistsAt answers null, and
-// every reader then answers exactly as it did before the Mists existed. Like
+// BEFORE THE SCHEDULE'S FIRST CROSSING THERE ARE NO MISTS: mistsAt answers null,
+// and every reader then answers exactly as it did before the Mists existed. Like
 // the weather, it is a pure function of the crossing number, so replay holds.
 //
 // THE WALL OCCLUDES EVERYTHING BEHIND IT. It has no ceiling and no height
-// exemption, and a signal's light does not cut it: from inside the map, no
-// sight line reaches past the wall, however tall the thing standing there. The
-// clear ground inside the wall is a rectangle, and a rectangle is convex, so a
-// sight line between two points inside it never leaves it. A target is behind
-// the wall exactly when the target itself stands outside the rectangle; no ray
-// march is needed. Once the wall recedes past the target, it is in sight again.
+// exemption, and a signal's light does not cut it: no sight line that passes
+// through the wall reaches its target, however tall the thing standing there.
+// The clear ground is the box inside the wall plus the clearings, each of them
+// convex, so a sight line is clear exactly when the pieces of it inside those
+// shapes cover the whole of it. Within the box alone that is the old rule: a
+// target is hidden exactly when it stands behind the wall. Once the wall
+// recedes past a target, it is in sight again.
 const SIDES = ["n", "e", "s", "w"];
 const lerpN = (a, b, t) => a + (b - a) * t;
 function sidesOf(front) {
@@ -307,6 +317,7 @@ function sidesOf(front) {
   const v = Number(front) || 0;
   return { n: v, e: v, s: v, w: v };
 }
+const clamp01 = (v) => Math.max(0, Math.min(1, Number(v) || 0));
 
 export function mistsAt(crossing, mists) {
   const sched = Array.isArray(mists?.schedule) ? mists.schedule : [];
@@ -320,13 +331,22 @@ export function mistsAt(crossing, mists) {
   const t = z === a ? 0 : (c - a.crossing) / (z.crossing - a.crossing);
   const fa = sidesOf(a.front_m), fz = sidesOf(z.front_m);
   const front = Object.fromEntries(SIDES.map((s) => [s, lerpN(fa[s], fz[s], t)]));
-  const clamp01 = (v) => Math.max(0, Math.min(1, Number(v) || 0));
+  // the density's own eased curve over the whole schedule
+  const first = sched[0].crossing, last = sched[sched.length - 1].crossing;
+  const u = last > first ? Math.max(0, Math.min(1, (c - first) / (last - first))) : 1;
+  const d = mists.density ?? {};
+  const power = Number(d.power) > 0 ? Number(d.power) : 1;
+  const density = clamp01(lerpN(Number(d.from) || 0, Number(d.to ?? d.from) || 0, Math.pow(u, power)));
+  const clearings = (Array.isArray(mists.clearings_m) ? mists.clearings_m : [])
+    .filter((k) => [k?.x, k?.y, k?.r_m].every(Number.isFinite) && k.r_m > 0)
+    .map((k) => ({ id: k.id ?? null, x: k.x, y: k.y, r: k.r_m }));
   return {
     crossing: c,
     front,
     // the clear ground: north is -y, east +x, south +y, west -x
     clear: { minX: b.minX + front.w, maxX: b.maxX - front.e, minY: b.minY + front.n, maxY: b.maxY - front.s },
-    density: clamp01(lerpN(Number(a.density) || 0, Number(z.density) || 0, t)),
+    clearings,
+    density,
     veil: clamp01(lerpN(Number(a.veil) || 0, Number(z.veil) || 0, t)),
     fringeM: Math.max(0, Number(mists.fringe_m) || 0),
     wallSightM: Math.max(0, Number(mists.wall_sight_m) || 0),
@@ -338,20 +358,55 @@ export function mistsAt(crossing, mists) {
  *  of the fringe, rising to the band's density at the wall). */
 export function mistsHere(p, m) {
   const { clear } = m;
-  const inWall = !(p.x >= clear.minX && p.x <= clear.maxX && p.y >= clear.minY && p.y <= clear.maxY);
-  if (inWall) return { inWall: true, wallM: 0, thickness: 1 };
-  const wallM = Math.min(p.x - clear.minX, clear.maxX - p.x, p.y - clear.minY, clear.maxY - p.y);
+  let wallM = -Infinity;
+  if (p.x >= clear.minX && p.x <= clear.maxX && p.y >= clear.minY && p.y <= clear.maxY)
+    wallM = Math.min(p.x - clear.minX, clear.maxX - p.x, p.y - clear.minY, clear.maxY - p.y);
+  for (const k of m.clearings ?? []) {
+    const inside = k.r - Math.hypot(p.x - k.x, p.y - k.y);
+    if (inside >= 0 && inside > wallM) wallM = inside;
+  }
+  if (wallM < 0) return { inWall: true, wallM: 0, thickness: 1 };
   const thickness = m.fringeM > 0 && wallM < m.fringeM ? m.density * (1 - wallM / m.fringeM) : 0;
   return { inWall: false, wallM, thickness };
 }
 
+// the stretch [t0, t1] of the segment a→b (t in 0..1) that lies inside a box,
+// or inside a circle; null when it never enters
+function segInBox(a, b, r) {
+  let t0 = 0, t1 = 1;
+  const dx = b.x - a.x, dy = b.y - a.y;
+  for (const [p, q] of [[-dx, a.x - r.minX], [dx, r.maxX - a.x], [-dy, a.y - r.minY], [dy, r.maxY - a.y]]) {
+    if (p === 0) { if (q < 0) return null; continue; }
+    const t = q / p;
+    if (p < 0) { if (t > t1) return null; if (t > t0) t0 = t; }
+    else { if (t < t0) return null; if (t < t1) t1 = t; }
+  }
+  return [t0, t1];
+}
+function segInCircle(a, b, k) {
+  const dx = b.x - a.x, dy = b.y - a.y, fx = a.x - k.x, fy = a.y - k.y;
+  const A = dx * dx + dy * dy, B = 2 * (fx * dx + fy * dy), C = fx * fx + fy * fy - k.r * k.r;
+  if (A === 0) return C <= 0 ? [0, 1] : null;
+  const disc = B * B - 4 * A * C;
+  if (disc < 0) return null;
+  const s = Math.sqrt(disc);
+  const t0 = Math.max(0, (-B - s) / (2 * A)), t1 = Math.min(1, (-B + s) / (2 * A));
+  return t0 <= t1 ? [t0, t1] : null;
+}
+
 /** Is `target` hidden by the wall from `from`? From clear ground, exactly when
- *  the target stands behind the wall (the clear ground is convex). From inside
- *  the wall, everything past arm's reach (wall_sight_m) is hidden. */
+ *  some stretch of the sight line runs through the wall. From inside the wall,
+ *  everything past arm's reach (wall_sight_m) is hidden. */
 export function mistsHide(from, target, m) {
-  const here = mistsHere(from, m);
-  if (here.inWall) return Math.hypot(target.x - from.x, target.y - from.y) > m.wallSightM;
-  return mistsHere(target, m).inWall;
+  if (mistsHere(from, m).inWall) return Math.hypot(target.x - from.x, target.y - from.y) > m.wallSightM;
+  const spans = [segInBox(from, target, m.clear), ...(m.clearings ?? []).map((k) => segInCircle(from, target, k))]
+    .filter(Boolean).sort((p, q) => p[0] - q[0]);
+  let reached = 0;
+  for (const [t0, t1] of spans) {
+    if (t0 > reached + 1e-9) break;                         // a gap: the line runs through the wall
+    if (t1 > reached) reached = t1;
+  }
+  return reached < 1 - 1e-9;
 }
 
 // ───────────────────────── status effects at a point ───────────────────────

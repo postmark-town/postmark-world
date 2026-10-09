@@ -250,8 +250,10 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
 - **The Mists: fog with a place** (POS-466, ruled 2026-10-09). `mistsAt(crossing,
   skeleton.mists)` puts a wall at the map's border (`border_m`, pinned config) on a
   crossing schedule: `front_m` per side (positive creeps onto the map, negative pulls
-  back past the edge), the fringe's `density`, and the `veil` on all light, signals
-  included. The wall occludes everything behind it, with no ceiling and no height
+  back past the edge), `clearings_m` (open ground the wall never takes, round land far
+  past the border), the fringe's `density` (eased in over the schedule), and the
+  `veil` on all light, signals included. `tools/world-terrain-gen.mjs` emits the
+  block, so a regenerate keeps it. The wall occludes everything behind it, with no ceiling and no height
   exemption. The fringe shortens sight like the weather, and a body inside the wall
   sees `wall_sight_m`. Before the schedule's first crossing it answers null and every
   telling is the pre-Mists one, byte for byte (`tools/mists.test.mjs`).

@@ -17,7 +17,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { buildHeightfield, fieldOfView, lightLevelAt, mistsAt, mistsHere, DIALS } from "./world-engine.mjs";
+import { buildHeightfield, fieldOfView, lightLevelAt, mistsAt, mistsHere, mistsHide, DIALS } from "./world-engine.mjs";
 import { orient, openYourEyes } from "./world-verbs.mjs";
 import { assembleWorld } from "./world-build.mjs";
 
@@ -32,9 +32,10 @@ const MISTS = {
   border_m: { minX: -1000, minY: -1000, maxX: 1000, maxY: 1000 },
   fringe_m: 300,
   wall_sight_m: 20,
+  density: { from: 0.9, to: 0.9 },
   schedule: [
-    { crossing: 10, front_m: 0, density: 0.9, veil: 0.4 },
-    { crossing: 20, front_m: { n: 400, e: 0, s: 0, w: 0 }, density: 0.9, veil: 0.6 },
+    { crossing: 10, front_m: 0, veil: 0.4 },
+    { crossing: 20, front_m: { n: 400, e: 0, s: 0, w: 0 }, veil: 0.6 },
   ],
 };
 const terrainWith = (mists, far_features = []) => ({ far_features, features: [], elevation: {}, ...(mists ? { mists } : {}) });
@@ -86,7 +87,7 @@ test("THE TALL THING as a horizon object: a far feature behind the wall is gone"
 });
 
 test("THE RECEDE: when the wall pulls back past the tall thing, it is in sight again", () => {
-  const recede = { ...MISTS, schedule: [...MISTS.schedule, { crossing: 30, front_m: { n: -300, e: 0, s: 0, w: 0 }, density: 0.9, veil: 0.6 }] };
+  const recede = { ...MISTS, schedule: [...MISTS.schedule, { crossing: 30, front_m: { n: -300, e: 0, s: 0, w: 0 }, veil: 0.6 }] };
   const w = worldOf([TOWER], { mists: recede });
   assert.ok(!shown(fieldOfView({ x: 0, y: 0 }, w, { crossing: 20, dials: CLEAR })).includes("beyond/tower"));
   assert.ok(shown(fieldOfView({ x: 0, y: 0 }, w, { crossing: 30, dials: CLEAR })).includes("beyond/tower"),
@@ -95,7 +96,7 @@ test("THE RECEDE: when the wall pulls back past the tall thing, it is in sight a
 
 test("the wall creeps in: a thing on the map is swallowed when the front passes it", () => {
   const w = worldOf([NEAR]);                                    // the well at y = -300; the north wall reaches -600 by crossing 20
-  const shallow = { ...MISTS, schedule: [{ crossing: 10, front_m: 0, density: 0.9, veil: 0 }, { crossing: 20, front_m: { n: 800, e: 0, s: 0, w: 0 }, density: 0.9, veil: 0 }] };
+  const shallow = { ...MISTS, schedule: [{ crossing: 10, front_m: 0, veil: 0 }, { crossing: 20, front_m: { n: 800, e: 0, s: 0, w: 0 }, veil: 0 }] };
   const ww = worldOf([NEAR], { mists: shallow });
   assert.ok(shown(fieldOfView({ x: 0, y: 0 }, w, { crossing: 20, dials: CLEAR })).includes("town/well"));
   assert.ok(!shown(fieldOfView({ x: 0, y: 0 }, ww, { crossing: 20, dials: CLEAR })).includes("town/well"), "the wall at y = -200 now stands in front of it");
@@ -152,6 +153,111 @@ test("A SIGNAL IS VEILED TOO: its light ranks dimmer and carries less far throug
   assert.equal(at(20, { ...FOG, signal_fog_reach_mult: 1 }), undefined);
 });
 
+// ── THE RECORD'S OWN MISTS (skeleton.mists, ruled 2026-10-09) ──────────────
+// The real record, assembled once for the tests below that read it.
+let realCache = null;
+function real() {
+  if (realCache) return realCache;
+  const skeleton = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
+  const worldState = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
+  const { mists, ...bare } = skeleton;
+  realCache = { skeleton, worldState, withM: assembleWorld({ worldState, skeleton }), without: assembleWorld({ worldState, skeleton: bare }) };
+  return realCache;
+}
+const RULED_UNDER = "vermillion/the-pando-peak-parcel";      // the one parcel ruled to lie behind the wall
+const KEYFRAMES = () => real().skeleton.mists.schedule.map((e) => e.crossing);
+const corners = (p) => {
+  const hw = (p.extent?.w ?? 0) / 2, hh = (p.extent?.h ?? 0) / 2;
+  return [{ x: p.at.x - hw, y: p.at.y - hh }, { x: p.at.x + hw, y: p.at.y - hh }, { x: p.at.x + hw, y: p.at.y + hh }, { x: p.at.x - hw, y: p.at.y + hh }];
+};
+
+test("NO PARCEL IS COVERED: every parcel on the record but the one ruled under stands clear of the wall AND its fringe, at every crossing", () => {
+  const { skeleton, worldState } = real();
+  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at);
+  assert.ok(parcels.length > 100, "the record's parcels are all here");
+  const first = KEYFRAMES()[0], last = KEYFRAMES().at(-1);
+  for (let c = first; c <= last + 10; c += 1) {
+    const m = mistsAt(c, skeleton.mists);
+    for (const p of parcels) {
+      if (p.id === RULED_UNDER) continue;
+      for (const q of corners(p)) {
+        const here = mistsHere(q, m);
+        assert.equal(here.inWall, false, `${p.id} is behind the wall at crossing ${c}`);
+        assert.equal(here.thickness, 0, `${p.id} is in the fringe at crossing ${c}`);
+      }
+    }
+    assert.equal(mistsHere(parcels.find((p) => p.id === RULED_UNDER).at, m).inWall, true, "the one ruled under is behind the wall");
+  }
+});
+
+test("THE PARCEL NEAREST EACH SIDE stays fully sighted at every keyframe: its reach is the weather's, and it loses only what stands behind the wall", () => {
+  const { skeleton, worldState, withM, without } = real();
+  const b = skeleton.mists.border_m;
+  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && m.id !== RULED_UNDER && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000);
+  const nearest = {
+    n: parcels.reduce((a, p) => (p.at.y < a.at.y ? p : a)), s: parcels.reduce((a, p) => (p.at.y > a.at.y ? p : a)),
+    e: parcels.reduce((a, p) => (p.at.x > a.at.x ? p : a)), w: parcels.reduce((a, p) => (p.at.x < a.at.x ? p : a)),
+  };
+  assert.ok(nearest.n.at.y - b.minY > 1000 && b.maxX - nearest.e.at.x > 1000, "the border stands well out");
+  for (const crossing of KEYFRAMES()) {
+    for (const [side, p] of Object.entries(nearest)) {
+      // every visible mark, uncollapsed and unbudgeted, so a change of household representative under the veil is not read as a loss
+      const all = { ...DIALS, cluster_beyond_m: 1e9 };
+      const a = fieldOfView(p.at, withM, { crossing, budget: 1e6, dials: all }), z = fieldOfView(p.at, without, { crossing, budget: 1e6, dials: all });
+      assert.equal(a.mists.thickness, 0, `${side}: ${p.id} stands out of the fringe at ${crossing}`);
+      assert.equal(a.sightReachM, z.sightReachM, `${side}: ${p.id}'s reach is the weather's at ${crossing}`);
+      const m = mistsAt(crossing, skeleton.mists);
+      const seen = new Set(a.carried.map((s) => s.id));
+      for (const s of z.carried)
+        if (!seen.has(s.id)) assert.ok(mistsHide(p.at, s.at, m), `${side}: ${p.id} lost ${s.id} at ${crossing}, which is not behind the wall`);
+    }
+  }
+});
+
+test("THE CRAG: a 100 m thing at (3850, -5300) is behind the north wall at every keyframe, from the town and from the parcel nearest it", () => {
+  const { skeleton, worldState } = real();
+  const crag = { id: "beyond/crag", kind: "sited", household: "beyond", at: { x: 3850, y: -5300 }, extent: { w: 60, h: 60 }, weight: 50, top_m: 100 };
+  const w = assembleWorld({ worldState: { ...worldState, marks: [...worldState.marks, crag] }, skeleton });
+  const ne = worldState.marks.filter((m) => m.kind === "parcel" && m.at && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000)
+    .reduce((a, p) => (Math.hypot(p.at.x - 3850, p.at.y + 5300) < Math.hypot(a.at.x - 3850, a.at.y + 5300) ? p : a));
+  for (const crossing of [...KEYFRAMES(), 300]) {
+    const m = mistsAt(crossing, skeleton.mists);
+    assert.equal(mistsHere(crag.at, m).inWall, true, `behind the wall at ${crossing}`);
+    for (const from of [{ x: 0, y: 0 }, { x: 575, y: -2600 }, ne.at]) {
+      const fov = fieldOfView(from, w, { crossing, budget: 1000 });
+      assert.ok(!fov.carried.some((s) => s.id === "beyond/crag"), `seen from (${from.x}, ${from.y}) at ${crossing}`);
+    }
+  }
+});
+
+test("THE CLEARING: land far past the border keeps open air round it, and no line of sight runs through the wall to it", () => {
+  const { skeleton } = real();
+  const m = mistsAt(KEYFRAMES().at(-1), skeleton.mists);
+  const k = m.clearings[0];
+  assert.ok(k, "the record carries a clearing");
+  assert.equal(mistsHere({ x: k.x, y: k.y }, m).inWall, false);
+  assert.equal(mistsHere({ x: k.x, y: k.y }, m).thickness, 0);
+  assert.equal(mistsHide({ x: k.x, y: k.y }, { x: k.x + 100, y: k.y }, m), false, "its own ground is in sight");
+  assert.equal(mistsHide({ x: k.x, y: k.y }, { x: k.x + k.r + 50, y: k.y }, m), true, "past the clearing is the wall");
+  assert.equal(mistsHide({ x: 0, y: 0 }, { x: k.x, y: k.y }, m), true, "from the town, the line runs through the wall");
+  assert.equal(mistsHide({ x: 0, y: 0 }, { x: 100, y: 100 }, m), false, "the box's own sight is unchanged");
+});
+
+test("THE THICKENING: the density eases in, from its first value to its last, gaining more every crossing", () => {
+  const { skeleton } = real();
+  const ks = KEYFRAMES(), d = skeleton.mists.density;
+  const at = (c) => mistsAt(c, skeleton.mists).density;
+  assert.equal(+at(ks[0]).toFixed(6), d.from);
+  assert.equal(+at(ks.at(-1)).toFixed(6), d.to);
+  let lastStep = 0;
+  for (let c = ks[0] + 1; c <= ks.at(-1); c += 1) {
+    const step = at(c) - at(c - 1);
+    assert.ok(step > lastStep, `crossing ${c} gains more than the one before (${step} vs ${lastStep})`);
+    lastStep = step;
+  }
+  assert.equal(at(ks.at(-1) + 20), at(ks.at(-1)), "and holds after");
+});
+
 // THE BEFORE-START IDENTITY, on the real record: the record's own schedule, at
 // crossings before its first entry, answers byte for byte what the same world
 // answers with no Mists in it at all. (The lane's proof also held this branch
@@ -201,4 +307,14 @@ test("the page mounts the wall above everything the record draws, and the veil u
   const at = (id) => src.indexOf(`setAttribute("id", "${id}")`);
   assert.ok(at("wv-veil-layer") > at("wv-placed-art-layer") && at("wv-veil-layer") < at("wv-fp-layer"), "the veil sits on the ground and its art, under the record");
   assert.ok(at("wv-mists-layer") > at("wv-walk-layer") && at("wv-mists-layer") > at("wv-overlay"), "the wall sits over the pips and the walkers");
+});
+
+test("the page cuts each clearing out of the wall, so the land past the border it keeps open is drawn open", async () => {
+  const { mistsWallSVG } = await import("../spectator/viewer.mjs");
+  const m = mistsAt(KEYFRAMES()[0], real().skeleton.mists);
+  const k = m.clearings[0];
+  const svg = mistsWallSVG(m, { originPx: { x: 485, y: 760 }, mPerPx: 5 });
+  const cx = 485 + k.x / 5, cy = 760 + k.y / 5, r = k.r / 5;
+  assert.ok(svg.includes(` M ${(cx - r).toFixed(1)} ${cy.toFixed(1)} a ${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(2 * r).toFixed(1)} 0`), "the hole");
+  assert.match(svg, /<circle class="wv-mists-fringe" data-src="mists:clearing-[^"]+" pointer-events="none"/, "its fringe ring");
 });

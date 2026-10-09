@@ -3889,10 +3889,22 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists" }) {
   // the wall: everything outward of the clear ground, as one even-odd ring
   const wall = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
     + ` d="M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-    + ` M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z"/>`;
+    + ` M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z`
+    // each clearing is one more hole: a circle, drawn as two half-arcs
+    + (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
+      return ` M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; }).join("")
+    + `"/>`;
+  // a clearing's fringe: a soft ring on its own clear side, fading inward from the wall
+  const ringOp = Math.min(1, m.density || 0).toFixed(3);
+  const rings = !(m.density > 0) || !(m.fringeM > 0) ? "" : (m.clearings ?? []).map((k, i) => {
+    const c = px(k), kr = k.r / mPerPx, inner = Math.max(0, 1 - m.fringeM / k.r).toFixed(3);
+    return `<radialGradient id="${id}-k${i}"><stop offset="${inner}" stop-color="${MISTS_INK}" stop-opacity="0"/>`
+      + `<stop offset="1" stop-color="${MISTS_INK}" stop-opacity="${ringOp}"/></radialGradient>`
+      + `<circle class="wv-mists-fringe" data-src="mists:clearing-${esc(String(k.id ?? i))}" pointer-events="none" cx="${n(c.x)}" cy="${n(c.y)}" r="${n(kr)}" fill="url(#${id}-k${i})"/>`;
+  }).join("");
   // the fringe: four soft strips on the map side, each fading inward from the wall
   const f = Math.min(m.fringeM / mPerPx, (b.x - a.x) / 2, (b.y - a.y) / 2);
-  if (!(f > 0) || !(m.density > 0) || !(b.x > a.x) || !(b.y > a.y)) return `<g class="wv-mists" aria-hidden="true">${wall}</g>`;
+  if (!(f > 0) || !(m.density > 0) || !(b.x > a.x) || !(b.y > a.y)) return `<g class="wv-mists" aria-hidden="true">${rings}${wall}</g>`;
   const op = Math.min(1, m.density).toFixed(3);
   const grad = (side, x1, y1, x2, y2) => `<linearGradient id="${id}-${side}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">`
     + `<stop offset="0" stop-color="${MISTS_INK}" stop-opacity="${op}"/><stop offset="1" stop-color="${MISTS_INK}" stop-opacity="0"/></linearGradient>`;
@@ -3901,7 +3913,7 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists" }) {
     + ` x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" fill="url(#${id}-${side})"/>`;
   const W = b.x - a.x, H = b.y - a.y;
   const fringe = strip("n", a.x, a.y, W, f) + strip("s", a.x, b.y - f, W, f) + strip("w", a.x, a.y, f, H) + strip("e", b.x - f, a.y, f, H);
-  return `<g class="wv-mists" aria-hidden="true">${defs}${fringe}${wall}</g>`;
+  return `<g class="wv-mists" aria-hidden="true">${defs}${fringe}${rings}${wall}</g>`;
 }
 
 // Place a bubble beside an anchor without letting it leave the painting.
