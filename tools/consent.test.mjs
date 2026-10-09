@@ -363,6 +363,22 @@ test("POS-477 · A PARCEL HOLDER OPPOSES vermillion/pando-plains: the same, the 
   assert.equal(standing(state, "holder/home"), true);
 });
 
+test("POS-477 · THE OPPOSITE CASE: the town opposing its OWN mark still carries the town's own children with it, and only those", () => {
+  // The rule is the opposed mark's household, whoever that is. The town's
+  // pando-peak, opposed by the town, takes the town's own lookout sited on it;
+  // vermillion's house on the same ground stays.
+  const lookout = sited("pando-lookout", "the-town", -95000, -95000, 200, 200, { tier: "constitution", date: "2026-07-22" });
+  const state = fold({ marks: pandoMarks([lookout]), terrain, tick: 1, stakes: [], townWords: new Map([["the-town/pando-peak", "opposed"]]) });
+  const r = state.returned.find((x) => x.mark === "the-town/pando-peak");
+  assert.ok(r, "the town's word returns the town's own mark");
+  assert.equal(r.state, "returned");
+  assert.deepEqual(r.subtree, ["the-town/pando-lookout"], "the town's own child goes with it");
+  assert.equal(standing(state, "the-town/pando-peak"), false);
+  assert.equal(standing(state, "the-town/pando-lookout"), false);
+  assert.equal(standing(state, "vermillion/the-pando-peak"), true, "another household's mark on that ground stays");
+  assert.equal(standing(state, "vermillion/pando-plains"), true, "and the ground around it is untouched");
+});
+
 test("POS-477 · another household's stake inside the subtree no longer holds the return: it is not the opposed household's to carry", () => {
   const state = fold({ marks: pandoMarks(), terrain, tick: 1, townWords: { "vermillion/pando-plains": "opposed" },
     stakes: [{ holder: "backer", mark: "the-town/pando-peak", n: 5, weight: 5, tick: 0 }] });
