@@ -56,6 +56,10 @@
 //                     time: the sweep reads BOT_NAME and BOT_EMAIL (git identity
 //                     fallbacks, harmless), the gate reads nothing. A new read
 //                     appearing on either side reds this and asks a person.
+//                     Since POS-363 it reads `marks-fold.mjs` too, the seam
+//                     both load the marks through (its snapshot switch:
+//                     WORLD_SNAPSHOT, WORLD_SNAPSHOT_ROOT), and a key a module
+//                     names as its `*_ENV` constant counts as a read.
 //   7. weight       — `harm-gate.mjs` reads no `weight`. THIS ONE IS NOT ABOUT
 //                     SECURITY and it is here because it is about this
 //                     rehearsal's honesty: the stakes are rebuilt from
