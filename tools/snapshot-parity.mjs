@@ -125,7 +125,11 @@ async function main(argv) {
     };
     if (opt("--json")) writeFileSync(opt("--json"), JSON.stringify(summary, null, 1) + "\n");
     console.error(`snapshot-parity: ${summary.same}/${summary.files} file(s) pass and fail alike on the tree and the snapshot (${summary.tests} tests); ${found.filing.length} read filings by path and retire with POS-365`);
-    process.exit(differing.length ? 1 : 0);
+    // The exit CODE, never process.exit() here: an exit inside the try ends the
+    // process before `finally` runs, and the scratch export was left behind on
+    // every run (Wright's review of world#165).
+    process.exitCode = differing.length ? 1 : 0;
+    return summary;
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }

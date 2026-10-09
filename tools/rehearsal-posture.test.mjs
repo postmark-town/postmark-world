@@ -51,6 +51,7 @@ function fixture(overrides = {}) {
   writeFileSync(join(dir, WORKFLOW_REL), overrides.workflow ?? GOOD_WORKFLOW);
   writeFileSync(join(dir, "tools", "settlement-sweep.mjs"), overrides.sweep ?? `const a = process.env.BOT_NAME; const b = process.env.BOT_EMAIL;\n`);
   writeFileSync(join(dir, "tools", "harm-gate.mjs"), overrides.gate ?? `// five checks, none of them reads a column\nexport const x = 1;\n`);
+  writeFileSync(join(dir, "tools", "marks-fold.mjs"), overrides.fold ?? `export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";\nexport const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";\n`);
   return dir;
 }
 
@@ -104,7 +105,13 @@ test("FALSIFIER 6: a new env read in a tool the job runs breaks it", () => {
   broke(posture({ gate: `const u = process.env["WORLD2_DSN"];\n` }), "consumers");
   // the two the sweep already reads are named, deliberately, and stay quiet
   assert.equal(posture({ sweep: `process.env.BOT_NAME; process.env.BOT_EMAIL;\n` }).ok, true);
-  assert.deepEqual(ALLOWED_TOOL_ENV, ["BOT_EMAIL", "BOT_NAME"]);
+  assert.deepEqual(ALLOWED_TOOL_ENV, ["BOT_EMAIL", "BOT_NAME", "WORLD_SNAPSHOT", "WORLD_SNAPSHOT_ROOT"]);
+  // the seam both tools load the marks through is read too (Wright's review of world#165),
+  // and a switch it names by constant counts as a read
+  broke(posture({ fold: `export const STORE_ENV = "WORLD2_PG_URL";\nconst u = env[STORE_ENV];\n` }), "consumers");
+  broke(posture({ fold: `const u = process.env.DATABASE_URL;\n` }), "consumers");
+  assert.equal(posture({ fold: `export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";\nexport const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";\n` }).ok, true,
+    "the snapshot seam's two keys are named, deliberately, and stay quiet");
 });
 
 test("FALSIFIER 7: a harm-gate check that reads weight breaks it — the rehearsal does not reproduce that column", () => {
