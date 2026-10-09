@@ -5553,14 +5553,12 @@ const STYLE = `
 .wv-vessel-s { transform:scale(var(--wv-vu,1)); transform-origin:0 0; }
 /* and your own people, named in the same gold the frame already uses for a
    reader's own body elsewhere */
+/* …AND RINGED IN THEIR OWN COLOUR (POS-373, Darko 2026-10-09): walkerFrameSVG's
+   --wv-ring on the frame. The legs keep the motion language, as the actor's do.
+   Stated before .is-found and .is-actor so a found housemate, and the one you
+   act as, keep those rings. */
 .wv-walker-far.is-mine > .wv-walker-frame,
-.wv-walker-near.is-mine > .wv-walker-frame { stroke-width:3; }
-/* YOUR HOUSEMATES' RING (POS-373, Darko 2026-10-09): the frame in their own
-   colour (walkerFrameSVG's --wv-ring), heavier than a neighbour's. The legs keep
-   the motion language, as the actor's do. Stated before .is-found and .is-actor
-   so a found housemate, and the one you act as, keep those rings. */
-.wv-walker-far.is-mine > .wv-walker-frame,
-.wv-walker-near.is-mine > .wv-walker-frame { stroke:var(--wv-ring, var(--green)); stroke-width:3.5; }
+.wv-walker-near.is-mine > .wv-walker-frame { stroke:var(--wv-ring, var(--green)); stroke-width:3; }
 /* THE BODY THE SEARCH JUST FOUND. The same emphasis your own people wear, in the
    rail's amber rather than the walkers' green, so "this is the one you asked
    for" reads differently from "this one is yours". It lasts until the reader
@@ -10702,18 +10700,21 @@ export function mountViewer(appEl) {
     const tier = drawTier();
     const bounds = drawnBounds();
     const inView = sceneWalkerSet({ walkers: walkState.walkers, manifest, roomId: sceneRoomId, marks: draw.marks });
-    // …EXCEPT YOUR HOUSEMATES, who are never culled (POS-373, Darko
-    // 2026-10-09): a body of your household is drawn wherever it stands, and
-    // when that is off the screen, an edge chevron points at it
-    // (drawHousemateEdges). The roof still holds: indoors the map is the room.
-    const drawnWalkers = inView.filter((w) => isOwnHandle(w.handle) || pointInDrawnBounds(w, bounds));
+    const drawnWalkers = inView.filter((w) => pointInDrawnBounds(w, bounds));
     // ONE BODY, ONE MARKER (POS-93), ASKED OF THE BODIES DRAWN (#2848 (a),
     // 2026-09-17). This asked the walker LIST: jetto-of-starforge was in it, so
     // the dot went — and his body stood at (−95,120, −95,120), 139 km off the
     // canvas, culled by the box above, so the founder acting as him saw no
     // marker of any kind. A body that was not drawn is not a marker; the dot
     // stands in until one is.
+    // The dot is still decided on the box: a housemate drawn beyond it (below)
+    // is on no screen, so it is no marker either (POS-373).
     syncStandpointDot(drawnWalkers, px);
+    // …AND YOUR HOUSEMATES ARE NEVER CULLED (POS-373, Darko 2026-10-09): a body
+    // of your household is drawn wherever it stands, and when that is off the
+    // screen, an edge chevron points at it (drawHousemateEdges). The roof
+    // still holds: indoors the map is the room.
+    const bodies = inView.filter((w) => isOwnHandle(w.handle) || pointInDrawnBounds(w, bounds));
     // under every body, at both tiers: a route is ground, not a person
     const paths = walkPathsSVG();
     // …then the TIER. At town width a face is eleven pixels of photograph with
@@ -10746,7 +10747,7 @@ export function mountViewer(appEl) {
     // ringed in the colour their monogram stands on.
     const ringOf = (h, face, actor) => (!actor && isOwnHandle(h) ? face.color : null);
     if (tier === "far") {
-      for (const w of drawnWalkers) {
+      for (const w of bodies) {
         const actor = isActor(w.handle);
         const mine = isOwnHandle(w.handle);
         const face = actor || mine ? faceOf(w.handle) : null;
@@ -10766,10 +10767,10 @@ export function mountViewer(appEl) {
           art: face ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null,
           thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null, ring: face ? ringOf(w.handle, face, actor) : null });
       }
-      writeWalkLayer(paths + s, drawnWalkers);
+      writeWalkLayer(paths + s, bodies);
       return;
     }
-    for (const w of drawnWalkers) {
+    for (const w of bodies) {
       // The drawn leg ends where the WALK ends — the first point on the
       // target's ground, not its centre (Keemin, party night: the dotted line
       // overshot into the mark while the derivation stopped at the edge).
@@ -10844,7 +10845,7 @@ export function mountViewer(appEl) {
         art: face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color },
         thumb: face.avatar ? thumbFor(FACE_UNITS, mine) : null, ring: ringOf(w.handle, face, actor) });
     }
-    writeWalkLayer(paths + hulls + s, drawnWalkers);
+    writeWalkLayer(paths + hulls + s, bodies);
   }
   // THE LAYER IS WRITTEN WHEN ITS MARKUP CHANGED, AND NOT OTHERWISE (#2912
   // (4)). The settle pass rebuilds the overlay whenever the camera crosses a

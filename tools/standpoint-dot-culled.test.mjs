@@ -222,6 +222,12 @@ const readDot = (page, handle) => page.evaluate((h) => {
     dots: document.querySelectorAll("#wv-overlay .ov-standpoint").length,
     dotAt: dot?.getAttribute("transform") ?? null,
     body: !!document.querySelector(`#wv-walk-layer [data-handle="${CSS.escape(h)}"]`),
+    // where the body is drawn, in painting units: since POS-373 a household body
+    // is never culled, so the far reader's body is drawn, off the canvas
+    bodyAt: (document.querySelector(`#wv-walk-layer g[transform][data-handle="${CSS.escape(h)}"]`)
+      ?? document.querySelector(`#wv-walk-layer [data-handle="${CSS.escape(h)}"]`)?.closest("g[transform]"))
+      ?.getAttribute("transform") ?? null,
+    edge: !!document.querySelector(`#wv-housemate-edge-layer [data-handle="${CSS.escape(h)}"]`),
     bodies: document.querySelectorAll("#wv-walk-layer [data-handle]").length,
     readout: document.querySelector(".pos")?.textContent ?? null,
     viewBox: vb,
@@ -237,7 +243,15 @@ test("ON THE PAGE: a reader whose body stands 139 km off the canvas keeps the do
   const seen = await readDot(page, "far-reader");
   await page.close();
   t.diagnostic("far-reader: " + JSON.stringify(seen));
-  assert.equal(seen.body, false, "the far body must be culled for this to mean anything: " + JSON.stringify(seen));
+  // POS-373 (Darko 2026-10-09): a household body is never culled, so the far
+  // reader's body IS drawn now — 139 km off the canvas, where no screen shows
+  // it. The dot is still decided on the drawn box, so it stands in, and an
+  // edge chevron points at the body.
+  const [, bx, by] = /translate\(([-\d.]+)[ ,]([-\d.]+)\)/.exec(String(seen.bodyAt)) ?? [];
+  const [vx, vy, vw, vh] = seen.viewBox;
+  assert.ok(Number(bx) < vx || Number(bx) > vx + vw || Number(by) < vy || Number(by) > vy + vh,
+    "the far body must be off the canvas for this to mean anything: " + JSON.stringify(seen));
+  assert.equal(seen.edge, true, "an edge chevron points at the far body: " + JSON.stringify(seen));
   assert.equal(seen.dots, 1, "no dot: the reader has no marker of any kind — " + JSON.stringify(seen));
   assert.match(String(seen.dotAt), /^translate\(/, "the dot carries a point");
   assert.deepEqual(errors, [], "the page threw: " + errors.join(" | "));
