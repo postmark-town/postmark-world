@@ -224,6 +224,17 @@
       }
     ]
   },
+  "mists": {
+    "_ruling": "POS-466, ruled by Darko 2026-10-09 (the border, the start crossing, the keyframes; LOGOS/classes.md § The emission lines): a border band with a place. The wall stands at the map's edge and moves on a crossing schedule; it occludes everything behind it, with no ceiling; its fringe shortens sight on the map side; its veil dims the daylight. Before the schedule's first crossing there are no Mists and every telling is the one it always was. All values are dials, movable by ruling, never silently (tools/world-engine.mjs mistsAt).",
+    "border_m": { "minX": -2975, "minY": -3238, "maxX": 4373, "maxY": 6645.3, "receipt": "the map's edge = the bounding box of the town's own region rings on 2026-10-09 (ruled), pinned here so the edge never moves with what the record draws later" },
+    "fringe_m": 400,
+    "wall_sight_m": 20,
+    "schedule": [
+      { "crossing": 244, "front_m": 0, "density": 0.55, "veil": 0.1 },
+      { "crossing": 272, "front_m": 500, "density": 0.8, "veil": 0.3 },
+      { "crossing": 282, "front_m": 1000, "density": 0.95, "veil": 0.5 }
+    ]
+  },
   "far_features": [
     {
       "id": "pando-peak",

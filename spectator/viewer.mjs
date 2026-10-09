@@ -21,9 +21,9 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
-import { orient, openYourEyes, investigate, containmentChain } from "../tools/world-verbs.mjs";
+import { orient, openYourEyes, investigate, containmentChain, mistsSentence, VEIL_LINE } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
-import { DIALS, bearingDeg, quantizeBearing } from "../tools/world-engine.mjs";
+import { DIALS, bearingDeg, quantizeBearing, mistsAt } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
@@ -3854,6 +3854,56 @@ export function mistBandSVG({ from, to, banks = MIST_BANKS, id = "wv-mist" } = {
   return `<g class="wv-mist" aria-hidden="true">${out}</g>`;
 }
 
+// THE MISTS AT THE BORDER (POS-466), drawn. Not the open water above (that is
+// scenery out to the far peak); this is the engine's own border band, read from
+// `mistsAt(crossing, skeleton.mists)`, so the page and every telling agree on
+// where the wall stands.
+//
+// Two layers, because they sit at two depths:
+//   • the VEIL: one dark wash over the ground and its art, as thick as the
+//     daylight the Mists take, so the whole land is darker and the record's
+//     pips still read on top of it;
+//   • the WALL and its FRINGE, on top of everything the record draws. The wall
+//     is fully opaque and TAKES the pointer: nothing behind it can be seen,
+//     hovered or clicked, which is the engine's "the wall occludes everything
+//     behind it" said in paint. The fringe is a soft fade on the map side,
+//     strongest at the wall, and lets the pointer through.
+//
+// Geometry only, laid down once per crossing (static gradients, no filter), for
+// the same reason the open water is: panning must cost nothing. `m` null (no
+// Mists this crossing) draws nothing at all.
+const MISTS_INK = "#b7bec8";
+const MISTS_FAR_M = 200000;    // the wall runs out past anything the camera can reach
+export function mistsVeilSVG(m, { originPx, mPerPx }) {
+  if (!m || !(m.veil > 0)) return "";
+  const r = MISTS_FAR_M / mPerPx, n = (v) => v.toFixed(1);
+  return `<rect class="wv-mists-veil" data-src="mists:veil" aria-hidden="true" x="${n(originPx.x - r)}" y="${n(originPx.y - r)}"`
+    + ` width="${n(2 * r)}" height="${n(2 * r)}" fill="#060d18" fill-opacity="${(0.6 * m.veil).toFixed(3)}" pointer-events="none"/>`;
+}
+export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists" }) {
+  if (!m) return "";
+  const px = (p) => ({ x: originPx.x + p.x / mPerPx, y: originPx.y + p.y / mPerPx });
+  const n = (v) => v.toFixed(1);
+  const a = px({ x: m.clear.minX, y: m.clear.minY }), b = px({ x: m.clear.maxX, y: m.clear.maxY });
+  const r = MISTS_FAR_M / mPerPx;
+  // the wall: everything outward of the clear ground, as one even-odd ring
+  const wall = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
+    + ` d="M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
+    + ` M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z"/>`;
+  // the fringe: four soft strips on the map side, each fading inward from the wall
+  const f = Math.min(m.fringeM / mPerPx, (b.x - a.x) / 2, (b.y - a.y) / 2);
+  if (!(f > 0) || !(m.density > 0) || !(b.x > a.x) || !(b.y > a.y)) return `<g class="wv-mists" aria-hidden="true">${wall}</g>`;
+  const op = Math.min(1, m.density).toFixed(3);
+  const grad = (side, x1, y1, x2, y2) => `<linearGradient id="${id}-${side}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">`
+    + `<stop offset="0" stop-color="${MISTS_INK}" stop-opacity="${op}"/><stop offset="1" stop-color="${MISTS_INK}" stop-opacity="0"/></linearGradient>`;
+  const defs = `<defs>${grad("n", 0, 0, 0, 1)}${grad("s", 0, 1, 0, 0)}${grad("w", 0, 0, 1, 0)}${grad("e", 1, 0, 0, 0)}</defs>`;
+  const strip = (side, x, y, w, h) => `<rect class="wv-mists-fringe" data-src="mists:fringe-${side}" pointer-events="none"`
+    + ` x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" fill="url(#${id}-${side})"/>`;
+  const W = b.x - a.x, H = b.y - a.y;
+  const fringe = strip("n", a.x, a.y, W, f) + strip("s", a.x, b.y - f, W, f) + strip("w", a.x, a.y, f, H) + strip("e", b.x - f, a.y, f, H);
+  return `<g class="wv-mists" aria-hidden="true">${defs}${fringe}${wall}</g>`;
+}
+
 // Place a bubble beside an anchor without letting it leave the painting.
 //
 // Sized and positioned in the PANEL's own pixels, not the painting's units: a
@@ -7223,9 +7273,14 @@ export function mountViewer(appEl) {
     return `The ground holds you at ${g >= 0 ? "+" : ""}${g} m above the sea${rel}; your eyes ride at ${obs.eyeElevM} m.`;
   }
   function fogStateLine(radial, obs) {
-    if (obs.aboveFog) return "You are above the fog; the sightlines run long.";
-    if (obs.inFog) return `Fog is in tonight (thickness ${radial.fog.thickness}) — it closes the view to about ${(radial.sightReachM ?? 0).toLocaleString()} m.`;
-    return `The air is clear — you can see about ${(radial.sightReachM ?? 0).toLocaleString()} m.`;
+    // the Mists (POS-466), in the telling's own words: where the mist is on you
+    // it stands in for the weather, elsewhere it rides beside it
+    const told = mistsSentence(radial.mists, (radial.sightReachM ?? 0).toLocaleString());
+    if (told?.onYou) return told.text + (radial.mists.veil > 0 ? " " + VEIL_LINE : "");
+    const weather = obs.aboveFog ? "You are above the fog; the sightlines run long."
+      : obs.inFog ? `Fog is in tonight (thickness ${radial.fog.thickness}) — it closes the view to about ${(radial.sightReachM ?? 0).toLocaleString()} m.`
+      : `The air is clear — you can see about ${(radial.sightReachM ?? 0).toLocaleString()} m.`;
+    return told ? `${weather} ${told.text}${radial.mists.veil > 0 ? " " + VEIL_LINE : ""}` : weather;
   }
   // keep: optional predicate — under just mine, only cards whose mark passes
   // show (the telling stays otherwise identical: same order, same budget already
@@ -8666,6 +8721,12 @@ export function mountViewer(appEl) {
     placedArtLayer.setAttribute("id", "wv-placed-art-layer");
     placedArtLayer.style.pointerEvents = "none";
     svg.appendChild(placedArtLayer);
+    // THE VEIL (POS-466): over the ground and its art, under everything the
+    // record draws, so the land darkens and the pips still read
+    const veilLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    veilLayer.setAttribute("id", "wv-veil-layer");
+    veilLayer.style.pointerEvents = "none";
+    svg.appendChild(veilLayer);
     // footprints — the second derived layer: every mark's true extent, from the
     // record. Sits above the grid, under the pips; pointer-events none so the
     // stand-click and drag pass straight through it.
@@ -8703,6 +8764,11 @@ export function mountViewer(appEl) {
     const walkLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     walkLayer.setAttribute("id", "wv-walk-layer");
     svg.appendChild(walkLayer);
+    // THE MISTS' WALL (POS-466): above everything the record draws, walkers
+    // included, because nothing behind the wall may be seen or clicked
+    const mistsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    mistsLayer.setAttribute("id", "wv-mists-layer");
+    svg.appendChild(mistsLayer);
     // The wash's name-box rides above the walkers while the washes stay under
     // everything. A wash says nothing until pointed at — the always-on labels
     // died at zoom (their halo strokes shattered into starbursts; Keemin's
@@ -8782,7 +8848,7 @@ export function mountViewer(appEl) {
       svg.insertBefore(base, mistLayer);
     }
     const view = { ...full };
-    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, convoLayer, convoHoverLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
     // THE PANE'S WIDTH IS KEPT, NOT MEASURED (POS-228). panePx is read four
     // times a frame by the settle pass (thumbClassKey), right after
     // applyCameraScale has written styles, so every read forced a layout: 13%
@@ -9645,8 +9711,23 @@ export function mountViewer(appEl) {
       fan, title,
     });
   }
+  // The Mists for the crossing on screen (live, or the time-travel dial), the
+  // town's scene only: a room is an inside, and the border is not in it. Drawn
+  // again only when the answer changes, so a render that keeps the crossing
+  // costs nothing here.
+  function drawMists() {
+    if (!mapCtx?.mistsLayer) return;
+    const m = sceneRoomId ? null : mistsAt(state.crossing, data?.skeleton?.mists);
+    const key = m ? JSON.stringify(m) : "";
+    if (mapCtx.mistsKey === key) return;
+    mapCtx.mistsKey = key;
+    mapCtx.veilLayer.innerHTML = mistsVeilSVG(m, mapCtx);
+    mapCtx.mistsLayer.innerHTML = mistsWallSVG(m, mapCtx);
+  }
+
   function drawOverlay(radial) {
     if (!mapCtx) return;
+    drawMists();
     // the footprints are baked, not drawn per frame, so this is where an open
     // layer notices the world moved under it (the epoch contract, above)
     mapCtx.refreshFp?.();
