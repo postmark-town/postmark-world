@@ -110,3 +110,16 @@ test("the parity run reads TAP per test, nested, and names each test whose verdi
   ]);
   assert.deepEqual(found, { reads: ["tools/a.test.mjs", "tools/b.test.mjs"], filing: ["tools/b.test.mjs"] });
 });
+
+test("the parity run leaves no scratch behind: its exit code is set, never process.exit() inside the try that cleans up (Wright's review of world#165)", async (t) => {
+  const { spawnSync } = await import("node:child_process");
+  const { readdirSync } = await import("node:fs");
+  const temp = scratch(t);
+  const env = { ...process.env, TMPDIR: temp, TEMP: temp, TMP: temp };
+  delete env[SNAPSHOT_ENV]; delete env[SNAPSHOT_ROOT_ENV];
+  const r = spawnSync(process.execPath, [join(ROOT, "tools", "snapshot-parity.mjs"), "--files", "tools/enter-affordance.test.mjs"],
+    { cwd: ROOT, env, encoding: "utf8", timeout: 300000 });
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stderr, /snapshot-parity: 1\/1 file\(s\) pass and fail alike/);
+  assert.deepEqual(readdirSync(temp).filter((n) => n.startsWith("postmark-snapshot-parity-")), [], "the scratch export was removed");
+});

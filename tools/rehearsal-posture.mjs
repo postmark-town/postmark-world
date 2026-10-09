@@ -56,6 +56,10 @@
 //                     time: the sweep reads BOT_NAME and BOT_EMAIL (git identity
 //                     fallbacks, harmless), the gate reads nothing. A new read
 //                     appearing on either side reds this and asks a person.
+//                     Since POS-363 it reads `marks-fold.mjs` too, the seam
+//                     both load the marks through (its snapshot switch:
+//                     WORLD_SNAPSHOT, WORLD_SNAPSHOT_ROOT), and a key a module
+//                     names as its `*_ENV` constant counts as a read.
 //   7. weight       — `harm-gate.mjs` reads no `weight`. THIS ONE IS NOT ABOUT
 //                     SECURITY and it is here because it is about this
 //                     rehearsal's honesty: the stakes are rebuilt from
@@ -88,8 +92,25 @@ export const WORKFLOW_REL = ".github/workflows/crossing-rehearsal.yml";
  * The env keys the rehearsal's own tools may read. Derived by reading the
  * tools, not by remembering them: anything outside this set must be argued for
  * by a person before the job hands an untrusted tree's code near it.
+ *
+ *   BOT_EMAIL, BOT_NAME     the sweep's commit identity: a name and an address,
+ *                           no credential.
+ *   WORLD_SNAPSHOT,         marks-fold.mjs § snapshotFor (POS-363): a local
+ *   WORLD_SNAPSHOT_ROOT     snapshot export to read in place of WORLD/marks, and
+ *                           the repo it stands for. Two paths, no credential, no
+ *                           store and no pen. The job sets neither (check 5: no
+ *                           env block), so its gate and sweep read the tree under
+ *                           test; a runner that set both would point the read at
+ *                           a file on that runner, nothing more.
  */
-export const ALLOWED_TOOL_ENV = ["BOT_EMAIL", "BOT_NAME"];
+export const ALLOWED_TOOL_ENV = ["BOT_EMAIL", "BOT_NAME", "WORLD_SNAPSHOT", "WORLD_SNAPSHOT_ROOT"];
+
+/**
+ * The files check 6 reads: the two tools the job runs, and the seam both of
+ * them load the marks through (Wright's review of world#165: the snapshot keys
+ * reached the gate through marks-fold.mjs, which no check read).
+ */
+export const ENV_CONSUMERS = ["tools/settlement-sweep.mjs", "tools/harm-gate.mjs", "tools/marks-fold.mjs"];
 
 /** Keys whose presence in the job would mean it can reach a store or a pen. */
 export const DENIED_RUNTIME_ENV = [
@@ -97,11 +118,17 @@ export const DENIED_RUNTIME_ENV = [
   /^TOWN_CLONE$/, /^WORLD_CLONE$/, /^OFFICE_/, /_TOKEN$/, /_SECRET$/, /^AWS_/, /^SSH_/,
 ];
 
-/** `process.env.X` and `process.env["X"]` reads in a source file. */
+/**
+ * `process.env.X` and `process.env["X"]` reads in a source file, and every key a
+ * module names as an environment switch (`export const SNAPSHOT_ENV =
+ * "WORLD_SNAPSHOT"`, read as `env[SNAPSHOT_ENV]` with `env = process.env`),
+ * which a literal scan cannot see.
+ */
 export function envReads(source) {
   const keys = new Set();
   for (const m of source.matchAll(/process\.env\.([A-Za-z_][A-Za-z0-9_]*)/g)) keys.add(m[1]);
   for (const m of source.matchAll(/process\.env\[\s*["'`]([^"'`]+)["'`]\s*\]/g)) keys.add(m[1]);
+  for (const m of source.matchAll(/\bconst\s+[A-Z][A-Z0-9_]*_ENV\s*=\s*["'`]([A-Za-z_][A-Za-z0-9_]*)["'`]/g)) keys.add(m[1]);
   return [...keys].sort();
 }
 
@@ -159,7 +186,7 @@ export function rehearsalPosture({ repo = ROOT, workflow = WORKFLOW_REL, env = n
   if (/^\s*env:\s*$/m.test(body)) fail("env", `${workflow} declares an \`env:\` block. The job hands its tools nothing — that is the only claim about env that stays true without anyone maintaining it.`);
 
   // 6 · consumers — read the files that consume env, not the memory of them
-  for (const rel of ["tools/settlement-sweep.mjs", "tools/harm-gate.mjs"]) {
+  for (const rel of ENV_CONSUMERS) {
     const p = join(repo, rel);
     if (!existsSync(p)) { fail("consumers", `${rel} is not in this tree — the rehearsal runs it and this check cannot read it`); continue; }
     const extra = envReads(readFileSync(p, "utf8")).filter((k) => !ALLOWED_TOOL_ENV.includes(k));
