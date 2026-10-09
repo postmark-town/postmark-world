@@ -7373,6 +7373,7 @@ export function mountViewer(appEl) {
     if (c.candidates != null) parts.push(`${c.shown ?? "?"} told of ${c.visible ?? "?"} in view (${c.candidates} in range)`);
     if (c.occluded) parts.push(`${c.occluded} behind the ground`);
     if (c.fogHidden) parts.push(`${c.fogHidden} lost to fog`);
+    if (c.mistHidden) parts.push(`${c.mistHidden} behind the mist`); // POS-466: absent before the Mists
     if (agg.hidden_by_budget) parts.push(`${agg.hidden_by_budget} more the eye doesn't sort out`);
     return parts.join(" · ");
   }

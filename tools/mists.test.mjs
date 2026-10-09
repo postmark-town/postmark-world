@@ -68,6 +68,7 @@ test("THE TALL THING: a 100 m object 200 m past the border is hidden from inside
   assert.ok(!shown(fov).includes("beyond/beacon"), "a signal's light does not cut the wall");
   assert.ok(shown(fov).includes("town/well"), "the map side of the wall is still seen");
   assert.equal(fov.counts.mistHidden, 2);
+  assert.equal(fov.counts.fogHidden, 0, "behind the mist is its own count, never also lost to fog");
 });
 
 test("THE TALL THING from a high eye: above the fog line, the wall still hides it", () => {

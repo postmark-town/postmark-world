@@ -563,7 +563,8 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     counts: {
       candidates: seen.length, visible: ranked.length, shown: carried.length, clustered: collapsed.length - carried.length,
       occluded: seen.filter((s) => s.occluded && !s.signal).length,
-      fogHidden: seen.filter((s) => !s.visible && !s.occluded).length,
+      // the mist keeps its own count, so a mark is never told as lost to both
+      fogHidden: seen.filter((s) => !s.visible && !s.occluded && !s.mistHidden).length,
       ...(mists ? { mistHidden: seen.filter((s) => s.mistHidden).length } : {}),
     },
   };
