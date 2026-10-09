@@ -229,17 +229,17 @@
     "border_m": {
       "minX": -4600,
       "minY": -4600,
-      "maxX": 5350,
+      "maxX": 5850,
       "maxY": 9700,
-      "receipt": "the box round every parcel on the map (x -3302.5..4050, y -3312.5..8412.5 on 2026-10-09) widened 1300 m on each side, so neither the wall nor its fringe reaches a parcel at any keyframe"
+      "receipt": "on 2026-10-09: every parcel on the map (x -3302.5..4050, y -3312.5..8412.5) with the 400 m fringe, 100 m more and the 780 m creep outside it, and every household's mark (east to x 4940) with 100 m and the creep outside it, so at no keyframe does the wall reach a household's mark or the fringe a parcel"
     },
     "clearings_m": [
       {
-        "id": "driftlight",
-        "x": -15050,
-        "y": 13400,
-        "r_m": 600,
-        "receipt": "a household's parcel 15 km past the border keeps open ground round it: its corners stand 582 m from the wall, past the 400 m fringe"
+        "id": "the-far-southwest",
+        "x": -14000,
+        "y": 14000,
+        "r_m": 4250,
+        "receipt": "a household's parcel and its wetland, 15 km past the border: the smallest circle that holds the wetland (6000 x 4500 m, the parcel inside it) is 3750 m, widened by the 400 m fringe and 100 m more, so no part of either is in the wall or the fringe"
       }
     ],
     "fringe_m": 400,

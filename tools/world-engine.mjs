@@ -491,12 +491,19 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     : Infinity;
   // A SIGNAL'S LIGHT IS VEILED TOO (Darko, 2026-10-09: "the Mists dim every
   // light in the land, daylight and residents' signals alike"). A signal keeps
-  // its own light at the dark end, as ever, but that light is scaled by
-  // (1 − veil): it ranks dimmer, and the extra reach it carries through fog
-  // shrinks with it, never below a plain mark's. With no veil both are the old
-  // numbers exactly.
+  // its own light at the dark end, as ever, but the light a reader is told it
+  // shows (`dim`) is scaled by (1 − veil).
+  //
+  // THE VEIL DARKENS WHAT IS TOLD, NEVER WHAT IS REACHED. The office builds a
+  // standpoint's law reach from this telling (the carried and far marks), so if
+  // the veil re-ranked marks it would move law reach across the whole town, and
+  // the ruling is that only what stands behind the wall is lost. So the ranking,
+  // the budget and every visibility test read the UNVEILED light, as they did
+  // before the Mists; only the reported `dim` and the observer's own light carry
+  // the veil. The wall is the one thing in the Mists that takes a mark out of
+  // reach.
   const signalLight = veil > 0 ? 1 - Math.min(1, veil) : 1;
-  const signalMult = veil > 0 ? Math.max(1, dials.signal_fog_reach_mult * signalLight) : dials.signal_fog_reach_mult;
+  const signalMult = dials.signal_fog_reach_mult;
 
   const seen = [];
   for (const mk of marks) {
@@ -533,15 +540,19 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     const fogHidden = distM > reach || mistHidden;
 
     // darkness dimming: a non-signal, non-luminous mark at the dark end is dim
-    const tgtLight = lightLevelAt(mk.at.x, mk.at.y, light, veil);
+    // the unveiled light ranks (it is the light there was before the Mists, bit
+    // for bit); the veiled light is what the reader is told
+    const rawLight = lightLevelAt(mk.at.x, mk.at.y, light);
+    const rankDimming = rawLight < 0.25 && !isSignal ? lerp(1, dials.dark_dim_floor, (0.25 - rawLight) / 0.25) : 1;
+    const tgtLight = veil > 0 ? lightLevelAt(mk.at.x, mk.at.y, light, veil) : rawLight;
     const dark = tgtLight < 0.25 && !isSignal;
-    const dimming = dark ? lerp(1, dials.dark_dim_floor, (0.25 - tgtLight) / 0.25) : isSignal ? signalLight : 1;
+    const dimming = veil > 0 ? (dark ? lerp(1, dials.dark_dim_floor, (0.25 - tgtLight) / 0.25) : isSignal ? signalLight : 1) : rankDimming;
 
     // terrain occlusion (the FOV over the heightfield) — every lean honored from
     // `dials` so a dev-pane override changes the sightline too, not just the ranking
     const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
-    const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming });
+    const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
     const visible = !fogHidden && (los.visible || isSignal); // a signal's light is seen even where its footing is occluded
     seen.push({
       id: mk.id, kind: mk.kind, household: mk.household, body: mk.body,

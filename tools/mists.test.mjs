@@ -137,7 +137,7 @@ test("the veil dims the whole land; orient and the telling say so", () => {
   assert.doesNotMatch(openYourEyes({ x: 0, y: 0 }, w, { crossing: 9, dials: CLEAR }).tell(), /mist|veiled/i);
 });
 
-test("A SIGNAL IS VEILED TOO: its light ranks dimmer and carries less far through fog, by (1 − veil)", () => {
+test("A SIGNAL IS VEILED TOO: the light it is told to show is scaled by (1 − veil), and what it reaches is not", () => {
   // a beacon in the bright east (never dark), 1,000 m off, through a thick weather fog
   const beacon = { id: "town/beacon", kind: "sited", household: "town", at: { x: 1000, y: 0 }, extent: { w: 4, h: 4 }, weight: 1, top_m: 4, signal: true };
   const big = { ...MISTS, border_m: { minX: -9000, minY: -9000, maxX: 9000, maxY: 9000 }, fringe_m: 0 };
@@ -146,11 +146,12 @@ test("A SIGNAL IS VEILED TOO: its light ranks dimmer and carries less far throug
   assert.equal(at(9, CLEAR).dim, 1, "before the Mists a signal is undimmed");
   assert.equal(at(10, CLEAR).dim, 0.6, "veil 0.4 → its light at 0.6");
   assert.equal(at(20, CLEAR).dim, 0.4, "veil 0.6 → 0.4");
-  // the fog reach: plain reach 200 m at this fog; ×6 before the veil carries it, ×2.4 under veil 0.6 does not
+  // the fog reach: plain reach 200 m at this fog; the signal's ×6 carries 1,200 m, veil or no veil
   const FOG = { ...DIALS, fog_base: 1, fog_swing: 0, fog_sight_floor_m: 200, fog_sight_ceiling_m: 200 };
   assert.ok(at(9, FOG), "×6: 1,200 m of reach, the beacon at 1,000 m is seen");
-  assert.equal(at(20, FOG), undefined, "×2.4 under the veil: 480 m, the beacon is lost to the fog");
-  assert.equal(at(20, { ...FOG, signal_fog_reach_mult: 1 }), undefined);
+  assert.ok(at(20, FOG), "under the veil it still carries: the veil darkens what is told, never what is reached");
+  assert.equal(at(20, FOG).score, at(9, FOG).score, "and it ranks as it did");
+  assert.equal(at(20, { ...FOG, signal_fog_reach_mult: 1 }), undefined, "control: without the signal's reach the fog takes it");
 });
 
 // ── THE RECORD'S OWN MISTS (skeleton.mists, ruled 2026-10-09) ──────────────
@@ -190,6 +191,23 @@ test("NO PARCEL IS COVERED: every parcel on the record but the one ruled under s
   }
 });
 
+test("NO HOUSEHOLD'S MARK IS BEHIND THE WALL but on Pando Peak's ground: every corner of every other placed mark stands clear, at every crossing", () => {
+  const { skeleton, worldState } = real();
+  const pando = worldState.marks.find((m) => m.id === RULED_UNDER).at;
+  const onPando = (m) => Math.hypot(m.at.x - pando.x, m.at.y - pando.y) < 10000;   // its own ground, 135 km out
+  // the world-root is the frame, never a mark in view (the engine skips it the same way)
+  const frame = (m) => Math.max(m.extent?.w ?? 0, m.extent?.h ?? 0) >= DIALS.world_scale_extent_m;
+  // households' marks: the town's own water runs off the map's edge into the mist, as a river would
+  const marks = worldState.marks.filter((m) => m.at && !m.far && !frame(m) && !onPando(m) && !String(m.id).startsWith("the-town/") && Math.abs(m.at.x) < 50000 && Math.abs(m.at.y) < 50000);
+  assert.ok(marks.length > 600);
+  for (const c of [...KEYFRAMES(), KEYFRAMES().at(-1) + 10]) {
+    const m = mistsAt(c, skeleton.mists);
+    for (const mk of marks)
+      for (const q of corners({ at: mk.at, extent: mk.extent ?? { w: 0, h: 0 } }))
+        assert.equal(mistsHere(q, m).inWall, false, `${mk.id} is behind the wall at crossing ${c}`);
+  }
+});
+
 test("THE PARCEL NEAREST EACH SIDE stays fully sighted at every keyframe: its reach is the weather's, and it loses only what stands behind the wall", () => {
   const { skeleton, worldState, withM, without } = real();
   const b = skeleton.mists.border_m;
@@ -214,18 +232,43 @@ test("THE PARCEL NEAREST EACH SIDE stays fully sighted at every keyframe: its re
   }
 });
 
-test("THE CRAG: a 100 m thing at (3850, -5300) is behind the north wall at every keyframe, from the town and from the parcel nearest it", () => {
+// LAW REACH IS THE TELLING'S CARRIED AND FAR MARKS (the office builds a
+// standpoint's reach from exactly these: world2-serve's `nearby`, the apex's
+// worldEyes), at the default budget. The Mists may take out of it only what the
+// wall hides: from every parcel's own standpoint, the reach with the Mists is the
+// reach the same crossing gives with no Mists and those hidden marks removed. The
+// veil must not re-rank it. (A sample of parcels here; the lane measured all of
+// them through the office's apexLawAt.)
+test("LAW REACH: from a parcel, the Mists change what is reached only by what the wall hides, never by the veil", () => {
+  const { skeleton, worldState, withM, without } = real();
+  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && m.id !== RULED_UNDER && Math.abs(m.at.x) < 50000)
+    .sort((p, q) => (p.id < q.id ? -1 : 1));
+  const sample = parcels.filter((_, i) => i % 8 === 0);
+  assert.ok(sample.length >= 12);
+  const reachOf = (fov) => [...fov.carried.map((s) => s.id), ...fov.far.map((f) => f.id)].sort();
+  for (const crossing of [KEYFRAMES()[0], KEYFRAMES().at(-1)]) {
+    const m = mistsAt(crossing, skeleton.mists);
+    for (const p of sample) {
+      const hidden = new Set(without.marks.filter((mk) => mk.at && mistsHide(p.at, mk.at, m)).map((mk) => mk.id));
+      const bare = { ...without, marks: without.marks.filter((mk) => !hidden.has(mk.id)) };
+      assert.deepEqual(reachOf(fieldOfView(p.at, withM, { crossing })), reachOf(fieldOfView(p.at, bare, { crossing })),
+        `${p.id}'s reach at ${crossing}`);
+    }
+  }
+});
+
+test("A TALL THING past the north wall: 100 m high, behind the wall at every keyframe, from the town and from the parcel nearest it", () => {
   const { skeleton, worldState } = real();
-  const crag = { id: "beyond/crag", kind: "sited", household: "beyond", at: { x: 3850, y: -5300 }, extent: { w: 60, h: 60 }, weight: 50, top_m: 100 };
-  const w = assembleWorld({ worldState: { ...worldState, marks: [...worldState.marks, crag] }, skeleton });
-  const ne = worldState.marks.filter((m) => m.kind === "parcel" && m.at && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000)
-    .reduce((a, p) => (Math.hypot(p.at.x - 3850, p.at.y + 5300) < Math.hypot(a.at.x - 3850, a.at.y + 5300) ? p : a));
+  const tall = { id: "beyond/tall-thing", kind: "sited", household: "beyond", at: { x: -1500, y: -5200 }, extent: { w: 60, h: 60 }, weight: 50, top_m: 100 };
+  const w = assembleWorld({ worldState: { ...worldState, marks: [...worldState.marks, tall] }, skeleton });
+  const nearest = worldState.marks.filter((m) => m.kind === "parcel" && m.at && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000)
+    .reduce((a, p) => (Math.hypot(p.at.x - tall.at.x, p.at.y - tall.at.y) < Math.hypot(a.at.x - tall.at.x, a.at.y - tall.at.y) ? p : a));
   for (const crossing of [...KEYFRAMES(), 300]) {
     const m = mistsAt(crossing, skeleton.mists);
-    assert.equal(mistsHere(crag.at, m).inWall, true, `behind the wall at ${crossing}`);
-    for (const from of [{ x: 0, y: 0 }, { x: 575, y: -2600 }, ne.at]) {
+    assert.equal(mistsHere(tall.at, m).inWall, true, `behind the wall at ${crossing}`);
+    for (const from of [{ x: 0, y: 0 }, { x: 575, y: -2600 }, nearest.at]) {
       const fov = fieldOfView(from, w, { crossing, budget: 1000 });
-      assert.ok(!fov.carried.some((s) => s.id === "beyond/crag"), `seen from (${from.x}, ${from.y}) at ${crossing}`);
+      assert.ok(!fov.carried.some((s) => s.id === "beyond/tall-thing"), `seen from (${from.x}, ${from.y}) at ${crossing}`);
     }
   }
 });
@@ -317,4 +360,27 @@ test("the page cuts each clearing out of the wall, so the land past the border i
   const cx = 485 + k.x / 5, cy = 760 + k.y / 5, r = k.r / 5;
   assert.ok(svg.includes(` M ${(cx - r).toFixed(1)} ${cy.toFixed(1)} a ${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(2 * r).toFixed(1)} 0`), "the hole");
   assert.match(svg, /<circle class="wv-mists-fringe" data-src="mists:clearing-[^"]+" pointer-events="none"/, "its fringe ring");
+});
+
+// THE GENERATOR KEEPS THE BLOCK. tools/world-terrain-gen.mjs writes the whole
+// skeleton, and the Mists' one home in code is tools/mists-record.mjs, which it
+// writes in. The committed block is held to that home on every run; the full
+// regenerate-then-diff needs the atlas the generator extracts from, which lives in
+// the town's repo, so it runs wherever POSTMARK_ATLAS names one and says why it
+// skipped otherwise.
+test("the committed skeleton's mists block is the generator's own", async () => {
+  const { MISTS } = await import("./mists-record.mjs");
+  assert.deepEqual(real().skeleton.mists, JSON.parse(JSON.stringify(MISTS)));
+});
+
+test("a regenerate writes the committed skeleton, key for key (needs POSTMARK_ATLAS)", { skip: !process.env.POSTMARK_ATLAS && "POSTMARK_ATLAS is not set: the atlas the generator extracts from lives in the town's repo" }, async () => {
+  const { execFileSync } = await import("node:child_process");
+  const { mkdtempSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const dir = mkdtempSync(join(tmpdir(), "skeleton-regen-"));
+  try {
+    const out = join(dir, "skeleton.json");
+    execFileSync(process.execPath, [join(ROOT, "tools/world-terrain-gen.mjs"), "--atlas", process.env.POSTMARK_ATLAS], { env: { ...process.env, SKELETON_OUT: out }, stdio: "pipe" });
+    assert.deepEqual(JSON.parse(readFileSync(out, "utf8")), real().skeleton);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
