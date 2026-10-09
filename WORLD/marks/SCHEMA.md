@@ -153,7 +153,8 @@ inside your own mark**, and about nobody's mark but another household's. A
 parcel's word reaches only marks laid **after** the parcel, and never the town's
 own marks (Darko, 2026-10-05); the lint names a word it ignores. A
 `welcomed` mark fans its weight up and comes back carrying `kept: true`; an
-`opposed` mark is **returned** — it leaves the fold, with its subtree, into
+`opposed` mark is **returned** — it leaves the fold, with its own household's
+marks under it (another household's, and the town's, stay), into
 `world-state.json`'s `returned[]`, which names every member. On parcel ground the
 word is absolute; on a commons edge it must out-weigh the child to move it. A
 mark carrying open escrow is never returned while the stakes stand (it records as

@@ -78,15 +78,16 @@
 //
 // A vetoed mark is RETURNED: it leaves the fold into a first-class `returned[]`
 // output beside `errors[]`, naming the mark, the ground or parent it was returned
-// from, and its state. Its subtree goes with it and every member is disclosed by
-// name. There is no silent drop anywhere in this file — a resident whose mark
+// from, and its state. Its subtree goes with it, and every member is disclosed by
+// name. The subtree is the opposed household's OWN marks under it (POS-477): what
+// another household, or the town, stands on that ground stays. There is no silent drop anywhere in this file — a resident whose mark
 // stops appearing is owed the sentence saying why.
 //
 // ── THE ESCROW GUARD ─────────────────────────────────────────────────────────
 //
 // Escrow implies existence is already law (MARKS.md; the fold's retirement gate):
 // "a mark is not retired until it hits 0 stamps." So a veto landing on a mark that
-// carries open stakes — its own or anywhere in its subtree — records as
+// carries open stakes (its own, or on any mark of its subtree) records as
 // `state: "pending-escrow"` and the mark STANDS until the stakes unwind. This is
 // no new law, only the sequencing the existing one already implies.
 //
@@ -259,9 +260,26 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
   // ---- returns, with the subtree and the escrow guard ----
   const children = new Map();
   for (const [c, p] of parentOf) { if (!children.has(p)) children.set(p, []); children.get(p).push(c); }
+  // A SUBTREE IS THE OPPOSED HOUSEHOLD'S OWN (POS-477). `parentOf` holds the
+  // geometric containment edge (the smallest sited mark around a mark, the edge
+  // published as `placementParent`), so an opposed mark's descendants include
+  // whatever any household, the town among them, sited on its ground. In S100
+  // the-town/pando-peak is a child of vermillion/pando-plains, and opposing the
+  // plains walked the town's constitution mark out with them. An opposition
+  // answers for the opposed mark's own household: the walk still descends the
+  // whole tree, and carries only that household's marks (by credential, as
+  // every household comparison here is). Everyone else's stays where it stands.
   const subtreeOf = (id) => {
     const out = [];
-    const walk = (n, seen) => { for (const c of children.get(n) ?? []) if (!seen.has(c)) { seen.add(c); out.push(c); walk(c, seen); } };
+    const cred = credOfMark(byId.get(id));
+    const walk = (n, seen) => {
+      for (const c of children.get(n) ?? []) {
+        if (seen.has(c)) continue;
+        seen.add(c);
+        if (credOfMark(byId.get(c)) === cred) out.push(c);
+        walk(c, seen);
+      }
+    };
     walk(id, new Set([id]));
     return out;
   };
