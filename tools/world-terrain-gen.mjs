@@ -118,6 +118,8 @@ const skeleton = {
     orthogonality: "the light gradient (E-W) runs roughly orthogonal to the altitude/river gradient (N-S) — the town's two great fields form a coordinate system; every place a (light, altitude) pair (decision 008)",
     night_enclaves: (candA.zones || []).filter(z => z.kind === "night").map(z => ({ id: z.id, center_m: m(z.cx, z.cy), rx_m: z.rx * K, ry_m: z.ry * K, receipt: z.receipt })),
   },
+  // THE MISTS (POS-466, ruled 2026-10-09): their one home is tools/mists-record.mjs
+  mists: (await import("./mists-record.mjs")).MISTS,
   far_features: [
     { id: "pando-peak", kind: "mountain-horizon", label: "Pando Peak", bearing: "NW", distance_m: 135000, height_m: 4000,
       days_out_on_foot: "4-5", crossings_out: 9,
@@ -163,5 +165,6 @@ const skeleton = {
 };
 
 mkdirSync(join(ROOT, "WORLD"), { recursive: true });
-writeFileSync(join(ROOT, "WORLD/skeleton.json"), JSON.stringify(skeleton, null, 2) + "\n");
+// SKELETON_OUT writes elsewhere (the suite's regenerate-then-diff); unset, the record itself
+writeFileSync(process.env.SKELETON_OUT ?? join(ROOT, "WORLD/skeleton.json"), JSON.stringify(skeleton, null, 2) + "\n");
 console.log(`WORLD/skeleton.json written: ${skeleton.features.length} features, ${skeleton.elevation.regions.length} elevation rows, ${skeleton.far_features.length} far feature(s), origin the Origin @ ${K} m/px`);

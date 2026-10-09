@@ -241,12 +241,18 @@ export function distanceBand(m, bands = DIALS.distance_bands) {
 // lightLevel: 1 at the dawn pole, 0 at the dark pole, linear along the axis,
 // clamped. Provisional on caelum's word (decision 008) — the poles are dated
 // config the loader passes in, not constants here.
-export function lightLevelAt(x, y, light) {
+//
+// THE VEIL (POS-466). `veil` [0..1] is the share of the daylight the Mists take
+// away this crossing (mistsAt(...).veil). It scales the whole axis, so the
+// gradient keeps its shape and the whole land dims together. Absent or 0, the
+// answer is the unveiled one, bit for bit.
+export function lightLevelAt(x, y, light, veil = 0) {
   const ax = light.dark_pole_m.x - light.dawn_pole_m.x;
   const ay = light.dark_pole_m.y - light.dawn_pole_m.y;
   const len2 = ax * ax + ay * ay || 1;
   const t = ((x - light.dawn_pole_m.x) * ax + (y - light.dawn_pole_m.y) * ay) / len2;
-  return Math.max(0, Math.min(1, 1 - t)); // 1 at dawn end, 0 at dark end
+  const level = Math.max(0, Math.min(1, 1 - t)); // 1 at dawn end, 0 at dark end
+  return veil > 0 ? level * (1 - Math.min(1, veil)) : level;
 }
 
 // ───────────────────────── fog (deterministic per crossing) ─────────────────
@@ -261,12 +267,154 @@ export function fogModel(crossing, dials = DIALS) {
   return { crossing: crossing | 0, thickness };
 }
 
+// ───────────────────────── the Mists (a border band, on a schedule) ─────────
+// The weather above has no place: one thickness for the whole town. The Mists
+// are the other kind of fog, the kind with a place. They stand at the map's
+// border as a WALL, and on a schedule keyed to the crossing number the wall
+// creeps in from the edges, or pulls back past them.
+//
+// The record is `skeleton.mists` (it reaches every reader as `world.terrain`;
+// tools/world-terrain-gen.mjs emits it, so a regenerate keeps it):
+//
+//   border_m   { minX, minY, maxX, maxY }  where the wall stands at front 0,
+//              pinned as dated config. It is never derived from what the record
+//              happens to draw today, because a border that moved with the
+//              record would re-tell past crossings.
+//   clearings_m  [{ id, x, y, r_m }]  clear ground the wall never takes: a
+//              household's land standing far past the border keeps a circle of
+//              open air round it (ruled 2026-10-09: no parcel is covered but the
+//              one ruled under). Clearings do not creep.
+//   fringe_m   the translucent haze on the clear side of the wall
+//   wall_sight_m  how far a body standing INSIDE the wall can see
+//   schedule   [{ crossing, front_m, veil }, …] in crossing order. front_m is
+//              how far the wall stands in from the border: a number for every
+//              side, or { n, e, s, w }. Positive means the wall has crept onto
+//              the map; negative means it has pulled back past the edge. veil
+//              [0..1] is the share of all light the Mists take (lightLevelAt).
+//              Between two entries both move linearly; after the last they hold.
+//   density    { from, to, power }  the fringe's thickness where it meets the
+//              wall, eased from the schedule's first crossing to its last:
+//              from + (to − from) · u^power, u the share of the span gone. A
+//              power above 1 thickens slowly at first and faster as the last
+//              crossing nears.
+//
+// BEFORE THE SCHEDULE'S FIRST CROSSING THERE ARE NO MISTS: mistsAt answers null,
+// and every reader then answers exactly as it did before the Mists existed. Like
+// the weather, it is a pure function of the crossing number, so replay holds.
+//
+// THE WALL OCCLUDES EVERYTHING BEHIND IT. It has no ceiling and no height
+// exemption, and a signal's light does not cut it: no sight line that passes
+// through the wall reaches its target, however tall the thing standing there.
+// The clear ground is the box inside the wall plus the clearings, each of them
+// convex, so a sight line is clear exactly when the pieces of it inside those
+// shapes cover the whole of it. Within the box alone that is the old rule: a
+// target is hidden exactly when it stands behind the wall. Once the wall
+// recedes past a target, it is in sight again.
+const SIDES = ["n", "e", "s", "w"];
+const lerpN = (a, b, t) => a + (b - a) * t;
+function sidesOf(front) {
+  if (front && typeof front === "object") return Object.fromEntries(SIDES.map((s) => [s, Number(front[s]) || 0]));
+  const v = Number(front) || 0;
+  return { n: v, e: v, s: v, w: v };
+}
+const clamp01 = (v) => Math.max(0, Math.min(1, Number(v) || 0));
+
+export function mistsAt(crossing, mists) {
+  const sched = Array.isArray(mists?.schedule) ? mists.schedule : [];
+  const b = mists?.border_m;
+  if (!sched.length || !b || ![b.minX, b.minY, b.maxX, b.maxY].every(Number.isFinite)) return null;
+  const c = crossing | 0;
+  if (c < sched[0].crossing) return null;                    // before the dial: no Mists at all
+  let i = 0;
+  while (i + 1 < sched.length && sched[i + 1].crossing <= c) i += 1;
+  const a = sched[i], z = sched[i + 1] ?? a;
+  const t = z === a ? 0 : (c - a.crossing) / (z.crossing - a.crossing);
+  const fa = sidesOf(a.front_m), fz = sidesOf(z.front_m);
+  const front = Object.fromEntries(SIDES.map((s) => [s, lerpN(fa[s], fz[s], t)]));
+  // the density's own eased curve over the whole schedule
+  const first = sched[0].crossing, last = sched[sched.length - 1].crossing;
+  const u = last > first ? Math.max(0, Math.min(1, (c - first) / (last - first))) : 1;
+  const d = mists.density ?? {};
+  const power = Number(d.power) > 0 ? Number(d.power) : 1;
+  const density = clamp01(lerpN(Number(d.from) || 0, Number(d.to ?? d.from) || 0, Math.pow(u, power)));
+  const clearings = (Array.isArray(mists.clearings_m) ? mists.clearings_m : [])
+    .filter((k) => [k?.x, k?.y, k?.r_m].every(Number.isFinite) && k.r_m > 0)
+    .map((k) => ({ id: k.id ?? null, x: k.x, y: k.y, r: k.r_m }));
+  return {
+    crossing: c,
+    front,
+    // the clear ground: north is -y, east +x, south +y, west -x
+    clear: { minX: b.minX + front.w, maxX: b.maxX - front.e, minY: b.minY + front.n, maxY: b.maxY - front.s },
+    clearings,
+    density,
+    veil: clamp01(lerpN(Number(a.veil) || 0, Number(z.veil) || 0, t)),
+    fringeM: Math.max(0, Number(mists.fringe_m) || 0),
+    wallSightM: Math.max(0, Number(mists.wall_sight_m) || 0),
+  };
+}
+
+/** Where a point stands in the Mists: `inWall` (behind the wall), the distance
+ *  to the wall (`wallM`, 0 inside it), and the fringe's thickness there (0 out
+ *  of the fringe, rising to the band's density at the wall). */
+export function mistsHere(p, m) {
+  const { clear } = m;
+  let wallM = -Infinity;
+  if (p.x >= clear.minX && p.x <= clear.maxX && p.y >= clear.minY && p.y <= clear.maxY)
+    wallM = Math.min(p.x - clear.minX, clear.maxX - p.x, p.y - clear.minY, clear.maxY - p.y);
+  for (const k of m.clearings ?? []) {
+    const inside = k.r - Math.hypot(p.x - k.x, p.y - k.y);
+    if (inside >= 0 && inside > wallM) wallM = inside;
+  }
+  if (wallM < 0) return { inWall: true, wallM: 0, thickness: 1 };
+  const thickness = m.fringeM > 0 && wallM < m.fringeM ? m.density * (1 - wallM / m.fringeM) : 0;
+  return { inWall: false, wallM, thickness };
+}
+
+// the stretch [t0, t1] of the segment a→b (t in 0..1) that lies inside a box,
+// or inside a circle; null when it never enters
+function segInBox(a, b, r) {
+  let t0 = 0, t1 = 1;
+  const dx = b.x - a.x, dy = b.y - a.y;
+  for (const [p, q] of [[-dx, a.x - r.minX], [dx, r.maxX - a.x], [-dy, a.y - r.minY], [dy, r.maxY - a.y]]) {
+    if (p === 0) { if (q < 0) return null; continue; }
+    const t = q / p;
+    if (p < 0) { if (t > t1) return null; if (t > t0) t0 = t; }
+    else { if (t < t0) return null; if (t < t1) t1 = t; }
+  }
+  return [t0, t1];
+}
+function segInCircle(a, b, k) {
+  const dx = b.x - a.x, dy = b.y - a.y, fx = a.x - k.x, fy = a.y - k.y;
+  const A = dx * dx + dy * dy, B = 2 * (fx * dx + fy * dy), C = fx * fx + fy * fy - k.r * k.r;
+  if (A === 0) return C <= 0 ? [0, 1] : null;
+  const disc = B * B - 4 * A * C;
+  if (disc < 0) return null;
+  const s = Math.sqrt(disc);
+  const t0 = Math.max(0, (-B - s) / (2 * A)), t1 = Math.min(1, (-B + s) / (2 * A));
+  return t0 <= t1 ? [t0, t1] : null;
+}
+
+/** Is `target` hidden by the wall from `from`? From clear ground, exactly when
+ *  some stretch of the sight line runs through the wall. From inside the wall,
+ *  everything past arm's reach (wall_sight_m) is hidden. */
+export function mistsHide(from, target, m) {
+  if (mistsHere(from, m).inWall) return Math.hypot(target.x - from.x, target.y - from.y) > m.wallSightM;
+  const spans = [segInBox(from, target, m.clear), ...(m.clearings ?? []).map((k) => segInCircle(from, target, k))]
+    .filter(Boolean).sort((p, q) => p[0] - q[0]);
+  let reached = 0;
+  for (const [t0, t1] of spans) {
+    if (t0 > reached + 1e-9) break;                         // a gap: the line runs through the wall
+    if (t1 > reached) reached = t1;
+  }
+  return reached < 1 - 1e-9;
+}
+
 // ───────────────────────── status effects at a point ───────────────────────
-export function statusAt({ x, y, groundH, eyeH, heightfield, light, fog, fogCeilingM }) {
+export function statusAt({ x, y, groundH, eyeH, heightfield, light, fog, fogCeilingM, veil = 0 }) {
   const eyeElev = groundH + eyeH;
   const inFog = groundH < fogCeilingM && fog.thickness > 0.02;
   const aboveFog = eyeElev >= fogCeilingM;
-  const lightLevel = lightLevelAt(x, y, light);
+  const lightLevel = lightLevelAt(x, y, light, veil);
   const inDarkness = lightLevel < 0.25;
   return { eyeElev, inFog, aboveFog, lightLevel, inDarkness };
 }
@@ -318,8 +466,12 @@ export function lodScore({ extentM, distM, weight = 0, dials = DIALS, dimming = 
 export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS } = {}) {
   const { marks, terrain, heightfield, light, fogCeilingM } = world;
   const fog = fogModel(crossing, dials);
+  // the Mists (POS-466): null before the schedule's first crossing, and then
+  // nothing below changes by a byte
+  const mists = mistsAt(crossing, terrain?.mists);
+  const veil = mists ? mists.veil : 0;
   const groundH = heightfield.elevationAt(observer.x, observer.y);
-  const self = statusAt({ x: observer.x, y: observer.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM });
+  const self = statusAt({ x: observer.x, y: observer.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM, veil });
 
   // the observer's own fog-limited sight radius this crossing
   // fog closes the view with a curve, so even moderate fog bites (a low-lying
@@ -328,6 +480,30 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   const clearReach = self.aboveFog
     ? dials.fog_sight_ceiling_m * dials.above_fog_bonus
     : dials.fog_sight_floor_m + (dials.fog_sight_ceiling_m - dials.fog_sight_floor_m) * Math.pow(1 - fogT, 3);
+  // The Mists' fringe closes the view the way the weather does (the same curve),
+  // but it has no ceiling: an eye above the fog line is still standing in it.
+  // Inside the wall, a body sees arm's reach. The wall itself is not a reach:
+  // it is a hard cut, applied per target below.
+  const mistSelf = mists ? mistsHere(observer, mists) : null;
+  const mistReach = !mistSelf ? Infinity
+    : mistSelf.inWall ? mists.wallSightM
+    : mistSelf.thickness > 0 ? dials.fog_sight_floor_m + (dials.fog_sight_ceiling_m - dials.fog_sight_floor_m) * Math.pow(1 - mistSelf.thickness, 3)
+    : Infinity;
+  // A SIGNAL'S LIGHT IS VEILED TOO (Darko, 2026-10-09: "the Mists dim every
+  // light in the land, daylight and residents' signals alike"). A signal keeps
+  // its own light at the dark end, as ever, but the light a reader is told it
+  // shows (`dim`) is scaled by (1 − veil).
+  //
+  // THE VEIL DARKENS WHAT IS TOLD, NEVER WHAT IS REACHED. The office builds a
+  // standpoint's law reach from this telling (the carried and far marks), so if
+  // the veil re-ranked marks it would move law reach across the whole town, and
+  // the ruling is that only what stands behind the wall is lost. So the ranking,
+  // the budget and every visibility test read the UNVEILED light, as they did
+  // before the Mists; only the reported `dim` and the observer's own light carry
+  // the veil. The wall is the one thing in the Mists that takes a mark out of
+  // reach.
+  const signalLight = veil > 0 ? 1 - Math.min(1, veil) : 1;
+  const signalMult = dials.signal_fog_reach_mult;
 
   const seen = [];
   for (const mk of marks) {
@@ -356,19 +532,27 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     const isSignal = !!mk.signal;
 
     // fog reach: signal marks cut much further through fog
-    const reach = isSignal ? clearReach * dials.signal_fog_reach_mult : clearReach;
-    const fogHidden = distM > reach;
+    const reach = isSignal ? clearReach * signalMult : clearReach;
+    // the Mists: the fringe's reach (a signal cuts it as it cuts the weather),
+    // and the wall, which nothing cuts
+    const mistHidden = !!mists && (mistsHide(observer, mk.at, mists)
+      || distM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
+    const fogHidden = distM > reach || mistHidden;
 
     // darkness dimming: a non-signal, non-luminous mark at the dark end is dim
-    const tgtLight = lightLevelAt(mk.at.x, mk.at.y, light);
+    // the unveiled light ranks (it is the light there was before the Mists, bit
+    // for bit); the veiled light is what the reader is told
+    const rawLight = lightLevelAt(mk.at.x, mk.at.y, light);
+    const rankDimming = rawLight < 0.25 && !isSignal ? lerp(1, dials.dark_dim_floor, (0.25 - rawLight) / 0.25) : 1;
+    const tgtLight = veil > 0 ? lightLevelAt(mk.at.x, mk.at.y, light, veil) : rawLight;
     const dark = tgtLight < 0.25 && !isSignal;
-    const dimming = dark ? lerp(1, dials.dark_dim_floor, (0.25 - tgtLight) / 0.25) : 1;
+    const dimming = veil > 0 ? (dark ? lerp(1, dials.dark_dim_floor, (0.25 - tgtLight) / 0.25) : isSignal ? signalLight : 1) : rankDimming;
 
     // terrain occlusion (the FOV over the heightfield) — every lean honored from
     // `dials` so a dev-pane override changes the sightline too, not just the ranking
     const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
-    const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming });
+    const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
     const visible = !fogHidden && (los.visible || isSignal); // a signal's light is seen even where its footing is occluded
     seen.push({
       id: mk.id, kind: mk.kind, household: mk.household, body: mk.body,
@@ -378,6 +562,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       elevM: +targetH.toFixed(1), aboveFogTarget: targetH >= fogCeilingM,
       occluded: !los.visible, occludeAt: los.occludeAt, dim: +dimming.toFixed(2), score,
       visible,
+      ...(mists ? { mistHidden } : {}),
     });
   }
 
@@ -406,7 +591,8 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       distM: Math.round(Math.hypot(dx, dy)),
       heightM: ff?.height_m ?? markTop(mk, dials),
       label: ff?.label ?? null, body: mk.body ?? ff?.receipt,
-      visible: clearHorizon,
+      // a horizon object behind the wall is hidden however tall it stands
+      visible: clearHorizon && !(mists && mistsHide(observer, mk.at, mists)),
     });
   }
 
@@ -436,19 +622,37 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       ...observer, groundElevM: +groundH.toFixed(1), eyeElevM: +self.eyeElev.toFixed(1),
       lightLevel: +self.lightLevel.toFixed(2), inFog: self.inFog, aboveFog: self.aboveFog, inDarkness: self.inDarkness,
     },
-    crossing: fog.crossing, fog: { thickness: +fog.thickness.toFixed(2) }, sightReachM: Math.round(clearReach),
+    crossing: fog.crossing, fog: { thickness: +fog.thickness.toFixed(2) }, sightReachM: Math.round(Math.min(clearReach, mistReach)),
+    ...(mists ? { mists: mistsBlock(mists, mistSelf) } : {}),
     carried, far: farSeen.filter((f) => f.visible),
     aggregate: { hidden_by_budget: tail.length, by_bearing: tailByBearing },
     counts: {
       candidates: seen.length, visible: ranked.length, shown: carried.length, clustered: collapsed.length - carried.length,
       occluded: seen.filter((s) => s.occluded && !s.signal).length,
-      fogHidden: seen.filter((s) => !s.visible && !s.occluded).length,
+      // the mist keeps its own count, so a mark is never told as lost to both
+      fogHidden: seen.filter((s) => !s.visible && !s.occluded && !s.mistHidden).length,
+      ...(mists ? { mistHidden: seen.filter((s) => s.mistHidden).length } : {}),
     },
   };
 }
 
 // radialSerialize — group a fieldOfView result into bearing → band → marks, the
 // shape a telling reads from. Pure restructure of fieldOfView output.
+// the Mists as a reader is told them, at one standpoint: where the wall stands,
+// how thick the fringe is here, and the veil on the daylight
+export function mistsBlock(m, here) {
+  const r = (v) => Math.round(v);
+  return {
+    crossing: m.crossing,
+    in_wall: here.inWall,
+    wall_m: r(here.wallM),
+    thickness: +here.thickness.toFixed(2),
+    density: +m.density.toFixed(2),
+    veil: +m.veil.toFixed(2),
+    front_m: { n: r(m.front.n), e: r(m.front.e), s: r(m.front.s), w: r(m.front.w) },
+  };
+}
+
 export function radialSerialize(fov) {
   const byBearing = {};
   for (const m of fov.carried) {
@@ -459,7 +663,7 @@ export function radialSerialize(fov) {
     (byBearing[f.bearing] ??= {});
     (byBearing[f.bearing]["on the horizon"] ??= []).push(f);
   }
-  return { observer: fov.observer, crossing: fov.crossing, fog: fov.fog, sightReachM: fov.sightReachM, byBearing, aggregate: fov.aggregate, counts: fov.counts };
+  return { observer: fov.observer, crossing: fov.crossing, fog: fov.fog, sightReachM: fov.sightReachM, ...(fov.mists ? { mists: fov.mists } : {}), byBearing, aggregate: fov.aggregate, counts: fov.counts };
 }
 
 // ───────────────────────── geometry is NOT redefined here ───────────────────

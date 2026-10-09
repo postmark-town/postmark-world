@@ -12,6 +12,7 @@
 
 import {
   fieldOfView, radialSerialize, statusAt, lightLevelAt, fogModel,
+  mistsAt, mistsHere, mistsBlock,
   bearingDeg, quantizeBearing, distanceBand, DIALS,
 } from "./world-engine.mjs";
 import {
@@ -29,8 +30,9 @@ import {
 export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
   const { heightfield, light, fogCeilingM, terrain } = world;
   const fog = fogModel(crossing, dials);
+  const mists = mistsAt(crossing, terrain?.mists); // POS-466: null before the schedule starts
   const groundH = heightfield.elevationAt(state.x, state.y);
-  const self = statusAt({ x: state.x, y: state.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM });
+  const self = statusAt({ x: state.x, y: state.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM, veil: mists ? mists.veil : 0 });
   // the containment spine: root → inward. within[0] is the frame (the root),
   // whose body is the establishing line — charter out of code, into the record.
   const within = containmentChain(state, world.marks);
@@ -47,6 +49,9 @@ export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
       within, // the spine, root → innermost (structural — the site renders it as the leading section)
       light: { level: +self.lightLevel.toFixed(2), inDarkness: self.inDarkness },
       fog: { crossing: fog.crossing, thickness: +fog.thickness.toFixed(2), inFog: self.inFog, aboveFog: self.aboveFog },
+      // the Mists at your standpoint; absent (not null) before they arrive, so
+      // the answer before the schedule's first crossing is the old one, bit for bit
+      ...(mists ? { mists: mistsBlock(mists, mistsHere(state, mists)) } : {}),
     },
     // enter/exit are DEMO-SLICE verbs (step 5) — listed so a reader of the
     // demo sees the pair, and pointedly listed apart from walk, which reaches
@@ -501,7 +506,8 @@ function renderTelling(state, radial, fov) {
   const lightline = o.inDarkness ? "You stand near the dark end of the world; the day is a rumor off to the northeast."
     : o.lightLevel > 0.7 ? "The northeast dawn-light is full on you here."
     : "The light is going — the world's glow lives off to the northeast and dies toward the southwest.";
-  L.push(airline + " " + lightline);
+  const veiled = radial.mists?.veil > 0 ? " " + VEIL_LINE : "";
+  L.push((mistLine(radial.mists, radial.sightReachM) ?? (radial.mists ? `${airline} ${MIST_AT_THE_EDGES}` : airline)) + " " + lightline + veiled);
   L.push("");
 
   // Distance orders the telling; bearing is a field on the mark (Keemin,
@@ -544,8 +550,30 @@ function renderTelling(state, radial, fov) {
     L.push(`  …and ${agg.hidden_by_budget} more marks the eye doesn't sort out at this range (${spread}). Walk toward one, or investigate it, to bring it in.`);
   }
   L.push("");
-  L.push(`  (${radial.counts.visible} marks in view of ${radial.counts.candidates} in range · ${radial.counts.occluded} behind the ground · ${radial.counts.fogHidden} lost to fog)`);
+  L.push(`  (${radial.counts.visible} marks in view of ${radial.counts.candidates} in range · ${radial.counts.occluded} behind the ground · ${radial.counts.fogHidden} lost to fog${radial.mists ? ` · ${radial.counts.mistHidden} behind the mist` : ""})`);
   return L.join("\n");
+}
+
+// THE MISTS, TOLD (POS-466). Where the mist is on you, its line replaces the
+// weather's: an eye above the fog line still stands inside the mist, so "the
+// sightlines run long" would be false there. Where it is not on you, one more
+// sentence rides beside the weather's.
+// Exported, with mistsSentence, so the page tells the Mists in these words and
+// no second copy of them exists.
+export const MIST_AT_THE_EDGES = "Mist has come in at the edges of the map; nothing past it can be seen.";
+export const VEIL_LINE = "The sun is veiled: the whole land is darker than its hour.";
+/** The Mists in one sentence for a standpoint's `mists` block, or null before
+ *  they arrive. `onYou` says whether it stands in for the weather's line. */
+export function mistsSentence(m, reach) {
+  if (!m) return null;
+  const line = mistLine(m, reach);
+  return { text: line ?? MIST_AT_THE_EDGES, onYou: !!line };
+}
+function mistLine(m, reach) {
+  if (!m) return null;
+  if (m.in_wall) return `You stand inside the mist. You can see about ${reach} m, and nothing past it.`;
+  if (m.thickness > 0) return `The mist's edge is ${m.wall_m} m off and its haze is on you (thickness ${m.thickness}); it closes the view to about ${reach} m, and nothing past the mist can be seen.`;
+  return null;
 }
 
 // ───────────────────────── charter (the let-there-be-light root) ─────────────
