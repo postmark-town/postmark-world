@@ -52,7 +52,7 @@ function fixture(overrides = {}) {
   writeFileSync(join(dir, "tools", "settlement-sweep.mjs"), overrides.sweep ?? `const a = process.env.BOT_NAME; const b = process.env.BOT_EMAIL;\n`);
   writeFileSync(join(dir, "tools", "harm-gate.mjs"), overrides.gate ?? `// five checks, none of them reads a column\nexport const x = 1;\n`);
   writeFileSync(join(dir, "tools", "marks-fold.mjs"), overrides.fold ?? `export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";\nexport const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";\n`);
-  writeFileSync(join(dir, "tools", "rehearsal-baseline.mjs"), overrides.baseline ?? `// asks main first; reads nothing of its own\nexport const y = 1;\n`);
+  writeFileSync(join(dir, "tools", "snapshot-export.mjs"), overrides.exporter ?? `// writes a tree's marks as a snapshot export; reads nothing of its own\nexport const y = 1;\n`);
   return dir;
 }
 
@@ -113,8 +113,8 @@ test("FALSIFIER 6: a new env read in a tool the job runs breaks it", () => {
   broke(posture({ fold: `const u = process.env.DATABASE_URL;\n` }), "consumers");
   assert.equal(posture({ fold: `export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";\nexport const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";\n` }).ok, true,
     "the snapshot seam's two keys are named, deliberately, and stay quiet");
-  // the baseline that runs main's sweep first (POS-371) is read too
-  broke(posture({ baseline: `const t = process.env.GITHUB_TOKEN;\n` }), "consumers");
+  // the exporter that writes the gate's snapshot pair (POS-421) is read too
+  broke(posture({ exporter: `const t = process.env.GITHUB_TOKEN;\n` }), "consumers");
 });
 
 test("FALSIFIER 7: a harm-gate check that reads weight breaks it — the rehearsal does not reproduce that column", () => {
@@ -238,9 +238,18 @@ test("[pin] the workflow the posture guards is the one the repository actually h
   assert.match(yaml, /tools\/settlement-sweep\.mjs/, "the job runs the real sweep");
   assert.match(yaml, /tools\/harm-gate\.mjs/, "the job runs the real gate");
   assert.match(yaml, /tools\/rehearsal-posture\.mjs/, "the job asserts its own posture before it runs the tree's code");
-  // POS-371: the sketchbooks main itself refuses are set aside before this tree is judged, so the
-  // baseline must run, and run BEFORE the sweep it scopes.
-  const baseline = yaml.indexOf("node tools/rehearsal-baseline.mjs");
-  assert.ok(baseline > 0, "the job asks main first (tools/rehearsal-baseline.mjs)");
-  assert.ok(baseline < yaml.indexOf("node tools/settlement-sweep.mjs"), "the baseline runs before the pull request's sweep");
+  // POS-421: the box crosses from the store, so the job crosses no git sketchbook. It clears every
+  // draft ref BEFORE the sweep (fetch-depth: 0 brings them all), fetches none, and gates the swept
+  // tree as a snapshot pair whose before-side is the merge's first parent, never the event's sha.
+  const run = yaml.split(/\r?\n/).filter((l) => !/^\s*#/.test(l)).join("\n");
+  const clear = run.indexOf("git update-ref --stdin");
+  const sweep = run.indexOf("node tools/settlement-sweep.mjs");
+  assert.ok(clear > 0 && clear < sweep, "every draft ref is cleared before the sweep runs");
+  assert.doesNotMatch(run, /git fetch[^\n]*draft/, "no step fetches the git sketchbooks");
+  assert.doesNotMatch(run, /rehearsal-baseline/, "the POS-371 baseline left with the sketchbooks");
+  assert.match(run, /main_now=\$\(git rev-parse HEAD\^1\)/, "main is the merge's first parent");
+  const exports = run.indexOf("node tools/snapshot-export.mjs");
+  assert.ok(exports > sweep, "the pair is exported after the sweep has committed");
+  assert.match(run, /--snapshot-before[\s\S]*--snapshot-after/, "the gate judges the snapshot pair");
+  assert.doesNotMatch(run, /--base\b/, "the gate's base is the before-export's commit, never the event's sha");
 });

@@ -103,7 +103,13 @@ export function harmGateOnSnapshots({ repo = join(HERE, ".."), before, after, ac
   const stakeRows = stakes ? (typeof stakes === "string" ? stakesFrom(stakes) : stakes) : [];
   const state = fold({ marks: structuredClone(now), terrain: null, stakes: stakeRows });
   const lintRun = lint && typeof after === "string" ? lintVerdict(repo, { [SNAPSHOT_ENV]: after, [SNAPSHOT_ROOT_ENV]: repo }) : null;
-  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: "snapshot" };
+  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: exportRef(before) ?? "snapshot" };
+}
+
+/** The commit a before-export was read at (`snapshot-export.mjs` writes `ref`), so the run names its base. */
+function exportRef(before) {
+  if (typeof before !== "string") return null;
+  try { const ref = JSON.parse(readFileSync(before, "utf8"))?.ref; return typeof ref === "string" && ref ? ref : null; } catch { return null; }
 }
 
 function stakesFrom(path) {
