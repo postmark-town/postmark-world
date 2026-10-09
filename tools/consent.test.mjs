@@ -253,7 +253,7 @@ test("an UNSTAKED parent's veto moves nothing — with nobody backing either sid
 
 // ── returned, never dropped ──────────────────────────────────────────────────
 
-test("a returned mark takes its subtree, and every member is disclosed by name", () => {
+test("a returned mark takes the mark continued (its predicate), its sited child stays and is named in `stays`, and every member that left is disclosed (ruling B)", () => {
   const marks = [
     parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }),
     sited("hall", "foreign", 0, 0, 100, 100),
@@ -264,8 +264,10 @@ test("a returned mark takes its subtree, and every member is disclosed by name",
   const state = fold({ marks, terrain, tick: 1, stakes: [] });
 
   assert.equal(state.returned.length, 1, "one return, not one per member");
-  assert.deepEqual(state.returned[0].subtree.sort(), ["foreign/room", "foreign/warm"]);
-  for (const id of ["foreign/hall", "foreign/room", "foreign/warm"]) assert.equal(standing(state, id), false, `${id} left`);
+  assert.deepEqual(state.returned[0].subtree, ["foreign/warm"], "the predicate is the hall continued: it has nowhere to stay");
+  assert.deepEqual(state.returned[0].stays, ["foreign/room"], "the room has a place of its own: it stays, and the return says so");
+  for (const id of ["foreign/hall", "foreign/warm"]) assert.equal(standing(state, id), false, `${id} left`);
+  assert.equal(standing(state, "foreign/room"), true, "the room stands");
 
   // never a silent drop: everything missing from the world is named in returned[]
   const disclosed = new Set(state.returned.flatMap((r) => [r.mark, ...r.subtree]));
@@ -282,17 +284,32 @@ test("the ESCROW GUARD: a veto on a mark carrying open stakes records pending-es
   assert.equal(w(state, "foreign/hall"), 3, "with its weight intact");
 });
 
-test("escrow ANYWHERE in the subtree holds the whole return — a staked child cannot be retired by its parent's eviction", () => {
+test("escrow ANYWHERE in what leaves holds the whole return — a staked predicate cannot be retired by its mark's eviction", () => {
+  const marks = [
+    parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }),
+    sited("hall", "foreign", 0, 0, 100, 100),
+    { id: "foreign/warm", slug: "warm", by: "foreign", household: "foreign", kind: "predicated",
+      tier: "market", parent: "foreign/hall", slot: "feel", value: "warm", date: "2026-08-10", body: "warm" },
+  ];
+  const state = fold({ marks, terrain, tick: 1, stakes: [{ holder: "backer", mark: "foreign/warm", n: 2, weight: 2, tick: 0 }] });
+  assert.equal(state.returned[0].state, "pending-escrow");
+  assert.deepEqual(state.returned[0].open_escrow_on, ["foreign/warm"]);
+  assert.equal(standing(state, "foreign/hall"), true);
+  assert.equal(standing(state, "foreign/warm"), true);
+});
+
+test("ruling B · a staked SITED child no longer holds its parent's return: it stays, stamps and all, and the parent leaves", () => {
   const marks = [
     parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }),
     sited("hall", "foreign", 0, 0, 100, 100),
     sited("room", "foreign", 0, 0, 10, 10),
   ];
   const state = fold({ marks, terrain, tick: 1, stakes: [{ holder: "backer", mark: "foreign/room", n: 2, weight: 2, tick: 0 }] });
-  assert.equal(state.returned[0].state, "pending-escrow");
-  assert.deepEqual(state.returned[0].open_escrow_on, ["foreign/room"]);
-  assert.equal(standing(state, "foreign/hall"), true);
+  assert.equal(state.returned[0].state, "returned", "the room is not leaving, so its escrow is not the return's to wait on");
+  assert.equal(state.returned[0].open_escrow_on, undefined);
+  assert.equal(standing(state, "foreign/hall"), false);
   assert.equal(standing(state, "foreign/room"), true);
+  assert.equal(w(state, "foreign/room"), 2, "with its stamps");
 });
 
 test("a household never consents to itself, and an unknown word is a fold error rather than a silent no-op", () => {
@@ -321,6 +338,11 @@ test("a household never consents to itself, and an unknown word is a fold error 
 // everything standing in it, out of the world with it. An opposition answers
 // for the opposed mark's own household: another household's marks, and the
 // town's own, stay where they stand (POS-364's B, for limits, is the same rule).
+//
+// Ruling B (Darko, 2026-10-09) went further for a STANCE return: it takes the
+// opposed mark alone, and every mark with a place of its own stays, whoever's
+// it is. The household rule still decides what a LAW return carries (R11's
+// limits, `townLaws`), and what of the mark continued leaves with a stance one.
 
 const PANDO_PICTURE = "https://media.postmark.town/media/FluffUPando/a6ceee3b3ae567a4c98f38dead4219e7152853df710749f162fe9fcaab77a2e7.jpg";
 const PANDO_PLAINS_RING = [[-87460,-95460],[-87610,-93950],[-88480,-92630],[-89500,-91460],[-90560,-90290],[-92100,-89580],[-93900,-89710],[-95460,-89930],[-97060,-89550],[-99000,-89260],[-100720,-89900],[-101770,-91220],[-102430,-92630],[-102760,-94050],[-102660,-95460],[-102430,-96800],[-102170,-98180],[-101380,-99440],[-100040,-100290],[-98690,-101110],[-97280,-102190],[-95460,-102730],[-93680,-102030],[-92410,-100790],[-91240,-99910],[-89890,-99200],[-88740,-98180],[-87940,-96900]];
@@ -340,35 +362,52 @@ const pandoStays = (state, why) => {
   assert.equal(standing(state, "third/picnic"), true, `another household's mark stands (${why})`);
 };
 
-test("POS-477 · THE TOWN OPPOSES vermillion/pando-plains: the plains leave with vermillion's own marks; the town's pando-peak, its picture and a third household's mark stay", () => {
+test("POS-477 + ruling B · THE TOWN OPPOSES vermillion/pando-plains: the plains leave ALONE; vermillion's own mark, the town's pando-peak and a third household's mark all stay", () => {
   const state = fold({ marks: pandoMarks(), terrain, tick: 1, stakes: [], townWords: new Map([["vermillion/pando-plains", "opposed"]]) });
   assert.equal(state.returned.length, 1);
   const r = state.returned[0];
   assert.equal(r.mark, "vermillion/pando-plains");
   assert.equal(r.state, "returned");
-  assert.deepEqual(r.subtree, ["vermillion/the-pando-peak"], "the subtree is the opposed household's own marks, and only those");
+  assert.deepEqual(r.subtree, [], "a stance return takes the opposed mark alone");
+  assert.deepEqual(r.stays, ["the-town/pando-peak", "third/picnic"], "the plains' own children, named");
   assert.equal(standing(state, "vermillion/pando-plains"), false);
-  assert.equal(standing(state, "vermillion/the-pando-peak"), false, "vermillion's own mark on that ground leaves with it");
+  assert.equal(standing(state, "vermillion/the-pando-peak"), true, "vermillion's mark on the peak stays with its own parent, the peak");
   pandoStays(state, "the town's word");
+  assert.equal(state.marks.find((m) => m.id === "the-town/pando-peak").placementParent, undefined, "reparented to open ground: nothing else contains it");
 });
 
-test("POS-477 · A PARCEL HOLDER OPPOSES vermillion/pando-plains: the same, the town's mark and every other household's stay", () => {
+test("POS-477 + ruling B · A PARCEL HOLDER OPPOSES vermillion/pando-plains: the same, the plains leave alone", () => {
   const holder = parcel("home", "holder", -99000, -99000, { consent: { "vermillion/pando-plains": "opposed" } });
   const state = fold({ marks: pandoMarks([holder]), terrain, tick: 1, stakes: [] });
   const r = state.returned.find((x) => x.mark === "vermillion/pando-plains");
   assert.ok(r, "the plains came after the parcel and overlap it, so the holder's word returns them");
   assert.equal(r.authority, "parcel (absolute)");
-  assert.deepEqual(r.subtree, ["vermillion/the-pando-peak"]);
+  assert.deepEqual(r.subtree, []);
   pandoStays(state, "a parcel's word");
+  assert.equal(standing(state, "vermillion/the-pando-peak"), true);
   assert.equal(standing(state, "holder/home"), true);
 });
 
-test("POS-477 · THE OPPOSITE CASE: the town opposing its OWN mark still carries the town's own children with it, and only those", () => {
+test("POS-477 · A LAW RETURN (townLaws) still takes the opposed household's own marks under it, and only those", () => {
+  const state = fold({ marks: pandoMarks(), terrain, tick: 1, stakes: [],
+    townWords: new Map([["vermillion/pando-plains", "opposed"]]), townLaws: new Map([["vermillion/pando-plains", "the-town/claim-cap"]]) });
+  assert.equal(state.returned.length, 1);
+  const r = state.returned[0];
+  assert.equal(r.mark, "vermillion/pando-plains");
+  assert.equal(r.authority, "the town (absolute)");
+  assert.deepEqual(r.subtree, ["vermillion/the-pando-peak"], "the subtree is the opposed household's own marks, and only those");
+  assert.equal(r.stays, undefined, "a law return names no `stays`: ruling B does not cover it");
+  assert.equal(standing(state, "vermillion/the-pando-peak"), false, "vermillion's own mark on that ground leaves with it");
+  pandoStays(state, "a law return");
+});
+
+test("POS-477 · THE OPPOSITE CASE: the town's LAW return on its OWN mark carries the town's own children with it, and only those; its stance return carries none", () => {
   // The rule is the opposed mark's household, whoever that is. The town's
-  // pando-peak, opposed by the town, takes the town's own lookout sited on it;
+  // pando-peak, returned by a law, takes the town's own lookout sited on it;
   // vermillion's house on the same ground stays.
   const lookout = sited("pando-lookout", "the-town", -95000, -95000, 200, 200, { tier: "constitution", date: "2026-07-22" });
-  const state = fold({ marks: pandoMarks([lookout]), terrain, tick: 1, stakes: [], townWords: new Map([["the-town/pando-peak", "opposed"]]) });
+  const words = new Map([["the-town/pando-peak", "opposed"]]);
+  const state = fold({ marks: pandoMarks([lookout]), terrain, tick: 1, stakes: [], townWords: words, townLaws: { "the-town/pando-peak": "the-town/claim-cap" } });
   const r = state.returned.find((x) => x.mark === "the-town/pando-peak");
   assert.ok(r, "the town's word returns the town's own mark");
   assert.equal(r.state, "returned");
@@ -377,6 +416,14 @@ test("POS-477 · THE OPPOSITE CASE: the town opposing its OWN mark still carries
   assert.equal(standing(state, "the-town/pando-lookout"), false);
   assert.equal(standing(state, "vermillion/the-pando-peak"), true, "another household's mark on that ground stays");
   assert.equal(standing(state, "vermillion/pando-plains"), true, "and the ground around it is untouched");
+
+  const stance = fold({ marks: pandoMarks([lookout]), terrain, tick: 1, stakes: [], townWords: words });
+  const sr = stance.returned.find((x) => x.mark === "the-town/pando-peak");
+  assert.deepEqual(sr.subtree, []);
+  assert.deepEqual(sr.stays, ["vermillion/the-pando-peak"], "the peak's one child");
+  assert.equal(standing(stance, "the-town/pando-lookout"), true, "a stance return leaves the lookout standing");
+  assert.equal(stance.marks.find((m) => m.id === "the-town/pando-lookout").placementParent, "vermillion/the-pando-peak",
+    "a grandchild stays with its own parent");
 });
 
 test("POS-477 · another household's stake inside the subtree no longer holds the return: it is not the opposed household's to carry", () => {
@@ -400,9 +447,10 @@ test("THE TOWN'S OPPOSITION PREVAILS: infinite backing in the veto, so no arithm
   assert.equal(r.grantor, "the-town");
   assert.equal(r.state, "returned");
   assert.equal("veto" in r, false, "no arithmetic: infinite backing cannot lose the comparison");
-  assert.deepEqual(r.subtree, ["foreign/room"], "the existing return path: the subtree goes with it");
+  assert.deepEqual(r.subtree, [], "the existing return path, under ruling B: the hall leaves alone");
+  assert.deepEqual(r.stays, ["foreign/room"]);
   assert.equal(standing(state, "foreign/hall"), false);
-  assert.equal(standing(state, "foreign/room"), false);
+  assert.equal(standing(state, "foreign/room"), true);
 });
 
 test("the town's opposition keeps the ESCROW GUARD: open stakes hold the return, and the mark stands until they unwind", () => {
