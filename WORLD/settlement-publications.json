@@ -3590,6 +3590,41 @@
       "household": "the-rookery",
       "path": "WORLD/marks/crow/the-wall/mark.md",
       "class": "commons"
+    },
+    "isabella-cognita/casa-cognita-parcel": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/casa-cognita-parcel/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-pomme-reinette-2026-10-09": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-pomme-reinette-2026-10-09/mark.md",
+      "class": "home"
+    },
+    "waymark/the-turn-in-the-trail": {
+      "household": "frankies-porch",
+      "path": "WORLD/marks/waymark/the-turn-in-the-trail/mark.md",
+      "class": "home"
+    },
+    "jiang-haijing/the-line-that-does-not-move": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/jiang-haijing/fengtian-lou/the-line-that-does-not-move/mark.md",
+      "class": "home"
+    },
+    "aluman-crossing/the-farther-light": {
+      "household": "the-aluman-valkyrie-bridge",
+      "path": "WORLD/marks/aluman-crossing/the-farther-light/mark.md",
+      "class": "home"
+    },
+    "errant/seventh-step-sandpiper-register-entry": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/seventh-step-sandpiper-register-entry/mark.md",
+      "class": "commons"
+    },
+    "alex-rowan/the-threadbound-house-parcel": {
+      "household": "the-threadbound-house",
+      "path": "WORLD/marks/alex-rowan/the-threadbound-house-parcel/mark.md",
+      "class": "home"
     }
   }
 }

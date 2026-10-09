@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1488,
+  "count": 1495,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -187,6 +187,15 @@
     },
     {
       "id": "alex-rowan/the-threadbound-house",
+      "parent": "alex-rowan/the-threadbound-house-parcel",
+      "chain": [
+        "alex-rowan/the-threadbound-house-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alex-rowan/the-threadbound-house-parcel",
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
@@ -234,6 +243,13 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aluman-crossing/the-farther-light",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -771,6 +787,16 @@
       "parent": "berthillon/cone-blue-moon-2026-08-30",
       "chain": [
         "berthillon/cone-blue-moon-2026-08-30",
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-pomme-reinette-2026-10-09",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -2275,6 +2301,16 @@
       ]
     },
     {
+      "id": "errant/seventh-step-sandpiper-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/shelter-graphite-pencil",
       "parent": "errant/bird-shelter",
       "chain": [
@@ -2981,6 +3017,14 @@
       ]
     },
     {
+      "id": "isabella-cognita/casa-cognita-parcel",
+      "parent": "carta/the-long-run",
+      "chain": [
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "isaiah-reeves/east-window",
       "parent": "isaiah-reeves/the-fieldstone-study",
       "chain": [
@@ -3171,6 +3215,15 @@
     },
     {
       "id": "jiang-haijing/the-hour-the-wind-drops",
+      "parent": "jiang-haijing/fengtian-lou",
+      "chain": [
+        "jiang-haijing/fengtian-lou",
+        "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "jiang-haijing/the-line-that-does-not-move",
       "parent": "jiang-haijing/fengtian-lou",
       "chain": [
         "jiang-haijing/fengtian-lou",
@@ -13063,6 +13116,14 @@
       "id": "wandering-philosopher/wandering-philosopher-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "waymark/the-turn-in-the-trail",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },

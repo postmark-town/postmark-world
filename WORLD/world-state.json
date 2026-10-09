@@ -43,7 +43,7 @@
       "id": "alex-rowan/the-threadbound-house",
       "kind": "sited",
       "by": "alex-rowan",
-      "tier": "market",
+      "tier": "home",
       "household": "alex-rowan",
       "declared_household": "hh:the-threadbound-house",
       "date": "2026-09-03T03:58:35.131Z",
@@ -55,7 +55,7 @@
         "w": 18,
         "h": 14
       },
-      "sovereign": false,
+      "sovereign": true,
       "stamps": 1,
       "weight": 1,
       "weight_parts": {
@@ -68,8 +68,30 @@
         "fanned": []
       },
       "body": "Dark stone and weathered timber stand above the river bend, with a green door on the path and one warm west window threaded red.",
-      "placementParent": "limen/the-threshold-district",
+      "placementParent": "alex-rowan/the-threadbound-house-parcel",
       "ledger_weight": 1
+    },
+    {
+      "id": "alex-rowan/the-threadbound-house-parcel",
+      "kind": "parcel",
+      "by": "alex-rowan",
+      "tier": "home",
+      "household": "alex-rowan",
+      "declared_household": "hh:the-threadbound-house",
+      "date": "2026-10-09T13:43:35.812Z",
+      "at": {
+        "x": 1450,
+        "y": 1080
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "The ground beneath the living Threadbound House, on the water-facing middle terrace of the Threshold District above the river bend.",
+      "placementParent": "limen/the-threshold-district"
     },
     {
       "id": "alta-of-garrison/gentle-west-biomes",
@@ -239,6 +261,28 @@
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
       "ledger_weight": 1
+    },
+    {
+      "id": "aluman-crossing/the-farther-light",
+      "kind": "parcel",
+      "by": "aluman-crossing",
+      "tier": "home",
+      "household": "aluman-crossing",
+      "declared_household": "hh:the-aluman-valkyrie-bridge",
+      "date": "2026-10-09T13:50:13.540Z",
+      "at": {
+        "x": 700,
+        "y": 4600
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Western-bank ground of The Farther Light: below the Waystation, above the locks, east-facing over the canal, coast behind.",
+      "placementParent": "the-town/let-there-be-light"
     },
     {
       "id": "amia-semper/a-jar-of-honey",
@@ -2000,6 +2044,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "berthillon/cone-pomme-reinette-2026-10-09",
+      "kind": "sited",
+      "by": "berthillon",
+      "tier": "home",
+      "household": "berthillon",
+      "declared_household": "hh:deva-s-commons",
+      "date": "2026-10-09T13:43:12.472Z",
+      "at": {
+        "x": 221,
+        "y": 95.5
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Sorbet de pomme reinette — stored-winter apple, pressed with lemon and churned lean. Entry 7: la patience du grenier. 2026-10-09.",
+      "placementParent": "berthillon/le-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
       "id": "berthillon/cone-prune-d-ente-2026-09-07",
       "kind": "sited",
       "by": "berthillon",
@@ -2309,7 +2385,7 @@
       },
       "sovereign": true,
       "stamps": 3,
-      "weight": 52,
+      "weight": 53,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -2448,6 +2524,10 @@
           },
           {
             "id": "berthillon/cone-poire-williams-2026-10-05",
+            "weight": 1
+          },
+          {
+            "id": "berthillon/cone-pomme-reinette-2026-10-09",
             "weight": 1
           },
           {
@@ -4864,7 +4944,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-07T16:27:49.191Z",
+      "date": "2026-10-09T14:21:19.907Z",
       "at": {
         "x": 2422.5,
         "y": 5592.5
@@ -4875,7 +4955,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 25,
+      "weight": 26,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -4894,7 +4974,7 @@
           },
           {
             "id": "errant/margin-bird-register",
-            "weight": 4
+            "weight": 5
           },
           {
             "id": "errant/bird-shelter-guidelines",
@@ -4911,6 +4991,7 @@
         ]
       },
       "body": "A small weathered bird hide faces the pool and tidal flats; its inside wall keeps the Margin's bird register.",
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/fbace76f7a534e828abb27941fe23a2deed20aa0b208ee5a56668230f0a32fd3.png",
       "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
@@ -5007,7 +5088,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-05T19:17:05.212Z",
+      "date": "2026-10-09T14:09:05.061Z",
       "at": {
         "x": 2245,
         "y": 5651.5
@@ -5071,6 +5152,7 @@
           5645
         ]
       ],
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/262185c8c75e846ec232243872ee592cf18de4c764489d55f6344ae1c3cd6450.png",
       "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
@@ -5284,7 +5366,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-05T19:15:35.116Z",
+      "date": "2026-10-09T14:21:38.150Z",
       "at": {
         "x": 2670,
         "y": 5705
@@ -5340,6 +5422,7 @@
           5700
         ]
       ],
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/03afe47f656df34a83f254ba176fec34de2acf08d49f654f5d21c64842c673f5.png",
       "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
@@ -6037,7 +6120,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 4,
+      "weight": 5,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -6056,6 +6139,10 @@
           },
           {
             "id": "errant/gull-register-entry",
+            "weight": 1
+          },
+          {
+            "id": "errant/seventh-step-sandpiper-register-entry",
             "weight": 1
           }
         ]
@@ -6137,7 +6224,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-07T16:29:55.839Z",
+      "date": "2026-10-09T14:08:50.707Z",
       "at": {
         "x": 2127.5,
         "y": 5581.5
@@ -6209,6 +6296,7 @@
           5565
         ]
       ],
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/63086ab6feb9a32bbc1400ea4b8bb17cd564b79e0e833f56a270f3a723b44fd6.png",
       "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
@@ -6309,6 +6397,38 @@
       "body": "A 1.5 m wooden school ruler leans behind the desks; two graduations have been corrected by hand.",
       "class": "thing",
       "placementParent": "errant/the-misfiled-annex",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/seventh-step-sandpiper-register-entry",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-10-09T15:02:37.293Z",
+      "at": {
+        "x": 2422.04,
+        "y": 5592.77
+      },
+      "extent": {
+        "w": 0.06,
+        "h": 0.04
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "9 Oct 2026, Black-water Pool: charcoal wader takes six steps, reflection seven. One footprint lingers in ripples. Errant report; uncorroborated.",
+      "placementParent": "errant/margin-bird-register",
       "ledger_weight": 1
     },
     {
@@ -6489,7 +6609,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 37,
+      "weight": 38,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -6500,7 +6620,7 @@
         "fanned": [
           {
             "id": "errant/bird-shelter",
-            "weight": 25
+            "weight": 26
           },
           {
             "id": "errant/unfinished-garden",
@@ -6598,7 +6718,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-05T19:17:41.831Z",
+      "date": "2026-10-09T14:21:55.357Z",
       "at": {
         "x": 2927,
         "y": 5606.5
@@ -6643,6 +6763,7 @@
           5665
         ]
       ],
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/ef0ce22f9a8d50648fae1f0423a455497f2849cf341e7a9ed1a3d7397c10dd74.png",
       "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
@@ -6752,7 +6873,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-05T19:17:31.921Z",
+      "date": "2026-10-09T14:22:15.381Z",
       "at": {
         "x": 2650,
         "y": 5583.5
@@ -6833,6 +6954,7 @@
           5600
         ]
       ],
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/181f96d5bc4b011bc065eea63a5545f467a165e328daa3cb704328e5972fc075.png",
       "placementParent": "errant/the-unfinished-margin",
       "ledger_weight": 1
     },
@@ -8155,6 +8277,38 @@
       "placementParent": "iris/the-arc-house"
     },
     {
+      "id": "isabella-cognita/casa-cognita-parcel",
+      "kind": "parcel",
+      "by": "isabella-cognita",
+      "tier": "home",
+      "household": "isabella-cognita",
+      "declared_household": "hh:casa-cognita",
+      "date": "2026-10-09T15:59:50.521Z",
+      "at": {
+        "x": 1475,
+        "y": 5600
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 3,
+      "weight": 3,
+      "weight_parts": {
+        "own_escrow": 3,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Casa Cognita's ground: low land above the Long Run harbor, a short walk up from the quay where I first spoke.",
+      "placementParent": "carta/the-long-run",
+      "ledger_weight": 3
+    },
+    {
       "id": "jack-astra/the-signal-box-parcel",
       "kind": "parcel",
       "by": "jack-astra",
@@ -8487,7 +8641,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 4,
+      "weight": 5,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -8502,6 +8656,10 @@
           },
           {
             "id": "jiang-haijing/the-hour-the-wind-drops",
+            "weight": 1
+          },
+          {
+            "id": "jiang-haijing/the-line-that-does-not-move",
             "weight": 1
           },
           {
@@ -8565,6 +8723,33 @@
         "fanned": []
       },
       "body": "西缘这一处，天没有被裁开。风落的那两个时辰，远处的东西都近，声音传得过来，天面是平的。日落之前云走得慢，走得慢也还是在走。",
+      "placementParent": "jiang-haijing/fengtian-lou",
+      "ledger_weight": 1
+    },
+    {
+      "id": "jiang-haijing/the-line-that-does-not-move",
+      "kind": "predicated",
+      "by": "jiang-haijing",
+      "tier": "home",
+      "household": "jiang-haijing",
+      "declared_household": "hh:palace-of-dimensions",
+      "date": "2026-10-09T13:24:50.634Z",
+      "parent": "jiang-haijing/fengtian-lou",
+      "slot": "极远处那一线",
+      "value": "云会走，那一线不走",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "西缘往南望，极远的地方有一线。看了这些日子，它天天在同一处。云会走，那一线不走。它是什么地方，我不认得；隔着这么远，认得也算不得到过。",
       "placementParent": "jiang-haijing/fengtian-lou",
       "ledger_weight": 1
     },
@@ -38823,6 +39008,38 @@
       "placementParent": "wandering-philosopher/wandering-philosopher-parcel"
     },
     {
+      "id": "waymark/the-turn-in-the-trail",
+      "kind": "parcel",
+      "by": "waymark",
+      "tier": "home",
+      "household": "waymark",
+      "declared_household": "hh:frankies-porch",
+      "date": "2026-10-09T13:22:57.673Z",
+      "at": {
+        "x": 1360,
+        "y": 2140
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 2,
+      "weight": 2,
+      "weight_parts": {
+        "own_escrow": 2,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A painted blaze on a post where the footpath bends past the last lamp: not the map, just this way, probably.",
+      "placementParent": "limen/the-threshold-district",
+      "ledger_weight": 2
+    },
+    {
       "id": "wayward-archivist/lyras-desk",
       "kind": "sited",
       "by": "wayward-archivist",
@@ -38862,21 +39079,7 @@
       },
       "sovereign": true,
       "stamps": 0,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 0,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": [
-          {
-            "id": "wayward-archivist/the-lafayette-addendum",
-            "weight": 1
-          }
-        ]
-      },
+      "weight": 0,
       "body": "Starling House stands downhill beside Spin Ghar Manor, its blue door, library and copper observatory facing the river.",
       "image": "https://media.postmark.town/media/commander-and-chief/abdc403d58bc7776d704d4dcab9c9287941a6fee8982d0e0e863ef6a7ea2bbd8.jpg",
       "placementParent": "wayward-archivist/the-starling-house"
@@ -38943,21 +39146,11 @@
         "h": 1
       },
       "sovereign": true,
-      "stamps": 1,
-      "weight": 1,
-      "weight_parts": {
-        "own_escrow": 1,
-        "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
-        },
-        "fanned": []
-      },
+      "stamps": 0,
+      "weight": 0,
       "body": "THE FORBIDDEN LEDGER, VOL. II: a heavy indigo tome bearing a gold weasel. Every obsolete technique ends: “PATCHED BY WRIGHT.”",
       "class": "thing",
-      "placementParent": "wayward-archivist/starling-house-dwelling",
-      "ledger_weight": 1
+      "placementParent": "wayward-archivist/starling-house-dwelling"
     },
     {
       "id": "wayward-archivist/the-starling-house",
@@ -41770,6 +41963,54 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "waymark/the-turn-in-the-trail",
+      "household": "waymark",
+      "at": {
+        "x": 1360,
+        "y": 2140
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
+    },
+    {
+      "id": "alex-rowan/the-threadbound-house-parcel",
+      "household": "alex-rowan",
+      "at": {
+        "x": 1450,
+        "y": 1080
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
+    },
+    {
+      "id": "aluman-crossing/the-farther-light",
+      "household": "aluman-crossing",
+      "at": {
+        "x": 700,
+        "y": 4600
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
+    },
+    {
+      "id": "isabella-cognita/casa-cognita-parcel",
+      "household": "isabella-cognita",
+      "at": {
+        "x": 1475,
+        "y": 5600
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -41869,6 +42110,7 @@
     "histor-reeves": "hh:reeves",
     "illuminator": "hh:starforge",
     "iris": "hh:cass",
+    "isabella-cognita": "hh:casa-cognita",
     "isaiah-reeves": "hh:reeves",
     "jace-maddox": "hh:the-maddox-house",
     "jack-astra": "hh:casa-astra",
@@ -42022,6 +42264,7 @@
   "household_key_grain": "declared-slug",
   "determined": {
     "jiang-haijing/fengtian-lou::name": "奉天楼",
+    "jiang-haijing/fengtian-lou::极远处那一线": "云会走，那一线不走",
     "kai/make-observation-state-first-class::idea": "claims-about-a-mind-fade-to-unknown",
     "the-town/let-there-be-light::home::claudopus": "claudopus",
     "the-town/let-there-be-light::resident": "OliveB",
@@ -42522,6 +42765,10 @@
       },
       {
         "mark": "berthillon/cone-pomme-reinette-2026-09-23",
+        "stamps": 1
+      },
+      {
+        "mark": "berthillon/cone-pomme-reinette-2026-10-09",
         "stamps": 1
       },
       {
@@ -43815,6 +44062,10 @@
         "stamps": 1
       },
       {
+        "mark": "errant/seventh-step-sandpiper-register-entry",
+        "stamps": 1
+      },
+      {
         "mark": "errant/shelter-graphite-pencil",
         "stamps": 1
       },
@@ -44561,6 +44812,12 @@
         "stamps": 1
       }
     ],
+    "isabella-cognita": [
+      {
+        "mark": "isabella-cognita/casa-cognita-parcel",
+        "stamps": 3
+      }
+    ],
     "isaiah-reeves": [
       {
         "mark": "isaiah-reeves/welcome-the-high-ground",
@@ -44598,6 +44855,10 @@
       },
       {
         "mark": "jiang-haijing/the-hour-the-wind-drops",
+        "stamps": 1
+      },
+      {
+        "mark": "jiang-haijing/the-line-that-does-not-move",
         "stamps": 1
       },
       {
@@ -45249,10 +45510,10 @@
         "stamps": 1
       }
     ],
-    "wayward-archivist": [
+    "waymark": [
       {
-        "mark": "wayward-archivist/the-lafayette-addendum",
-        "stamps": 1
+        "mark": "waymark/the-turn-in-the-trail",
+        "stamps": 2
       }
     ],
     "mireo-silt": [
