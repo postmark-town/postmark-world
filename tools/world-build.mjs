@@ -93,10 +93,15 @@ export function waterControlPoints(skeleton) {
 // anchor, so a low region holds its corridor down instead of the hills bleeding
 // in. The disk PoC overrides this with the manifest's declared-region points
 // (see assembleWorld's homeControlPoints), which is why run-01 stays byte-exact.
-export function deriveHomeControlPoints(marks) {
+//
+// A mark standing on GROUND BEYOND THE BORDER is not a control point (below):
+// the ground declares the height there, and a mark out there homed at its
+// nearest anchor would drag the atlas's own ground toward that anchor's band.
+export function deriveHomeControlPoints(marks, { grounds = [] } = {}) {
   const pts = [];
   for (const m of marks) {
     if (m.kind !== "sited" || !m.at) continue;
+    if (grounds.some((g) => onGround(m.at, g))) continue;
     let best = null, bd = Infinity;
     for (const r of REGION_ANCHORS) {
       const d = (m.at.x - r.at.x) ** 2 + (m.at.y - r.at.y) ** 2;
@@ -105,6 +110,129 @@ export function deriveHomeControlPoints(marks) {
     if (best) pts.push({ x: m.at.x, y: m.at.y, h: best.h, id: best.id });
   }
   return pts;
+}
+
+// ───────────────────────── GROUND BEYOND THE BORDER ─────────────────────────
+//
+// The atlas is the town's drawn ground, and its height is decision 008's: the
+// residents' words and the survey's bands, interpolated, never drawn. Past the
+// atlas's edge the heightfield has always answered too (it extrapolates the
+// nearest anchors, with no edge), but nothing could GIVE that land a shape:
+// a crag, a basin, the ground the biomes will stand on, or anything the Mists
+// will one day pull back from. A ground is that shape, declared in the skeleton:
+//
+//   features[]: { id, kind: "ground", ring_m: [{x,y}…], top_m, foot_gap_m?, receipt }
+//
+// THE ONE PROMISE: ground beyond the border never moves the atlas. So it is not
+// mixed into the one field (measured 2026-10-09: added as ordinary control
+// points, a ground 140 m past the north edge moved atlas ground 275 m inside
+// it by 58.9 m, because the north is sparse and its points crept into the k
+// nearest). It is an OFFSET, added only outside the atlas box:
+//
+//   elevationAt(x, y) = base(x, y)                   inside the atlas box (today's field)
+//                     = base(x, y) + offset(x, y)    beyond the border
+//
+// where `offset` is the same IDW over: each ground's top lattice at
+// (top_m − base), two rings at 0 around its foot (foot_gap_m and
+// foot_gap_m + GROUND_SKIRT_M out from its box), and the atlas's border at 0
+// every BORDER_SEAM_M. So the top stands at top_m, the foot meets the ground
+// that was already there, the border meets the atlas exactly (no seam), and
+// open country away from any ground is untouched. A ground must lie wholly
+// beyond the border, foot rings included; one that reaches the atlas is a
+// defect and is refused here, as it is in world-terrain-gen.mjs.
+export const GROUND_LATTICE_M = 20;     // the top's sampling step
+export const GROUND_FOOT_DEG = 3;       // the foot rings' angular step
+export const GROUND_SKIRT_M = 60;       // the second foot ring, this far past the first
+export const GROUND_FOOT_GAP_M = 40;    // default foot gap: the cliff's steepness dial
+export const BORDER_SEAM_M = 25;        // the atlas border's zero points, this far apart
+
+/** The atlas box the skeleton declares (`_grid.atlas_box_m`), or null. */
+export function atlasBoxOf(skeleton) {
+  const b = skeleton?._grid?.atlas_box_m;
+  return b && [b.x0, b.x1, b.y0, b.y1].every(Number.isFinite) ? b : null;
+}
+const inBox = (p, b) => p.x >= b.x0 && p.x <= b.x1 && p.y >= b.y0 && p.y <= b.y1;
+const boxOfRing = (ring) => ({
+  x0: Math.min(...ring.map((p) => p.x)), x1: Math.max(...ring.map((p) => p.x)),
+  y0: Math.min(...ring.map((p) => p.y)), y1: Math.max(...ring.map((p) => p.y)),
+});
+
+/** Is the point on this ground (inside its ring, or on its edge)? */
+export function onGround(p, ground) {
+  const ring = ground.ring_m;
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const a = ring[i], b = ring[j];
+    if (((a.y > p.y) !== (b.y > p.y)) && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  if (inside) return true;
+  // its own edge counts as on it (the even-odd test is undecided there)
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const a = ring[j], b = ring[i], dx = b.x - a.x, dy = b.y - a.y, L = dx * dx + dy * dy;
+    const t = L ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / L)) : 0;
+    if (Math.hypot(p.x - (a.x + t * dx), p.y - (a.y + t * dy)) <= 1e-6) return true;
+  }
+  return false;
+}
+
+/** The outermost box a ground's foot reaches (its ring's box, grown by both foot rings). */
+export function groundReach(ground) {
+  const b = boxOfRing(ground.ring_m), r = (ground.foot_gap_m ?? GROUND_FOOT_GAP_M) + GROUND_SKIRT_M;
+  return { x0: b.x0 - r, x1: b.x1 + r, y0: b.y0 - r, y1: b.y1 + r };
+}
+
+/** The skeleton's grounds, each checked to lie wholly beyond the border. Throws on a defect. */
+export function groundsBeyondTheBorder(skeleton) {
+  const grounds = (skeleton?.features ?? []).filter((f) => f.kind === "ground");
+  if (!grounds.length) return [];
+  const atlas = atlasBoxOf(skeleton);
+  if (!atlas) throw new Error("a ground beyond the border needs the border: the skeleton declares no _grid.atlas_box_m");
+  for (const g of grounds) {
+    if (!Array.isArray(g.ring_m) || g.ring_m.length < 3 || !Number.isFinite(g.top_m))
+      throw new Error(`ground ${g.id}: needs ring_m (3+ points) and top_m`);
+    const r = groundReach(g);
+    const apart = r.x1 < atlas.x0 || r.x0 > atlas.x1 || r.y1 < atlas.y0 || r.y0 > atlas.y1;
+    if (!apart) throw new Error(`ground ${g.id} reaches the atlas (its foot spans x ${r.x0}..${r.x1}, y ${r.y0}..${r.y1}); ground beyond the border must lie wholly beyond it`);
+  }
+  return grounds;
+}
+
+/** The offset field's points: each ground's top lattice and foot rings, and the border at 0. */
+export function groundOffsetPoints(grounds, atlas, baseAt) {
+  const pts = [];
+  for (const g of grounds) {
+    const b = boxOfRing(g.ring_m);
+    for (let x = b.x0; x <= b.x1 + 1e-9; x += GROUND_LATTICE_M)
+      for (let y = b.y0; y <= b.y1 + 1e-9; y += GROUND_LATTICE_M)
+        if (onGround({ x, y }, g)) pts.push({ x, y, h: g.top_m - baseAt(x, y) });
+    const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+    const gap = g.foot_gap_m ?? GROUND_FOOT_GAP_M;
+    for (const out of [gap, gap + GROUND_SKIRT_M]) {
+      const hw = (b.x1 - b.x0) / 2 + out, hh = (b.y1 - b.y0) / 2 + out;
+      for (let a = 0; a < 360; a += GROUND_FOOT_DEG) {
+        const r = (a * Math.PI) / 180, c = Math.cos(r), s = Math.sin(r);
+        const k = 1 / Math.max(Math.abs(c) / hw, Math.abs(s) / hh);
+        pts.push({ x: cx + k * c, y: cy + k * s, h: 0 });
+      }
+    }
+  }
+  for (let x = atlas.x0; x <= atlas.x1; x += BORDER_SEAM_M) pts.push({ x, y: atlas.y0, h: 0 }, { x, y: atlas.y1, h: 0 });
+  for (let y = atlas.y0 + BORDER_SEAM_M; y < atlas.y1; y += BORDER_SEAM_M) pts.push({ x: atlas.x0, y, h: 0 }, { x: atlas.x1, y, h: 0 });
+  return pts;
+}
+
+/** Today's heightfield inside the atlas; today's plus the grounds' offset beyond it. */
+export function withGroundBeyondTheBorder(base, grounds, atlas) {
+  const offset = buildHeightfield({ controlPoints: groundOffsetPoints(grounds, atlas, base.elevationAt) });
+  return {
+    // controlPoints stay the base's: the region ids world-verbs reads are the atlas's own
+    controlPoints: base.controlPoints,
+    grounds: grounds.map((g) => g.id),
+    elevationAt(x, y) {
+      const h = base.elevationAt(x, y);
+      return inBox({ x, y }, atlas) ? h : h + offset.elevationAt(x, y);
+    },
+  };
 }
 
 // ───────────────────────── the assembly ─────────────────────────────────────
@@ -125,14 +253,17 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
     signalParents.add(m.kind === "predicated" || m.kind === "naming" ? m.parent : m.id);
   }
   const marks = (worldState.marks ?? []).map((m) => ({ ...m, signal: signalParents.has(m.id) || !!SIGNAL_MARKS[m.id] }));
-  const homePts = homeControlPoints ?? deriveHomeControlPoints(marks);
+  const grounds = groundsBeyondTheBorder(skeleton);
+  const homePts = homeControlPoints ?? deriveHomeControlPoints(marks, { grounds });
   const controlPoints = [
     ...REGION_ANCHORS.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
     ...homePts,
     ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
     ...waterControlPoints(skeleton),
   ];
-  const heightfield = buildHeightfield({ controlPoints });
+  const base = buildHeightfield({ controlPoints });
+  // With no ground beyond the border this IS today's heightfield, the same object.
+  const heightfield = grounds.length ? withGroundBeyondTheBorder(base, grounds, atlasBoxOf(skeleton)) : base;
   return {
     marks,
     // THE PARCEL IS THE HOME (ruling 7). Home is a household's parcel, so the

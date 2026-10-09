@@ -1537,7 +1537,11 @@ export function townGround(marks, skeleton, { originPx, mPerPx, pad = TOWN_GROUN
   const light = skeleton?.light ?? {};
   const regions = townRegionMarks(marks);
   const waters = townWaterShapes(marks, skeleton);
-  const features = (skeleton?.features ?? []).filter((f) => !TG_WATER_KINDS.has(f.kind));
+  // GROUND BEYOND THE BORDER is not the sheet's: the sheet is the town's ground as
+  // the record draws it, and a ground past the edge would widen it (tgFeaturePoints
+  // reads ring_m) and paint paper over land the map has never shown. It is height
+  // (tools/world-build.mjs § GROUND BEYOND THE BORDER), not drawing.
+  const features = (skeleton?.features ?? []).filter((f) => !TG_WATER_KINDS.has(f.kind) && f.kind !== "ground");
 
   // ── THE SHEET IS WHAT THE WORLD DRAWS, padded. Not a canvas size carried over
   // from a drawing; the extent of the record's own ground.

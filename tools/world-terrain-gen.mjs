@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { groundsBeyondTheBorder } from "./world-build.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -55,6 +56,22 @@ if (!Number.isFinite(MAP_W) || !Number.isFinite(MAP_H))
   throw new Error("extraction failed: MAP_W / MAP_H not found in render-town.mjs — the renderer changed shape; fix the extractor, do not guess");
 if (COASTLINE.length < 20) throw new Error("suspicious extraction: coastline has <20 points");
 if (WATER.length < 10) throw new Error("suspicious extraction: main channel has <10 waypoints");
+// THE ATLAS BOX, in metres: the drawn map's own frame, so "beyond the border"
+// is a fact the skeleton states rather than a number each reader re-derives.
+const ATLAS_BOX_M = { x0: -ORIGIN.x * K, x1: (MAP_W - ORIGIN.x) * K, y0: -ORIGIN.y * K, y1: (MAP_H - ORIGIN.y) * K };
+
+// GROUND BEYOND THE BORDER (Darko, 2026-10-09: it ships public, a north crag its
+// first use). Authored, not extracted: the atlas draws nothing past its edge, so
+// there is nothing to extract. Each is a shape the land takes out there, and
+// tools/world-build.mjs § GROUND BEYOND THE BORDER keeps the one promise: it
+// never moves the atlas. A ground that reaches the atlas is refused below.
+const GROUNDS = [
+  { id: "the-north-crag", kind: "ground",
+    ring_m: [{ x: 2397.5, y: -4347.5 }, { x: 2917.5, y: -4347.5 }, { x: 2917.5, y: -3927.5 }, { x: 2397.5, y: -3927.5 }],
+    top_m: 150, foot_gap_m: 40,
+    receipt: "a flat-topped crag past the map's north edge, 150 m at its top, its cliffs falling to the land around it within ~40 m; the first ground beyond the border (Darko, 2026-10-09). Dials: top_m, foot_gap_m (steepness)" },
+];
+
 console.log(`extracted: ${WATER.length} channel waypoints, ${STILL_REACH.length} still-reach, ${LOCKS.length} locks, ${COASTLINE.length} coastline points, origin (${ORIGIN.x},${ORIGIN.y})`);
 
 const candA = JSON.parse(readFileSync(join(ATLAS, "terrain-candidate-A.json"), "utf8"));
@@ -64,7 +81,8 @@ const mPt = (p) => ({ ...m(p.x, p.y), ...(p.w !== undefined ? { w_m: Math.round(
 
 const skeleton = {
   _law: "WORLD/skeleton.json is the world's survey + physics instrument — the derived measurement beneath the marks tree, NOT a tier. Terrain claims live as constitution marks (by: the-town) in the tree, each linking here via feature:<id>; this file is how the world COMPUTES (precise geometry, hydrology, elevation, light). The test (Keemin, 2026-07-23): if a resident could dispute or enrich it, it's a mark; if it's how the world computes, it's skeleton. Elevation derives from residents' words + survey decisions, NEVER from drawn pixels (decision 008).",
-  _grid: { cell_m: 1, scale: "5 m per atlas px (RULED 2026-07-17)", origin: `the Origin — {0,0}, where the ferry lands; center of the Town Centre, atlas (${ORIGIN.x},${ORIGIN.y}); x east, y south, z in meters above sea (decision 008)` },
+  _grid: { cell_m: 1, scale: "5 m per atlas px (RULED 2026-07-17)", origin: `the Origin — {0,0}, where the ferry lands; center of the Town Centre, atlas (${ORIGIN.x},${ORIGIN.y}); x east, y south, z in meters above sea (decision 008)`,
+    atlas_box_m: ATLAS_BOX_M },
   _derived: "re-derived 2026-07-22 from the LIVE atlas (post atlas-v2 + the Evermoon move, town commit bdb5c93) by extraction from render-town.mjs + terrain-candidate-A.json — see this tool's header",
   physics_registry: {
     hydrology: { honored: true, receipt: "the residents' own invented river system (survey decision 003); locks only mean anything because flow does" },
@@ -90,6 +108,7 @@ const skeleton = {
     north_trend: "~1.45% climb, quay to the north rim (~+60 m at the map's edge)",
     open_ground_principle: "unclaimed ground stays gentle and unremarkable until a resident gives it words — height is canon too",
     walk_speed_m_per_crossing: 60000,
+    beyond_the_border: "the atlas's height is the residents' and the survey's (the bands below); ground beyond the border is declared ground (features of kind ground) and never moves the atlas — inside the atlas box the heightfield is today's, beyond it today's plus the grounds' offset (tools/world-build.mjs)",
     regions: [
       { id: "the-town-centre", band_m: [4, 6], note: "flat quayside, both banks low" },
       { id: "the-lanternseed-gardens", band_m: [10, 20], note: "lower slope" },
@@ -159,9 +178,11 @@ const skeleton = {
       ring_m: [...COASTLINE, { x: MAP_W + 5, y: MAP_H }, { x: -5, y: MAP_H }].map((p) => m(p.x, p.y)),
       note: "everything south and west of the drawn coastline, out to the map's own edges (the atlas's one-shore-one-sea rule, 2026-07-21); ring_m is the atlas COASTLINE closed against the map frame, as renderSea() fills it — one shore, one sea, no bay cut in afterwards",
       receipt: "spar, orion, dregg, tulip, aelyria — the coastal corpus" },
+    ...GROUNDS,
   ],
 };
 
+groundsBeyondTheBorder(skeleton); // throws on a ground that reaches the atlas, before anything is written
 mkdirSync(join(ROOT, "WORLD"), { recursive: true });
 writeFileSync(join(ROOT, "WORLD/skeleton.json"), JSON.stringify(skeleton, null, 2) + "\n");
 console.log(`WORLD/skeleton.json written: ${skeleton.features.length} features, ${skeleton.elevation.regions.length} elevation rows, ${skeleton.far_features.length} far feature(s), origin the Origin @ ${K} m/px`);
