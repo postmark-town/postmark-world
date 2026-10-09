@@ -313,10 +313,16 @@ test("FALSIFIER — the drawn set is a SUBSET of what the read named, never a su
   assert.deepEqual(walkersFromPresent({ residents: [] }), []);
 });
 
-test("[pin] FALSIFIER — the resident path does not ask /world/walkers", async () => {
-  // A SOURCE GUARD, and it is the one the reviewer asked for: the whole-town
-  // poll must not be reachable from the resident branch. Read from the bytes,
-  // because the behaviour lives in a browser this test does not have.
+test("[pin] FALSIFIER — the resident path asks earshot AND draws the town's bodies, and never falls through", async () => {
+  // A SOURCE GUARD. Until POS-373 it said the opposite: the 09-13 ruling
+  // ("presence stays earshot, for who is drawn") kept the whole-town poll out
+  // of the resident branch. Darko's 09-18 ask ("Act As resident is actually
+  // quite limiting in terms of seeing where other residents are") and POS-452's
+  // 10-07 "presence stays on the walkers" are later, and the bodies are now the
+  // town's (tools/act-as-town-bodies.test.mjs drives the page). What this still
+  // guards: the branch asks earshot, merges the town in through withTownBodies,
+  // and RETURNS, so it never runs the Spectator's camera binding below it.
+  // Read from the bytes, because the behaviour lives in a browser.
   const { readFileSync } = await import("node:fs");
   const src = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
   // ⚑ COMMENTS ARE STRIPPED FIRST, and the first version of this test did not
@@ -334,10 +340,33 @@ test("[pin] FALSIFIER — the resident path does not ask /world/walkers", async 
     "pollWalkers branches on the resident path before it reaches the town-wide poll");
   assert.ok(residentArm.includes("/world/present"),
     "and that branch asks who is within earshot");
-  assert.ok(!residentArm.includes("/world/walkers"),
-    "the resident branch must not reach the whole-town poll");
+  assert.ok(residentArm.includes("townBodies()") && residentArm.includes("withTownBodies("),
+    "and draws the town's bodies, earshot's rows winning for their handles");
   assert.ok(/(^|[^A-Za-z])return;/.test(residentArm),
-    "and it RETURNS — falling through would ask both");
+    "and it RETURNS — falling through would run the Spectator's camera binding");
+});
+
+test("withTownBodies: the town is drawn, earshot keeps its detail, one row per handle", async () => {
+  const { withTownBodies } = await import("../spectator/viewer.mjs");
+  const town = [
+    { handle: "rei", x: 10, y: -20, standing: true },
+    { handle: "far-away", x: 9000, y: 9000, standing: true },
+    { handle: "wright", x: 5, y: 5, moving: true },
+  ];
+  const earshot = [
+    { handle: "rei", x: 10, y: -20, standing: true, place: "the quay" },
+    { handle: "wright", x: 967, y: -2450, standing: true, self: true },
+    { handle: "only-near", x: 1, y: 1 },
+  ];
+  const rows = withTownBodies(earshot, town);
+  assert.deepEqual(rows.map((r) => r.handle), ["rei", "far-away", "wright", "only-near"],
+    "the town's order, then an earshot row the town does not carry");
+  assert.equal(rows[0].place, "the quay", "an earshot row wins for its handle");
+  assert.equal(rows[2].self, true, "the reader's own body is the read's, as before");
+  assert.equal(rows[1].x, 9000, "a body outside earshot is drawn from the town's row");
+  // the earshot-only answer is what a dead town door leaves
+  assert.deepEqual(withTownBodies(earshot, []).map((r) => r.handle), ["rei", "wright", "only-near"]);
+  assert.equal(withTownBodies([], [{ handle: "a" }, { handle: "a" }]).length, 1, "one row per handle");
 });
 
 // ───────── a fold in hand must not feed a resident's painting ──────────────

@@ -2326,7 +2326,14 @@ export const WALKER_FRAME = Object.freeze({ far: 14, near: 22, legFar: 4, legNea
 // FILLED at every tier, the far tier included — never the far tier's empty
 // frame.
 export const ACTOR_HALO = 5;   // glyph units beyond the frame's rim
-export function walkerFrameSVG({ at, handle = "", moving = false, label = null, art = null, mine = false, found = false, threshold = false, actor = false, thumb = null } = {}) {
+// YOUR HOUSEMATES' RING (POS-373, Darko 2026-10-09: "the residents of your
+// signed-in household are always highlighted, visible with their full profile
+// art"). `ring` is the colour a housemate's frame is drawn in: their own colour,
+// the one their monogram already stands on. Only #rgb / #rrggbb is written;
+// anything else draws no ring colour and the frame keeps the stylesheet's. It
+// rides a CSS variable on the frame so the found and the actor rings, stated
+// after it in the stylesheet, still win.
+export function walkerFrameSVG({ at, handle = "", moving = false, label = null, art = null, mine = false, found = false, threshold = false, actor = false, thumb = null, ring = null } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
   const filled = !!(art && (art.avatar || art.monogram));
@@ -2341,6 +2348,7 @@ export function walkerFrameSVG({ at, handle = "", moving = false, label = null, 
   const rim = Math.sqrt(r * r - (size * 0.22) ** 2);
   const who = esc(label ?? handle);
   const safe = String(handle ?? "").toLowerCase().replace(/[^a-z0-9-]/g, "");
+  const ringHex = HEX.test(String(ring ?? "").trim()) ? String(ring).trim() : "";
   let fill = "";
   if (filled && art.avatar) {
     const clip = `wv-face-${safe}`;
@@ -2365,10 +2373,34 @@ export function walkerFrameSVG({ at, handle = "", moving = false, label = null, 
     // the halo sits behind the face and inside the hit disc: a reading, not a target
     + (actor ? `<circle cx="0" cy="0" r="${r + ACTOR_HALO}" class="wv-walker-halo"/>` : "")
     + fill
-    + `<circle cx="0" cy="0" r="${r}" class="wv-walker-frame"/>`
+    + `<circle cx="0" cy="0" r="${r}" class="wv-walker-frame"${ringHex ? ` style="--wv-ring:${ringHex}"` : ""}/>`
     + `<line x1="${-size * 0.22}" y1="${rim}" x2="${-size * 0.3}" y2="${rim + leg}" class="wv-walker-leg"/>`
     + `<line x1="${size * 0.22}" y1="${rim}" x2="${size * 0.3}" y2="${rim + leg}" class="wv-walker-leg"/>`
     + `</g></g></g>`;
+}
+
+// A HOUSEMATE OFF THE SCREEN IS POINTED AT, NEVER LOST (POS-373, Darko
+// 2026-10-09). For each of your household's bodies the map holds whose position
+// lies outside the viewport (world metres), the point on the viewport's edge
+// toward them, inset, and the bearing — the same arithmetic the off-screen mark
+// arrow uses (edgePointToward). A body on screen gets nothing; a body with no
+// position gets nothing. One per handle, in the walkers' order. Pure.
+export function housemateEdges({ walkers = [], handles = [], viewport = null, inset = 0 } = {}) {
+  const own = new Set((handles ?? []).filter(Boolean));
+  if (!own.size || !viewport) return [];
+  const b = viewportBounds(viewport);
+  if (![b.minX, b.minY, b.maxX, b.maxY].every(Number.isFinite)) return [];
+  const out = [];
+  const seen = new Set();
+  for (const w of walkers ?? []) {
+    const x = Number(w?.x), y = Number(w?.y);
+    if (!own.has(w?.handle) || seen.has(w.handle) || ![x, y].every(Number.isFinite)) continue;
+    seen.add(w.handle);
+    if (x >= b.minX && x <= b.maxX && y >= b.minY && y <= b.maxY) continue;
+    const edge = edgePointToward(viewport, { x, y }, inset);
+    if (edge) out.push({ handle: w.handle, ...edge });
+  }
+  return out;
 }
 
 
@@ -5521,8 +5553,12 @@ const STYLE = `
 .wv-vessel-s { transform:scale(var(--wv-vu,1)); transform-origin:0 0; }
 /* and your own people, named in the same gold the frame already uses for a
    reader's own body elsewhere */
+/* …AND RINGED IN THEIR OWN COLOUR (POS-373, Darko 2026-10-09): walkerFrameSVG's
+   --wv-ring on the frame. The legs keep the motion language, as the actor's do.
+   Stated before .is-found and .is-actor so a found housemate, and the one you
+   act as, keep those rings. */
 .wv-walker-far.is-mine > .wv-walker-frame,
-.wv-walker-near.is-mine > .wv-walker-frame { stroke-width:3; }
+.wv-walker-near.is-mine > .wv-walker-frame { stroke:var(--wv-ring, var(--green)); stroke-width:3; }
 /* THE BODY THE SEARCH JUST FOUND. The same emphasis your own people wear, in the
    rail's amber rather than the walkers' green, so "this is the one you asked
    for" reads differently from "this one is yours". It lasts until the reader
@@ -6682,6 +6718,30 @@ export function withLiveWalkers(rows = [], walkers = [], { selfHandle = null } =
     }
     return out;
   });
+}
+
+/**
+ * THE TOWN'S BODIES ON THE RESIDENT PATH (POS-373, Darko 2026-09-18: "Act As
+ * resident is actually quite limiting in terms of seeing where other residents
+ * are"). Who is DRAWN is the town: every row of the public `/world/walkers`
+ * answer, the same bodies the Spectator draws. Who is within EARSHOT keeps its
+ * detail: a handle the earshot rows carry is drawn from its earshot row (the
+ * reader's own body from the read, `place`, `available`, the live walk), in
+ * the town's order. An earshot row the town does not carry is kept after them.
+ * One row per handle. Pure.
+ */
+export function withTownBodies(earshot = [], town = []) {
+  const near = new Map();
+  for (const r of earshot ?? []) if (r?.handle && !near.has(r.handle)) near.set(r.handle, r);
+  const out = [];
+  const seen = new Set();
+  for (const w of town ?? []) {
+    if (!w?.handle || seen.has(w.handle)) continue;
+    seen.add(w.handle);
+    out.push(near.get(w.handle) ?? w);
+  }
+  for (const r of near.values()) if (!seen.has(r.handle)) { seen.add(r.handle); out.push(r); }
+  return out;
 }
 
 export function walkersFromPresent(present = {}, { self = null } = {}) {
@@ -8792,6 +8852,13 @@ export function mountViewer(appEl) {
     convoHoverLayer.style.pointerEvents = "none";
     convoHoverLayer.style.display = "none"; // rides the same toggle as its washes
     svg.appendChild(convoHoverLayer);
+    // YOUR HOUSEMATES OFF THE SCREEN (POS-373): an edge chevron toward each,
+    // on top of everything, because it sits on the frame's edge and says where
+    // to look. A reading, never a target.
+    const housemateEdgeLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    housemateEdgeLayer.setAttribute("id", "wv-housemate-edge-layer");
+    housemateEdgeLayer.style.pointerEvents = "none";
+    svg.appendChild(housemateEdgeLayer);
     function renderConvoHover(hit) {
       if (!hit) { convoHoverLayer.innerHTML = ""; return; }
       const bounds = svg.getBoundingClientRect();
@@ -8861,7 +8928,7 @@ export function mountViewer(appEl) {
       svg.insertBefore(base, mistLayer);
     }
     const view = { ...full };
-    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, housemateEdgeLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
     // THE PANE'S WIDTH IS KEPT, NOT MEASURED (POS-228). panePx is read four
     // times a frame by the settle pass (thumbClassKey), right after
     // applyCameraScale has written styles, so every read forced a layout: 13%
@@ -8919,6 +8986,7 @@ export function mountViewer(appEl) {
       // crossing and the whole of every 150–620 ms tick inside the tier.
       if (k !== lastMarkerK) { lastMarkerK = k; drawConversations(); drawWalkPreview(); }
       renderMarkHighlight();
+      drawHousemateEdges(); // the edge is the camera's, so it follows every frame
       positionBubbles(); // the anchors are on the painting, so they move with it
       noticeTheCameraSettling();
     }
@@ -10620,9 +10688,8 @@ export function mountViewer(appEl) {
     // lines, and a cached roof is a roof that goes stale the moment someone
     // crosses a threshold — which is exactly when a reader is looking.
     const { manifest } = standpointOccupancy({ acts: enterExitLedger.acts, at: occupancyClock() });
-    // THE SPECTATOR'S TWO CUTS (2026-09-11), both null-safe on the resident path
-    // — whose walkers are already only the people within earshot, so `bounds`
-    // and `tier` come back null and this is the pass it was yesterday.
+    // THE TWO CUTS (2026-09-11), on every path: since POS-373 the resident's
+    // walkers are the town's too, so the cull matters to them as much.
     //
     // The CULL first: a walker three viewports away costs six nodes and a
     // network-fetched photograph to draw somewhere nobody is looking. Hit
@@ -10640,7 +10707,14 @@ export function mountViewer(appEl) {
     // canvas, culled by the box above, so the founder acting as him saw no
     // marker of any kind. A body that was not drawn is not a marker; the dot
     // stands in until one is.
+    // The dot is still decided on the box: a housemate drawn beyond it (below)
+    // is on no screen, so it is no marker either (POS-373).
     syncStandpointDot(drawnWalkers, px);
+    // …AND YOUR HOUSEMATES ARE NEVER CULLED (POS-373, Darko 2026-10-09): a body
+    // of your household is drawn wherever it stands, and when that is off the
+    // screen, an edge chevron points at it (drawHousemateEdges). The roof
+    // still holds: indoors the map is the room.
+    const bodies = inView.filter((w) => isOwnHandle(w.handle) || pointInDrawnBounds(w, bounds));
     // under every body, at both tiers: a route is ground, not a person
     const paths = walkPathsSVG();
     // …then the TIER. At town width a face is eleven pixels of photograph with
@@ -10661,14 +10735,22 @@ export function mountViewer(appEl) {
     // is the first thing that would grow, not this.
     // THE BODY YOU ARE ACTING AS is drawn with its face at every tier, this one
     // included (Keemin, 2026-09-18) — never the empty frame — so a reader can
-    // find themself at town width. One handle: the act-as, not the household.
+    // find themself at town width. The act-as alone wears the amber ring; the
+    // household's faces follow below.
     const actorHandle = standpointKey();
     const isActor = (h) => !!h && h !== SPECTATOR_ACTOR && h === actorHandle;
+    // AND EVERY HOUSEMATE WEARS THEIR FACE TOO (POS-373, Darko 2026-10-09:
+    // "visible with their full profile art, so at a glance on the World page
+    // it's always obvious where your residents are, even if you don't have them
+    // selected as your act-as"), at every tier, in a ring of their own colour.
+    // The act-as keeps its amber ring and halo; the rest of the household is
+    // ringed in the colour their monogram stands on.
+    const ringOf = (h, face, actor) => (!actor && isOwnHandle(h) ? face.color : null);
     if (tier === "far") {
-      for (const w of drawnWalkers) {
+      for (const w of bodies) {
         const actor = isActor(w.handle);
-        const face = actor ? faceOf(w.handle) : null;
         const mine = isOwnHandle(w.handle);
+        const face = actor || mine ? faceOf(w.handle) : null;
         // AND IT ASKS FOR ITS COPY HERE TOO (#2940 / POS-163). This is the one
         // face drawn at the far tier, and it went to the ORIGINAL while every
         // other face and card on the map asked the shelf for the copy that
@@ -10682,13 +10764,13 @@ export function mountViewer(appEl) {
         // the frame's accent reads, because the accent is what scales the box.
         s += walkerFrameSVG({ at: px(w), handle: w.handle, moving: w.moving ?? (!w.arrived && !w.standing),
           mine, found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor,
-          art: actor ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null,
-          thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null });
+          art: face ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null,
+          thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null, ring: face ? ringOf(w.handle, face, actor) : null });
       }
-      writeWalkLayer(paths + s, drawnWalkers);
+      writeWalkLayer(paths + s, bodies);
       return;
     }
-    for (const w of drawnWalkers) {
+    for (const w of bodies) {
       // The drawn leg ends where the WALK ends — the first point on the
       // target's ground, not its centre (Keemin, party night: the dotted line
       // overshot into the mark while the derivation stopped at the edge).
@@ -10757,12 +10839,13 @@ export function mountViewer(appEl) {
       // on the household's colour. Same anchor, same hit disc as the old circle.
       const face = faceOf(w.handle);
       const mine = isOwnHandle(w.handle);
+      const actor = isActor(w.handle);
       s += walkerFrameSVG({ at: now, handle: w.handle, moving, label: identity, mine,
-        found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor: isActor(w.handle),
+        found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor,
         art: face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color },
-        thumb: face.avatar ? thumbFor(FACE_UNITS, mine) : null });
+        thumb: face.avatar ? thumbFor(FACE_UNITS, mine) : null, ring: ringOf(w.handle, face, actor) });
     }
-    writeWalkLayer(paths + hulls + s, drawnWalkers);
+    writeWalkLayer(paths + hulls + s, bodies);
   }
   // THE LAYER IS WRITTEN WHEN ITS MARKUP CHANGED, AND NOT OTHERWISE (#2912
   // (4)). The settle pass rebuilds the overlay whenever the camera crosses a
@@ -10788,6 +10871,51 @@ export function mountViewer(appEl) {
     syncHouseLights();
     syncActorPosition();
     renderWalkDestination();
+    drawHousemateEdges();
+  }
+
+  // AN EDGE CHEVRON TOWARD EACH HOUSEMATE OFF THE SCREEN (POS-373, Darko
+  // 2026-10-09: "a housemate outside the viewport gets an edge chevron toward
+  // them"). Asked of the bodies DRAWN, so the roof holds (indoors the map is the
+  // room) and a body the map does not hold is pointed at by nothing. The arrow
+  // and the box are the off-screen mark's (renderOneMarkHighlight), in the
+  // housemate's own colour, with their name. Runs on every frame of the camera
+  // and after every draw; the layer is written only when its markup changed.
+  function drawHousemateEdges() {
+    const layer = mapCtx?.housemateEdgeLayer;
+    if (!layer) return;
+    const handles = state.whoami?.handles ?? [];
+    let html = "";
+    if (handles.length && mapCtx.view) {
+      const { originPx, mPerPx, view } = mapCtx;
+      const paneW = panePx();
+      const unit = paneW > 0 ? view.w / paneW : 1;
+      // the top edge sits below the map's control row (about 50 px of the pane
+      // drawn over the painting), so a chevron there is not hidden under it
+      const top = 40 * unit;
+      const viewport = {
+        minX: (view.x - originPx.x) * mPerPx, minY: (view.y + top - originPx.y) * mPerPx,
+        maxX: (view.x + view.w - originPx.x) * mPerPx, maxY: (view.y + view.h - originPx.y) * mPerPx,
+      };
+      const edges = housemateEdges({ walkers: walkState.lastDrawn ?? [], handles, viewport, inset: 18 * unit * mPerPx });
+      for (const e of edges) {
+        const face = faceOf(e.handle);
+        const at = { x: originPx.x + e.x / mPerPx, y: originPx.y + e.y / mPerPx };
+        const label = face.name.length > 28 ? `${face.name.slice(0, 27)}…` : face.name;
+        const labelWidth = Math.max(60, Math.min(220, label.length * 7 + 12)) * unit;
+        const labelHeight = 21 * unit;
+        const labelX = Math.max(view.x + 4 * unit, Math.min(view.x + view.w - labelWidth - 4 * unit, at.x - labelWidth / 2));
+        const labelY = Math.max(view.y + top + 4 * unit, Math.min(view.y + view.h - labelHeight - 4 * unit,
+          at.y < view.y + view.h / 2 ? at.y + 12 * unit : at.y - labelHeight - 12 * unit));
+        html += `<g class="wv-edge-indicator wv-edge-housemate" data-handle="${esc(e.handle)}" style="color:${esc(face.color)}">`
+          + `<path d="M0 -5 L2.8 4 L0 2.1 L-2.8 4 Z" transform="translate(${at.x} ${at.y}) rotate(${e.bearingDeg}) scale(${2.2 * unit})"/>`
+          + `<rect x="${labelX}" y="${labelY}" width="${labelWidth}" height="${labelHeight}" rx="${3 * unit}"/>`
+          + `<text x="${labelX + 6 * unit}" y="${labelY + 14.5 * unit}" font-size="${11 * unit}">${esc(label)}</text></g>`;
+      }
+    }
+    if (layer._pmHtml === html) return;
+    layer._pmHtml = html;
+    layer.innerHTML = html;
   }
 
   // The standpoint dot has ONE owner and ONE list. The overlay sets the dot down
@@ -10883,6 +11011,17 @@ export function mountViewer(appEl) {
     drawWalkers();
     return true;
   }
+  // The town's bodies for the resident path: the public `/world/walkers`, the
+  // Spectator's own read, walkers and standing together as the Spectator draws
+  // them. Null when the door does not answer.
+  async function townBodies() {
+    try {
+      const r = await fetch(officeUrl("/world/walkers"), { headers: authHeaders(), credentials: "same-origin" });
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j?.error ? null : [...(j.walkers ?? []), ...(j.standing ?? [])];
+    } catch { return null; }
+  }
   async function pollWalkers() {
     // ⚑ NOT BEFORE WE KNOW WHO IS READING. The first poll fires at boot, which
     // is before the office has answered whoami — so a reader with a key would
@@ -10891,13 +11030,18 @@ export function mountViewer(appEl) {
     // that caught the fold one commit earlier, one layer over. `resolveIdentity`
     // calls `mountWalkers` when it finishes, so nothing is lost by waiting.
     if (pmKey() && !identitySettled) return;
-    // ── THE RESIDENT PATH ASKS WHO IS WITHIN EARSHOT, NOT WHO IS IN TOWN ─────
+    // ── THE RESIDENT PATH DRAWS THE TOWN'S BODIES, WITH EARSHOT'S DETAIL ─────
     //
-    // `/world/walkers` answers with EVERYONE, every fifteen seconds — which is
-    // the same shape of question as the whole fold, one layer over, and the
-    // same answer: a resident sees who is about, not who exists. So this path
-    // asks `/world/present` at the standpoint the read was taken from, which is
-    // the very function the read's own `present` block is built by.
+    // From 09-13 this path asked only `/world/present` ("presence stays
+    // earshot, for who is drawn"), so a resident saw a handful of people where
+    // the Spectator saw everyone. Two later rulings undo that for the bodies:
+    // Darko's 09-18 ask ("Act As resident is actually quite limiting in terms
+    // of seeing where other residents are") and POS-452's 10-07 "presence stays
+    // on the walkers". So the bodies come from the public `/world/walkers`, the
+    // same read the Spectator draws from (POS-373), and `/world/present` at the
+    // standpoint still answers who is within earshot, whose rows keep their
+    // detail (withTownBodies). The telling pane, the marks and the cards stay
+    // shaped by the standpoint; only the bodies layer is the town's.
     //
     // THE STANDPOINT COMES FROM THE READ, never from the camera. `present` is a
     // reading taken from a body, and the office will not answer an embodied
@@ -10918,6 +11062,8 @@ export function mountViewer(appEl) {
       // stands until the present answers; the read's standpoint is only ever
       // the body's stand-in before the first present (loadResidentRead).
       if (at && Number.isFinite(at.x) && Number.isFinite(at.y)) {
+        // asked beside the present, not after it: one poll, one wait
+        const town = townBodies();
         try {
           const r = await fetch(officeUrl(`/world/present?x=${Math.round(at.x)}&y=${Math.round(at.y)}`),
             { credentials: "same-origin" });
@@ -10944,7 +11090,9 @@ export function mountViewer(appEl) {
                   }
                 } catch { /* the live layer is a garnish; the earshot answer stands */ }
               }
-              takeWalkers(rows);
+              // the town's bodies, earshot's rows winning for their handles; a
+              // town door that does not answer leaves the earshot answer alone
+              takeWalkers(withTownBodies(rows, (await town) ?? []));
             }
           }
         } catch { /* a poll miss is silent — the last good reading stands */ }
@@ -13208,9 +13356,18 @@ export function mountViewer(appEl) {
           // body only until /world/present has answered with the reader's own
           // row (a present row carries no `self` flag); after that the poll's
           // merge owns the list and a fresh read never overwrites it.
+          // THE TOWN'S BODIES ALREADY HELD STAY (POS-373): the read names only
+          // earshot, so the town the last poll drew stands behind it until the
+          // next poll answers, rather than the map emptying to earshot between.
+          // And the town is asked now, not at the next tick, for the same
+          // reason the read's own people are drawn here.
           if (!walkState.walkers.some((w) => w?.handle === state.handle && !w?.self)) {
-            walkState.walkers = walkersFromPresent(read.present ?? {}, { self: selfFromRead(read) });
+            const near = walkersFromPresent(read.present ?? {}, { self: selfFromRead(read) });
+            walkState.walkers = withTownBodies(near, walkState.walkers);
             drawWalkers();
+            townBodies().then((town) => {
+              if (town && onResidentPath() && state.handle === handle) takeWalkers(withTownBodies(near, town));
+            });
           }
         }
         return read;

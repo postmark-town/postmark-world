@@ -174,7 +174,9 @@ test("no thumb, or a face that is not on the shelf, renders exactly what it did 
 function farTierDraw(src = SRC) {
   const i = src.indexOf(`    if (tier === "far") {`);
   assert.ok(i >= 0, "the far-tier branch of drawWalkers is not where this reader looks for it");
-  const j = src.indexOf("writeWalkLayer(paths + s, drawnWalkers);", i);
+  // the drawn list's name is not this reader's business (POS-373 split it from
+  // the dot's), only the write that ends the branch
+  const j = src.indexOf("writeWalkLayer(paths + s, ", i);
   assert.ok(j > i, "the far-tier branch no longer ends at its own writeWalkLayer");
   return src.slice(i, j);
 }

@@ -34,7 +34,9 @@
 //   (5) the act-as body (Keemin, 2026-09-18): its face at every tier, the far
 //       tier included, one class of its own (`is-actor`), the ring the rail's
 //       amber at a heavier stroke with a halo; a household sibling keeps
-//       `is-mine` and the empty frame; the dot yields to the drawn body.
+//       `is-mine` and, since POS-373 (Darko 2026-10-09), wears its face at
+//       every tier too, ringed in its own colour; the dot yields to the drawn
+//       body.
 //
 // `markIndex` is not exported, so the count is taken where it is visible: a
 // plain array becomes an index only through `marks.filter(...)`, and a Proxy
@@ -597,7 +599,7 @@ const readBodies = (page) => page.evaluate(() => {
   };
 });
 
-test("(5) ON THE PAGE, at the far tier: the act-as body wears its face, is-actor and the amber ring; a household sibling wears is-mine and the empty frame; the dot yields to the drawn body", async (t) => {
+test("(5) ON THE PAGE, at the far tier: the act-as body wears its face, is-actor and the amber ring; a household sibling wears is-mine, its face and its own ring (POS-373); the dot yields to the drawn body", async (t) => {
   if (!chromium) return t.skip(skipReason);
   const { page, errors } = await openActingAs("near-reader");
   const seen = await readBodies(page);
@@ -613,9 +615,13 @@ test("(5) ON THE PAGE, at the far tier: the act-as body wears its face, is-actor
   assert.equal(seen.actor.colour, "rgb(232, 197, 106)", "…in the rail's amber (#e8c56a)");
   assert.match(seen.sibling.classes, /\bis-mine\b/, "the household sibling is yours");
   assert.doesNotMatch(seen.sibling.classes, /\bis-actor\b/, "…but not the actor");
-  assert.match(seen.sibling.classes, /\bwv-walker-far\b/, "…and keeps the far tier's empty frame");
-  assert.equal(seen.sibling.face, false);
+  // POS-373 (Darko 2026-10-09): every housemate wears their face at every tier,
+  // ringed in their own colour (the town gold here: the rig serves no colours)
+  assert.match(seen.sibling.classes, /\bwv-walker-near\b/, "…and is FILLED at the far tier too");
+  assert.equal(seen.sibling.face, true);
+  assert.equal(seen.sibling.halo, false, "no halo: that is the actor's alone");
   assert.equal(seen.sibling.stroke, "3px", "is-mine's stroke stays as it was");
+  assert.equal(seen.sibling.colour, "rgb(232, 196, 139)", "…in their own colour, the town gold when they set none (#e8c48b)");
   assert.doesNotMatch(seen.stranger.classes, /\bis-mine\b|\bis-actor\b/);
   assert.equal(seen.stranger.stroke, "2px");
   assert.equal(seen.dots, 0, "one body, one marker: the drawn actor takes the dot's place (POS-93)");
