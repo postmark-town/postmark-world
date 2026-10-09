@@ -21,9 +21,10 @@
 # deliberately does not, because that check reads this file WHOLE, comments
 # included: the cheapest way for the dangerous trigger to arrive here is as a
 # line somebody copied out of a comment. This job runs the pull request's own
-# code, so it gets no secrets and a read-only token. It needs neither. The world declares no
-# dependencies, so there is no install step and nothing is fetched from a
-# registry; the sweep and the gate read only this repository's own refs; the
+# code, so it gets no secrets and a read-only token. It needs neither. This job
+# installs nothing (the world's one devDependency, playwright, is the suite's,
+# never this job's), so nothing is fetched from a registry; the sweep and
+# the gate read only this repository's own refs; the
 # only env the sweep reads at all is BOT_NAME/BOT_EMAIL, which this job does not
 # set (`git config` covers the same ground where the sweep's rebase actually
 # looks). The posture is asserted rather than asserted-about:
