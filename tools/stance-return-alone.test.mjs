@@ -188,3 +188,24 @@ test("RULING B · a child FILED inside the returned mark's frame keeps its world
   assert.deepEqual({ x: now.at.x, y: now.at.y }, { x: 2500, y: 2300 }, "at the same world position");
   assert.equal(now.placementParent, marks.find((m) => m.id.endsWith("let-there-be-light")).id, "reparented to open ground: the world root");
 });
+
+// ── A PARCEL: the law return keeps what it did; a stance return reparents ────
+// A parcel has no positioned child on the fan-up edge (that edge is sited in
+// sited), so what a return of one changes is the PUBLISHED edge of the marks
+// standing on it. R11's return (a limit) leaves that edge as it was; a stance
+// return (the town opposing the plot) reparents it, as ruling B says.
+
+test("R11 vs RULING B on a parcel: a mark on an over-limit plot keeps its placement under the law return, and is reparented under a stance return", () => {
+  const marks = [
+    sited("district", "the-town", 0, 0, 5000, 5000, { tier: "constitution", date: "2026-07-01" }),
+    parcel("plot", "bo", 100, 100),
+    sited("stall", "cy", 100, 100, 4, 4),
+  ];
+  const words = new Map([["bo/plot", "opposed"]]);
+  const law = fold({ marks, terrain, tick: 1, stakes: [], townWords: words, townLaws: new Map([["bo/plot", "the-town/one-per-resident"]]) });
+  assert.equal(standing(law, "bo/plot"), false);
+  assert.equal(markOf(law, "cy/stall").placementParent, "bo/plot", "the law return keeps what it did");
+  const stance = fold({ marks, terrain, tick: 1, stakes: [], townWords: words });
+  assert.equal(standing(stance, "bo/plot"), false);
+  assert.equal(markOf(stance, "cy/stall").placementParent, "the-town/district", "the stance return reparents what stood on it");
+});
