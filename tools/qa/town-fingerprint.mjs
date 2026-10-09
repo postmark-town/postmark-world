@@ -38,7 +38,7 @@
 // group `#wv-overlay > g[transform]` that holds each mark's `g.ov-s`. So "the
 // extraction moved the town's marks", the likeliest symptom of a bad extraction,
 // could not turn this net red. Placement is now captured where it actually lives.
-import { chromium } from "file:///G:/Wright-HQ/node_modules/playwright/index.mjs";
+import { chromium } from "playwright";
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

@@ -76,7 +76,7 @@ test("[pin] the pin is not a second draw path — it rides homeCard and the same
 
 // ── and the page, because the above only proves lines were typed ────────────
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* next */ }

@@ -77,12 +77,13 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Playwright is not a dependency of this package and must not become one — the
-// world is browser-pure and its suite runs anywhere node does. Resolved the same
+// Playwright is a devDependency only (POS-372, ruled 09-14): CI installs it and
+// the browser, the box installs nothing and stays browser-free, and the world's
+// runtime stays browser-pure. Resolved the same
 // way tools/town-ground-page.test.mjs resolves it, and when it is absent this
 // file SKIPS WITH ITS REASON SAID OUT LOUD. A skip is not a pass: the message
 // names exactly what goes unguarded.
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }

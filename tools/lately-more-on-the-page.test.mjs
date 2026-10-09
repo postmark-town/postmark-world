@@ -38,7 +38,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // the lane's own run put one there).
 const SHOT_DIR = process.env.LATELY_SHOT_DIR ?? "";
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }

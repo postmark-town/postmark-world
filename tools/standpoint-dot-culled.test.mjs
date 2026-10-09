@@ -83,7 +83,7 @@ test("[pin] the walker pass hands the DRAWN set to the decision, and the overlay
 
 // ── the page ───────────────────────────────────────────────────────────────
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* try the next */ }

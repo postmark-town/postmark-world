@@ -39,8 +39,9 @@
 // The wheel handler lives inside mountViewer's closure and needs a DOM, so what
 // is exercised here is the arithmetic it now delegates to — the same call, the
 // same numbers — plus [pin]s that BOTH readers really delegate. The suite has
-// no dependencies by construction (the CI workflow installs nothing), so there
-// is no jsdom to mount the real closure in; the browser pass is the rig's.
+// no runtime dependencies by construction (CI installs only playwright, a
+// devDependency, since POS-372), so there is no jsdom to mount the real closure
+// in; the browser pass is the rig's.
 //
 // ⚑ THE FIRST DRAFT OF THIS FILE PASSED ITS OWN FLIP. Its central assertion
 // compared the wheel's floor to the resting view and took BOTH from

@@ -56,7 +56,7 @@ const FIXTURE_GROUND = `<!doctype html><html><body>
 </svg>
 </body></html>`;
 
-const PLAYWRIGHT_PATHS = ["playwright", "file:///G:/Wright-HQ/node_modules/playwright/index.mjs"];
+const PLAYWRIGHT_PATHS = ["playwright"];
 async function loadChromium() {
   for (const spec of PLAYWRIGHT_PATHS) {
     try { return (await import(spec)).chromium; } catch { /* next */ }

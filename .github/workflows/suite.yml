@@ -16,9 +16,19 @@
 # file, the candle was the ONLY thing that ran those pins, which is backwards.
 #
 # SECURITY. `pull_request`, not `pull_request_target`: this runs the PR's own
-# code, so it gets no secrets and read-only contents. It needs none — the world
-# declares no dependencies, so there is no install step and nothing is fetched
-# from a registry. Node and the checkout, and nothing else.
+# code, so it gets no secrets and read-only contents. It needs none. The world
+# declares no runtime dependencies; its one devDependency is playwright, and
+# this job is the one place it is installed (below).
+#
+# THE BROWSER IS CI'S, NOT THE BOX'S (POS-372; ruled 09-14). The viewer suites
+# drive the World page in headless Chromium. Until this, they found playwright
+# only through a hard-coded path into one operator's checkout, so CI and the box
+# skipped every one of them and a viewer red could reach main unseen. Now
+# playwright is a pinned devDependency with a lockfile: this job installs it and
+# its Chromium, and fails if any viewer suite still skips for want of it. The box
+# never runs an install in the world (the site installs the world as a dependency,
+# which brings no devDependencies), so it stays browser-free, and there the
+# viewer suites skip by name as they always have.
 #
 # MAIN AND ON DEMAND TOO (2026-10-07, Darko: no heavy local runs while the meeps
 # run on the operator's machine). Until this, a pull request was the only place
@@ -77,9 +87,29 @@ jobs:
           git config --global user.name "postmark suite"
           git config --global user.email "suite@postmark.invalid"
 
-      # No `npm ci`, no `npm install`: package.json declares no dependencies and
-      # the suite imports only node builtins and this repo's own modules. A test
-      # that wants a browser asks for playwright inside a try/catch and skips
-      # itself when it is absent, which is what happens here.
-      - name: the whole suite — behaviour AND the source pins
-        run: npm test
+      # The one install: playwright from the lockfile, then its Chromium and the
+      # libraries it needs. Everything else the suite imports is node builtins
+      # and this repo's own modules.
+      - name: playwright and its Chromium, for the viewer suites
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      # A browser that will not launch would make every viewer suite skip and
+      # read as a pass. Ask it once, here, so that failure has its own name.
+      - name: the browser launches
+        run: node -e 'import("playwright").then(async ({ chromium }) => { const b = await chromium.launch(); console.log(`chromium ${b.version()} launches`); await b.close(); })'
+
+      # A viewer test asks for playwright inside a try/catch and skips itself,
+      # loudly, when it is absent. That is right on the box and wrong here: in
+      # this job a skip for want of playwright is the install having failed, so
+      # it fails the run rather than reading as a pass.
+      - name: the whole suite — behaviour AND the source pins, the viewer suites included
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee "$RUNNER_TEMP/suite.tap"
+          # A skip's reason follows a `#` in both reporters (tap: `# SKIP <reason>`, spec: `# <reason>`).
+          if grep -E '# .*(playwright is absent|NO PLAYWRIGHT)' "$RUNNER_TEMP/suite.tap"; then
+            echo "::error::a viewer suite skipped for want of playwright, so it guarded nothing. This job installs it; the install did not take." >&2
+            exit 1
+          fi

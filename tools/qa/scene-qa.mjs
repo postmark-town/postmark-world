@@ -19,7 +19,7 @@
 // Exits 1 on the first failed assertion, 0 with a receipt table when green.
 // The rig's own WORLD record is the fixture: rei stands inside the Lanternstep
 // House on the threshold ledger this branch carries.
-import { chromium } from "file:///G:/Wright-HQ/node_modules/playwright/index.mjs";
+import { chromium } from "playwright";
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

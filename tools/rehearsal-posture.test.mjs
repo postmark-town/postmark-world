@@ -52,6 +52,7 @@ function fixture(overrides = {}) {
   writeFileSync(join(dir, "tools", "settlement-sweep.mjs"), overrides.sweep ?? `const a = process.env.BOT_NAME; const b = process.env.BOT_EMAIL;\n`);
   writeFileSync(join(dir, "tools", "harm-gate.mjs"), overrides.gate ?? `// five checks, none of them reads a column\nexport const x = 1;\n`);
   writeFileSync(join(dir, "tools", "marks-fold.mjs"), overrides.fold ?? `export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";\nexport const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";\n`);
+  writeFileSync(join(dir, "tools", "rehearsal-baseline.mjs"), overrides.baseline ?? `// asks main first; reads nothing of its own\nexport const y = 1;\n`);
   return dir;
 }
 
@@ -112,6 +113,8 @@ test("FALSIFIER 6: a new env read in a tool the job runs breaks it", () => {
   broke(posture({ fold: `const u = process.env.DATABASE_URL;\n` }), "consumers");
   assert.equal(posture({ fold: `export const SNAPSHOT_ENV = "WORLD_SNAPSHOT";\nexport const SNAPSHOT_ROOT_ENV = "WORLD_SNAPSHOT_ROOT";\n` }).ok, true,
     "the snapshot seam's two keys are named, deliberately, and stay quiet");
+  // the baseline that runs main's sweep first (POS-371) is read too
+  broke(posture({ baseline: `const t = process.env.GITHUB_TOKEN;\n` }), "consumers");
 });
 
 test("FALSIFIER 7: a harm-gate check that reads weight breaks it — the rehearsal does not reproduce that column", () => {
@@ -235,4 +238,9 @@ test("[pin] the workflow the posture guards is the one the repository actually h
   assert.match(yaml, /tools\/settlement-sweep\.mjs/, "the job runs the real sweep");
   assert.match(yaml, /tools\/harm-gate\.mjs/, "the job runs the real gate");
   assert.match(yaml, /tools\/rehearsal-posture\.mjs/, "the job asserts its own posture before it runs the tree's code");
+  // POS-371: the sketchbooks main itself refuses are set aside before this tree is judged, so the
+  // baseline must run, and run BEFORE the sweep it scopes.
+  const baseline = yaml.indexOf("node tools/rehearsal-baseline.mjs");
+  assert.ok(baseline > 0, "the job asks main first (tools/rehearsal-baseline.mjs)");
+  assert.ok(baseline < yaml.indexOf("node tools/settlement-sweep.mjs"), "the baseline runs before the pull request's sweep");
 });

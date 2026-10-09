@@ -59,6 +59,21 @@
 # not change is the four gate checks a pull request is actually being asked about
 # — lint, moved, lost, parcels — which read this tree's marks and this tree's
 # base. The rehearsal is honest about which question it answers.
+#
+# AND WHICH OF THOSE SKETCHBOOKS ARE THIS PULL REQUEST'S TO ANSWER (POS-371,
+# 2026-10-09). One refusal anywhere refuses the sweep, and the stalest
+# sketchbook decides it: from 2026-09-26 every pull request went red on a
+# draft that already could not cross over MAIN (a duplicate `neth/warm-stone`
+# carried into the publish, then `draft/angelus-novus`, last written 09-11,
+# failing to rebase an amend of a mark main had since moved). So main is asked
+# first: `tools/rehearsal-baseline.mjs` runs the BASE's own stakes and sweep, in
+# a throwaway clone at the base, over the same sketchbooks, and sets aside each
+# one main refuses on (named on the run as a warning). The pull request is then
+# judged over the sketchbooks main can carry. A pull request that breaks one of
+# those, or whose own tree refuses, is still red by name; a refusal main cannot
+# charge to any sketchbook is main's own and reds the run. The sweep's code is
+# not touched, and no resident's branch is: the set-aside refs are this
+# runner's local copies.
 
 name: crossing rehearsal
 on:
@@ -80,7 +95,9 @@ jobs:
     # The sweep spawns one git process per supersession row and rebases every
     # sketchbook; on the box it is minutes, not seconds. A rehearsal that hangs
     # is a red check nobody can read, so it gets a ceiling with room in it.
-    timeout-minutes: 30
+    # The baseline asks main once more per sketchbook it sets aside (at most
+    # five), so the ceiling carries those sweeps too.
+    timeout-minutes: 50
     steps:
       # fetch-depth: 0 and NO blob filter, which is the one place this job
       # deliberately differs from suite.yml. The sweep `git archive`s WORLD/ at
@@ -151,6 +168,28 @@ jobs:
         run: |
           git checkout -B main HEAD
           echo "rehearsing over $(git rev-parse HEAD), base ${{ github.event.pull_request.base.sha }}"
+
+      # MAIN FIRST (POS-371). The base's own code over the base's own tree and
+      # these sketchbooks; each one main already refuses on is set aside, here,
+      # in this checkout only. Exit 1 is main refusing with no sketchbook to
+      # charge it to, or more than five refusing; exit 2 is "could not ask
+      # main". Neither is a pass. The count is asserted again afterwards, for
+      # the same reason the fetch step asserts it.
+      #
+      # MAIN IS THE MERGE'S FIRST PARENT, not the event's base sha. Measured on
+      # #173: the event said 33fbe353 while the merge GitHub built was onto
+      # ee017ae4, so asking the event's sha would ask an older main than the
+      # one this pull request lands on.
+      - name: the sketchbooks main itself refuses, set aside
+        run: |
+          main_now=$(git rev-parse HEAD^1)
+          echo "main as this merge sees it: $main_now (the event's base: ${{ github.event.pull_request.base.sha }})"
+          node tools/rehearsal-baseline.mjs --repo . --base "$main_now" --scratch "$RUNNER_TEMP/baseline" --out "$RUNNER_TEMP/baseline.json"
+          books=$(git for-each-ref --format='%(refname)' 'refs/remotes/origin/draft/' | wc -l)
+          if [ "$books" -eq 0 ]; then
+            echo "::error::every sketchbook refuses on main itself, so this job would sweep an empty crossing and report it green. That wants a person." >&2
+            exit 1
+          fi
 
       # NOT A TOWN READ. See tools/rehearsal-stakes.mjs's header. Exit 2 here is
       # "could not derive", and it fails the job on purpose.
