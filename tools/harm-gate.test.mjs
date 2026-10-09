@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import { harmGate, harmGateOnSnapshots, defaultBase } from "./harm-gate.mjs";
 import { snapshotFromTree } from "./marks-fold.mjs";
 import { withTool } from "./engine-files.mjs";
+import { exportSnapshot } from "./snapshot-export.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -267,4 +268,34 @@ test("SNAPSHOT PAIR · ESCROW: the gate folds the after snapshot itself with the
   const ok = harmGateOnSnapshots({ repo: f.repo, ...pair, acts: {}, stakes: f.stakesPath, lint: false });
   assert.equal(names(ok, "escrow").ok, true, JSON.stringify(names(ok, "escrow")));
   assert.match(names(ok, "escrow").note, /fold stamps [1-9]/, "the stakes reached the gate's fold");
+});
+
+// ── POS-421: THE REHEARSAL'S PAIR, AND THE BASE IT PRINTS ───────────────────
+//
+// The crossing rehearsal exports main as the merge sees it (`HEAD^1`, read at
+// that commit, never from the working tree) and the swept merge tree, and the
+// gate names the before-export's commit as its base (POS-494 item 1).
+
+test("REHEARSAL PAIR: the before-export is read at its commit, and the gate prints that commit as its base", (t) => {
+  const f = fixture(t);
+  const dir = mkdtempSync(join(tmpdir(), "postmark-harm-rehearsal-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const before = join(dir, "before.json"), after = join(dir, "after.json");
+  // the pull request's own hand: the lamp moved, and no act names it
+  f.put(f.paths.lamp, record({ by: "alice", at: { x: 260, y: 200 }, extent: { w: 2, h: 2 }, body: "a lamp, moved" }));
+  f.fold();
+  f.commit("a pull request that moves a mark");
+  writeFileSync(before, JSON.stringify(exportSnapshot(f.repo, f.base)));
+  writeFileSync(after, JSON.stringify(exportSnapshot(f.repo)));
+  const was = JSON.parse(readFileSync(before, "utf8"));
+  assert.equal(was.ref, f.base, "the export names the full sha it was read at");
+  assert.deepEqual(was.marks.find((m) => m.id === "alice/the-lamp").at, { x: 1200, y: 2200 }, "read at the commit (framed: the district stands at 1000,2000), not off the working tree");
+
+  const red = harmGateOnSnapshots({ repo: f.repo, before, after, acts: {}, stakes: f.stakesPath, lint: false });
+  assert.equal(red.base, f.base, "the gate's base is the before-export's commit");
+  assert.match(names(red, "moved").rows.join("\n"), /^alice\/the-lamp: 1200,2200 -> 1260,2200 \(no act names it\)$/m);
+
+  const clean = harmGateOnSnapshots({ repo: f.repo, before: after, after, acts: {}, stakes: f.stakesPath, lint: false });
+  assert.equal(clean.ok, true, JSON.stringify(clean.checks.filter((c) => !c.ok)));
+  assert.match(clean.base, /^the working tree at [0-9a-f]{40}$/);
 });
