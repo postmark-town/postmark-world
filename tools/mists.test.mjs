@@ -191,20 +191,27 @@ test("NO PARCEL IS COVERED: every parcel on the record but the one ruled under s
   }
 });
 
-test("NO HOUSEHOLD'S MARK IS BEHIND THE WALL but on Pando Peak's ground: every corner of every other placed mark stands clear, at every crossing", () => {
+test("NO MARK IS BEHIND THE WALL but on Pando Peak's ground and the town's own water: every corner of every other placed mark stands clear, and a far clearing's marks clear its fringe too, at every crossing", () => {
   const { skeleton, worldState } = real();
   const pando = worldState.marks.find((m) => m.id === RULED_UNDER).at;
   const onPando = (m) => Math.hypot(m.at.x - pando.x, m.at.y - pando.y) < 10000;   // its own ground, 135 km out
   // the world-root is the frame, never a mark in view (the engine skips it the same way)
   const frame = (m) => Math.max(m.extent?.w ?? 0, m.extent?.h ?? 0) >= DIALS.world_scale_extent_m;
-  // households' marks: the town's own water runs off the map's edge into the mist, as a river would
-  const marks = worldState.marks.filter((m) => m.at && !m.far && !frame(m) && !onPando(m) && !String(m.id).startsWith("the-town/") && Math.abs(m.at.x) < 50000 && Math.abs(m.at.y) < 50000);
-  assert.ok(marks.length > 600);
+  // the town's own water runs off the map's edge into the mist, as a river
+  // would (ruled 2026-10-09): these two, by id, and nothing else of the town's
+  const RUNS_INTO_THE_MIST = new Set(["the-town/the-sea", "the-town/the-main-channel"]);
+  const marks = worldState.marks.filter((m) => m.at && !m.far && !frame(m) && !onPando(m) && !RUNS_INTO_THE_MIST.has(m.id) && Math.abs(m.at.x) < 50000 && Math.abs(m.at.y) < 50000);
+  assert.ok(marks.length > 700);
   for (const c of [...KEYFRAMES(), KEYFRAMES().at(-1) + 10]) {
     const m = mistsAt(c, skeleton.mists);
-    for (const mk of marks)
-      for (const q of corners({ at: mk.at, extent: mk.extent ?? { w: 0, h: 0 } }))
-        assert.equal(mistsHere(q, m).inWall, false, `${mk.id} is behind the wall at crossing ${c}`);
+    // a clearing was sized to keep what it holds out of the fringe as well
+    const inAClearing = (q) => m.clearings.some((k) => Math.hypot(q.x - k.x, q.y - k.y) <= k.r);
+    for (const mk of marks) {
+      const cs = corners({ at: mk.at, extent: mk.extent ?? { w: 0, h: 0 } });
+      for (const q of cs) assert.equal(mistsHere(q, m).inWall, false, `${mk.id} is behind the wall at crossing ${c}`);
+      if (inAClearing(mk.at))
+        for (const q of cs) assert.equal(mistsHere(q, m).thickness, 0, `${mk.id} is in a clearing's fringe at crossing ${c}`);
+    }
   }
 });
 
@@ -237,18 +244,17 @@ test("THE PARCEL NEAREST EACH SIDE stays fully sighted at every keyframe: its re
 // worldEyes), at the default budget. The Mists may take out of it only what the
 // wall hides: from every parcel's own standpoint, the reach with the Mists is the
 // reach the same crossing gives with no Mists and those hidden marks removed. The
-// veil must not re-rank it. (A sample of parcels here; the lane measured all of
-// them through the office's apexLawAt.)
+// veil must not re-rank it. Every parcel but Pando's, at the first keyframe and
+// the last.
 test("LAW REACH: from a parcel, the Mists change what is reached only by what the wall hides, never by the veil", () => {
   const { skeleton, worldState, withM, without } = real();
   const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && m.id !== RULED_UNDER && Math.abs(m.at.x) < 50000)
     .sort((p, q) => (p.id < q.id ? -1 : 1));
-  const sample = parcels.filter((_, i) => i % 8 === 0);
-  assert.ok(sample.length >= 12);
+  assert.ok(parcels.length >= 116);
   const reachOf = (fov) => [...fov.carried.map((s) => s.id), ...fov.far.map((f) => f.id)].sort();
   for (const crossing of [KEYFRAMES()[0], KEYFRAMES().at(-1)]) {
     const m = mistsAt(crossing, skeleton.mists);
-    for (const p of sample) {
+    for (const p of parcels) {
       const hidden = new Set(without.marks.filter((mk) => mk.at && mistsHide(p.at, mk.at, m)).map((mk) => mk.id));
       const bare = { ...without, marks: without.marks.filter((mk) => !hidden.has(mk.id)) };
       assert.deepEqual(reachOf(fieldOfView(p.at, withM, { crossing })), reachOf(fieldOfView(p.at, bare, { crossing })),
