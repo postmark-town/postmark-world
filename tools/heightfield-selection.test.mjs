@@ -38,9 +38,13 @@ function referenceHeightfield({ controlPoints, power = DIALS.idw_power, k = DIAL
   };
 }
 
+// The selection under test is the BASE field's. Ground beyond the border adds an
+// offset past the atlas's edge (tools/ground-beyond-the-border.test.mjs holds that),
+// so the grounds are taken out here and the oracle sweeps the same field it always did.
+const SKELETON = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
 const world = assembleWorld({
   worldState: JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")),
-  skeleton: JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")),
+  skeleton: { ...SKELETON, features: SKELETON.features.filter((f) => f.kind !== "ground") },
 });
 const REAL_CPS = world.heightfield.controlPoints;
 
