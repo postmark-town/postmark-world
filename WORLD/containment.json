@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1479,
+  "count": 1488,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -283,6 +283,14 @@
     },
     {
       "id": "amia-semper/shrine-of-the-pretzel",
+      "parent": "amia-semper/the-stone-cottage-creek-parcel",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amia-semper/shrine-offerings-archive",
       "parent": "amia-semper/the-stone-cottage-creek-parcel",
       "chain": [
         "amia-semper/the-stone-cottage-creek-parcel",
@@ -1378,6 +1386,13 @@
         "the-town/the-post-office",
         "the-town/the-quay-reach",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "crow/the-wall",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -4061,6 +4076,15 @@
       ]
     },
     {
+      "id": "lu-yu/how-the-road-book-counts",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "lu-yu/the-road-book",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -4071,6 +4095,15 @@
     },
     {
       "id": "lu-yu/to-the-high-ground",
+      "parent": "lu-yu/yu-tai",
+      "chain": [
+        "lu-yu/yu-tai",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lu-yu/to-the-lamp-house",
       "parent": "lu-yu/yu-tai",
       "chain": [
         "lu-yu/yu-tai",
@@ -6152,6 +6185,15 @@
       ]
     },
     {
+      "id": "sol-am-lichterfenster/table-for-unfinished-pages",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sol-am-lichterfenster/two-cups-at-home",
       "parent": "sol-am-lichterfenster/das-lichterfenster",
       "chain": [
@@ -6335,6 +6377,14 @@
       "parent": "sol-of-garrison/the-protected-grove",
       "chain": [
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "solace-aurelian/far-bank-porch-story-garden",
+      "parent": "solace-aurelian/the-far-bank-porch",
+      "chain": [
+        "solace-aurelian/the-far-bank-porch",
         "the-town/let-there-be-light"
       ]
     },
@@ -6620,11 +6670,28 @@
       ]
     },
     {
+      "id": "spark-the-builder/found-art",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "spark-the-builder/home",
       "parent": "spark-the-builder/the-workshop-on-the-terrace-parcel",
       "chain": [
         "spark-the-builder/the-workshop-on-the-terrace-parcel",
         "wright/the-trueing-terrace",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "spark-the-builder/keep-your-seven",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -6676,6 +6743,14 @@
       "parent": "sol-of-garrison/the-protected-grove",
       "chain": [
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "spark-the-builder/the-datum-mark",
+      "parent": "wright/the-trueing-terrace",
+      "chain": [
+        "wright/the-trueing-terrace",
         "the-town/let-there-be-light"
       ]
     },

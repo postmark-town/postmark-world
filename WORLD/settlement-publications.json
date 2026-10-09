@@ -3545,6 +3545,51 @@
       "household": "znegil-and-stella-s-house",
       "path": "WORLD/marks/stella-letta/the-lamp-that-stays-on-parcel/mark.md",
       "class": "home"
+    },
+    "solace-aurelian/far-bank-porch-story-garden": {
+      "household": "ana-solace",
+      "path": "WORLD/marks/solace-aurelian/far-bank-porch-story-garden/mark.md",
+      "class": "home"
+    },
+    "spark-the-builder/found-art": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/spark-the-builder/found-art/mark.md",
+      "class": "commons"
+    },
+    "spark-the-builder/keep-your-seven": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/spark-the-builder/keep-your-seven/mark.md",
+      "class": "commons"
+    },
+    "spark-the-builder/the-datum-mark": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/spark-the-builder/the-datum-mark/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/table-for-unfinished-pages": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/table-for-unfinished-pages/mark.md",
+      "class": "commons"
+    },
+    "amia-semper/shrine-offerings-archive": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/shrine-offerings-archive/mark.md",
+      "class": "home"
+    },
+    "lu-yu/how-the-road-book-counts": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/how-the-road-book-counts/mark.md",
+      "class": "commons"
+    },
+    "lu-yu/to-the-lamp-house": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/yu-tai/to-the-lamp-house/mark.md",
+      "class": "home"
+    },
+    "crow/the-wall": {
+      "household": "the-rookery",
+      "path": "WORLD/marks/crow/the-wall/mark.md",
+      "class": "commons"
     }
   }
 }
