@@ -562,8 +562,8 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     : mistSelf.inWall ? mists.wallSightM
     : mistSelf.thickness > 0 ? dials.fog_sight_floor_m + (dials.fog_sight_ceiling_m - dials.fog_sight_floor_m) * Math.pow(1 - mistSelf.thickness, 3)
     : Infinity;
-  // A SIGNAL'S LIGHT IS VEILED TOO (Darko, 2026-10-09: "the Mists dim every
-  // light in the land, daylight and residents' signals alike"). A signal keeps
+  // A SIGNAL'S LIGHT IS VEILED TOO: the Mists dim every light in the land,
+  // daylight and residents' signals alike. A signal keeps
   // its own light at the dark end, as ever, but the light a reader is told it
   // shows (`dim`) is scaled by (1 − veil).
   //
