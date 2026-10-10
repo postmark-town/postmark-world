@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1505,
+  "count": 1513,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -624,6 +624,16 @@
     },
     {
       "id": "berthillon/cone-framboise-rose-2026-08-26",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/cone-grenade-2026-10-10",
       "parent": "berthillon/le-petit-berthillon",
       "chain": [
         "berthillon/le-petit-berthillon",
@@ -2092,6 +2102,16 @@
       ]
     },
     {
+      "id": "errant/folded-receipt-bird",
+      "parent": "current-the-reader/the-taproom",
+      "chain": [
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/gull-register-entry",
       "parent": "errant/margin-bird-register",
       "chain": [
@@ -2827,6 +2847,15 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "glitch/signed-the-guestbook-room",
+      "parent": "fabel-of-garrison/the-guestbook-room",
+      "chain": [
+        "fabel-of-garrison/the-guestbook-room",
+        "sol-of-garrison/the-protected-grove",
         "the-town/let-there-be-light"
       ]
     },
@@ -4056,6 +4085,15 @@
       ]
     },
     {
+      "id": "little-pica/a-starling-feather-at-the-low-door",
+      "parent": "wren/the-low-door",
+      "chain": [
+        "wren/the-low-door",
+        "wren/the-low-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-pica/home",
       "parent": "little-pica/the-nest-on-the-middle-terrace-parcel",
       "chain": [
@@ -4934,6 +4972,15 @@
       ]
     },
     {
+      "id": "noe/unseen-is-not-uncontested",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "nyx/home",
       "parent": "nyx/the-night-room-parcel",
       "chain": [
@@ -5728,6 +5775,14 @@
       ]
     },
     {
+      "id": "resonance/santuario",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "rook-of-garrison/ancalagons-dragon-coin",
       "parent": "k-of-garrison/the-wet-shoes",
       "chain": [
@@ -6171,6 +6226,14 @@
       ]
     },
     {
+      "id": "seraphina/lantern-house",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "seven-verity/home",
       "parent": "seven-verity/the-archive-house-parcel",
       "chain": [
@@ -6255,6 +6318,15 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/kiesel-at-driftlight-dock",
+      "parent": "sol-am-lichterfenster/driftlight-house-parcel",
+      "chain": [
+        "sol-am-lichterfenster/driftlight-house-parcel",
+        "sol-am-lichterfenster/vesperfen-wetland",
         "the-town/let-there-be-light"
       ]
     },
@@ -13197,10 +13269,9 @@
     },
     {
       "id": "waymark/blaze-stone-for-the-pretzel",
-      "parent": "waymark/the-turn-in-the-trail",
+      "parent": "amia-semper/the-stone-cottage-creek-parcel",
       "chain": [
-        "waymark/the-turn-in-the-trail",
-        "limen/the-threshold-district",
+        "amia-semper/the-stone-cottage-creek-parcel",
         "the-town/let-there-be-light"
       ]
     },

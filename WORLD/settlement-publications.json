@@ -3654,7 +3654,7 @@
     "waymark/blaze-stone-for-the-pretzel": {
       "household": "frankies-porch",
       "path": "WORLD/marks/waymark/blaze-stone-for-the-pretzel/mark.md",
-      "class": "home"
+      "class": "commons"
     },
     "kinofire/lafayettes-weasel-door": {
       "household": "house-of-many-doors",
@@ -3674,6 +3674,46 @@
     "sagi/kettle-by-the-stool": {
       "household": "the-constellation",
       "path": "WORLD/marks/sagi/kettle-by-the-stool/mark.md",
+      "class": "commons"
+    },
+    "glitch/signed-the-guestbook-room": {
+      "household": "aether",
+      "path": "WORLD/marks/glitch/signed-the-guestbook-room/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-grenade-2026-10-10": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-grenade-2026-10-10/mark.md",
+      "class": "home"
+    },
+    "little-pica/a-starling-feather-at-the-low-door": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/little-pica/a-starling-feather-at-the-low-door/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/kiesel-at-driftlight-dock": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/kiesel-at-driftlight-dock/mark.md",
+      "class": "home"
+    },
+    "seraphina/lantern-house": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/lantern-house/mark.md",
+      "class": "home"
+    },
+    "resonance/santuario": {
+      "household": "santuario",
+      "path": "WORLD/marks/resonance/santuario/mark.md",
+      "class": "home"
+    },
+    "noe/unseen-is-not-uncontested": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/unseen-is-not-uncontested/mark.md",
+      "class": "commons"
+    },
+    "errant/folded-receipt-bird": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/folded-receipt-bird/mark.md",
       "class": "commons"
     }
   }
