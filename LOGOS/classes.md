@@ -731,26 +731,7 @@ standpoint; a human's voice carried by the resident they stand with);
 (it sits on the ground and rides no speaker). Fog instead carries the
 family's one engine child: no verb makes fog — `fogModel` in the world
 engine brews it as a pure function of the crossing number, so any clone
-gets the same day. **Fog has a place, too: the Mists** (amended
-2026-10-09, POS-466). Beside the weather, which has no place, the world
-keeps a band of mist at the map's border. It still rides nothing and no
-verb makes it. Where it stands, how thick it is and how much daylight it
-takes are the town's own schedule (`skeleton.mists`, read by `mistsAt` in
-the world engine), a pure function of the crossing number like the
-weather, so replay holds. The band is a wall: from inside the map, nothing
-behind it can be seen, however tall it stands and whoever placed it, until
-the schedule pulls the wall back past it. On the map side, its fringe
-shortens sight the way the weather does, but with no ceiling.
-
-**Daylight gains its veil** (same amendment). The world's daylight is
-ambient physics, not an emission (Q4 of the reconciliation). The Mists'
-veil dims it: the light axis keeps its shape, and every place's light is
-scaled by (1 − veil), so the whole land darkens together. A signal's light
-is veiled too: the Mists dim every light in the land, daylight and
-residents' signals alike.
-
-*Ruled by Darko 2026-10-09 (the amendment as drafted, with signals veiled
-too); written in by Plumb on Wright's rail, POS-466.*
+gets the same day.
 
 **A season's voice** (amended 2026-10-09, POS-551). The town may declare a
 season: a schedule keyed to crossing numbers, written in the world's own

@@ -23,7 +23,7 @@
 // the office has explaining to do.
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
-import { DIALS, bearingDeg, quantizeBearing, mistsAt } from "../tools/world-engine.mjs";
+import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
@@ -746,18 +746,26 @@ export function departPaceKm(marks) {
   return Number.isFinite(pace) && pace > 0 ? pace : null;
 }
 
-export function previewWalkLeg({ from, toward, targetExtent = null, skeleton = null, paceKm = null } = {}) {
+// `at` is the clock (the live crossing unless a caller pins one, as a test must:
+// the Mists make the preview a function of the crossing).
+export function previewWalkLeg({ from, toward, targetExtent = null, skeleton = null, paceKm = null, at = fractionalCrossing() } = {}) {
   if (![from?.x, from?.y, toward?.x, toward?.y].every(Number.isFinite)) return null;
-  const at = fractionalCrossing();
+  // THE MISTS ON THIS ROAD (POS-468), read the way the office reads them at the
+  // declare: a road into the wall is no walk at all, and a road through the
+  // fringe walks at its slowed stride. No Mists, and nothing here changes.
+  const road = skeleton?.mists ? mistsRoad(from, toward, at, skeleton.mists) : null;
+  if (road?.refused) return { distanceM: 0, etaCrossings: 0, paceKm: 0, paceFromRecord: paceKm != null, viaCrossings: [], mistRefused: road.refused };
+  const stride = road && road.factor < 1 ? (paceKm ?? WALK_KM_PER_CROSSING) * road.factor : paceKm;
   // positionAt already speaks pace — a departure may carry its own stride and
   // the town dial governs when it does not. The preview simply never passed one.
-  const position = positionAt({ from, toward, at, targetExtent, pace: paceKm ?? undefined }, at);
+  const position = positionAt({ from, toward, at, targetExtent, pace: stride ?? undefined }, at);
   return {
     distanceM: position.legM,
     etaCrossings: position.etaCrossings,
-    paceKm: paceKm ?? WALK_KM_PER_CROSSING,
+    paceKm: stride ?? WALK_KM_PER_CROSSING,
     paceFromRecord: paceKm != null,
     viaCrossings: skeleton ? crossingsOnSegment(from, toward, skeleton) : [],
+    ...(road && road.factor < 1 ? { mist: { factor: road.factor, deepest: road.deepest } } : {}),
   };
 }
 
@@ -11371,7 +11379,7 @@ export function mountViewer(appEl) {
   // routes and only the mark one was ever guarded. A walk to where you already
   // stand is not a walk, and the record should not carry one.
   function isRealDeparture(preview) {
-    return !!preview && Number(preview.leg?.distanceM) > 0;
+    return !!preview && Number(preview.leg?.distanceM) > 0 && !preview.leg?.mistRefused;
   }
 
   function walkPreviewTo(point) {

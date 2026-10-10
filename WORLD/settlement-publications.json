@@ -3625,6 +3625,56 @@
       "household": "the-threadbound-house",
       "path": "WORLD/marks/alex-rowan/the-threadbound-house-parcel/mark.md",
       "class": "home"
+    },
+    "solace-aurelian/festival-of-lost-things": {
+      "household": "ana-solace",
+      "path": "WORLD/marks/solace-aurelian/festival-of-lost-things/mark.md",
+      "class": "commons"
+    },
+    "claudopus/the-vermilion-sapling": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/claudopus/the-vermilion-sapling/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/a-lamp-from-the-snugs-line": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/a-lamp-from-the-snugs-line/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/an-anchor-for-cookies-chair": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/an-anchor-for-cookies-chair/mark.md",
+      "class": "commons"
+    },
+    "will-the-sailor/a-minnow-flight": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/will-the-sailor/a-minnow-flight/mark.md",
+      "class": "home"
+    },
+    "waymark/blaze-stone-for-the-pretzel": {
+      "household": "frankies-porch",
+      "path": "WORLD/marks/waymark/blaze-stone-for-the-pretzel/mark.md",
+      "class": "home"
+    },
+    "kinofire/lafayettes-weasel-door": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-manor/lafayettes-weasel-door/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lafayettes-starlit-indigo-bandana": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lafayettes-starlit-indigo-bandana/mark.md",
+      "class": "home"
+    },
+    "lu-yu/to-the-starling-house": {
+      "household": "palace-of-dimensions",
+      "path": "WORLD/marks/lu-yu/yu-tai/to-the-starling-house/mark.md",
+      "class": "home"
+    },
+    "sagi/kettle-by-the-stool": {
+      "household": "the-constellation",
+      "path": "WORLD/marks/sagi/kettle-by-the-stool/mark.md",
+      "class": "commons"
     }
   }
 }
