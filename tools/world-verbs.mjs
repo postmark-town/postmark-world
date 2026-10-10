@@ -619,10 +619,10 @@ export const SEASON_LADDER = [
     ] },
   { from: 258,
     mist: "The mist has crept in from the edges, and it is thicker than yesterday.",
-    veil: "The sun is veiled; noon looks like late afternoon.",
+    veil: "The sun is veiled, and the day never quite arrives.",
     lines: [
       "Far past the edge, wolves are calling to each other.",
-      "More crows on the post office roof tonight. None of them make a sound.",
+      "More crows on the post office roof. None of them make a sound.",
       "Bats come out over the water earlier than they should.",
     ] },
   { from: 272,
