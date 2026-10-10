@@ -604,6 +604,20 @@ export function seasonLine(m, crossing) {
   const rung = SEASON_LINES.filter((r) => m.veil >= r.veil).at(-1);
   return rung ? rung.lines[Math.abs(crossing | 0) % rung.lines.length] : null;
 }
+// A rung keyed to the crossing number itself, for a line whose crossing the veil
+// can't name (the veil holds at its deepest from 282). DRAFTED (POS-551, for
+// Darko's word on the LOGOS season's voice): the page reads it; the telling does
+// not speak it until it is ruled, so seasonLine above is unchanged.
+export const SEASON_LINES_BY_CROSSING = [
+  { from: 284, lines: ["Every lantern in town leans a little north, as if the dark there were drawing breath."] },
+];
+/** Every season line a page shows at this crossing, oldest rung first: the
+ *  veil's line (the telling's own), then any crossing rung reached. */
+export function seasonLines(m, crossing) {
+  if (!m) return [];
+  const pick = (r) => r.lines[Math.abs(crossing | 0) % r.lines.length];
+  return [seasonLine(m, crossing), ...SEASON_LINES_BY_CROSSING.filter((r) => (crossing | 0) >= r.from).map(pick)].filter(Boolean);
+}
 
 /**
  * THE AIR, IN ONE LINE (POS-551): light, fog and the Mists at a standpoint, from

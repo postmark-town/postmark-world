@@ -153,3 +153,16 @@ test("the creatures: seeded by the crossing, sparse at 244 and populated by 284,
   assert.ok(counts[0] >= 3 && counts[2] >= 25, `sparse but present at 244, populated at 284 (${counts.join(", ")})`);
   assert.deepEqual(mistsCreatures(null), [], "no Mists, no creatures");
 });
+
+test("the page's season lines: the telling's bell from veil 0.3, and the drafted lanterns from 284, which the telling does not speak", async () => {
+  const { seasonLine, seasonLines } = await import("./world-verbs.mjs");
+  assert.deepEqual(seasonLines(null, 284), []);
+  assert.deepEqual(seasonLines(mistsAt(244, MISTS), 244), []);
+  const bell = seasonLine(mistsAt(272, MISTS), 272);
+  assert.ok(bell, "the bell from 272");
+  assert.deepEqual(seasonLines(mistsAt(272, MISTS), 272), [bell]);
+  const at284 = seasonLines(mistsAt(284, MISTS), 284);
+  assert.equal(at284.length, 2);
+  assert.match(at284[1], /lantern/);
+  assert.equal(seasonLine(mistsAt(284, MISTS), 284), bell, "the telling's line is unchanged");
+});
