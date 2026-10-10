@@ -120,3 +120,10 @@ test("THE PAGE'S PREVIEW reads the same road: slowed in the fringe, and no walk 
   assert.ok(wall.mistRefused);
   assert.equal(wall.distanceM, 0);
 });
+
+test("A STOP is never refused: standing still goes nowhere, even where the wall has come", () => {
+  for (const c of [FIRST, LAST]) {
+    const inWall = roadTo(faceN(c) - 100);
+    assert.deepEqual(mistsRoad(inWall, inWall, c, MISTS), { factor: 1, deepest: 0 });
+  }
+});
