@@ -38,7 +38,7 @@ import { parseEnterExitLedger, occupancyAt, occupantsOf, withinOf, isMark, isEnt
 // is not allowed to hold one, and `tools/record-sources.test.mjs` reads these
 // bytes to prove it.
 import { recordSources, recordAbsenceMessage } from "../tools/record-sources.mjs";
-import { MISTS_PAINT, mistsBakePlan, mistsBaker, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureSVG, bellFor, ringBell } from "./mists-render.mjs";
+import { MISTS_PAINT, bakeSheetFeather, mistsBakePlan, mistsBaker, mistsKeepRasterBuilder, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureSVG, bellFor, ringBell } from "./mists-render.mjs";
 // THE PARCEL'S COLUMN — the atlas's right-hand panel, back (Keemin 2026-09-11).
 // It owns its own markdown reader, its own builder and its own dress, and it
 // takes no viewer internals: the door read, the shelf gate and the handle rule
@@ -3909,6 +3909,7 @@ const MISTS_INK_FLAT = "#b7bec8";
 const mistsBaked = new Map();          // a crossing's baked paint, kept while it is on screen
 const mistsOnce = new Set();           // sessionStorage's stand-in when storage is shut
 const mistsBaking = new Set();         // crossings whose paint is being baked
+let mistsFeather = null;               // the sheet's feathered edge, baked once
 const mistsBellState = { ctx: null, out: null, rung: false, armed: false };
 const MISTS_FAR_M = 200000;    // the wall runs out past anything the camera can reach
 export function mistsVeilSVG(m, { originPx, mPerPx }) {
@@ -9837,11 +9838,18 @@ export function mountViewer(appEl) {
     // the town the paint keeps clear: every sited mark the world holds (the
     // whole fold, not the resident path's ground set)
     const keepMarks = data?.worldState?.marks ?? allMarks();
+    // the painted sheet's own rectangle, in metres: the fog stands past it too
+    const { originPx: o0, mPerPx: s0, full: fv0 } = mapCtx;
+    const frame = fv0 ? { minX: (fv0.x - o0.x) * s0, minY: (fv0.y - o0.y) * s0, maxX: (fv0.x + fv0.w - o0.x) * s0, maxY: (fv0.y + fv0.h - o0.y) * s0 } : null;
+    const drawn = m;
+    m = frame ? { ...m, frame } : m;
+    // the sheet's straight edge, feathered into the open country (under the record)
+    if (frame) setTimeout(() => { if (mapCtx) paintSheetFeather(frame); }, 0);   // its own task, after the wall
     const key = JSON.stringify(m) + "|" + (keepMarks?.length ?? 0);
     const baked = mistsBaked.get(key);
     // not baked yet: bake it a piece at a time between frames (the vector wall
     // already stands), then paint, if this crossing is still the one on screen
-    if (!baked) { bakeMists(m, key, mistsKeepRects(keepMarks)); mistsBellButton(m); return; }
+    if (!baked) { bakeMists(m, key, mistsKeepRects(keepMarks), JSON.stringify(drawn)); mistsBellButton(drawn); return; }
     const { originPx, mPerPx } = mapCtx, n = (v) => v.toFixed(1);
     let html = "";
     // the creatures, in the back layer's banks (so the front layers veil them)
@@ -9863,29 +9871,55 @@ export function mountViewer(appEl) {
     mistsIntro(m, g);
     mistsBellButton(m);
   }
-  function bakeMists(m, key, keepRects) {
+  function bakeMists(m, key, keepRects, drawnKey) {
     if (mistsBaking.has(key)) return;
     mistsBaking.add(key);
-    const plan = mistsBakePlan(m), out = [];
-    let baker = null, rows = 8;
+    const plan = mistsBakePlan(m), out = [], rasters = new Map();
+    let baker = null, rows = 2, building = null, per = 2;
+    // every slice is timed and sized to stay near 6 ms (starting small, growing at
+    // most twofold a slice), so a slow phone keeps its frames
+    const timed = (fn, n, set) => { const t = performance.now(); const more = fn(n); const ms = performance.now() - t; set(Math.max(1, Math.min(400, Math.round(n * Math.min(2, ms > 0 ? 6 / ms : 2))))); return more; };
     const step = () => {
       const p = plan[out.length];
-      baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, keepRects, canvas: document.createElement("canvas") });
+      const rk = p.box.minX + "," + p.box.minY + "," + p.pxM;
+      if (!rasters.has(rk)) {
+        building = building ?? mistsKeepRasterBuilder(keepRects, p.box, p.pxM);
+        if (timed((n) => building.next(n), per, (n) => { per = n; })) { setTimeout(step, 0); return; }
+        rasters.set(rk, building.raster); building = null;
+      }
+      baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, keepRaster: rasters.get(rk), canvas: document.createElement("canvas") });
       // a slice of rows, sized to stay near 8 ms, so a phone keeps its frames
-      const t = performance.now();
-      const more = baker.next(rows);
-      const ms = performance.now() - t;
-      rows = Math.max(2, Math.min(200, Math.round(rows * (ms > 0 ? 8 / ms : 2))));
-      if (more) { setTimeout(step, 0); return; }
-      out.push({ li: p.li, box: p.box, w: baker.width * p.pxM, h: baker.height * p.pxM, url: baker.canvas.toDataURL("image/png") });
-      baker = null;
-      if (out.length < plan.length) { setTimeout(step, 0); return; }
-      mistsBaking.delete(key);
-      mistsBaked.set(key, out);
-      if (mistsBaked.size > 4) mistsBaked.delete(mistsBaked.keys().next().value);
-      if (mapCtx?.mistsKey === JSON.stringify(m)) paintMists(m);
+      if (timed((n) => baker.next(n), rows, (n) => { rows = n; })) { setTimeout(step, 0); return; }
+      // encoded off the main thread; the page shows it by an object URL
+      const done = baker; baker = null;
+      done.canvas.toBlob((blob) => {
+        out.push({ li: p.li, box: p.box, w: done.width * p.pxM, h: done.height * p.pxM, url: blob ? URL.createObjectURL(blob) : done.canvas.toDataURL("image/png") });
+        if (out.length < plan.length) { setTimeout(step, 0); return; }
+        mistsBaking.delete(key);
+        mistsBaked.set(key, out);
+        if (mistsBaked.size > 4) { const old = mistsBaked.keys().next().value; for (const b of mistsBaked.get(old)) if (b.url.startsWith("blob:")) URL.revokeObjectURL(b.url); mistsBaked.delete(old); }
+        if (mapCtx?.mistsKey === drawnKey) paintMists(JSON.parse(drawnKey));
+      }, "image/png");
     };
     setTimeout(step, 0);
+  }
+  function paintSheetFeather(frame) {
+    const night = (getComputedStyle(mapCtx.svg).getPropertyValue("--night") || "#14171d").trim();
+    const key = JSON.stringify(frame) + night;
+    if (!mistsFeather || mistsFeather.key !== key) {
+      const colour = /^#[0-9a-f]{6}$/i.test(night) ? night : "#14171d";
+      const fb = bakeSheetFeather(frame, colour, { canvas: document.createElement("canvas") });
+      mistsFeather = { key, ...fb, url: fb.canvas.toDataURL("image/png") };
+    }
+    const { originPx, mPerPx } = mapCtx, n = (x) => x.toFixed(1), F = mistsFeather;
+    mapCtx.svg.querySelector(".wv-sheet-feather")?.remove();
+    // on the sheet's ground: just under the first region (or the placed art), so
+    // the regions and everything on them stay whole on top of it
+    const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+    for (const [k, val] of Object.entries({ class: "wv-sheet-feather", "pointer-events": "none", "aria-hidden": "true", href: F.url, preserveAspectRatio: "none",
+      x: n(originPx.x + F.box.minX / mPerPx), y: n(originPx.y + F.box.minY / mPerPx), width: n(F.w / mPerPx), height: n(F.h / mPerPx) })) img.setAttribute(k, val);
+    const under = mapCtx.svg.querySelector(":scope > g.region") ?? mapCtx.placedArtLayer;
+    mapCtx.svg.insertBefore(img, under);
   }
   function sessionOnce(k) {
     try { if (sessionStorage.getItem(k)) return false; sessionStorage.setItem(k, "1"); return true; }

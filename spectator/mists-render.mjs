@@ -30,15 +30,19 @@ export const MISTS_PAINT = {
   cornerM: 600,          // the clear ground's corners, rounded into banks
   depthM: 1600,          // from the face to the core's full darkness
   softM: 50,             // a bank's own soft edge, inside the clear ground only
-  pxM: 36,               // metres per baked pixel (the fog is soft; this keeps a phone's bake small)
+  pxM: 56,               // metres per baked pixel, upscaled smooth (the fog is soft; this keeps a phone's bake small)
   clearingPx: 320,       // a clearing's bake is at most this many pixels across (they are far off)
   clearingLayers: 2,     // and takes the back two layers only
-  keepM: 360,            // the town's margin: past the widest drift (200 m along, 90 across) and its soft edge, so a drifting bank never reaches a mark
-  keepSoftM: 120,        // the margin's soft edge
+  keepM: 440,            // the town's margin: past its soft edge plus the widest drift (200 m along, 90 across), so a drifting bank never reaches a mark
+  keepSoftM: 200,        // the margin's soft edge
+  keepNoiseM: 420,       // the margin grows by up to this much, by noise, so its edge is ragged (never less than keepM)
+  frameInsetM: 260,      // how far over the painted sheet's own edge the fog reaches before its noise
   townMaxM: 2600,        // past this a mark is open country, not the town
+  faceRampM: 80,         // the least band over which the wall's face rises inside the town's margin
+  faceClearM: 70,        // and no part of that band comes nearer a mark than this
   keepHaze: 0.06,        // the most any one layer may lay over the town (three of them: under 0.2)
   layers: [              // back to front: the back layer is the opaque one
-    { seed: 11, scaleM: 2600, wispM: 700, reach: 1.0, alpha: 1.0, driftM: 90, driftS: 71 },
+    { seed: 11, scaleM: 2600, wispM: 700, reach: 1.0, alpha: 1.0, driftM: 0, driftS: 71 },   // the opaque layer holds still; the weather drifts over it
     { seed: 23, scaleM: 1700, wispM: 480, reach: 0.75, alpha: 0.55, driftM: 140, driftS: 53 },
     { seed: 37, scaleM: 1100, wispM: 320, reach: 1.6, alpha: 0.32, driftM: 200, driftS: 37 },
   ],
@@ -108,7 +112,11 @@ export function mistsReachM(m) {
  */
 export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const L = MISTS_PAINT.layers[layer], reach = mistsReachM(m) * L.reach;
-  const dTrue = mistsTrueDistance(m, x, y), dPaint = Math.max(paintDistance(m, x, y), dTrue);
+  const dTrue = mistsTrueDistance(m, x, y);
+  // the sheet's edge is a face too: past it the fog may stand, and it reaches in
+  // over the edge by frameInsetM, so the sheet's straight sides never show
+  const dFrame = m.frame ? sdBox(x, y, m.frame) + MISTS_PAINT.frameInsetM : -Infinity;
+  const dPaint = Math.max(paintDistance(m, x, y), dTrue, dFrame);
   // the visible face, pushed inward by the noise and never outward (offset ≤ 0)
   // (two scales, the long banks and their tongues, stretched apart so the reach is uneven)
   const v = smooth(0.32, 0.68, 0.65 * mistsFbm(x / L.scaleM, y / L.scaleM, L.seed) + 0.35 * mistsFbm(x * 4 / L.scaleM, y * 4 / L.scaleM, L.seed + 3));
@@ -130,6 +138,14 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   // their drift never carries the wall's paint onto a mark.
   const k = keep ? keep(x, y) : 0;
   if (k > 0 && (layer > 0 || !(dTrue > 0))) alpha = Math.min(alpha, alpha + (MISTS_PAINT.keepHaze - alpha) * k);
+  // where the town's margin meets the wall's face, the back layer does not step
+  // from haze to wall in a straight line: it rises over a ragged band, starting
+  // 80-128 m out from the face (the nearest mark to any face, 130 m, keeps more)
+  if (layer === 0 && k > 0) {
+    const room = (keep.dist ? keep.dist(x, y) : 0) - MISTS_PAINT.faceClearM;   // how far the nearest mark stands, less its clearance
+    const width = Math.min(MISTS_PAINT.faceRampM + 600 * smooth(0.35, 0.65, mistsFbm(x / 900, y / 900, 151, 3)), room);
+    if (width > 20) alpha = Math.max(alpha, smooth(-width, 0, dTrue));
+  }
   if (layer === 0 && dTrue > 0) alpha = 1;
   return { alpha, depth };
 }
@@ -154,12 +170,23 @@ export function mistsKeepRects(marks) {
 /** How kept-clear a point is, 0..1: 1 within a mark's margin less the soft
  *  band, 0 outside every rectangle. Pure (the tests' instrument); the bake uses
  *  a raster of the same rule. */
+// two scales stretched apart (as the banks' edge is), so the margin's edge wanders well clear of a straight line
+const keepWobble = (x, y) => MISTS_PAINT.keepNoiseM * smooth(0.4, 0.6, 0.6 * mistsFbm(x / 650, y / 650, 71, 3) + 0.4 * mistsFbm(x / 210, y / 210, 73, 2));
+const KEEP_CELL = 1000;
 export function mistsKeepAt(rects) {
-  const g = MISTS_PAINT.keepM, soft = MISTS_PAINT.keepSoftM;
-  return (x, y) => {
-    let k = 0;
-    for (const r of rects) {
-      if (x < r.minX || x > r.maxX || y < r.minY || y > r.maxY) continue;
+  const soft = MISTS_PAINT.keepSoftM, pad = MISTS_PAINT.keepNoiseM;
+  // bucket the rectangles (each with its ragged pad) by 1 km cell
+  const cells = new Map(), cellOf = (v) => Math.floor(v / KEEP_CELL);
+  for (const r of rects)
+    for (let cx = cellOf(r.minX - pad); cx <= cellOf(r.maxX + pad); cx++)
+      for (let cy = cellOf(r.minY - pad); cy <= cellOf(r.maxY + pad); cy++) {
+        const k = cx + "," + cy; let list = cells.get(k); if (!list) cells.set(k, (list = [])); list.push(r);
+      }
+  const keep = (x, y) => {
+    let k = 0, g = null;
+    for (const r of cells.get(cellOf(x) + "," + cellOf(y)) ?? []) {
+      if (x < r.minX - pad || x > r.maxX + pad || y < r.minY - pad || y > r.maxY + pad) continue;
+      if (g === null) g = MISTS_PAINT.keepM + keepWobble(x, y);
       // how far outside the mark's own extent (0 inside it): the margin is round at the corners
       const d = Math.hypot(Math.max(r.cx0 - x, 0, x - r.cx1), Math.max(r.cy0 - y, 0, y - r.cy1));
       k = Math.max(k, Math.max(0, Math.min(1, (g - d) / soft)));
@@ -167,15 +194,32 @@ export function mistsKeepAt(rects) {
     }
     return k;
   };
+  // how far the nearest mark's own extent is (Infinity past every margin)
+  keep.dist = (x, y) => {
+    let best = Infinity;
+    for (const r of cells.get(cellOf(x) + "," + cellOf(y)) ?? [])
+      best = Math.min(best, Math.hypot(Math.max(r.cx0 - x, 0, x - r.cx1), Math.max(r.cy0 - y, 0, y - r.cy1)));
+    return best;
+  };
+  return keep;
+}
+/** The keep-out raster built a slice of rectangles at a time: `next(n)` adds the
+ *  next n and answers true while some remain; `raster` is the result. */
+export function mistsKeepRasterBuilder(rects, box, pxM) {
+  const all = mistsKeepRaster([], box, pxM), list = rects.slice();
+  let i = 0;
+  return { raster: all, next(n = list.length) { for (const end = Math.min(list.length, i + n); i < end; i++) all.add(list[i]); return i < list.length; } };
 }
 /** The keep-out as a raster over a bake box (one cell per baked pixel). */
 export function mistsKeepRaster(rects, box, pxM) {
   const w = Math.max(1, Math.ceil((box.maxX - box.minX) / pxM)), h = Math.max(1, Math.ceil((box.maxY - box.minY) / pxM));
-  const grid = new Float32Array(w * h), g = MISTS_PAINT.keepM, soft = MISTS_PAINT.keepSoftM;
-  for (const r of rects) {
-    if (r.maxX < box.minX || r.minX > box.maxX || r.maxY < box.minY || r.minY > box.maxY) continue;
-    const i0 = Math.max(0, Math.floor((r.minX - box.minX) / pxM) - 1), i1 = Math.min(w - 1, Math.ceil((r.maxX - box.minX) / pxM) + 1);
-    const j0 = Math.max(0, Math.floor((r.minY - box.minY) / pxM) - 1), j1 = Math.min(h - 1, Math.ceil((r.maxY - box.minY) / pxM) + 1);
+  const grid = new Float32Array(w * h), near = new Float32Array(w * h).fill(Infinity), soft = MISTS_PAINT.keepSoftM, pad = MISTS_PAINT.keepNoiseM;
+  const wob = new Map();
+  const gAt = (i, j, x, y) => { const o = j * w + i; let v = wob.get(o); if (v === undefined) { v = MISTS_PAINT.keepM + keepWobble(x, y); wob.set(o, v); } return v; };
+  const add = (r) => {
+    if (r.maxX + pad < box.minX || r.minX - pad > box.maxX || r.maxY + pad < box.minY || r.minY - pad > box.maxY) return;
+    const i0 = Math.max(0, Math.floor((r.minX - pad - box.minX) / pxM) - 1), i1 = Math.min(w - 1, Math.ceil((r.maxX + pad - box.minX) / pxM) + 1);
+    const j0 = Math.max(0, Math.floor((r.minY - pad - box.minY) / pxM) - 1), j1 = Math.min(h - 1, Math.ceil((r.maxY + pad - box.minY) / pxM) + 1);
     for (let j = j0; j <= j1; j++) {
       const y = box.minY + (j + 0.5) * pxM;
       for (let i = i0; i <= i1; i++) {
@@ -183,20 +227,24 @@ export function mistsKeepRaster(rects, box, pxM) {
         // from the cell's centre, less most of a cell, so the raster is never less
         // kept than the pure rule anywhere in the cell, and still ramps smoothly
         const d = Math.hypot(Math.max(r.cx0 - x, 0, x - r.cx1), Math.max(r.cy0 - y, 0, y - r.cy1)) - pxM * 0.75;
-        const k = Math.max(0, Math.min(1, (g - d) / soft)), o = j * w + i;
+        const k = Math.max(0, Math.min(1, (gAt(i, j, x, y) - d) / soft)), o = j * w + i;
         if (k > grid[o]) grid[o] = k;
+        if (d < near[o]) near[o] = Math.max(0, d);
       }
     }
-  }
-  return { w, h, at: (i, j) => grid[j * w + i] };
+  };
+  for (const r of rects) add(r);
+  return { w, h, add, at: (i, j) => grid[j * w + i], dist: (i, j) => near[j * w + i] };
 }
 
 // ── colour ──────────────────────────────────────────────────────────────────
 function rgbOf(hex) { return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)); }
 /** The fog's colour at a depth for this veil: the tint at the face, toward
  *  near-black at the core, all of it dimmed by the veil. */
+const rgbCache = new Map();
 export function mistsColourAt(m, depth, tint = MISTS_TINT) {
-  const [r, g, b] = rgbOf(tint), veil = m?.veil ?? 0;
+  let c = rgbCache.get(tint); if (!c) rgbCache.set(tint, (c = rgbOf(tint)));
+  const [r, g, b] = c, veil = m?.veil ?? 0;
   const dark = Math.min(0.92, 0.12 * veil / 0.5 + depth * (0.55 + 0.3 * veil / 0.5));
   return [r, g, b].map((v) => Math.round(v * (1 - dark)));
 }
@@ -226,14 +274,14 @@ export function mistsBakePlan(m) {
 /** A bake of one layer over `box`, a band of rows at a time, so a page can
  *  spread it across frames: `next(rows)` paints the next rows and answers true
  *  while rows remain; `canvas` holds the result once done. */
-export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT.pxM, canvas = null, keepRects = null } = {}) {
+export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT.pxM, canvas = null, keepRects = null, keepRaster = null } = {}) {
   const w = Math.max(1, Math.ceil((box.maxX - box.minX) / pxM)), h = Math.max(1, Math.ceil((box.maxY - box.minY) / pxM));
   const cv = canvas ?? (typeof OffscreenCanvas === "function" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h }));
   cv.width = w; cv.height = h;
   const ctx = cv.getContext("2d"), img = ctx.createImageData(w, h), px = img.data;
   const far = mistsReachM(m) * MISTS_PAINT.layers[layer].reach + (m.fringeM || 0) + MISTS_PAINT.softM;
   const core = mistsColourAt(m, 1, tint), coreA = Math.round((layer === 0 ? 1 : MISTS_PAINT.layers[layer].alpha) * 255);
-  const kr = keepRects?.length ? mistsKeepRaster(keepRects, box, pxM) : null;
+  const kr = keepRaster ?? (keepRects?.length ? mistsKeepRaster(keepRects, box, pxM) : null);
   let j = 0;
   return {
     canvas: cv, width: w, height: h,
@@ -248,7 +296,7 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
           // past the core's depth it is the core, whatever the noise says
           if (dT >= MISTS_PAINT.depthM) { px[o] = core[0]; px[o + 1] = core[1]; px[o + 2] = core[2]; px[o + 3] = coreA; continue; }
           const kv = kr ? kr.at(i, j) : 0;
-          const { alpha, depth } = mistsRenderAt(m, x, y, layer, kv > 0 ? () => kv : null);
+          const { alpha, depth } = mistsRenderAt(m, x, y, layer, kv > 0 ? Object.assign(() => kv, { dist: () => kr.dist(i, j) }) : null);
           const [r, g, b] = mistsColourAt(m, depth, tint);
           px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = Math.round(alpha * 255);
         }
@@ -318,7 +366,8 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
     // a three: two more close by, if they too stand clear of the town
     for (const [dx, dy] of [[1.6, -0.7], [-1.3, 0.9]]) {
       const x = lead.x + dx * lead.sizeM, y = lead.y + dy * lead.sizeM;
-      if (clearOfTown(x, y, lead.sizeM * 0.8)) out.push({ ...lead, x: Math.round(x), y: Math.round(y), sizeM: Math.round(lead.sizeM * 0.8), phase: +r().toFixed(3) });
+      const dd = mistsTrueDistance(m, x, y);
+      if (dd >= -reach * 0.8 && dd <= 220 && clearOfTown(x, y, lead.sizeM * 0.8)) out.push({ ...lead, x: Math.round(x), y: Math.round(y), sizeM: Math.round(lead.sizeM * 0.8), phase: +r().toFixed(3) });
     }
   }
   return out;
@@ -409,4 +458,39 @@ export function ringBell(ctx, dest, when, bell) {
     end = Math.max(end, t - when + strikeBell(ctx, dest, t, { prime: bell.prime, gain: bell.gain * (s ? 0.8 : 1) }));
   }
   return end;
+}
+
+// ── the sheet's edge, feathered (POS-553 review) ────────────────────────────
+// The painted sheet is a rectangle, and where the fog thins over the town's
+// margin its straight sides would show. So its edge is feathered into the open
+// country's own colour: a ragged band under the record (the marks stay on top),
+// opaque at the sheet's edge and gone sheetFeatherM inside it. It lies on the
+// sheet's ground, under the regions and their art, so nothing a resident made
+// is cut by it.
+export const MISTS_SHEET = { featherM: 560, wobbleM: 420, pxM: 90 };   // the feather is soft: a coarse bake, upscaled smooth
+/** How much of the open country covers the sheet at a point, 0..1. Pure. */
+export function mistsSheetFeatherAt(frame, x, y) {
+  const wob = 0.65 * mistsFbm(x / 2200, y / 2200, 97, 3) + 0.35 * mistsFbm(x / 600, y / 600, 131, 2);
+  const d = sdBox(x, y, frame) + MISTS_SHEET.wobbleM * (wob - 0.5) * 2.4;
+  return smooth(-MISTS_SHEET.featherM, 0, d);
+}
+/** The feather baked over the sheet's border, in the open country's colour. */
+export function bakeSheetFeather(frame, colour, { canvas = null, pxM = MISTS_SHEET.pxM } = {}) {
+  const pad = MISTS_SHEET.wobbleM + 2 * pxM;
+  const box = { minX: frame.minX - pad, minY: frame.minY - pad, maxX: frame.maxX + pad, maxY: frame.maxY + pad };
+  const w = Math.ceil((box.maxX - box.minX) / pxM), h = Math.ceil((box.maxY - box.minY) / pxM);
+  const cv = canvas ?? Object.assign(document.createElement("canvas"), { width: w, height: h });
+  cv.width = w; cv.height = h;
+  const ctx = cv.getContext("2d"), img = ctx.createImageData(w, h), px = img.data, [r, g, b] = rgbOf(colour);
+  const inner = MISTS_SHEET.featherM + MISTS_SHEET.wobbleM + pxM;
+  for (let j = 0; j < h; j++) {
+    const y = box.minY + (j + 0.5) * pxM;
+    for (let i = 0; i < w; i++) {
+      const x = box.minX + (i + 0.5) * pxM, o = (j * w + i) * 4;
+      if (sdBox(x, y, frame) < -inner) continue;   // deep inside the sheet: nothing
+      px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = Math.round(255 * mistsSheetFeatherAt(frame, x, y));
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  return { canvas: cv, box, w: w * pxM, h: h * pxM };
 }

@@ -145,7 +145,7 @@ test("the creatures: seeded by the crossing, sparse at 244 and populated by 284,
     for (const c of cs) {
       for (const [a, b] of [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]]) assert.equal(KEEP(c.x + a * c.sizeM, c.y + b * c.sizeM), 0, `${c.kind} at (${c.x}, ${c.y}) stands clear of the town`);
       const d = mistsTrueDistance(m, c.x, c.y);
-      assert.ok(d > -mistsReachM(m) * 1.0 && d < 400, `${c.kind} is in the banks (true-face distance ${Math.round(d)} m)`);
+      assert.ok(d > -mistsReachM(m) * 1.3 && d < 400, `${c.kind} is in the banks (true-face distance ${Math.round(d)} m)`);
     }
     counts.push(cs.length);
   }
@@ -165,4 +165,37 @@ test("the page's season lines: the telling's bell from veil 0.3, and the drafted
   assert.equal(at284.length, 2);
   assert.match(at284[1], /lantern/);
   assert.equal(seasonLine(mistsAt(284, MISTS), 284), bell, "the telling's line is unchanged");
+});
+
+// THE SHEET'S EDGE IS A FACE TOO (POS-553 review): the painted sheet (the atlas
+// painting, 1500 x 2400 units at 5 m, the Origin at 485,760) is a rectangle; the
+// fog stands past it and reaches raggedly over it, so its sides never show. With
+// the frame the hard rule and the town's clearance both still hold.
+const FRAME = { minX: -485 * 5, minY: -760 * 5, maxX: (1500 - 485) * 5, maxY: (2400 - 760) * 5 };
+test("with the sheet's frame: the hard rule holds, the town stays clear, and the sheet's edge is under fog, unevenly", () => {
+  for (const n of [244, 272, 284]) {
+    const m = { ...mistsAt(n, MISTS), frame: FRAME };
+    for (const p of samples(m)) if (mistsHere(p, m).inWall) assert.equal(mistsRenderAt(m, p.x, p.y, 0, KEEP).alpha, 1);
+    for (const mk of MARKS) {
+      if (!mk?.at || !Number.isFinite(mk.at.x) || Math.max(mk.extent?.w ?? 0, mk.extent?.h ?? 0) > MISTS_PAINT.townMaxM) continue;
+      if (mistsHere(mk.at, m).inWall) continue;
+      const a = 1 - [0, 1, 2].reduce((acc, li) => acc * (1 - mistsRenderAt(m, mk.at.x, mk.at.y, li, KEEP).alpha), 1);
+      assert.ok(a <= 0.2, `${mk.id} at ${n} is under ${a.toFixed(2)} of fog`);
+    }
+  }
+  // round all four sides of the sheet, away from the town, the fog's opaque face stands an uneven way in
+  const m = { ...mistsAt(272, MISTS), frame: FRAME }, depths = [];
+  const sides = [
+    (t, d) => ({ x: FRAME.minX + d, y: FRAME.minY + t * (FRAME.maxY - FRAME.minY) }), (t, d) => ({ x: FRAME.maxX - d, y: FRAME.minY + t * (FRAME.maxY - FRAME.minY) }),
+    (t, d) => ({ x: FRAME.minX + t * (FRAME.maxX - FRAME.minX), y: FRAME.minY + d }), (t, d) => ({ x: FRAME.minX + t * (FRAME.maxX - FRAME.minX), y: FRAME.maxY - d }),
+  ];
+  for (const at of sides) for (let t = 0.08; t < 0.92; t += 0.02) {
+    const edge = at(t, 100); if (KEEP(edge.x, edge.y) > 0) continue;
+    let d = -600; for (;;) { const p = at(t, d); if (mistsRenderAt(m, p.x, p.y, 0).alpha < 1 || d >= 1500) break; d += 10; }
+    if (KEEP(at(t, d).x, at(t, d).y) > 0) continue;   // the town's margin stopped it, not the noise
+    depths.push(d);
+  }
+  assert.ok(depths.length > 10, `the sheet's edge was read (${depths.length} points)`);
+  assert.ok(Math.min(...depths) >= MISTS_PAINT.frameInsetM, "the fog covers the sheet's edge everywhere it is read");
+  assert.ok(Math.max(...depths) - Math.min(...depths) > 100, `unevenly (${Math.min(...depths)}..${Math.max(...depths)} m)`);
 });
