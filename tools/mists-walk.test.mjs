@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { mistsAt, mistsRoad, mistsStride, MISTS_STRIDE_FLOOR, MISTS_WALL_STRIDE } from "./world-engine.mjs";
+import { mistsAt, mistsRoad, mistsStride, MISTS_STRIDE_FLOOR, MISTS_WALL_STRIDE, MISTS_OUT_GRADE } from "./world-engine.mjs";
 import { formatDeparture, parseWalkLedger, positionAt } from "./walk.mjs";
 import { previewWalkLeg } from "../spectator/viewer.mjs";
 
@@ -168,4 +168,15 @@ test("THE WALK OUT: a walker the wall has overtaken may walk straight out, slowl
   const time = (from) => { const r = mistsRoad(from, end, FIRST, MISTS); return Math.hypot(end.x - from.x, end.y - from.y) / r.factor; };
   const extra = time({ x: 0, y: -4900 }) - time(caught);
   assert.ok(Math.abs(extra - 200 / MISTS_WALL_STRIDE) < 0.02 * (200 / MISTS_WALL_STRIDE), `200 m of wall walks as ${extra.toFixed(1)} m of open road (expected ${(200 / MISTS_WALL_STRIDE).toFixed(1)})`);
+});
+
+test("STRAIGHT OUT means straight out: while in the wall or the deep fringe the road must point within 45° of outward; a glide along the wall is refused", () => {
+  const caught = { x: 0, y: -4700 };                                   // 100 m behind the north face at the first crossing
+  const toward = (deg, len, from = caught) => ({ x: from.x + len * Math.sin((deg * Math.PI) / 180), y: from.y + len * Math.cos((deg * Math.PI) / 180) });
+  assert.ok(mistsRoad(caught, toward(89, 5800), FIRST, MISTS).refused, "the 1° glide (89° off straight out) is refused");
+  assert.ok(mistsRoad({ x: -1500, y: -4600.5 }, { x: 1500, y: -4599.5 }, FIRST, MISTS).refused, "the near-parallel 3 km road with a 1 m inward drift is refused");
+  const thirty = mistsRoad(caught, toward(30, 2000), FIRST, MISTS);
+  assert.ok(!thirty.refused && thirty.walk_out, "a road 30° off straight out is allowed");
+  assert.ok(mistsRoad(caught, toward(50, 2000), FIRST, MISTS).refused, "50° off straight out is refused");
+  assert.ok(Math.abs(MISTS_OUT_GRADE - Math.cos(Math.PI / 4)) < 1e-12);
 });

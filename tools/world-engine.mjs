@@ -485,16 +485,21 @@ export function mistsRoad(from, toward, crossing, mists) {
 }
 
 // THE WALK OUT. As the wall creeps in it can overtake a walker standing on open
-// ground. They may declare a road that only heads out toward clear land: its
-// depth in the mist never rises anywhere along the road (the depth runs on
-// through the wall and the fringe as one measure, so it is continuous at the
-// face), and it ends on clear ground or in the fringe, never in the wall or on
-// its face. Inside the wall they walk at MISTS_WALL_STRIDE of their pace. In the
-// fringe on the way out, the stride is the fringe's own curve but never less
-// than that, because the curve is nothing at the face and a walker leaving
-// through the face would otherwise never leave. Any other road from inside the
-// wall is refused at the point it stands on, in the same words as every refusal.
+// ground. They may declare a road that leads STRAIGHT out toward clear land:
+//   · its depth in the mist (one measure through the wall and the fringe, so it
+//     is continuous at the face) never rises anywhere along the road;
+//   · while the road is in the wall or deep in the fringe (more than half way
+//     in), the depth falls by at least MISTS_OUT_GRADE metres per metre of road,
+//     so it points within 45° of straight out: no gliding along the wall;
+//   · it ends on clear ground or in the fringe, never in the wall or on its face.
+// Inside the wall they walk at MISTS_WALL_STRIDE of their pace; in the deep
+// fringe on the way out, at the fringe's own curve but never less than that
+// (the curve is nothing at the face, and a walker leaving through it would
+// otherwise never leave); from half way out, at the ordinary curve. Any other
+// road from inside the wall is refused at the point it stands on, in the same
+// words as every refusal.
 export const MISTS_WALL_STRIDE = 0.15;
+export const MISTS_OUT_GRADE = Math.SQRT1_2;                       // cos 45°
 function mistsDepthOf(p, m) {
   const h = mistsHere(p, m);
   if (!h.inWall) return h.wallM < m.fringeM ? m.fringeM - h.wallM : 0;
@@ -508,14 +513,18 @@ function mistsWalkOut(from, toward, L, at, m) {
   if (mistsHere(toward, m).inWall || mistsHere(toward, m).wallM <= 0) return refuse();
   const n = Math.max(64, Math.min(20000, Math.ceil(L)));
   let last = mistsDepthOf(from, m), time = 0;
+  const step = L / n, deep = m.fringeM / 2;
   for (let i = 1; i <= n; i += 1) {
     const p = at(i / n), mid = at((i - 0.5) / n);
     const depth = mistsDepthOf(p, m);
     if (depth > last + 1e-6) return refuse();                       // the road goes deeper somewhere
+    if (last > deep && last - depth < MISTS_OUT_GRADE * step - 1e-6) return refuse();   // not straight out
     last = depth;
     const h = mistsHere(mid, m);
+    const s = h.inWall ? 1 : h.wallM < m.fringeM ? 1 - h.wallM / m.fringeM : 0;
     const stride = h.inWall ? MISTS_WALL_STRIDE
-      : h.wallM < m.fringeM ? Math.max(MISTS_WALL_STRIDE, mistsStride(1 - h.wallM / m.fringeM, m.density)) : 1;
+      : s > 0.5 ? Math.max(MISTS_WALL_STRIDE, mistsStride(s, m.density))
+      : s > 0 ? mistsStride(s, m.density) : 1;
     time += (L / n) / stride;
   }
   return { factor: Math.max(MISTS_STRIDE_FLOOR, Math.min(1, L / time)), deepest: 1, walk_out: true };
