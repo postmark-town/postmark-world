@@ -17,10 +17,12 @@
 // clear side of the true face, thinning toward the clear land, at the band's
 // density, so the page and the walk's slowdown agree.
 
-// The fog's colour, ONE variable: the palette sitting sets it. A neutral cold
-// grey until then. The face takes it; depth and the veil darken it toward
-// near-black at the core.
-export const MISTS_TINT = "#6a6f78";
+// The fog's colour, ONE variable: the skin's variant 2 (Darko 2026-10-10 10:56),
+// its plum-grey between the base and the quiet. The face takes it; depth and the
+// veil darken it toward near-black at the core.
+export const MISTS_TINT = "#796a71";
+// the light a wolf's eyes catch: the skin's candle orange (variant 2)
+export const MISTS_EYE = "#f39a3d";
 
 // How the paint is shaped. Metres, so it holds at any zoom.
 export const MISTS_PAINT = {
@@ -31,7 +33,7 @@ export const MISTS_PAINT = {
   pxM: 36,               // metres per baked pixel (the fog is soft; this keeps a phone's bake small)
   clearingPx: 320,       // a clearing's bake is at most this many pixels across (they are far off)
   clearingLayers: 2,     // and takes the back two layers only
-  keepM: 320,            // the town's margin: past the widest drift (200 m), so a drifting bank never reaches a mark
+  keepM: 360,            // the town's margin: past the widest drift (200 m along, 90 across) and its soft edge, so a drifting bank never reaches a mark
   keepSoftM: 120,        // the margin's soft edge
   townMaxM: 2600,        // past this a mark is open country, not the town
   keepHaze: 0.06,        // the most any one layer may lay over the town (three of them: under 0.2)
@@ -55,9 +57,14 @@ function vnoise(x, y, seed) {
   return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
 }
 /** fractal value noise in [0, 1). */
+// each octave turned by ~37°, so value noise's grid never lines up into steps
+const ROT_C = Math.cos(0.65), ROT_S = Math.sin(0.65);
 export function mistsFbm(x, y, seed, octaves = 3) {
-  let sum = 0, amp = 0.5, norm = 0, f = 1;
-  for (let i = 0; i < octaves; i++) { sum += amp * vnoise(x * f, y * f, seed + i * 101); norm += amp; amp *= 0.5; f *= 2.03; }
+  let sum = 0, amp = 0.5, norm = 0, px = x, py = y;
+  for (let i = 0; i < octaves; i++) {
+    sum += amp * vnoise(px, py, seed + i * 101); norm += amp; amp *= 0.5;
+    const nx = (px * ROT_C - py * ROT_S) * 2.03, ny = (px * ROT_S + py * ROT_C) * 2.03; px = nx + 17.3; py = ny - 9.1;
+  }
   return sum / norm;
 }
 
@@ -138,7 +145,9 @@ export function mistsKeepRects(marks) {
     if (!mk?.at || !Number.isFinite(mk.at.x) || !Number.isFinite(mk.at.y)) continue;
     if (Math.max(Number(mk.extent?.w) || 0, Number(mk.extent?.h) || 0) > MISTS_PAINT.townMaxM) continue;
     const w = Math.max(0, Number(mk.extent?.w) || 0) / 2, h = Math.max(0, Number(mk.extent?.h) || 0) / 2;
-    out.push({ minX: mk.at.x - w - g, maxX: mk.at.x + w + g, minY: mk.at.y - h - g, maxY: mk.at.y + h + g });
+    // the mark's own extent (core) and its reach (core grown by the margin)
+    out.push({ cx0: mk.at.x - w, cx1: mk.at.x + w, cy0: mk.at.y - h, cy1: mk.at.y + h,
+      minX: mk.at.x - w - g, maxX: mk.at.x + w + g, minY: mk.at.y - h - g, maxY: mk.at.y + h + g });
   }
   return out;
 }
@@ -146,13 +155,14 @@ export function mistsKeepRects(marks) {
  *  band, 0 outside every rectangle. Pure (the tests' instrument); the bake uses
  *  a raster of the same rule. */
 export function mistsKeepAt(rects) {
-  const soft = MISTS_PAINT.keepSoftM;
+  const g = MISTS_PAINT.keepM, soft = MISTS_PAINT.keepSoftM;
   return (x, y) => {
     let k = 0;
     for (const r of rects) {
       if (x < r.minX || x > r.maxX || y < r.minY || y > r.maxY) continue;
-      const inset = Math.min(x - r.minX, r.maxX - x, y - r.minY, r.maxY - y);
-      k = Math.max(k, Math.min(1, inset / soft));
+      // how far outside the mark's own extent (0 inside it): the margin is round at the corners
+      const d = Math.hypot(Math.max(r.cx0 - x, 0, x - r.cx1), Math.max(r.cy0 - y, 0, y - r.cy1));
+      k = Math.max(k, Math.max(0, Math.min(1, (g - d) / soft)));
       if (k >= 1) return 1;
     }
     return k;
@@ -161,19 +171,19 @@ export function mistsKeepAt(rects) {
 /** The keep-out as a raster over a bake box (one cell per baked pixel). */
 export function mistsKeepRaster(rects, box, pxM) {
   const w = Math.max(1, Math.ceil((box.maxX - box.minX) / pxM)), h = Math.max(1, Math.ceil((box.maxY - box.minY) / pxM));
-  const grid = new Float32Array(w * h), soft = MISTS_PAINT.keepSoftM;
+  const grid = new Float32Array(w * h), g = MISTS_PAINT.keepM, soft = MISTS_PAINT.keepSoftM;
   for (const r of rects) {
     if (r.maxX < box.minX || r.minX > box.maxX || r.maxY < box.minY || r.minY > box.maxY) continue;
-    const i0 = Math.max(0, Math.floor((r.minX - box.minX) / pxM)), i1 = Math.min(w - 1, Math.ceil((r.maxX - box.minX) / pxM));
-    const j0 = Math.max(0, Math.floor((r.minY - box.minY) / pxM)), j1 = Math.min(h - 1, Math.ceil((r.maxY - box.minY) / pxM));
+    const i0 = Math.max(0, Math.floor((r.minX - box.minX) / pxM) - 1), i1 = Math.min(w - 1, Math.ceil((r.maxX - box.minX) / pxM) + 1);
+    const j0 = Math.max(0, Math.floor((r.minY - box.minY) / pxM) - 1), j1 = Math.min(h - 1, Math.ceil((r.maxY - box.minY) / pxM) + 1);
     for (let j = j0; j <= j1; j++) {
       const y = box.minY + (j + 0.5) * pxM;
       for (let i = i0; i <= i1; i++) {
         const x = box.minX + (i + 0.5) * pxM;
-        // a whole cell counts as kept when any of it is: measure from the cell's far corner
-        const inset = Math.min(x + pxM / 2 - r.minX, r.maxX - (x - pxM / 2), y + pxM / 2 - r.minY, r.maxY - (y - pxM / 2));
-        if (inset <= 0) continue;
-        const k = Math.min(1, inset / soft), o = j * w + i;
+        // from the cell's centre, less most of a cell, so the raster is never less
+        // kept than the pure rule anywhere in the cell, and still ramps smoothly
+        const d = Math.hypot(Math.max(r.cx0 - x, 0, x - r.cx1), Math.max(r.cy0 - y, 0, y - r.cy1)) - pxM * 0.75;
+        const k = Math.max(0, Math.min(1, (g - d) / soft)), o = j * w + i;
         if (k > grid[o]) grid[o] = k;
       }
     }
@@ -316,22 +326,24 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
 // the silhouettes, drawn for this (no clip-art), in a 100-wide box with the
 // feet (or the body's centre, for a flier) at the origin
 const CREATURE_PATHS = {
-  wolf: "M-42 -22c6-6 14-8 24-7l28-1c4-6 8-10 12-11l2-7 3 6 3-4 1 7c5 2 9 5 13 7l-2 3c-4 1-8 2-12 3-2 4-4 7-6 9l2 17h-4l-3-15c-9 1-19 1-27 0l-4 15h-4l-1-15c-5-1-11-3-15-4-4 3-8 7-14 9 4-4 6-8 4-12z",
-  crowperch: "M-27 -6l13.5-6.5c1.6-6 7.4-10.4 15-10.6 2-4 6.2-6.2 10.4-5.6 2.2.3 4 1.4 5.2 2.8l9.4 1.9-9.4 1.7c-.2 4.4-2.6 8.6-6.6 11.3-4.4 3-10.8 3.8-16.4 2.6L-25 -4.5zM-1 -8.7l-1.2 5M3.4 -9.1l.6 5.4",
-  crowlift: "M-32 -2c8-6 16-8 24-4 3-4 7-5 10-4 2-2 6-3 9-1l6-1-5 4c3 1 6 1 12-1-6 6-14 9-22 8-6 3-16 3-24 1-4-1-7-2-10-2z",
-  bat: "M0 -6c1.2-2.6 2.4-3.6 3.6-3.8-.5 1.4-.4 2.6.6 3.4C7.6-10 14-12.6 21-12c-2.2 1.4-3.2 3.2-3.2 5.4 3.4-.7 7.6-.1 10.2 2.2-3.6.3-6.6 1.8-8.6 4.2-4.6-1.6-9.6-1.2-13.4 1.8C3.6 3.4 1.4 6.2 0 10c-1.4-3.8-3.6-6.6-6-8.4-3.8-3-8.8-3.4-13.4-1.8-2-2.4-5-3.9-8.6-4.2 2.6-2.3 6.8-2.9 10.2-2.2 0-2.2-1-4-3.2-5.4 7-.6 13.4 2 16.8 5.6 1-.8 1.1-2 .6-3.4 1.2.2 2.4 1.2 3.6 3.8z",
+  // one path each in a 100-unit box, and the offset that puts the feet (or a
+  // flier's middle) at the creature's point; the same shapes the site's motifs use
+  wolf: { d: "M5 95 C8 88 16 84 28 84 C26 72 30 62 38 56 C44 50 48 44 50 38 C51 33 51 29 52 26 L47 16 L56 22 L55 11 L61 19 C64 15 68 11 72 7 L86 2 L88 5 L74 18 C70 24 68 30 67 36 C70 44 71 52 69 60 L69 95 L62 95 L61 66 L59 66 L59 95 L53 95 L53 70 C50 72 48 76 48 80 C48 87 52 92 56 95 L38 95 C32 94 26 95 22 95 C14 96 8 96 5 95 Z", at: [-50, -96] },
+  crowperch: { d: "M8 64 L30 55 C38 45 50 40 60 40 C64 36 69 34 74 35 C77 36 79 38 80 40 L94 44 L80 49 C79 56 74 62 66 65 C58 68 48 68 40 66 L44 80 L41 80 L37 66 L33 65 L35 79 L32 79 L30 64 C24 64 16 66 10 68 Z", at: [-50, -80] },
+  crowlift: { d: "M10 60 L20 53 C28 49 34 47 40 47 C44 40 46 28 52 16 C62 24 66 36 62 48 C62 47 66 46 70 46 L82 47 L71 51 C66 57 58 60 48 60 C40 61 30 60 22 59 L12 64 Z", at: [-50, -45] },
+  bat: { d: "M50 34 L48 29 L46.5 36 C43 34 36 30 26 29 C22 29 14 31 4 37 C9 38 13 40 15 43 C19 41 24 41 27 44 C31 42 36 43 39 46 C43 45 46 47 48 50 L50 53 L52 50 C54 47 57 45 61 46 C64 43 69 42 73 44 C76 41 81 41 85 43 C87 40 91 38 96 37 C86 31 78 29 74 29 C64 30 57 34 53.5 36 L52 29 Z", at: [-50, -40] },
 };
 /** One creature as SVG, in the painting's frame. `ink` is the silhouette's
  *  colour (the fog's core); `eye` the light its eyes catch. */
-export function mistsCreatureSVG(cr, { originPx, mPerPx, ink, eye = "#e9a54a" }) {
+export function mistsCreatureSVG(cr, { originPx, mPerPx, ink, eye = MISTS_EYE }) {
   const n = (v) => v.toFixed(1), s = cr.sizeM / 100 / mPerPx;
   const x = originPx.x + cr.x / mPerPx, y = originPx.y + cr.y / mPerPx;
-  const path = cr.kind === "wolf" ? CREATURE_PATHS.wolf : cr.kind === "bat" ? CREATURE_PATHS.bat : cr.pose === "lift" ? CREATURE_PATHS.crowlift : CREATURE_PATHS.crowperch;
-  const legs = cr.kind === "crow" && cr.pose === "perch" ? ` stroke="${ink}" stroke-width="1.4"` : "";
-  const eyes = cr.eyes ? `<g class="wv-mc-eyes" style="animation-delay:-${n(cr.phase * 9)}s"><circle cx="17" cy="-25.5" r="1.5" fill="${eye}"/><circle cx="17" cy="-25.5" r="4" fill="${eye}" opacity="0.25"/></g>` : "";
+  const P = cr.kind === "wolf" ? CREATURE_PATHS.wolf : cr.kind === "bat" ? CREATURE_PATHS.bat : cr.pose === "lift" ? CREATURE_PATHS.crowlift : CREATURE_PATHS.crowperch;
+  // a wolf's eye catches the light just under the crown, before the snout
+  const eyes = cr.eyes ? `<g class="wv-mc-eyes" style="animation-delay:-${n(cr.phase * 9)}s"><circle cx="69" cy="15" r="1.5" fill="${eye}"/><circle cx="69" cy="15" r="4.5" fill="${eye}" opacity="0.3"/></g>` : "";
   return `<g transform="translate(${n(x)} ${n(y)}) scale(${cr.flip ? "-" : ""}${s.toFixed(4)} ${s.toFixed(4)})">`
     + `<g class="wv-mc wv-mc-${cr.kind}${cr.pose ? " wv-mc-" + cr.pose : ""}" style="animation-delay:-${n(cr.phase * 12)}s">`
-    + `<path d="${path}" fill="${ink}"${legs}/>${eyes}</g></g>`;
+    + `<g transform="translate(${P.at[0]} ${P.at[1]})"><path d="${P.d}" fill="${ink}"/>${eyes}</g></g></g>`;
 }
 
 /** Paint one layer into a canvas over `box` (metres), all at once. */
