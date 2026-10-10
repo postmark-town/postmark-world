@@ -18,7 +18,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { buildHeightfield, fieldOfView, lightLevelAt, mistsAt, mistsHere, mistsHide, DIALS } from "./world-engine.mjs";
-import { orient, openYourEyes, airLine, seasonLine, SEASON_LINES } from "./world-verbs.mjs";
+import { orient, openYourEyes, airLine, seasonLine, seasonRung, SEASON_LADDER } from "./world-verbs.mjs";
 import { assembleWorld } from "./world-build.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -400,20 +400,75 @@ test("a regenerate writes the committed skeleton, key for key (needs POSTMARK_AT
 // Every one is keyed on the Mists (so on the record's schedule) or on the
 // crossing number, and none is said before the schedule's first crossing.
 const BELL = "Somewhere past the north edge, a bell you have never heard rings once.";
+// The ladder's words, pinned as they were given.
+const LADDER = [
+  [244, "Mist has come in at the edges of the map; nothing past it can be seen.", "The sun is veiled: the whole land is darker than its hour.",
+    ["The gulls have stopped flying north.", "The fog at the edges does not move with the wind.", "A crow sits on the post office roof and watches the quay."]],
+  [258, "The mist has crept in from the edges, and it is thicker than yesterday.", "The sun is veiled; noon looks like late afternoon.",
+    ["Far past the edge, wolves are calling to each other.", "More crows on the post office roof tonight. None of them make a sound.", "Bats come out over the water earlier than they should."]],
+  [272, "The mist presses at the edges of the map. Nothing that walks into it has walked back out.", "The sun has not properly risen in days.",
+    [BELL, "The candles in the windows lean north, though there is no draught.", "A wolf howls close enough that the ferry's bell answers it."]],
+  [282, "The mist is at its thickest, and it is listening.", "There is no day now, only a paler dark.",
+    ["The bell past the north edge rings twice now, and the mist does not carry it back.", "The crows have all gone quiet at once.", "Wolves circle somewhere in the grey; you can hear them breathing between howls."]],
+  [284, "The mist is at its thickest, and it is listening.", "Night has come to stay.",
+    ["Every lantern in town leans north, as if the dark there were drawing breath.", "Bats pour out of the mist in one long ribbon and do not scatter.", "Every dog in Postmark is facing the same way."]],
+];
+const DAYLIGHT = /dark end of the world|dawn-light is full on you|The light is going/;
 
-test("the season line: from veil 0.3, the bell; below it, nothing; with no Mists, nothing; and the crossing alone picks it", () => {
+test("the ladder: five rungs from 244, 258, 272, 282 and 284, in the words given; the last keeps the edge sentence before it", () => {
+  assert.deepEqual(SEASON_LADDER.map((r) => [r.from, r.mist, r.veil, r.lines]), LADDER);
+});
+
+test("the rung is the crossing's: none before 244 or with no Mists, each rung from its own crossing to the next's", () => {
+  assert.equal(seasonRung(null, 300), null, "no Mists, no rung");
+  assert.equal(seasonRung({ crossing: 243 }), null, "Mists on a schedule that starts early still have no rung before 244");
+  const from = (c) => seasonRung({ crossing: c })?.from ?? null;
+  assert.deepEqual([243, 244, 257, 258, 271, 272, 281, 282, 283, 284, 400].map(from), [null, 244, 244, 258, 258, 272, 272, 282, 282, 284, 284]);
+});
+
+test("the season line: the crossing picks it (crossing % 3); inside the wall no north edge is told, at any crossing", () => {
   assert.equal(seasonLine(null, 300), null, "no Mists, no line");
-  assert.equal(seasonLine({ veil: 0.29 }, 300), null);
-  assert.equal(seasonLine({ veil: 0.3 }, 300), BELL);
-  assert.equal(seasonLine({ veil: 0.6 }, 301), BELL);
-  assert.ok(SEASON_LINES.every((r) => r.lines.length >= 1), "every rung has a line");
-  assert.equal(seasonLine({ veil: 0.5 }, 284), seasonLine({ veil: 0.5 }, 284), "a pure function of the crossing");
-  // on the record: the veil reaches 0.3 at crossing 272, and the bell rings from then
-  const { withM } = real();
-  const told = (c) => openYourEyes({ x: 0, y: 0 }, withM, { crossing: c }).tell();
-  assert.doesNotMatch(told(244), /a bell/);
-  assert.doesNotMatch(told(271), /a bell/);
-  for (const c of [272, 282, 284]) assert.ok(told(c).includes(BELL), `the bell at ${c}`);
+  for (let c = 244; c <= 300; c += 1) {
+    const rung = LADDER.filter(([f]) => c >= f).at(-1);
+    assert.equal(seasonLine({ crossing: c, in_wall: false }), rung[3][c % 3], `crossing ${c}`);
+    const walled = seasonLine({ crossing: c, in_wall: true });
+    assert.doesNotMatch(walled, /north edge/, `inside the wall at ${c}`);
+    const kept = rung[3].filter((l) => !/north edge/.test(l));
+    assert.equal(walled, kept[c % kept.length]);
+  }
+  // on the record: the bell rings in the telling at the Origin (273 = 0 mod 3), never at the Pando landing
+  const { withM, worldState } = real();
+  assert.ok(openYourEyes({ x: 0, y: 0 }, withM, { crossing: 273 }).tell().includes(BELL));
+  const landing = worldState.marks.find((m) => m.id === "the-town/the-pando-landing").at;
+  for (let c = 244; c <= 300; c += 1) {
+    const o = orient(landing, withM, { crossing: c });
+    assert.equal(o.you.mists.in_wall, true, "the landing stands inside the wall");
+    assert.doesNotMatch(openYourEyes(landing, withM, { crossing: c }).tell(), /north edge/, `the landing's telling at ${c}`);
+    assert.doesNotMatch(airLine(o.you, c), /north edge/, `the landing's air at ${c}`);
+  }
+});
+
+test("the edge and veil sentences escalate in the telling, rung by rung; under the Mists the veil speaks for the light", () => {
+  const { withM, worldState } = real();
+  const quay = worldState.marks.find((m) => m.id === "the-town/the-quay").at;
+  for (const [from, mist, veil] of LADDER) {
+    const told = openYourEyes(quay, withM, { crossing: from }).tell();
+    assert.ok(told.includes(mist), `the edge at ${from}`);
+    assert.ok(told.includes(veil), `the veil at ${from}`);
+    assert.doesNotMatch(told, DAYLIGHT, `no daylight sentence at ${from}`);
+  }
+  // the daylight sentence is the old one before the Mists: the control
+  assert.match(openYourEyes({ x: -1900, y: 2150 }, withM, { crossing: 243 }).tell(), /dark end of the world/);
+});
+
+test("THE DARK END, UNDER THE VEIL: no daylight sentence is told at the quay or the Pando landing at any crossing of the season", () => {
+  const { withM, worldState } = real();
+  const spots = ["the-town/the-quay", "the-town/the-pando-landing"].map((id) => worldState.marks.find((m) => m.id === id).at);
+  for (const at of spots)
+    for (let c = 244; c <= 300; c += 1) {
+      assert.doesNotMatch(openYourEyes(at, withM, { crossing: c }).tell(), DAYLIGHT, `telling at (${at.x}, ${at.y}), ${c}`);
+      assert.doesNotMatch(airLine(orient(at, withM, { crossing: c }).you, c), DAYLIGHT, `air at (${at.x}, ${at.y}), ${c}`);
+    }
 });
 
 test("the crossing's own hour: in a season the fog is in this evening (even) or this morning (odd), never tonight; before it, the old word", () => {
@@ -453,16 +508,17 @@ test("the missing horizon: a far feature the wall takes is told where it stood, 
   assert.match(told, /  · NW, where Pando Peak stood: only grey/);
 });
 
-test("the air, in one line: absent with no Mists; the weather by the crossing's hour, the edge, the light, the veil and the season's line", () => {
+test("the air, in one line: absent with no Mists; the weather by the crossing's hour, the rung's edge, its veil, and its line", () => {
   const w = worldOf([NEAR]);
   assert.equal(airLine(orient({ x: 0, y: 0 }, w, { crossing: 9, dials: CLEAR }).you, 9), null);
   const at10 = airLine(orient({ x: 0, y: 0 }, w, { crossing: 10, dials: CLEAR }).you, 10);
-  assert.match(at10, /^The air is clear this evening\. Mist has come in at the edges of the map/);
-  assert.match(at10, /The sun is veiled/);
-  assert.ok(at10.endsWith(BELL), "veil 0.4: the bell rings in the air too");
+  assert.equal(at10, "The air is clear this evening. Mist has come in at the edges of the map; nothing past it can be seen. The sun is veiled: the whole land is darker than its hour.",
+    "before 244 there is no rung: the first words, and no line");
   const deep = airLine(orient({ x: 0, y: -1225 }, w, { crossing: 11, dials: CLEAR }).you, 11);
   assert.match(deep, /^You stand inside the mist/);
   const { withM } = real();
-  assert.ok(airLine(orient({ x: 0, y: 0 }, withM, { crossing: 272 }).you, 272).endsWith(BELL));
+  assert.ok(airLine(orient({ x: 0, y: 0 }, withM, { crossing: 273 }).you, 273).endsWith(BELL));
+  const at284 = airLine(orient({ x: 0, y: 0 }, withM, { crossing: 284 }).you, 284);
+  assert.ok(at284.includes("Night has come to stay.") && at284.endsWith("Every dog in Postmark is facing the same way."));
   assert.match(airLine(orient({ x: 0, y: 0 }, withM, { crossing: 245 }).you, 245), /this morning|above the fog/);
 });
