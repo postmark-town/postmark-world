@@ -453,6 +453,8 @@ export function mistsRoad(from, toward, crossing, mists) {
   const L = Math.hypot(toward.x - from.x, toward.y - from.y);
   const at = (t) => ({ x: from.x + (toward.x - from.x) * t, y: from.y + (toward.y - from.y) * t });
   const wallAt = (p) => { const h = mistsHere(p, m); return h.inWall ? 0 : h.wallM; };
+  // standing still is not going anywhere: a stop is never refused, wherever it stands
+  if (L === 0) return { factor: 1, deepest: 0 };
   // the road may not start, pass or end in the wall, nor on its face
   if (wallAt(from) <= 0 || wallAt(toward) <= 0 || (L > 0 && mistsHide(from, toward, m))) {
     let t = 0;
@@ -460,7 +462,6 @@ export function mistsRoad(from, toward, crossing, mists) {
     const p = at(t);
     return { refused: { x: Math.round(p.x), y: Math.round(p.y) }, factor: 0, deepest: 1 };
   }
-  if (L === 0) return { factor: 1, deepest: 0 };
   // ∫ ds / stride, stepping finer as the road nears the wall
   const f = m.fringeM;
   let time = 0, deepest = 0, t = 0;
