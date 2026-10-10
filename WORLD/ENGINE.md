@@ -259,8 +259,10 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
     byte (`tools/mists.test.mjs`).
   - **What the wall hides.** Everything behind it, with no ceiling and no height exemption: a
     sight line is cut wherever it runs through the wall. The fringe on the clear side shortens
-    sight like the weather, and a body inside the wall sees `wall_sight_m`. The veil dims
-    every place's light, signals included, in what is told; what is reached (and so law
+    sight like the weather, and a body inside the wall sees `wall_sight_m`. The world's
+    daylight is ambient physics, not an emission: it rides nothing and has no source. The veil
+    dims it, scaling every place's light by (1 − veil) so the axis keeps its shape and the whole
+    land darkens together, and it dims every signal's light too, in what is told; what is reached (and so law
     reach) reads the unveiled light, and only the wall takes a mark out of reach.
   - **How walking slows.** `mistsRoad(from, toward, crossing, mists)` reads one leg once, at
     its declaration. In the fringe the stride is `mistsStride(s, d) = (1 − s)^(2d)`: s is how
