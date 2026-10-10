@@ -409,6 +409,78 @@ export function mistsHide(from, target, m) {
   return reached < 1 - 1e-9;
 }
 
+// ───────────────────────── the Mists slow the walk (POS-468) ─────────────────
+// Darko, 2026-10-09: "the further they make it into the mist, the slower they
+// get until they essentially hit zero". So the stride through the fringe falls
+// with DEPTH, to nothing at the wall's face, and no road goes into the wall at
+// all: there is no creeping in by short legs.
+//
+// THE CURVE. At a point in the fringe, s = 1 − wallM / fringe_m is how deep it
+// stands (0 at the fringe's outer edge, 1 at the wall's face), and d is the
+// day's density. The stride there is scaled by
+//
+//     mistsStride(s, d) = (1 − s)^(2d)
+//
+// It is 1 at the outer edge and 0 at the face on every crossing, and it falls
+// with depth and with density: the thicker the day's mist, the earlier in the
+// fringe it bites. Out of the fringe it is 1, and before the Mists there is no
+// fringe at all.
+//
+// THE LEG. A walk is one straight leg at an even pace (calls 1 and 2, ruled):
+// the mist is read once, when the walk is declared, and the leg's time through
+// it is spread over the whole leg, so its ETA is exact and its position stays
+// a pure function of the line and the clock. The factor is length ÷ ∫ ds / stride,
+// stamped on the leg as part of its pace.
+export function mistsStride(s, d) {
+  if (!(s > 0)) return 1;
+  if (s >= 1) return 0;
+  return Math.pow(1 - s, 2 * Math.max(0, d));
+}
+
+// A leg could otherwise be slowed to nothing at all; this is the floor the factor
+// is stamped at (a leg ten thousand times slower than the open road), so a
+// stamped pace is always a number a reader can divide by.
+export const MISTS_STRIDE_FLOOR = 1e-4;
+
+/** The Mists on one leg, read once at its declaration: `null` when there are no
+ *  Mists this crossing; otherwise `{ refused }` for a road that ends in the wall
+ *  or crosses it (with the point where it meets the wall), or `{ factor, deepest }`
+ *  — the leg's even stride as a share of the open road's, and how deep into the
+ *  fringe it goes (0 untouched, toward 1 at the wall's face). */
+export function mistsRoad(from, toward, crossing, mists) {
+  const m = mistsAt(crossing, mists);
+  if (!m) return null;
+  const L = Math.hypot(toward.x - from.x, toward.y - from.y);
+  const at = (t) => ({ x: from.x + (toward.x - from.x) * t, y: from.y + (toward.y - from.y) * t });
+  const wallAt = (p) => { const h = mistsHere(p, m); return h.inWall ? 0 : h.wallM; };
+  // the road may not start, pass or end in the wall, nor on its face
+  if (wallAt(from) <= 0 || wallAt(toward) <= 0 || (L > 0 && mistsHide(from, toward, m))) {
+    let t = 0;
+    if (wallAt(from) > 0) { const n = Math.max(1, Math.ceil(L)); for (let i = 1; i <= n; i += 1) { t = i / n; if (wallAt(at(t)) <= 0) break; } }
+    const p = at(t);
+    return { refused: { x: Math.round(p.x), y: Math.round(p.y) }, factor: 0, deepest: 1 };
+  }
+  if (L === 0) return { factor: 1, deepest: 0 };
+  // ∫ ds / stride, stepping finer as the road nears the wall
+  const f = m.fringeM;
+  let time = 0, deepest = 0, t = 0;
+  while (t < 1) {
+    const w = wallAt(at(t));
+    const h = Math.min(10, Math.max(0.05, w / 4)) / L;            // metres → share of the leg
+    const dt = Math.min(h, 1 - t);
+    const mid = at(t + dt / 2);
+    const wm = wallAt(mid);
+    const s = f > 0 && wm < f ? 1 - wm / f : 0;
+    if (s > deepest) deepest = s;
+    time += (dt * L) / Math.max(mistsStride(s, m.density), 1e-12);
+    t += dt;
+  }
+  // a road the fringe never touched is the open road, exactly
+  if (deepest === 0) return { factor: 1, deepest: 0 };
+  const factor = Math.max(MISTS_STRIDE_FLOOR, Math.min(1, L / time));
+  return { factor, deepest };
+}
+
 // ───────────────────────── status effects at a point ───────────────────────
 export function statusAt({ x, y, groundH, eyeH, heightfield, light, fog, fogCeilingM, veil = 0 }) {
   const eyeElev = groundH + eyeH;
