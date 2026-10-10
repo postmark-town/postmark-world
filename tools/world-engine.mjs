@@ -623,7 +623,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       lightLevel: +self.lightLevel.toFixed(2), inFog: self.inFog, aboveFog: self.aboveFog, inDarkness: self.inDarkness,
     },
     crossing: fog.crossing, fog: { thickness: +fog.thickness.toFixed(2) }, sightReachM: Math.round(Math.min(clearReach, mistReach)),
-    ...(mists ? { mists: mistsBlock(mists, mistSelf) } : {}),
+    ...(mists ? { mists: mistsBlock(mists, mistSelf, observer) } : {}),
     carried, far: farSeen.filter((f) => f.visible),
     // THE HORIZON THE WALL TOOK (POS-551): a far feature on a horizon that is
     // otherwise clear, gone only because the wall stands in front of it, so the
@@ -643,9 +643,14 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 // radialSerialize — group a fieldOfView result into bearing → band → marks, the
 // shape a telling reads from. Pure restructure of fieldOfView output.
 // the Mists as a reader is told them, at one standpoint: where the wall stands,
-// how thick the fringe is here, and the veil on the daylight
-export function mistsBlock(m, here) {
+// how thick the fringe is here, and the veil on the daylight. A standpoint on
+// open ground past the town's clear box, held clear by a clearing, carries that
+// clearing's id (POS-551); everywhere else the block is the one it was.
+export function mistsBlock(m, here, p = null) {
   const r = (v) => Math.round(v);
+  const c = m.clear;
+  const pastTheBox = p && !here.inWall && !(p.x >= c.minX && p.x <= c.maxX && p.y >= c.minY && p.y <= c.maxY);
+  const clearing = pastTheBox ? (m.clearings ?? []).find((k) => Math.hypot(p.x - k.x, p.y - k.y) <= k.r) : null;
   return {
     crossing: m.crossing,
     in_wall: here.inWall,
@@ -654,6 +659,7 @@ export function mistsBlock(m, here) {
     density: +m.density.toFixed(2),
     veil: +m.veil.toFixed(2),
     front_m: { n: r(m.front.n), e: r(m.front.e), s: r(m.front.s), w: r(m.front.w) },
+    ...(clearing ? { clearing: clearing.id ?? "unnamed" } : {}),
   };
 }
 

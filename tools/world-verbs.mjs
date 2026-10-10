@@ -51,7 +51,7 @@ export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
       fog: { crossing: fog.crossing, thickness: +fog.thickness.toFixed(2), inFog: self.inFog, aboveFog: self.aboveFog },
       // the Mists at your standpoint; absent (not null) before they arrive, so
       // the answer before the schedule's first crossing is the old one, bit for bit
-      ...(mists ? { mists: mistsBlock(mists, mistsHere(state, mists)) } : {}),
+      ...(mists ? { mists: mistsBlock(mists, mistsHere(state, mists), state) } : {}),
     },
     // enter/exit are DEMO-SLICE verbs (step 5) — listed so a reader of the
     // demo sees the pair, and pointedly listed apart from walk, which reaches
@@ -626,7 +626,7 @@ export const SEASON_LADDER = [
       "Bats come out over the water earlier than they should.",
     ] },
   { from: 272,
-    mist: "The mist presses at the edges of the map. Nothing that walks into it has walked back out.",
+    mist: "The mist presses at the edges of the map, and nobody who goes near it wants to go nearer.",
     veil: "The sun has not properly risen in days.",
     lines: [
       "Somewhere past the north edge, a bell you have never heard rings once.",
@@ -654,12 +654,13 @@ export function seasonRung(m, crossing = m?.crossing) {
   if (!m) return null;
   return SEASON_LADDER.filter((r) => (crossing | 0) >= r.from).at(-1) ?? null;
 }
-/** The season's one line at a standpoint. A body inside the wall (Pando's ground
- *  is) is never told of the north edge; it hears the rung's other lines. */
+/** The season's one line at a standpoint. A body inside the wall, or in a
+ *  clearing past the town's clear box (Pando's ground, once it keeps its own
+ *  air), is never told of the north edge; it hears the rung's other lines. */
 export function seasonLine(m, crossing = m?.crossing) {
   const rung = seasonRung(m, crossing);
   if (!rung) return null;
-  const lines = m.in_wall ? rung.lines.filter((l) => !NORTH_EDGE.test(l)) : rung.lines;
+  const lines = m.in_wall || m.clearing ? rung.lines.filter((l) => !NORTH_EDGE.test(l)) : rung.lines;
   return lines.length ? lines[Math.abs(crossing | 0) % lines.length] : null;
 }
 
