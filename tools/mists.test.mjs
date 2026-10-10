@@ -18,7 +18,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { buildHeightfield, fieldOfView, lightLevelAt, mistsAt, mistsHere, mistsHide, DIALS } from "./world-engine.mjs";
-import { orient, openYourEyes } from "./world-verbs.mjs";
+import { orient, openYourEyes, airLine, seasonLine, SEASON_LINES } from "./world-verbs.mjs";
 import { assembleWorld } from "./world-build.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -324,6 +324,11 @@ test("before the schedule starts, the real town's answers are byte-identical to 
       assert.equal(JSON.stringify(orient(at, withM, { crossing })), JSON.stringify(orient(at, without, { crossing })));
       const a = openYourEyes(at, withM, { crossing }), b = openYourEyes(at, without, { crossing });
       assert.equal(JSON.stringify(a.radial) + a.tell(), JSON.stringify(b.radial) + b.tell(), `crossing ${crossing}`);
+      // the season's lines (POS-551) say nothing before it starts
+      assert.equal(JSON.stringify(a.fov), JSON.stringify(b.fov), `fov at crossing ${crossing}`);
+      assert.equal("farLost" in a.fov, false);
+      assert.equal(airLine(orient(at, withM, { crossing }).you, crossing), null, `no air at crossing ${crossing}`);
+      assert.doesNotMatch(a.tell(), /guttering|only grey|this evening|this morning|a bell/);
     }
   }
   // and the positive control: at the first crossing, the corner's answer moves
@@ -389,4 +394,75 @@ test("a regenerate writes the committed skeleton, key for key (needs POSTMARK_AT
     execFileSync(process.execPath, [join(ROOT, "tools/world-terrain-gen.mjs"), "--atlas", process.env.POSTMARK_ATLAS], { env: { ...process.env, SKELETON_OUT: out }, stdio: "pipe" });
     assert.deepEqual(JSON.parse(readFileSync(out, "utf8")), real().skeleton);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+// ── THE SEASON'S LINES (POS-551) ─────────────────────────────────────────────
+// Every one is keyed on the Mists (so on the record's schedule) or on the
+// crossing number, and none is said before the schedule's first crossing.
+const BELL = "Somewhere past the north edge, a bell you have never heard rings once.";
+
+test("the season line: from veil 0.3, the bell; below it, nothing; with no Mists, nothing; and the crossing alone picks it", () => {
+  assert.equal(seasonLine(null, 300), null, "no Mists, no line");
+  assert.equal(seasonLine({ veil: 0.29 }, 300), null);
+  assert.equal(seasonLine({ veil: 0.3 }, 300), BELL);
+  assert.equal(seasonLine({ veil: 0.6 }, 301), BELL);
+  assert.ok(SEASON_LINES.every((r) => r.lines.length >= 1), "every rung has a line");
+  assert.equal(seasonLine({ veil: 0.5 }, 284), seasonLine({ veil: 0.5 }, 284), "a pure function of the crossing");
+  // on the record: the veil reaches 0.3 at crossing 272, and the bell rings from then
+  const { withM } = real();
+  const told = (c) => openYourEyes({ x: 0, y: 0 }, withM, { crossing: c }).tell();
+  assert.doesNotMatch(told(244), /a bell/);
+  assert.doesNotMatch(told(271), /a bell/);
+  for (const c of [272, 282, 284]) assert.ok(told(c).includes(BELL), `the bell at ${c}`);
+});
+
+test("the crossing's own hour: in a season the fog is in this evening (even) or this morning (odd), never tonight; before it, the old word", () => {
+  const FOG = { ...DIALS, fog_base: 1, fog_swing: 0 };
+  const w = worldOf([NEAR]);
+  const told = (c) => openYourEyes({ x: 0, y: 0 }, w, { crossing: c, dials: FOG }).tell();
+  assert.match(told(9), /Fog is in tonight \(crossing 9,/, "before the Mists, unchanged");
+  assert.match(told(10), /Fog is in this evening \(crossing 10,/);
+  assert.match(told(11), /Fog is in this morning \(crossing 11,/);
+  assert.doesNotMatch(told(11), /tonight/);
+});
+
+test("guttering: under a veil a light that carries is told guttering; with no veil, as it was", () => {
+  const big = { ...MISTS, border_m: { minX: -9000, minY: -9000, maxX: 9000, maxY: 9000 }, fringe_m: 0 };
+  const lamp = { id: "town/lamp", kind: "sited", household: "town", at: { x: 300, y: 0 }, extent: { w: 4, h: 4 }, weight: 1, top_m: 4, signal: true };
+  const w = worldOf([lamp], { mists: big });
+  const told = (c) => openYourEyes({ x: 0, y: 0 }, w, { crossing: c, dials: CLEAR }).tell();
+  assert.match(told(9), /\(its light carries\)/);
+  assert.doesNotMatch(told(9), /guttering/);
+  assert.match(told(10), /\(its light carries, guttering\)/);
+  const unveiled = { ...big, schedule: [{ crossing: 10, front_m: 0, veil: 0 }] };
+  assert.doesNotMatch(openYourEyes({ x: 0, y: 0 }, worldOf([lamp], { mists: unveiled }), { crossing: 10, dials: CLEAR }).tell(), /guttering/, "no veil, no guttering");
+});
+
+test("the missing horizon: a far feature the wall takes is told where it stood, kept out of reach; one the fog takes is not told", () => {
+  const peak = { id: "beyond/peak", far: true, feature: "peak", kind: "sited", at: { x: 0, y: -1200 }, extent: { w: 30, h: 30 } };
+  const w = worldOf([peak], { far_features: [{ id: "peak", height_m: 100, label: "a peak" }] });
+  const e = openYourEyes({ x: 0, y: 0 }, w, { crossing: 10, dials: CLEAR });
+  assert.equal(e.fov.far.length, 0, "never in the reach");
+  assert.deepEqual(e.fov.farLost.map((f) => f.id), ["beyond/peak"]);
+  assert.match(e.tell(), /On the horizon:\n  · N, where a peak stood: only grey/);
+  assert.doesNotMatch(openYourEyes({ x: 0, y: 0 }, w, { crossing: 9, dials: CLEAR }).tell(), /only grey/, "before the Mists it is simply seen");
+  const FOG = { ...DIALS, fog_base: 1, fog_swing: 0 };
+  assert.deepEqual(openYourEyes({ x: 0, y: 0 }, w, { crossing: 10, dials: FOG }).fov.farLost, [], "the weather hid it anyway: no line");
+  // on the record: Pando Peak, from the Origin, at the first keyframe
+  const told = openYourEyes({ x: 0, y: 0 }, real().withM, { crossing: KEYFRAMES()[0] }).tell();
+  assert.match(told, /  · NW, where Pando Peak stood: only grey/);
+});
+
+test("the air, in one line: absent with no Mists; the weather by the crossing's hour, the edge, the light, the veil and the season's line", () => {
+  const w = worldOf([NEAR]);
+  assert.equal(airLine(orient({ x: 0, y: 0 }, w, { crossing: 9, dials: CLEAR }).you, 9), null);
+  const at10 = airLine(orient({ x: 0, y: 0 }, w, { crossing: 10, dials: CLEAR }).you, 10);
+  assert.match(at10, /^The air is clear this evening\. Mist has come in at the edges of the map/);
+  assert.match(at10, /The sun is veiled/);
+  assert.ok(at10.endsWith(BELL), "veil 0.4: the bell rings in the air too");
+  const deep = airLine(orient({ x: 0, y: -1225 }, w, { crossing: 11, dials: CLEAR }).you, 11);
+  assert.match(deep, /^You stand inside the mist/);
+  const { withM } = real();
+  assert.ok(airLine(orient({ x: 0, y: 0 }, withM, { crossing: 272 }).you, 272).endsWith(BELL));
+  assert.match(airLine(orient({ x: 0, y: 0 }, withM, { crossing: 245 }).you, 245), /this morning|above the fog/);
 });

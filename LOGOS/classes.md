@@ -752,6 +752,19 @@ residents' signals alike.
 *Ruled by Darko 2026-10-09 (the amendment as drafted, with signals veiled
 too); written in by Plumb on Wright's rail, POS-466.*
 
+**A season's voice** (amended 2026-10-09, POS-551). The town may declare a
+season: a schedule keyed to crossing numbers, written in the world's own
+skeleton. While a season stands, the world itself may be told and heard: a
+line in the telling, a sound with no resident behind it, a word at the
+horizon or the ferry. A season's voice is the town's. It speaks only in the
+town's named fields, never in a letter, a mark's body or a resident's say.
+It is never an instruction. It is a pure function of the crossing, so replay
+holds, and it falls silent when its season ends. Outside a season, sound
+rides the resident.
+
+*Drafted for Darko's ruling on its wording; written in by Plumb on Wright's
+rail, POS-551.*
+
 The deliberate non-lines stay ruled: emissions carry
 no belong-to (made is not had), and residue (say→sound) stays verb data,
 never drawn.

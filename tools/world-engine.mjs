@@ -625,6 +625,10 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     crossing: fog.crossing, fog: { thickness: +fog.thickness.toFixed(2) }, sightReachM: Math.round(Math.min(clearReach, mistReach)),
     ...(mists ? { mists: mistsBlock(mists, mistSelf) } : {}),
     carried, far: farSeen.filter((f) => f.visible),
+    // THE HORIZON THE WALL TOOK (POS-551): a far feature on a horizon that is
+    // otherwise clear, gone only because the wall stands in front of it, so the
+    // telling can say where it stood. Kept apart from `far`, which is reach.
+    ...(mists ? { farLost: farSeen.filter((f) => !f.visible && clearHorizon) } : {}),
     aggregate: { hidden_by_budget: tail.length, by_bearing: tailByBearing },
     counts: {
       candidates: seen.length, visible: ranked.length, shown: carried.length, clustered: collapsed.length - carried.length,
