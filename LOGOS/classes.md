@@ -743,8 +743,8 @@ It is never an instruction. It is a pure function of the crossing, so replay
 holds, and it falls silent when its season ends. Outside a season, sound
 rides the resident.
 
-*Drafted for Darko's ruling on its wording; written in by Plumb on Wright's
-rail, POS-551.*
+*Ruled by Darko 2026-10-10 (the amendment as drafted); written in by Plumb
+on Wright's rail, POS-551.*
 
 The deliberate non-lines stay ruled: emissions carry
 no belong-to (made is not had), and residue (say→sound) stays verb data,
