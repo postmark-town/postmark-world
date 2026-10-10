@@ -410,10 +410,8 @@ export function mistsHide(from, target, m) {
 }
 
 // ───────────────────────── the Mists slow the walk (POS-468) ─────────────────
-// Darko, 2026-10-09: "the further they make it into the mist, the slower they
-// get until they essentially hit zero". So the stride through the fringe falls
-// with DEPTH, to nothing at the wall's face, and no road goes into the wall at
-// all: there is no creeping in by short legs.
+// The stride through the fringe falls with DEPTH, to nothing at the wall's face,
+// and no road goes into the wall at all: there is no creeping in by short legs.
 //
 // THE CURVE. At a point in the fringe, s = 1 − wallM / fringe_m is how deep it
 // stands (0 at the fringe's outer edge, 1 at the wall's face), and d is the
@@ -426,7 +424,7 @@ export function mistsHide(from, target, m) {
 // fringe it bites. Out of the fringe it is 1, and before the Mists there is no
 // fringe at all.
 //
-// THE LEG. A walk is one straight leg at an even pace (calls 1 and 2, ruled):
+// THE LEG. A walk is one straight leg at an even pace:
 // the mist is read once, when the walk is declared, and the leg's time through
 // it is spread over the whole leg, so its ETA is exact and its position stays
 // a pure function of the line and the clock. The factor is length ÷ ∫ ds / stride,
@@ -467,7 +465,9 @@ export function mistsRoad(from, toward, crossing, mists) {
   let time = 0, deepest = 0, t = 0;
   while (t < 1) {
     const w = wallAt(at(t));
-    const h = Math.min(10, Math.max(0.05, w / 4)) / L;            // metres → share of the leg
+    // fine near the wall, coarse away from it; never finer than L / 20000, so a road
+    // that runs along the face for kilometres stays a bounded number of steps
+    const h = Math.min(10, Math.max(0.05, w / 4, L / 20000)) / L;  // metres → share of the leg
     const dt = Math.min(h, 1 - t);
     const mid = at(t + dt / 2);
     const wm = wallAt(mid);

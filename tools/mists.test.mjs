@@ -165,7 +165,7 @@ function real() {
   realCache = { skeleton, worldState, withM: assembleWorld({ worldState, skeleton }), without: assembleWorld({ worldState, skeleton: bare }) };
   return realCache;
 }
-// Pando Peak keeps its own air (Darko, 2026-10-09 22:00): its parcel stands in a
+// Pando Peak keeps its own air: its parcel stands in a
 // clearing of its own, so no parcel at all is behind the wall
 const PANDO = "vermillion/the-pando-peak-parcel";
 const KEYFRAMES = () => real().skeleton.mists.schedule.map((e) => e.crossing);

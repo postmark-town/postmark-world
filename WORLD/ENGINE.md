@@ -257,7 +257,7 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
   exemption. The fringe shortens sight like the weather, and a body inside the wall
   sees `wall_sight_m`. Before the schedule's first crossing it answers null and every
   telling is the pre-Mists one, byte for byte (`tools/mists.test.mjs`).
-- **The Mists slow the walk** (POS-468, Darko 2026-10-09). `mistsRoad(from, toward, crossing, mists)`
+- **The Mists slow the walk** (POS-468). `mistsRoad(from, toward, crossing, mists)`
   reads one leg at its declaration: a road that ends in the wall, on its face, crosses it
   or starts in it is refused; otherwise the stride at each point of the fringe is
   `mistsStride(s, d) = (1 − s)^(2d)` (s the depth, 0 at the outer edge and 1 at the face;

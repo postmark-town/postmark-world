@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // mists-walk.test.mjs — the Mists slow the walk (POS-468). Run: node --test tools/mists-walk.test.mjs
 //
-// The laws this holds (Darko, 2026-10-09 21:47):
+// The laws this holds:
 //   • the stride falls with depth into the fringe, to nothing at the wall's face,
 //     at every crossing; the thicker the day's mist, the earlier it bites;
 //   • no road ends in the wall, crosses it, or starts in it: there is no creeping
@@ -126,4 +126,24 @@ test("A STOP is never refused: standing still goes nowhere, even where the wall 
     const inWall = roadTo(faceN(c) - 100);
     assert.deepEqual(mistsRoad(inWall, inWall, c, MISTS), { factor: 1, deepest: 0 });
   }
+});
+
+test("NOT A WAY ACROSS: from Pando's clearing, a road to the Origin and a road to the far south-west clearing are both refused at the wall; a road inside Pando walks", () => {
+  const byId = (id) => mistsAt(LAST, MISTS).clearings.find((k) => k.id === id);
+  const pando = byId("pando"), sw = byId("the-far-southwest");
+  assert.ok(pando && sw, "both clearings stand on the record");
+  for (const c of [FIRST, LAST]) {
+    const here = { x: pando.x, y: pando.y };
+    assert.ok(mistsRoad(here, { x: 0, y: 0 }, c, MISTS).refused, `Pando → the Origin at ${c}`);
+    assert.ok(mistsRoad(here, { x: sw.x, y: sw.y }, c, MISTS).refused, `Pando → the far south-west clearing at ${c}`);
+    assert.ok(mistsRoad({ x: sw.x, y: sw.y }, here, c, MISTS).refused, `and back, at ${c}`);
+    const inside = mistsRoad(here, { x: pando.x + 1000, y: pando.y }, c, MISTS);
+    assert.deepEqual(inside, { factor: 1, deepest: 0 }, `a road inside Pando, clear of its fringe, walks open at ${c}`);
+  }
+});
+
+test("A ROAD ALONG THE FACE for kilometres crawls the whole way, at the floor", () => {
+  const y = faceN(LAST) + 0.3;
+  const r = mistsRoad({ x: -3000, y }, { x: 4000, y }, LAST, MISTS);
+  assert.ok(!r.refused && r.factor <= 0.001);
 });
