@@ -165,14 +165,16 @@ function real() {
   realCache = { skeleton, worldState, withM: assembleWorld({ worldState, skeleton }), without: assembleWorld({ worldState, skeleton: bare }) };
   return realCache;
 }
-const RULED_UNDER = "vermillion/the-pando-peak-parcel";      // the one parcel ruled to lie behind the wall
+// Pando Peak keeps its own air (Darko, 2026-10-09 22:00): its parcel stands in a
+// clearing of its own, so no parcel at all is behind the wall
+const PANDO = "vermillion/the-pando-peak-parcel";
 const KEYFRAMES = () => real().skeleton.mists.schedule.map((e) => e.crossing);
 const corners = (p) => {
   const hw = (p.extent?.w ?? 0) / 2, hh = (p.extent?.h ?? 0) / 2;
   return [{ x: p.at.x - hw, y: p.at.y - hh }, { x: p.at.x + hw, y: p.at.y - hh }, { x: p.at.x + hw, y: p.at.y + hh }, { x: p.at.x - hw, y: p.at.y + hh }];
 };
 
-test("NO PARCEL IS COVERED: every parcel on the record but the one ruled under stands clear of the wall AND its fringe, at every crossing", () => {
+test("NO PARCEL IS COVERED: every parcel on the record, Pando's too, stands clear of the wall AND its fringe, at every crossing", () => {
   const { skeleton, worldState } = real();
   const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at);
   assert.ok(parcels.length > 100, "the record's parcels are all here");
@@ -180,28 +182,26 @@ test("NO PARCEL IS COVERED: every parcel on the record but the one ruled under s
   for (let c = first; c <= last + 10; c += 1) {
     const m = mistsAt(c, skeleton.mists);
     for (const p of parcels) {
-      if (p.id === RULED_UNDER) continue;
       for (const q of corners(p)) {
         const here = mistsHere(q, m);
         assert.equal(here.inWall, false, `${p.id} is behind the wall at crossing ${c}`);
         assert.equal(here.thickness, 0, `${p.id} is in the fringe at crossing ${c}`);
       }
     }
-    assert.equal(mistsHere(parcels.find((p) => p.id === RULED_UNDER).at, m).inWall, true, "the one ruled under is behind the wall");
+    const pando = parcels.find((p) => p.id === PANDO);
+    assert.ok(m.clearings.some((k) => Math.hypot(pando.at.x - k.x, pando.at.y - k.y) <= k.r), "Pando's parcel stands in a clearing of its own");
   }
 });
 
-test("NO MARK IS BEHIND THE WALL but on Pando Peak's ground and the town's own water: every corner of every other placed mark stands clear, and a far clearing's marks clear its fringe too, at every crossing", () => {
+test("NO MARK IS BEHIND THE WALL but the town's own water: every corner of every placed mark stands clear, Pando Peak's ground with the rest, and a far clearing's marks clear its fringe too, at every crossing", () => {
   const { skeleton, worldState } = real();
-  const pando = worldState.marks.find((m) => m.id === RULED_UNDER).at;
-  const onPando = (m) => Math.hypot(m.at.x - pando.x, m.at.y - pando.y) < 10000;   // its own ground, 135 km out
   // the world-root is the frame, never a mark in view (the engine skips it the same way)
   const frame = (m) => Math.max(m.extent?.w ?? 0, m.extent?.h ?? 0) >= DIALS.world_scale_extent_m;
   // the town's own water runs off the map's edge into the mist, as a river
   // would (ruled 2026-10-09): these two, by id, and nothing else of the town's
   const RUNS_INTO_THE_MIST = new Set(["the-town/the-sea", "the-town/the-main-channel"]);
-  const marks = worldState.marks.filter((m) => m.at && !m.far && !frame(m) && !onPando(m) && !RUNS_INTO_THE_MIST.has(m.id) && Math.abs(m.at.x) < 50000 && Math.abs(m.at.y) < 50000);
-  assert.ok(marks.length > 700);
+  const marks = worldState.marks.filter((m) => m.at && !frame(m) && !RUNS_INTO_THE_MIST.has(m.id));
+  assert.ok(marks.length > 800, "every placed mark, the far ones with them");
   for (const c of [...KEYFRAMES(), KEYFRAMES().at(-1) + 10]) {
     const m = mistsAt(c, skeleton.mists);
     // a clearing was sized to keep what it holds out of the fringe as well
@@ -218,7 +218,7 @@ test("NO MARK IS BEHIND THE WALL but on Pando Peak's ground and the town's own w
 test("THE PARCEL NEAREST EACH SIDE stays fully sighted at every keyframe: its reach is the weather's, and it loses only what stands behind the wall", () => {
   const { skeleton, worldState, withM, without } = real();
   const b = skeleton.mists.border_m;
-  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && m.id !== RULED_UNDER && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000);
+  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000);
   const nearest = {
     n: parcels.reduce((a, p) => (p.at.y < a.at.y ? p : a)), s: parcels.reduce((a, p) => (p.at.y > a.at.y ? p : a)),
     e: parcels.reduce((a, p) => (p.at.x > a.at.x ? p : a)), w: parcels.reduce((a, p) => (p.at.x < a.at.x ? p : a)),
@@ -244,13 +244,13 @@ test("THE PARCEL NEAREST EACH SIDE stays fully sighted at every keyframe: its re
 // worldEyes), at the default budget. The Mists may take out of it only what the
 // wall hides: from every parcel's own standpoint, the reach with the Mists is the
 // reach the same crossing gives with no Mists and those hidden marks removed. The
-// veil must not re-rank it. Every parcel but Pando's, at the first keyframe and
+// veil must not re-rank it. Every parcel, Pando's with them, at the first keyframe and
 // the last.
 test("LAW REACH: from a parcel, the Mists change what is reached only by what the wall hides, never by the veil", () => {
   const { skeleton, worldState, withM, without } = real();
-  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && m.id !== RULED_UNDER && Math.abs(m.at.x) < 50000)
+  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at)
     .sort((p, q) => (p.id < q.id ? -1 : 1));
-  assert.ok(parcels.length >= 116);
+  assert.ok(parcels.length >= 117);
   const reachOf = (fov) => [...fov.carried.map((s) => s.id), ...fov.far.map((f) => f.id)].sort();
   for (const crossing of [KEYFRAMES()[0], KEYFRAMES().at(-1)]) {
     const m = mistsAt(crossing, skeleton.mists);
