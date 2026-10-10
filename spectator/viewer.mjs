@@ -3229,7 +3229,7 @@ export function activityFeed({ departures = [], marks = [], stakes = [], blessin
   const latestPerDay = new Map();
   for (const d of departures) {
     if (!d?.iso || !d?.handle) continue;
-    const key = `${activityDayKey(d.iso)} ${d.handle}`;
+    const key = `${activityDayKey(d.iso)}\0${d.handle}`;
     const held = latestPerDay.get(key);
     if (!held || String(held.iso) < String(d.iso)) latestPerDay.set(key, d);
   }
