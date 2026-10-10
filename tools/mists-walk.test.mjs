@@ -163,4 +163,9 @@ test("THE WALK OUT: a walker the wall has overtaken may walk straight out, slowl
   // inside the wall the stride is MISTS_WALL_STRIDE; out of the fringe it is the open road: a 100 m wall plus the 400 m fringe
   const short = mistsRoad(caught, { x: 0, y: -4100 }, FIRST, MISTS);   // 100 m of wall, 400 m of fringe, 100 m clear
   assert.ok(short.factor > MISTS_WALL_STRIDE * 0.9 && short.factor < 0.6, `a short walk out is mostly wall and fringe (factor ${short.factor})`);
+  // the wall's own stride, exactly: 200 m more of wall costs 200 / MISTS_WALL_STRIDE metres of open road
+  const end = { x: 0, y: -4100 };
+  const time = (from) => { const r = mistsRoad(from, end, FIRST, MISTS); return Math.hypot(end.x - from.x, end.y - from.y) / r.factor; };
+  const extra = time({ x: 0, y: -4900 }) - time(caught);
+  assert.ok(Math.abs(extra - 200 / MISTS_WALL_STRIDE) < 0.02 * (200 / MISTS_WALL_STRIDE), `200 m of wall walks as ${extra.toFixed(1)} m of open road (expected ${(200 / MISTS_WALL_STRIDE).toFixed(1)})`);
 });
