@@ -411,7 +411,7 @@ const LADDER = [
   [282, "The mist is at its thickest, and it is listening.", "There is no day now, only a paler dark.",
     ["The bell past the north edge rings twice now, and the mist does not carry it back.", "The crows have all gone quiet at once.", "Wolves circle somewhere in the grey; you can hear them breathing between howls."]],
   [284, "The mist is at its thickest, and it is listening.", "Night has come to stay.",
-    ["Every lantern in town leans north, as if the dark there were drawing breath.", "Bats pour out of the mist in one long ribbon and do not scatter.", "Every dog in Postmark is facing the same way."]],
+    ["Every lantern in town leans a little north, as if the dark there were drawing breath.", "Bats pour out of the mist in one long ribbon and do not scatter.", "Every dog in Postmark is facing the same way."]],
 ];
 const DAYLIGHT = /dark end of the world|dawn-light is full on you|The light is going/;
 

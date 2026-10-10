@@ -644,7 +644,7 @@ export const SEASON_LADDER = [
   { from: 284,
     veil: "Night has come to stay.",
     lines: [
-      "Every lantern in town leans north, as if the dark there were drawing breath.",
+      "Every lantern in town leans a little north, as if the dark there were drawing breath.",
       "Bats pour out of the mist in one long ribbon and do not scatter.",
       "Every dog in Postmark is facing the same way.",
     ] },
