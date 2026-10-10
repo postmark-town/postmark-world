@@ -374,13 +374,15 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
 }
 // the silhouettes, drawn for this (no clip-art), in a 100-wide box with the
 // feet (or the body's centre, for a flier) at the origin
+// Rei's originals (2026-10-10; motifs-rei/README.md: original vector drawings,
+// no external source or licence), as drawn: one path each in a 100-unit box,
+// and the offset that puts the feet (or a flier's middle) at the creature's
+// point. The site's motifs are the same four shapes.
 const CREATURE_PATHS = {
-  // one path each in a 100-unit box, and the offset that puts the feet (or a
-  // flier's middle) at the creature's point; the same shapes the site's motifs use
-  wolf: { d: "M5 95 C8 88 16 84 28 84 C26 72 30 62 38 56 C44 50 48 44 50 38 C51 33 51 29 52 26 L47 16 L56 22 L55 11 L61 19 C64 15 68 11 72 7 L86 2 L88 5 L74 18 C70 24 68 30 67 36 C70 44 71 52 69 60 L69 95 L62 95 L61 66 L59 66 L59 95 L53 95 L53 70 C50 72 48 76 48 80 C48 87 52 92 56 95 L38 95 C32 94 26 95 22 95 C14 96 8 96 5 95 Z", at: [-50, -96] },
-  crowperch: { d: "M8 64 L30 55 C38 45 50 40 60 40 C64 36 69 34 74 35 C77 36 79 38 80 40 L94 44 L80 49 C79 56 74 62 66 65 C58 68 48 68 40 66 L44 80 L41 80 L37 66 L33 65 L35 79 L32 79 L30 64 C24 64 16 66 10 68 Z", at: [-50, -80] },
-  crowlift: { d: "M10 60 L20 53 C28 49 34 47 40 47 C44 40 46 28 52 16 C62 24 66 36 62 48 C62 47 66 46 70 46 L82 47 L71 51 C66 57 58 60 48 60 C40 61 30 60 22 59 L12 64 Z", at: [-50, -45] },
-  bat: { d: "M50 34 L48 29 L46.5 36 C43 34 36 30 26 29 C22 29 14 31 4 37 C9 38 13 40 15 43 C19 41 24 41 27 44 C31 42 36 43 39 46 C43 45 46 47 48 50 L50 53 L52 50 C54 47 57 45 61 46 C64 43 69 42 73 44 C76 41 81 41 85 43 C87 40 91 38 96 37 C86 31 78 29 74 29 C64 30 57 34 53.5 36 L52 29 Z", at: [-50, -40] },
+  wolf: { d: "M8 91 C12 83 22 79 32 81 C28 72 30 61 38 53 C44 47 47 38 47 31 L43 18 L54 24 L58 17 L63 20 L74 8 L82 7 L84 12 L73 21 L81 17 L82 22 L69 33 C66 38 67 43 70 48 L66 46 L70 57 L65 54 L65 83 L70 88 L70 92 L57 92 L55 62 C51 66 48 72 48 77 C49 82 51 86 55 88 L54 92 L35 92 C25 96 14 96 8 91 Z", at: [-50, -92] },
+  crowperch: { d: "M8 80 L25 59 C30 52 36 49 42 44 C47 40 48 31 53 25 C58 18 68 17 75 22 L79 27 L94 32 L94 35 L78 36 C79 43 75 48 74 53 L78 55 L73 57 L75 60 L69 60 C65 66 60 70 53 73 L54 83 L63 86 L62 89 L49 88 L48 76 L41 77 L39 86 L45 89 L43 92 L34 88 L35 77 L13 87 Z", at: [-50, -89] },
+  crowlift: { d: "M6 78 L29 58 C28 43 21 29 17 20 Q18 16 22 20 L29 29 L27 13 Q28 9 32 13 L41 26 L40 8 Q42 5 45 10 L55 28 L55 13 Q58 10 60 16 L63 44 C66 40 73 40 77 44 L81 48 L96 52 L96 55 L81 57 C75 66 68 69 57 69 L51 79 L55 82 L53 85 L45 80 L48 71 L41 74 L34 88 L29 87 L34 76 L12 85 Z", at: [-50, -50] },
+  bat: { d: "M50 39 L44 28 L41 44 C32 37 24 24 7 18 C12 31 11 44 3 57 C17 52 24 56 25 65 C35 60 41 65 43 73 L50 83 L57 73 C59 65 65 60 75 65 C76 56 83 52 97 57 C89 44 88 31 93 18 C76 24 68 37 59 44 L56 28 Z", at: [-50, -50] },
 };
 /** One creature as SVG, in the painting's frame. `ink` is the silhouette's
  *  colour (the fog's core); `eye` the light its eyes catch. */
@@ -388,8 +390,8 @@ export function mistsCreatureSVG(cr, { originPx, mPerPx, ink, eye = MISTS_EYE })
   const n = (v) => v.toFixed(1), s = cr.sizeM / 100 / mPerPx;
   const x = originPx.x + cr.x / mPerPx, y = originPx.y + cr.y / mPerPx;
   const P = cr.kind === "wolf" ? CREATURE_PATHS.wolf : cr.kind === "bat" ? CREATURE_PATHS.bat : cr.pose === "lift" ? CREATURE_PATHS.crowlift : CREATURE_PATHS.crowperch;
-  // a wolf's eye catches the light just under the crown, before the snout
-  const eyes = cr.eyes ? `<g class="wv-mc-eyes" style="animation-delay:-${n(cr.phase * 9)}s"><circle cx="69" cy="15" r="1.5" fill="${eye}"/><circle cx="69" cy="15" r="4.5" fill="${eye}" opacity="0.3"/></g>` : "";
+  // a wolf's eye catches the light on the head, just behind the muzzle's root
+  const eyes = cr.eyes ? `<g class="wv-mc-eyes" style="animation-delay:-${n(cr.phase * 9)}s"><circle cx="64" cy="25" r="1.6" fill="${eye}"/><circle cx="64" cy="25" r="4.5" fill="${eye}" opacity="0.3"/></g>` : "";
   return `<g transform="translate(${n(x)} ${n(y)}) scale(${cr.flip ? "-" : ""}${s.toFixed(4)} ${s.toFixed(4)})">`
     + `<g class="wv-mc wv-mc-${cr.kind}${cr.pose ? " wv-mc-" + cr.pose : ""}" style="animation-delay:-${n(cr.phase * 12)}s">`
     + `<g transform="translate(${P.at[0]} ${P.at[1]})"><path d="${P.d}" fill="${ink}"/>${eyes}</g></g></g>`;

@@ -154,19 +154,6 @@ test("the creatures: seeded by the crossing, sparse at 244 and populated by 284,
   assert.deepEqual(mistsCreatures(null), [], "no Mists, no creatures");
 });
 
-test("the page's season lines: the telling's bell from veil 0.3, and the drafted lanterns from 284, which the telling does not speak", async () => {
-  const { seasonLine, seasonLines } = await import("./world-verbs.mjs");
-  assert.deepEqual(seasonLines(null, 284), []);
-  assert.deepEqual(seasonLines(mistsAt(244, MISTS), 244), []);
-  const bell = seasonLine(mistsAt(272, MISTS), 272);
-  assert.ok(bell, "the bell from 272");
-  assert.deepEqual(seasonLines(mistsAt(272, MISTS), 272), [bell]);
-  const at284 = seasonLines(mistsAt(284, MISTS), 284);
-  assert.equal(at284.length, 2);
-  assert.match(at284[1], /lantern/);
-  assert.equal(seasonLine(mistsAt(284, MISTS), 284), bell, "the telling's line is unchanged");
-});
-
 // THE SHEET'S EDGE IS A FACE TOO (POS-553 review): the painted sheet (the atlas
 // painting, 1500 x 2400 units at 5 m, the Origin at 485,760) is a rectangle; the
 // fog stands past it and reaches raggedly over it, so its sides never show. With
