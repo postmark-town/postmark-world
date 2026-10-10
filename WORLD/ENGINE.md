@@ -247,24 +247,43 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
 - **Deterministic and replayable from any clone.** No wall-clock, no unseeded
   randomness; fog seeds from the crossing number (`fogModel`). Same crossing →
   byte-identical telling (tested).
-- **The Mists: fog with a place** (POS-466, ruled 2026-10-09). `mistsAt(crossing,
-  skeleton.mists)` puts a wall at the map's border (`border_m`, pinned config) on a
-  crossing schedule: `front_m` per side (positive creeps onto the map, negative pulls
-  back past the edge), `clearings_m` (open ground the wall never takes, round land far
-  past the border), the fringe's `density` (eased in over the schedule), and the
-  `veil` on all light, signals included. `tools/world-terrain-gen.mjs` emits the
-  block, so a regenerate keeps it. The wall occludes everything behind it, with no ceiling and no height
-  exemption. The fringe shortens sight like the weather, and a body inside the wall
-  sees `wall_sight_m`. Before the schedule's first crossing it answers null and every
-  telling is the pre-Mists one, byte for byte (`tools/mists.test.mjs`).
-- **The Mists slow the walk** (POS-468). `mistsRoad(from, toward, crossing, mists)`
-  reads one leg at its declaration: a road that ends in the wall, on its face, crosses it
-  or starts in it is refused; otherwise the stride at each point of the fringe is
-  `mistsStride(s, d) = (1 − s)^(2d)` (s the depth, 0 at the outer edge and 1 at the face;
-  d the day's density), and the leg's even factor, length ÷ ∫ ds / stride, is stamped on
-  the leg as part of its pace. A walker the wall overtakes may walk straight out (the road's
-  depth never rising, ending clear or in the fringe) at `MISTS_WALL_STRIDE` (0.15) inside the wall
-  and never less in the fringe on the way out (`tools/mists-walk.test.mjs`).
+- **The Mists** (POS-466, POS-468): a seasonal border wall of mist. Their mechanics live
+  here and in `skeleton.mists` (written by `tools/world-terrain-gen.mjs` from its one home,
+  `tools/mists-record.mjs`, so a regenerate keeps it), not in LOGOS.
+  - **Where the wall stands.** `mistsAt(crossing, skeleton.mists)` puts a wall at the map's
+    border (`border_m`, pinned config) on a crossing schedule: `front_m` per side (positive
+    creeps onto the map, negative pulls back past the edge), `clearings_m` (open ground the
+    wall never takes: Pando Peak's ground and the far south-west), the fringe's `density`
+    (eased in over the schedule), and the `veil` on all light. Before the schedule's first
+    crossing it answers null, and every telling is the one it was before the Mists, byte for
+    byte (`tools/mists.test.mjs`).
+  - **What the wall hides.** Everything behind it, with no ceiling and no height exemption: a
+    sight line is cut wherever it runs through the wall. The fringe on the clear side shortens
+    sight like the weather, and a body inside the wall sees `wall_sight_m`. The veil dims
+    every place's light, signals included, in what is told; what is reached (and so law
+    reach) reads the unveiled light, and only the wall takes a mark out of reach.
+  - **How walking slows.** `mistsRoad(from, toward, crossing, mists)` reads one leg once, at
+    its declaration. In the fringe the stride is `mistsStride(s, d) = (1 − s)^(2d)`: s is how
+    deep the point stands (0 at the fringe's outer edge, 1 at the wall's face) and d the day's
+    density, so it is whole at the edge, nothing at the face, and bites sooner on thicker days.
+    The leg's time through the fringe is spread over the whole leg as one even pace (length ÷
+    ∫ ds / stride, never below 1e-4 of the open road) and stamped on the leg as its pace.
+  - **No road into the wall.** A road that ends in the wall, on its face, or crosses it (to a
+    clearing, say) is refused, naming where it meets the wall. A stop is never refused.
+  - **The walk out.** A walker the wall has overtaken may walk straight out. The road's depth
+    (one measure through the wall and the fringe) never rises; while it is in the wall or more
+    than half way into the fringe it falls at least `MISTS_OUT_GRADE` (cos 45°) per metre, so
+    the road points within 45° of straight out; and it ends on clear ground or in the fringe.
+    The stride is `MISTS_WALL_STRIDE` (0.15) inside the wall, the fringe's curve but never
+    less than that while more than half way in, and the ordinary curve from there
+    (`tools/mists-walk.test.mjs`). Any other road from inside the wall is refused.
+  - **No mark placed or moved into the wall** (the office's placement door, from the first
+    crossing). A mark whose ground (its outline, else its box; every corner and every side)
+    reaches behind the wall is refused. An amend is asked only about the ground it adds: its
+    new sides outside the old footprint and the old sides inside the new one, so the town's
+    great marks can be re-filed in place and a filled notch counts as new. Marks already
+    standing stay as they are. A portal ground never sets anyone down behind the wall. If the
+    office cannot read the wall, both refuse rather than guess.
 - **Render cost capped by a context budget, never world size.** Candidates are
   culled to a sight radius, ranked, and carried to the budget; the rest aggregate.
 
