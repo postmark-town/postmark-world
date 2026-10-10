@@ -21,9 +21,9 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
-import { orient, openYourEyes, investigate, containmentChain, mistsSentence, VEIL_LINE } from "../tools/world-verbs.mjs";
+import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
-import { DIALS, bearingDeg, quantizeBearing, mistsAt } from "../tools/world-engine.mjs";
+import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
@@ -747,18 +747,26 @@ export function departPaceKm(marks) {
   return Number.isFinite(pace) && pace > 0 ? pace : null;
 }
 
-export function previewWalkLeg({ from, toward, targetExtent = null, skeleton = null, paceKm = null } = {}) {
+// `at` is the clock (the live crossing unless a caller pins one, as a test must:
+// the Mists make the preview a function of the crossing).
+export function previewWalkLeg({ from, toward, targetExtent = null, skeleton = null, paceKm = null, at = fractionalCrossing() } = {}) {
   if (![from?.x, from?.y, toward?.x, toward?.y].every(Number.isFinite)) return null;
-  const at = fractionalCrossing();
+  // THE MISTS ON THIS ROAD (POS-468), read the way the office reads them at the
+  // declare: a road into the wall is no walk at all, and a road through the
+  // fringe walks at its slowed stride. No Mists, and nothing here changes.
+  const road = skeleton?.mists ? mistsRoad(from, toward, at, skeleton.mists) : null;
+  if (road?.refused) return { distanceM: 0, etaCrossings: 0, paceKm: 0, paceFromRecord: paceKm != null, viaCrossings: [], mistRefused: road.refused };
+  const stride = road && road.factor < 1 ? (paceKm ?? WALK_KM_PER_CROSSING) * road.factor : paceKm;
   // positionAt already speaks pace — a departure may carry its own stride and
   // the town dial governs when it does not. The preview simply never passed one.
-  const position = positionAt({ from, toward, at, targetExtent, pace: paceKm ?? undefined }, at);
+  const position = positionAt({ from, toward, at, targetExtent, pace: stride ?? undefined }, at);
   return {
     distanceM: position.legM,
     etaCrossings: position.etaCrossings,
-    paceKm: paceKm ?? WALK_KM_PER_CROSSING,
+    paceKm: stride ?? WALK_KM_PER_CROSSING,
     paceFromRecord: paceKm != null,
     viaCrossings: skeleton ? crossingsOnSegment(from, toward, skeleton) : [],
+    ...(road && road.factor < 1 ? { mist: { factor: road.factor, deepest: road.deepest } } : {}),
   };
 }
 
@@ -3222,7 +3230,7 @@ export function activityFeed({ departures = [], marks = [], stakes = [], blessin
   const latestPerDay = new Map();
   for (const d of departures) {
     if (!d?.iso || !d?.handle) continue;
-    const key = `${activityDayKey(d.iso)} ${d.handle}`;
+    const key = `${activityDayKey(d.iso)}\0${d.handle}`;
     const held = latestPerDay.get(key);
     if (!held || String(held.iso) < String(d.iso)) latestPerDay.set(key, d);
   }
@@ -7368,11 +7376,11 @@ export function mountViewer(appEl) {
     // the Mists (POS-466), in the telling's own words: where the mist is on you
     // it stands in for the weather, elsewhere it rides beside it
     const told = mistsSentence(radial.mists, (radial.sightReachM ?? 0).toLocaleString());
-    if (told?.onYou) return told.text + (radial.mists.veil > 0 ? " " + VEIL_LINE : "");
+    if (told?.onYou) return told.text + (veilSentence(radial.mists) ? " " + veilSentence(radial.mists) : "");
     const weather = obs.aboveFog ? "You are above the fog; the sightlines run long."
       : obs.inFog ? `Fog is in tonight (thickness ${radial.fog.thickness}) — it closes the view to about ${(radial.sightReachM ?? 0).toLocaleString()} m.`
       : `The air is clear — you can see about ${(radial.sightReachM ?? 0).toLocaleString()} m.`;
-    return told ? `${weather} ${told.text}${radial.mists.veil > 0 ? " " + VEIL_LINE : ""}` : weather;
+    return told ? `${weather} ${told.text}${veilSentence(radial.mists) ? " " + veilSentence(radial.mists) : ""}` : weather;
   }
   // keep: optional predicate — under just mine, only cards whose mark passes
   // show (the telling stays otherwise identical: same order, same budget already
@@ -11559,7 +11567,7 @@ export function mountViewer(appEl) {
   // routes and only the mark one was ever guarded. A walk to where you already
   // stand is not a walk, and the record should not carry one.
   function isRealDeparture(preview) {
-    return !!preview && Number(preview.leg?.distanceM) > 0;
+    return !!preview && Number(preview.leg?.distanceM) > 0 && !preview.leg?.mistRefused;
   }
 
   function walkPreviewTo(point) {

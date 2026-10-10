@@ -58,12 +58,17 @@ export function formatDeparture({ handle, from, toward, at, targetExtent = null,
   const intent = targetMarkId ? ` · to ${targetMarkId}` : "";
   // pace (008b): the law as it stood at declaration, stamped so later dial
   // amendments never re-derive this leg. Omitted = pre-008b legacy constant.
-  const stride = pace > 0 ? ` · pace ${round1(pace)}` : "";
+  // FOUR PLACES, NOT ONE (POS-468): a leg the Mists slow carries its slowed
+  // stride here, and a stride a hundred times slower than the open road would
+  // round to 0 at one place, and an unreadable 0 walks at the legacy constant.
+  // A whole-number pace (every leg before the Mists) prints exactly as it did.
+  const stride = pace > 0 ? ` · pace ${roundPace(pace)}` : "";
   return `- ${stamp} · ${handle} · from ${round1(from.x)},${round1(from.y)}`
        + ` · toward ${round1(toward.x)},${round1(toward.y)} · at ${at.toFixed(4)}${within}${intent}${stride}`;
 }
 
 const round1 = (n) => Math.round(n * 10) / 10;
+const roundPace = (n) => Math.round(n * 1e4) / 1e4;
 // Two decimals in ONE division. round1(n * 10) / 10 divides twice, and 107/10/10
 // is not 1.07 in binary floating point — it published 1.0699999999999998 to
 // every reader of the walkers API.

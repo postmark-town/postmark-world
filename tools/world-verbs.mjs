@@ -51,7 +51,7 @@ export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
       fog: { crossing: fog.crossing, thickness: +fog.thickness.toFixed(2), inFog: self.inFog, aboveFog: self.aboveFog },
       // the Mists at your standpoint; absent (not null) before they arrive, so
       // the answer before the schedule's first crossing is the old one, bit for bit
-      ...(mists ? { mists: mistsBlock(mists, mistsHere(state, mists)) } : {}),
+      ...(mists ? { mists: mistsBlock(mists, mistsHere(state, mists), state) } : {}),
     },
     // enter/exit are DEMO-SLICE verbs (step 5) — listed so a reader of the
     // demo sees the pair, and pointedly listed apart from walk, which reaches
@@ -505,10 +505,9 @@ function renderTelling(state, radial, fov) {
   const airline = o.aboveFog ? "You are above the fog; the sightlines run long."
     : o.inFog ? `Fog is in ${fogWhen} (crossing ${radial.crossing}, thickness ${radial.fog.thickness}); it closes the view to about ${radial.sightReachM} m${anySignalCarries ? ", and only the lights carry further" : ""}.`
     : `The air is clear (crossing ${radial.crossing}); you can see about ${radial.sightReachM} m.`;
-  const lightline = lightWords(o.inDarkness, o.lightLevel);
-  const veiled = radial.mists?.veil > 0 ? " " + VEIL_LINE : "";
+  const lightline = lightOrVeil(radial.mists, o.inDarkness, o.lightLevel);
   const season = seasonLine(radial.mists, radial.crossing);
-  L.push((mistLine(radial.mists, radial.sightReachM) ?? (radial.mists ? `${airline} ${MIST_AT_THE_EDGES}` : airline)) + " " + lightline + veiled + (season ? " " + season : ""));
+  L.push((mistLine(radial.mists, radial.sightReachM) ?? (radial.mists ? `${airline} ${mistBase(radial.mists)}` : airline)) + " " + lightline + (season ? " " + season : ""));
   L.push("");
 
   // Distance orders the telling; bearing is a field on the mark (Keemin,
@@ -563,8 +562,8 @@ function renderTelling(state, radial, fov) {
 // weather's: an eye above the fog line still stands inside the mist, so "the
 // sightlines run long" would be false there. Where it is not on you, one more
 // sentence rides beside the weather's.
-// Exported, with mistsSentence, so the page tells the Mists in these words and
-// no second copy of them exists.
+// Exported, with mistsSentence and veilSentence, so the page tells the Mists in
+// these words and no second copy of them exists.
 export const MIST_AT_THE_EDGES = "Mist has come in at the edges of the map; nothing past it can be seen.";
 export const VEIL_LINE = "The sun is veiled: the whole land is darker than its hour.";
 /** The Mists in one sentence for a standpoint's `mists` block, or null before
@@ -572,8 +571,14 @@ export const VEIL_LINE = "The sun is veiled: the whole land is darker than its h
 export function mistsSentence(m, reach) {
   if (!m) return null;
   const line = mistLine(m, reach);
-  return { text: line ?? MIST_AT_THE_EDGES, onYou: !!line };
+  return { text: line ?? mistBase(m), onYou: !!line };
 }
+/** The veil in one sentence for a `mists` block, or null where there is no veil. */
+export function veilSentence(m) {
+  if (!(m?.veil > 0)) return null;
+  return seasonRung(m)?.veil ?? VEIL_LINE;
+}
+function mistBase(m) { return seasonRung(m)?.mist ?? MIST_AT_THE_EDGES; }
 function mistLine(m, reach) {
   if (!m) return null;
   if (m.in_wall) return `You stand inside the mist. You can see about ${reach} m, and nothing past it.`;
@@ -585,24 +590,78 @@ function lightWords(inDarkness, level) {
     : level > 0.7 ? "The northeast dawn-light is full on you here."
     : "The light is going — the world's glow lives off to the northeast and dies toward the southwest.";
 }
+// Under a veil the veil's sentence speaks for the light: the daylight sentence
+// reads the veiled level, so it would call any place the dark end of the world.
+function lightOrVeil(m, inDarkness, level) {
+  return veilSentence(m) ?? lightWords(inDarkness, level);
+}
 // The crossing's own hour: an even crossing sails at 00:00 UTC, the town's
 // evening, and an odd one at 12:00 UTC, its morning (crossings.mjs in the office).
 function hourOf(crossing) { return (crossing | 0) % 2 === 0 ? "evening" : "morning"; }
 
 // ───────────────────────── the season's voice (POS-551) ──────────────────────
-// While the Mists stand, the world itself has a line in the weather and light
-// telling. A rung is reached by the veil the reader is told (the block's veil,
-// rounded as told), the highest rung reached speaks, and among a rung's lines
-// the crossing number picks one, so the same crossing always says the same thing
-// and no clock is read. No Mists, no line: before the schedule's first crossing
-// the telling is the one it always was.
-export const SEASON_LINES = [
-  { veil: 0.3, lines: ["Somewhere past the north edge, a bell you have never heard rings once."] },
-];
-export function seasonLine(m, crossing) {
+// While the Mists stand, the world itself is told: the edge's sentence, the
+// veil's sentence and one line more, rung by rung. A rung holds from its
+// crossing to the next rung's; the crossing number picks one of its lines
+// (crossing % n), so the same crossing always says the same thing and no clock
+// is read. No Mists, no rung: before the schedule's first crossing the telling
+// is the one it always was. A rung with no sentence of its own for a slot keeps
+// the one before.
+const NORTH_EDGE = /north edge/;
+export const SEASON_LADDER = [
+  { from: 244,
+    mist: MIST_AT_THE_EDGES,
+    veil: VEIL_LINE,
+    lines: [
+      "The gulls have stopped flying north.",
+      "The fog at the edges does not move with the wind.",
+      "A crow sits on the post office roof and watches the quay.",
+    ] },
+  { from: 258,
+    mist: "The mist has crept in from the edges, and it is thicker than yesterday.",
+    veil: "The sun is veiled, and the day never quite arrives.",
+    lines: [
+      "Far past the edge, wolves are calling to each other.",
+      "More crows on the post office roof. None of them make a sound.",
+      "Bats come out over the water earlier than they should.",
+    ] },
+  { from: 272,
+    mist: "The mist presses at the edges of the map, and nobody who goes near it wants to go nearer.",
+    veil: "The sun has not properly risen in days.",
+    lines: [
+      "Somewhere past the north edge, a bell you have never heard rings once.",
+      "The candles in the windows lean north, though there is no draught.",
+      "A wolf howls close enough that the ferry's bell answers it.",
+    ] },
+  { from: 282,
+    mist: "The mist is at its thickest, and it is listening.",
+    veil: "There is no day now, only a paler dark.",
+    lines: [
+      "The bell past the north edge rings twice now, and the mist does not carry it back.",
+      "The crows have all gone quiet at once.",
+      "Wolves circle somewhere in the grey; you can hear them breathing between howls.",
+    ] },
+  { from: 284,
+    veil: "Night has come to stay.",
+    lines: [
+      "Every lantern in town leans a little north, as if the dark there were drawing breath.",
+      "Bats pour out of the mist in one long ribbon and do not scatter.",
+      "Every dog in Postmark is facing the same way.",
+    ] },
+].map((r, i, all) => ({ ...r, mist: r.mist ?? all.slice(0, i).reverse().find((q) => q.mist).mist }));
+/** The rung the Mists stand at for a `mists` block (its own crossing), or null. */
+export function seasonRung(m, crossing = m?.crossing) {
   if (!m) return null;
-  const rung = SEASON_LINES.filter((r) => m.veil >= r.veil).at(-1);
-  return rung ? rung.lines[Math.abs(crossing | 0) % rung.lines.length] : null;
+  return SEASON_LADDER.filter((r) => (crossing | 0) >= r.from).at(-1) ?? null;
+}
+/** The season's one line at a standpoint. A body inside the wall, or in a
+ *  clearing past the town's clear box (Pando's ground, once it keeps its own
+ *  air), is never told of the north edge; it hears the rung's other lines. */
+export function seasonLine(m, crossing = m?.crossing) {
+  const rung = seasonRung(m, crossing);
+  if (!rung) return null;
+  const lines = m.in_wall || m.clearing ? rung.lines.filter((l) => !NORTH_EDGE.test(l)) : rung.lines;
+  return lines.length ? lines[Math.abs(crossing | 0) % lines.length] : null;
 }
 // A rung keyed to the crossing number itself, for a line whose crossing the veil
 // can't name (the veil holds at its deepest from 282). DRAFTED (POS-551, for
@@ -620,10 +679,10 @@ export function seasonLines(m, crossing) {
 }
 
 /**
- * THE AIR, IN ONE LINE (POS-551): light, fog and the Mists at a standpoint, from
- * the numbers `orient` returns (`you` and the crossing), in the telling's own
- * words. Null when orient carries no Mists, so a reader's answer before the
- * schedule's first crossing is unchanged.
+ * THE AIR, IN ONE LINE (POS-551): fog, the Mists and the veil at a standpoint,
+ * from the numbers `orient` returns (`you` and the crossing), in the telling's
+ * own words, and the season's line. Null when orient carries no Mists, so a
+ * reader's answer before the schedule's first crossing is unchanged.
  */
 export function airLine(you, crossing) {
   const m = you?.mists;
@@ -633,9 +692,8 @@ export function airLine(you, crossing) {
     : m.thickness > 0 ? `The mist's edge is ${m.wall_m} m off and its haze is on you (thickness ${m.thickness}).`
     : (you.fog?.aboveFog ? "You are above the fog."
       : you.fog?.inFog ? `Fog is in this ${when} (thickness ${you.fog.thickness}).`
-      : `The air is clear this ${when}.`) + " " + MIST_AT_THE_EDGES;
-  const season = seasonLine(m, crossing);
-  return [weather, lightWords(you.light?.inDarkness, you.light?.level), m.veil > 0 ? VEIL_LINE : null, season]
+      : `The air is clear this ${when}.`) + " " + mistBase(m);
+  return [weather, lightOrVeil(m, you.light?.inDarkness, you.light?.level), seasonLine(m, crossing)]
     .filter(Boolean).join(" ");
 }
 

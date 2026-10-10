@@ -43,7 +43,7 @@ export function suiteFiles(toolsDir = HERE) {
 export function countPinned(files) {
   let pinned = 0, total = 0;
   for (const f of files) {
-    // latin1: one suite carries NUL bytes, and this only ever reads titles
+    // latin1: byte-safe decoding; this only ever reads titles
     for (const line of readFileSync(f, "latin1").split("\n")) {
       const m = line.match(TITLE_RE);
       if (!m) continue;

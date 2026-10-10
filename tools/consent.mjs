@@ -193,8 +193,8 @@ const overlapsRect = (a, b) => {
 export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rectOf, townWords = null, townLaws = null }) {
   const errors = [];
   const kept = new Set();
-  const words = new Map();      // `${grantorId} ${targetId}` -> word
-  const wordKey = (g, t) => `${g} ${t}`;
+  const words = new Map();      // `${grantorId}\0${targetId}` -> word
+  const wordKey = (g, t) => `${g}\0${t}`;
   const own = (id) => ownStamps.get(id) ?? 0;
   const credOfMark = (mk) => credOf(mk?.household);
 
