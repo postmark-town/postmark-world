@@ -262,7 +262,9 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
   or starts in it is refused; otherwise the stride at each point of the fringe is
   `mistsStride(s, d) = (1 − s)^(2d)` (s the depth, 0 at the outer edge and 1 at the face;
   d the day's density), and the leg's even factor, length ÷ ∫ ds / stride, is stamped on
-  the leg as part of its pace (`tools/mists-walk.test.mjs`).
+  the leg as part of its pace. A walker the wall overtakes may walk straight out (the road's
+  depth never rising, ending clear or in the fringe) at `MISTS_WALL_STRIDE` (0.15) inside the wall
+  and never less in the fringe on the way out (`tools/mists-walk.test.mjs`).
 - **Render cost capped by a context budget, never world size.** Candidates are
   culled to a sight radius, ranked, and carried to the budget; the rest aggregate.
 

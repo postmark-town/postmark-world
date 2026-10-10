@@ -453,8 +453,10 @@ export function mistsRoad(from, toward, crossing, mists) {
   const wallAt = (p) => { const h = mistsHere(p, m); return h.inWall ? 0 : h.wallM; };
   // standing still is not going anywhere: a stop is never refused, wherever it stands
   if (L === 0) return { factor: 1, deepest: 0 };
-  // the road may not start, pass or end in the wall, nor on its face
-  if (wallAt(from) <= 0 || wallAt(toward) <= 0 || (L > 0 && mistsHide(from, toward, m))) {
+  // A WALKER THE WALL HAS OVERTAKEN may walk straight out, slowly: see mistsWalkOut
+  if (wallAt(from) <= 0) return mistsWalkOut(from, toward, L, at, m);
+  // the road may not pass or end in the wall, nor on its face
+  if (wallAt(toward) <= 0 || (L > 0 && mistsHide(from, toward, m))) {
     let t = 0;
     if (wallAt(from) > 0) { const n = Math.max(1, Math.ceil(L)); for (let i = 1; i <= n; i += 1) { t = i / n; if (wallAt(at(t)) <= 0) break; } }
     const p = at(t);
@@ -480,6 +482,43 @@ export function mistsRoad(from, toward, crossing, mists) {
   if (deepest === 0) return { factor: 1, deepest: 0 };
   const factor = Math.max(MISTS_STRIDE_FLOOR, Math.min(1, L / time));
   return { factor, deepest };
+}
+
+// THE WALK OUT. As the wall creeps in it can overtake a walker standing on open
+// ground. They may declare a road that only heads out toward clear land: its
+// depth in the mist never rises anywhere along the road (the depth runs on
+// through the wall and the fringe as one measure, so it is continuous at the
+// face), and it ends on clear ground or in the fringe, never in the wall or on
+// its face. Inside the wall they walk at MISTS_WALL_STRIDE of their pace. In the
+// fringe on the way out, the stride is the fringe's own curve but never less
+// than that, because the curve is nothing at the face and a walker leaving
+// through the face would otherwise never leave. Any other road from inside the
+// wall is refused at the point it stands on, in the same words as every refusal.
+export const MISTS_WALL_STRIDE = 0.15;
+function mistsDepthOf(p, m) {
+  const h = mistsHere(p, m);
+  if (!h.inWall) return h.wallM < m.fringeM ? m.fringeM - h.wallM : 0;
+  const c = m.clear;
+  let d = Math.hypot(Math.max(c.minX - p.x, 0, p.x - c.maxX), Math.max(c.minY - p.y, 0, p.y - c.maxY));
+  for (const k of m.clearings ?? []) d = Math.min(d, Math.max(0, Math.hypot(p.x - k.x, p.y - k.y) - k.r));
+  return m.fringeM + d;
+}
+function mistsWalkOut(from, toward, L, at, m) {
+  const refuse = () => ({ refused: { x: Math.round(from.x), y: Math.round(from.y) }, factor: 0, deepest: 1 });
+  if (mistsHere(toward, m).inWall || mistsHere(toward, m).wallM <= 0) return refuse();
+  const n = Math.max(64, Math.min(20000, Math.ceil(L)));
+  let last = mistsDepthOf(from, m), time = 0;
+  for (let i = 1; i <= n; i += 1) {
+    const p = at(i / n), mid = at((i - 0.5) / n);
+    const depth = mistsDepthOf(p, m);
+    if (depth > last + 1e-6) return refuse();                       // the road goes deeper somewhere
+    last = depth;
+    const h = mistsHere(mid, m);
+    const stride = h.inWall ? MISTS_WALL_STRIDE
+      : h.wallM < m.fringeM ? Math.max(MISTS_WALL_STRIDE, mistsStride(1 - h.wallM / m.fringeM, m.density)) : 1;
+    time += (L / n) / stride;
+  }
+  return { factor: Math.max(MISTS_STRIDE_FLOOR, Math.min(1, L / time)), deepest: 1, walk_out: true };
 }
 
 // ───────────────────────── status effects at a point ───────────────────────

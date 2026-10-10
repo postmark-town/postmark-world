@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { mistsAt, mistsRoad, mistsStride, MISTS_STRIDE_FLOOR } from "./world-engine.mjs";
+import { mistsAt, mistsRoad, mistsStride, MISTS_STRIDE_FLOOR, MISTS_WALL_STRIDE } from "./world-engine.mjs";
 import { formatDeparture, parseWalkLedger, positionAt } from "./walk.mjs";
 import { previewWalkLeg } from "../spectator/viewer.mjs";
 
@@ -87,7 +87,7 @@ test("NEAR THE FACE the stride goes to (almost) nothing: a road across the fring
   assert.ok(r.factor >= MISTS_STRIDE_FLOOR, "and never to a pace nobody can divide by");
 });
 
-test("NO ROAD INTO THE WALL: one that ends in it, ends on its face, crosses it, or starts in it is refused, naming where it meets the wall", () => {
+test("NO ROAD INTO THE WALL: one that ends in it, ends on its face, crosses it, or starts in it and goes deeper is refused, naming where it meets the wall", () => {
   for (const c of [FIRST, LAST]) {
     const into = mistsRoad(FROM, roadTo(faceN(c) - 100), c, MISTS);
     assert.ok(into.refused, `ends in the wall at ${c}`);
@@ -95,7 +95,7 @@ test("NO ROAD INTO THE WALL: one that ends in it, ends on its face, crosses it, 
     assert.ok(mistsRoad(FROM, roadTo(faceN(c)), c, MISTS).refused, `ends on the face at ${c}`);
     const k = mistsAt(c, MISTS).clearings[0];
     assert.ok(mistsRoad(FROM, { x: k.x, y: k.y }, c, MISTS).refused, `crosses the wall to a clearing at ${c}`);
-    assert.ok(mistsRoad(roadTo(faceN(c) - 100), FROM, c, MISTS).refused, `starts in the wall at ${c}`);
+    assert.ok(mistsRoad(roadTo(faceN(c) - 100), roadTo(faceN(c) - 400), c, MISTS).refused, `starts in the wall and goes deeper at ${c}`);
   }
 });
 
@@ -146,4 +146,21 @@ test("A ROAD ALONG THE FACE for kilometres crawls the whole way, at the floor", 
   const y = faceN(LAST) + 0.3;
   const r = mistsRoad({ x: -3000, y }, { x: 4000, y }, LAST, MISTS);
   assert.ok(!r.refused && r.factor <= 0.001);
+});
+
+test("THE WALK OUT: a walker the wall has overtaken may walk straight out, slowly; any road from inside that goes deeper, runs along, or ends in the wall is refused", () => {
+  const caught = { x: 0, y: -4700 };                                   // 100 m behind the north face at the first crossing
+  assert.equal(faceN(FIRST), -4600, "the face this test stands behind");
+  const out = mistsRoad(caught, { x: 0, y: 0 }, FIRST, MISTS);
+  assert.ok(!out.refused && out.walk_out, "toward the Origin: allowed");
+  assert.ok(out.factor < 1, `and slow (factor ${out.factor})`);
+  const deeper = mistsRoad(caught, { x: 0, y: -5000 }, FIRST, MISTS);
+  assert.deepEqual(deeper.refused, { x: 0, y: -4700 }, "toward (0, −5000): refused where it stands");
+  assert.ok(mistsRoad(caught, { x: 300, y: -4700 }, FIRST, MISTS).refused, "along the wall: refused (it ends in the wall)");
+  assert.ok(mistsRoad(caught, { x: 0, y: -4650 }, FIRST, MISTS).refused, "a step that stays in the wall: refused");
+  const k = mistsAt(FIRST, MISTS).clearings.find((c) => c.id === "pando");
+  assert.ok(mistsRoad(caught, { x: k.x, y: k.y }, FIRST, MISTS).refused, "off through the wall toward Pando: refused (it goes deeper first)");
+  // inside the wall the stride is MISTS_WALL_STRIDE; out of the fringe it is the open road: a 100 m wall plus the 400 m fringe
+  const short = mistsRoad(caught, { x: 0, y: -4100 }, FIRST, MISTS);   // 100 m of wall, 400 m of fringe, 100 m clear
+  assert.ok(short.factor > MISTS_WALL_STRIDE * 0.9 && short.factor < 0.6, `a short walk out is mostly wall and fringe (factor ${short.factor})`);
 });
