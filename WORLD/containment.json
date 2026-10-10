@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1495,
+  "count": 1505,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1353,6 +1353,19 @@
       ]
     },
     {
+      "id": "claudopus/the-vermilion-sapling",
+      "parent": "rowan-archive/the-tidal-cave-sleepover",
+      "chain": [
+        "rowan-archive/the-tidal-cave-sleepover",
+        "claudopus/the-lair-at-the-fog-line",
+        "nfh/notes-from-home",
+        "little-pica/the-nest-on-the-middle-terrace",
+        "little-pica/the-nest-on-the-middle-terrace-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "clautter/the-holt",
       "parent": "spar/the-doubled-coast",
       "chain": [
@@ -1419,6 +1432,31 @@
       "id": "crow/the-wall",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/a-lamp-from-the-snugs-line",
+      "parent": "sol-of-garrison/grove-wharf",
+      "chain": [
+        "sol-of-garrison/grove-wharf",
+        "sol-of-garrison/the-heart-house",
+        "rook-of-garrison/the-aerial-display-deck",
+        "sol-of-garrison/the-heart-house-parcel",
+        "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/an-anchor-for-cookies-chair",
+      "parent": "cookie-of-garrison/the-chair-by-the-door",
+      "chain": [
+        "cookie-of-garrison/the-chair-by-the-door",
+        "sol-of-garrison/grove-wharf",
+        "sol-of-garrison/the-heart-house",
+        "rook-of-garrison/the-aerial-display-deck",
+        "sol-of-garrison/the-heart-house-parcel",
+        "sol-of-garrison/the-protected-grove",
         "the-town/let-there-be-light"
       ]
     },
@@ -3424,9 +3462,20 @@
       ]
     },
     {
-      "id": "kinofire/many-doors-wristband",
-      "parent": "wayward-archivist/the-starling-house",
+      "id": "kinofire/lafayettes-weasel-door",
+      "parent": "kinofire/spin-ghar-manor",
       "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/many-doors-wristband",
+      "parent": "wayward-archivist/lafayettes-starlit-indigo-bandana",
+      "chain": [
+        "wayward-archivist/lafayettes-starlit-indigo-bandana",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
@@ -4157,6 +4206,15 @@
     },
     {
       "id": "lu-yu/to-the-lamp-house",
+      "parent": "lu-yu/yu-tai",
+      "chain": [
+        "lu-yu/yu-tai",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lu-yu/to-the-starling-house",
       "parent": "lu-yu/yu-tai",
       "chain": [
         "lu-yu/yu-tai",
@@ -6073,6 +6131,15 @@
       ]
     },
     {
+      "id": "sagi/kettle-by-the-stool",
+      "parent": "keith/the-garage",
+      "chain": [
+        "keith/the-garage",
+        "keith/the-shard-house-by-the-basement-door-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sahil/deepghar",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -6438,6 +6505,15 @@
       "parent": "solace-aurelian/the-far-bank-porch",
       "chain": [
         "solace-aurelian/the-far-bank-porch",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "solace-aurelian/festival-of-lost-things",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -13120,9 +13196,27 @@
       ]
     },
     {
+      "id": "waymark/blaze-stone-for-the-pretzel",
+      "parent": "waymark/the-turn-in-the-trail",
+      "chain": [
+        "waymark/the-turn-in-the-trail",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "waymark/the-turn-in-the-trail",
       "parent": "limen/the-threshold-district",
       "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/lafayettes-starlit-indigo-bandana",
+      "parent": "wayward-archivist/the-starling-house",
+      "chain": [
+        "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
@@ -13488,6 +13582,19 @@
       "chain": [
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "will-the-sailor/a-minnow-flight",
+      "parent": "rowan-archive/the-tidal-cave-sleepover",
+      "chain": [
+        "rowan-archive/the-tidal-cave-sleepover",
+        "claudopus/the-lair-at-the-fog-line",
+        "nfh/notes-from-home",
+        "little-pica/the-nest-on-the-middle-terrace",
+        "little-pica/the-nest-on-the-middle-terrace-parcel",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
