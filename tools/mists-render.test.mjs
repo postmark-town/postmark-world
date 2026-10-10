@@ -10,10 +10,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsRenderAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsRenderAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
+const MARKS = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")).marks;
+const KEEP = mistsKeepAt(mistsKeepRects(MARKS));   // the town, as the viewer keeps it clear
 const CROSSINGS = [244, 272, 282];
 
 // a grid over the band (the clear ground ± 3 km) plus a ring around each clearing
@@ -43,6 +45,7 @@ for (const n of CROSSINGS) {
       if (!inWall) continue;
       behind += 1;
       assert.equal(mistsRenderAt(m, p.x, p.y, 0).alpha, 1, `opaque behind the wall at (${p.x.toFixed(0)}, ${p.y.toFixed(0)})`);
+      assert.equal(mistsRenderAt(m, p.x, p.y, 0, KEEP).alpha, 1, `opaque behind the wall even where the town is kept clear (${p.x.toFixed(0)}, ${p.y.toFixed(0)})`);
     }
     assert.ok(behind > 1000, `the grid reached the wall (${behind} points)`);
   });
@@ -104,4 +107,49 @@ test("the viewer paints over the vector wall, which keeps its exact geometry and
   assert.equal(painted.match(/ d="[^"]*"/)[0], flat.match(/ d="[^"]*"/)[0], "the same wall");
   assert.match(painted, /pointer-events="all"/);
   assert.match(painted, new RegExp(`fill="${mistsCoreHex(m)}"`), "in the paint's core colour, never white");
+});
+
+// THE TOWN IS KEPT CLEAR (Darko 2026-10-10 09:45): at 284, no parcel's or
+// mark's footprint is under more than a light haze, all three layers together,
+// with every layer at either end of its drift. The engine's wall is the only
+// exception (a point it hides stays hidden).
+const LIGHT_HAZE = 0.2;
+// each layer drifts on its own clock, so the worst case takes each layer at its own worst end
+const worstLayer = (m, x, y, li) => { const L = MISTS_PAINT.layers[li];
+  return Math.max(...[0, 1, -1].map((sg) => mistsRenderAt(m, x - sg * L.driftM, y - sg * L.driftM * 0.45, li, KEEP).alpha)); };
+const composite = (m, x, y) => 1 - [0, 1, 2].reduce((a, li) => a * (1 - worstLayer(m, x, y, li)), 1);
+test("the town is kept clear at 284: every mark's footprint is under no more than a light haze", () => {
+  const m = mistsAt(284, MISTS);
+  let checked = 0, hidden = 0;
+  for (const mk of MARKS) {
+    if (!mk?.at || !Number.isFinite(mk.at.x)) continue;
+    if (Math.max(mk.extent?.w ?? 0, mk.extent?.h ?? 0) > MISTS_PAINT.townMaxM) continue;   // the world's frame and open country
+    const w = (mk.extent?.w ?? 0) / 2, h = (mk.extent?.h ?? 0) / 2;
+    for (const [a, b] of [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]]) {
+      const x = mk.at.x + a * w, y = mk.at.y + b * h;
+      if (mistsHere({ x, y }, m).inWall) { hidden += 1; continue; }
+      // a layer drifted by (dx, dy) shows at (x, y) what it painted at (x - dx, y - dy)
+      const al = composite(m, x, y);
+      assert.ok(al <= LIGHT_HAZE, `${mk.id} at (${x}, ${y}) is under ${al.toFixed(2)} of fog`);
+      checked += 1;
+    }
+  }
+  assert.ok(checked > 3000, `the footprints were read (${checked} points; ${hidden} behind the wall, the physics')`);
+});
+
+test("the creatures: seeded by the crossing, sparse at 244 and populated by 284, in the banks, never over the town", () => {
+  const counts = [];
+  for (const n of [244, 272, 284]) {
+    const m = mistsAt(n, MISTS), cs = mistsCreatures(m, { first: 244, keep: KEEP });
+    assert.deepEqual(mistsCreatures(m, { first: 244, keep: KEEP }), cs, "the same crossing, the same creatures");
+    for (const c of cs) {
+      for (const [a, b] of [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]]) assert.equal(KEEP(c.x + a * c.sizeM, c.y + b * c.sizeM), 0, `${c.kind} at (${c.x}, ${c.y}) stands clear of the town`);
+      const d = mistsTrueDistance(m, c.x, c.y);
+      assert.ok(d > -mistsReachM(m) * 1.0 && d < 400, `${c.kind} is in the banks (true-face distance ${Math.round(d)} m)`);
+    }
+    counts.push(cs.length);
+  }
+  assert.ok(counts[0] < counts[1] && counts[1] <= counts[2], `fewer at first, more by 284 (${counts.join(", ")})`);
+  assert.ok(counts[0] >= 3 && counts[2] >= 25, `sparse but present at 244, populated at 284 (${counts.join(", ")})`);
+  assert.deepEqual(mistsCreatures(null), [], "no Mists, no creatures");
 });

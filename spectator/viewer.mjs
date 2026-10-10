@@ -38,7 +38,7 @@ import { parseEnterExitLedger, occupancyAt, occupantsOf, withinOf, isMark, isEnt
 // is not allowed to hold one, and `tools/record-sources.test.mjs` reads these
 // bytes to prove it.
 import { recordSources, recordAbsenceMessage } from "../tools/record-sources.mjs";
-import { MISTS_PAINT, mistsBakePlan, mistsBaker, mistsCoreHex, bellFor, ringBell } from "./mists-render.mjs";
+import { MISTS_PAINT, mistsBakePlan, mistsBaker, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureSVG, bellFor, ringBell } from "./mists-render.mjs";
 // THE PARCEL'S COLUMN — the atlas's right-hand panel, back (Keemin 2026-09-11).
 // It owns its own markdown reader, its own builder and its own dress, and it
 // takes no viewer internals: the door read, the shelf gate and the handle rule
@@ -4968,7 +4968,13 @@ const STYLE = `
 @media (prefers-reduced-motion:reduce){ .wv-main { transition:none; } }
 .wv-mists-drift { animation:wv-mists-drift 60s ease-in-out infinite alternate; }
 @keyframes wv-mists-drift { from { transform:translate(calc(var(--wv-dx) * -1), calc(var(--wv-dy) * -1)); } to { transform:translate(var(--wv-dx), var(--wv-dy)); } }
-@media (prefers-reduced-motion:reduce){ .wv-mists-drift { animation:none; } }
+.wv-mc-flit { animation:wv-mc-flit 4.2s ease-in-out infinite alternate; }
+@keyframes wv-mc-flit { 0% { transform:translate(-14px,4px) rotate(-6deg); } 50% { transform:translate(6px,-8px) rotate(5deg); } 100% { transform:translate(16px,3px) rotate(-3deg); } }
+.wv-mc-lift { animation:wv-mc-lift 9s ease-in-out infinite alternate; }
+@keyframes wv-mc-lift { from { transform:translate(-10px,6px); } to { transform:translate(14px,-12px); } }
+.wv-mc-eyes { animation:wv-mc-blink 9s steps(1,end) infinite; }
+@keyframes wv-mc-blink { 0%, 46%, 50%, 100% { opacity:1; } 47% { opacity:0; } 90% { opacity:.35; } }
+@media (prefers-reduced-motion:reduce){ .wv-mists-drift, .wv-mc-flit, .wv-mc-lift, .wv-mc-eyes { animation:none; } }
 .wv-main.no-map { grid-template-columns:var(--rail) minmax(0,1fr); }
 @media (max-width:1160px){ .wv-main,.wv-main.no-map { grid-template-columns:var(--rail) minmax(0,1fr); }
   .wv-map { grid-column:1 / -1; border-top:1px solid var(--line); } .wv-map .wv-sticky { position:static; } }
@@ -9828,18 +9834,27 @@ export function mountViewer(appEl) {
   function paintMists(m) {
     const bellBtn = root.querySelector(".wv-bell");
     if (!m) { if (bellBtn) bellBtn.hidden = true; return; }
-    const key = JSON.stringify(m);
+    // the town the paint keeps clear: every sited mark the world holds (the
+    // whole fold, not the resident path's ground set)
+    const keepMarks = data?.worldState?.marks ?? allMarks();
+    const key = JSON.stringify(m) + "|" + (keepMarks?.length ?? 0);
     const baked = mistsBaked.get(key);
     // not baked yet: bake it a piece at a time between frames (the vector wall
     // already stands), then paint, if this crossing is still the one on screen
-    if (!baked) { bakeMists(m, key); mistsBellButton(m); return; }
+    if (!baked) { bakeMists(m, key, mistsKeepRects(keepMarks)); mistsBellButton(m); return; }
     const { originPx, mPerPx } = mapCtx, n = (v) => v.toFixed(1);
     let html = "";
+    // the creatures, in the back layer's banks (so the front layers veil them)
+    const firstMists = data?.skeleton?.mists?.schedule?.[0]?.crossing;
+    const ink = mistsCoreHex(m);
+    const creatures = mistsCreatures(m, { first: firstMists, keep: mistsKeepAt(mistsKeepRects(keepMarks)) })
+      .map((cr) => mistsCreatureSVG(cr, { originPx, mPerPx, ink })).join("");
     MISTS_PAINT.layers.forEach((L, li) => {
       const d = L.driftM / mPerPx;
       html += `<g class="wv-mists-drift" style="--wv-dx:${n(d)}px;--wv-dy:${n(d * 0.45)}px;animation-duration:${L.driftS}s">`
         + baked.filter((b) => b.li === li).map((b) => `<image href="${b.url}" x="${n(originPx.x + b.box.minX / mPerPx)}" y="${n(originPx.y + b.box.minY / mPerPx)}"`
-          + ` width="${n(b.w / mPerPx)}" height="${n(b.h / mPerPx)}" preserveAspectRatio="none"/>`).join("") + `</g>`;
+          + ` width="${n(b.w / mPerPx)}" height="${n(b.h / mPerPx)}" preserveAspectRatio="none"/>`).join("")
+        + (li === 0 ? `<g class="wv-mists-creatures">${creatures}</g>` : "") + `</g>`;
     });
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute("class", "wv-mists-paint"); g.setAttribute("pointer-events", "none"); g.setAttribute("aria-hidden", "true");
@@ -9848,14 +9863,14 @@ export function mountViewer(appEl) {
     mistsIntro(m, g);
     mistsBellButton(m);
   }
-  function bakeMists(m, key) {
+  function bakeMists(m, key, keepRects) {
     if (mistsBaking.has(key)) return;
     mistsBaking.add(key);
     const plan = mistsBakePlan(m), out = [];
     let baker = null, rows = 8;
     const step = () => {
       const p = plan[out.length];
-      baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, canvas: document.createElement("canvas") });
+      baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, keepRects, canvas: document.createElement("canvas") });
       // a slice of rows, sized to stay near 8 ms, so a phone keeps its frames
       const t = performance.now();
       const more = baker.next(rows);
@@ -9868,7 +9883,7 @@ export function mountViewer(appEl) {
       mistsBaking.delete(key);
       mistsBaked.set(key, out);
       if (mistsBaked.size > 4) mistsBaked.delete(mistsBaked.keys().next().value);
-      if (mapCtx?.mistsKey === key) paintMists(m);
+      if (mapCtx?.mistsKey === JSON.stringify(m)) paintMists(m);
     };
     setTimeout(step, 0);
   }
