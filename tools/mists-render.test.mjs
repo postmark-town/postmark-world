@@ -273,7 +273,8 @@ test("open country is the town's own, read from the id when by and household are
 // opaque, walking south), its FOOT (where, past the face, the fog has darkened
 // 60% of the way to the core), and the SHEET'S EDGE (where its feather into the
 // open country is half drawn). None may lie within ±20 m of one straight line
-// (any slope) for more than 15 samples in a row (750 m). At #186's merge
+// (any slope) for more than 15 samples in a row (750 m); nor may the town's
+// margin, where the fog thins to haze. At #186's merge
 // (d19052e5) the longest runs were: face 25 at 244 and 28 at 284, foot 31 at
 // 244 and 28 at 284, the sheet's edge 31 (the sea's long flat bank, the far
 // shore's margin against the true face, and the dark band at the bank's foot).
@@ -328,6 +329,15 @@ test("no straight runs: the fog's face, its dark foot and the sheet's own edge a
   }
   const c = longestStraightRun(edge);
   assert.ok(c <= STRAIGHT_MAX, `the sheet's edge runs straight (±${STRAIGHT_TOL_M} m) for ${c} samples of 50 m`);
+  // and the town's margin, where the fog thins to haze: round the far shore (the
+  // south's longest household mark), its south and east edges (18 and 7 at d19052e5)
+  const south = [], east = [];
+  for (let x = -3400; x <= -600; x += 50) { let y = 8400; while (KEEP(x, y) > 0.5 && y < 11000) y += 5; south.push(y); }
+  for (let y = 7000; y <= 8800; y += 50) { let x = -400; while (KEEP(x, y) > 0.5 && x < 3000) x += 5; east.push(x); }
+  for (const [side, list] of [["south", south], ["east", east]]) {
+    const run = longestStraightRun(list);
+    assert.ok(run <= STRAIGHT_MAX, `the far shore's margin runs straight on its ${side} (±${STRAIGHT_TOL_M} m) for ${run} samples of 50 m`);
+  }
 });
 
 // THE ROLL-IN WAITS FOR THE TOUR (Darko 2026-10-11): the viewer's gate, driven

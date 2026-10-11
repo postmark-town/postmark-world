@@ -231,7 +231,7 @@ export function mistsKeepRects(marks, clearings = []) {
  *  a raster of the same rule. */
 // two scales stretched apart (as the banks' edge is), so the margin's edge wanders well clear of a straight line;
 // stretched only so far that it seldom saturates (a saturated wobble is a flat margin: a ruled edge, Darko 10-11)
-const keepWobble = (x, y) => MISTS_PAINT.keepNoiseM * smooth(0.22, 0.78, 0.55 * mistsFbm(x / 650, y / 650, 71, 3) + 0.45 * mistsFbm(x / 210, y / 210, 73, 2));
+const keepWobble = (x, y) => MISTS_PAINT.keepNoiseM * Math.max(0, Math.min(1, 0.5 + 2.4 * (0.45 * mistsFbm(x / 650, y / 650, 71, 3) + 0.55 * mistsFbm(x / 190, y / 190, 73, 2) - 0.5)));
 const KEEP_CELL = 1000;
 export function mistsKeepAt(rects) {
   const soft = MISTS_PAINT.keepSoftM, pad = MISTS_PAINT.keepNoiseM;
