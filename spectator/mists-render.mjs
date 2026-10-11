@@ -30,7 +30,8 @@ export const MISTS_PAINT = {
   cornerM: 600,          // the clear ground's corners, rounded into banks
   depthM: 1600,          // from the face to the core's full darkness
   depthJagM: [-220, 620], // how far the darkness wanders from the face's own line (lighter, darker): its own noise, so the foot is never a ruled band
-  coreFadeM: [1050, 1500], // the front layers are gone this far behind the wall (±150 m of noise): inside every box, past every drift
+  coreFadeM: [950, 1150],  // the front layers are gone this far behind the wall (± coreJagM of noise): inside every box, past every drift
+  coreJagM: 550,
   tongueM: 480,          // how far the short tongues reach in, at any veil: a noise that never saturates, so no stretch of the face runs straight (Darko 10-11)
   tongueScaleM: 380,     // and their size
   softM: 50,             // a bank's own soft edge, inside the clear ground only
@@ -169,7 +170,12 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   // 284. So they fade out over a ragged line well inside the bake's box (past
   // their drift too), and the box's edge is the back layer's core alone, the
   // wall's exact colour.
-  if (layer > 0) alpha *= 1 - smooth(MISTS_PAINT.coreFadeM[0], MISTS_PAINT.coreFadeM[1], dTrue + 150 * (2 * mistsFbm(x / 700, y / 700, L.seed + 13, 2) - 1));
+  // (the line wanders ±coreJagM at two scales: a fade that follows the wall's
+  // distance alone is the wall's rectangle again, a level lighter)
+  if (layer > 0) {
+    const n = Math.max(0, Math.min(1, 0.5 + 1.8 * (0.6 * mistsFbm(x / 900, y / 900, L.seed + 13, 3) + 0.4 * mistsFbm(x / 280, y / 280, L.seed + 17, 2) - 0.5)));
+    alpha *= 1 - smooth(MISTS_PAINT.coreFadeM[0], MISTS_PAINT.coreFadeM[1], dTrue + MISTS_PAINT.coreJagM * (2 * n - 1));
+  }
   // depth, broken by the same banks (lighter tongues, darker gaps) and by its own
   // noise, so the darkness does not follow the face in a ruled band
   const [jl, jd] = MISTS_PAINT.depthJagM;
