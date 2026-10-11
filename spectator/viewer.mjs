@@ -14422,7 +14422,14 @@ export function mountViewer(appEl) {
         const parsed = json
           ? { departures: walksFromOffice(await r.json()).departures.filter((d) => d.iso >= since) }
           : parseWalkLedger(await r.text());
-        if (parsed.departures.length) { departures = parsed.departures; noteRecordRead("/WORLD/walk-ledger.md"); return; }
+        if (parsed.departures.length) {
+          departures = parsed.departures;
+          noteRecordRead("/WORLD/walk-ledger.md");
+          // The ledger can arrive after the map and its other readers painted.
+          // Its paths owe their own repaint, not another lane's lucky redraw.
+          drawWalkers();
+          return;
+        }
       } catch { /* try the next one */ }
     }
     // NOT SILENT. An empty rail and an unread rail look identical, and the

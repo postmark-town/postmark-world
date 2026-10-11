@@ -264,13 +264,15 @@ before(async () => {
   CLEANUP.push(() => browser.close());
 });
 
-async function openPage({ signedIn }) {
+async function openPage({ signedIn, walkLedgerReady = null }) {
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   // the ledger is same-origin by law, so the fixture is served here
-  await page.route("**/WORLD/walk-ledger.md", (route) =>
-    route.fulfill({ status: 200, contentType: "text/markdown", body: LEDGER }));
+  await page.route("**/WORLD/walk-ledger.md", async (route) => {
+    if (walkLedgerReady) await walkLedgerReady;
+    return route.fulfill({ status: 200, contentType: "text/markdown", body: LEDGER });
+  });
   await page.addInitScript((base) => { try { localStorage.setItem("pm.office.base", base); } catch {} },
     "http://127.0.0.1:" + office.port);
   if (signedIn) {
@@ -340,7 +342,16 @@ test("YOUR PARCEL IS PINNED AT TOWN WIDTH — and the one you only BACKED is not
 
 test("YOUR HOUSEHOLD'S WALK IS DRAWN AT TOWN WIDTH, AND STAYS ON THE SHEET", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  const { page, errors } = await openPage({ signedIn: true });
+  let releaseLedger;
+  const walkLedgerReady = new Promise((resolve) => { releaseLedger = resolve; });
+  const { page, errors } = await openPage({ signedIn: true, walkLedgerReady });
+  // Hold the record until the map has painted: a fast ledger used to borrow
+  // another reader's redraw, hiding the missing repaint when it arrived last.
+  assert.equal((await read(page, OWNED_ID, BACKED_ID)).paths.length, 0,
+    "the rig has not released its ledger, so no walk path should exist yet");
+  releaseLedger();
+  await page.waitForFunction(() => document.querySelectorAll("#wv-walk-layer .wv-walk-path").length > 0,
+    null, { timeout: 60_000 }).catch(() => {});
   const seen = await read(page, OWNED_ID, BACKED_ID);
   await page.close();
 
