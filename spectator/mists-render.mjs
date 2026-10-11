@@ -229,8 +229,9 @@ export function mistsKeepRects(marks, clearings = []) {
 /** How kept-clear a point is, 0..1: 1 within a mark's margin less the soft
  *  band, 0 outside every rectangle. Pure (the tests' instrument); the bake uses
  *  a raster of the same rule. */
-// two scales stretched apart (as the banks' edge is), so the margin's edge wanders well clear of a straight line
-const keepWobble = (x, y) => MISTS_PAINT.keepNoiseM * smooth(0.4, 0.6, 0.6 * mistsFbm(x / 650, y / 650, 71, 3) + 0.4 * mistsFbm(x / 210, y / 210, 73, 2));
+// two scales stretched apart (as the banks' edge is), so the margin's edge wanders well clear of a straight line;
+// stretched only so far that it seldom saturates (a saturated wobble is a flat margin: a ruled edge, Darko 10-11)
+const keepWobble = (x, y) => MISTS_PAINT.keepNoiseM * smooth(0.22, 0.78, 0.55 * mistsFbm(x / 650, y / 650, 71, 3) + 0.45 * mistsFbm(x / 210, y / 210, 73, 2));
 const KEEP_CELL = 1000;
 export function mistsKeepAt(rects) {
   const soft = MISTS_PAINT.keepSoftM, pad = MISTS_PAINT.keepNoiseM;
@@ -400,9 +401,10 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
   const apart = (x, y, size) => out.every((o) => Math.hypot(o.x - x, o.y - y) > (o.sizeM + size) * 0.75);
   const place = (kind, dIn, dOut, extra) => {
     for (let tries = 0; tries < 60; tries++) {
-      const p = onBand(dIn, dOut), size = C.sizeM[kind] * (0.8 + 0.4 * r());
-      if (!clearOfTown(p.x, p.y, size) || !apart(p.x, p.y, size)) continue;
-      const cr = { kind, x: Math.round(p.x), y: Math.round(p.y), sizeM: Math.round(size), flip: r() < 0.5, phase: +r().toFixed(3), ...extra() };
+      // judged where it is drawn (whole metres), so a margin's edge never falls between the two
+      const p = onBand(dIn, dOut), x = Math.round(p.x), y = Math.round(p.y), size = Math.round(C.sizeM[kind] * (0.8 + 0.4 * r()));
+      if (!clearOfTown(x, y, size) || !apart(x, y, size)) continue;
+      const cr = { kind, x, y, sizeM: size, flip: r() < 0.5, phase: +r().toFixed(3), ...extra() };
       out.push(cr);
       return cr;
     }
@@ -418,9 +420,9 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
     if (!lead || r() >= 0.45) continue;
     // a three: two more close by, if they too stand clear of the town
     for (const [dx, dy] of [[1.6, -0.7], [-1.3, 0.9]]) {
-      const x = lead.x + dx * lead.sizeM, y = lead.y + dy * lead.sizeM;
+      const x = Math.round(lead.x + dx * lead.sizeM), y = Math.round(lead.y + dy * lead.sizeM), size = Math.round(lead.sizeM * 0.8);
       const dd = mistsTrueDistance(m, x, y);
-      if (dd >= -reach * 0.8 && dd <= 220 && clearOfTown(x, y, lead.sizeM * 0.8)) out.push({ ...lead, x: Math.round(x), y: Math.round(y), sizeM: Math.round(lead.sizeM * 0.8), phase: +r().toFixed(3) });
+      if (dd >= -reach * 0.8 && dd <= 220 && clearOfTown(x, y, size)) out.push({ ...lead, x, y, sizeM: size, phase: +r().toFixed(3) });
     }
   }
   return out;
