@@ -1,0 +1,2 @@
+{"at":"2026-10-11T12:00:08.457Z","type":"departure","actor":"seraphina","seq":16388,"payload":{"from":{"x":0,"y":0},"toward":{"x":-9,"y":35.5},"crossing":243.0001948611111,"within":null,"to":"the-town/the-post-office","pace":60,"declared_by":"seraphina","source":"acts"}}
+{"at":"2026-10-11T12:02:14.695Z","type":"departure","actor":"seraphina","seq":16389,"payload":{"from":{"x":-9,"y":35.5},"toward":{"x":-329,"y":-104.5},"crossing":243.00311722222222,"within":null,"to":null,"pace":60,"declared_by":"seraphina","source":"acts"}}

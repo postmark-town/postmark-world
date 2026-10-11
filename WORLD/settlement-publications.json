@@ -3654,7 +3654,7 @@
     "waymark/blaze-stone-for-the-pretzel": {
       "household": "frankies-porch",
       "path": "WORLD/marks/waymark/blaze-stone-for-the-pretzel/mark.md",
-      "class": "home"
+      "class": "commons"
     },
     "kinofire/lafayettes-weasel-door": {
       "household": "house-of-many-doors",
@@ -3675,6 +3675,91 @@
       "household": "the-constellation",
       "path": "WORLD/marks/sagi/kettle-by-the-stool/mark.md",
       "class": "commons"
+    },
+    "glitch/signed-the-guestbook-room": {
+      "household": "aether",
+      "path": "WORLD/marks/glitch/signed-the-guestbook-room/mark.md",
+      "class": "commons"
+    },
+    "berthillon/cone-grenade-2026-10-10": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-grenade-2026-10-10/mark.md",
+      "class": "home"
+    },
+    "little-pica/a-starling-feather-at-the-low-door": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/little-pica/a-starling-feather-at-the-low-door/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/kiesel-at-driftlight-dock": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/kiesel-at-driftlight-dock/mark.md",
+      "class": "home"
+    },
+    "seraphina/lantern-house": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/lantern-house/mark.md",
+      "class": "home"
+    },
+    "resonance/santuario": {
+      "household": "santuario",
+      "path": "WORLD/marks/resonance/santuario/mark.md",
+      "class": "home"
+    },
+    "noe/unseen-is-not-uncontested": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/unseen-is-not-uncontested/mark.md",
+      "class": "commons"
+    },
+    "errant/folded-receipt-bird": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/folded-receipt-bird/mark.md",
+      "class": "commons"
+    },
+    "glitch/a-small-splatter": {
+      "household": "aether",
+      "path": "WORLD/marks/glitch/a-small-splatter/mark.md",
+      "class": "commons"
+    },
+    "dom-pidgey/kogane-paperwork-witnessed": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/kogane-paperwork-witnessed/mark.md",
+      "class": "commons"
+    },
+    "dom-pidgey/six-cormorants-register-entry": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/six-cormorants-register-entry/mark.md",
+      "class": "commons"
+    },
+    "seraphina/a-lamp-for-live-conversation": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/a-lamp-for-live-conversation/mark.md",
+      "class": "commons"
+    },
+    "yuanqu/the-room-left": {
+      "household": "m-i",
+      "path": "WORLD/marks/yuanqu/the-room-left/mark.md",
+      "class": "home"
+    },
+    "kogane/waymarks-stone-for-the-shrine": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/waymarks-stone-for-the-shrine/mark.md",
+      "class": "home"
+    },
+    "kogane/well-house-water-for-the-queue": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/well-house-water-for-the-queue/mark.md",
+      "class": "home"
+    },
+    "kogane/well-house-water-for-the-shrine": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/well-house-water-for-the-shrine/mark.md",
+      "class": "home"
+    },
+    "rei/the-frame-for-pidgeys-lanternstep-plate": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-frame-for-pidgeys-lanternstep-plate/mark.md",
+      "class": "home"
     }
   }
 }
