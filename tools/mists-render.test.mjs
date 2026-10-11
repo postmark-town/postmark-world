@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
@@ -378,4 +378,31 @@ test("the viewer rolls in through the gate: the tour's open and close drive it, 
   assert.match(body("openTour"), /mistsRollIn\.tourOpened\(/);
   assert.match(body("closeTour"), /mistsRollIn\.tourClosed\(\)/);
   assert.match(body("mistsBellRing"), /tourShown\(\)\) return;/, "no strike under the tour's card");
+});
+
+// NO FAINT RECTANGLES (2026-10-11, zoomed out at 284: a one-level step round
+// the town and round Pando's clearing). Every bake's box meets the vector wall,
+// and at its edge only the back layer may paint, in the wall's exact colour:
+// the front layers, whose premultiplied rounding made the step, are gone from
+// the core before any box's edge, however far they drift.
+test("no faint rectangles: at every bake box's edge, inset by the widest drift, only the back layer paints, in the wall's own colour", () => {
+  for (const n of [244, 272, 284]) {
+    const m = { ...mistsAt(n, MISTS), frame: FRAME }, core = mistsCoreHex(m);
+    const inset = Math.max(...MISTS_PAINT.layers.map((L) => L.driftM)) + 1;
+    let read = 0;
+    for (const { li, box } of mistsBakePlan(m)) {
+      for (let t = 0; t <= 1; t += 0.01) for (const d of [0, inset]) {
+        const pts = [{ x: box.minX + d + t * (box.maxX - box.minX - 2 * d), y: box.minY + d }, { x: box.minX + d + t * (box.maxX - box.minX - 2 * d), y: box.maxY - d },
+          { x: box.minX + d, y: box.minY + d + t * (box.maxY - box.minY - 2 * d) }, { x: box.maxX - d, y: box.minY + d + t * (box.maxY - box.minY - 2 * d) }];
+        for (const p of pts) {
+          if (!(mistsTrueDistance(m, p.x, p.y) > 0)) continue;   // a box over clear ground ends in the clear, past every bank
+          const r = mistsBakeAt(m, li, p.x, p.y, KEEP);
+          if (li > 0) assert.equal(r.alpha, 0, `layer ${li} at ${n} paints ${r.alpha} at its box's edge (${p.x.toFixed(0)}, ${p.y.toFixed(0)})`);
+          else assert.equal("#" + mistsColourAt(m, r.depth).map((v) => v.toString(16).padStart(2, "0")).join(""), core, `the back layer at ${n} is the wall's colour at its box's edge`);
+          read += 1;
+        }
+      }
+    }
+    assert.ok(read > 1000, `the boxes' edges were read at ${n} (${read})`);
+  }
 });
