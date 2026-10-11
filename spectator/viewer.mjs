@@ -9883,7 +9883,7 @@ export function mountViewer(appEl) {
     if (mistsBaking.has(key)) return;
     mistsBaking.add(key);
     const plan = mistsBakePlan(m), out = [], rasters = new Map();
-    let baker = null, rows = 2, building = null, per = 2;
+    let baker = null, rows = 2, rasterJob = null, per = 2;
     // every slice is timed and sized to stay near 6 ms (starting small, growing at
     // most twofold a slice), so a slow phone keeps its frames
     const timed = (fn, n, set) => { const t = performance.now(); const more = fn(n); const ms = performance.now() - t; set(Math.max(1, Math.min(400, Math.round(n * Math.min(2, ms > 0 ? 6 / ms : 2))))); return more; };
@@ -9891,9 +9891,9 @@ export function mountViewer(appEl) {
       const p = plan[out.length];
       const rk = p.box.minX + "," + p.box.minY + "," + p.pxM;
       if (!rasters.has(rk)) {
-        building = building ?? mistsKeepRasterBuilder(keepRects, p.box, p.pxM);
-        if (timed((n) => building.next(n), per, (n) => { per = n; })) { setTimeout(step, 0); return; }
-        rasters.set(rk, building.raster); building = null;
+        rasterJob = rasterJob ?? mistsKeepRasterBuilder(keepRects, p.box, p.pxM);
+        if (timed((n) => rasterJob.next(n), per, (n) => { per = n; })) { setTimeout(step, 0); return; }
+        rasters.set(rk, rasterJob.raster); rasterJob = null;
       }
       baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, keepRaster: rasters.get(rk), canvas: document.createElement("canvas") });
       // a slice of rows, sized to stay near 8 ms, so a phone keeps its frames
