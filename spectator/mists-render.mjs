@@ -527,7 +527,9 @@ export const MISTS_SHEET = { featherM: 560, wobbleM: 420, pxM: 60 };   // the fe
 export function mistsSheetFeatherAt(frame, x, y) {
   // three scales, the shortest unsaturated, so its line never runs straight over the sea (Darko 10-11)
   const wob = 0.45 * mistsFbm(x / 1600, y / 1600, 97, 3) + 0.35 * mistsFbm(x / 480, y / 480, 131, 2) + 0.2 * mistsFbm(x / 170, y / 170, 137, 2);
-  const d = sdBox(x, y, frame) + MISTS_SHEET.wobbleM * Math.max(-1, Math.min(1, (wob - 0.5) * 3.2));
+  // the wobble only ever moves the feather inward, so it is whole at the sheet's
+  // own edge everywhere (a feather thin there showed the edge as a ruled seam)
+  const d = sdBox(x, y, frame) + MISTS_SHEET.wobbleM * (1 + Math.max(-1, Math.min(1, (wob - 0.5) * 3.2)));
   return smooth(-MISTS_SHEET.featherM, 0, d);
 }
 /** The feather baked over the sheet's border, in the open country's colour. */
@@ -538,7 +540,7 @@ export function bakeSheetFeather(frame, colour, { canvas = null, pxM = MISTS_SHE
   const cv = canvas ?? Object.assign(document.createElement("canvas"), { width: w, height: h });
   cv.width = w; cv.height = h;
   const ctx = cv.getContext("2d"), img = ctx.createImageData(w, h), px = img.data, [r, g, b] = rgbOf(colour);
-  const inner = MISTS_SHEET.featherM + MISTS_SHEET.wobbleM + pxM;
+  const inner = MISTS_SHEET.featherM + 2 * MISTS_SHEET.wobbleM + pxM;
   for (let j = 0; j < h; j++) {
     const y = box.minY + (j + 0.5) * pxM;
     for (let i = 0; i < w; i++) {
