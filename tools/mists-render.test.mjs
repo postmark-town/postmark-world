@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
@@ -268,14 +268,15 @@ test("open country is the town's own, read from the id when by and household are
 });
 
 // NO STRAIGHT RUNS ALONG THE SOUTH (Darko 2026-10-11: "too perfectly
-// rectangular"). Across the sheet's south, every 50 m, two lines are read from
-// the bake's own rule with the town kept clear: the FACE (where the back layer
-// first turns half opaque, walking south) and its FOOT (where, past the face,
-// the fog has darkened 60% of the way to the core). Neither may lie within
-// ±20 m of one straight line (any slope) for more than 15 samples in a row
-// (750 m). At #186's merge (d19052e5) the longest runs were: face 25 at 244
-// and 28 at 284, foot 31 at 244 and 28 at 284 (the sea's long flat bank, and
-// the far shore's margin against the true face).
+// rectangular"). Across the sheet's south, every 50 m, three lines are read:
+// the FACE (where the bake's back layer, the town kept clear, first turns half
+// opaque, walking south), its FOOT (where, past the face, the fog has darkened
+// 60% of the way to the core), and the SHEET'S EDGE (where its feather into the
+// open country is half drawn). None may lie within ±20 m of one straight line
+// (any slope) for more than 15 samples in a row (750 m). At #186's merge
+// (d19052e5) the longest runs were: face 25 at 244 and 28 at 284, foot 31 at
+// 244 and 28 at 284, the sheet's edge 31 (the sea's long flat bank, the far
+// shore's margin against the true face, and the dark band at the bank's foot).
 const STRAIGHT_TOL_M = 20, STRAIGHT_MAX = 15;
 export function longestStraightRun(ys, tol = STRAIGHT_TOL_M) {
   let best = 0;
@@ -310,7 +311,7 @@ export function southFaceAndFoot(m, keep = KEEP) {
   }
   return { face, foot };
 }
-test("no straight runs: the fog's face and its dark foot along the sheet's south wander, at 244 and 284", () => {
+test("no straight runs: the fog's face, its dark foot and the sheet's own edge along the south all wander, at 244 and 284", () => {
   for (const n of [244, 284]) {
     const m = { ...mistsAt(n, MISTS), frame: FRAME };
     const { face, foot } = southFaceAndFoot(m);
@@ -320,6 +321,13 @@ test("no straight runs: the fog's face and its dark foot along the sheet's south
     assert.ok(a <= STRAIGHT_MAX, `${n}: the face runs straight (±${STRAIGHT_TOL_M} m) for ${a} samples of 50 m`);
     assert.ok(b <= STRAIGHT_MAX, `${n}: the foot runs straight (±${STRAIGHT_TOL_M} m) for ${b} samples of 50 m`);
   }
+  const edge = [];
+  for (let x = FRAME.minX + 600; x < FRAME.maxX - 600; x += 50) {
+    let y = FRAME.maxY - 1500; while (mistsSheetFeatherAt(FRAME, x, y) < 0.5 && y < FRAME.maxY + 600) y += 5;
+    edge.push(y);
+  }
+  const c = longestStraightRun(edge);
+  assert.ok(c <= STRAIGHT_MAX, `the sheet's edge runs straight (±${STRAIGHT_TOL_M} m) for ${c} samples of 50 m`);
 });
 
 // THE ROLL-IN WAITS FOR THE TOUR (Darko 2026-10-11): the viewer's gate, driven

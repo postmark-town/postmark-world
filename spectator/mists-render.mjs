@@ -522,11 +522,12 @@ export function ringBell(ctx, dest, when, bell) {
 // opaque at the sheet's edge and gone sheetFeatherM inside it. It lies on the
 // sheet's ground, under the regions and their art, so nothing a resident made
 // is cut by it.
-export const MISTS_SHEET = { featherM: 560, wobbleM: 420, pxM: 90 };   // the feather is soft: a coarse bake, upscaled smooth
+export const MISTS_SHEET = { featherM: 560, wobbleM: 420, pxM: 60 };   // the feather is soft: a coarse bake, upscaled smooth (fine enough for its shortest wobble)
 /** How much of the open country covers the sheet at a point, 0..1. Pure. */
 export function mistsSheetFeatherAt(frame, x, y) {
-  const wob = 0.65 * mistsFbm(x / 2200, y / 2200, 97, 3) + 0.35 * mistsFbm(x / 600, y / 600, 131, 2);
-  const d = sdBox(x, y, frame) + MISTS_SHEET.wobbleM * (wob - 0.5) * 2.4;
+  // three scales, the shortest unsaturated, so its line never runs straight over the sea (Darko 10-11)
+  const wob = 0.45 * mistsFbm(x / 1600, y / 1600, 97, 3) + 0.35 * mistsFbm(x / 480, y / 480, 131, 2) + 0.2 * mistsFbm(x / 170, y / 170, 137, 2);
+  const d = sdBox(x, y, frame) + MISTS_SHEET.wobbleM * Math.max(-1, Math.min(1, (wob - 0.5) * 3.2));
   return smooth(-MISTS_SHEET.featherM, 0, d);
 }
 /** The feather baked over the sheet's border, in the open country's colour. */
