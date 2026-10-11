@@ -113,7 +113,8 @@ test("[pin] the column's lead is parcelLeadImage — the first resident's declar
   assert.equal(parcelLeadImage(pictured, { ...HOME, image: undefined }), markImagePath(pictured));
   assert.equal(parcelLeadImage(pictured, null), markImagePath(pictured), "no dwelling on the record: the ground's own");
   assert.equal(parcelLeadImage(PARCEL, null), null);
-  assert.match(SOURCE, /leadImage: parcelLeadImage\(mark, home, faceOf\(handle\)\.home\),/, "the column asks it");
+  assert.match(SOURCE, /leadImage: parcelLeadImage\(mark, home, homes\.length \? faceOf\(handle\)\.home : null\),/,
+    "the column asks it, and a parcel that is nobody's home borrows no house picture (POS-584)");
   assert.match(SOURCE, /const homes = homesOf\(mark\.id\)/, "of the homes on the parcel (POS-368)");
   assert.match(SOURCE, /const homes = homesOf\(parcel\.id\);/, "and the card beside it asks the same");
   assert.ok(!/dwellingOf\(|homeMarkOfParcel\(/.test(SOURCE), "the dwelling picker is gone from the viewer");
