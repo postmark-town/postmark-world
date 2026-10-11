@@ -533,7 +533,9 @@ export function mistsSheetFeatherAt(frame, x, y) {
   return smooth(-MISTS_SHEET.featherM, 0, d);
 }
 /** The feather baked over the sheet's border, in the open country's colour. */
-export function bakeSheetFeather(frame, colour, { canvas = null, pxM = MISTS_SHEET.pxM } = {}) {
+/** `invert`: the same feather as a mask, white where the sheet shows (alpha
+ *  1 - feather), for the sheet-sized washes drawn over the record's ground. */
+export function bakeSheetFeather(frame, colour, { canvas = null, pxM = MISTS_SHEET.pxM, invert = false } = {}) {
   const pad = MISTS_SHEET.wobbleM + 2 * pxM;
   const box = { minX: frame.minX - pad, minY: frame.minY - pad, maxX: frame.maxX + pad, maxY: frame.maxY + pad };
   const w = Math.ceil((box.maxX - box.minX) / pxM), h = Math.ceil((box.maxY - box.minY) / pxM);
@@ -545,8 +547,10 @@ export function bakeSheetFeather(frame, colour, { canvas = null, pxM = MISTS_SHE
     const y = box.minY + (j + 0.5) * pxM;
     for (let i = 0; i < w; i++) {
       const x = box.minX + (i + 0.5) * pxM, o = (j * w + i) * 4;
-      if (sdBox(x, y, frame) < -inner) continue;   // deep inside the sheet: nothing
-      px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = Math.round(255 * mistsSheetFeatherAt(frame, x, y));
+      const f = sdBox(x, y, frame) < -inner ? 0 : mistsSheetFeatherAt(frame, x, y);   // deep inside the sheet: nothing
+      if (invert) { px[o] = px[o + 1] = px[o + 2] = 255; px[o + 3] = Math.round(255 * (1 - f)); continue; }
+      if (!f) continue;
+      px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = Math.round(255 * f);
     }
   }
   ctx.putImageData(img, 0, 0);

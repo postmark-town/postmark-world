@@ -9869,7 +9869,7 @@ export function mountViewer(appEl) {
   // they roll in from the edges and the bell is armed.
   function paintMists(m) {
     const bellBtn = root.querySelector(".wv-bell");
-    if (!m) { if (bellBtn) bellBtn.hidden = true; mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); return; }
+    if (!m) { if (bellBtn) bellBtn.hidden = true; mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); unmaskSheetWashes(); return; }
     // the town the paint keeps clear: every sited mark the world holds (the
     // whole fold, not the resident path's ground set)
     const keepMarks = data?.worldState?.marks ?? allMarks();
@@ -9956,7 +9956,8 @@ export function mountViewer(appEl) {
     if (!mistsFeather || mistsFeather.key !== key) {
       const colour = /^#[0-9a-f]{6}$/i.test(night) ? night : "#14171d";
       const fb = bakeSheetFeather(frame, colour, { canvas: document.createElement("canvas") });
-      mistsFeather = { key, ...fb, url: fb.canvas.toDataURL("image/png") };
+      const fm = bakeSheetFeather(frame, colour, { canvas: document.createElement("canvas"), invert: true });
+      mistsFeather = { key, ...fb, url: fb.canvas.toDataURL("image/png"), maskUrl: fm.canvas.toDataURL("image/png") };
     }
     const { originPx, mPerPx } = mapCtx, n = (x) => x.toFixed(1), F = mistsFeather;
     mapCtx.svg.querySelector(".wv-sheet-feather")?.remove();
@@ -9967,6 +9968,22 @@ export function mountViewer(appEl) {
       x: n(originPx.x + F.box.minX / mPerPx), y: n(originPx.y + F.box.minY / mPerPx), width: n(F.w / mPerPx), height: n(F.h / mPerPx) })) img.setAttribute(k, val);
     const under = mapCtx.svg.querySelector(":scope > g.region") ?? mapCtx.placedArtLayer;
     mapCtx.svg.insertBefore(img, under);
+    // the sheet-sized washes of light (the daylight and the night's pool) lie over
+    // the regions, so the feather under them cannot hide their straight sides: they
+    // take the same feather as a mask, and the sheet's edge does not show through
+    unmaskSheetWashes();
+    const box = { x: n(originPx.x + F.box.minX / mPerPx), y: n(originPx.y + F.box.minY / mPerPx), width: n(F.w / mPerPx), height: n(F.h / mPerPx) };
+    const mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
+    mask.setAttribute("id", "wv-sheet-unfeather"); mask.setAttribute("class", "wv-sheet-unfeather"); mask.setAttribute("maskUnits", "userSpaceOnUse");
+    for (const [k, val] of Object.entries(box)) mask.setAttribute(k, val);
+    mask.innerHTML = `<image href="${F.maskUrl}" x="${box.x}" y="${box.y}" width="${box.width}" height="${box.height}" preserveAspectRatio="none"/>`;
+    mapCtx.svg.insertBefore(mask, img);
+    for (const r of sheetWashes()) r.setAttribute("mask", "url(#wv-sheet-unfeather)");
+  }
+  function sheetWashes() { return mapCtx?.svg ? [...mapCtx.svg.querySelectorAll(':scope > rect[fill^="url(#daylight"], :scope > rect[fill^="url(#nightpool"]')] : []; }
+  function unmaskSheetWashes() {
+    mapCtx?.svg?.querySelector(".wv-sheet-unfeather")?.remove();
+    for (const r of sheetWashes()) if (r.getAttribute("mask") === "url(#wv-sheet-unfeather)") r.removeAttribute("mask");
   }
   function sessionOnce(k) {
     try { if (sessionStorage.getItem(k)) return false; sessionStorage.setItem(k, "1"); return true; }
