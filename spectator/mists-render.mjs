@@ -113,10 +113,7 @@ export function mistsReachM(m) {
 export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const L = MISTS_PAINT.layers[layer], reach = mistsReachM(m) * L.reach;
   const dTrue = mistsTrueDistance(m, x, y);
-  // the sheet's edge is a face too: past it the fog may stand, and it reaches in
-  // over the edge by frameInsetM, so the sheet's straight sides never show
-  const dFrame = m.frame ? sdBox(x, y, m.frame) + MISTS_PAINT.frameInsetM : -Infinity;
-  const dPaint = Math.max(paintDistance(m, x, y), dTrue, dFrame);
+  const dPaint = Math.max(paintDistance(m, x, y), dTrue, mistsFrameDistance(m, x, y));
   // the visible face, pushed inward by the noise and never outward (offset ≤ 0)
   // (two scales, the long banks and their tongues, stretched apart so the reach is uneven)
   const v = smooth(0.32, 0.68, 0.65 * mistsFbm(x / L.scaleM, y / L.scaleM, L.seed) + 0.35 * mistsFbm(x * 4 / L.scaleM, y * 4 / L.scaleM, L.seed + 3));
@@ -150,16 +147,48 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   return { alpha, depth };
 }
 
+/** The painted sheet's edge as a face (metres, positive past it): past the sheet
+ *  the fog may stand, and it reaches in over the edge by frameInsetM so the
+ *  sheet's straight sides never show. Never inside a clearing: a clearing is
+ *  ground the engine keeps clear, and it is drawn by its own banks alone.
+ *  -Infinity with no frame. */
+export function mistsFrameDistance(m, x, y) {
+  if (!m?.frame) return -Infinity;
+  let d = sdBox(x, y, m.frame) + MISTS_PAINT.frameInsetM;
+  for (const k of m.clearings ?? []) d = Math.min(d, Math.hypot(x - k.x, y - k.y) - k.r);
+  return d;
+}
+
+/** One baked pixel's paint, exactly as the bake decides it: nothing deep in the
+ *  clear ground (judged on the painted distance, the sheet's face included, so
+ *  the skip never cuts the paint along a straight line), the core past the
+ *  core's depth, and mistsRenderAt between. `far` is mistsBakeFar(m, layer).
+ *  Pure; the tests run this rule. */
+export function mistsBakeAt(m, layer, x, y, keep = null, far = mistsBakeFar(m, layer)) {
+  const dT = mistsTrueDistance(m, x, y);
+  if (Math.max(dT, mistsFrameDistance(m, x, y)) < -far) return { alpha: 0, depth: 0 };
+  if (dT >= MISTS_PAINT.depthM) return { alpha: layer === 0 ? 1 : MISTS_PAINT.layers[layer].alpha, depth: 1 };
+  return mistsRenderAt(m, x, y, layer, keep);
+}
+/** How far into the clear ground a layer's paint can reach (the bake's skip). */
+export function mistsBakeFar(m, layer) {
+  return mistsReachM(m) * MISTS_PAINT.layers[layer].reach + (m.fringeM || 0) + MISTS_PAINT.softM;
+}
+
 // ── the town's keep-out ─────────────────────────────────────────────────────
 /** The keep-out rectangles, metres: every sited mark's own extent (parcels,
  *  houses, lit marks, districts), grown by MISTS_PAINT.keepM. The world's frame
  *  and its open country are not the town: a mark wider than townMaxM on either
- *  side (the root, the sea, the main channel, the far plains) keeps nothing. */
-export function mistsKeepRects(marks) {
+ *  side (the root, the sea, the main channel) keeps nothing, unless it stands in
+ *  one of `clearings` (the mists block's, or the skeleton's clearings_m). */
+export function mistsKeepRects(marks, clearings = []) {
   const g = MISTS_PAINT.keepM, out = [];
+  const inClearing = (p) => (clearings ?? []).some((k) => Math.hypot(p.x - k.x, p.y - k.y) < (k.r ?? k.r_m));
   for (const mk of marks ?? []) {
     if (!mk?.at || !Number.isFinite(mk.at.x) || !Number.isFinite(mk.at.y)) continue;
-    if (Math.max(Number(mk.extent?.w) || 0, Number(mk.extent?.h) || 0) > MISTS_PAINT.townMaxM) continue;
+    // a mark that stands in a clearing is kept whatever its size: the engine
+    // widened the clearing so that no part of it is in the wall or the fringe
+    if (Math.max(Number(mk.extent?.w) || 0, Number(mk.extent?.h) || 0) > MISTS_PAINT.townMaxM && !inClearing(mk.at)) continue;
     const w = Math.max(0, Number(mk.extent?.w) || 0) / 2, h = Math.max(0, Number(mk.extent?.h) || 0) / 2;
     // the mark's own extent (core) and its reach (core grown by the margin)
     out.push({ cx0: mk.at.x - w, cx1: mk.at.x + w, cy0: mk.at.y - h, cy1: mk.at.y + h,
@@ -270,7 +299,6 @@ export function mistsBakePlan(m) {
   }
   return plan;
 }
-/** Paint one layer into a canvas over `box` (metres). Returns the canvas. */
 /** A bake of one layer over `box`, a band of rows at a time, so a page can
  *  spread it across frames: `next(rows)` paints the next rows and answers true
  *  while rows remain; `canvas` holds the result once done. */
@@ -279,8 +307,7 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
   const cv = canvas ?? (typeof OffscreenCanvas === "function" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h }));
   cv.width = w; cv.height = h;
   const ctx = cv.getContext("2d"), img = ctx.createImageData(w, h), px = img.data;
-  const far = mistsReachM(m) * MISTS_PAINT.layers[layer].reach + (m.fringeM || 0) + MISTS_PAINT.softM;
-  const core = mistsColourAt(m, 1, tint), coreA = Math.round((layer === 0 ? 1 : MISTS_PAINT.layers[layer].alpha) * 255);
+  const far = mistsBakeFar(m, layer);
   const kr = keepRaster ?? (keepRects?.length ? mistsKeepRaster(keepRects, box, pxM) : null);
   let j = 0;
   return {
@@ -290,13 +317,9 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
         const y = box.minY + (j + 0.5) * pxM;
         for (let i = 0; i < w; i++) {
           const x = box.minX + (i + 0.5) * pxM, o = (j * w + i) * 4;
-          // deep in the clear ground nothing is painted; skip the noise there
-          const dT = mistsTrueDistance(m, x, y);
-          if (dT < -far) { px[o + 3] = 0; continue; }
-          // past the core's depth it is the core, whatever the noise says
-          if (dT >= MISTS_PAINT.depthM) { px[o] = core[0]; px[o + 1] = core[1]; px[o + 2] = core[2]; px[o + 3] = coreA; continue; }
           const kv = kr ? kr.at(i, j) : 0;
-          const { alpha, depth } = mistsRenderAt(m, x, y, layer, kv > 0 ? Object.assign(() => kv, { dist: () => kr.dist(i, j) }) : null);
+          const { alpha, depth } = mistsBakeAt(m, layer, x, y, kv > 0 ? Object.assign(() => kv, { dist: () => kr.dist(i, j) }) : null, far);
+          if (!(alpha > 0)) { px[o + 3] = 0; continue; }
           const [r, g, b] = mistsColourAt(m, depth, tint);
           px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = Math.round(alpha * 255);
         }

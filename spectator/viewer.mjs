@@ -7790,6 +7790,9 @@ export function mountViewer(appEl) {
     boxEl.appendChild(townKeep.svg);
     reattach();
     mapCtx = townKeep.ctx;
+    // the Mists drawn afresh on the way out, from the baked cache (a bake that
+    // finished while we were inside could not paint them)
+    mapCtx.mistsKey = null;
     boxEl.classList.add("pannable");
     mapCtx.refit();          // the pane may have changed shape while we were inside
     mapCtx.settleFrame?.();
@@ -9837,12 +9840,13 @@ export function mountViewer(appEl) {
 
   // THE MISTS, PAINTED (POS-553). Over the vector wall: the baked banks and
   // wisps (mists-render.mjs), one canvas per layer per crossing, kept as images
-  // in the painting's own frame so panning costs nothing, each layer drifting
-  // slowly on its own (still under reduced motion). On the first Mists of a
-  // browser session they roll in from the edges and the bell rings.
+  // in the painting's own frame so panning costs nothing, the weather layers
+  // drifting slowly on their own (held still under reduced motion). On the first
+  // Mists of a browser session, at the live crossing (never one dialled ahead),
+  // they roll in from the edges and the bell is armed.
   function paintMists(m) {
     const bellBtn = root.querySelector(".wv-bell");
-    if (!m) { if (bellBtn) bellBtn.hidden = true; return; }
+    if (!m) { if (bellBtn) bellBtn.hidden = true; mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); return; }
     // the town the paint keeps clear: every sited mark the world holds (the
     // whole fold, not the resident path's ground set)
     const keepMarks = data?.worldState?.marks ?? allMarks();
@@ -9857,13 +9861,13 @@ export function mountViewer(appEl) {
     const baked = mistsBaked.get(key);
     // not baked yet: bake it a piece at a time between frames (the vector wall
     // already stands), then paint, if this crossing is still the one on screen
-    if (!baked) { bakeMists(m, key, mistsKeepRects(keepMarks), JSON.stringify(drawn)); mistsBellButton(drawn); return; }
+    if (!baked) { bakeMists(m, key, mistsKeepRects(keepMarks, drawn.clearings), JSON.stringify(drawn)); mistsBellButton(drawn); return; }
     const { originPx, mPerPx } = mapCtx, n = (v) => v.toFixed(1);
     let html = "";
     // the creatures, in the back layer's banks (so the front layers veil them)
     const firstMists = data?.skeleton?.mists?.schedule?.[0]?.crossing;
     const ink = mistsCoreHex(m);
-    const creatures = mistsCreatures(m, { first: firstMists, keep: mistsKeepAt(mistsKeepRects(keepMarks)) })
+    const creatures = mistsCreatures(m, { first: firstMists, keep: mistsKeepAt(mistsKeepRects(keepMarks, drawn.clearings)) })
       .map((cr) => mistsCreatureSVG(cr, { originPx, mPerPx, ink })).join("");
     MISTS_PAINT.layers.forEach((L, li) => {
       const d = L.driftM / mPerPx;
@@ -9876,7 +9880,10 @@ export function mountViewer(appEl) {
     g.setAttribute("class", "wv-mists-paint"); g.setAttribute("pointer-events", "none"); g.setAttribute("aria-hidden", "true");
     g.innerHTML = html;
     mapCtx.mistsLayer.appendChild(g);
-    mistsIntro(m, g);
+    // the roll-in and the bell belong to the live crossing: dialling ahead shows
+    // the paint (as it shows the wall) but neither spends the session's roll-in
+    // nor rings the bell
+    if (state.crossing <= liveCrossing()) mistsIntro(m, g);
     mistsBellButton(m);
   }
   function bakeMists(m, key, keepRects, drawnKey) {
@@ -9887,7 +9894,16 @@ export function mountViewer(appEl) {
     // every slice is timed and sized to stay near 6 ms (starting small, growing at
     // most twofold a slice), so a slow phone keeps its frames
     const timed = (fn, n, set) => { const t = performance.now(); const more = fn(n); const ms = performance.now() - t; set(Math.max(1, Math.min(400, Math.round(n * Math.min(2, ms > 0 ? 6 / ms : 2))))); return more; };
+    const quit = () => { mistsBaking.delete(key); for (const b of out) if (b.url.startsWith("blob:")) URL.revokeObjectURL(b.url); };
+    // the town's own scene: a room visit mounts another, and the bake carries on
+    const town = mapCtx;
     const step = () => {
+      // the town has moved on to another crossing: stop, so a scrubbed dial never
+      // queues one bake per crossing it passed
+      if (town?.mistsKey !== drawnKey) { quit(); return; }
+      try { stepOnce(); } catch { quit(); }   // e.g. a null 2d context: free the key, so a later draw retries
+    };
+    const stepOnce = () => {
       const p = plan[out.length];
       const rk = p.box.minX + "," + p.box.minY + "," + p.pxM;
       if (!rasters.has(rk)) {
@@ -9900,14 +9916,14 @@ export function mountViewer(appEl) {
       if (timed((n) => baker.next(n), rows, (n) => { rows = n; })) { setTimeout(step, 0); return; }
       // encoded off the main thread; the page shows it by an object URL
       const done = baker; baker = null;
-      done.canvas.toBlob((blob) => {
+      done.canvas.toBlob((blob) => { try {
         out.push({ li: p.li, box: p.box, w: done.width * p.pxM, h: done.height * p.pxM, url: blob ? URL.createObjectURL(blob) : done.canvas.toDataURL("image/png") });
         if (out.length < plan.length) { setTimeout(step, 0); return; }
         mistsBaking.delete(key);
         mistsBaked.set(key, out);
         if (mistsBaked.size > 4) { const old = mistsBaked.keys().next().value; for (const b of mistsBaked.get(old)) if (b.url.startsWith("blob:")) URL.revokeObjectURL(b.url); mistsBaked.delete(old); }
-        if (mapCtx?.mistsKey === drawnKey) paintMists(JSON.parse(drawnKey));
-      }, "image/png");
+        if (mapCtx === town && town.mistsKey === drawnKey) paintMists(JSON.parse(drawnKey));
+      } catch { quit(); } }, "image/png");
     };
     setTimeout(step, 0);
   }
@@ -9949,9 +9965,12 @@ export function mountViewer(appEl) {
   // rings on the first click, tap or key if it could not ring before. Never
   // looped. The viewer's choice (on or off) is remembered on this device.
   function bellOn() { try { return localStorage.getItem("pm_world_bell") !== "off"; } catch { return true; } }
-  function mistsBellRing(m) {
+  function mistsBellRing(m, fromGesture = false) {
     const bell = bellFor(m);
     if (!bell || !bellOn() || mistsBellState.rung) return;
+    // no AudioContext before the reader has touched the page: browsers refuse it
+    // anyway, and where one would allow it the bell must still wait for a gesture
+    if (!fromGesture && !navigator.userActivation?.hasBeenActive) return;
     try {
       const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
       const ctx = mistsBellState.ctx ?? (mistsBellState.ctx = new AC());
@@ -9968,12 +9987,15 @@ export function mountViewer(appEl) {
     mistsBellRing(m);
     if (mistsBellState.armed) return;
     mistsBellState.armed = true;
+    // a touch's pointerdown does not unlock audio (pointerup, click or a key does),
+    // so listen for those too, and let go only once the bell has rung
+    const GESTURES = ["pointerup", "click", "keydown"];
     const first = () => {
-      document.removeEventListener("pointerdown", first, true); document.removeEventListener("keydown", first, true);
-      const cur = sceneRoomId ? null : mistsAt(state.crossing, data?.skeleton?.mists);
-      if (cur) mistsBellRing(cur);
+      const cur = sceneRoomId || state.crossing > liveCrossing() ? null : mistsAt(state.crossing, data?.skeleton?.mists);
+      if (cur) mistsBellRing(cur, true);
+      if (mistsBellState.rung) for (const ev of GESTURES) document.removeEventListener(ev, first, true);
     };
-    document.addEventListener("pointerdown", first, true); document.addEventListener("keydown", first, true);
+    for (const ev of GESTURES) document.addEventListener(ev, first, true);
   }
   function mistsBellButton(m) {
     let btn = root.querySelector(".wv-bell");
@@ -9988,7 +10010,7 @@ export function mountViewer(appEl) {
         if (!on && mistsBellState.out) { try { mistsBellState.out.gain.setTargetAtTime(0, mistsBellState.ctx.currentTime, 0.15); } catch { /* already quiet */ } }
         paintBell(btn);
         const cur = sceneRoomId ? null : mistsAt(state.crossing, data?.skeleton?.mists);
-        if (on && cur) mistsBellRing(cur);
+        if (on && cur) mistsBellRing(cur, true);
       });
     }
     btn.hidden = false;

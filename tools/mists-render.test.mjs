@@ -10,12 +10,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsRenderAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
 const MARKS = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")).marks;
-const KEEP = mistsKeepAt(mistsKeepRects(MARKS));   // the town, as the viewer keeps it clear
+const KEEP = mistsKeepAt(mistsKeepRects(MARKS, MISTS.clearings_m));   // the town, as the viewer keeps it clear
 const CROSSINGS = [244, 272, 282];
 
 // a grid over the band (the clear ground ± 3 km) plus a ring around each clearing
@@ -107,6 +107,12 @@ test("the viewer paints over the vector wall, which keeps its exact geometry and
   assert.equal(painted.match(/ d="[^"]*"/)[0], flat.match(/ d="[^"]*"/)[0], "the same wall");
   assert.match(painted, /pointer-events="all"/);
   assert.match(painted, new RegExp(`fill="${mistsCoreHex(m)}"`), "in the paint's core colour, never white");
+  // the hard rule's guarantee in the page is this path: fully opaque, and so is
+  // the group it is drawn in (no opacity anywhere between it and the painting)
+  const svg = mistsWallSVG(m, { ...reg, painted: true });
+  assert.doesNotMatch(painted, /opacity/, "the painted wall carries no fill-opacity or opacity");
+  assert.match(svg, /^<g class="wv-mists" aria-hidden="true">/, "its group is the plain one");
+  assert.doesNotMatch(svg.match(/^<g[^>]*>/)[0], /opacity|style=/, "and its group carries no opacity or style either");
 });
 
 // THE TOWN IS KEPT CLEAR (Darko 2026-10-10 09:45): at 284, no parcel's or
@@ -185,4 +191,55 @@ test("with the sheet's frame: the hard rule holds, the town stays clear, and the
   assert.ok(depths.length > 10, `the sheet's edge was read (${depths.length} points)`);
   assert.ok(Math.min(...depths) >= MISTS_PAINT.frameInsetM, "the fog covers the sheet's edge everywhere it is read");
   assert.ok(Math.max(...depths) - Math.min(...depths) > 100, `unevenly (${Math.min(...depths)}..${Math.max(...depths)} m)`);
+});
+
+// THE BAKE'S OWN RULE (#186 review): every test below runs mistsBakeAt, the
+// rule the canvas bake applies pixel by pixel, the skip included, with the
+// painted sheet's frame. Three layers together, each at either end of its drift.
+const bakeWorst = (m, x, y, li) => { const L = MISTS_PAINT.layers[li];
+  return Math.max(...[0, 1, -1].map((sg) => mistsBakeAt(m, li, x - sg * L.driftM, y - sg * L.driftM * 0.45, KEEP).alpha)); };
+const bakeComposite = (m, x, y) => 1 - [0, 1, 2].reduce((a, li) => a * (1 - bakeWorst(m, x, y, li)), 1);
+const footprint = (mk) => { const w = (mk.extent?.w ?? 0) / 2, h = (mk.extent?.h ?? 0) / 2;
+  return [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]].map(([a, b]) => ({ x: mk.at.x + a * w, y: mk.at.y + b * h })); };
+
+test("the bake keeps the clearings clear: no paint above a haze on any mark inside them, whatever its size, at 244, 272 and 282", () => {
+  let checked = 0;
+  for (const n of CROSSINGS) {
+    const m = { ...mistsAt(n, MISTS), frame: FRAME };
+    const inside = MARKS.filter((mk) => mk?.at && Number.isFinite(mk.at.x) && m.clearings.some((k) => Math.hypot(mk.at.x - k.x, mk.at.y - k.y) < k.r));
+    assert.ok(inside.some((mk) => mk.id === "sol-am-lichterfenster/vesperfen-wetland"), "the far south-west's wetland is among them");
+    for (const mk of inside) for (const p of footprint(mk)) {
+      if (mistsHere(p, m).inWall) continue;
+      const a = bakeComposite(m, p.x, p.y);
+      assert.ok(a <= LIGHT_HAZE, `${mk.id} at ${n}, (${p.x.toFixed(0)}, ${p.y.toFixed(0)}): ${a.toFixed(2)} of fog`);
+      checked += 1;
+    }
+    // and walking out from each clearing's centre, the opaque bank begins only near its own edge
+    for (const k of m.clearings) {
+      let r = 0; while (r < k.r && mistsBakeAt(m, 0, k.x + r, k.y).alpha < 1) r += 25;
+      assert.ok(r >= k.r - mistsReachM(m) - 50, `clearing ${k.id} at ${n}: opaque from r ${r} of ${k.r}`);
+    }
+  }
+  assert.ok(checked > 100, `footprints read (${checked})`);
+});
+
+test("the bake's face off the sheet is ragged, never a straight line, on the west and south at 244", () => {
+  const m = { ...mistsAt(244, MISTS), frame: FRAME };
+  const faces = { west: [], south: [] };
+  for (let y = FRAME.minY + 600; y < FRAME.maxY - 600; y += 150) {
+    let x = FRAME.maxX - 2000; while (x > m.clear.minX - 200 && mistsBakeAt(m, 0, x, y).alpha < 1) x -= 10;
+    if (KEEP(x, y) < 1) faces.west.push(x);
+  }
+  for (let x = FRAME.minX + 600; x < FRAME.maxX - 600; x += 150) {
+    let y = FRAME.minY + 3000; while (y < m.clear.maxY + 200 && mistsBakeAt(m, 0, x, y).alpha < 1) y += 10;
+    if (KEEP(x, y) < 1) faces.south.push(y);
+  }
+  for (const [side, list] of Object.entries(faces)) {
+    assert.ok(list.length >= 8, `${side}: the face was read clear of the town (${list.length} points)`);
+    const spread = Math.max(...list) - Math.min(...list);
+    assert.ok(spread > 150, `${side}: the face wanders ${spread} m, not a straight line`);
+    // and no long straight run: consecutive points never all equal
+    const runs = list.slice(1).filter((v, i) => v === list[i]).length;
+    assert.ok(runs < list.length / 2, `${side}: ${runs} of ${list.length} steps lie on one line`);
+  }
 });
