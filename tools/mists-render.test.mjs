@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
@@ -129,7 +129,7 @@ test("the town is kept clear at 284: every mark's footprint is under no more tha
   let checked = 0, hidden = 0;
   for (const mk of MARKS) {
     if (!mk?.at || !Number.isFinite(mk.at.x)) continue;
-    if (Math.max(mk.extent?.w ?? 0, mk.extent?.h ?? 0) > MISTS_PAINT.townMaxM) continue;   // the world's frame and open country
+    if (mistsOpenCountry(mk)) continue;   // the town's own frame and open country; every household's mark is read
     const w = (mk.extent?.w ?? 0) / 2, h = (mk.extent?.h ?? 0) / 2;
     for (const [a, b] of [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]]) {
       const x = mk.at.x + a * w, y = mk.at.y + b * h;
@@ -170,7 +170,7 @@ test("with the sheet's frame: the hard rule holds, the town stays clear, and the
     const m = { ...mistsAt(n, MISTS), frame: FRAME };
     for (const p of samples(m)) if (mistsHere(p, m).inWall) assert.equal(mistsRenderAt(m, p.x, p.y, 0, KEEP).alpha, 1);
     for (const mk of MARKS) {
-      if (!mk?.at || !Number.isFinite(mk.at.x) || Math.max(mk.extent?.w ?? 0, mk.extent?.h ?? 0) > MISTS_PAINT.townMaxM) continue;
+      if (!mk?.at || !Number.isFinite(mk.at.x) || mistsOpenCountry(mk)) continue;
       if (mistsHere(mk.at, m).inWall) continue;
       const a = 1 - [0, 1, 2].reduce((acc, li) => acc * (1 - mistsRenderAt(m, mk.at.x, mk.at.y, li, KEEP).alpha), 1);
       assert.ok(a <= 0.2, `${mk.id} at ${n} is under ${a.toFixed(2)} of fog`);
@@ -225,12 +225,12 @@ test("the bake keeps the clearings clear: no paint above a haze on any mark insi
 
 test("the bake's face off the sheet is ragged, never a straight line, on the west and south at 244", () => {
   const m = { ...mistsAt(244, MISTS), frame: FRAME };
-  const faces = { west: [], south: [] };
-  for (let y = FRAME.minY + 600; y < FRAME.maxY - 600; y += 150) {
+  const faces = { west: [], south: [] };   // read every 50 m: the town's margins (every household's mark, any size) take whole stretches of the strip
+  for (let y = FRAME.minY + 600; y < FRAME.maxY - 600; y += 50) {
     let x = FRAME.maxX - 2000; while (x > m.clear.minX - 200 && mistsBakeAt(m, 0, x, y).alpha < 1) x -= 10;
     if (KEEP(x, y) < 1) faces.west.push(x);
   }
-  for (let x = FRAME.minX + 600; x < FRAME.maxX - 600; x += 150) {
+  for (let x = FRAME.minX + 600; x < FRAME.maxX - 600; x += 50) {
     let y = FRAME.minY + 3000; while (y < m.clear.maxY + 200 && mistsBakeAt(m, 0, x, y).alpha < 1) y += 10;
     if (KEEP(x, y) < 1) faces.south.push(y);
   }
@@ -242,4 +242,21 @@ test("the bake's face off the sheet is ragged, never a straight line, on the wes
     const runs = list.slice(1).filter((v, i) => v === list[i]).length;
     assert.ok(runs < list.length / 2, `${side}: ${runs} of ${list.length} steps lie on one line`);
   }
+});
+
+test("the bake keeps every household's mark clear, whatever its size, at 244, 272, 282 and 284 (#186 review: sahil/the-far-shore)", () => {
+  let checked = 0;
+  const households = MARKS.filter((mk) => mk?.at && Number.isFinite(mk.at.x) && !mistsOpenCountry(mk));
+  assert.ok(households.some((mk) => mk.id === "sahil/the-far-shore"), "the far shore, a household's 3.2 km mark, is among them");
+  assert.ok(MARKS.filter(mistsOpenCountry).every((mk) => mk.by === "the-town" || mk.household === "the-town"), "only the town's own marks are open country");
+  for (const n of [244, 272, 282, 284]) {
+    const m = { ...mistsAt(n, MISTS), frame: FRAME };
+    for (const mk of households) for (const p of footprint(mk)) {
+      if (mistsHere(p, m).inWall) continue;
+      const a = bakeComposite(m, p.x, p.y);
+      assert.ok(a <= LIGHT_HAZE, `${mk.id} at ${n}, (${p.x.toFixed(0)}, ${p.y.toFixed(0)}): ${a.toFixed(2)} of fog`);
+      checked += 1;
+    }
+  }
+  assert.ok(checked > 3000, `footprints read (${checked})`);
 });
