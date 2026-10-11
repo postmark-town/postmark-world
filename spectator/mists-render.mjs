@@ -185,7 +185,7 @@ export function mistsBakeFar(m, layer) {
  *  town's own (by or household `the-town`) wider than townMaxM on either side.
  *  A household's mark is never open country, whatever its size. */
 export function mistsOpenCountry(mk) {
-  const town = mk?.by === "the-town" || mk?.household === "the-town";
+  const town = mk?.by === "the-town" || mk?.household === "the-town" || String(mk?.id ?? "").startsWith("the-town/");   // the id too: a path that drops by/household must not keep the root and thin the fog everywhere
   return town && Math.max(Number(mk?.extent?.w) || 0, Number(mk?.extent?.h) || 0) > MISTS_PAINT.townMaxM;
 }
 export function mistsKeepRects(marks, clearings = []) {

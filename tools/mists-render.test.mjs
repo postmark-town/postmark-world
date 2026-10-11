@@ -260,3 +260,9 @@ test("the bake keeps every household's mark clear, whatever its size, at 244, 27
   }
   assert.ok(checked > 3000, `footprints read (${checked})`);
 });
+
+test("open country is the town's own, read from the id when by and household are missing", () => {
+  assert.equal(mistsOpenCountry({ id: "the-town/let-there-be-light", extent: { w: 320000, h: 320000 } }), true);
+  assert.equal(mistsOpenCountry({ id: "sahil/the-far-shore", extent: { w: 3200, h: 1000 } }), false);
+  assert.equal(mistsOpenCountry({ id: "the-town/a-bench", extent: { w: 2, h: 1 } }), false, "small town marks are the town, kept");
+});
