@@ -217,7 +217,7 @@ test("the bake keeps the clearings clear: no paint above a haze on any mark insi
     // and walking out from each clearing's centre, the opaque bank begins only near its own edge
     for (const k of m.clearings) {
       let r = 0; while (r < k.r && mistsBakeAt(m, 0, k.x + r, k.y).alpha < 1) r += 25;
-      assert.ok(r >= k.r - mistsReachM(m) - 50, `clearing ${k.id} at ${n}: opaque from r ${r} of ${k.r}`);
+      assert.ok(r >= k.r - mistsReachM(m) - MISTS_PAINT.tongueM - 50, `clearing ${k.id} at ${n}: opaque from r ${r} of ${k.r}`);   // the banks' reach and their short tongues
     }
   }
   assert.ok(checked > 100, `footprints read (${checked})`);
@@ -265,4 +265,99 @@ test("open country is the town's own, read from the id when by and household are
   assert.equal(mistsOpenCountry({ id: "the-town/let-there-be-light", extent: { w: 320000, h: 320000 } }), true);
   assert.equal(mistsOpenCountry({ id: "sahil/the-far-shore", extent: { w: 3200, h: 1000 } }), false);
   assert.equal(mistsOpenCountry({ id: "the-town/a-bench", extent: { w: 2, h: 1 } }), false, "small town marks are the town, kept");
+});
+
+// NO STRAIGHT RUNS ALONG THE SOUTH (Darko 2026-10-11: "too perfectly
+// rectangular"). Across the sheet's south, every 50 m, two lines are read from
+// the bake's own rule with the town kept clear: the FACE (where the back layer
+// first turns half opaque, walking south) and its FOOT (where, past the face,
+// the fog has darkened 60% of the way to the core). Neither may lie within
+// ±20 m of one straight line (any slope) for more than 15 samples in a row
+// (750 m). At #186's merge (d19052e5) the longest runs were: face 25 at 244
+// and 28 at 284, foot 31 at 244 and 28 at 284 (the sea's long flat bank, and
+// the far shore's margin against the true face).
+const STRAIGHT_TOL_M = 20, STRAIGHT_MAX = 15;
+export function longestStraightRun(ys, tol = STRAIGHT_TOL_M) {
+  let best = 0;
+  for (let i = 0; i < ys.length; i++) {
+    for (let j = i + best + 1; j <= ys.length; j++) {
+      const seg = ys.slice(i, j);
+      if (seg.some((v) => v == null)) break;
+      // the least-squares line through the run; every sample within tol of it
+      const n = seg.length, mx = (n - 1) / 2, my = seg.reduce((a, b) => a + b, 0) / n;
+      let sxy = 0, sxx = 0;
+      seg.forEach((v, k) => { sxy += (k - mx) * (v - my); sxx += (k - mx) ** 2; });
+      const slope = sxx ? sxy / sxx : 0;
+      if (seg.some((v, k) => Math.abs(v - (my + slope * (k - mx))) > tol)) break;
+      best = n;
+    }
+  }
+  return best;
+}
+export function southFaceAndFoot(m, keep = KEEP) {
+  const face = [], foot = [];
+  for (let x = FRAME.minX + 600; x < FRAME.maxX - 600; x += 50) {
+    let f = null, ft = null;
+    const y0 = FRAME.maxY - 5000;
+    // a column the sheet's east or west fog already covers at its start is not the south's: no reading
+    if (mistsBakeAt(m, 0, x, y0, keep).alpha >= 0.5) { face.push(null); foot.push(null); continue; }
+    for (let y = y0; y < m.clear.maxY + 2500; y += 5) {
+      const r = mistsBakeAt(m, 0, x, y, keep);
+      if (f == null && r.alpha >= 0.5) f = y;
+      if (f != null && r.depth >= 0.6) { ft = y; break; }
+    }
+    face.push(f); foot.push(ft);
+  }
+  return { face, foot };
+}
+test("no straight runs: the fog's face and its dark foot along the sheet's south wander, at 244 and 284", () => {
+  for (const n of [244, 284]) {
+    const m = { ...mistsAt(n, MISTS), frame: FRAME };
+    const { face, foot } = southFaceAndFoot(m);
+    const read = face.filter((v, i) => v != null && foot[i] != null).length;
+    assert.ok(read > 90, `the south was read at ${n} (${read} of ${face.length} samples)`);
+    const a = longestStraightRun(face), b = longestStraightRun(foot);
+    assert.ok(a <= STRAIGHT_MAX, `${n}: the face runs straight (±${STRAIGHT_TOL_M} m) for ${a} samples of 50 m`);
+    assert.ok(b <= STRAIGHT_MAX, `${n}: the foot runs straight (±${STRAIGHT_TOL_M} m) for ${b} samples of 50 m`);
+  }
+});
+
+// THE ROLL-IN WAITS FOR THE TOUR (Darko 2026-10-11): the viewer's gate, driven
+// through the orders a first visit can take.
+test("the roll-in waits for the tour: held under it, played when it closes, taken back if the tour interrupts it", async () => {
+  const { mistsIntroGate } = await import("../spectator/viewer.mjs");
+  const running = () => true, still = () => false;
+  // the tour is up when the paint arrives: hold, then roll on close, once
+  let g = mistsIntroGate(), a = { id: "a" }, b = { id: "b" };
+  assert.equal(g.arrive(a, true), "hold");
+  assert.equal(g.held, a);
+  assert.equal(g.rehold(b), true, "a repaint while held waits instead");
+  assert.equal(g.tourClosed(), b, "the tour closes: the latest paint rolls in");
+  assert.equal(g.tourClosed(), null, "and only once");
+  assert.equal(g.rehold(a), false, "nothing waits after");
+  // no tour: roll now; the tour opening mid-roll takes it back, closing replays it
+  g = mistsIntroGate();
+  assert.equal(g.arrive(a, false), "roll");
+  assert.equal(g.tourOpened(running), a, "a running roll-in is taken back");
+  assert.equal(g.tourClosed(), a, "and played after the tour");
+  // a roll-in that has finished is never replayed by a later tour
+  g = mistsIntroGate();
+  g.arrive(a, false); g.done(a);
+  assert.equal(g.tourOpened(running), null);
+  assert.equal(g.tourClosed(), null);
+  g = mistsIntroGate();
+  g.arrive(a, false);
+  assert.equal(g.tourOpened(still), null, "a roll-in not running (reduced motion) is not taken back");
+  assert.equal(g.tourClosed(), null);
+});
+
+test("the viewer rolls in through the gate: the tour's open and close drive it, and the bell waits under the tour", () => {
+  const src = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
+  const body = (name) => { const i = src.indexOf(`  function ${name}(`); return src.slice(i, src.indexOf("\n  }\n", i)); };
+  assert.match(body("mistsIntro"), /mistsRollIn\.arrive\(item, tourShown\(\)\)/, "the first Mists ask whether the tour is up");
+  assert.match(body("mistsRollInPlay"), /mistsBellArm\(m\)/, "the bell is armed only when the roll-in plays");
+  assert.doesNotMatch(body("mistsIntro"), /mistsBellArm/, "never while it waits");
+  assert.match(body("openTour"), /mistsRollIn\.tourOpened\(/);
+  assert.match(body("closeTour"), /mistsRollIn\.tourClosed\(\)/);
+  assert.match(body("mistsBellRing"), /tourShown\(\)\) return;/, "no strike under the tour's card");
 });

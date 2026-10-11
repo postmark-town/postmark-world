@@ -29,6 +29,9 @@ export const MISTS_PAINT = {
   reachM: [380, 900],    // how far the banks reach inward, at the first and the deepest veil
   cornerM: 600,          // the clear ground's corners, rounded into banks
   depthM: 1600,          // from the face to the core's full darkness
+  depthJagM: [-220, 620], // how far the darkness wanders from the face's own line (lighter, darker): its own noise, so the foot is never a ruled band
+  tongueM: 480,          // how far the short tongues reach in, at any veil: a noise that never saturates, so no stretch of the face runs straight (Darko 10-11)
+  tongueScaleM: 380,     // and their size
   softM: 50,             // a bank's own soft edge, inside the clear ground only
   pxM: 56,               // metres per baked pixel, upscaled smooth (the fog is soft; this keeps a phone's bake small)
   clearingPx: 320,       // a clearing's bake is at most this many pixels across (they are far off)
@@ -39,6 +42,7 @@ export const MISTS_PAINT = {
   frameInsetM: 260,      // how far over the painted sheet's own edge the fog reaches before its noise
   townMaxM: 2600,        // past this a mark is open country, not the town
   faceRampM: 80,         // the least band over which the wall's face rises inside the town's margin
+  faceJagM: 700,         // and how far beyond that it may reach, by noise, where the marks leave room
   faceClearM: 70,        // and no part of that band comes nearer a mark than this
   keepHaze: 0.06,        // the most any one layer may lay over the town (three of them: under 0.2)
   layers: [              // back to front: the back layer is the opaque one
@@ -116,11 +120,14 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const dPaint = Math.max(paintDistance(m, x, y), dTrue, mistsFrameDistance(m, x, y));
   // the visible face, pushed inward by the noise and never outward (offset ≤ 0)
   // (two scales, the long banks and their tongues, stretched apart so the reach is uneven)
-  const v = smooth(0.32, 0.68, 0.65 * mistsFbm(x / L.scaleM, y / L.scaleM, L.seed) + 0.35 * mistsFbm(x * 4 / L.scaleM, y * 4 / L.scaleM, L.seed + 3));
-  const edge = -reach * (0.3 + 0.7 * v);
+  const v = smooth(0.25, 0.75, 0.65 * mistsFbm(x / L.scaleM, y / L.scaleM, L.seed) + 0.35 * mistsFbm(x * 4 / L.scaleM, y * 4 / L.scaleM, L.seed + 3));
+  // and short tongues that never saturate: the banks' term goes flat where its
+  // noise runs past either end, and a flat term over a straight face (the
+  // sheet's edge, the clear ground's side) was a ruled line (Darko 10-11)
+  const ts = MISTS_PAINT.tongueScaleM, tn = 0.72 * mistsFbm(x / ts, y / ts, L.seed + 5, 3) + 0.28 * mistsFbm(x * 2.6 / ts, y * 2.6 / ts, L.seed + 6, 2);
+  const tongue = MISTS_PAINT.tongueM * Math.max(0, Math.min(1, 0.5 + 1.8 * (tn - 0.5)));
+  const edge = -reach * (0.3 + 0.7 * v) - tongue;
   const e = dPaint - edge;   // ≥ reach·0.3 > softM wherever dTrue > 0
-  // depth, broken by the same banks: lighter tongues, darker gaps
-  const depth = Math.max(0, Math.min(1, smooth(0, MISTS_PAINT.depthM, e) + (v - 0.5) * 0.35 * (1 - smooth(0, MISTS_PAINT.depthM, e))));
   let bank = smooth(-MISTS_PAINT.softM, 0, e) * (layer === 0 ? 1 : L.alpha);
   if (layer === 0 && e >= 0) bank = 1;
   // the engine's fringe: haze over fringe_m on the clear side of the true face
@@ -136,14 +143,29 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const k = keep ? keep(x, y) : 0;
   if (k > 0 && (layer > 0 || !(dTrue > 0))) alpha = Math.min(alpha, alpha + (MISTS_PAINT.keepHaze - alpha) * k);
   // where the town's margin meets the wall's face, the back layer does not step
-  // from haze to wall in a straight line: it rises over a ragged band, starting
-  // 80-128 m out from the face (the nearest mark to any face, 130 m, keeps more)
+  // from haze to wall in a straight line: a ragged bank stands out from the face
+  // into the room the marks leave (the nearest mark to any face, 130 m, keeps
+  // faceClearM of it). Its reach is a share of the room at the face, the point's
+  // own room plus its way back to the face, so it is not pinned to the room's
+  // line; two scales and no saturation, so it never runs straight (Darko 10-11).
+  let eDepth = e;
   if (layer === 0 && k > 0) {
     const room = (keep.dist ? keep.dist(x, y) : 0) - MISTS_PAINT.faceClearM;   // how far the nearest mark stands, less its clearance
-    const width = Math.min(MISTS_PAINT.faceRampM + 600 * smooth(0.35, 0.65, mistsFbm(x / 900, y / 900, 151, 3)), room);
-    if (width > 20) alpha = Math.max(alpha, smooth(-width, 0, dTrue));
+    const span = room + Math.max(0, -dTrue);   // the room at the face, about: never less than the point's own
+    const jag = 0.6 * mistsFbm(x / 900, y / 900, 151, 3) + 0.4 * mistsFbm(x / 260, y / 260, 157, 2);
+    // fog here only where it is short of the bank's reach, and the reach is never
+    // more than the span, so a point with no room of its own (room < 0) stays clear
+    const width = Math.min(span, MISTS_PAINT.faceRampM + Math.min(span - MISTS_PAINT.faceRampM, MISTS_PAINT.faceJagM) * Math.max(0, Math.min(1, (jag - 0.15) / 0.7)));
+    if (width > 20) alpha = Math.max(alpha, smooth(-width, -width + MISTS_PAINT.faceRampM * 0.75, dTrue));
+    // the fog here is lit from this face, not from the far one the margin hid
+    eDepth = e + (Math.min(e, dTrue + Math.max(0, width)) - e) * k;
   }
   if (layer === 0 && dTrue > 0) alpha = 1;
+  // depth, broken by the same banks (lighter tongues, darker gaps) and by its own
+  // noise, so the darkness does not follow the face in a ruled band
+  const [jl, jd] = MISTS_PAINT.depthJagM;
+  const s = smooth(0, MISTS_PAINT.depthM, eDepth + jl + (jd - jl) * mistsFbm(x / 800, y / 800, L.seed + 9, 3));
+  const depth = Math.max(0, Math.min(1, s + (v - 0.5) * 0.35 * (1 - s)));
   return { alpha, depth };
 }
 
@@ -167,12 +189,12 @@ export function mistsFrameDistance(m, x, y) {
 export function mistsBakeAt(m, layer, x, y, keep = null, far = mistsBakeFar(m, layer)) {
   const dT = mistsTrueDistance(m, x, y);
   if (Math.max(dT, mistsFrameDistance(m, x, y)) < -far) return { alpha: 0, depth: 0 };
-  if (dT >= MISTS_PAINT.depthM) return { alpha: layer === 0 ? 1 : MISTS_PAINT.layers[layer].alpha, depth: 1 };
+  if (dT >= MISTS_PAINT.depthM - MISTS_PAINT.depthJagM[0]) return { alpha: layer === 0 ? 1 : MISTS_PAINT.layers[layer].alpha, depth: 1 };
   return mistsRenderAt(m, x, y, layer, keep);
 }
 /** How far into the clear ground a layer's paint can reach (the bake's skip). */
 export function mistsBakeFar(m, layer) {
-  return mistsReachM(m) * MISTS_PAINT.layers[layer].reach + (m.fringeM || 0) + MISTS_PAINT.softM;
+  return mistsReachM(m) * MISTS_PAINT.layers[layer].reach + MISTS_PAINT.tongueM + (m.fringeM || 0) + MISTS_PAINT.softM;
 }
 
 // ── the town's keep-out ─────────────────────────────────────────────────────
