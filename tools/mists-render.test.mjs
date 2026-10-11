@@ -405,4 +405,12 @@ test("no faint rectangles: at every bake box's edge, inset by the widest drift, 
     }
     assert.ok(read > 1000, `the boxes' edges were read at ${n} (${read})`);
   }
+  // and the line where the front layers give out is no rectangle either: east of the clear ground at 284
+  const m = mistsAt(284, MISTS), out = [];
+  for (let y = m.clear.minY + 1000; y < m.clear.maxY - 1000; y += 50) {
+    let x = m.clear.maxX + 600; while (mistsRenderAt(m, x, y, 1).alpha > 0 && x < m.clear.maxX + 2000) x += 5;
+    out.push(x);
+  }
+  const run = longestStraightRun(out);
+  assert.ok(run <= STRAIGHT_MAX, `the front layers' fade runs straight (±${STRAIGHT_TOL_M} m) for ${run} samples of 50 m`);
 });
