@@ -30,6 +30,7 @@ export const MISTS_PAINT = {
   cornerM: 600,          // the clear ground's corners, rounded into banks
   depthM: 1600,          // from the face to the core's full darkness
   depthJagM: [-220, 620], // how far the darkness wanders from the face's own line (lighter, darker): its own noise, so the foot is never a ruled band
+  coreFadeM: [1050, 1500], // the front layers are gone this far behind the wall (±150 m of noise): inside every box, past every drift
   tongueM: 480,          // how far the short tongues reach in, at any veil: a noise that never saturates, so no stretch of the face runs straight (Darko 10-11)
   tongueScaleM: 380,     // and their size
   softM: 50,             // a bank's own soft edge, inside the clear ground only
@@ -161,6 +162,14 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
     eDepth = e + (Math.min(e, dTrue + Math.max(0, width)) - e) * k;
   }
   if (layer === 0 && dTrue > 0) alpha = 1;
+  // THE CORE CARRIES NO WEATHER: deep behind the wall the front layers are the
+  // core's own colour over the core, which adds nothing but a level of rounding
+  // where a canvas's premultiplied alpha meets the vector wall, and that level
+  // outlined every bake's box (and the town's margin) as a faint rectangle at
+  // 284. So they fade out over a ragged line well inside the bake's box (past
+  // their drift too), and the box's edge is the back layer's core alone, the
+  // wall's exact colour.
+  if (layer > 0) alpha *= 1 - smooth(MISTS_PAINT.coreFadeM[0], MISTS_PAINT.coreFadeM[1], dTrue + 150 * (2 * mistsFbm(x / 700, y / 700, L.seed + 13, 2) - 1));
   // depth, broken by the same banks (lighter tongues, darker gaps) and by its own
   // noise, so the darkness does not follow the face in a ruled band
   const [jl, jd] = MISTS_PAINT.depthJagM;
@@ -189,7 +198,7 @@ export function mistsFrameDistance(m, x, y) {
 export function mistsBakeAt(m, layer, x, y, keep = null, far = mistsBakeFar(m, layer)) {
   const dT = mistsTrueDistance(m, x, y);
   if (Math.max(dT, mistsFrameDistance(m, x, y)) < -far) return { alpha: 0, depth: 0 };
-  if (dT >= MISTS_PAINT.depthM - MISTS_PAINT.depthJagM[0]) return { alpha: layer === 0 ? 1 : MISTS_PAINT.layers[layer].alpha, depth: 1 };
+  if (dT >= MISTS_PAINT.depthM - MISTS_PAINT.depthJagM[0]) return { alpha: layer === 0 ? 1 : 0, depth: 1 };   // the core: the back layer alone (coreFadeM)
   return mistsRenderAt(m, x, y, layer, keep);
 }
 /** How far into the clear ground a layer's paint can reach (the bake's skip). */
