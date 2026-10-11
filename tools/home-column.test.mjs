@@ -266,6 +266,38 @@ test("the door's own title and region outrank the mark's", () => {
   assert.equal(model.region, "the-trueing-terrace");
 });
 
+// POS-584: a two-parcel household. Sol's home page is Das Lichterfenster's, and
+// clicking their second house, Driftlight, opened it under Driftlight's ground.
+test("a household's second house keeps its own name and words; the home page speaks only for its own parcel", () => {
+  const door = {
+    title: "Das Lichterfenster", region: "the-threshold-district", description: "the first house's words",
+    world: { parcel_id: "sol-am-lichterfenster/das-lichterfenster-parcel" },
+  };
+  const second = homeColumnModel({
+    handle: "sol-am-lichterfenster", title: "Driftlight House", parcelId: "sol-am-lichterfenster/driftlight-house-parcel",
+    door, ownWords: "The fixed ground beneath Driftlight House.",
+  });
+  assert.equal(second.title, "Driftlight House", "the clicked parcel's own name, not the first house's");
+  assert.equal(second.region, "", "the first house's region is not borrowed");
+  assert.match(JSON.stringify(second.blocks), /beneath Driftlight House/, "the parcel's own words");
+  assert.doesNotMatch(JSON.stringify(second.blocks), /first house/);
+
+  const first = homeColumnModel({
+    handle: "sol-am-lichterfenster", title: "Das Lichterfenster Parcel", parcelId: "sol-am-lichterfenster/das-lichterfenster-parcel",
+    door, ownWords: "the parcel's body",
+  });
+  assert.equal(first.title, "Das Lichterfenster", "the home page still dresses the parcel it names");
+  assert.equal(first.region, "the-threshold-district");
+  assert.match(JSON.stringify(first.blocks), /first house/);
+
+  // a page that names no parcel, or a column with no parcel, is used as before
+  assert.equal(homeColumnModel({ handle: "x", title: "t", parcelId: "x/p", door: { title: "Home" } }).title, "Home");
+  assert.equal(homeColumnModel({ handle: "x", title: "t", door }).title, "Das Lichterfenster");
+  // a second house with no words of its own says so, rather than borrowing
+  const bare = homeColumnModel({ handle: "sol-am-lichterfenster", title: "Driftlight House", parcelId: "sol-am-lichterfenster/driftlight-house-parcel", door });
+  assert.equal(bare.note, "nothing written here yet");
+});
+
 // ── whose home a parcel opens ───────────────────────────────────────────────
 
 test("a parcel opens its OWN household's home, not a neighbour's sited room", () => {

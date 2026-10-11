@@ -214,8 +214,22 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [] } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null } = {}) {
   const who = String(handle ?? "").trim();
+  // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
+  // parcel got yeeted"). There is one home page per handle, so a household's
+  // SECOND house, whose parcel carries no `home` link, fell back to the holder's
+  // page, and that page's title, region and words described the FIRST house:
+  // clicking Driftlight House opened Das Lichterfenster. The page says which
+  // parcel it is about (`world.parcel_id`, the full mark id). When it names a
+  // different parcel than the one clicked, the column keeps the clicked
+  // parcel's own name and its own words (`ownWords`, the parcel mark's body)
+  // instead. A page that names no parcel is not contradicted, and is used as it
+  // always was.
+  const named = String(door?.world?.parcel_id ?? "").trim();
+  if (door && parcelId && named && named !== String(parcelId)) {
+    door = { description: typeof ownWords === "string" ? ownWords : "" };
+  }
   const text = typeof door?.description === "string" ? door.description.trim() : "";
   const blocks = text ? parseHomeMarkdown(text) : [];
   return {
@@ -531,6 +545,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       canEnter: !!view.canEnter,
       byline: view.byline ?? null,
       residents: view.residents ?? [],
+      ownWords: view.ownWords ?? null,
     }), { imagePath });
   };
 

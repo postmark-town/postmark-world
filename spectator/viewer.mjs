@@ -12128,7 +12128,14 @@ export function mountViewer(appEl) {
       title: parcelCardLabel(mark, data?.worldState?.determined ?? {}),
       // the dwelling's picture, and failing that the ground's own — the
       // RECORD's dwelling (POS-200), never the first pictured child
-      leadImage: parcelLeadImage(mark, home, faceOf(handle).home),
+      // A parcel with no `home` link of its own (a household's second house,
+      // POS-584) does not borrow the holder's house picture: that picture
+      // belongs to the house the record does link. Measured at S103: 1 of 125
+      // parcels takes this path, sol-am-lichterfenster/driftlight-house-parcel.
+      leadImage: parcelLeadImage(mark, home, homes.length ? faceOf(handle).home : null),
+      // the clicked parcel's own words, for when the holder's home page turns
+      // out to describe a different parcel (home-column.mjs § POS-584)
+      ownWords: (byId.get(mark.id) ?? mark).body ?? null,
       residents: homes.map((h) => ({
         handle: h.handle, via: h.via,
         picture: housePicture(faceOf(h.handle).home, h.home_mark),
