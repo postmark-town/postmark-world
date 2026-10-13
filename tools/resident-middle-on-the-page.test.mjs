@@ -108,6 +108,11 @@ const READ = {
       at: FROM, extent: { w: 4, h: 4 }, body: "a stone by the standpoint", date: TODAY + "T12:00:00.000Z" },
     [TARGET]: { id: TARGET, kind: "sited", by: "rig-resident", household: "rig-resident", tier: "market",
       at: TARGET_AT, extent: { w: 1, h: 1 }, body: "a gate far to the north", date: TODAY + "T12:00:01.000Z" },
+    // the town's GROUND SET rides every read (office § markRecords): one
+    // synthetic region ring, so the generated ground has a floor to draw
+    "rig-town/the-town-centre": { id: "rig-town/the-town-centre", kind: "sited", by: "rig-town", tier: "constitution",
+      at: { x: 0, y: 0 }, extent: { w: 1200, h: 1200 }, body: "a synthetic region",
+      points: [{ x: -600, y: -600 }, { x: 600, y: -600 }, { x: 600, y: 600 }, { x: -600, y: 600 }] },
     // a CONFLICTING stride, in the read's own records: the digest must win over it
     "the-town/resident": { id: "the-town/resident", kind: "class", by: "the-town", tier: "constitution", dials: { pace_km_per_crossing: 5 } },
   },
