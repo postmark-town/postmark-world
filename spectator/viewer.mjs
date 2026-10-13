@@ -12635,14 +12635,14 @@ export function mountViewer(appEl) {
       el.hidden = false;
       return;
     }
-    const mark = id && !walkerHandleFromHoverId(id) ? byId.get(id) : null;
+    // FLIP G2: the bubble's record taken from the spectator fold when it has one
+    const mark = id && !walkerHandleFromHoverId(id) ? ((townWorld?.marks ?? []).find((m) => m.id === id) ?? byId.get(id)) : null;
     if (!mark) { el.hidden = true; el.innerHTML = ""; pinnedBuiltId = null; return; }
     if (pinnedBuiltId === mark.id && el.firstChild) { el.hidden = false; return; }
     pinnedBuiltId = mark.id;
     // the cell, plus this mark's own predicates as cells, then the SAME fold the
     // telling runs — so an attribute reads identically in both places
-    // FLIP G1: the bubble's predicates also taken from the spectator fold
-    const predicates = ([...allMarks(), ...(townWorld?.marks ?? [])]).filter((p) => p.parent === mark.id && isPredicateAttribute(p));
+    const predicates = (allMarks()).filter((p) => p.parent === mark.id && isPredicateAttribute(p));
     // the way back, NAMED — "◂ back" makes you remember what you left, and the
     // one thing a bubble on a map should never ask you to do is hold the route
     // in your head
