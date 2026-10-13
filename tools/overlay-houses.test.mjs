@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 
 import {
   OVERLAY_PIP_R, HOME_CARD, homeCardPath, markerScale,
-  overlayHomeCardSVG, homesOfParcel, houseIsLit, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
+  overlayHomeCardSVG, homesOfParcel, houseIsLit, houseLight, lightNote, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
   sceneArtSVG, parcelLeadImage, markImagePath, housePicture,
 } from "../spectator/viewer.mjs";
 
@@ -131,17 +131,26 @@ test("[pin] the house's picture is the household record's, for the parcel's hold
   assert.match(SOURCE, /image: room \? homesPicture\(parcel, homes\) : null,/, "the map's card asks it of the residents at home there, holder first (POS-368)");
 });
 
-test("HOME: the household's walker at rest inside the parcel lights the frame", () => {
-  const home = { handle: "jack", x: 105, y: 195, standing: true };
-  assert.equal(houseIsLit(PARCEL, [home]), true);
-  assert.equal(houseIsLit(PARCEL, [{ ...home, moving: true }]), false, "walking past your own door is not being home");
-  assert.equal(houseIsLit(PARCEL, [{ ...home, x: 140 }]), false, "outside the fence is not home");
-  assert.equal(houseIsLit(PARCEL, [{ ...home, handle: "rei" }]), false, "a visitor at rest is not the household");
-  assert.equal(houseIsLit(PARCEL, []), false);
-  const shared = { ...PARCEL, household: "keeminlee" };
-  assert.equal(houseIsLit(shared, [{ handle: "wright", x: 100, y: 200, arrived: true }], (h) => (h === "wright" ? "keeminlee" : null)), true, "a multi-resident household lights through the resolver");
-  assert.equal(houseIsLit(shared, [{ handle: "wright", x: 100, y: 200, arrived: true }]), false, "…and not without it");
-  assert.equal(houseIsLit({ ...PARCEL, at: null }, [home]), false);
+test("HOME: the porch light is the household's ACTIVITY — C and C-1 lit, older/future/none dark, unknown and historical never a light (Darko 2026-10-08; WLD-29)", () => {
+  const C = 400;
+  const act = (households, house_of = { jack: "hh:jack-house" }) => ({ clock: C, households, house_of });
+  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C })), "lit");
+  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C - 1 })), "lit");
+  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C - 2 })), "dark");
+  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C + 1 })), "dark", "a crossing after the read's clock is not lit");
+  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": null })), "dark", "known: no act on record");
+  assert.equal(houseLight(PARCEL, act({ "hh:other": C })), "unknown", "a house the digest does not name is unknown, not dark");
+  assert.equal(houseLight(PARCEL, null), "unknown", "no digest held");
+  assert.equal(houseLight(PARCEL, { clock: C, households: null, unavailable: "the store could not be read" }), "unknown");
+  assert.equal(houseLight(PARCEL, { clock: null, households: null, historical: true, note: "activity isn't kept per crossing" }), "historical");
+  assert.match(lightNote("historical", { note: "activity isn't kept per crossing" }), /isn't kept per crossing/);
+  assert.equal(lightNote("lit"), "");
+  // the light is the household's: a co-resident's act lights the owner's parcel
+  assert.equal(houseLight(PARCEL, { clock: C, households: { "hh:shared": C }, house_of: { jack: "hh:shared", wright: "hh:shared" } }), "lit");
+  // walkers are not an input any more: there is no walker argument to pass
+  assert.equal(houseIsLit(PARCEL, act({ "hh:jack-house": C })), true);
+  assert.equal(houseIsLit(PARCEL, act({ "hh:jack-house": C - 2 })), false);
+  assert.doesNotMatch(SOURCE, /houseIsLit\([^)]*walkState\.walkers/, "no light path reads the walkers");
 });
 
 test("[pin] THE PARCEL UNDERFOOT — entered directly, through the dwelling on it, or a room in that dwelling — is the one parcel whose card is not drawn", () => {

@@ -741,10 +741,32 @@ function settlementChip(at) {
 // this edge for ANYTHING that departs. it should sit under resident") — the
 // vessel precedent already said so: the post-office sails at its own 405.
 export const STRIDE_CLASS_ID = "the-town/resident";
-export function departPaceKm(marks) {
-  const byMarkId = markIndex(marks);
-  const pace = Number(byMarkId.get(STRIDE_CLASS_ID)?.dials?.pace_km_per_crossing);
-  return Number.isFinite(pace) && pace > 0 ? pace : null;
+//
+// WHERE THE STRIDE IS READ (WLD-29). The resident read carries every dial in
+// its own digest (`read.dials`, id → dials); the resident path's index never
+// held the class (the office used to smuggle it into `records` by name), so
+// the digest is asked FIRST, and a valid stride there wins over any record.
+// The policy, all three arms:
+//   digest names the class   its pace if valid → "digest"; malformed → null
+//                            ("malformed": an honest unknown, never patched
+//                            from a record the read did not vouch for)
+//   no digest entry          the index's record (the spectator's fold, an
+//                            older office) → "record", or null if malformed
+//   neither                  null → "missing"
+// A null is the desk's honest unknown: the legacy 15 km stride and its "?".
+const paceOf = (dials) => { const n = Number(dials?.pace_km_per_crossing); return Number.isFinite(n) && n > 0 ? n : null; };
+export function strideFrom({ dials = null, marks = null } = {}) {
+  if (dials && typeof dials === "object" && Object.hasOwn(dials, STRIDE_CLASS_ID)) {
+    const pace = paceOf(dials[STRIDE_CLASS_ID]);
+    return { pace, source: pace == null ? "malformed" : "digest" };
+  }
+  const rec = marks ? markIndex(marks).get(STRIDE_CLASS_ID) : null;
+  if (!rec) return { pace: null, source: "missing" };
+  const pace = paceOf(rec.dials);
+  return { pace, source: pace == null ? "malformed" : "record" };
+}
+export function departPaceKm(marks, dials = null) {
+  return strideFrom({ dials, marks }).pace;
 }
 
 // `at` is the clock (the live crossing unless a caller pins one, as a test must:
@@ -2214,7 +2236,7 @@ export function homeFaceSVG({ w, h, roof } = HOME_CARD) {
   return `<rect x="${r(x0)}" y="${r(y0)}" width="${envW}" height="${envH}" rx="2" class="ov-home-envelope"/>`
     + `<path d="M ${r(x0 + inx)} ${r(y0 + iny)} L 0 ${r(y0 + deep)} L ${r(x0 + envW - inx)} ${r(y0 + iny)}" class="ov-home-flap"/>`;
 }
-export function overlayHomeCardSVG({ at, id, label = "", image = null, lit = false, fan = null, title = null, classes = "", mine = false, thumb = null } = {}) {
+export function overlayHomeCardSVG({ at, id, label = "", image = null, lit = false, light = null, lightTitle = "", fan = null, title = null, classes = "", mine = false, thumb = null } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
   const { w, h, roof } = HOME_CARD;
@@ -2232,7 +2254,8 @@ export function overlayHomeCardSVG({ at, id, label = "", image = null, lit = fal
       + `<image ${thumbImageAttrs(image, thumb)} x="${x0}" y="${top}" width="${w}" height="${h + roof}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
     : `<path d="${d}" class="ov-home-blank"/>${homeFaceSVG()}`;
   return `<g transform="translate(${x} ${y})"><g class="ov-s${mine ? " ov-mine" : ""}">`
-    + `<g class="ov-home${lit ? " lit" : ""}${image ? "" : " no-art"}" data-id="${esc(id)}" transform="translate(${dx} ${dy})">`
+    + `<g class="ov-home${lit ? " lit" : ""}${image ? "" : " no-art"}" data-id="${esc(id)}"${light ? ` data-light="${esc(light)}"` : ""} transform="translate(${dx} ${dy})">`
+    + `<title class="ov-light-note">${esc(lightTitle)}</title>`
     + art
     + `<path d="${d}" class="ov-home-frame"/>`
     + (label ? `<text class="ov-home-label" y="${base + 11}" text-anchor="middle">${esc(label)}</text>` : "")
@@ -2674,23 +2697,41 @@ export function townHouseMarks(marks = [], world = null) {
   return out;
 }
 
-/** HOME: a walker of the parcel's household, at rest, inside the parcel. Pure. */
-export function houseIsLit(parcel, walkers = [], householdOf = null) {
-  const w = Number(parcel?.extent?.w), h = Number(parcel?.extent?.h);
-  const cx = Number(parcel?.at?.x), cy = Number(parcel?.at?.y);
-  if (![cx, cy, w, h].every(Number.isFinite)) return false;
+// ── THE PORCH LIGHT IS HOUSEHOLD ACTIVITY (Darko, 2026-10-08; WLD-29) ──────
+//
+// Not a walker resting inside: the house is lit when its household acted in the
+// read's activity crossing C or the one before (Wright, 2026-10-13T11:04Z). The
+// office's `activity` digest carries the clock C, each house's newest crossing
+// and which house each handle belongs to; this reads only that — never the
+// walkers, never the browser's preview crossing. Four states, and only one is
+// a light:
+//   "lit"         the house acted at C or C-1
+//   "dark"        known: its newest act is older, newer than C, or none at all
+//   "unknown"     no digest, an unread store, or a house the digest does not name
+//   "historical"  a past crossing's read: activity isn't kept per crossing
+export const LIGHT_WINDOW = 1;
+export function houseLight(parcel, activity) {
+  if (!activity || typeof activity !== "object") return "unknown";
+  if (activity.historical) return "historical";
+  const clock = activity.clock, houses = activity.households;
+  if (!Number.isInteger(clock) || !houses || typeof houses !== "object") return "unknown";
+  // a parcel names its owner's handle; the digest says which house that is
   const who = String(parcel?.household ?? parcel?.by ?? "");
-  if (!who) return false;
-  return (walkers ?? []).some((k) => {
-    if (!k) return false;
-    const moving = k.moving ?? (!k.arrived && !k.standing);
-    if (moving) return false;
-    const handle = String(k.handle ?? "");
-    const hh = householdOf ? String(householdOf(handle) ?? "") : "";
-    if (handle !== who && hh !== who) return false;
-    const x = Number(k.x), y = Number(k.y);
-    return Number.isFinite(x) && Number.isFinite(y) && Math.abs(x - cx) <= w / 2 && Math.abs(y - cy) <= h / 2;
-  });
+  if (!who) return "unknown";
+  const key = Object.hasOwn(houses, who) ? who : (activity.house_of?.[who] ?? null);
+  if (!key || !Object.hasOwn(houses, key)) return "unknown";
+  const last = houses[key];
+  if (last === null) return "dark";
+  if (!Number.isInteger(last)) return "unknown";
+  const age = clock - last;
+  return age >= 0 && age <= LIGHT_WINDOW ? "lit" : "dark";
+}
+export const houseIsLit = (parcel, activity) => houseLight(parcel, activity) === "lit";
+/** What a home card says about a light it does not show. */
+export function lightNote(light, activity = null) {
+  if (light === "historical") return activity?.note ?? "no porch lights on a past crossing: activity isn't kept per crossing";
+  if (light === "unknown") return activity?.unavailable ?? "this household's activity is not known just now";
+  return "";
 }
 
 export function markerScale(zoomK) {
@@ -5655,6 +5696,8 @@ const STYLE = `
    only what a house wears when it has nothing to show. */
 .ov-home-blank { fill:#0d1426; }
 .ov-home.lit .ov-home-frame { stroke:#ffcf5c; stroke-width:2.2; filter:drop-shadow(0 0 3px #ffb84a); }
+/* WLD-29: a light the page cannot know is not drawn as a known dark house */
+.ov-home[data-light="unknown"] .ov-home-frame, .ov-home[data-light="historical"] .ov-home-frame { stroke-dasharray:3 2; }
 .ov-home-label { font:600 9px Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif; fill:#241c10;
   paint-order:stroke; stroke:#ece0c4; stroke-width:2.5px; stroke-linejoin:round; }
 /* the far tier's house: the card's own roofline, filled, at half size. It reads
@@ -6888,6 +6931,13 @@ export function mountViewer(appEl) {
   shadowHost.appendChild(wrap);
 
   const root = shadowHost;
+  // ── THE READ'S MIDDLE (WLD-29) ────────────────────────────────────────────
+  // The acting resident's read carries the dials digest; the porch lights are
+  // the activity digest, ONE response's — held with the office, actor and
+  // crossing it was asked for, and never shown for another.
+  let heldReads = null;                 // the resident read cache, once it exists
+  let activityHeld = null;              // { key, activity }
+  let activityPending = null;           // { key, promise }
   const state = {
     cam: { x: 0, y: 0 },
     step: STEP_NOTCHES[STEP_DEFAULT_I], // 100 m
@@ -9842,7 +9892,7 @@ export function mountViewer(appEl) {
       label: parcelCardLabel(parcel, data?.worldState?.determined ?? {}),
       image: room ? homesPicture(parcel, homes) : null,
       thumb: thumbFor(CARD_UNITS, mine),
-      lit: houseIsLit(parcel, walkState.walkers, (h) => faceOf(h).household),
+      ...lightOf(parcel),
       fan, title,
     });
   }
@@ -10595,7 +10645,7 @@ export function mountViewer(appEl) {
       destination: walkState.destination,
       skeleton: data?.skeleton,
       residentMode: canAct(),
-      paceKm: departPaceKm(byId),
+      paceKm: departPaceKm(byId, currentReadDials()),
     });
   }
 
@@ -11225,16 +11275,64 @@ export function mountViewer(appEl) {
         `${drawnWalkers.length} on the map, ${on} on the road, ${still} at rest`;
   }
 
-  // The lights read the walkers, and the walkers arrive after the first overlay
-  // is drawn (a poll, not the record) — so they are trued here, on the cards
-  // already standing, rather than by rebuilding the overlay.
+  // The lights read the household activity digest, which arrives after the
+  // first overlay is drawn (a read, refreshed) — so they are trued here, on
+  // the cards already standing, rather than by rebuilding the overlay. The
+  // same `lightOf` the draw uses: one answer, initial paint and update alike.
   function syncHouseLights() {
     if (!mapCtx?.overlay) return;
     for (const g of mapCtx.overlay.querySelectorAll(".ov-home[data-id]")) {
       const full = byId.get(g.dataset.id);
       if (!full) continue;
-      g.classList.toggle("lit", houseIsLit(full, walkState.walkers, (h) => faceOf(h).household));
+      const { lit, light, lightTitle } = lightOf(full);
+      g.classList.toggle("lit", lit);
+      g.dataset.light = light;
+      const note = g.querySelector("title.ov-light-note");
+      if (note) note.textContent = lightTitle;
     }
+  }
+
+  // ── THE ACTIVITY HELD, AND WHOSE (WLD-29) ──────────────────────────────────
+  // One response's digest, keyed by the office it came from, the actor and the
+  // crossing it was asked at. A change of any of the three asks again and
+  // shows "unknown" meanwhile — never another read's lights.
+  const activityKeyFor = (handle, crossing) => `${officeBase()}|${handle ?? ""}|${crossing}`;
+  const activityKey = () => activityKeyFor(state.handle, state.crossing);
+  function takeActivity(key, activity) {
+    if (key !== activityKey()) return;          // asked for another office, actor or crossing
+    activityHeld = { key, activity: activity && typeof activity === "object" ? activity : null };
+    syncHouseLights();
+  }
+  // The town-wide digest rides every read; the keyless eyes read at the
+  // Origin is the cheapest one that carries it, for a spectator and a
+  // resident alike. The crossing asked is the page's (live, or the
+  // time-travel dial's), so a past crossing answers "historical".
+  function refreshActivity() {
+    const key = activityKey();
+    if (activityPending?.key === key) return activityPending.promise;
+    const promise = fetch(officeUrl(`/world/eyes?x=0&y=0&crossing=${state.crossing}`), { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => takeActivity(key, j && !j.error ? j.activity ?? null : null))
+      .catch(() => takeActivity(key, null))
+      .finally(() => { if (activityPending?.key === key) activityPending = null; });
+    activityPending = { key, promise };
+    return promise;
+  }
+  function currentActivity() {
+    if (activityHeld?.key === activityKey()) return activityHeld.activity;
+    refreshActivity();
+    return null;
+  }
+  function lightOf(parcel) {
+    const activity = currentActivity();
+    const light = houseLight(parcel, activity);
+    return { lit: light === "lit", light, lightTitle: lightNote(light, activity) };
+  }
+  // The acting resident's own read's dials digest; null on the spectator path,
+  // where the fold's own class record answers (strideFrom § the policy).
+  function currentReadDials() {
+    if (!heldReads || !onResidentPath()) return null;
+    return heldReads.get(residentStandpointKey(null, state.handle))?.dials ?? null;
   }
 
   function drawWalkPreview() {
@@ -11652,7 +11750,7 @@ export function mountViewer(appEl) {
       destination: { x: point.x, y: point.y },
       skeleton: data?.skeleton,
       residentMode: canAct(),
-      paceKm: departPaceKm(byId),
+      paceKm: departPaceKm(byId, currentReadDials()),
     });
   }
 
@@ -12748,7 +12846,7 @@ export function mountViewer(appEl) {
     const from = byId.get(TOUR_WALK_LEG.from), to = byId.get(TOUR_WALK_LEG.to);
     if (!desk || !from?.at || !to?.at) return null;
     const wasHidden = desk.hidden, wasHTML = desk.innerHTML;
-    const leg = previewWalkLeg({ from: from.at, toward: to.at, targetExtent: to.extent ?? null, paceKm: departPaceKm(byId) });
+    const leg = previewWalkLeg({ from: from.at, toward: to.at, targetExtent: to.extent ?? null, paceKm: departPaceKm(byId, currentReadDials()) });
     const parts = walkLegParts(leg);
     const bearing = quantizeBearing(bearingDeg(to.at.x - from.at.x, to.at.y - from.at.y), state.dials.bearing_points);
     const arrow = bearing ? `<span class="wv-walk-dir" title="${esc(BEARING_LONG[bearing] ?? bearing)}">${bearingArrow(bearing)}</span>` : "";
@@ -13585,6 +13683,7 @@ export function mountViewer(appEl) {
   // like a spectator and nothing may be decided on that resemblance.
   let identitySettled = false;
   const readCache = new Map();
+  heldReads = readCache;
   const readPending = new Map();   // key -> promise, so N callers make ONE request
   let readError = null;
 
@@ -13606,6 +13705,7 @@ export function mountViewer(appEl) {
    */
   function loadResidentRead(standpoint, handle) {
     const key = residentStandpointKey(standpoint, handle);
+    const askedCrossing = state.crossing;
     if (readCache.has(key)) return Promise.resolve(readCache.get(key));
     if (readPending.has(key)) return readPending.get(key);
     // NO x/y. The office stands the resident where their BODY is and refuses
@@ -13619,6 +13719,9 @@ export function mountViewer(appEl) {
         if (read?.error) throw new Error(read.defect ?? read.error);
         readCache.set(key, read);
         readError = null;
+        // the read's own activity digest is the lights' answer for this actor
+        // and crossing (WLD-29), held as that response's, never another's
+        if (handle === state.handle) takeActivity(activityKeyFor(handle, askedCrossing), read.activity ?? null);
         // THE INDEX, FILLED FROM THE READ. `byId` is what forty call sites ask
         // "what is this id", and on this path this is the only thing that fills
         // it — the records the read carries, plus the resident's own rows.
@@ -14798,6 +14901,18 @@ export function mountViewer(appEl) {
   // re-tell if the record advanced. On /WORLD or RAW we don't poll (don't hammer a
   // CDN / GitHub). Every re-tell preserves standpoint / step / mode / dials / scroll.
   let lastLive = liveCrossing(), tick = 0;
+  // THE LIGHTS REFRESH (WLD-29): the activity digest is asked again on its own
+  // beat, so a house that acts lights without a reload, a sign-out or a detour
+  // through the Spectator. Activity is kept by the crossing, so minutes is fine
+  // grain; a crossing change asks at once (currentActivity's key moves).
+  // `pm.world.activity_ms` (≥ 1 s) shortens it for a rig that must watch an
+  // update land; unset, which is every real page, it is five minutes.
+  const ACTIVITY_REFRESH_MS = (() => {
+    try { const v = Number(localStorage.getItem("pm.world.activity_ms")); if (Number.isFinite(v) && v >= 1000) return v; } catch { /* no storage */ }
+    return 5 * 60 * 1000;
+  })();
+  const activityTimer = setInterval(() => { refreshActivity(); }, ACTIVITY_REFRESH_MS);
+  activityTimer.unref?.();
   const clock = setInterval(async () => {
     tick++;
     const nl = liveCrossing();
