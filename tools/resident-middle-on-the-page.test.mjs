@@ -177,6 +177,8 @@ async function openSignedIn() {
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
+  page.__logs = [];
+  page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") page.__logs.push(m.text().slice(0, 200)); });
   await page.addInitScript((base) => {
     try {
       localStorage.setItem("pm.office.base", base);
@@ -205,6 +207,8 @@ const diag = async (page, errors) => JSON.stringify({
   errors, asked: office.asked.slice(-30),
   homes: await page.evaluate(() => [...document.querySelectorAll(".ov-home[data-id]")].map((g) => g.getAttribute("data-id"))),
   tier: await page.evaluate(() => document.querySelector("#wv-overlay")?.getAttribute("data-tier") ?? null),
+  minimap: await page.evaluate(() => { const b = document.querySelector(".wv-minimap"); return b ? { svg: !!b.querySelector(":scope > svg"), text: b.innerText.slice(0, 200), ground: b.querySelector("svg")?.getAttribute("data-ground") ?? null } : null; }),
+  console: (page.__logs ?? []).slice(-12),
   desk: await page.evaluate(() => document.querySelector(".wv-walkdesk")?.innerText?.slice(0, 300) ?? null),
 }).slice(0, 2000);
 
