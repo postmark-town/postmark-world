@@ -56,6 +56,9 @@ const CLEANUP = [];
 after(() => { for (const stop of CLEANUP.reverse()) { try { stop(); } catch { /* already gone */ } } });
 
 const TODAY = new Date().toISOString().slice(0, 10);
+const TARGET = "rig-resident/the-far-gate";
+const FROM = { x: 10, y: 10 };
+const TARGET_AT = { x: 10, y: 7710 };                // 7.7 km due north
 
 // ── THE SYNTHETIC, POISONED FOLD ─────────────────────────────────────────────
 const plot = (who, at) => ({ id: `${who}/the-plot`, kind: "parcel", tier: "home", by: who, household: who, at, extent: { w: 25, h: 25 }, body: `${who}'s plot` });
@@ -75,6 +78,13 @@ const FOLD = {
     // standpoint (the map draws it) — so a widening cannot hide by being dull.
     { id: "poison/the-fold-only-lamp", kind: "sited", tier: "market", by: "poison", household: "poison", at: { x: 20, y: 20 }, extent: { w: 30, h: 30 },
       body: "POISON-FOLD-BODY", dials: { POISON: 1 }, date: TODAY + "T12:00:02.000Z" },
+    // THE GENERAL GUARD'S PAIR (first review R1): the fold's version of a mark the
+    // read ALSO carries, and a predicate on it the read does NOT carry. A resident
+    // pane that took either from the fold would draw POISON.
+    { id: TARGET, kind: "sited", tier: "market", by: "rig-resident", household: "rig-resident", at: TARGET_AT, extent: { w: 1, h: 1 },
+      body: "POISON-FOLD-GATE-BODY", date: TODAY + "T12:00:01.000Z" },
+    { id: "poison/the-gate-colour", kind: "predicated", tier: "market", by: "poison", parent: TARGET, slot: "colour", value: "POISON-RED",
+      body: "POISON-FOLD-PREDICATE: the gate is red" },
     ...Object.values(PLOTS),
   ],
   parcels: Object.values(PLOTS).map((p) => ({ id: p.id, household: p.household, at: p.at, extent: p.extent })),
@@ -91,13 +101,14 @@ function syntheticWorld() {
   CLEANUP.push(() => rmSync(dir, { recursive: true, force: true }));
   writeFileSync(join(dir, "world-state.json"), JSON.stringify(FOLD));
   writeFileSync(join(dir, "skeleton.json"), JSON.stringify(SKELETON));
+  // THE LEDGERS ARE SYNTHETIC TOO (first review R1): the server serves them from
+  // WORLD_DIR now, so no real walk or crossing reaches this page
+  writeFileSync(join(dir, "walk-ledger.md"), "# walks\n\nsynthetic: nobody has walked in the rig\n");
+  writeFileSync(join(dir, "enter-exit-ledger.md"), "# crossings\n\nsynthetic: nobody has entered anything in the rig\n");
   return dir;
 }
 
 // ── THE READ THE STUB OFFICE HANDS BACK ──────────────────────────────────────
-const TARGET = "rig-resident/the-far-gate";
-const FROM = { x: 10, y: 10 };
-const TARGET_AT = { x: 10, y: 7710 };                // 7.7 km due north
 const C = 500;                                       // the read's activity clock — NOT the browser's crossing
 const ACTIVITY = { clock: C, window: 1,
   households: { "hh:lit": C - 1, "hh:dark": C - 5, "hh:far": C },
@@ -112,7 +123,11 @@ const READ = {
     "rig-resident/the-near-stone": { id: "rig-resident/the-near-stone", kind: "sited", by: "rig-resident", household: "rig-resident", tier: "market",
       at: FROM, extent: { w: 4, h: 4 }, body: "a stone by the standpoint", date: TODAY + "T12:00:00.000Z" },
     [TARGET]: { id: TARGET, kind: "sited", by: "rig-resident", household: "rig-resident", tier: "market",
-      at: TARGET_AT, extent: { w: 1, h: 1 }, body: "a gate far to the north", date: TODAY + "T12:00:01.000Z" },
+      at: TARGET_AT, extent: { w: 1, h: 1 }, body: "READ-GATE-BODY: a gate far to the north", date: TODAY + "T12:00:01.000Z" },
+    // the read's own predicate on the gate: the bubble DOES draw predicates, so
+    // the guard below is looking at a pane that renders record content
+    "rig-resident/the-gate-sign": { id: "rig-resident/the-gate-sign", kind: "predicated", by: "rig-resident", tier: "market",
+      parent: TARGET, slot: "sign", value: "READ-SIGN", body: "READ-SIGN: the gate's own sign" },
     // the town's GROUND SET rides every read (office § markRecords): one
     // synthetic region ring, so the generated ground has a floor to draw
     "rig-town/the-town-centre": { id: "rig-town/the-town-centre", kind: "sited", by: "rig-town", tier: "constitution",
@@ -309,4 +324,49 @@ test("A HISTORICAL READ: no house is lit, each says activity isn't kept per cros
     }
     assert.deepEqual(errors, []);
   } finally { office.live.historical = false; await page.close(); }
+});
+
+// ── THE GENERAL RESIDENT-PAGE GUARD (first review R1) ────────────────────────
+//
+// THE BOUNDARY: the pinned bubble of a selected mark — the pane that draws a
+// record's CONTENT and its predicate children by id. The read carries the gate
+// and one predicate; the poisoned fold carries ITS version of the same gate and
+// a second predicate on it. The permitted sources, named: the read's records
+// and the ids it names (within, nearby), the resident's own marks (none here),
+// the middle digests (ids → dials, never drawn as records), and the town's
+// houses (the approved public layer). Observed: the bubble's text and every
+// data-id the resident panes draw.
+test("THE GENERAL PAGE GUARD: the selected mark's bubble draws the READ's record and predicate, never the fold's; every id the resident panes draw is from a permitted source", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  const { page, errors } = await openSignedIn();
+  try {
+    const housesIn = await until(page, (id) => !!document.querySelector(`.ov-home[data-id="${id}"]`), PLOTS.lit.id, 45_000);
+    assert.ok(housesIn, `precondition: the fold has landed (its houses are drawn) before the guard looks: ${await diag(page, errors)}`);
+    const listed = await until(page, (id) => !!document.querySelector(`.wv-act-line .what[data-id="${id}"]`), TARGET, 45_000);
+    assert.ok(listed, `precondition: the read's gate is in Lately: ${await diag(page, errors)}`);
+    await page.evaluate((id) => document.querySelector(`.wv-act-line .what[data-id="${id}"]`).click(), TARGET);
+    const opened = await until(page, (id) => !!document.querySelector(`.wv-bubbles .wv-bubble.is-pinned .wv-card[data-id="${id}"]`), TARGET, 20_000);
+    assert.ok(opened, `selecting the gate opened no bubble for it: ${await diag(page, errors)}`);
+    await page.waitForTimeout(600);
+    const seen = await page.evaluate(() => {
+      const b = document.querySelector(".wv-bubbles .wv-bubble.is-pinned");
+      const ids = (sel) => [...document.querySelectorAll(`${sel} [data-id]`)].map((e) => e.getAttribute("data-id"));
+      return { bubble: b?.innerText ?? "", bubbleHtml: b?.innerHTML ?? "", ids: { bubble: ids(".wv-bubbles"), lately: ids(".wv-acts"), desk: ids(".wv-walkdesk"), overlay: ids("#wv-overlay") } };
+    });
+    console.log(`    PAGE GUARD RECEIPT · bubble ${JSON.stringify(seen.bubble.slice(0, 240))} · ids ${JSON.stringify(seen.ids)}`);
+    // the pane renders record content and predicates — so it CAN show a bad source
+    assert.match(seen.bubble, /READ-GATE-BODY/, "the bubble draws the read's own body for the gate");
+    assert.match(seen.bubble + seen.bubbleHtml, /READ-SIGN/, "the bubble draws the read's own predicate on the gate");
+    // …and draws nothing of the fold's
+    assert.doesNotMatch(seen.bubble + seen.bubbleHtml, /poison/i, "the bubble drew the fold's version of a record, or a predicate only the fold carries");
+    // provenance: every id a resident pane draws is from a permitted source
+    const ALLOWED = new Set([...Object.keys(READ.records), ...READ.within.map((m) => m.id), ...READ.nearby.map((m) => m.id), ...Object.values(PLOTS).map((p) => p.id)]);
+    for (const [pane, list] of Object.entries(seen.ids)) {
+      const outside = [...new Set(list)].filter((id) => id.includes("/") && !ALLOWED.has(id));
+      assert.deepEqual(outside, [], `the ${pane} drew ids no permitted source carries`);
+    }
+    const html = await page.evaluate(() => document.documentElement.outerHTML);
+    assert.deepEqual([...html.matchAll(/.{0,60}poison.{0,60}/gi)].map((m) => m[0]).slice(0, 5), [], "fold-only content drawn anywhere on the resident page");
+    assert.deepEqual(errors, []);
+  } finally { await page.close(); }
 });

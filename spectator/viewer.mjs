@@ -6946,6 +6946,7 @@ export function mountViewer(appEl) {
   let heldReads = null;                 // the resident read cache, once it exists
   let activityHeld = null;              // { key, activity }
   let activityPending = null;           // { key, promise }
+  let stopped = false;                  // set by the handle's stop(): nothing asks or publishes after it
   const state = {
     cam: { x: 0, y: 0 },
     step: STEP_NOTCHES[STEP_DEFAULT_I], // 100 m
@@ -11307,6 +11308,7 @@ export function mountViewer(appEl) {
   const activityKeyFor = (handle, crossing) => `${officeBase()}|${handle ?? ""}|${crossing}`;
   const activityKey = () => activityKeyFor(state.handle, state.crossing);
   function takeActivity(key, activity) {
+    if (stopped) return;                        // the mount is gone: a late answer has nowhere to land
     if (key !== activityKey()) return;          // asked for another office, actor or crossing
     activityHeld = { key, activity: activity && typeof activity === "object" ? activity : null };
     syncHouseLights();
@@ -11316,6 +11318,7 @@ export function mountViewer(appEl) {
   // resident alike. The crossing asked is the page's (live, or the
   // time-travel dial's), so a past crossing answers "historical".
   function refreshActivity() {
+    if (stopped) return null;                   // a stopped viewer asks the office nothing
     const key = activityKey();
     if (activityPending?.key === key) return activityPending.promise;
     const promise = fetch(officeUrl(`/world/eyes?x=0&y=0&crossing=${state.crossing}`), { credentials: "same-origin" })
@@ -13703,7 +13706,10 @@ export function mountViewer(appEl) {
   // EMBODIED: who and when, never where. See `residentReadKey`'s note and the
   // office's own refusal — "your eyes ride your body".
   function residentStandpointKey(_standpoint, handle) {
-    return residentReadKey({ handle, crossing: state.crossing });
+    // THE OFFICE IS PART OF WHOSE READ IT IS (WLD-29 first review, R2): a read
+    // and its digests are one office's answer, never another's — switching the
+    // office base asks again rather than serving the last office's law.
+    return `${officeBase()}#${residentReadKey({ handle, crossing: state.crossing })}`;
   }
 
   /**
@@ -13714,6 +13720,10 @@ export function mountViewer(appEl) {
   function loadResidentRead(standpoint, handle) {
     const key = residentStandpointKey(standpoint, handle);
     const askedCrossing = state.crossing;
+    // WHO ASKED, fixed BEFORE the request leaves (R2): the office, actor and
+    // crossing this answer will belong to — never read again after the await
+    const askedOffice = officeBase();
+    const askedActivity = activityKeyFor(handle, askedCrossing);
     if (readCache.has(key)) return Promise.resolve(readCache.get(key));
     if (readPending.has(key)) return readPending.get(key);
     // NO x/y. The office stands the resident where their BODY is and refuses
@@ -13727,14 +13737,15 @@ export function mountViewer(appEl) {
         if (read?.error) throw new Error(read.defect ?? read.error);
         readCache.set(key, read);
         readError = null;
-        // the read's own activity digest is the lights' answer for this actor
-        // and crossing (WLD-29), held as that response's, never another's
-        if (handle === state.handle) takeActivity(activityKeyFor(handle, askedCrossing), read.activity ?? null);
+        // the read's own activity digest is the lights' answer for the office,
+        // actor and crossing it was ASKED for (WLD-29, R2); takeActivity drops
+        // it if any of the three has moved since
+        if (handle === state.handle) takeActivity(askedActivity, read.activity ?? null);
         // THE INDEX, FILLED FROM THE READ. `byId` is what forty call sites ask
         // "what is this id", and on this path this is the only thing that fills
         // it — the records the read carries, plus the resident's own rows.
         // `homeSet` follows from the same set, so green still means home.
-        if (handle === state.handle) {
+        if (handle === state.handle && officeBase() === askedOffice) {
           byId = residentById(read, mineSet.marks);
           loadTownHouses();      // once; fills + repaints when it lands
           withTownHouses();      // and at once, when it already has
@@ -14063,7 +14074,7 @@ export function mountViewer(appEl) {
     // before anything is drawn, and `homeSet` with it or green stops meaning
     // home. The read is normally cached, so this costs nothing; where it is not
     // the compose pass asks for it and this repeats when it lands.
-    const cachedRead = readCache.get(residentReadKey({ handle: actor, crossing: state.crossing }));
+    const cachedRead = readCache.get(residentStandpointKey(null, actor));   // this office's read only (R2)
     if (cachedRead) {
       byId = residentById(cachedRead, mineSet.marks);
       withTownHouses();
@@ -15034,8 +15045,10 @@ export function mountViewer(appEl) {
     // taken — the instrument behind tools/walk-layer-once.test.mjs (#2912)
     walkDraws: () => ({ ...walkDraws }),
     stop: () => {
+      stopped = true;                    // no late answer publishes into a stopped mount (WLD-29, R3)
       clearInterval(clock);
       clearInterval(walkState.timer);
+      clearInterval(activityTimer);
       document.removeEventListener("keydown", onViewerKeydown);
       window.removeEventListener("resize", onViewerResize);
       window.removeEventListener("pm:stood-out", onStoodOut);
