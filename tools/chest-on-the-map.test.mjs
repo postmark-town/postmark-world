@@ -143,7 +143,7 @@ before(async () => {
   [rig, withChests, without] = await Promise.all([bootRig(atlas.port), bootStubOffice({ chests: CHESTS }), bootStubOffice({ chests: null })]);
 });
 
-async function look(office) {
+async function look(office, { zoomToMid = false } = {}) {
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
@@ -154,7 +154,28 @@ async function look(office) {
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
   await page.waitForFunction((id) => !!document.querySelector(`#wv-overlay [data-id="${CSS.escape(id)}"]`), GROUND.id, { timeout: 60_000 }).catch(() => {});
   await page.waitForTimeout(4000);
+  // ZOOM ONTO THE GROUND CHEST UNTIL THE MID TIER, where the furnishing pass
+  // draws every art-less embodied mark as its tinted extent — the layer a
+  // carried chest must ALSO leave (Bevel's review, finding 8). Small notches,
+  // stopping at the tier, as placed-art.test.mjs learned to.
+  if (zoomToMid) {
+    for (let i = 0; i < 40; i++) {
+      const at = await page.evaluate((id) => {
+        const b = document.querySelector(`#wv-overlay [data-id="${CSS.escape(id)}"]`)?.getBoundingClientRect();
+        return b ? { x: b.x + b.width / 2, y: b.y + b.height / 2 } : { x: 750, y: 475 };
+      }, GROUND.id);
+      await page.mouse.move(at.x, at.y);
+      await page.mouse.wheel(0, -80);
+      await page.waitForTimeout(160);
+      if (await page.evaluate(() => document.getElementById("wv-overlay")?.getAttribute("data-tier")) !== "far") break;
+    }
+    await page.waitForTimeout(1500);
+  }
   const seen = await page.evaluate(([g, c]) => ({
+    tier: document.getElementById("wv-overlay")?.getAttribute("data-tier") ?? "-",
+    groundExtent: !!document.querySelector(`#wv-overlay .wv-ph-extent[data-id="${CSS.escape(g)}"]`),
+    carriedAnywhere: [...document.querySelectorAll(`[data-id="${CSS.escape(c)}"]`)].map((e) => e.getAttribute("class") ?? e.tagName),
+    carriedArt: [...document.querySelectorAll("#wv-placed-art-layer .wv-far-art")].filter((a) => (a.getAttribute("aria-label") ?? "").includes("tin")).length,
     groundPip: !!document.querySelector(`#wv-overlay .ov-pip[data-id="${CSS.escape(g)}"]`),
     carriedPip: !!document.querySelector(`#wv-overlay [data-id="${CSS.escape(c)}"]`),
     label: document.querySelector(`#wv-overlay .ov-chest-label[data-chest="${CSS.escape(g)}"]`)?.textContent ?? null,
@@ -181,5 +202,23 @@ test("CONTROL: no chests read, no label — the map never invents a count", asyn
   assert.ok(seen.groundPip, "the control drew no chest pip, so its absent label would be vacuous");
   assert.equal(seen.labels, 0);
   assert.ok(seen.carriedPip, "without the office's word that it is carried, the tin stays where the record puts it");
+  assert.deepEqual(errors, [], "the page threw: " + errors.join(" | "));
+});
+
+test("THE CARRIED CHEST LEAVES EVERY LAYER: at mid its furniture extent is gone too, while the ground chest's is drawn", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  const { seen, errors } = await look(withChests, { zoomToMid: true });
+  assert.notEqual(seen.tier, "far", "the page never left the far tier, so the furnishing pass was never asked");
+  assert.ok(seen.groundExtent, "the ground chest drew no furniture extent at " + seen.tier + ", so the carried one's absence would be vacuous");
+  assert.deepEqual(seen.carriedAnywhere, [], "a carried chest left something on its old ground: " + seen.carriedAnywhere.join(", "));
+  assert.equal(seen.carriedArt, 0);
+  assert.deepEqual(errors, [], "the page threw: " + errors.join(" | "));
+});
+
+test("CONTROL at mid: without the office's word that it is carried, the tin's extent IS on the ground", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  const { seen, errors } = await look(without, { zoomToMid: true });
+  assert.notEqual(seen.tier, "far");
+  assert.ok(seen.carriedAnywhere.length > 0, "the control drew nothing for the tin, so the carried test's absence proves nothing");
   assert.deepEqual(errors, [], "the page threw: " + errors.join(" | "));
 });

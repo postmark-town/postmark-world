@@ -10155,9 +10155,14 @@ export function mountViewer(appEl) {
     // screen. The margin is what keeps a pan free — see viewportWorldBounds.
     // …AND NOTHING FROM INSIDE A PARCEL THE READER IS NOT IN (2026-09-11) — see
     // hiddenInsideParcel: the card is the house from outside.
+    // …AND NO CARRIED CHEST, ON ANY LAYER (WLD-27, Bevel's review finding 8). A
+    // chest the office's read names as carried rides its holder: it leaves the
+    // ground's pips, its tinted furniture extent, its art and its hit geometry
+    // alike, so it is filtered HERE, before every pass below reads `drawn`.
     const drawn = overlayMarks(radial)
       .filter((m) => markInDrawnBounds(byId.get(m.id) ?? m, bounds))
-      .filter((m) => !hiddenInsideParcel(byId.get(m.id) ?? m, byId, underfoot, townChain));
+      .filter((m) => !hiddenInsideParcel(byId.get(m.id) ?? m, byId, underfoot, townChain))
+      .filter((m) => !chestIsCarried(chestFaces.get(m.id)));
     // THE PLACED ART, into its own layer under this one. Driven from here so it
     // is culled and tier-gated by the same two readings every other pass uses,
     // rather than laid down once at mount as the mountain's picture was.
@@ -10268,7 +10273,6 @@ export function mountViewer(appEl) {
       // A CARRIED CHEST IS NOT A FREE PIP (WLD-27): it rides its holder and is
       // drawn on their card. Nothing of it is left here to hover or hit.
       const chest = chestFaces.get(m.id);
-      if (chestIsCarried(chest)) { glyphIds.delete(m.id); continue; }
       s += overlayPipSVG({
         at: p, id: m.id, classes: markClasses(m) + (pictured.has(m.id) ? " ov-pip-pictured" : ""),
         fan: fanned.has(m.id) ? fanOffsetPx(m.id) : null,
@@ -10832,6 +10836,7 @@ export function mountViewer(appEl) {
       return false;
     };
     const hung = allMarks().filter((m) => {
+      if (chestIsCarried(chestFaces.get(m.id))) return false; // a carried chest hangs no art where it was (WLD-27)
       if (!bigEnough(m)) return false;
       if (from && m.id === from) return false;   // your own ground is not a hanging
       // A REGION IS A FAR THING (Keemin, 2026-09-13: "the region marks should
