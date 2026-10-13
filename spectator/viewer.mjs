@@ -12635,8 +12635,7 @@ export function mountViewer(appEl) {
       el.hidden = false;
       return;
     }
-    // FLIP G2: the bubble's record taken from the spectator fold when it has one
-    const mark = id && !walkerHandleFromHoverId(id) ? ((townWorld?.marks ?? []).find((m) => m.id === id) ?? byId.get(id)) : null;
+    const mark = id && !walkerHandleFromHoverId(id) ? byId.get(id) : null;
     if (!mark) { el.hidden = true; el.innerHTML = ""; pinnedBuiltId = null; return; }
     if (pinnedBuiltId === mark.id && el.firstChild) { el.hidden = false; return; }
     pinnedBuiltId = mark.id;
