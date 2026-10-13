@@ -2124,6 +2124,36 @@ export function overlayPipSVG({ at, id, classes = "", fan = null, title = null }
     + `</g></g>`;
 }
 
+// ── A CHEST'S LABEL (WLD-27) ────────────────────────────────────────────────
+//
+// "Map chest rendering shows its top class/kind and live count (e.g. `Pocket
+// Comets: 18`). Held stacks appear on the holder's card and doorstep, NOT as
+// free map pips." The words come from the office's GET /world/chests — the fold
+// of the record's acts at that read — and from nowhere else: the map keeps no
+// count of its own and never edits the world-state file to carry one.
+
+/** The office's chests answer → Map(chest id → its face). Anything malformed is simply not a chest here. */
+export function chestFacesOf(body) {
+  const out = new Map();
+  for (const c of Array.isArray(body?.chests) ? body.chests : []) if (c && typeof c.chest === "string") out.set(c.chest, c);
+  return out;
+}
+
+/** What the chest's label reads: the office's own sentence ("Pocket Comets: 18", "101 candies", "empty"). */
+export const chestLabelText = (face) => (face && typeof face.shows === "string" && face.shows ? face.shows : null);
+
+/** A carried chest rides its holder: it is drawn on their card, never as a pip of its own. */
+export const chestIsCarried = (face) => Boolean(face?.held_by);
+
+/** The label under a chest's pip, counter-scaled like the pip. */
+export function chestLabelSVG({ at, id, text } = {}) {
+  const x = Number(at?.x), y = Number(at?.y);
+  if (![x, y].every(Number.isFinite) || !text) return "";
+  return `<g transform="translate(${x} ${y})"><g class="ov-s">`
+    + `<text class="ov-chest-label" data-chest="${esc(id)}" y="${OVERLAY_PIP_R + 11}" text-anchor="middle">${esc(text)}</text>`
+    + `</g></g>`;
+}
+
 /** Where the reader is standing: the dot and its halo, counter-scaled together. */
 export function overlayStandpointSVG({ at } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
@@ -5655,6 +5685,8 @@ const STYLE = `
    only what a house wears when it has nothing to show. */
 .ov-home-blank { fill:#0d1426; }
 .ov-home.lit .ov-home-frame { stroke:#ffcf5c; stroke-width:2.2; filter:drop-shadow(0 0 3px #ffb84a); }
+.ov-chest-label { font:600 9px Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif; fill:#3a1d05;
+  paint-order:stroke; stroke:#f6e2b8; stroke-width:2.5px; stroke-linejoin:round; pointer-events:none; }
 .ov-home-label { font:600 9px Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif; fill:#241c10;
   paint-order:stroke; stroke:#ece0c4; stroke-width:2.5px; stroke-linejoin:round; }
 /* the far tier's house: the card's own roofline, filled, at half size. It reads
@@ -10233,6 +10265,10 @@ export function mountViewer(appEl) {
         s += homeCard(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null, nameOf(m), tier);
         continue;
       }
+      // A CARRIED CHEST IS NOT A FREE PIP (WLD-27): it rides its holder and is
+      // drawn on their card. Nothing of it is left here to hover or hit.
+      const chest = chestFaces.get(m.id);
+      if (chestIsCarried(chest)) { glyphIds.delete(m.id); continue; }
       s += overlayPipSVG({
         at: p, id: m.id, classes: markClasses(m) + (pictured.has(m.id) ? " ov-pip-pictured" : ""),
         fan: fanned.has(m.id) ? fanOffsetPx(m.id) : null,
@@ -10240,6 +10276,8 @@ export function mountViewer(appEl) {
         // label does: the bubble is already saying this word, sooner and better
         title: nameOf(m),
       });
+      // …and a chest on the ground says what it holds, in the office's words.
+      if (chest) s += chestLabelSVG({ at: p, id: m.id, text: chestLabelText(chest) });
     }
     // THE TOWN'S HOUSES ARE ALWAYS ON THE MAP. The atlas drew every home on its
     // sheet, whoever was looking; the field-of-view rule above is right for the
@@ -10498,6 +10536,17 @@ export function mountViewer(appEl) {
       const commits = Array.isArray(body) ? body : (body?.commits ?? body?.log ?? []);
       stakeEvents = parseStakeCommits(commits).slice(0, stakeKeep);
     } catch { /* a quiet lane contributes nothing, and the rail is unchanged */ }
+  }
+  // THE CHESTS (WLD-27): their live counts, from the office's own read. Best-
+  // effort like the settlement lane: an office that does not answer leaves the
+  // chests as plain pips, never with a guessed number.
+  let chestFaces = new Map();
+  async function loadChests() {
+    try {
+      const r = await fetch(officeUrl("/world/chests"), { credentials: "same-origin" });
+      if (!r.ok) return;
+      chestFaces = chestFacesOf(await r.json());
+    } catch { /* no counts today; the chests are still on the map */ }
   }
   async function loadSettlements() {
     try {
@@ -14807,6 +14856,8 @@ export function mountViewer(appEl) {
     // on the same slower beat the fold uses
     if (!$(root, ".settlenow")?.hidden) renderSettlementChip();
     if (tick % 20 === 0) loadSettlements().then(renderSettlementChip);
+    // a chest's count moves with every take: refreshed every other tick (~60 s)
+    if (tick % 2 === 0) loadChests().then(() => { if (lastRadial) drawOverlay(lastRadial); });
     // the talk moves faster than the record: every other tick (~60 s), gentler
     // than the conversations page's own 7 s poll — this is a map, not a feed,
     // and a hidden layer costs the office nothing
@@ -14864,6 +14915,8 @@ export function mountViewer(appEl) {
       // three have answered or failed. `allSettled` rather than `all` because
       // a quiet lane must not be able to keep the pane shut: each of these
       // already swallows its own failure, and this says so at the join too.
+      // the chests' counts, once they arrive: the overlay is redrawn to put them on
+      loadChests().then(() => { if (lastRadial) drawOverlay(lastRadial); });
       const settlements = loadSettlements();
       // the settlement number and its chip are NOT downstream of the other two
       // and do not wait on them — only the rail does
