@@ -11343,8 +11343,7 @@ export function mountViewer(appEl) {
   }
   function lightOf(parcel) {
     const lights = currentLights();
-    // FLIP R1 (not for merge): the light joins by a key guessed from the owner's handle
-    const light = houseLight({ ...parcel, declared_household: `solo:${parcel?.by ?? parcel?.household}` }, lights);
+    const light = houseLight(parcel, lights);
     return { lit: light === "lit", light, lightTitle: lightNote(light, lights) };
   }
 
@@ -11373,7 +11372,8 @@ export function mountViewer(appEl) {
     return promise;
   }
   function currentReadDials() {
-    // FLIP R2 (not for merge): the stride no longer reads GET /world/dials
+    if (dialsHeld?.key === officeBase()) return dialsHeld.answer?.dials ?? null;
+    refreshDials();
     return null;
   }
 
@@ -12666,8 +12666,7 @@ export function mountViewer(appEl) {
       el.hidden = false;
       return;
     }
-    // FLIP R3 (not for merge): the bubble's record taken from the spectator fold when it has one
-    const mark = id && !walkerHandleFromHoverId(id) ? ((townWorld?.marks ?? []).find((m) => m.id === id) ?? byId.get(id)) : null;
+    const mark = id && !walkerHandleFromHoverId(id) ? byId.get(id) : null;
     if (!mark) { el.hidden = true; el.innerHTML = ""; pinnedBuiltId = null; return; }
     if (pinnedBuiltId === mark.id && el.firstChild) { el.hidden = false; return; }
     pinnedBuiltId = mark.id;
