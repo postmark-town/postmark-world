@@ -10161,8 +10161,8 @@ export function mountViewer(appEl) {
     // alike, so it is filtered HERE, before every pass below reads `drawn`.
     const drawn = overlayMarks(radial)
       .filter((m) => markInDrawnBounds(byId.get(m.id) ?? m, bounds))
-      .filter((m) => !hiddenInsideParcel(byId.get(m.id) ?? m, byId, underfoot, townChain))
-      .filter((m) => !chestIsCarried(chestFaces.get(m.id)));
+      .filter((m) => !hiddenInsideParcel(byId.get(m.id) ?? m, byId, underfoot, townChain));
+    for (let i = drawn.length - 1; i >= 0; i--) if (chestIsCarried(chestFaces.get(drawn[i].id))) drawn.splice(i, 1);
     // THE PLACED ART, into its own layer under this one. Driven from here so it
     // is culled and tier-gated by the same two readings every other pass uses,
     // rather than laid down once at mount as the mountain's picture was.

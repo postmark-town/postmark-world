@@ -174,7 +174,11 @@ async function look(office, { zoomToMid = false } = {}) {
   const seen = await page.evaluate(([g, c]) => ({
     tier: document.getElementById("wv-overlay")?.getAttribute("data-tier") ?? "-",
     groundExtent: !!document.querySelector(`#wv-overlay .wv-ph-extent[data-id="${CSS.escape(g)}"]`),
-    carriedAnywhere: [...document.querySelectorAll(`[data-id="${CSS.escape(c)}"]`)].map((e) => e.getAttribute("class") ?? e.tagName),
+    // THE MAP'S LAYERS: the overlay (pips, furniture extents, art drawn over
+    // extents, hit geometry) and the placed-art layer. The telling pane's cards
+    // list what the office's read names nearby; that is the read's sentence,
+    // not ground, and is not asserted here.
+    carriedAnywhere: [...document.querySelectorAll(`#wv-overlay [data-id="${CSS.escape(c)}"], #wv-placed-art-layer [data-id="${CSS.escape(c)}"]`)].map((e) => e.getAttribute("class") ?? e.tagName),
     carriedArt: [...document.querySelectorAll("#wv-placed-art-layer .wv-far-art")].filter((a) => (a.getAttribute("aria-label") ?? "").includes("tin")).length,
     groundPip: !!document.querySelector(`#wv-overlay .ov-pip[data-id="${CSS.escape(g)}"]`),
     carriedPip: !!document.querySelector(`#wv-overlay [data-id="${CSS.escape(c)}"]`),
