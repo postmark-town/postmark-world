@@ -12641,7 +12641,8 @@ export function mountViewer(appEl) {
     pinnedBuiltId = mark.id;
     // the cell, plus this mark's own predicates as cells, then the SAME fold the
     // telling runs — so an attribute reads identically in both places
-    const predicates = (allMarks()).filter((p) => p.parent === mark.id && isPredicateAttribute(p));
+    // FLIP G1: the bubble's predicates also taken from the spectator fold
+    const predicates = ([...allMarks(), ...(townWorld?.marks ?? [])]).filter((p) => p.parent === mark.id && isPredicateAttribute(p));
     // the way back, NAMED — "◂ back" makes you remember what you left, and the
     // one thing a bubble on a map should never ask you to do is hold the route
     // in your head
