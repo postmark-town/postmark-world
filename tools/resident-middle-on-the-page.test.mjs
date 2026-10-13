@@ -270,7 +270,8 @@ test("THE DESK AND THE GUARD: the ETA is the digest's stride (77), not the fold'
     for (const p of [999, 5, 60, 15]) assert.ok(etaAt(p) !== want && !desk.metas.includes(etaAt(p)), `not the ${p} km stride's ETA (${etaAt(p)})`);
     // THE GUARD: nothing of the poisoned fold beyond the houses is drawn anywhere
     const html = await page.evaluate(() => document.documentElement.outerHTML);
-    const hits = [...html.matchAll(/.{0,60}POISON.{0,60}/g)].map((m) => m[0]).slice(0, 5);
+    // case-blind: the poisoned mark's id is lowercase (`poison/…`), its body and dials upper
+    const hits = [...html.matchAll(/.{0,60}poison.{0,60}/gi)].map((m) => m[0]).slice(0, 5);
     assert.deepEqual(hits, [], "a resident pane drew something only the spectator fold carries");
     // provenance: what the page asked, recorded
     const paths = new Set(office.asked.map((p) => p.split("?")[0]));
