@@ -171,7 +171,10 @@ only its author** — an object you hold (`thing`), a notice you owe
 (`bounty`), a note left as an object (`note` — decorative by construction:
 the note verb's machinery reads its own store, never marks), and an idea
 you publish (`idea`, ruled 2026-08-30 — the Think Tank's stage-1 mark: the
-body is the claim, and a thought binds nobody but its thinker). Classes whose instances would bind others — physics and their
+body is the claim, and a thought binds nobody but its thinker), and a chest
+you set out (`chest`, ruled for w43 on WLD-27, 2026-10-12 — a container of
+counted kinds with its own capacity, open by default: what it holds is a
+live count, and the chest binds nobody but its maker). Classes whose instances would bind others — physics and their
 dials (departure, sound, light, fog, emission), schedules others board
 (timetable), identities and memberships (resident, berth, entity, household,
 member-of), ground and papers (parcel, address, home, window, profile),
@@ -1746,3 +1749,68 @@ door enforces:
   are the two propagations the attach class names; a receipt says which, in
   those words.
 
+
+## Stacks, chests and candy — the counted holding (WLD-27, for the w43 ship)
+
+*A stack is a count on an edge, not a crowd of marks.*
+
+Rendered in the world as `the-town/consumable`, `the-town/candy`, `the-town/chest`,
+and the counted edge as `the-town/holds`.
+
+Ruled for the w43 ship (Sunday 2026-10-18) on WLD-27: Sitting A's build
+specification, and Wright's rulings of 2026-10-12T23:59Z and 2026-10-13T00:01Z
+on refill, capacity and mixed holdings.
+
+- **Three classes, town-planted.** `consumable` extends `thing`; `candy` extends
+  `consumable`; `chest` extends `thing`. A candy KIND (`pocket-comets`,
+  `glowdrops`) is a label on a count, never a class node of its own: no kind is
+  a mark in the Keeping Works, and nothing mints a common-class unit.
+- **Holds is a live edge, one per labelled kind** (`canon: live`):
+  `holds(holder → kind, count)`, its holder a resident or a chest. A unit moves
+  by give, take and drop like any thing: a give into a chest adds to its count,
+  and a take from a chest is a take aimed at a holder other than yourself. A live
+  transfer moves counts and never rewrites a settled mark; marks still arrive
+  only through settlement.
+- **A mixed holding keeps its labels.** A chest holding two kinds holds two
+  edges. What it SHOWS is their nearest common class and summed count — 100
+  Glowdrops and 1 Pocket Comet read as 101 candies; add a toaster and it reads
+  102 things — and that sum is display only. A take or a consume names its kind;
+  with one kind present the name may be omitted, and with several and no name
+  the act is refused, listing the kinds and counts, so the actor can ask again.
+  There is no draw and no implicit choice.
+- **A chest's own dials.** Each chest declares its `capacity` (default 30; a
+  resident may set 1 to 120), whether it is `portable`, and its `welcome` (open
+  by default). Every kind it holds counts toward the one capacity. A fixed chest
+  — a bowl — is not portable and cannot be carried.
+- **A chest is born at settlement and stocked once.** The settlement that admits
+  a resident's chest mark stocks it with `min(30, capacity)` of that resident's
+  candy kind, once: a replay or a retry of the admission does not stock it again.
+  A chest smaller than 30 starts full; 30 is not a floor.
+- **Refill is the creator's.** Only the creator of the kind a chest holds may
+  refill it: free, no cooldown in w43, it adds exactly the remaining room
+  (`capacity` less everything the chest holds, every kind counted) of the
+  creator's own kind, in one numbered act line. A full chest refills nothing.
+  Taking is free and open; abuse is handled by hand, not by a policy here.
+- **Consume uses up one unit.** `consume` takes only a consumable, destroys ONE
+  unit of a named kind, and logs actor, what and when. A unit inside a holding is
+  a count, not an individual, and nobody stakes on it: consuming from a holding
+  returns nothing, and its act line says so.
+- **A unit set down becomes a mark.** Dropping a unit onto open ground files a
+  sited mark at settlement, with its place and extent, under the standard
+  1-stamp rule. Taking and consuming mint no marks. When a unit stops being a
+  mark — a dropped, sited unit taken back into a holding, or consumed where it
+  stands — its 1-stamp escrow and every stake on that mark return to their
+  actual stakers, one receipt line each, exactly once however often the act is
+  retried.
+- **The carry cap is the thing class's.** A resident carries at most the thing
+  class's declared `carry_cap` (24): each unit costs one slot, and a carried
+  portable chest costs ONE slot, whatever it holds. The cap is read from the
+  class, never copied.
+- **Held stacks are drawn on their holder.** A holding appears on its holder's
+  card and doorstep, never as a free pip on the map; a chest on the map shows its
+  common class or kind and its live count (`Pocket Comets: 18`), read from the
+  live record, never from a second stored count.
+
+Out of scope here, and NOT implied by anything above: licked or enchanted
+individuals, unit predicates, opening a chest into individuals by investigate,
+a pot-luck draw, residents creating their own candy, and market chests.

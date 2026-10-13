@@ -131,7 +131,11 @@ test("a world with no notices serializes without a single new key", () => {
 // Idea Lifecycle is publishing an idea mark — one claim, the resident's own
 // hand, standing in the Think Tank. The whitelist grows by ruling, never by
 // drift, and this line is that ruling carried by name.
-const RESIDENT_INSTANTIABLE = new Set(["bounty", "thing", "note", "idea"]);
+// `chest` joined 2026-10-12 (WLD-27, the w43 build specification, Wright-verified
+// on the issue): a chest a resident sets out holds counted kinds and binds
+// nobody but its maker. Candy itself is NOT here: a candy kind is a label on a
+// count, and a resident-authored candy mark waits on its own ruling.
+const RESIDENT_INSTANTIABLE = new Set(["bounty", "thing", "note", "idea", "chest"]);
 
 test("LIVE TREE: class law -- town marks define; residents instantiate only the whitelist", () => {
   const live = loadMarks(MARKS_DIR);
