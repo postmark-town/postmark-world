@@ -754,16 +754,24 @@ export const STRIDE_CLASS_ID = "the-town/resident";
 //                            older office) → "record", or null if malformed
 //   neither                  null → "missing"
 // A null is the desk's honest unknown: the legacy 15 km stride and its "?".
-const paceOf = (dials) => { const n = Number(dials?.pace_km_per_crossing); return Number.isFinite(n) && n > 0 ? n : null; };
+//
+// THE ONE WAY THIS PAGE READS A RECORD'S DIALS (WLD-29). Every consumer of a
+// mark's dials asks `dialOf` — the read's digest first, the index's record only
+// when the digest does not name the mark — so no pane can quietly lean on a
+// record the resident read does not carry. tools/read-middle.test.mjs pins
+// that nothing else in this file reads `.dials` off a record.
+const isDialsObject = (d) => d && typeof d === "object" && !Array.isArray(d);
+export function dialOf({ dials = null, marks = null } = {}, id) {
+  if (isDialsObject(dials) && Object.hasOwn(dials, id)) return { dials: isDialsObject(dials[id]) ? dials[id] : null, source: "digest" };
+  const rec = marks ? markIndex(marks).get(id) : null;
+  return rec ? { dials: isDialsObject(rec.dials) ? rec.dials : null, source: "record" } : { dials: null, source: "missing" };
+}
+const paceOf = (d) => { const n = Number(d?.pace_km_per_crossing); return Number.isFinite(n) && n > 0 ? n : null; };
 export function strideFrom({ dials = null, marks = null } = {}) {
-  if (dials && typeof dials === "object" && Object.hasOwn(dials, STRIDE_CLASS_ID)) {
-    const pace = paceOf(dials[STRIDE_CLASS_ID]);
-    return { pace, source: pace == null ? "malformed" : "digest" };
-  }
-  const rec = marks ? markIndex(marks).get(STRIDE_CLASS_ID) : null;
-  if (!rec) return { pace: null, source: "missing" };
-  const pace = paceOf(rec.dials);
-  return { pace, source: pace == null ? "malformed" : "record" };
+  const got = dialOf({ dials, marks }, STRIDE_CLASS_ID);
+  if (got.source === "missing") return { pace: null, source: "missing" };
+  const pace = paceOf(got.dials);
+  return { pace, source: pace == null ? "malformed" : got.source };
 }
 export function departPaceKm(marks, dials = null) {
   return strideFrom({ dials, marks }).pace;
@@ -7193,8 +7201,7 @@ export function mountViewer(appEl) {
   // stay assembled for a later Spectator switch — it is expensive to fetch and
   // there is no reason to throw it away — it just does not get to feed the
   // resident's painting.
-  // FLIP (c''): the resident pane's marks widened to the whole spectator fold
-  const allMarks = () => (onResidentPath() ? [...byId.values(), ...(townWorld?.marks ?? []).filter((m) => !byId.has(m?.id))] : (world?.marks ?? [...byId.values()]));
+  const allMarks = () => (onResidentPath() ? [...byId.values()] : (world?.marks ?? [...byId.values()]));
   const isOfficeLive = (url) => url === officeUrl("/world/state");
   // ── TWO LOADS, BECAUSE THEY ARE TWO DIFFERENT SIZES (2026-09-10) ──────────
   //

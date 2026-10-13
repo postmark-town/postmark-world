@@ -6,7 +6,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { strideFrom, departPaceKm, STRIDE_CLASS_ID, previewWalkLeg, walkLegParts } from "../spectator/viewer.mjs";
+import { strideFrom, departPaceKm, dialOf, STRIDE_CLASS_ID, previewWalkLeg, walkLegParts } from "../spectator/viewer.mjs";
 
 const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
 const rec = (pace) => ({ id: STRIDE_CLASS_ID, dials: { pace_km_per_crossing: pace } });
@@ -41,4 +41,24 @@ test("[pin] EVERY LIVE PREVIEW ASKS THE SAME ANSWER: the three call sites pass t
   const live = SOURCE.split("departPaceKm(byId, currentReadDials())").length - 1;
   assert.equal(live, 3, "the three preview call sites pass the read's dials");
   assert.equal(all, 4, "and there is no fourth caller (the fourth is the definition)");
+});
+
+// ── THE GUARD, AT THE SOURCE: one accessor for every record dial ─────────────
+
+test("A SECOND CONSUMER, SYNTHETIC: dialOf answers any mark's dials digest-first — the stride is not special-cased", () => {
+  const LAMP = "rig/the-lantern-of-a-second-consumer";
+  const poisoned = [{ id: LAMP, dials: { glow: 999, POISON: true } }];
+  assert.deepEqual(dialOf({ dials: { [LAMP]: { glow: 3 } }, marks: poisoned }, LAMP), { dials: { glow: 3 }, source: "digest" }, "the digest wins over the index's record");
+  assert.deepEqual(dialOf({ dials: { [LAMP]: [1, 2] }, marks: poisoned }, LAMP), { dials: null, source: "digest" }, "a malformed digest entry is not patched from the record");
+  assert.deepEqual(dialOf({ dials: {}, marks: poisoned }, LAMP), { dials: { glow: 999, POISON: true }, source: "record" }, "no digest entry: the record, said as such");
+  assert.deepEqual(dialOf({ dials: null, marks: [] }, LAMP), { dials: null, source: "missing" });
+});
+
+test("[pin] NOTHING ELSE IN THE VIEWER READS A RECORD'S DIALS: every `<x>.dials` read is dialOf's own record or its result, or the page's own state", () => {
+  const code = SOURCE.split("\n").filter((l) => !/^\s*(\/\/|\*)/.test(l)).join("\n");
+  const readers = [...code.matchAll(/\b([A-Za-z_$][\w$]*)\??\.dials\b/g)].map((m) => m[1]);
+  const offenders = readers.filter((x) => !["state", "rec", "got"].includes(x));
+  assert.deepEqual(offenders, [], `a record's dials read outside dialOf: ${offenders.join(", ")}`);
+  assert.equal(code.split("rec.dials").length - 1, 2, "rec.dials is read in dialOf alone (its test and its value)");
+  assert.equal(code.split("got.dials").length - 1, 1, "got.dials is dialOf's answer, read once by strideFrom");
 });
