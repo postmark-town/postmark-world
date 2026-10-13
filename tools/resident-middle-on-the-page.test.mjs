@@ -55,6 +55,8 @@ const freePort = () => new Promise((resolve, reject) => {
 const CLEANUP = [];
 after(() => { for (const stop of CLEANUP.reverse()) { try { stop(); } catch { /* already gone */ } } });
 
+const TODAY = new Date().toISOString().slice(0, 10);
+
 // ── THE SYNTHETIC, POISONED FOLD ─────────────────────────────────────────────
 const plot = (who, at) => ({ id: `${who}/the-plot`, kind: "parcel", tier: "home", by: who, household: who, at, extent: { w: 25, h: 25 }, body: `${who}'s plot` });
 const PLOTS = {
@@ -68,7 +70,11 @@ const FOLD = {
   marks: [
     { id: "the-town/let-there-be-light", kind: "sited", tier: "constitution", by: "the-town", at: { x: 0, y: 0 }, extent: { w: 40000, h: 40000 }, body: "the world frame" },
     { id: "the-town/resident", kind: "class", tier: "constitution", by: "the-town", body: "POISON-FOLD-CLASS", dials: { pace_km_per_crossing: 999, POISON: 1 } },
-    { id: "poison/the-fold-only-lamp", kind: "sited", tier: "market", by: "poison", at: { x: 20, y: 20 }, extent: { w: 2, h: 2 }, body: "POISON-FOLD-BODY", dials: { POISON: 1 } },
+    // the poison is something a resident pane WOULD draw if it took it: dated
+    // today (Lately lists the newest marks), with a real footprint by the
+    // standpoint (the map draws it) — so a widening cannot hide by being dull.
+    { id: "poison/the-fold-only-lamp", kind: "sited", tier: "market", by: "poison", household: "poison", at: { x: 20, y: 20 }, extent: { w: 30, h: 30 },
+      body: "POISON-FOLD-BODY", dials: { POISON: 1 }, date: TODAY + "T12:00:02.000Z" },
     ...Object.values(PLOTS),
   ],
   parcels: Object.values(PLOTS).map((p) => ({ id: p.id, household: p.household, at: p.at, extent: p.extent })),
@@ -89,7 +95,6 @@ function syntheticWorld() {
 }
 
 // ── THE READ THE STUB OFFICE HANDS BACK ──────────────────────────────────────
-const TODAY = new Date().toISOString().slice(0, 10);
 const TARGET = "rig-resident/the-far-gate";
 const FROM = { x: 10, y: 10 };
 const TARGET_AT = { x: 10, y: 7710 };                // 7.7 km due north
