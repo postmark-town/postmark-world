@@ -30,6 +30,9 @@ export const ENGINE_FILES = [
   // joined 2026-10-10 (POS-449): a mark's first-laid instant, read by both
   // marks-fold.mjs and consent.mjs, so neither imports the other for it.
   "claim-instant.mjs",
+  // joined 2026-10-13 (WLD-27): mark-lint's candy grammar (§ 3e) asks the one
+  // reading board-grammar's live tree asks too, so the gate's fixtures carry it.
+  "candy-grammar.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

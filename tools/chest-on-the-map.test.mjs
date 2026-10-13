@@ -76,7 +76,12 @@ const CHESTS = { chests: [
   { chest: CARRIED.id, shows: "empty", count: 0, held_by: "sbx-cy" },
 ] };
 const row = (m) => ({ id: m.id, at: m.at, kind: m.kind, tier: m.tier, distance_m: Math.round(Math.hypot(m.at.x - STANDPOINT.x, m.at.y - STANDPOINT.y)), bearing: "N" });
+// SIGNED IN, as mine-stands-out.test.mjs is: the synthetic chests exist only in
+// this rig's RESIDENT read (/world/apex), which only a signed-in page asks for —
+// a spectator page draws WORLD/world-state.json, where they are not. (The first
+// CI run of this file was a spectator page, and found no chest pip at all.)
 const READ = {
+  handle: "berthillon",
   standpoint: { ...STANDPOINT, name: "the rig's standpoint" }, within: [],
   nearby: [row(GROUND), row(CARRIED)],
   records: Object.fromEntries([...townRegionMarks(SERVED.marks), GROUND, CARRIED].map((m) => [m.id, m])),
@@ -91,6 +96,8 @@ async function bootStubOffice({ chests }) {
     res.setHeader("Access-Control-Allow-Headers", "*");
     if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
     const send = (b) => { res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify(b)); };
+    if (url.pathname === "/ops/whoami") return send({ principal: "rig", handles: ["berthillon"] });
+    if (url.pathname === "/world/my-marks") return send({ drafts: [], docket: [], published: [], backed: [], counts: { drafts: 0, docket: 0, published: 0, backed: 0 }, complete: true });
     if (url.pathname === "/world/apex") return send(READ);
     if (url.pathname === "/world/chests" && chests) return send(chests);
     res.writeHead(404, { "content-type": "application/json" });
@@ -141,6 +148,7 @@ async function look(office) {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.addInitScript((base) => { try { localStorage.setItem("pm.office.base", base); } catch {} }, "http://127.0.0.1:" + office.port);
+  await page.addInitScript(() => { try { localStorage.setItem("pm_key", "rig-key-not-a-secret"); localStorage.setItem("pm.world.act_as", "berthillon"); } catch {} });
   await page.goto("http://localhost:" + rig.port + "/", { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
