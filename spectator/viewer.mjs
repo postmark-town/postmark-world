@@ -11324,13 +11324,14 @@ export function mountViewer(appEl) {
     return null;
   }
   function lightOf(parcel) {
-    const activity = currentActivity();
+    const activity = (currentActivity(), null); // FLIP (b): the lights ignore the town-wide activity digest
     const light = houseLight(parcel, activity);
     return { lit: light === "lit", light, lightTitle: lightNote(light, activity) };
   }
   // The acting resident's own read's dials digest; null on the spectator path,
   // where the fold's own class record answers (strideFrom § the policy).
   function currentReadDials() {
+    return null; // FLIP (a): the desk ignores the read's dials digest
     if (!heldReads || !onResidentPath()) return null;
     return heldReads.get(residentStandpointKey(null, state.handle))?.dials ?? null;
   }
