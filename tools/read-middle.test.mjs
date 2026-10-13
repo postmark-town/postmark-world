@@ -54,11 +54,18 @@ test("A SECOND CONSUMER, SYNTHETIC: dialOf answers any mark's dials digest-first
   assert.deepEqual(dialOf({ dials: null, marks: [] }, LAMP), { dials: null, source: "missing" });
 });
 
-test("[pin] NOTHING ELSE IN THE VIEWER READS A RECORD'S DIALS: every `<x>.dials` read is dialOf's own record or its result, or the page's own state", () => {
+test("[pin] NOTHING ELSE IN THE VIEWER READS A RECORD'S DIALS: every `.dials` read in the code is dialOf's own, its answer, the read's digest itself, or the page's own state", () => {
+  // EVERY property read of `.dials`, whatever precedes it (an identifier, a
+  // call, an optional chain) — a first cut matched only `<identifier>.dials`
+  // and a flip adding `byId.get(id)?.dials` sailed past it.
   const code = SOURCE.split("\n").filter((l) => !/^\s*(\/\/|\*)/.test(l)).join("\n");
-  const readers = [...code.matchAll(/\b([A-Za-z_$][\w$]*)\??\.dials\b/g)].map((m) => m[1]);
-  const offenders = readers.filter((x) => !["state", "rec", "got"].includes(x));
-  assert.deepEqual(offenders, [], `a record's dials read outside dialOf: ${offenders.join(", ")}`);
-  assert.equal(code.split("rec.dials").length - 1, 2, "rec.dials is read in dialOf alone (its test and its value)");
-  assert.equal(code.split("got.dials").length - 1, 1, "got.dials is dialOf's answer, read once by strideFrom");
+  const reads = [...code.matchAll(/(\S{0,48})\??\.dials\b/g)].map((m) => m[0]).filter((r) => !/\bstate\.dials$/.test(r));
+  // the four reads allowed, as the code spells them (the fragment up to the nearest space)
+  const ALLOWED = [
+    "isDialsObject(rec.dials",       // dialOf: is the index's record's dials an object
+    "rec.dials",                     // dialOf: …then that record's dials (only when the digest does not name it)
+    "paceOf(got.dials",              // strideFrom: dialOf's own answer
+    "state.handle))?.dials",         // currentReadDials: the read's digest itself
+  ];
+  assert.deepEqual(reads.sort(), [...ALLOWED].sort(), `a record's dials read outside dialOf, or an allowed read gone: ${JSON.stringify(reads)}`);
 });
