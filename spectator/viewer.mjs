@@ -7063,8 +7063,6 @@ export function mountViewer(appEl) {
     // adds the town's houses the index lacks, and fills what the resident's own
     // rows are missing about their house — see fillFromTown
     fillFromTown(byId, townHouses);
-    // FLIP (c'): the resident index widened to the WHOLE fold, every mark the spectator has
-    for (const m of townWorld?.marks ?? []) if (m?.id && !byId.has(m.id)) byId.set(m.id, m);
   }
   // THE ATLAS USED TO LOAD FOUR TIMES. Its one caller is guarded by `if (!mapCtx)`,
   // but mapCtx is not assigned until the scene is built, which is on the far side
@@ -7195,7 +7193,8 @@ export function mountViewer(appEl) {
   // stay assembled for a later Spectator switch — it is expensive to fetch and
   // there is no reason to throw it away — it just does not get to feed the
   // resident's painting.
-  const allMarks = () => (onResidentPath() ? [...byId.values()] : (world?.marks ?? [...byId.values()]));
+  // FLIP (c''): the resident pane's marks widened to the whole spectator fold
+  const allMarks = () => (onResidentPath() ? [...byId.values(), ...(townWorld?.marks ?? []).filter((m) => !byId.has(m?.id))] : (world?.marks ?? [...byId.values()]));
   const isOfficeLive = (url) => url === officeUrl("/world/state");
   // ── TWO LOADS, BECAUSE THEY ARE TWO DIFFERENT SIZES (2026-09-10) ──────────
   //
