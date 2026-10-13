@@ -7062,7 +7062,7 @@ export function mountViewer(appEl) {
   function withTownHouses() {
     // adds the town's houses the index lacks, and fills what the resident's own
     // rows are missing about their house — see fillFromTown
-    fillFromTown(byId, townHouses);
+    fillFromTown(byId, townWorld?.marks ?? townHouses); // FLIP (c): the resident index widened to the whole fold
   }
   // THE ATLAS USED TO LOAD FOUR TIMES. Its one caller is guarded by `if (!mapCtx)`,
   // but mapCtx is not assigned until the scene is built, which is on the far side
@@ -11284,7 +11284,10 @@ export function mountViewer(appEl) {
     for (const g of mapCtx.overlay.querySelectorAll(".ov-home[data-id]")) {
       const full = byId.get(g.dataset.id);
       if (!full) continue;
-      const { lit, light, lightTitle } = lightOf(full);
+      // FLIP (d): the update path reads the walkers again (a household walker resting inside)
+      const wk = (walkState.walkers ?? []).some((k) => k && !(k.moving ?? (!k.arrived && !k.standing)) && String(k.handle) === String(full.household ?? full.by)
+        && Math.abs(Number(k.x) - full.at?.x) <= full.extent?.w / 2 && Math.abs(Number(k.y) - full.at?.y) <= full.extent?.h / 2);
+      const { lightTitle } = lightOf(full); const lit = wk, light = wk ? "lit" : "dark";
       g.classList.toggle("lit", lit);
       g.dataset.light = light;
       const note = g.querySelector("title.ov-light-note");
@@ -11324,14 +11327,13 @@ export function mountViewer(appEl) {
     return null;
   }
   function lightOf(parcel) {
-    const activity = (currentActivity(), null); // FLIP (b): the lights ignore the town-wide activity digest
+    const activity = currentActivity();
     const light = houseLight(parcel, activity);
     return { lit: light === "lit", light, lightTitle: lightNote(light, activity) };
   }
   // The acting resident's own read's dials digest; null on the spectator path,
   // where the fold's own class record answers (strideFrom § the policy).
   function currentReadDials() {
-    return null; // FLIP (a): the desk ignores the read's dials digest
     if (!heldReads || !onResidentPath()) return null;
     return heldReads.get(residentStandpointKey(null, state.handle))?.dials ?? null;
   }
