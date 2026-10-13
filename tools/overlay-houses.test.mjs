@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 
 import {
   OVERLAY_PIP_R, HOME_CARD, homeCardPath, markerScale,
-  overlayHomeCardSVG, homesOfParcel, houseIsLit, houseLight, lightNote, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
+  overlayHomeCardSVG, homesOfParcel, houseIsLit, houseLight, lightNote, lightsRequest, enclosingParcels, homeFaceSVG, fillFromTown, TOWN_FILL_FIELDS,
   sceneArtSVG, parcelLeadImage, markImagePath, housePicture,
 } from "../spectator/viewer.mjs";
 
@@ -131,26 +131,42 @@ test("[pin] the house's picture is the household record's, for the parcel's hold
   assert.match(SOURCE, /image: room \? homesPicture\(parcel, homes\) : null,/, "the map's card asks it of the residents at home there, holder first (POS-368)");
 });
 
-test("HOME: the porch light is the household's ACTIVITY — C and C-1 lit, older/future/none dark, unknown and historical never a light (Darko 2026-10-08; WLD-29)", () => {
+test("HOME: the porch light is GET /world/lights — the parcel's OWN declared household key in the lit list is lit, a known answer without it dark; unknown and historical never a light; solo keys by their own spelling (Darko 2026-10-08; WLD-29, the pointer model)", () => {
   const C = 400;
-  const act = (households, house_of = { jack: "hh:jack-house" }) => ({ clock: C, households, house_of });
-  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C })), "lit");
-  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C - 1 })), "lit");
-  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C - 2 })), "dark");
-  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": C + 1 })), "dark", "a crossing after the read's clock is not lit");
-  assert.equal(houseLight(PARCEL, act({ "hh:jack-house": null })), "dark", "known: no act on record");
-  assert.equal(houseLight(PARCEL, act({ "hh:other": C })), "unknown", "a house the digest does not name is unknown, not dark");
-  assert.equal(houseLight(PARCEL, null), "unknown", "no digest held");
-  assert.equal(houseLight(PARCEL, { clock: C, households: null, unavailable: "the store could not be read" }), "unknown");
-  assert.equal(houseLight(PARCEL, { clock: null, households: null, historical: true, note: "activity isn't kept per crossing" }), "historical");
+  const house = { ...PARCEL, declared_household: "hh:jack-house" };
+  const lights = (lit) => ({ crossing: C, window: 1, lit });
+  assert.equal(houseLight(house, lights(["hh:jack-house"])), "lit");
+  assert.equal(houseLight(house, lights(["hh:other", "solo:rei"])), "dark", "a known answer that does not list it");
+  assert.equal(houseLight(house, lights([])), "dark", "a known answer listing nobody: the town is dark, and known so");
+  // a house of one joins by its own solo key, never one guessed from the owner's handle
+  const solo = { ...PARCEL, declared_household: "solo:jack" };
+  assert.equal(houseLight(solo, lights(["solo:jack"])), "lit");
+  assert.equal(houseLight(solo, lights(["hh:jack-house"])), "dark");
+  assert.equal(houseLight(PARCEL, lights(["solo:jack", "jack", "hh:jack"])), "unknown", "no declared key on the parcel: unknown, never a key reconstructed from `household`/`by`");
+  // the unknowns
+  assert.equal(houseLight(house, null), "unknown", "no answer held");
+  assert.equal(houseLight(house, { crossing: C, window: 1, lit: null, unavailable: "the store could not be read" }), "unknown", "an unread store is not a dark town");
+  assert.equal(houseLight(house, { window: 1, lit: ["hh:jack-house"] }), "unknown", "an answer that names no crossing is no answer");
+  assert.equal(houseLight(house, { crossing: C - 3, window: 1, lit: null, historical: true, note: "activity isn't kept per crossing" }), "historical");
   assert.match(lightNote("historical", { note: "activity isn't kept per crossing" }), /isn't kept per crossing/);
+  assert.match(lightNote("unknown", { unavailable: "the store could not be read" }), /could not be read/);
   assert.equal(lightNote("lit"), "");
-  // the light is the household's: a co-resident's act lights the owner's parcel
-  assert.equal(houseLight(PARCEL, { clock: C, households: { "hh:shared": C }, house_of: { jack: "hh:shared", wright: "hh:shared" } }), "lit");
-  // walkers are not an input any more: there is no walker argument to pass
-  assert.equal(houseIsLit(PARCEL, act({ "hh:jack-house": C })), true);
-  assert.equal(houseIsLit(PARCEL, act({ "hh:jack-house": C - 2 })), false);
-  assert.doesNotMatch(SOURCE, /houseIsLit\([^)]*walkState\.walkers/, "no light path reads the walkers");
+  assert.equal(houseIsLit(house, lights(["hh:jack-house"])), true);
+  assert.equal(houseIsLit(house, lights([])), false);
+  // no light path reads the walkers, the old activity map or a resident→house map
+  assert.doesNotMatch(SOURCE, /houseIsLit\([^)]*walkState\.walkers/);
+  const lightBody = SOURCE.match(/^export function houseLight\([\s\S]*?^\}/m)?.[0] ?? "";
+  assert.ok(lightBody.includes("declared_household"), "source extraction: houseLight");
+  assert.doesNotMatch(lightBody, /house_of|households|\.by\b|\.household\b/, "the light joins by the parcel's declared key only: no resident→house map, no owner handle");
+  assert.doesNotMatch(SOURCE, /house_of/, "nothing in the viewer reads a resident→house map");
+});
+
+test("lightsRequest: the LIVE page asks the bare door (the office's clock decides today); a pinned crossing asks that crossing; the key names the office and the ask", () => {
+  const live = lightsRequest({ office: "https://a.invalid", crossing: 248, override: false });
+  assert.deepEqual(live, { key: "https://a.invalid|live:248", path: "/world/lights" });
+  assert.deepEqual(lightsRequest({ office: "https://a.invalid", crossing: 3, override: true }), { key: "https://a.invalid|at:3", path: "/world/lights?crossing=3" });
+  assert.notEqual(lightsRequest({ office: "https://b.invalid", crossing: 248 }).key, live.key, "another office, another key");
+  assert.notEqual(lightsRequest({ office: "https://a.invalid", crossing: 249 }).key, live.key, "a live crossing tick asks again");
 });
 
 test("[pin] THE PARCEL UNDERFOOT — entered directly, through the dwelling on it, or a room in that dwelling — is the one parcel whose card is not drawn", () => {

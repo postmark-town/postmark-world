@@ -742,10 +742,12 @@ function settlementChip(at) {
 // vessel precedent already said so: the post-office sails at its own 405.
 export const STRIDE_CLASS_ID = "the-town/resident";
 //
-// WHERE THE STRIDE IS READ (WLD-29). The resident read carries every dial in
-// its own digest (`read.dials`, id → dials); the resident path's index never
-// held the class (the office used to smuggle it into `records` by name), so
-// the digest is asked FIRST, and a valid stride there wins over any record.
+// WHERE THE STRIDE IS READ (WLD-29, the pointer model). The page asks its own
+// door for dials — GET /world/dials, every published mark of the office's
+// blessed settlement that carries dials, id → dials (the "digest" below) —
+// because no default read carries a dial table, and the resident path's index
+// never held the class (the office used to smuggle it into `records` by name).
+// The table is asked FIRST, and a valid stride there wins over any record.
 // The policy, all three arms:
 //   digest names the class   its pace if valid → "digest"; malformed → null
 //                            ("malformed": an honest unknown, never patched
@@ -756,8 +758,8 @@ export const STRIDE_CLASS_ID = "the-town/resident";
 // A null is the desk's honest unknown: the legacy 15 km stride and its "?".
 //
 // THE ONE WAY THIS PAGE READS A RECORD'S DIALS (WLD-29). Every consumer of a
-// mark's dials asks `dialOf` — the read's digest first, the index's record only
-// when the digest does not name the mark — so no pane can quietly lean on a
+// mark's dials asks `dialOf` — the /world/dials table first, the index's record
+// only when the table does not name the mark — so no pane can quietly lean on a
 // record the resident read does not carry. tools/read-middle.test.mjs pins
 // that nothing else in this file reads `.dials` off a record.
 const isDialsObject = (d) => d && typeof d === "object" && !Array.isArray(d);
@@ -2708,38 +2710,46 @@ export function townHouseMarks(marks = [], world = null) {
 // ── THE PORCH LIGHT IS HOUSEHOLD ACTIVITY (Darko, 2026-10-08; WLD-29) ──────
 //
 // Not a walker resting inside: the house is lit when its household acted in the
-// read's activity crossing C or the one before (Wright, 2026-10-13T11:04Z). The
-// office's `activity` digest carries the clock C, each house's newest crossing
-// and which house each handle belongs to; this reads only that — never the
-// walkers, never the browser's preview crossing. Four states, and only one is
-// a light:
-//   "lit"         the house acted at C or C-1
-//   "dark"        known: its newest act is older, newer than C, or none at all
-//   "unknown"     no digest, an unread store, or a house the digest does not name
-//   "historical"  a past crossing's read: activity isn't kept per crossing
+// office's crossing C or the one before (Wright, 2026-10-13T11:04Z). The page
+// asks GET /world/lights (the pointer model, Wright AUTHORITY
+// 2026-10-13T19:16:02.257Z): `{ crossing, window, lit: [<household keys>] }`,
+// the lit keys only. A house joins it by the parcel's OWN canonical household
+// key, `declared_household` (`hh:<slug>`, or `solo:<handle>` for a house of one)
+// — never a resident→house map, and never a solo key guessed from the owner's
+// handle. Four states, and only one is a light:
+//   "lit"         its key is in the answer's lit list
+//   "dark"        a known answer that does not list it
+//   "unknown"     no answer, an unread store (`lit: null`), or a parcel with no
+//                 declared household key
+//   "historical"  a past crossing's answer: activity isn't kept per crossing
+// The answer's own crossing is the light's clock — never the browser's.
 export const LIGHT_WINDOW = 1;
-export function houseLight(parcel, activity) {
-  if (!activity || typeof activity !== "object") return "unknown";
-  if (activity.historical) return "historical";
-  const clock = activity.clock, houses = activity.households;
-  if (!Number.isInteger(clock) || !houses || typeof houses !== "object") return "unknown";
-  // a parcel names its owner's handle; the digest says which house that is
-  const who = String(parcel?.household ?? parcel?.by ?? "");
-  if (!who) return "unknown";
-  const key = Object.hasOwn(houses, who) ? who : (activity.house_of?.[who] ?? null);
-  if (!key || !Object.hasOwn(houses, key)) return "unknown";
-  const last = houses[key];
-  if (last === null) return "dark";
-  if (!Number.isInteger(last)) return "unknown";
-  const age = clock - last;
-  return age >= 0 && age <= LIGHT_WINDOW ? "lit" : "dark";
+export function houseLight(parcel, lights) {
+  if (!lights || typeof lights !== "object") return "unknown";
+  if (lights.historical) return "historical";
+  if (!Array.isArray(lights.lit) || !Number.isInteger(lights.crossing)) return "unknown";
+  const key = typeof parcel?.declared_household === "string" && parcel.declared_household ? parcel.declared_household : null;
+  if (!key) return "unknown";
+  return lights.lit.includes(key) ? "lit" : "dark";
 }
-export const houseIsLit = (parcel, activity) => houseLight(parcel, activity) === "lit";
+export const houseIsLit = (parcel, lights) => houseLight(parcel, lights) === "lit";
 /** What a home card says about a light it does not show. */
-export function lightNote(light, activity = null) {
-  if (light === "historical") return activity?.note ?? "no porch lights on a past crossing: activity isn't kept per crossing";
-  if (light === "unknown") return activity?.unavailable ?? "this household's activity is not known just now";
+export function lightNote(light, lights = null) {
+  if (light === "historical") return lights?.note ?? "no porch lights on a past crossing: activity isn't kept per crossing";
+  if (light === "unknown") return lights?.unavailable ?? "this household's activity is not known just now";
   return "";
+}
+/**
+ * Which lights the page asks for, and under what key: the LIVE page asks the
+ * bare door, so the office's clock decides today's crossing (never the
+ * browser's); a page the time-travel dial has pinned asks that crossing. The key
+ * names the office and the ask, so another office's or crossing's answer is
+ * never shown for this one.
+ */
+export function lightsRequest({ office = "", crossing = 0, override = false } = {}) {
+  return override
+    ? { key: `${office}|at:${crossing}`, path: `/world/lights?crossing=${encodeURIComponent(crossing)}` }
+    : { key: `${office}|live:${crossing}`, path: "/world/lights" };
 }
 
 export function markerScale(zoomK) {
@@ -6939,13 +6949,15 @@ export function mountViewer(appEl) {
   shadowHost.appendChild(wrap);
 
   const root = shadowHost;
-  // ── THE READ'S MIDDLE (WLD-29) ────────────────────────────────────────────
-  // The acting resident's read carries the dials digest; the porch lights are
-  // the activity digest, ONE response's — held with the office, actor and
-  // crossing it was asked for, and never shown for another.
-  let heldReads = null;                 // the resident read cache, once it exists
-  let activityHeld = null;              // { key, activity }
-  let activityPending = null;           // { key, promise }
+  // ── THE PAGE'S TWO SOURCES (WLD-29, the pointer model) ────────────────────
+  // No default read carries a dial table or the town's activity. The page asks
+  // GET /world/dials (the stride) and GET /world/lights (the porch lights) — each
+  // answer held with the key it was ASKED under (the office, and for the lights
+  // the crossing asked), and never shown for another.
+  let lightsHeld = null;                // { key, lights }
+  let lightsPending = null;             // { key, promise }
+  let dialsHeld = null;                 // { key, answer }
+  let dialsPending = null;              // { key, promise }
   let stopped = false;                  // set by the handle's stop(): nothing asks or publishes after it
   const state = {
     cam: { x: 0, y: 0 },
@@ -11284,10 +11296,10 @@ export function mountViewer(appEl) {
         `${drawnWalkers.length} on the map, ${on} on the road, ${still} at rest`;
   }
 
-  // The lights read the household activity digest, which arrives after the
-  // first overlay is drawn (a read, refreshed) — so they are trued here, on
-  // the cards already standing, rather than by rebuilding the overlay. The
-  // same `lightOf` the draw uses: one answer, initial paint and update alike.
+  // The lights read GET /world/lights, which answers after the first overlay
+  // is drawn (and is refreshed) — so they are trued here, on the cards already
+  // standing, rather than by rebuilding the overlay. The same `lightOf` the
+  // draw uses: one answer, initial paint and update alike.
   function syncHouseLights() {
     if (!mapCtx?.overlay) return;
     for (const g of mapCtx.overlay.querySelectorAll(".ov-home[data-id]")) {
@@ -11301,49 +11313,68 @@ export function mountViewer(appEl) {
     }
   }
 
-  // ── THE ACTIVITY HELD, AND WHOSE (WLD-29) ──────────────────────────────────
-  // One response's digest, keyed by the office it came from, the actor and the
-  // crossing it was asked at. A change of any of the three asks again and
-  // shows "unknown" meanwhile — never another read's lights.
-  const activityKeyFor = (handle, crossing) => `${officeBase()}|${handle ?? ""}|${crossing}`;
-  const activityKey = () => activityKeyFor(state.handle, state.crossing);
-  function takeActivity(key, activity) {
+  // ── THE LIGHTS HELD, AND WHOSE (WLD-29) ────────────────────────────────────
+  // One answer of GET /world/lights, keyed by the office it came from and the
+  // crossing asked (lightsRequest). A change of either asks again and shows
+  // "unknown" meanwhile — never another office's or crossing's lights.
+  const lightsAsk = () => lightsRequest({ office: officeBase(), crossing: state.crossing, override: Boolean(state.crossingOverride) });
+  function takeLights(key, lights) {
     if (stopped) return;                        // the mount is gone: a late answer has nowhere to land
-    if (key !== activityKey()) return;          // asked for another office, actor or crossing
-    activityHeld = { key, activity: activity && typeof activity === "object" ? activity : null };
+    if (key !== lightsAsk().key) return;        // asked for another office or crossing
+    lightsHeld = { key, lights: lights && typeof lights === "object" && !lights.error ? lights : null };
     syncHouseLights();
   }
-  // The town-wide digest rides every read; the keyless eyes read at the
-  // Origin is the cheapest one that carries it, for a spectator and a
-  // resident alike. The crossing asked is the page's (live, or the
-  // time-travel dial's), so a past crossing answers "historical".
-  function refreshActivity() {
+  function refreshLights() {
     if (stopped) return null;                   // a stopped viewer asks the office nothing
-    const key = activityKey();
-    if (activityPending?.key === key) return activityPending.promise;
-    const promise = fetch(officeUrl(`/world/eyes?x=0&y=0&crossing=${state.crossing}`), { credentials: "same-origin" })
+    const { key, path } = lightsAsk();
+    if (lightsPending?.key === key) return lightsPending.promise;
+    const promise = fetch(officeUrl(path), { credentials: "same-origin" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((j) => takeActivity(key, j && !j.error ? j.activity ?? null : null))
-      .catch(() => takeActivity(key, null))
-      .finally(() => { if (activityPending?.key === key) activityPending = null; });
-    activityPending = { key, promise };
+      .then((j) => takeLights(key, j))
+      .catch(() => takeLights(key, null))
+      .finally(() => { if (lightsPending?.key === key) lightsPending = null; });
+    lightsPending = { key, promise };
     return promise;
   }
-  function currentActivity() {
-    if (activityHeld?.key === activityKey()) return activityHeld.activity;
-    refreshActivity();
+  function currentLights() {
+    if (lightsHeld?.key === lightsAsk().key) return lightsHeld.lights;
+    refreshLights();
     return null;
   }
   function lightOf(parcel) {
-    const activity = currentActivity();
-    const light = houseLight(parcel, activity);
-    return { lit: light === "lit", light, lightTitle: lightNote(light, activity) };
+    const lights = currentLights();
+    const light = houseLight(parcel, lights);
+    return { lit: light === "lit", light, lightTitle: lightNote(light, lights) };
   }
-  // The acting resident's own read's dials digest; null on the spectator path,
-  // where the fold's own class record answers (strideFrom § the policy).
+
+  // ── THE DIALS HELD, AND WHOSE (WLD-29) ─────────────────────────────────────
+  // GET /world/dials: one office's blessed settlement's dial table, keyed by the
+  // office asked. The stride is read from it on every path (strideFrom § the
+  // policy); until it lands, or when it cannot be read, the stride is the
+  // index's own record or the honest unknown — never another office's table.
+  function takeDials(key, answer) {
+    if (stopped) return;
+    if (key !== officeBase()) return;           // asked of another office
+    dialsHeld = { key, answer: answer && typeof answer === "object" && !answer.error ? answer : null };
+    // a desk already open re-prices its leg with the table's stride
+    if (walkState.destination || state.arming === "walk") renderWalkDestination();
+  }
+  function refreshDials() {
+    if (stopped) return null;
+    const key = officeBase();
+    if (dialsPending?.key === key) return dialsPending.promise;
+    const promise = fetch(officeUrl("/world/dials"), { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => takeDials(key, j))
+      .catch(() => takeDials(key, null))
+      .finally(() => { if (dialsPending?.key === key) dialsPending = null; });
+    dialsPending = { key, promise };
+    return promise;
+  }
   function currentReadDials() {
-    if (!heldReads || !onResidentPath()) return null;
-    return heldReads.get(residentStandpointKey(null, state.handle))?.dials ?? null;
+    if (dialsHeld?.key === officeBase()) return dialsHeld.answer?.dials ?? null;
+    refreshDials();
+    return null;
   }
 
   function drawWalkPreview() {
@@ -13694,7 +13725,6 @@ export function mountViewer(appEl) {
   // like a spectator and nothing may be decided on that resemblance.
   let identitySettled = false;
   const readCache = new Map();
-  heldReads = readCache;
   const readPending = new Map();   // key -> promise, so N callers make ONE request
   let readError = null;
 
@@ -13719,11 +13749,9 @@ export function mountViewer(appEl) {
    */
   function loadResidentRead(standpoint, handle) {
     const key = residentStandpointKey(standpoint, handle);
-    const askedCrossing = state.crossing;
     // WHO ASKED, fixed BEFORE the request leaves (R2): the office, actor and
     // crossing this answer will belong to — never read again after the await
     const askedOffice = officeBase();
-    const askedActivity = activityKeyFor(handle, askedCrossing);
     if (readCache.has(key)) return Promise.resolve(readCache.get(key));
     if (readPending.has(key)) return readPending.get(key);
     // NO x/y. The office stands the resident where their BODY is and refuses
@@ -13737,10 +13765,6 @@ export function mountViewer(appEl) {
         if (read?.error) throw new Error(read.defect ?? read.error);
         readCache.set(key, read);
         readError = null;
-        // the read's own activity digest is the lights' answer for the office,
-        // actor and crossing it was ASKED for (WLD-29, R2); takeActivity drops
-        // it if any of the three has moved since
-        if (handle === state.handle) takeActivity(askedActivity, read.activity ?? null);
         // THE INDEX, FILLED FROM THE READ. `byId` is what forty call sites ask
         // "what is this id", and on this path this is the only thing that fills
         // it — the records the read carries, plus the resident's own rows.
@@ -14920,18 +14944,20 @@ export function mountViewer(appEl) {
   // re-tell if the record advanced. On /WORLD or RAW we don't poll (don't hammer a
   // CDN / GitHub). Every re-tell preserves standpoint / step / mode / dials / scroll.
   let lastLive = liveCrossing(), tick = 0;
-  // THE LIGHTS REFRESH (WLD-29): the activity digest is asked again on its own
+  // THE LIGHTS REFRESH (WLD-29): GET /world/lights is asked again on its own
   // beat, so a house that acts lights without a reload, a sign-out or a detour
   // through the Spectator. Activity is kept by the crossing, so minutes is fine
-  // grain; a crossing change asks at once (currentActivity's key moves).
+  // grain; a crossing change asks at once (lightsRequest's key moves).
   // `pm.world.activity_ms` (≥ 1 s) shortens it for a rig that must watch an
-  // update land; unset, which is every real page, it is five minutes.
+  // update land; unset, which is every real page, it is five minutes. The
+  // dials are asked once per office (refreshDials), here at the mount.
   const ACTIVITY_REFRESH_MS = (() => {
     try { const v = Number(localStorage.getItem("pm.world.activity_ms")); if (Number.isFinite(v) && v >= 1000) return v; } catch { /* no storage */ }
     return 5 * 60 * 1000;
   })();
-  const activityTimer = setInterval(() => { refreshActivity(); }, ACTIVITY_REFRESH_MS);
-  activityTimer.unref?.();
+  const lightsTimer = setInterval(() => { refreshLights(); }, ACTIVITY_REFRESH_MS);
+  lightsTimer.unref?.();
+  refreshDials();
   const clock = setInterval(async () => {
     tick++;
     const nl = liveCrossing();
@@ -15048,7 +15074,7 @@ export function mountViewer(appEl) {
       stopped = true;                    // no late answer publishes into a stopped mount (WLD-29, R3)
       clearInterval(clock);
       clearInterval(walkState.timer);
-      clearInterval(activityTimer);
+      clearInterval(lightsTimer);
       document.removeEventListener("keydown", onViewerKeydown);
       window.removeEventListener("resize", onViewerResize);
       window.removeEventListener("pm:stood-out", onStoodOut);

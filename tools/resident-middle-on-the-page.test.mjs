@@ -1,10 +1,12 @@
 // resident-middle-on-the-page.test.mjs — WLD-29, on the RENDERED resident page.
 //
-// "The resident read carries its middle": the walk desk prices a leg by the
-// stride in the read's own dials digest, and the porch lights are the
-// household activity digest (Darko, 2026-10-08; Wright, 2026-10-13T11:04Z) —
-// both read off the page a signed-in resident actually sees, in a real browser,
-// against a stub office and a SYNTHETIC world (WORLD_DIR), never the record.
+// THE POINTER MODEL (Wright, AUTHORITY 2026-10-13T19:16:02.257Z): no default
+// read carries a dial table or the town's activity. The walk desk prices a leg
+// by the stride in GET /world/dials, and the porch lights are GET /world/lights
+// — the lit household keys, joined by each parcel's own `declared_household`
+// (Darko, 2026-10-08; Wright, 2026-10-13T11:04Z) — both read off the page a
+// signed-in resident actually sees, in a real browser, against a stub office
+// and a SYNTHETIC world (WORLD_DIR), never the record.
 //
 // ── THE GUARD, AND WHAT IT OBSERVES ─────────────────────────────────────────
 // The class of bug: a resident pane sourcing a record or dial from the full
@@ -14,14 +16,15 @@
 // one of the town's houses (parcels — the one approved public layer the
 // resident path takes from the fold, POS-373) carries the token POISON in its
 // id, body and dials, and the stride class there walks at 999 km/crossing. The
-// read's own records carry a CONFLICTING stride class (5), and the digest says
-// 77. The guard then observes:
+// read's own records carry a CONFLICTING stride class (5) — as an older office's
+// read would — and /world/dials says 77. The guard then observes:
 //   1. the whole rendered document (markup, text, attributes) carries no POISON
 //      token — no pane drew anything from the fold beyond the houses;
 //   2. the desk's ETA is the one 77 gives, and not 999's, 5's, 60's or 15's —
-//      the digest won over both the fold and the conflicting record;
+//      the dials door won over both the fold and the conflicting record;
 //   3. the requests the page made: the read, my-marks, whoami, the fold
-//      (for the houses), and the activity refresh — recorded, not assumed.
+//      (for the houses), /world/dials and /world/lights — and never the old
+//      activity-through-the-eyes request — recorded, not assumed.
 // Its LIMITS, said: (1) sees only what was rendered while the test looked —
 // a pane not opened is not inspected; (2) is about the stride's one consumer
 // on the desk; a token check cannot prove a CONTENT was consumed, only that
@@ -61,12 +64,13 @@ const FROM = { x: 10, y: 10 };
 const TARGET_AT = { x: 10, y: 7710 };                // 7.7 km due north
 
 // ── THE SYNTHETIC, POISONED FOLD ─────────────────────────────────────────────
-const plot = (who, at) => ({ id: `${who}/the-plot`, kind: "parcel", tier: "home", by: who, household: who, at, extent: { w: 25, h: 25 }, body: `${who}'s plot` });
+// each parcel carries the fold's own household key, as the fold publishes it
+const plot = (who, at, key) => ({ id: `${who}/the-plot`, kind: "parcel", tier: "home", by: who, household: who, ...(key ? { declared_household: key } : {}), at, extent: { w: 25, h: 25 }, body: `${who}'s plot` });
 const PLOTS = {
-  lit: plot("rig-lit", { x: 60, y: 10 }),            // its house acted at C-1 → lit
-  dark: plot("rig-dark", { x: 10, y: 70 }),          // acted at C-5, and a walker RESTS inside → dark
-  far: plot("rig-far", { x: 160, y: 10 }),           // acted at C, nobody of it in earshot → lit
-  unknown: plot("rig-unknown", { x: 10, y: -60 }),   // the digest does not name it → unknown
+  lit: plot("rig-lit", { x: 60, y: 10 }, "hh:lit"),           // in the lit list → lit
+  dark: plot("rig-dark", { x: 10, y: 70 }, "hh:dark"),        // not listed, and a walker RESTS inside → dark
+  far: plot("rig-far", { x: 160, y: 10 }, "solo:rig-far"),    // a house of one, by its own solo key, nobody in earshot → lit
+  unknown: plot("rig-unknown", { x: 10, y: -60 }),            // no declared key on the parcel → unknown, never guessed
 };
 const FOLD = {
   tick: 0, dials: {},
@@ -108,12 +112,12 @@ function syntheticWorld() {
   return dir;
 }
 
-// ── THE READ THE STUB OFFICE HANDS BACK ──────────────────────────────────────
-const C = 500;                                       // the read's activity clock — NOT the browser's crossing
-const ACTIVITY = { clock: C, window: 1,
-  households: { "hh:lit": C - 1, "hh:dark": C - 5, "hh:far": C },
-  house_of: { "rig-lit": "hh:lit", "rig-dark": "hh:dark", "rig-far": "hh:far" } };
+// ── WHAT THE STUB OFFICE HANDS BACK ──────────────────────────────────────────
+const C = 500;                                       // the office's crossing — NOT the browser's
+const LIGHTS = { crossing: C, window: 1, lit: ["hh:lit", "solo:rig-far"] };
 const DIGEST_PACE = 77;
+const DIALS = { settlement: "S9", sha: "9".repeat(40), dials: { "the-town/resident": { pace_km_per_crossing: DIGEST_PACE }, "rig-resident/a-dialled-marker": { glow: 3 } },
+  means: "the rig's dial table" };
 const READ = {
   handle: "rei",
   standpoint: { ...FROM, name: "the rig's standpoint" },
@@ -133,11 +137,10 @@ const READ = {
     "rig-town/the-town-centre": { id: "rig-town/the-town-centre", kind: "sited", by: "rig-town", tier: "constitution",
       at: { x: 0, y: 0 }, extent: { w: 1200, h: 1200 }, body: "a synthetic region",
       points: [{ x: -600, y: -600 }, { x: 600, y: -600 }, { x: 600, y: 600 }, { x: -600, y: 600 }] },
-    // a CONFLICTING stride, in the read's own records: the digest must win over it
+    // a CONFLICTING stride, in the read's own records (an older office's read):
+    // the /world/dials table must win over it
     "the-town/resident": { id: "the-town/resident", kind: "class", by: "the-town", tier: "constitution", dials: { pace_km_per_crossing: 5 } },
   },
-  dials: { "the-town/resident": { pace_km_per_crossing: DIGEST_PACE }, "rig-resident/a-dialled-marker": { glow: 3 } },
-  activity: ACTIVITY,
   telling: "The rig's air is clear.",
   present: { residents: [{ handle: "rig-neighbour", at: { x: 40, y: 40 }, standing: true }] },
 };
@@ -145,7 +148,7 @@ const READ = {
 async function bootStubOffice() {
   const port = await freePort();
   const asked = [];
-  const live = { activity: ACTIVITY, historical: false };
+  const live = { lights: LIGHTS, historical: false };
   const srv = createHttp((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1:" + port);
     if (req.method !== "OPTIONS") asked.push(url.pathname + url.search);
@@ -154,13 +157,14 @@ async function bootStubOffice() {
     res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
     if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
     const send = (body) => { res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify(body)); };
-    const activity = () => (live.historical
-      ? { clock: null, households: null, house_of: null, historical: true, note: "activity isn't kept per crossing — RIG-HISTORICAL-NOTE" }
-      : live.activity);
+    const lights = () => (live.historical
+      ? { crossing: C - 3, window: 1, lit: null, historical: true, note: "activity isn't kept per crossing — RIG-HISTORICAL-NOTE" }
+      : live.lights);
     if (url.pathname === "/ops/whoami") return send({ principal: "rig", handles: ["rei"] });
     if (url.pathname === "/world/my-marks") return send({ drafts: [], docket: [], published: [], backed: [], counts: { drafts: 0, docket: 0, published: 0, backed: 0 }, complete: true });
-    if (url.pathname === "/world/apex") return send({ ...READ, activity: activity() });
-    if (url.pathname === "/world/eyes") return send({ stance: "spectator", telling: "", objects: [], records: {}, dials: READ.dials, activity: activity() });
+    if (url.pathname === "/world/apex") return send(READ);
+    if (url.pathname === "/world/lights") return send(lights());
+    if (url.pathname === "/world/dials") return send(DIALS);
     // a resident of the DARK house RESTING inside it: presence is not a light
     if (url.pathname === "/world/walkers") return send({ walkers: [], standing: [{ handle: "rig-dark", x: 10, y: 70, standing: true }] });
     if (url.pathname === "/world/present") return send(READ.present);
@@ -238,9 +242,9 @@ const diag = async (page, errors) => JSON.stringify({
 }).slice(0, 2000);
 
 const skipReason = "playwright is absent, so the RESIDENT PAGE'S MIDDLE goes unguarded: the desk's stride from the dials digest, "
-  + "the porch lights from the activity digest, and the guard that no resident pane draws from the fold — none of it is proven by unit tests alone.";
+  + "the porch lights from GET /world/lights, and the guard that no resident pane draws from the fold — none of it is proven by unit tests alone.";
 
-test("THE RESIDENT PAGE: the read was asked as the selected resident; the lights are household ACTIVITY at the read's clock — lit, dark (a resident resting at home is not a light), lit off-earshot, unknown — and an update lands without a reload", async (t) => {
+test("THE RESIDENT PAGE: the read was asked as the selected resident; the lights are GET /world/lights by each parcel's own household key — lit, dark (a resident resting at home is not a light), a solo house lit off-earshot, unknown — and an update lands without a reload", async (t) => {
   if (!chromium) return t.skip(skipReason);
   const { page, errors } = await openSignedIn();
   try {
@@ -262,15 +266,16 @@ test("THE RESIDENT PAGE: the read was asked as the selected resident; the lights
     }, `lights at first paint: ${JSON.stringify(first)} · ${await diag(page, errors)}`);
     assert.ok(first[PLOTS.unknown.id].note, "an unknown house says so, rather than reading as a dark one");
     // AN UPDATE, on the page's own refresh: the dark house acts now
-    office.live.activity = { ...ACTIVITY, households: { ...ACTIVITY.households, "hh:dark": C } };
+    office.live.lights = { ...LIGHTS, lit: [...LIGHTS.lit, "hh:dark"] };
     const updated = await until(page, (id) => document.querySelector(`.ov-home[data-id="${id}"]`)?.classList.contains("lit"), PLOTS.dark.id, 20_000);
     assert.ok(updated, `the light did not update without a reload: ${JSON.stringify(await lights(page))}`);
-    assert.ok(office.asked.some((p) => p.startsWith("/world/eyes?x=0&y=0&crossing=")), "the refresh is the activity read, at the page's crossing");
+    assert.ok(office.asked.includes("/world/lights"), "the refresh is the lights door, bare on a live page: the office's clock decides today");
+    assert.ok(!office.asked.some((p) => p.startsWith("/world/eyes")), "no read is asked for activity any more");
     assert.deepEqual(errors, []);
-  } finally { office.live.activity = ACTIVITY; await page.close(); }
+  } finally { office.live.lights = LIGHTS; await page.close(); }
 });
 
-test("THE DESK AND THE GUARD: the ETA is the digest's stride (77), not the fold's (999), the conflicting record's (5), 60 or the legacy 15 — no '?' — and nothing the poisoned fold carries is drawn", async (t) => {
+test("THE DESK AND THE GUARD: the ETA is /world/dials' stride (77), not the fold's (999), the conflicting record's (5), 60 or the legacy 15 — no '?' — and nothing the poisoned fold carries is drawn", async (t) => {
   if (!chromium) return t.skip(skipReason);
   const { page, errors } = await openSignedIn();
   try {
@@ -285,8 +290,8 @@ test("THE DESK AND THE GUARD: the ETA is the digest's stride (77), not the fold'
     });
     const etaAt = (paceKm) => walkLegParts(previewWalkLeg({ from: FROM, toward: TARGET_AT, targetExtent: { w: 1, h: 1 }, paceKm, at: 0 }))?.eta;
     const want = etaAt(DIGEST_PACE);
-    assert.equal(desk.guess, false, "no '?' chip: the stride came from the record's digest");
-    assert.ok(desk.metas.includes(want), `the desk's ETA is the digest's (${want}); it shows ${JSON.stringify(desk.metas)}`);
+    assert.equal(desk.guess, false, "no '?' chip: the stride came from the dials door");
+    assert.ok(desk.metas.includes(want), `the desk's ETA is /world/dials' (${want}); it shows ${JSON.stringify(desk.metas)}`);
     for (const p of [999, 5, 60, 15]) assert.ok(etaAt(p) !== want && !desk.metas.includes(etaAt(p)), `not the ${p} km stride's ETA (${etaAt(p)})`);
     // THE GUARD: nothing of the poisoned fold beyond the houses is drawn anywhere
     const drawnIds = await page.evaluate(() => ({
@@ -303,7 +308,8 @@ test("THE DESK AND THE GUARD: the ETA is the digest's stride (77), not the fold'
     assert.deepEqual(hits, [], "a resident pane drew something only the spectator fold carries");
     // provenance: what the page asked, recorded
     const paths = new Set(office.asked.map((p) => p.split("?")[0]));
-    for (const p of ["/ops/whoami", "/world/my-marks", "/world/apex"]) assert.ok(paths.has(p), `the page never asked ${p}`);
+    for (const p of ["/ops/whoami", "/world/my-marks", "/world/apex", "/world/dials", "/world/lights"]) assert.ok(paths.has(p), `the page never asked ${p}`);
+    assert.ok(!paths.has("/world/eyes"), "the old activity-through-the-eyes request is gone");
     assert.deepEqual(errors, []);
   } finally { await page.close(); }
 });
@@ -320,7 +326,7 @@ test("A HISTORICAL READ: no house is lit, each says activity isn't kept per cros
     for (const [id, v] of Object.entries(seen)) {
       assert.equal(v?.light, "historical", `${id}: ${JSON.stringify(v)}`);
       assert.equal(v.lit, false, `${id} is not painted with a light it cannot have had`);
-      assert.match(v.note ?? "", /RIG-HISTORICAL-NOTE/, `${id} carries the read's own explanation`);
+      assert.match(v.note ?? "", /RIG-HISTORICAL-NOTE/, `${id} carries the lights door's own explanation`);
     }
     assert.deepEqual(errors, []);
   } finally { office.live.historical = false; await page.close(); }
@@ -333,9 +339,11 @@ test("A HISTORICAL READ: no house is lit, each says activity isn't kept per cros
 // and one predicate; the poisoned fold carries ITS version of the same gate and
 // a second predicate on it. The permitted sources, named: the read's records
 // and the ids it names (within, nearby), the resident's own marks (none here),
-// the middle digests (ids → dials, never drawn as records), and the town's
-// houses (the approved public layer). Observed: the bubble's text and every
-// data-id the resident panes draw.
+// the page's two approved sources — GET /world/dials (ids → dials, never drawn
+// as records) and GET /world/lights (household keys, never drawn as records) —
+// and the town's houses (the approved public layer). No fallback to the fold
+// for anything else. Observed: the bubble's text and every data-id the
+// resident panes draw.
 test("THE GENERAL PAGE GUARD: the selected mark's bubble draws the READ's record and predicate, never the fold's; every id the resident panes draw is from a permitted source", async (t) => {
   if (!chromium) return t.skip(skipReason);
   const { page, errors } = await openSignedIn();
