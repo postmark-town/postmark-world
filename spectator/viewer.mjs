@@ -7062,7 +7062,9 @@ export function mountViewer(appEl) {
   function withTownHouses() {
     // adds the town's houses the index lacks, and fills what the resident's own
     // rows are missing about their house — see fillFromTown
-    fillFromTown(byId, townWorld?.marks ?? townHouses); // FLIP (c): the resident index widened to the whole fold
+    fillFromTown(byId, townHouses);
+    // FLIP (c'): the resident index widened to the WHOLE fold, every mark the spectator has
+    for (const m of townWorld?.marks ?? []) if (m?.id && !byId.has(m.id)) byId.set(m.id, m);
   }
   // THE ATLAS USED TO LOAD FOUR TIMES. Its one caller is guarded by `if (!mapCtx)`,
   // but mapCtx is not assigned until the scene is built, which is on the far side
@@ -11284,10 +11286,7 @@ export function mountViewer(appEl) {
     for (const g of mapCtx.overlay.querySelectorAll(".ov-home[data-id]")) {
       const full = byId.get(g.dataset.id);
       if (!full) continue;
-      // FLIP (d): the update path reads the walkers again (a household walker resting inside)
-      const wk = (walkState.walkers ?? []).some((k) => k && !(k.moving ?? (!k.arrived && !k.standing)) && String(k.handle) === String(full.household ?? full.by)
-        && Math.abs(Number(k.x) - full.at?.x) <= full.extent?.w / 2 && Math.abs(Number(k.y) - full.at?.y) <= full.extent?.h / 2);
-      const { lightTitle } = lightOf(full); const lit = wk, light = wk ? "lit" : "dark";
+      const { lit, light, lightTitle } = lightOf(full);
       g.classList.toggle("lit", lit);
       g.dataset.light = light;
       const note = g.querySelector("title.ov-light-note");
