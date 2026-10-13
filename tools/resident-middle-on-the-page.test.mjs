@@ -74,7 +74,12 @@ const FOLD = {
   parcels: Object.values(PLOTS).map((p) => ({ id: p.id, household: p.household, at: p.at, extent: p.extent })),
   determined: {}, vague: [], rivalries: [], portfolios: {}, terrain_weight: {}, errors: [],
 };
-const SKELETON = { features: [], physics_registry: {} };
+// The registration the map mounts on (`_grid`, the skeleton's own two sentences,
+// in the record's format) and nothing else: no terrain, no regions, no Mists.
+const SKELETON = {
+  _grid: { cell_m: 1, scale: "5 m per atlas px", origin: "the Origin, synthetic: atlas (485,760)" },
+  features: [], far_features: [], physics_registry: {},
+};
 function syntheticWorld() {
   const dir = mkdtempSync(join(tmpdir(), "wld29-world-"));
   CLEANUP.push(() => rmSync(dir, { recursive: true, force: true }));
@@ -134,6 +139,8 @@ async function bootStubOffice() {
     // a resident of the DARK house RESTING inside it: presence is not a light
     if (url.pathname === "/world/walkers") return send({ walkers: [], standing: [{ handle: "rig-dark", x: 10, y: 70, standing: true }] });
     if (url.pathname === "/world/present") return send(READ.present);
+    // where the selected resident lives: the walk desk's origin
+    if (url.pathname === "/homes/rei") return send({ world: { sited: true, x: FROM.x, y: FROM.y, mark_id: null } });
     res.writeHead(404, { "content-type": "application/json" });
     res.end(JSON.stringify({ error: "bounce", defect: "no such door in the rig" }));
   });
