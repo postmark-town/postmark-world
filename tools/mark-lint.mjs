@@ -36,6 +36,7 @@ import {
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
+import { candyLabelsOf, candyInstanceDefects } from "./candy-grammar.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -124,6 +125,9 @@ const standsInTheWorks = (rec) => {
 const isClassDeclaration = (m) =>
   m.by === "the-town" && m.tier === "constitution" && m.class !== undefined && standsInTheWorks(m);
 const CLASS_ROSTER = new Set(marks.filter(isClassDeclaration).map((m) => String(m.class)));
+// The candy class's own labels (WLD-27): `labels: [{label, name, creator}]` on
+// the declaration — the one registry of candy identities, read, never copied.
+const CANDY_LABELS = candyLabelsOf(marks.filter(isClassDeclaration));
 
 // the gate quotes the law (rung 1, 2026-08-02): a refusal cites the clause of
 // the-town/logos it enforces — id + body verbatim, so the bounce hands the
@@ -254,6 +258,18 @@ for (const rec of marks) {
   // a definition nested under a class mark — household/human — is still of
   // the works); the old direct-parent test was this rule's per-bounty prototype
   const isClassDefinition = isClassDeclaration(rec);
+  // 3e. the candy grammar (WLD-27; Wright, 2026-10-13T00:09Z). Town alone
+  // makes candy, and candy is NOT resident-instantiable: a resident's candy
+  // mark exists only as a HELD UNIT SET DOWN — the hold door's drop files it,
+  // authored by the dropper, under the standard 1-stamp rule. So a candy
+  // instance is sited, names its `label` (one the candy class carries, the
+  // identity field — never the mark's `kind`), and, when a resident authored
+  // it, names the drop act that set it down as `dropped: act:<id>`. What this
+  // gate can prove is the SHAPE; that the act exists is the office's record,
+  // and the office's placement door is what refuses a fresh candy mark.
+  if (rec.class === "candy" && !isClassDefinition) {
+    for (const d of candyInstanceDefects(rec, CANDY_LABELS)) err(rec, d);
+  }
   if (rec.class === "bounty" && !isClassDefinition) {
     // ON THE BOARD means standing on the board's GROUND, not filed in its
     // directory (re-keyed 2026-08-25). A notice filed at its id — which is where

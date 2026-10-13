@@ -31,6 +31,7 @@ const scratch = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); SCR
 after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true }); });
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs";
+import { candyLabelsOf, isDroppedCandyUnit } from "./candy-grammar.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LINT = join(HERE, "mark-lint.mjs");
@@ -133,8 +134,9 @@ test("a world with no notices serializes without a single new key", () => {
 // drift, and this line is that ruling carried by name.
 // `chest` joined 2026-10-12 (WLD-27, the w43 build specification, Wright-verified
 // on the issue): a chest a resident sets out holds counted kinds and binds
-// nobody but its maker. Candy itself is NOT here: a candy kind is a label on a
-// count, and a resident-authored candy mark waits on its own ruling.
+// nobody but its maker. Candy is NOT here (Wright, 2026-10-13T00:09Z): town alone
+// makes candy, and a resident's candy mark is only a held unit their drop set
+// down (the droppedUnit test in the LIVE TREE check below).
 const RESIDENT_INSTANTIABLE = new Set(["bounty", "thing", "note", "idea", "chest"]);
 
 test("LIVE TREE: class law -- town marks define; residents instantiate only the whitelist", () => {
@@ -208,8 +210,16 @@ test("LIVE TREE: class law -- town marks define; residents instantiate only the 
     // LOGOS/classes.md Instantiation carries the same words, nodes first.
     ["wright/the-lanternstep-parlor", "founder ruling 2026-09-10 -- the birthday parlor passes to its builder"],
   ]);
+  // ⚠ A HELD UNIT SET DOWN IS NOT A RESIDENT PLACING CANDY (WLD-27; Wright,
+  // 2026-10-13T00:09Z). Candy stays OFF the whitelist — town alone makes it —
+  // and a resident's candy mark stands only as a unit their drop set down:
+  // sited, a label the candy class carries, and the drop act named. Anything
+  // else carrying class: candy under a resident's name fails below as before.
+  const candyLabels = candyLabelsOf(defs);
+  const droppedUnit = (m) => isDroppedCandyUnit(m, candyLabels);
   for (const m of classed.filter((m) => m.by !== "the-town")) {
     if (INSTANCE_EXCEPTIONS_BY_RULING.has(m.id)) continue;
+    if (droppedUnit(m)) continue;
     assert.ok(RESIDENT_INSTANTIABLE.has(m.class),
       `${m.id}: residents may instantiate only [${[...RESIDENT_INSTANTIABLE].join(", ")}] today -- "${m.class}" is town-only (#1797)`);
   }

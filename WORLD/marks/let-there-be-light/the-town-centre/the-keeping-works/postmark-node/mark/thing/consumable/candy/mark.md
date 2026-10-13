@@ -7,8 +7,9 @@ class: candy
 version: 1
 extends: consumable
 dials: {}
+labels: []
 implements: []
 source: LOGOS/classes.md
 ---
 
-Candy is a consumable that comes in kinds; a kind is a label on a count, never a class of its own.
+Candy is a consumable that comes in labels, each with its name and its creator; a label marks a count, never a class of its own.

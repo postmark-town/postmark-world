@@ -8,10 +8,10 @@ version: 1
 extends: postmark-edge
 canon: live
 subject: ["resident", "chest"]
-object: kind
+object: label
 dials: {}
 implements: []
 source: LOGOS/classes.md
 ---
 
-Holds is a live count: one edge per labelled kind, holder to kind; give, take and consume move units, never the settled record.
+Holds is a live count: one edge per label, holder to label; give, take and consume move units, never the settled record.

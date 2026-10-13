@@ -43,15 +43,19 @@ test("the thing class still declares carry_cap 24 — the cap the counted holdin
   assert.equal(dialsOf(one("thing")).carry_cap, 24);
 });
 
-test("holds is a postmark-edge labelled canon: live, holder a resident or a chest", () => {
+test("holds is a postmark-edge labelled canon: live, holder a resident or a chest, object the label", () => {
   const h = one("holds");
   assert.equal(h.extends, "postmark-edge");
   assert.equal(h.canon, "live");
+  assert.equal(h.object, "label", "the candy identity is its label, never the mark kind (Wright, 2026-10-13T00:09Z)");
   const subject = typeof h.subject === "string" && h.subject.startsWith("[") ? JSON.parse(h.subject) : h.subject;
   assert.deepEqual(subject, ["resident", "chest"]);
 });
 
-test("no candy kind is a class node: kinds are labels on counts", () => {
+test("the candy class carries its labels as a list of {label, name, creator}; no label is a class node", () => {
+  const labels = one("candy").labels;
+  assert.ok(Array.isArray(labels), "candy.labels is the one source, read both ways (creator -> label, label -> creator)");
+  for (const l of labels) assert.deepEqual(Object.keys(l).sort(), ["creator", "label", "name"]);
   for (const kind of ["pocket-comets", "glowdrops", "pocket-comet", "glowdrop"])
     assert.equal(declared(kind).length, 0, `${kind} must not be a class in the Keeping Works`);
 });
