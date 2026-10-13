@@ -14704,7 +14704,8 @@ export function mountViewer(appEl) {
     if (!onResidentPath()) return allMarks();
     const standpoint = { x: state.cam.x, y: state.cam.y };
     const read = readCache.get(residentStandpointKey(standpoint, state.handle));
-    return [...residentById(read ?? {}, mineSet.marks).values()];
+    // FLIP (c3): the resident Lately pane widened to the whole spectator fold
+    return [...residentById(read ?? {}, mineSet.marks).values(), ...(townWorld?.marks ?? [])];
   }
   function composeActivity(page) {
     const marks = activityMarks();
