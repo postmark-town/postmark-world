@@ -161,6 +161,16 @@ test("HOME: the porch light is GET /world/lights — the parcel's OWN declared h
   assert.doesNotMatch(SOURCE, /house_of/, "nothing in the viewer reads a resident→house map");
 });
 
+test("[pin] BOTH HOUSE-DRAWING CALLS ASK THE LIGHTS DOOR: the card's first paint and the re-true of the cards standing each take `lightOf`, and `lightOf` reads only the held /world/lights answer", () => {
+  assert.equal(SOURCE.split("...lightOf(parcel),").length - 1, 1, "the card's draw spreads lightOf(parcel)");
+  assert.equal(SOURCE.split("= lightOf(full);").length - 1, 1, "syncHouseLights trues each standing card with lightOf(full)");
+  assert.equal(SOURCE.split("lightOf(").length - 1, 3, "and nothing else calls it (the third is its definition)");
+  const body = SOURCE.match(/^  function lightOf\(parcel\) \{[\s\S]*?^  \}/m)?.[0] ?? "";
+  assert.match(body, /const lights = currentLights\(\);/, "source extraction: lightOf");
+  assert.doesNotMatch(body, /walk|walkers|faceOf|records|readCache/, "no light from walkers, faces or a read");
+  assert.doesNotMatch(SOURCE, /houseIsLit\(parcel|houseIsLit\(full/, "neither call site reads the old walker light");
+});
+
 test("lightsRequest: the LIVE page asks the bare door (the office's clock decides today); a pinned crossing asks that crossing; the key names the office and the ask", () => {
   const live = lightsRequest({ office: "https://a.invalid", crossing: 248, override: false });
   assert.deepEqual(live, { key: "https://a.invalid|live:248", path: "/world/lights" });
