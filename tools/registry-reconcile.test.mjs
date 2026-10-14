@@ -77,3 +77,16 @@ test("applyPlan writes repairs and removals only; held and unresolved rows are b
   assert.equal(out.version, 1);
   assert.equal(doc.published["k/f"].path, "old", "the input is not mutated");
 });
+
+test("over the world's own registry: the verb changes no row's class, only paths (and removes the gone)", async () => {
+  const { reconcileRepo } = await import("./registry-reconcile.mjs");
+  const { join, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const { doc, plan } = reconcileRepo(join(dirname(fileURLToPath(import.meta.url)), ".."));
+  const out = applyPlan(doc, plan);
+  for (const [id, row] of Object.entries(out.published)) {
+    assert.equal(row.class, doc.published[id].class, `${id}: the stored class is never written`);
+    assert.equal(row.household, doc.published[id].household, `${id}: nor the household`);
+  }
+  for (const r of plan.repairs) assert.equal(r.why, "path");
+});
