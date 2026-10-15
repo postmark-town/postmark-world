@@ -28,7 +28,8 @@
 // A pure function of (N, secret_N, the window's dials, the Mists at N, the town's
 // keep-out at the window's opening sha). Each spawn has a kind, a minute in the
 // window, and a place: in the band on the clear side of the wall, never inside it,
-// never in a clearing, never on or near the town's ground (tools/mists-keep.mjs).
+// never in a clearing, never on or near the town's ground (tools/mists-keep.mjs),
+// never on the town's water (the sea, the main channel).
 // A spawn with no place found after a bounded search is not made, and the schedule
 // says so (`unplaced`), the same way on every replay.
 //
@@ -64,6 +65,7 @@ import { createHash, createHmac } from "node:crypto";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
 import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
+import { pointInPolygon, polygonOf } from "./geometry.mjs";
 
 export const TOWN = "the-town";
 export const DESPAWN_REASONS = Object.freeze(["faded", "fled"]);
@@ -174,8 +176,20 @@ function bandPoint(m, u1, u2, from, to) {
   return { x: Math.round(p.x), y: Math.round(p.y) };
 }
 
-/** Does p stand in the band, on the clear box's ground (not a clearing's), off the town's? */
-function placeable(m, p, from, to, keep) {
+/** THE TOWN'S WATER (Darko 2026-10-15 13:17, review of #219 F2): open country is
+ *  land. A creature never spawns on the sea or the main channel, for all three
+ *  kinds. The water is the town's own marks with these features, by their drawn
+ *  polygons (`points:`), read from the same marks as the keep-out. */
+export const TOWN_WATERS = Object.freeze(["the-sea", "the-main-channel"]);
+const townsOwn = (mk) => mk?.by === TOWN || mk?.household === TOWN || String(mk?.id ?? "").startsWith(`${TOWN}/`);
+/** The water rings among `marks`: [[{x, y}…]…], one per town water mark with a drawn polygon. */
+export function townWaterRings(marks) {
+  return (marks ?? []).filter((mk) => townsOwn(mk) && TOWN_WATERS.includes(mk.feature))
+    .map((mk) => polygonOf(mk)).filter(Boolean);
+}
+
+/** Does p stand in the band, on the clear box's ground (not a clearing's), off the town's, on land? */
+function placeable(m, p, from, to, keep, waters = []) {
   const c = m.clear;
   if (!(p.x >= c.minX && p.x <= c.maxX && p.y >= c.minY && p.y <= c.maxY)) return false;
   const boxWallM = Math.min(p.x - c.minX, c.maxX - p.x, p.y - c.minY, c.maxY - p.y);
@@ -183,6 +197,7 @@ function placeable(m, p, from, to, keep) {
   const here = mistsHere(p, m);
   if (here.inWall) return false;
   if ((m.clearings ?? []).some((k) => Math.hypot(p.x - k.x, p.y - k.y) <= k.r)) return false;
+  if (waters.some((ring) => pointInPolygon(p.x, p.y, ring))) return false;
   return !keptByTheTown(keep, p.x, p.y);
 }
 
@@ -212,6 +227,7 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
   const spanMs = Number(dials.span_h) * 3600 * 1000;
   const from = Number(dials.band_from_m), to = Number(dials.band_to_m), apart = Number(dials.apart_m) || 0;
   const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m));
+  const waters = townWaterRings(marks);
   const minutes = CROSSING_MS / 60000;
   // Each spawn's draws are named by its own id (its minute, then two per try), so
   // another kind's count never moves it; only "apart" couples spawns, in a fixed
@@ -225,7 +241,7 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
       let at = null;
       for (let t = 0; t < TRIES && !at; t += 1) {
         const p = bandPoint(m, draw(secret, `${id}|side|${t}`), draw(secret, `${id}|depth|${t}`), from, to);
-        if (p && placeable(m, p, from, to, keep) && placed.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= apart)) at = p;
+        if (p && placeable(m, p, from, to, keep, waters) && placed.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= apart)) at = p;
       }
       if (!at) { out.unplaced.push({ id, kind, index: i }); continue; }
       placed.push(at);

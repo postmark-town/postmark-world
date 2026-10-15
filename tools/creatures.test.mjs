@@ -12,8 +12,9 @@ import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
 import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { loadMarks } from "./marks-fold.mjs";
+import { pointInPolygon } from "./geometry.mjs";
 import {
-  creatureLaw, CREATURE_DIAL_NAMES, TOWN, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
+  creatureLaw, CREATURE_DIAL_NAMES, TOWN, TOWN_WATERS, townWaterRings, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
   scheduleFor, dueSpawns, auditWindow, creaturesAt, creaturesWritten, dueFades, creaturesSnapshot,
 } from "./creatures.mjs";
 
@@ -85,6 +86,25 @@ test("the schedule: the law's counts, every one placed in the band, off the town
     }
     for (let i = 1; i < sched.spawns.length; i += 1) assert.ok(sched.spawns[i - 1].at_ms <= sched.spawns[i].at_ms, "in time order");
   }
+});
+
+test("never on the town's water: no spawn of any kind on the sea or the main channel, across the season and many secrets (Darko 10-15 13:17)", () => {
+  const rings = townWaterRings(MARKS);
+  assert.deepEqual(TOWN_WATERS, ["the-sea", "the-main-channel"]);
+  assert.equal(rings.length, 2, "the sea and the main channel, by their drawn polygons");
+  assert.equal(townWaterRings(MARKS.map((m) => ({ ...m, by: "someone", household: "someone", id: `someone/${m.id}` }))).length, 0, "only the town's own water marks");
+  let checked = 0;
+  for (let N = 270; N <= 290; N += 4) {
+    for (let k = 0; k < 40; k += 1) {
+      const sched = scheduleFor(N, secretFor(`water probe ${k}`, N), INPUTS);
+      for (const sp of sched.spawns) {
+        assert.ok(!rings.some((r) => pointInPolygon(sp.x, sp.y, r)), `${sp.id} (${sp.x}, ${sp.y}) stands on the town's water`);
+        checked += 1;
+      }
+      assert.deepEqual(sched.unplaced, [], `crossing ${N}: every spawn still finds land`);
+    }
+  }
+  assert.ok(checked >= 2000, `spawns checked: ${checked}`);
 });
 
 test("the schedule is the secret's alone: the same inputs give the same window, another secret another", () => {
