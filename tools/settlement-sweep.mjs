@@ -1608,11 +1608,15 @@ export function settlementSweep({
       ...(staleRows ? { staleRows } : {}),
     });
     if (verdict.unpublish !== true) continue;
+    // `class` is the ROW's, as the registry holds it (a home row taken under G2
+    // says home), and `walked` is what the walk found: every take walks commons.
+    // The row's class is also what a kept frame's row is put back with, below.
     unpublished.push({
       household: entry.household,
       id,
       path: verdict.path,
-      class: "commons",
+      class: entry.class,
+      walked: "commons",
       escrow: escrow.get(id) ?? 0,
       content: readAt(repo, mainBranch, verdict.path),
     });

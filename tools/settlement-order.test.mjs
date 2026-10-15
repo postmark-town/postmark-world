@@ -362,6 +362,7 @@ test("G2: a home row whose mark walks market at ✦0 is taken, with nothing laid
   });
   const report = settlementSweep({ repo: w.repo, stakesPath: w.stakesPath });
   assert.deepEqual(ids(report.unpublished), ["keith/the-garage"], "stored home, standing on open ground: taken");
+  assert.deepEqual(report.unpublished.map((r) => [r.class, r.walked]), [["home", "commons"]], "reported with the row's real class, and what the walk found");
   assert.equal(w.file(GARAGE), null);
   assert.ok(w.file(SHED), "stored home, walking home: kept");
   assert.equal(w.registry()["keith/the-garage"], undefined, "its row leaves the registry");
