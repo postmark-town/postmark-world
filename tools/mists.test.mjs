@@ -515,13 +515,13 @@ const BELL = "Somewhere past the north edge, a bell you have never heard rings o
 // The ladder's words, pinned as they were given.
 const LADDER = [
   [244, "Mist has come in at the edges of the map; nothing past it can be seen.", "The sun is veiled: the whole land is darker than its hour.",
-    ["The gulls have stopped flying north.", "The fog at the edges does not move with the wind.", "A crow sits on the post office roof and watches the quay."]],
+    ["The gulls have stopped flying north.", "The fog at the edges does not move with the wind.", "A raven sits on the post office roof and watches the quay."]],
   [258, "The mist has crept in from the edges, and it is thicker than yesterday.", "The sun is veiled, and the day never quite arrives.",
-    ["Far past the edge, wolves are calling to each other.", "More crows on the post office roof. None of them make a sound.", "Bats come out over the water earlier than they should."]],
+    ["Far past the edge, wolves are calling to each other.", "More ravens on the post office roof. None of them make a sound.", "Bats come out over the water earlier than they should."]],
   [272, "The mist presses at the edges of the map, and nobody who goes near it wants to go nearer.", "The sun has not properly risen in days.",
     [BELL, "The candles in the windows lean north, though there is no draught.", "A wolf howls close enough that the ferry's bell answers it."]],
   [282, "The mist is at its thickest, and it is listening.", "There is no day now, only a paler dark.",
-    ["The bell past the north edge rings twice now, and the mist does not carry it back.", "The crows have all gone quiet at once.", "Wolves circle somewhere in the grey; you can hear them breathing between howls."]],
+    ["The bell past the north edge rings twice now, and the mist does not carry it back.", "The ravens have all gone quiet at once.", "Wolves circle somewhere in the grey; you can hear them breathing between howls."]],
   [284, "The mist is at its thickest, and it is listening.", "Night has come to stay.",
     ["Every lantern in town leans a little north, as if the dark there were drawing breath.", "Bats pour out of the mist in one long ribbon and do not scatter.", "Every dog in Postmark is facing the same way."]],
 ];

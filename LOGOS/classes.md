@@ -625,6 +625,64 @@ belong-to pairs gain meeps→town at the graduation).
   lattice stays is-a — an office answers to another without being a
   kind of it.
 
+## The creature class — what comes out of the Mists
+
+Ruled in Sitting E (Darko, 2026-10-14 §§ 2–3, 6–7; the record is
+Starstory `docs/2026-10-14/halloween/sitting-E-entities.md`): **a creature is a
+living node** that comes out of the Mists. `creature extends entity`; it is
+the first class to write its canon down, `canon: live` — the first live
+create edge, which is what sets an entity apart from a mark. The three kinds
+of the season are its subclasses, `wolf`, `raven` and `bat`, each a class
+whose law is its kind file (`WORLD/kinds/<kind>.kind`, read by
+`tools/creature-kind.mjs`): its moods, its awareness ring, its span, the
+reactions its `when` allows, and the line each one leaves. The class's words,
+and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
+
+> A creature comes out of the Mists, lives half a day, answers what is done
+> near it in its own way, and goes back: it fades, or it flees; it belongs to
+> no one.
+
+(The class mark's body says the same within the 150-character cap, with
+two cuts: "it fades or it flees" and "it is no one's".)
+
+| a creature's act | family | canon |
+|---|---|---|
+| its spawn, by `the-town`, under its class's rule | create (a living node) | live |
+| a change of its state (its moods) | revise | live |
+| a predicate on it (a name) | attach a predicate | settled |
+| its emissions (a snarl, a howl) | produces a fleeting node | live, never saved |
+| its leaving, with its reason | revise: withdraw | live |
+| the crossing-save | a snapshot | every crossing saves it |
+
+- **Two ways to leave, and only two.** `faded`: twelve hours after its spawn
+  it goes back into the mist, on its own clock. `fled`: a reaction sent it
+  back at once — the only leaving by outcome. Nothing a creature is ever
+  vanishes otherwise, and it is never tamed or befriended: it is no one's.
+- **No verbs of its own to be acted on.** A creature has an awareness ring;
+  every ordinary public act a resident takes inside it — a walk, an entry or
+  exit, a say, a take, give or drop, a mark left — is its trigger. The
+  resident's acts stay one set; combat is the dungeon's.
+- **Code decides what is possible; Jev only chooses among it.** The ring is
+  measured, the menu is the reactions whose `when` holds, and a public d20
+  samples the judgment. A reaction changes only the creature: no nerve, no
+  harm, no holds outside the Spire.
+- **The schedule is hidden until each spawn and re-derivable after.** Each
+  crossing `the-town` commits to the window's schedule before any spawn and
+  reveals its seed when the window closes (`tools/creatures.mjs`).
+- **Where, how many, how long.** A creature spawns in the 400 m fringe on the
+  clear side of the Mists' wall, on open country only: never inside the wall,
+  never in a clearing, never on or within 440 m of the town's ground (the
+  class's `band_from_m`, `band_to_m` and `keep_m` dials). Each window brings a
+  wolf 2, a raven 4 and a bat 3 (each kind's `count_per_window`), each at its
+  own seeded minute, and each lasts 12 h from that minute (`span_h`), so the
+  creatures overlap across a crossing rather than turning over at once. In
+  w44 a creature stands where it spawned and holds nothing: its stalking and
+  circling are lines, and fleeing is its only leaving early.
+- **Off until the town says so.** The class's `from_crossing` dial is null,
+  and a null dial spawns nothing.
+
+Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
+
 ## The round class — the offices' procedures, as papers
 
 Ruled 2026-08-19 (with the meep class): **a round is an office's

@@ -28,6 +28,7 @@
 | dials (pace, extents, caps, lifetimes) | code constants + ENGINE.md | should be class-node predicates | currently materialized in code | **VIOLATING** — inversion #1 (dials into the tree); prerequisite for the pilot |
 | fold views (`world-state.json`, `INDEX.md`) | generator | n/a (projection) | regenerable, refuses stampless overwrite | **ADHERES** |
 | crossing-save (`STATE/`) | box | n/a (projection/checkpoint) | replayable from log | **ADHERES** |
+| creatures (spawn, fade, the window's seed and reveal) | office (the writer's creature tick) | live create and withdraw (`faded`), creature class, by `the-town`; a creature's own `react` and `withdraw` (`fled`) are POS-637's | rows in the store's log (`acts`, class `creature`); the schedule re-derives from the revealed seed (`tools/creatures.mjs § auditWindow`); saved to `STATE/log/` and `STATE/snapshot/<N>/creatures.json` every crossing | **BUILDING** (WLD-56; off by the class's `from_crossing` dial until Darko's word) |
 
 ## The town's surfaces (the shadow grammars, ranked by cutover order)
 

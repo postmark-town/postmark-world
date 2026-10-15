@@ -28,14 +28,16 @@
 // A pure function of (N, secret_N, the window's dials, the Mists at N, the town's
 // keep-out at the window's opening sha). Each spawn has a kind, a minute in the
 // window, and a place: in the band on the clear side of the wall, never inside it,
-// never in a clearing, never on or near the town's ground (tools/mists-keep.mjs).
+// never in a clearing, never on or near the town's ground (tools/mists-keep.mjs),
+// never on the town's water (the sea, the main channel).
 // A spawn with no place found after a bounded search is not made, and the schedule
 // says so (`unplaced`), the same way on every replay.
 //
-// ⚑ PENDING DARKO (D1, D2): the counts per kind, the band's depth and the keep-out
-// margin are placeholders, each Plumb's recommendation, passed in as dials. Nothing
-// here hard-codes a creature's numbers; CREATURE_DIALS_PENDING is only the default
-// the tests and the tick use until the class mark carries the ruled dials.
+// THE NUMBERS ARE LAW (D1, D2; Darko 2026-10-15 12:09, as recommended): the band
+// is the 400 m fringe on the clear side of the wall, open country only; per window
+// a wolf 2, a raven 4, a bat 3, each at its own seeded minute. They live on the
+// creature class's dials and each kind's `count_per_window` (WORLD/marks/…/entity/
+// creature/), read by `creatureLaw`; nothing here hard-codes a creature's numbers.
 //
 // ── THE FOLD (W4, W5) ──────────────────────────────────────────────────────────
 // A creature is a fold of the log's rows: `spawn` (the-town, object = its id),
@@ -61,8 +63,9 @@
 
 import { createHash, createHmac } from "node:crypto";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsKeepRects, keptByTheTown, MISTS_KEEP } from "./mists-keep.mjs";
+import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
+import { pointInPolygon, polygonOf } from "./geometry.mjs";
 
 export const TOWN = "the-town";
 export const DESPAWN_REASONS = Object.freeze(["faded", "fled"]);
@@ -70,16 +73,48 @@ export const ID_PREFIX = "creature:";
 /** A creature's own act: its reaction, as the office writes it (POS-637 W4). */
 export const REACT_ACTION = "react";
 
-/** The placeholder dials, PENDING Darko's D1 and D2 (Plumb's recommendations,
- *  WLD-56 gap read § 3). The ruled values will ride the creature class's dials. */
-export const CREATURE_DIALS_PENDING = Object.freeze({
-  counts: Object.freeze({ wolf: 2, raven: 4, bat: 3 }),   // D2: per 12 h window
-  band_from_m: 0,                                         // D1: the band, measured from the wall's face into the clear ground
-  band_to_m: 400,                                         //     (the fringe: fringe_m)
-  keep_m: MISTS_KEEP.keepM,                               // D1: how far from the town's ground a creature may stand
-  apart_m: 150,                                           //     how far apart two spawns of one window stand
-  span_h: 12,                                             // ruled (§ 7): a creature lasts 12 h from its spawn; the class's dial, its one home
-});
+/** Where the creature class and its kinds stand in the world: the one directory a
+ *  reader at a ref (the office's tick) lists and parses to read the law. A mark's
+ *  directory never moves (the frozen filing), so this is a durable address. */
+export const CREATURE_LAW_DIR = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/creature";
+
+/** The dials the schedule reads, each from the creature class (or a kind's mark). */
+export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "keep_m", "apart_m", "span_h"]);
+
+/**
+ * The creature law as the class marks write it: { fromCrossing, dials, kinds }.
+ *   fromCrossing  the class's launch dial (null is off, W6)
+ *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m, span_h }
+ *   kinds         [{ kind, kind_file }], by name
+ * `marks` are parsed mark records (`loadMarks`, or `parseRecord` on each file read
+ * at a ref). Only the-town's classes count. Null when there is no creature class:
+ * no class, no creatures. A class missing a dial, or a kind with no whole count or
+ * no kind file, throws: the law is read whole or not at all.
+ */
+export function creatureLaw(marks) {
+  const classes = (marks ?? []).filter((m) => m?.kind === "class" && m.by === TOWN);
+  const c = classes.find((m) => String(m.class) === "creature");
+  if (!c) return null;
+  const dials = { counts: {} };
+  for (const k of CREATURE_DIAL_NAMES) {
+    const v = c.dials?.[k];
+    if (typeof v !== "number" || !Number.isFinite(v) || v < 0) throw new Error(`creatureLaw: the creature class's ${k} dial is ${JSON.stringify(v)}, not a number ≥ 0`);
+    dials[k] = v;
+  }
+  const kinds = [];
+  for (const m of classes.filter((x) => x.extends === "creature").sort((a, b) => (String(a.class) < String(b.class) ? -1 : 1))) {
+    const kind = String(m.class), n = m.dials?.count_per_window;
+    if (!Number.isInteger(n) || n < 0) throw new Error(`creatureLaw: ${kind}'s count_per_window is ${JSON.stringify(n)}, not a whole number`);
+    if (typeof m.kind_file !== "string" || !m.kind_file) throw new Error(`creatureLaw: ${kind} names no kind_file`);
+    dials.counts[kind] = n;
+    kinds.push({ kind, kind_file: m.kind_file });
+  }
+  return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds };
+}
+
+/** A plain object: {…} or Object.create(null); never an array, a date or a boxed value. */
+const isPlainObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v)
+  && [Object.prototype, null].includes(Object.getPrototypeOf(v));
 
 // ── the seed ────────────────────────────────────────────────────────────────────
 /** secret_N: the crossing's own key, from the box's master key. Hex. */
@@ -141,8 +176,20 @@ function bandPoint(m, u1, u2, from, to) {
   return { x: Math.round(p.x), y: Math.round(p.y) };
 }
 
-/** Does p stand in the band, on the clear box's ground (not a clearing's), off the town's? */
-function placeable(m, p, from, to, keep) {
+/** THE TOWN'S WATER (Darko 2026-10-15 13:17, review of #219 F2): open country is
+ *  land. A creature never spawns on the sea or the main channel, for all three
+ *  kinds. The water is the town's own marks with these features, by their drawn
+ *  polygons (`points:`), read from the same marks as the keep-out. */
+export const TOWN_WATERS = Object.freeze(["the-sea", "the-main-channel"]);
+const townsOwn = (mk) => mk?.by === TOWN || mk?.household === TOWN || String(mk?.id ?? "").startsWith(`${TOWN}/`);
+/** The water rings among `marks`: [[{x, y}…]…], one per town water mark with a drawn polygon. */
+export function townWaterRings(marks) {
+  return (marks ?? []).filter((mk) => townsOwn(mk) && TOWN_WATERS.includes(mk.feature))
+    .map((mk) => polygonOf(mk)).filter(Boolean);
+}
+
+/** Does p stand in the band, on the clear box's ground (not a clearing's), off the town's, on land? */
+function placeable(m, p, from, to, keep, waters = []) {
   const c = m.clear;
   if (!(p.x >= c.minX && p.x <= c.maxX && p.y >= c.minY && p.y <= c.maxY)) return false;
   const boxWallM = Math.min(p.x - c.minX, c.maxX - p.x, p.y - c.minY, c.maxY - p.y);
@@ -150,6 +197,7 @@ function placeable(m, p, from, to, keep) {
   const here = mistsHere(p, m);
   if (here.inWall) return false;
   if ((m.clearings ?? []).some((k) => Math.hypot(p.x - k.x, p.y - k.y) <= k.r)) return false;
+  if (waters.some((ring) => pointInPolygon(p.x, p.y, ring))) return false;
   return !keptByTheTown(keep, p.x, p.y);
 }
 
@@ -162,22 +210,24 @@ const TRIES = 64;
  *
  *   mists        the skeleton's `mists` block at the window's opening sha
  *   marks        the standing marks at that sha (the town's keep-out is read from them)
- *   dials        { counts, band_from_m, band_to_m, keep_m, apart_m, span_h }
+ *   dials        { counts, band_from_m, band_to_m, keep_m, apart_m, span_h }: creatureLaw's
  *   fromCrossing the creature class's launch dial; null is off (W6)
  *
  * Empty when the dial is off for N or the Mists are out of season (mistsAt null).
  */
-export function scheduleFor(crossing, secret, { mists, marks = [], dials = CREATURE_DIALS_PENDING, fromCrossing = null } = {}) {
+export function scheduleFor(crossing, secret, { mists, marks = [], dials = null, fromCrossing = null } = {}) {
   const N = crossing | 0;
   const out = { crossing: N, spawns: [], unplaced: [] };
   if (!creaturesOn(N, fromCrossing)) return out;
   const m = mistsAt(N, mists);
   if (!m) return out;
   if (!secret) throw new Error("scheduleFor: no secret for this crossing");
+  if (!dials) throw new Error("scheduleFor: no dials (read them with creatureLaw)");
   const { startMs } = windowOf(N);
   const spanMs = Number(dials.span_h) * 3600 * 1000;
   const from = Number(dials.band_from_m), to = Number(dials.band_to_m), apart = Number(dials.apart_m) || 0;
   const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m));
+  const waters = townWaterRings(marks);
   const minutes = CROSSING_MS / 60000;
   // Each spawn's draws are named by its own id (its minute, then two per try), so
   // another kind's count never moves it; only "apart" couples spawns, in a fixed
@@ -191,7 +241,7 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = CREAT
       let at = null;
       for (let t = 0; t < TRIES && !at; t += 1) {
         const p = bandPoint(m, draw(secret, `${id}|side|${t}`), draw(secret, `${id}|depth|${t}`), from, to);
-        if (p && placeable(m, p, from, to, keep) && placed.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= apart)) at = p;
+        if (p && placeable(m, p, from, to, keep, waters) && placed.every((q) => Math.hypot(q.x - p.x, q.y - p.y) >= apart)) at = p;
       }
       if (!at) { out.unplaced.push({ id, kind, index: i }); continue; }
       placed.push(at);
@@ -300,15 +350,17 @@ export function creaturesWritten(snapshot, acts, atMs) {
       living.set(a.object, {
         id: a.object, kind: p.kind, crossing: p.crossing, x: p.x, y: p.y,
         spawned_at: new Date(msOf(p.at ?? a.at)).toISOString(), fades_at: p.fades_at,
-        moods: { ...(p.moods ?? {}) }, flags: [...(p.flags ?? [])],
+        moods: isPlainObject(p.moods) ? { ...p.moods } : {}, flags: Array.isArray(p.flags) ? [...p.flags].sort() : [],
       });
     } else if (lawfulWithdraw(a)) {
       living.delete(a.object);
     } else if (a.action === REACT_ACTION && isCreatureId(a.actor) && living.has(a.actor)) {
       // the reaction row as the office writes it (POS-637 W4): its state after, in the payload
       const c = living.get(a.actor), p = a.payload ?? {};
-      if (p.moods_after && typeof p.moods_after === "object") c.moods = { ...p.moods_after };
-      if (Array.isArray(p.flags_after)) c.flags = [...p.flags_after];
+      // a plain object only: an array would fold as {"0": …}. Flags are kept sorted on
+      // the live read as in the photograph, so the two reads never differ by order.
+      if (isPlainObject(p.moods_after)) c.moods = { ...p.moods_after };
+      if (Array.isArray(p.flags_after)) c.flags = [...p.flags_after].sort();
     }
   }
   return living;

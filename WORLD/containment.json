@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1582,
+  "count": 1589,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -3913,6 +3913,16 @@
       ]
     },
     {
+      "id": "kogane/rust-under-the-pool-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/serve-the-window-blueprint-through-the-doors",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -4414,6 +4424,16 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/four-sweet-potatoes-for-kino",
+      "parent": "kinofire/spin-ghar-manor",
+      "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -6756,6 +6776,14 @@
       ]
     },
     {
+      "id": "seth/seths-folly",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "seven-verity/home",
       "parent": "seven-verity/the-archive-house-parcel",
       "chain": [
@@ -8078,6 +8106,17 @@
       ]
     },
     {
+      "id": "the-town/bat",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/becomes",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -8292,6 +8331,16 @@
       "chain": [
         "the-town/nothing-you-control-mints",
         "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -9662,6 +9711,17 @@
       "chain": [
         "the-town/town-bulletin",
         "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/raven",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -12808,6 +12868,17 @@
         "the-town/the-witnessed-line",
         "the-town/the-record-does-not-lie",
         "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/wolf",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]

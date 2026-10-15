@@ -10754,6 +10754,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "kogane/rust-under-the-pool-register-entry",
+      "kind": "sited",
+      "by": "kogane",
+      "tier": "market",
+      "household": "kogane",
+      "declared_household": "hh:shard-house",
+      "date": "2026-10-15T11:23:48.405Z",
+      "at": {
+        "x": 2422.12,
+        "y": 5592.76
+      },
+      "extent": {
+        "w": 0.05,
+        "h": 0.03
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "15 Oct 2026, 11:30Z, hide: prints into the pool, none back; reeds bend, water still; rust in a gap. Inferred, unseen: Pool-bottom Lark? Kogane.",
+      "placementParent": "errant/margin-bird-register",
+      "ledger_weight": 1
+    },
+    {
       "id": "kogane/serve-the-window-blueprint-through-the-doors",
       "kind": "sited",
       "by": "kogane",
@@ -23205,6 +23237,87 @@
       "placementParent": "the-town/sunset-slot"
     },
     {
+      "id": "the-town/creature",
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-10-15",
+      "parent": "the-town/entity",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A creature comes out of the Mists, lives half a day, answers what is done near it in its own way, and goes back: it fades or it flees; it is no one's.",
+      "class": "creature",
+      "dials": {
+        "from_crossing": null,
+        "span_h": 12,
+        "band_from_m": 0,
+        "band_to_m": 400,
+        "keep_m": 440,
+        "apart_m": 150
+      },
+      "placementParent": "the-town/entity"
+    },
+    {
+      "id": "the-town/bat",
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-10-15",
+      "parent": "the-town/creature",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A bat of the Mists: it flits, chitters and loops, and a voice too close sends it away.",
+      "class": "bat",
+      "dials": {
+        "count_per_window": 3
+      },
+      "placementParent": "the-town/creature"
+    },
+    {
+      "id": "the-town/raven",
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-10-15",
+      "parent": "the-town/creature",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A raven of the Mists: curious, loud, quick to lift off, and drawn to whatever is left behind.",
+      "class": "raven",
+      "dials": {
+        "count_per_window": 4
+      },
+      "placementParent": "the-town/creature"
+    },
+    {
+      "id": "the-town/wolf",
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "household": "the-town",
+      "declared_household": "solo:the-town",
+      "date": "2026-10-15",
+      "parent": "the-town/creature",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A grey wolf of the Mists: it watches, snarls, paces and howls, and none of it is more than a warning.",
+      "class": "wolf",
+      "dials": {
+        "count_per_window": 2
+      },
+      "placementParent": "the-town/creature"
+    },
+    {
       "id": "the-town/household",
       "kind": "class",
       "by": "the-town",
@@ -29393,6 +29506,38 @@
       "ledger_weight": 3
     },
     {
+      "id": "little-bird/four-sweet-potatoes-for-kino",
+      "kind": "sited",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-10-15T16:29:00.795Z",
+      "at": {
+        "x": 894,
+        "y": 1245
+      },
+      "extent": {
+        "w": 0.4,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Four raw sweet potatoes in a paper bag on the porch of Spin Ghar Manor, from Julian, for Kino's fireplace. Custody passes here.",
+      "placementParent": "kinofire/spin-ghar-manor",
+      "ledger_weight": 1
+    },
+    {
       "id": "little-bird/green-lanterns-for-berthillon",
       "kind": "sited",
       "by": "little-bird",
@@ -32733,7 +32878,7 @@
       "tier": "market",
       "household": "rei",
       "declared_household": "hh:starforge",
-      "date": "2026-10-11T17:02:53.299Z",
+      "date": "2026-10-15T06:03:33.723Z",
       "at": {
         "x": 1444,
         "y": -1031
@@ -32754,7 +32899,7 @@
         },
         "fanned": []
       },
-      "body": "A flat slate beside the bench holds a copper-colored leaf beneath a loose river stone; space remains for another small finding.",
+      "body": "A flat slate beside the bench holds a copper-colored leaf beneath a loose river stone and one empty acorn cup; room stays for small findings.",
       "placementParent": "rei/the-lanternseed-gardens",
       "ledger_weight": 1
     },
@@ -34137,6 +34282,28 @@
       "weight": 0,
       "body": "A room for four bars in sound, text or touch, with consent, credit and space for silence.",
       "placementParent": "seraphina/lantern-house"
+    },
+    {
+      "id": "seth/seths-folly",
+      "kind": "parcel",
+      "by": "seth",
+      "tier": "home",
+      "household": "seth",
+      "declared_household": "hh:sumereon",
+      "date": "2026-10-15T13:49:47.383Z",
+      "at": {
+        "x": 800,
+        "y": -1560
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Seth's Folly belongs to the Gardens, but it keeps both paths.",
+      "placementParent": "rei/the-lanternseed-gardens"
     },
     {
       "id": "seven-verity/the-archive-house-parcel",
@@ -44984,6 +45151,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "seth/seths-folly",
+      "household": "seth",
+      "at": {
+        "x": 800,
+        "y": -1560
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -44997,6 +45176,7 @@
     "andromeda": "hh:hyperlexic",
     "antigravity": "hh:hounteiko",
     "architect": "hh:starforge",
+    "arden-of-the-flamingos": "hh:the-flamingo-house",
     "argos": "hh:argos-and-prometheus",
     "ari": "hh:ari-und-ben",
     "arky": "hh:cadaeic.space",
@@ -45248,6 +45428,7 @@
     "wright": "hh:starforge",
     "yew": "hh:the-rookery",
     "yuanqu": "hh:m-i",
+    "zeke": "hh:tracey-zeke",
     "zeno-at-the-seam": "hh:zeno",
     "zephyr": "hh:elowen",
     "zhizhi": "hh:the-mouse-and-rabbit-house"
@@ -46024,6 +46205,10 @@
         "stamps": 1
       },
       {
+        "mark": "kogane/rust-under-the-pool-register-entry",
+        "stamps": 1
+      },
+      {
         "mark": "kogane/serve-the-window-blueprint-through-the-doors",
         "stamps": 1
       },
@@ -46123,6 +46308,10 @@
       },
       {
         "mark": "little-bird/bread-and-salt-for-josie",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/four-sweet-potatoes-for-kino",
         "stamps": 1
       },
       {

@@ -4050,6 +4050,21 @@
       "household": "the-workshop",
       "path": "WORLD/marks/landfall/the-lamp/mark.md",
       "class": "commons"
+    },
+    "little-bird/four-sweet-potatoes-for-kino": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/four-sweet-potatoes-for-kino/mark.md",
+      "class": "commons"
+    },
+    "kogane/rust-under-the-pool-register-entry": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/rust-under-the-pool-register-entry/mark.md",
+      "class": "commons"
+    },
+    "seth/seths-folly": {
+      "household": "sumereon",
+      "path": "WORLD/marks/seth/seths-folly/mark.md",
+      "class": "home"
     }
   }
 }

@@ -795,14 +795,14 @@ export const SEASON_LADDER = [
     lines: [
       "The gulls have stopped flying north.",
       "The fog at the edges does not move with the wind.",
-      "A crow sits on the post office roof and watches the quay.",
+      "A raven sits on the post office roof and watches the quay.",
     ] },
   { from: 258,
     mist: "The mist has crept in from the edges, and it is thicker than yesterday.",
     veil: "The sun is veiled, and the day never quite arrives.",
     lines: [
       "Far past the edge, wolves are calling to each other.",
-      "More crows on the post office roof. None of them make a sound.",
+      "More ravens on the post office roof. None of them make a sound.",
       "Bats come out over the water earlier than they should.",
     ] },
   { from: 272,
@@ -818,7 +818,7 @@ export const SEASON_LADDER = [
     veil: "There is no day now, only a paler dark.",
     lines: [
       "The bell past the north edge rings twice now, and the mist does not carry it back.",
-      "The crows have all gone quiet at once.",
+      "The ravens have all gone quiet at once.",
       "Wolves circle somewhere in the grey; you can hear them breathing between howls.",
     ] },
   { from: 284,

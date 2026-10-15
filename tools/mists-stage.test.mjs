@@ -78,7 +78,8 @@ test("a creature on the stage is its svg twin: the same place, scale, flip, path
   for (const cr of [
     { kind: "wolf", x: 4321, y: -1234, sizeM: 610, flip: true, pose: "stand", eyes: true, phase: 0.37 },
     { kind: "bat", x: -880, y: 2210, sizeM: 230, flip: false, pose: "flit", eyes: false, phase: 0.912 },
-    { kind: "crow", x: 15, y: 3, sizeM: 300, flip: false, pose: "lift", eyes: false, phase: 0 },
+    { kind: "raven", x: 15, y: 3, sizeM: 300, flip: false, pose: "lift", eyes: false, phase: 0 },
+    { kind: "raven", x: -40, y: 77, sizeM: 320, flip: true, pose: "perch", eyes: false, phase: 0.5 },
   ]) {
     const svg = mistsCreatureSVG(cr, { ...reg, ink: "#2a2228" }), html = mistsCreatureHTML(cr, { ...reg, ink: "#2a2228" });
     const [, sx, sy, ss] = svg.match(/translate\(([-\d.]+) ([-\d.]+)\) scale\(([-\d.]+) /);
