@@ -21,7 +21,8 @@ the record's shape as `the-town/the-record-shape` (planted 2026-08-25)
 Everything that ever happened is an action record —
 `{seq, actor, witnesses, class, payload}` — in one of the **two lawful
 substrates**: git commits (structure acts) and the STATE log (dynamic acts).
-Which substrate a class writes is a class param, never an instance's choice.
+When a class's acts become canon (`canon: live | settled`,
+[lifetimes.md](lifetimes.md)) is a class param, never an instance's choice.
 The log is append-only and self-witnessing: an appended record needs no
 second record to prove it, and it is never edited — corrections are
 superseding actions at the same level, **latest appended wins** (file order
@@ -53,8 +54,8 @@ evaluated by the response function
 state ([conflict-matrix.md](conflict-matrix.md)), and every sketchbook is
 rebased onto it. Declarations land in the author's sovereign space instantly;
 the town sees them at the crossing. Classes whose claims cannot conflict
-canonize trivially and read as continuous — the fleeting kinds live at
-conversation speed without any second clock.
+canonize trivially (`canon: live`) and read as continuous — the fleeting
+lifetime lives at conversation speed without any second clock.
 
 The tense law stands: every write target has a tense. A genesis surface
 speaks from creation; a current-truth surface speaks from now; confusing the

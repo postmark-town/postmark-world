@@ -282,8 +282,9 @@ export function fogModel(crossing, dials = DIALS) {
 //              record would re-tell past crossings.
 //   clearings_m  [{ id, x, y, r_m }]  clear ground the wall never takes: a
 //              household's land standing far past the border keeps a circle of
-//              open air round it (ruled 2026-10-09: no parcel is covered but the
-//              one ruled under). Clearings do not creep.
+//              open air round it (ruled 2026-10-09). Elsewhere the wall may
+//              cover a household's marks as it creeps (WLD-38, 2026-10-12).
+//              Clearings do not creep.
 //   fringe_m   the translucent haze on the clear side of the wall
 //   wall_sight_m  how far a body standing INSIDE the wall can see
 //   schedule   [{ crossing, front_m, veil }, …] in crossing order. front_m is
@@ -627,6 +628,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   const signalMult = dials.signal_fog_reach_mult;
 
   const seen = [];
+  const bareScore = new Map(); // id → the score at weight 0, for the landmark lift below (POS-632)
   for (const mk of marks) {
     if (!mk.at) continue;                                   // predicated/naming have no site of their own
     // A PARCEL RENDERS IN THE WORLD LIKE ANY OTHER MARK (the home-images
@@ -677,6 +679,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
     const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
+    bareScore.set(mk.id, lodScore({ extentM, distM, weight: 0, dials, dimming: rankDimming }));
     const visible = !fogHidden && (los.visible || isSignal); // a signal's light is seen even where its footing is occluded
     seen.push({
       id: mk.id, kind: mk.kind, household: mk.household, body: mk.body,
@@ -728,30 +731,21 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   // rest folded into a clusteredCount you `investigate` to open. This is the LOD
   // law — top-level marks at distance, descend with proximity or attention.
   const ranked = seen.filter((s) => s.visible).sort((a, b) => b.score - a.score);
-  const repByHh = new Map();
-  const collapsed = [];
-  for (const s of ranked) {
-    const far = s.distM > dials.cluster_beyond_m;
-    // the acting home is never folded into (or made the rep of) its household's cluster: it
-    // is carried alone below, and the rest of the household clusters without it (WLD-9)
-    if (far && s.household && !s.signal && s.id !== keep) {
-      const rep = repByHh.get(s.household);
-      if (rep) { rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
-      repByHh.set(s.household, s);
-    }
-    collapsed.push(s);
-  }
-  // THE ACTOR'S HOME RIDES OUTSIDE THE BUDGET (WLD-9, formerly POS-528). `keep`
-  // is one mark id the caller resolved (the acting resident's home). If that mark
-  // is VISIBLE it is carried ONCE and never spends one of the `budget` seats,
-  // wherever it ranks: the other `budget` marks keep theirs, in rank order, and
-  // the home sits at its own rank among them. It never makes a hidden mark
-  // visible; the tail and the counts below describe what is left.
-  const kept = keep == null ? null : collapsed.find((s) => s.id === keep) ?? null;
-  const rest = kept ? collapsed.filter((s) => s !== kept) : collapsed;
-  const seats = new Set(rest.slice(0, budget));
-  const carried = collapsed.filter((s) => s === kept || seats.has(s));
-  const tail = rest.slice(budget);
+  const { collapsed, carried, tail } = seatsOf(ranked, { keep, budget, dials, count: true });
+
+  // THE LANDMARK LIFT (POS-632 G2, Darko 2026-10-14: "a place in view is flagged
+  // landmark when its weight, not its size, puts it there"). The counterfactual,
+  // asked literally: rank the same visible marks with every weight at 0 (same
+  // dimming, same collapse, same budget, same kept home) and see who is seated.
+  // A carried mark that would NOT be seated then was put there by its stamps, and
+  // carries `lifted: true`. Nothing else about the ranking moves: this pass only
+  // reads. The weight floor that makes it a landmark is the reader's (the office's).
+  // from the visible set in RECORD order, not the weighted rank: a sort is stable,
+  // so re-sorting the weighted order would let the stamps break a weight-0 tie
+  // (review-217 § 4)
+  const bareRanked = seen.filter((s) => s.visible).sort((a, b) => bareScore.get(b.id) - bareScore.get(a.id));
+  const bareSeated = new Set(seatsOf(bareRanked, { keep, budget, dials, count: false }).carried.map((s) => s.id));
+  for (const s of carried) if (!bareSeated.has(s.id)) s.lifted = true;
   const tailByBearing = {};
   for (const t of tail) tailByBearing[t.bearing] = (tailByBearing[t.bearing] ?? 0) + 1;
 
@@ -776,6 +770,37 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       ...(mists ? { mistHidden: seen.filter((s) => s.mistHidden).length } : {}),
     },
   };
+}
+
+// The seats: collapse each far household's cluster to its best-ranked mark, then
+// carry the kept home plus the first `budget` of the rest. `count` writes each
+// rep's clusteredCount (the real pass); the landmark lift's counterfactual pass
+// asks with count: false, so it never touches a row.
+function seatsOf(ranked, { keep, budget, dials, count }) {
+  const repByHh = new Map();
+  const collapsed = [];
+  for (const s of ranked) {
+    const far = s.distM > dials.cluster_beyond_m;
+    // the acting home is never folded into (or made the rep of) its household's cluster: it
+    // is carried alone below, and the rest of the household clusters without it (WLD-9)
+    if (far && s.household && !s.signal && s.id !== keep) {
+      const rep = repByHh.get(s.household);
+      if (rep) { if (count) rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
+      repByHh.set(s.household, s);
+    }
+    collapsed.push(s);
+  }
+  // THE ACTOR'S HOME RIDES OUTSIDE THE BUDGET (WLD-9, formerly POS-528). `keep`
+  // is one mark id the caller resolved (the acting resident's home). If that mark
+  // is VISIBLE it is carried ONCE and never spends one of the `budget` seats,
+  // wherever it ranks: the other `budget` marks keep theirs, in rank order, and
+  // the home sits at its own rank among them. It never makes a hidden mark
+  // visible; the tail and the counts below describe what is left.
+  const kept = keep == null ? null : collapsed.find((s) => s.id === keep) ?? null;
+  const rest = kept ? collapsed.filter((s) => s !== kept) : collapsed;
+  const seats = new Set(rest.slice(0, budget));
+  const carried = collapsed.filter((s) => s === kept || seats.has(s));
+  return { collapsed, carried, tail: rest.slice(budget) };
 }
 
 // radialSerialize — group a fieldOfView result into bearing → band → marks, the

@@ -80,14 +80,14 @@
    "predicates": {
     "identity": "slug + class, nothing else"
    },
-   "prose": "LOGOS/kinds.md",
+   "prose": "LOGOS/lifetimes.md",
    "ontology": "LOGOS/classes.md — the node-ontology planting (2026-08-18); split declared deliberate, ruled 2026-08-19 (C8)"
   },
   {
    "id": "slug",
    "class": "structure",
    "predicates": {},
-   "prose": "LOGOS/kinds.md"
+   "prose": "LOGOS/lifetimes.md"
   },
   {
    "id": "class-node",
@@ -109,7 +109,7 @@
    "predicates": {
     "note": "a field, given its own node"
    },
-   "prose": "LOGOS/kinds.md"
+   "prose": "LOGOS/lifetimes.md"
   },
   {
    "id": "edge",
@@ -173,7 +173,7 @@
    "predicates": {
     "lifetime": "until withdrawn"
    },
-   "prose": "LOGOS/kinds.md"
+   "prose": "LOGOS/lifetimes.md"
   },
   {
    "id": "entity",
@@ -181,7 +181,7 @@
    "predicates": {
     "lifetime": "animated"
    },
-   "prose": "LOGOS/kinds.md"
+   "prose": "LOGOS/lifetimes.md"
   },
   {
    "id": "emission",
@@ -189,7 +189,7 @@
    "predicates": {
     "lifetime": "dial-bounded"
    },
-   "prose": "LOGOS/kinds.md"
+   "prose": "LOGOS/lifetimes.md"
   },
   {
    "id": "declare",
@@ -277,7 +277,7 @@
    "predicates": {
     "note": "the directory IS the geometry"
    },
-   "prose": "LOGOS/kinds.md"
+   "prose": "LOGOS/lifetimes.md"
   },
   {
    "id": "the-response-function",

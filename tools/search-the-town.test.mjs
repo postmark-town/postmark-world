@@ -311,13 +311,16 @@ const readState = (page) => page.evaluate(() => {
     layout: (() => {
       const row = document.querySelector(".wv-mapctl");
       if (!row) return null;
-      const kids = [...row.children].map((c) => Math.round(c.getBoundingClientRect().top));
+      // only what is drawn stands on a line: a child the page keeps but does not show
+      // (display:none, as the lite toggle is on a phone, WLD-43) has a box at top 0
+      const shown = (c) => c.getClientRects().length > 0;
+      const kids = [...row.children].filter(shown).map((c) => Math.round(c.getBoundingClientRect().top));
       const tools = document.querySelector(".wv-mapctl-tools");
       return {
         lines: new Set(kids).size,
         toolsBesidePill: kids.length > 1 && kids[1] === kids[0],
         toolsOnOneLine: tools
-          ? new Set([...tools.children].map((c) => Math.round(c.getBoundingClientRect().top))).size === 1
+          ? new Set([...tools.children].filter(shown).map((c) => Math.round(c.getBoundingClientRect().top))).size === 1
           : false,
         rowFits: Math.round(row.getBoundingClientRect().width) <= window.innerWidth,
       };

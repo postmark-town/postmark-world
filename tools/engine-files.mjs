@@ -33,6 +33,11 @@ export const ENGINE_FILES = [
   // joined 2026-10-13 (WLD-27): mark-lint's candy grammar (§ 3e) asks the one
   // reading board-grammar's live tree asks too, so the gate's fixtures carry it.
   "candy-grammar.mjs",
+  // joined 2026-10-13 (WLD-5): the lint's portal rules are portals.mjs's, one
+  // definition beside the passage's, and portals.mjs reads the entry law from
+  // enter-exit.mjs.
+  "portals.mjs",
+  "enter-exit.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

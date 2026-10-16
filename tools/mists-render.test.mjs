@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, mistsCreatureBox, mistsCreatureSVG, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
@@ -143,7 +143,7 @@ test("the town is kept clear at 284: every mark's footprint is under no more tha
   assert.ok(checked > 3000, `the footprints were read (${checked} points; ${hidden} behind the wall, the physics')`);
 });
 
-test("the creatures: seeded by the crossing, sparse at 244 and populated by 284, in the banks, never over the town", () => {
+test("the creatures: seeded by the crossing, sparse at 244 and populated by 284, behind the wall, never over the town", () => {
   const counts = [];
   for (const n of [244, 272, 284]) {
     const m = mistsAt(n, MISTS), cs = mistsCreatures(m, { first: 244, keep: KEEP });
@@ -151,13 +151,42 @@ test("the creatures: seeded by the crossing, sparse at 244 and populated by 284,
     for (const c of cs) {
       for (const [a, b] of [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]]) assert.equal(KEEP(c.x + a * c.sizeM, c.y + b * c.sizeM), 0, `${c.kind} at (${c.x}, ${c.y}) stands clear of the town`);
       const d = mistsTrueDistance(m, c.x, c.y);
-      assert.ok(d > -mistsReachM(m) * 1.3 && d < 400, `${c.kind} is in the banks (true-face distance ${Math.round(d)} m)`);
+      assert.ok(d > 0 && d < 1500, `${c.kind} stands behind the wall's true face, never on the clear side (true-face distance ${Math.round(d)} m; WLD-56 D5)`);
+      assert.ok(["wolf", "raven", "bat"].includes(c.kind), `${c.kind} is one of the season's kinds`);
     }
     counts.push(cs.length);
   }
   assert.ok(counts[0] < counts[1] && counts[1] <= counts[2], `fewer at first, more by 284 (${counts.join(", ")})`);
   assert.ok(counts[0] >= 3 && counts[2] >= 25, `sparse but present at 244, populated at 284 (${counts.join(", ")})`);
   assert.deepEqual(mistsCreatures(null), [], "no Mists, no creatures");
+});
+
+test("the drawn silhouette, not its point, stands wholly behind the wall: every corner of every box, at every crossing of the season (WLD-56 D5, review of #219 F1)", () => {
+  let boxes = 0;
+  for (let n = 244; n <= 288; n += 2) {
+    const m = mistsAt(n, MISTS);
+    for (const c of mistsCreatures(m, { first: 244, keep: KEEP })) {
+      const b = mistsCreatureBox(c);
+      for (const [x, y] of [[b.minX, b.minY], [b.maxX, b.minY], [b.minX, b.maxY], [b.maxX, b.maxY], [(b.minX + b.maxX) / 2, (b.minY + b.maxY) / 2]])
+        assert.ok(mistsTrueDistance(m, x, y) > 0, `crossing ${n}: ${c.kind} (${c.pose}) at (${c.x}, ${c.y}), size ${c.sizeM}: its box reaches (${Math.round(x)}, ${Math.round(y)}), ${Math.round(-mistsTrueDistance(m, x, y))} m onto the clear side`);
+      const k = m.clear;
+      assert.ok(b.maxX < k.minX || b.minX > k.maxX || b.maxY < k.minY || b.minY > k.maxY, `crossing ${n}: ${c.kind}'s box is off the clear box entirely`);
+      boxes += 1;
+    }
+  }
+  assert.ok(boxes > 500, `the season's silhouettes were all checked (${boxes})`);
+});
+
+test("the box is the one the silhouette is drawn in: its path's box at its size, from its point", () => {
+  const reg = { originPx: { x: 0, y: 0 }, mPerPx: 1, ink: "#000" };
+  for (const c of [{ kind: "wolf", pose: "stand", x: 100, y: 200, sizeM: 600 }, { kind: "raven", pose: "perch", x: 0, y: 0, sizeM: 300 }, { kind: "raven", pose: "lift", x: 0, y: 0, sizeM: 300 }, { kind: "bat", pose: "flit", x: -50, y: 9, sizeM: 230 }]) {
+    const svg = mistsCreatureSVG(c, reg), b = mistsCreatureBox(c);
+    const [, ax, ay] = svg.match(/<g transform="translate\(([-\d.]+) ([-\d.]+)\)"><path/);
+    const scale = c.sizeM / 100;
+    assert.equal(Math.round(c.x + Number(ax) * scale), Math.round(b.minX), `${c.kind} ${c.pose}: drawn from the box's left edge`);
+    assert.equal(Math.round(c.y + Number(ay) * scale), Math.round(b.minY), `${c.kind} ${c.pose}: drawn from the box's top edge`);
+    assert.equal(Math.round(b.maxX - b.minX), c.sizeM);
+  }
 });
 
 // THE SHEET'S EDGE IS A FACE TOO (POS-553 review): the painted sheet (the atlas
@@ -196,21 +225,26 @@ test("with the sheet's frame: the hard rule holds, the town stays clear, and the
 // THE BAKE'S OWN RULE (#186 review): every test below runs mistsBakeAt, the
 // rule the canvas bake applies pixel by pixel, the skip included, with the
 // painted sheet's frame. Three layers together, each at either end of its drift.
-const bakeWorst = (m, x, y, li) => { const L = MISTS_PAINT.layers[li];
-  return Math.max(...[0, 1, -1].map((sg) => mistsBakeAt(m, li, x - sg * L.driftM, y - sg * L.driftM * 0.45, KEEP).alpha)); };
-const bakeComposite = (m, x, y) => 1 - [0, 1, 2].reduce((a, li) => a * (1 - bakeWorst(m, x, y, li)), 1);
+const bakeWorst = (m, x, y, li, keep = KEEP) => { const L = MISTS_PAINT.layers[li];
+  return Math.max(...[0, 1, -1].map((sg) => mistsBakeAt(m, li, x - sg * L.driftM, y - sg * L.driftM * 0.45, keep).alpha)); };
+const bakeComposite = (m, x, y, keep = KEEP) => 1 - [0, 1, 2].reduce((a, li) => a * (1 - bakeWorst(m, x, y, li, keep)), 1);
 const footprint = (mk) => { const w = (mk.extent?.w ?? 0) / 2, h = (mk.extent?.h ?? 0) / 2;
   return [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1], [0, -1], [0, 1], [-1, 0], [1, 0]].map(([a, b]) => ({ x: mk.at.x + a * w, y: mk.at.y + b * h })); };
 
-test("the bake keeps the clearings clear: no paint above a haze on any mark inside them, whatever its size, at 244, 272 and 282", () => {
+// The far south-west's wetland is a household's (sol-am-lichterfenster): the
+// clearing was sized for it, but if it moves out the Mists may cover it
+// (WLD-38), so its absence is told, never failed; `checked` keeps the test whole.
+const WETLAND = "sol-am-lichterfenster/vesperfen-wetland";
+function bakeKeepsClearings(marks, keep = KEEP) {
   let checked = 0;
+  const notes = [];
   for (const n of CROSSINGS) {
     const m = { ...mistsAt(n, MISTS), frame: FRAME };
-    const inside = MARKS.filter((mk) => mk?.at && Number.isFinite(mk.at.x) && m.clearings.some((k) => Math.hypot(mk.at.x - k.x, mk.at.y - k.y) < k.r));
-    assert.ok(inside.some((mk) => mk.id === "sol-am-lichterfenster/vesperfen-wetland"), "the far south-west's wetland is among them");
+    const inside = marks.filter((mk) => mk?.at && Number.isFinite(mk.at.x) && m.clearings.some((k) => Math.hypot(mk.at.x - k.x, mk.at.y - k.y) < k.r));
+    if (!inside.some((mk) => mk.id === WETLAND)) notes.push(`${WETLAND} is not in a clearing at ${n}`);
     for (const mk of inside) for (const p of footprint(mk)) {
       if (mistsHere(p, m).inWall) continue;
-      const a = bakeComposite(m, p.x, p.y);
+      const a = bakeComposite(m, p.x, p.y, keep);
       assert.ok(a <= LIGHT_HAZE, `${mk.id} at ${n}, (${p.x.toFixed(0)}, ${p.y.toFixed(0)}): ${a.toFixed(2)} of fog`);
       checked += 1;
     }
@@ -221,6 +255,19 @@ test("the bake keeps the clearings clear: no paint above a haze on any mark insi
     }
   }
   assert.ok(checked > 100, `footprints read (${checked})`);
+  return notes;
+}
+
+test("the bake keeps the clearings clear: no paint above a haze on any mark inside them, whatever its size, at 244, 272 and 282", (t) => {
+  const notes = bakeKeepsClearings(MARKS);
+  t.diagnostic(notes.length ? notes.join("; ") : "the far south-west's wetland is in its clearing");
+});
+
+test("MAY COVER, in the paint: the far south-west's wetland moved out of its clearing is told, never failed, and the bake still keeps the clearings clear", (t) => {
+  const moved = MARKS.map((mk) => (mk?.id === WETLAND ? { ...mk, at: { x: mk.at.x + 6000, y: mk.at.y } } : mk));
+  const notes = bakeKeepsClearings(moved, mistsKeepAt(mistsKeepRects(moved, MISTS.clearings_m)));
+  t.diagnostic(notes.join("; "));
+  assert.deepEqual(notes, CROSSINGS.map((n) => `${WETLAND} is not in a clearing at ${n}`));
 });
 
 test("the bake's face off the sheet is ragged, never a straight line, on the west and south at 244", () => {

@@ -40,7 +40,10 @@ test("[pin] WHAT IS INSIDE A PARCEL STAYS INSIDE IT — the dwelling and its fur
   assert.equal(hiddenInsideParcel(thin, [], outside, chain), true, "with the chain, the thin entry is inside the parcel — hidden");
   assert.equal(hiddenInsideParcel(thin, [], inside, chain), false, "and drawn again from inside");
   assert.match(SOURCE, /\.filter\(\(m\) => !hiddenInsideParcel\(byId\.get\(m\.id\) \?\? m, byId, underfoot, townChain\)\);/, "the drawn set honours it, chain in hand");
-  assert.match(SOURCE, /townChain = new Map\(\(json\?\.marks \?\? \[\]\)\.map/, "the chain is built from the same world read the houses come from");
+  // WLD-5 (2026-10-13): the houses come from `townWorld`, the same read scoped
+  // through standpointSight, so the chain is built from that same scoped copy.
+  assert.match(SOURCE, /townWorld = sightOf\(\{ marks: json\?\.marks \?\? \[\]/, "the houses and the chain come from one read");
+  assert.match(SOURCE, /townChain = new Map\(townWorld\.marks\.map/, "the chain is built from the same world read the houses come from");
   // ⚑ THE FLIP: make hiddenInsideParcel return false unconditionally → four lines red.
 });
 

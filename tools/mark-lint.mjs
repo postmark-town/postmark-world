@@ -31,12 +31,13 @@ import { fileURLToPath } from "node:url";
 import {
   loadMarks, polygonOf, ringMatchesClaim, isValidMarkDate, rect, overlapArea,
   standingRank, fileToWorld, declaredCoords, COORDS_RELATIVE, WORLD_ROOT_SLUG,
-  containmentParents,
+  containmentParents, lossyValues, lossyMessage,
 } from "./marks-fold.mjs";
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 import { candyLabelsOf, candyInstanceDefects } from "./candy-grammar.mjs";
+import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -186,13 +187,15 @@ for (const rec of marks) {
   // constitution), and `draft` stays (branch-state, not standing — the one
   // field standingRank still reads).
   if (rec._dir) {
-    let rawTier = null;
-    try {
-      const raw = readFileSync(join(rec._dir, "mark.md"), "utf8");
-      rawTier = ((raw.match(/^---\r?\n[\s\S]*?\r?\n---/) || [""])[0].match(/^tier:\s*(\S+)/m) || [])[1] ?? null;
-    } catch { /* unreadable file already erred above */ }
+    let raw = null;
+    try { raw = readFileSync(join(rec._dir, "mark.md"), "utf8"); } catch { /* unreadable file already erred above */ }
+    const rawTier = raw == null ? null : ((raw.match(/^---\r?\n[\s\S]*?\r?\n---/) || [""])[0].match(/^tier:\s*(\S+)/m) || [])[1] ?? null;
     if (rawTier && rawTier !== "draft" && !(rec.by === TOWN && rawTier === "constitution"))
       err(rec, `tier: is not a field — standing is derived by the one walk, never asserted (drop the line; the ground decides)${cite("the-town/the-tiers")}`);
+    // 1.5 a value the parser would silently lose (WLD-41): the record above was
+    // read already diminished, so this reads the file. A snapshot's records
+    // carry no file, so the rule speaks where a tree is linted (the PR lane).
+    if (raw != null) for (const l of lossyValues(raw)) err(rec, lossyMessage(l));
   }
   if (!rec.date || !isValidMarkDate(rec.date)) warn(rec, `date should be YYYY-MM-DD or a full ISO 8601 datetime (got ${JSON.stringify(rec.date)})`);
 
@@ -875,7 +878,7 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
     if (rec._error || rec.source === undefined) continue;
     const rel = String(rec.source).trim().replace(/\\/g, "/");
     if (!rel || /^([a-z]:)?\//i.test(rel) || rel.split("/").includes("..") || rel.includes("\0")) {
-      err(rec, `source: ${JSON.stringify(rec.source)} must be a path inside this repository, written from its root (e.g. LOGOS/kinds.md) — a word that stands outside the repo is a word nobody here can check${cite(FIDELITY)}`);
+      err(rec, `source: ${JSON.stringify(rec.source)} must be a path inside this repository, written from its root (e.g. LOGOS/lifetimes.md) — a word that stands outside the repo is a word nobody here can check${cite(FIDELITY)}`);
       continue;
     }
     const doc = readDoc(rel);
@@ -915,6 +918,56 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
       }
     }
   }
+}
+
+// 10. PORTALS AND DUNGEONS (WLD-5, ruled by Darko with Wright 2026-10-13). The
+// rules are portals.mjs § the lint, one definition beside the passage's: every
+// `into` names a mark; every string `lands_at` names a mark; every landing
+// stands within LANDING_REACH_M of its `into`; an exit out of a dungeon is never
+// opposed; every room of a dungeon has a path of unlocked portals out (ADVISORY
+// since Darko's 21:13 change: a whole-dungeon exit is always offered); no two
+// marks with the same parent inside a dungeon overlap (Darko, 20:31: siblings only).
+//
+// AN ERROR, AND IT REFUSES THE CROSSING. The settlement's harm gate runs this
+// lint as its first check (tools/harm-gate.mjs § 1), and Darko ruled the rules
+// airtight ("no exceptions in the rule"): a portal that strands whoever takes it
+// is harm to residents. The one way through is NAMED, never coded: an entry in
+// WORLD/portal-lint-exceptions.json ({ mark, rule, by, why }), appended by
+// whoever answers for it. An excepted finding prints as a warning that names
+// the exception, so every receipt shows the portal was let through and by whom,
+// and an exception that excuses nothing is said too.
+//
+// JURISDICTION, as the freeze's: this repository's own tree reads its own file;
+// a fixture tree reads one only when it passes --portal-exceptions.
+{
+  const PORTAL_EXC_REL = "WORLD/portal-lint-exceptions.json";
+  const excPath = opt("--portal-exceptions", OWN_TREE ? join(REPO, PORTAL_EXC_REL) : null);
+  const excFile = (msg) => findings.push({ sev: "ERROR", file: PORTAL_EXC_REL, msg });
+  let exceptions = [];
+  // A MISSING list is an empty one: the strict direction, since absence can only
+  // let fewer portals through, never more. An unreadable one is an error.
+  if (excPath && existsSync(excPath)) {
+    let parsed = null;
+    try { parsed = JSON.parse(readFileSync(excPath, "utf8")); }
+    catch (e) { excFile(`could not be read as JSON (${String(e?.message ?? e).slice(0, 120)}) — the exception list is part of the gate, and a gate that cannot read its own list does not guess`); }
+    if (parsed) {
+      if (!Array.isArray(parsed.exceptions)) excFile("carries no `exceptions` array");
+      else for (const e of parsed.exceptions) {
+        if (!e || typeof e.mark !== "string" || !PORTAL_RULES.includes(e.rule) || !e.by || !e.why)
+          excFile(`an entry must name { mark, rule, by, why } with rule one of ${PORTAL_RULES.join(", ")} — got ${JSON.stringify(e)}`);
+        else exceptions.push(e);
+      }
+    }
+  }
+  const { findings: portal, stale } = applyPortalExceptions(portalFindings(marks), exceptions);
+  for (const f of portal) {
+    const rec = standingIndex.get(f.mark) ?? { id: f.mark };
+    if (f.excepted) warn(rec, `[${f.rule}] EXCEPTED by ${PORTAL_EXC_REL} (${f.excepted.by}: ${f.excepted.why}) — ${f.msg}`);
+    else if (f.sev === "WARN") warn(rec, `[${f.rule}] ${f.msg}`);
+    else err(rec, `[${f.rule}] ${f.msg}`);
+  }
+  for (const e of stale)
+    findings.push({ sev: "WARN", file: PORTAL_EXC_REL, msg: `the exception for ${e.mark} (${e.rule}) matches no finding — it excuses nothing; remove it` });
 }
 
 // ---- report (lint.mjs idiom: sort, print, exit non-zero only on ERROR) ----

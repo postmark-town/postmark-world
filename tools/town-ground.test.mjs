@@ -440,7 +440,10 @@ test("[pin] THE CALL SITE PASSES A SET THAT EXISTS — a CHEAP SECOND GUARD, not
     "`allMarks` must ask who is reading before it reaches for a fold");
   assert.match(VIEWER, /const allMarks = \(\) =>[^;]*world\?\.marks/,
     "and it still reads the fold where there is a reader who wants one");
-  assert.match(VIEWER, /world = assembleWorld\(\{ worldState: data\.worldState, skeleton: data\.skeleton \}\)/);
+  // ⚑ THE CALL SITE MOVED AGAIN ON 2026-10-13 (WLD-5): the assembled world is
+  // read through `sightOf` (the world tools' standpointSight, so a dungeon draws
+  // as its own mark alone). Same fold, same skeleton, scoped before anything draws.
+  assert.match(VIEWER, /world = sightOf\(assembleWorld\(\{ worldState: data\.worldState, skeleton: data\.skeleton \}\)\)/);
   assert.doesNotMatch(VIEWER, /townGround\(data\.marks/, "`data.marks` is undefined and always was");
   // THE ORIGINAL BUG, still watched: a set that does not exist. `world.marks`
   // is now the one that can be absent — the resident path never assembles a

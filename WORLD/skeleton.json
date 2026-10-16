@@ -225,13 +225,13 @@
     ]
   },
   "mists": {
-    "_ruling": "WORLD/ENGINE.md § The Mists (seasonal; POS-466, POS-468): a border band with a place. The wall stands at the border and creeps in on a crossing schedule; it occludes everything behind it, with no ceiling; its fringe shortens sight on the clear side; its veil dims every light. No household's parcel is covered, but the one ruled under. Before the schedule's first crossing there are no Mists and every telling is the one it always was.",
+    "_ruling": "WORLD/ENGINE.md § The Mists (seasonal; POS-466, POS-468): a border band with a place. The wall stands at the border and creeps in on a crossing schedule; it occludes everything behind it, with no ceiling; its fringe shortens sight on the clear side; its veil dims every light. As it creeps in it may cover a household's marks, for the season (WLD-38, ruled 2026-10-12), and the household is to be told so on its doorstep; the clearings keep the ground the town sized them for. Before the schedule's first crossing there are no Mists and every telling is the one it always was.",
     "border_m": {
       "minX": -4600,
       "minY": -4600,
       "maxX": 5850,
       "maxY": 9700,
-      "receipt": "on 2026-10-09: every parcel on the map (x -3302.5..4050, y -3312.5..8412.5) with the 400 m fringe, 100 m more and the 780 m creep outside it, and every household's mark (east to x 4940) with 100 m and the creep outside it, so at no keyframe does the wall reach a household's mark or the fringe a parcel; the last keyframe moved to 760 m on 2026-10-12 (S105) when bee/bee-pink-burrow was placed at x 4667, east of this sizing"
+      "receipt": "on 2026-10-09: every parcel on the map (x -3302.5..4050, y -3312.5..8412.5) with the 400 m fringe, 100 m more and the 780 m creep outside it, and every household's mark (east to x 4940) with 100 m and the creep outside it, so at no keyframe does the wall reach a household's mark or the fringe a parcel; the last keyframe moved to 760 m on 2026-10-12 (S105) when bee/bee-pink-burrow was placed at x 4667, east of this sizing. SUPERSEDED 2026-10-12 (WLD-38): the Mists may cover a household's marks, so this sizing is no longer a promise that none is reached"
     },
     "clearings_m": [
       {

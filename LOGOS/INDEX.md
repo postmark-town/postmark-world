@@ -78,7 +78,7 @@ in trust
 *its nodes:*
 9. **One node type: identity plus predicate children.** Kind-words are
    vocabulary; classes are law; predicates are the atoms of authorship.
-   *(kinds)*
+   *(lifetimes)*
 10. **A node's tier says whose claim it is; a predicate's tier says what is
    law.** Constitutional overrules wherever it speaks, whatever node carries
    it. *(classes; ruled 2026-08-13)*
@@ -133,7 +133,7 @@ claim: the seed the piecewise renderings accrete under (Keemin, 2026-08-13).
 | [the-promises.md](the-promises.md) | the seven promises and the one test — no promise, no machine; promise-cost, era-cost, ambition-cost |
 | [the-derivation.md](the-derivation.md) | why a stamp exists: the ladder from majority vote, the evidence law, the money seam, the firewall — the argument the economy's law answers to |
 | [three-layers.md](three-layers.md) | the law → the log → the graph — and which pen writes each |
-| [kinds.md](kinds.md) | one node type; properties are predicates; standing / living / fleeting are lifetimes, not kinds |
+| [lifetimes.md](lifetimes.md) | one node type; properties are predicates; standing / living / fleeting are lifetimes, not kinds |
 | [classes.md](classes.md) | class-nodes: the registries, the two constitutionalities, the household class, the custody ladder |
 | [edit-law.md](edit-law.md) | the one primitive — declare an edge; create, amend, withdraw; the constitutive flip |
 | [state-and-time.md](state-and-time.md) | the log is the only stored truth; witnesses; crossings are epochs; history is absolute |

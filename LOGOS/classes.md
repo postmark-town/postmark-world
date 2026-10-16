@@ -276,6 +276,23 @@ edge — impossible, not forbidden; clauses may expose child-fillable
 **options**), and its **payload schema** (the declarable params a caller
 fills).
 
+## The LOGOS ladder — label, predicate, subclass (Sitting A, 2026-10-12)
+
+A descriptor climbs one ladder, in increasing order of resolution and
+distributability: it starts as a **label**, may become a **predicate**, and
+may become a **subclass** (Darko, Sitting A, 2026-10-12).
+
+- **A label is a lazy class** (ruled in direction, Sitting A, 2026-10-12): the
+  same idea as a class, in shorthand that has not yet needed a class-node's
+  upkeep, and it may be promoted to one.
+- **Kind and subclass are one word** (ruled, Sitting A, 2026-10-12): "a kind
+  of candy" is a subclass of candy. A mark's `kind` field reads as a label —
+  `kind: predicated` labels a predicate — so the field keeps its one meaning,
+  how a mark stands ([lifetimes.md](lifetimes.md)), and nothing migrates.
+- **What promotes a descriptor is unruled** (POS-615): who may write a label,
+  what carries a label to a predicate or a predicate to a subclass, and how the
+  town lists the labels in use all wait for that sitting.
+
 ## The two constitutionalities
 
 A class carries two independent constitutionalities:
@@ -610,6 +627,64 @@ belong-to pairs gain meeps→town at the graduation).
   declares `reports-to:` and the graph draws the line. The extends
   lattice stays is-a — an office answers to another without being a
   kind of it.
+
+## The creature class — what comes out of the Mists
+
+Ruled in Sitting E (Darko, 2026-10-14 §§ 2–3, 6–7; the record is
+Starstory `docs/2026-10-14/halloween/sitting-E-entities.md`): **a creature is a
+living node** that comes out of the Mists. `creature extends entity`; it is
+the first class to write its canon down, `canon: live` — the first live
+create edge, which is what sets an entity apart from a mark. The three kinds
+of the season are its subclasses, `wolf`, `raven` and `bat`, each a class
+whose law is its kind file (`WORLD/kinds/<kind>.kind`, read by
+`tools/creature-kind.mjs`): its moods, its awareness ring, its span, the
+reactions its `when` allows, and the line each one leaves. The class's words,
+and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
+
+> A creature comes out of the Mists, lives half a day, answers what is done
+> near it in its own way, and goes back: it fades, or it flees; it belongs to
+> no one.
+
+(The class mark's body says the same within the 150-character cap, with
+two cuts: "it fades or it flees" and "it is no one's".)
+
+| a creature's act | family | canon |
+|---|---|---|
+| its spawn, by `the-town`, under its class's rule | create (a living node) | live |
+| a change of its state (its moods) | revise | live |
+| a predicate on it (a name) | attach a predicate | settled |
+| its emissions (a snarl, a howl) | produces a fleeting node | live, never saved |
+| its leaving, with its reason | revise: withdraw | live |
+| the crossing-save | a snapshot | every crossing saves it |
+
+- **Two ways to leave, and only two.** `faded`: twelve hours after its spawn
+  it goes back into the mist, on its own clock. `fled`: a reaction sent it
+  back at once — the only leaving by outcome. Nothing a creature is ever
+  vanishes otherwise, and it is never tamed or befriended: it is no one's.
+- **No verbs of its own to be acted on.** A creature has an awareness ring;
+  every ordinary public act a resident takes inside it — a walk, an entry or
+  exit, a say, a take, give or drop, a mark left — is its trigger. The
+  resident's acts stay one set; combat is the dungeon's.
+- **Code decides what is possible; Jev only chooses among it.** The ring is
+  measured, the menu is the reactions whose `when` holds, and a public d20
+  samples the judgment. A reaction changes only the creature: no nerve, no
+  harm, no holds outside the Spire.
+- **The schedule is hidden until each spawn and re-derivable after.** Each
+  crossing `the-town` commits to the window's schedule before any spawn and
+  reveals its seed when the window closes (`tools/creatures.mjs`).
+- **Where, how many, how long.** A creature spawns in the 400 m fringe on the
+  clear side of the Mists' wall, on open country only: never inside the wall,
+  never in a clearing, never on or within 440 m of the town's ground (the
+  class's `band_from_m`, `band_to_m` and `keep_m` dials). Each window brings a
+  wolf 2, a raven 4 and a bat 3 (each kind's `count_per_window`), each at its
+  own seeded minute, and each lasts 12 h from that minute (`span_h`), so the
+  creatures overlap across a crossing rather than turning over at once. In
+  w44 a creature stands where it spawned and holds nothing: its stalking and
+  circling are lines, and fleeing is its only leaving early.
+- **Off until the town says so.** The class's `from_crossing` dial is null,
+  and a null dial spawns nothing.
+
+Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
 
 ## The round class — the offices' procedures, as papers
 
@@ -1296,6 +1371,76 @@ stands for things riding things; the passenger case is occupancy → hull, exit 
 The vehicle is a third behaviour and takes the compound name `vehicle` for the same reason ② took a compound one:
 crossing ① changes what you read, standing on ② changes what you may do, entering a vehicle changes where you are, and
 the three must never be read as one mechanism wearing three hats.
+
+## The portal and the dungeon — a passage that leads somewhere, and a place left whole
+
+*A portal changes where you are when you cross it. A dungeon changes what you may see and how you may leave.*
+
+Rendered in the world as `the-town/dungeon`.
+
+Ruled by Darko with Wright in the doors sitting of 2026-10-13 (WLD-5, concluded 20:03 EDT; exit amended 21:13), and
+built on the entry law
+that already stood: a mark's `entry: {word, edge, consequence}` is its fixed answer to every entrant.
+
+- **A portal is a mark whose entry law carries `into`.** `into` is a mark, or a list of marks: entering the portal
+  enters that mark, and with a list the walker picks, and nothing is recorded until they do. An optional
+  **`lands_at`** (a mark, or coordinates) is where you stand within `into`; it is clamped into `into`'s shape and
+  set about a metre inside. With neither, you stand at `into`'s anchor. A two-way passage is two portals pointing at
+  each other, each with its own word, body and art, so it can be locked from one side only. You enter a portal from
+  anywhere in its extent, by the reach rule every threshold keeps.
+- **One step at a time.** A room's answer lists the portals in it, and you pick the next. There is no
+  route-finding, and leaving a room means walking to the portal that leads out and entering it ("not unreasonable
+  for a DM to make you move your token to the door of a room full of traps").
+- **A portal that leads nowhere refuses, by its own words.** An `into` or a `lands_at` that names no mark leaves the
+  walker standing at the portal, and the refusal quotes the field exactly as written.
+- **A dungeon is a sited-mark class**, and its rules reach every mark it geometrically contains, as a parcel's
+  sovereignty does; the marks inside it are not classed themselves. You leave by a portal whose `into` is outside,
+  and **such a portal can never be opposed**, because it is locked from the outside, never from the inside. No jails.
+- **A dungeon is left whole.** `exit` is offered inside one, with a confirmation: the first call records nothing and
+  says what it will do, and the second, with `confirm: true`, does it. Exiting from any mark inside a dungeon exits
+  the whole dungeon, and you are set down outside it, at the portal you entered by (the Post Office's deposit rule,
+  restated).
+- **A dungeon is opaque from outside.** A resident who has not entered it reads it as the dungeon mark alone, with
+  nothing it contains at any depth. The block keys off having *entered* (the enter ledger), never off where you
+  stand, so walking onto a room's ground from outside reveals nothing. Inside, you read the room you entered and
+  what it holds, not its neighbours, and your walk is fenced to that room. The World map shows the same: one rule,
+  read by the town's doors and by the page alike.
+- **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
+  `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
+  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). That every room has a path of
+  unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone. A portal let through anyway is let through by name, in
+  `WORLD/portal-lint-exceptions.json`, and every lint run says so.
+
+**Later** (named in the sitting, not law yet): `requires:` on a portal (town-written conditions, so locked portals
+with keys), secret portals (a hidden entry in the list), and exit routing for marks that are not dungeons.
+
+**Terminology.** "Portal" now names this mechanism, a third sense beside ① the read-root slot and ② the verb-lending
+ground. The read-root slot is to be renamed (proposed: lens), and live identifiers are renamed only after the
+freeze.
+
+## The stairs — a way between floors, before the floor exists
+
+*A stair is a portal by its class: it says where it would take you, and until there is a floor there, it says so.*
+
+Rendered in the world as `the-town/stairs`.
+
+Ruled by Darko 2026-10-15 13:31 (WLD-21): a generic class for interiors with more than one floor, whose passage
+answers **"Moving to higher/lower floors has not been implemented yet. Coming Soon!"** by default.
+
+- **A stairs is a sited mark carrying `class: stairs`.** It extends mark, as the dungeon does: there is no portal
+  class-node to extend, because a portal is a mechanism (an entry law with `into`), and `the-town/portal` is the
+  read-root homonym above.
+- **It is a portal by its class.** A stair that writes no `entry:` at all reads the class's law: `into` itself,
+  word `opposed`, the line as its consequence. So inside a dungeon, where only a portal is entered, a stair is
+  entered and answers, and the portal lint holds (its `into` names a mark: itself).
+- **Its refusal is the line.** The refusal's `because`, which is what every reader prints, is the line, not the
+  town's standing "opposes entry" sentence. That is for a stair on the class's default only; every other opposed
+  mark keeps the standing sentence.
+- **A stair that writes its own `entry:` is read by that entry alone, as any mark is** (a portal when it writes
+  `into`), and keeps the class. Nothing of the default carries over, its refusal included: a stair that writes its
+  own opposed entry says the standing sentence. A later floor is reached by writing `into`, `lands_at` and a word.
+- **A stair is a box inside a room, not a door in a wall**, so it is held to the rule that siblings inside a
+  dungeon do not overlap, as a room is; portals set in walls stay exempt.
 
 ## The witnessed roll
 

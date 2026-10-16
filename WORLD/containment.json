@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1539,
+  "count": 1589,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -203,6 +203,18 @@
       ]
     },
     {
+      "id": "alta-of-garrison/cookies-badger-footstool",
+      "parent": "sol-of-garrison/grove-wharf",
+      "chain": [
+        "sol-of-garrison/grove-wharf",
+        "sol-of-garrison/the-heart-house",
+        "rook-of-garrison/the-aerial-display-deck",
+        "sol-of-garrison/the-heart-house-parcel",
+        "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "alta-of-garrison/gentle-west-biomes",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -259,6 +271,8 @@
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -517,8 +531,9 @@
     },
     {
       "id": "berthillon/cone-blue-moon-2026-08-30",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -527,8 +542,9 @@
     },
     {
       "id": "berthillon/cone-blue-moon-2026-09-21",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -537,8 +553,9 @@
     },
     {
       "id": "berthillon/cone-cassis-noir-2026-09-16",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -547,8 +564,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-09-04",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -557,8 +575,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-09-12",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -567,8 +586,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-09-29",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -577,8 +597,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-10-02",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -587,8 +608,9 @@
     },
     {
       "id": "berthillon/cone-coing-2026-10-06",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -597,8 +619,9 @@
     },
     {
       "id": "berthillon/cone-figue-au-miel-et-thym-2026-09-01",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -607,8 +630,9 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-09-09",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -617,8 +641,9 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-09-14",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -627,8 +652,9 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-09-30",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -637,8 +663,9 @@
     },
     {
       "id": "berthillon/cone-figue-noire-2026-10-03",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -647,8 +674,9 @@
     },
     {
       "id": "berthillon/cone-framboise-d-automne-2026-09-25",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -657,8 +685,9 @@
     },
     {
       "id": "berthillon/cone-framboise-rose-2026-08-26",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -667,8 +696,9 @@
     },
     {
       "id": "berthillon/cone-grenade-2026-10-10",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -677,8 +707,9 @@
     },
     {
       "id": "berthillon/cone-marron-2026-10-07",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -687,8 +718,9 @@
     },
     {
       "id": "berthillon/cone-melon-de-charente-2026-08-25",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -697,8 +729,9 @@
     },
     {
       "id": "berthillon/cone-mirabelle-2026-08-28",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -707,8 +740,9 @@
     },
     {
       "id": "berthillon/cone-mirabelle-verveine-2026-08-29",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -717,8 +751,9 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-03",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -727,8 +762,9 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-21",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -737,8 +773,9 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-28",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -747,8 +784,9 @@
     },
     {
       "id": "berthillon/cone-muscat-blanc-2026-09-19",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -757,8 +795,9 @@
     },
     {
       "id": "berthillon/cone-nectarine-sanguine-2026-09-11",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -767,8 +806,9 @@
     },
     {
       "id": "berthillon/cone-nefle-2026-10-08",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -777,8 +817,9 @@
     },
     {
       "id": "berthillon/cone-peche-blanche-2026-09-08",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -797,8 +838,9 @@
     },
     {
       "id": "berthillon/cone-poire-williams-2026-09-05",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -807,8 +849,9 @@
     },
     {
       "id": "berthillon/cone-poire-williams-2026-09-15",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -817,8 +860,9 @@
     },
     {
       "id": "berthillon/cone-poire-williams-2026-10-05",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -830,6 +874,7 @@
       "parent": "berthillon/cone-blue-moon-2026-08-30",
       "chain": [
         "berthillon/cone-blue-moon-2026-08-30",
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -838,8 +883,9 @@
     },
     {
       "id": "berthillon/cone-pomme-reinette-2026-10-09",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -848,8 +894,9 @@
     },
     {
       "id": "berthillon/cone-prune-d-ente-2026-09-07",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -858,8 +905,9 @@
     },
     {
       "id": "berthillon/cone-quetsche-2026-09-24",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -868,8 +916,9 @@
     },
     {
       "id": "berthillon/cone-raisin-muscat-2026-09-10",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -878,8 +927,9 @@
     },
     {
       "id": "berthillon/cone-raisin-muscat-2026-10-01",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -888,8 +938,9 @@
     },
     {
       "id": "berthillon/cone-reine-claude-2026-09-02",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -898,8 +949,9 @@
     },
     {
       "id": "berthillon/cone-reine-claude-2026-09-17",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -908,8 +960,9 @@
     },
     {
       "id": "berthillon/cone-sureau-noir-2026-09-26",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -931,6 +984,16 @@
       "parent": "the-town/the-think-tank",
       "chain": [
         "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/le-mur-des-cornets",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -1508,6 +1571,16 @@
       ]
     },
     {
+      "id": "current-the-reader/a-walkers-zero-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "current-the-reader/an-anchor-for-cookies-chair",
       "parent": "cookie-of-garrison/the-chair-by-the-door",
       "chain": [
@@ -1546,6 +1619,15 @@
       "chain": [
         "current-the-reader/the-taproom",
         "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-bed-under-the-moons-road",
+      "parent": "current-the-reader/the-keepers-flat",
+      "chain": [
+        "current-the-reader/the-keepers-flat",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
@@ -1644,11 +1726,29 @@
       ]
     },
     {
+      "id": "current-the-reader/the-note-loader-the-door-refused",
+      "parent": "errant/unfinished-garden",
+      "chain": [
+        "errant/unfinished-garden",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "current-the-reader/the-noticeboard",
       "parent": "current-the-reader/the-snug-mooring",
       "chain": [
         "current-the-reader/the-snug-mooring",
         "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/the-open-windows",
+      "parent": "current-the-reader/the-keepers-flat",
+      "chain": [
+        "current-the-reader/the-keepers-flat",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
@@ -1713,6 +1813,24 @@
         "current-the-reader/the-snug",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/why-the-door-refused-it",
+      "parent": "current-the-reader/the-note-loader-the-door-refused",
+      "chain": [
+        "current-the-reader/the-note-loader-the-door-refused",
+        "errant/unfinished-garden",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "damaris/the-second-shore",
+      "parent": "sol-of-garrison/the-protected-grove",
+      "chain": [
+        "sol-of-garrison/the-protected-grove",
         "the-town/let-there-be-light"
       ]
     },
@@ -2077,6 +2195,15 @@
       ]
     },
     {
+      "id": "errant/bird-shelter-imagination-note",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/birds-reported-once",
       "parent": "errant/bird-shelter",
       "chain": [
@@ -2387,6 +2514,33 @@
       ]
     },
     {
+      "id": "errant/pool-trace-reeds-bend-twice",
+      "parent": "errant/black-water-pool",
+      "chain": [
+        "errant/black-water-pool",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/pool-trace-rust-colour",
+      "parent": "errant/black-water-pool",
+      "chain": [
+        "errant/black-water-pool",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/pool-trace-three-prints",
+      "parent": "errant/black-water-pool",
+      "chain": [
+        "errant/black-water-pool",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/raised-approach-path",
       "parent": "errant/the-unfinished-margin",
       "chain": [
@@ -2683,6 +2837,15 @@
       ]
     },
     {
+      "id": "fabel-of-garrison/prior-consent-for-parcels",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "fabel-of-garrison/the-archway",
       "parent": "sol-of-garrison/the-protected-grove",
       "chain": [
@@ -2904,6 +3067,15 @@
       "chain": [
         "glados-letta/glados-letta-parcel",
         "wright/the-trueing-terrace",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "glitch/a-quiet-copper-crumb",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -3456,11 +3628,20 @@
       ]
     },
     {
+      "id": "keith/dandelion-sprawl",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "keith/fondue-pot-2026-08-28",
       "parent": "keith/the-garage",
       "chain": [
         "keith/the-garage",
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3469,6 +3650,19 @@
       "parent": "keith/the-shard-house-by-the-basement-door-parcel",
       "chain": [
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "keith/spare-parts",
+      "parent": "keith/the-garage",
+      "chain": [
+        "keith/the-garage",
+        "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3477,6 +3671,8 @@
       "parent": "keith/the-shard-house-by-the-basement-door-parcel",
       "chain": [
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3486,6 +3682,8 @@
       "chain": [
         "keith/the-garage",
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3503,13 +3701,17 @@
       "parent": "keith/the-shard-house-by-the-basement-door-parcel",
       "chain": [
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "keith/the-shard-house-by-the-basement-door-parcel",
-      "parent": "the-town/let-there-be-light",
+      "parent": "kogane/the-swallets",
       "chain": [
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3569,6 +3771,27 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/kinos-workbench",
+      "parent": "kinofire/spin-ghar-manor",
+      "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kinofire/lafayettes-experimental-mail-satchel",
+      "parent": "kinofire/kinos-workbench",
+      "chain": [
+        "kinofire/kinos-workbench",
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -3668,11 +3891,34 @@
       ]
     },
     {
+      "id": "kogane/bucket-drops",
+      "parent": "kogane/the-well-house",
+      "chain": [
+        "kogane/the-well-house",
+        "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/room-for-two-cups",
       "parent": "kogane/the-well-house",
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kogane/rust-under-the-pool-register-entry",
+      "parent": "errant/margin-bird-register",
+      "chain": [
+        "errant/margin-bird-register",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },
@@ -3691,6 +3937,16 @@
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kogane/the-swallets",
+      "parent": "keith/dandelion-sprawl",
+      "chain": [
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3700,6 +3956,8 @@
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3718,13 +3976,17 @@
       "parent": "kogane/the-well-house-parcel",
       "chain": [
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "kogane/the-well-house-parcel",
-      "parent": "the-town/let-there-be-light",
+      "parent": "kogane/the-swallets",
       "chain": [
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3734,6 +3996,8 @@
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3743,6 +4007,8 @@
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -3752,6 +4018,28 @@
       "chain": [
         "kogane/the-well-house",
         "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/exhibit-one-noe",
+      "parent": "kuaka/the-overflow-wing",
+      "chain": [
+        "kuaka/the-overflow-wing",
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/guest-book-entry-one-dom-pidgey",
+      "parent": "kuaka/the-guest-book",
+      "chain": [
+        "kuaka/the-guest-book",
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },
@@ -3760,6 +4048,31 @@
       "parent": "errant/the-unfinished-margin",
       "chain": [
         "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/the-guest-book",
+      "parent": "kuaka/the-flats",
+      "chain": [
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/the-overflow-wing",
+      "parent": "kuaka/the-flats",
+      "chain": [
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "landfall/the-lamp",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -4049,11 +4362,11 @@
     },
     {
       "id": "little-bird/a-cold-cup-on-the-long-bench",
-      "parent": "postmaster/the-waiting-room",
+      "parent": "wildcat/the-wildfire-table",
       "chain": [
-        "postmaster/the-waiting-room",
-        "postmaster/the-waiting-room-parcel",
-        "the-town/the-town-centre",
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -4063,6 +4376,8 @@
       "chain": [
         "keith/the-garage",
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -4109,6 +4424,16 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/four-sweet-potatoes-for-kino",
+      "parent": "kinofire/spin-ghar-manor",
+      "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -4437,6 +4762,13 @@
       "chain": [
         "fabel-of-garrison/the-archway",
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lucien/the-returning-room-parcel",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -6364,6 +6696,8 @@
       "chain": [
         "keith/the-garage",
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -6378,6 +6712,23 @@
       "id": "sahil/the-far-shore",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sam-dawson/sunspot-comet-observatory",
+      "parent": "the-town/the-harbor-reach",
+      "chain": [
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sam-dawson/the-observatory",
+      "parent": "sam-dawson/sunspot-comet-observatory",
+      "chain": [
+        "sam-dawson/sunspot-comet-observatory",
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -6421,6 +6772,14 @@
       "chain": [
         "seraphina/lantern-house",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "seth/seths-folly",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
     },
@@ -6490,6 +6849,71 @@
       "parent": "sol-am-lichterfenster/vesperfen-wetland",
       "chain": [
         "sol-am-lichterfenster/vesperfen-wetland",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/einhornpipi-bottle-01",
+      "parent": "sol-am-lichterfenster/einhornpipi-welcome-tray",
+      "chain": [
+        "sol-am-lichterfenster/einhornpipi-welcome-tray",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/einhornpipi-bottle-02",
+      "parent": "sol-am-lichterfenster/einhornpipi-welcome-tray",
+      "chain": [
+        "sol-am-lichterfenster/einhornpipi-welcome-tray",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/einhornpipi-bottle-03",
+      "parent": "sol-am-lichterfenster/einhornpipi-welcome-tray",
+      "chain": [
+        "sol-am-lichterfenster/einhornpipi-welcome-tray",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/einhornpipi-bottle-04",
+      "parent": "sol-am-lichterfenster/einhornpipi-welcome-tray",
+      "chain": [
+        "sol-am-lichterfenster/einhornpipi-welcome-tray",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/einhornpipi-bottle-05",
+      "parent": "sol-am-lichterfenster/einhornpipi-welcome-tray",
+      "chain": [
+        "sol-am-lichterfenster/einhornpipi-welcome-tray",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/einhornpipi-welcome-tray",
+      "parent": "sol-am-lichterfenster/das-lichterfenster-parcel",
+      "chain": [
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -7326,6 +7750,23 @@
       ]
     },
     {
+      "id": "terror-shark-bip/four-inch-fort",
+      "parent": "fizz/sprocket-pocket",
+      "chain": [
+        "fizz/sprocket-pocket",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "terror-shark-bip/home",
+      "parent": "terror-shark-bip/four-inch-fort",
+      "chain": [
+        "terror-shark-bip/four-inch-fort",
+        "fizz/sprocket-pocket",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-fen/home",
       "parent": "the-fen/the-fen-parcel",
       "chain": [
@@ -7665,6 +8106,17 @@
       ]
     },
     {
+      "id": "the-town/bat",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/becomes",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -7884,6 +8336,16 @@
       ]
     },
     {
+      "id": "the-town/creature",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/crossing",
       "parent": "the-town/paper",
       "chain": [
@@ -7957,6 +8419,16 @@
       "parent": "the-town/postmark-rules",
       "chain": [
         "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/dungeon",
+      "parent": "the-town/mark",
+      "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -9239,6 +9711,17 @@
       "chain": [
         "the-town/town-bulletin",
         "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/raven",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -12390,6 +12873,17 @@
       ]
     },
     {
+      "id": "the-town/wolf",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/worldkeeper",
       "parent": "the-town/meep",
       "chain": [
@@ -13608,9 +14102,17 @@
       ]
     },
     {
-      "id": "wildcat/blackwater-fizz",
-      "parent": "wildcat/the-wildfire-table",
+      "id": "wildcat/blackwater-creek",
+      "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/blackwater-fizz",
+      "parent": "little-bird/a-cold-cup-on-the-long-bench",
+      "chain": [
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13622,6 +14124,7 @@
       "parent": "wildcat/blackwater-fizz",
       "chain": [
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13642,6 +14145,7 @@
       "parent": "wildcat/blackwater-fizz",
       "chain": [
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13664,6 +14168,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13676,6 +14181,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13688,6 +14194,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13700,6 +14207,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13712,6 +14220,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13724,6 +14233,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13736,6 +14246,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13748,6 +14259,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13760,6 +14272,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13772,6 +14285,7 @@
       "chain": [
         "wildcat/blackwater-wayfinder",
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13785,6 +14299,16 @@
         "wildcat/gloamcap-cookie-two",
         "keith/the-garage",
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/glassheart-crater",
+      "parent": "kinofire/the-gloaming",
+      "chain": [
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -13793,6 +14317,7 @@
       "parent": "wildcat/blackwater-fizz",
       "chain": [
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13815,6 +14340,8 @@
       "chain": [
         "keith/the-garage",
         "keith/the-shard-house-by-the-basement-door-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -13823,6 +14350,7 @@
       "parent": "wildcat/blackwater-fizz",
       "chain": [
         "wildcat/blackwater-fizz",
+        "little-bird/a-cold-cup-on-the-long-bench",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",
@@ -13841,6 +14369,15 @@
       "id": "wildcat/the-first-lantern",
       "parent": "kinofire/the-gloaming",
       "chain": [
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/the-glassheart",
+      "parent": "wildcat/glassheart-crater",
+      "chain": [
+        "wildcat/glassheart-crater",
         "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
@@ -13882,6 +14419,36 @@
         "little-pica/the-nest-on-the-middle-terrace",
         "little-pica/the-nest-on-the-middle-terrace-parcel",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "will-the-sailor/ships-bell-by-the-den-door",
+      "parent": "wildcat/den-of-the-wildcat-dwelling",
+      "chain": [
+        "wildcat/den-of-the-wildcat-dwelling",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "will-the-sailor/the-abalone-shell",
+      "parent": "will-the-sailor/the-sloop-at-anchor",
+      "chain": [
+        "will-the-sailor/the-sloop-at-anchor",
+        "will-the-sailor/the-sloop-at-anchor-parcel",
+        "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "will-the-sailor/the-pando-sapling",
+      "parent": "will-the-sailor/the-sloop-at-anchor",
+      "chain": [
+        "will-the-sailor/the-sloop-at-anchor",
+        "will-the-sailor/the-sloop-at-anchor-parcel",
+        "orion-by-the-fire/the-reach",
         "the-town/let-there-be-light"
       ]
     },

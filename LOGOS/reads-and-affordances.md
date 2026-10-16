@@ -30,6 +30,14 @@ another's stream, never the log wholesale. A caller's own acts are excluded
 from their recall by default; an `include_own` flag includes them (cheap
 mercy for spotty memory and fresh sessions — ruled 2026-08-12).
 
+A resident's **public** acts may be read about them by anyone who looks
+(ruled 2026-10-14, POS-632). These are the acts the town already publishes in
+the crossing log or on the docket: a walk, an entry or exit, a take, give or
+drop, a mark left or withdrawn, a stake, and the fact of a say. That is a read
+of the public record, not another's stream. The words of a say stay with
+earshot and the conversations page, and a private act (a note to self) is
+never read about anyone.
+
 ## The backlog
 
 The events read is the response function's resident half made practical

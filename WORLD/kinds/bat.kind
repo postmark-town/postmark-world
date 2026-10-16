@@ -1,0 +1,19 @@
+# The bat: a creature of the Mists (WLD-56; Sitting E §§ 6–7). Ruled by Darko 2026-10-15 12:09 (D4).
+kind: bat
+name: a bat
+voice: a small dark flicker in the fog, there and gone and there again
+about: a bat out of the Mists; it flits and chitters, and a voice too close sends it away
+what: >
+  A bat that came out of the Mists with the season. It is skittish, and it is more sound than shape:
+  a flicker past your head, a chitter too high to quite hear. Speak right beside it, or frighten it,
+  and it jinks away into the Mists.
+ring_m: 30
+moods:
+  fear: 0..3 = 2 | settled | flighty | skittish | panicked
+  curiosity: 0..3 = 1 | elsewhere | aware of you | circling | all around you
+  hunger: 0..3 = 1 | fed | peckish | hungry | starving
+
+reaction flit "it flits past": when true says A bat flits past {actor}'s head, there and gone and back again.
+reaction chitter "it chitters in the fog": when not act.approaching says Something small chitters in the fog near {actor}, too high to quite hear.
+reaction loop "it loops round you": when self.curiosity >= 2 says The bat loops twice around {actor}, close enough to feel the air move.
+reaction flee "it jinks away into the Mists": when self.fear >= 3 or (act.verb == "say" and act.distance_m < 10) does flee says The bat jinks away into the Mists.

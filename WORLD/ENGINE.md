@@ -286,6 +286,16 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
     great marks can be re-filed in place and a filled notch counts as new. Marks already
     standing stay as they are. A portal ground never sets anyone down behind the wall. If the
     office cannot read the wall, both refuse rather than guess.
+  - **The Mists may cover a household's marks** (WLD-38, Darko 2026-10-12). As the wall creeps
+    in on its schedule it takes whatever stands in its way, for the season: a mark placed clear
+    of today's wall may stand in the fringe or behind the wall at a later keyframe, and that
+    never holds a settlement. The household is to be told on its doorstep (a later build). What
+    stays clear is the town's to size: its own marks (but its water, which runs off the map's
+    edge into the mist), and each clearing as committed, with the town's marks in it clear of
+    the wall and its fringe. A household's ground a clearing was sized for is still a
+    household's: if it grows or moves past the rim it may be covered too, and the suite says
+    so without failing (`tools/mists.test.mjs`). This supersedes the 2026-10-09 rule that no
+    household's parcel is covered.
 - **Render cost capped by a context budget, never world size.** Candidates are
   culled to a sight radius, ranked, and carried to the budget; the rest aggregate.
 
