@@ -6988,6 +6988,44 @@ export function withTownBodies(earshot = [], town = []) {
   return out;
 }
 
+// ── A LANDING IS DRAWN WITH THE ROOM (WLD-63 row 68 (b), Darko 2026-10-16) ──
+//
+// Passing a door, the office sets you down and says where (`landed`, or an
+// exit's `set_down`). The page used to learn the room from the ledger poll and
+// the body from the walkers poll, 15 and 30 s apart, so for a while you stood
+// outside the room it showed. These three let one render draw both.
+
+/** The reader's body set down at a landing, in the walkers list the map draws. Pure. */
+export function placeLanded(rows = [], handle = null, landed = null) {
+  const x = Number(landed?.x), y = Number(landed?.y);
+  if (!handle || !Number.isFinite(x) || !Number.isFinite(y)) return rows;
+  let found = false;
+  const at = { x, y, moving: false, standing: true, remaining_m: 0 };
+  const out = rows.map((r) => (r?.handle === handle ? ((found = true), { ...r, ...at }) : r));
+  return found ? out : [...out, { handle, ...at }];
+}
+
+/** A landing the walkers read reports for this reader that this page has not drawn yet:
+ *  its instant, or null. Pure. */
+export function freshLanding(bodies = [], handle = null, seenIso = null) {
+  const me = (bodies ?? []).find((b) => b?.handle === handle);
+  const iso = me?.landed?.iso ?? null;
+  return iso && iso !== seenIso ? iso : null;
+}
+
+/** LEAVING A DUNGEON ASKS FIRST (row 72): the office's own words, then go or stay. Null
+ *  for any answer that is not asking. Pure. */
+export function exitConfirmSheetHTML(answer = {}, markId = "") {
+  if (answer?.awaiting?.effect !== "confirm") return null;
+  return `<div class="wv-cross-sheet is-terms wv-exit-confirm-sheet" data-for="${esc(markId)}">`
+    + `<div class="wv-cross-head">leave the whole ${esc(String(answer.dungeon ?? "dungeon"))}?</div>`
+    + `<p class="wv-cross-body">${esc(String(answer.awaiting.because ?? ""))}</p>`
+    + `<div class="wv-cross-row">`
+    + `<button type="button" class="ctl wv-exit-confirm" data-exit-confirm="${esc(markId)}">go</button>`
+    + `<button type="button" class="ctl wv-exit-stay">stay</button>`
+    + `</div></div>`;
+}
+
 export function walkersFromPresent(present = {}, { self = null } = {}) {
   const rows = Array.isArray(present?.residents) ? present.residents : [];
   const out = [];
@@ -8233,6 +8271,9 @@ export function mountViewer(appEl) {
       // CROSSED. The ledger is the answer, so go and read it rather than
       // assuming — and then the interior takes over on its own, off insideOf,
       // because that path already exists and is the one the record drives.
+      // A passage says where it set you down (row 68 (b)): the body goes there
+      // in the same render that mounts the room, never a poll later.
+      if (answer.landed?.recorded) { walkState.walkers = placeLanded(walkState.walkers, state.handle, answer.landed); walkState.selfLive = null; }
       await loadEnterExitLedger();
       renderCurrent();
     } catch (err) {
@@ -8280,14 +8321,27 @@ export function mountViewer(appEl) {
     }
   }
 
-  async function stepOutside(markId, button) {
+  async function stepOutside(markId, button, { confirm = false } = {}) {
     const room = markId && byId.get(markId);
     if (!room) return;
     const label = button?.textContent;
     if (button) { button.disabled = true; button.textContent = "stepping outside…"; }
     try {
-      const response = await apexAct("exit", { mark: markId });
+      const response = await apexAct("exit", { mark: markId, ...(confirm ? { confirm: true } : {}) });
+      const answer = response?.body ?? {};
       if (response?.error) throw new Error(response.defect ?? response.error);
+      if (answer.error === "bounce") throw new Error(answer.defect ?? answer.error);
+      // LEAVING A DUNGEON ASKS FIRST (WLD-5 21:13; row 72): the first answer writes
+      // nothing and says what will happen. It is shown, and "go" sends the word.
+      const ask = exitConfirmSheetHTML(answer, markId);
+      if (ask) {
+        const row = button?.closest(".wv-int-exit");
+        row?.querySelector(".wv-exit-confirm-sheet")?.remove();
+        row?.insertAdjacentHTML("beforeend", ask);
+        if (button) { button.disabled = false; button.textContent = label ?? "↤ step outside"; }
+        return;
+      }
+      if (answer.set_down?.recorded) { walkState.walkers = placeLanded(walkState.walkers, state.handle, answer.set_down); walkState.selfLive = null; }
       // the ledger is the answer, so go and read it rather than assuming the act
       // landed the way this page expected
       await loadEnterExitLedger();
@@ -10818,6 +10872,8 @@ export function mountViewer(appEl) {
   let walkState = {
     at: null,
     walkers: [],
+    // the instant of the last landing of the reader this page has drawn (row 68 (b))
+    landedIso: null,
     // the reader's own body while it walks, from /world/walkers (null when standing)
     selfLive: null,
     timer: null,
@@ -11740,7 +11796,14 @@ export function mountViewer(appEl) {
               }
               // the town's bodies, earshot's rows winning for their handles; a
               // town door that does not answer leaves the earshot answer alone
-              takeWalkers(withTownBodies(rows, (await town) ?? []));
+              const bodies = (await town) ?? [];
+              // A LANDING THIS PAGE DID NOT MAKE (the arrival tick's passage, another
+              // tab): the room is read at once, so the scene and the body change in
+              // ONE render rather than on two polls 15 s apart (row 68 (b))
+              const landedIso = freshLanding(bodies, state.handle, walkState.landedIso ?? null);
+              if (landedIso) { walkState.landedIso = landedIso; await loadEnterExitLedger(); }
+              takeWalkers(withTownBodies(rows, bodies));
+              if (landedIso) renderCurrent();
             }
           }
         } catch { /* a poll miss is silent — the last good reading stands */ }
@@ -13659,6 +13722,10 @@ export function mountViewer(appEl) {
     if (cancelBtn) { e.stopPropagation(); cancelBtn.closest(".wv-cross-sheet")?.remove(); return; }
     const exitBtn = e.target.closest(".wv-int-exit-btn");
     if (exitBtn) { stepOutside(exitBtn.dataset.mark, exitBtn); return; }
+    const exitGo = e.target.closest("[data-exit-confirm]");
+    if (exitGo) { e.stopPropagation(); stepOutside(exitGo.dataset.exitConfirm, exitGo, { confirm: true }); return; }
+    const exitStay = e.target.closest(".wv-exit-stay");
+    if (exitStay) { e.stopPropagation(); exitStay.closest(".wv-exit-confirm-sheet")?.remove(); return; }
     if (e.target.closest(".wv-dev-toggle")) { const dev = $(root, ".wv-dev"); dev.hidden = !dev.hidden; if (!dev.dataset.built) { buildDevPane(); dev.dataset.built = "1"; } syncDevReadouts(); return; }
     if (e.target.closest(".wv-dev-reset")) {
       state.dials = { ...DIALS };
