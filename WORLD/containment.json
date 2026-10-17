@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1718,
+  "count": 1719,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -9658,6 +9658,15 @@
       "parent": "the-town/stake",
       "chain": [
         "the-town/stake",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/land",
+      "parent": "the-town/postmark-edge",
+      "chain": [
         "the-town/postmark-edge",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"

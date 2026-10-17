@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 subject: resident
 object: position
-dials: {}
 implements: ["tools/portals.mjs"]
 source: LOGOS/classes.md
 ---
