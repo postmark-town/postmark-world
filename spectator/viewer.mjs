@@ -741,10 +741,42 @@ function settlementChip(at) {
 // this edge for ANYTHING that departs. it should sit under resident") — the
 // vessel precedent already said so: the post-office sails at its own 405.
 export const STRIDE_CLASS_ID = "the-town/resident";
-export function departPaceKm(marks) {
-  const byMarkId = markIndex(marks);
-  const pace = Number(byMarkId.get(STRIDE_CLASS_ID)?.dials?.pace_km_per_crossing);
-  return Number.isFinite(pace) && pace > 0 ? pace : null;
+//
+// WHERE THE STRIDE IS READ (WLD-29, the pointer model). The page asks its own
+// door for dials — GET /world/dials, every published mark of the office's
+// blessed settlement that carries dials, id → dials (the "digest" below) —
+// because no default read carries a dial table, and the resident path's index
+// never held the class (the office used to smuggle it into `records` by name).
+// The table is asked FIRST, and a valid stride there wins over any record.
+// The policy, all three arms:
+//   digest names the class   its pace if valid → "digest"; malformed → null
+//                            ("malformed": an honest unknown, never patched
+//                            from a record the read did not vouch for)
+//   no digest entry          the index's record (the spectator's fold, an
+//                            older office) → "record", or null if malformed
+//   neither                  null → "missing"
+// A null is the desk's honest unknown: the legacy 15 km stride and its "?".
+//
+// THE ONE WAY THIS PAGE READS A RECORD'S DIALS (WLD-29). Every consumer of a
+// mark's dials asks `dialOf` — the /world/dials table first, the index's record
+// only when the table does not name the mark — so no pane can quietly lean on a
+// record the resident read does not carry. tools/read-middle.test.mjs pins
+// that nothing else in this file reads `.dials` off a record.
+const isDialsObject = (d) => d && typeof d === "object" && !Array.isArray(d);
+export function dialOf({ dials = null, marks = null } = {}, id) {
+  if (isDialsObject(dials) && Object.hasOwn(dials, id)) return { dials: isDialsObject(dials[id]) ? dials[id] : null, source: "digest" };
+  const rec = marks ? markIndex(marks).get(id) : null;
+  return rec ? { dials: isDialsObject(rec.dials) ? rec.dials : null, source: "record" } : { dials: null, source: "missing" };
+}
+const paceOf = (d) => { const n = Number(d?.pace_km_per_crossing); return Number.isFinite(n) && n > 0 ? n : null; };
+export function strideFrom({ dials = null, marks = null } = {}) {
+  const got = dialOf({ dials, marks }, STRIDE_CLASS_ID);
+  if (got.source === "missing") return { pace: null, source: "missing" };
+  const pace = paceOf(got.dials);
+  return { pace, source: pace == null ? "malformed" : got.source };
+}
+export function departPaceKm(marks, dials = null) {
+  return strideFrom({ dials, marks }).pace;
 }
 
 // `at` is the clock (the live crossing unless a caller pins one, as a test must:
@@ -2258,7 +2290,7 @@ export function homeFaceSVG({ w, h, roof } = HOME_CARD) {
   return `<rect x="${r(x0)}" y="${r(y0)}" width="${envW}" height="${envH}" rx="2" class="ov-home-envelope"/>`
     + `<path d="M ${r(x0 + inx)} ${r(y0 + iny)} L 0 ${r(y0 + deep)} L ${r(x0 + envW - inx)} ${r(y0 + iny)}" class="ov-home-flap"/>`;
 }
-export function overlayHomeCardSVG({ at, id, label = "", image = null, lit = false, fan = null, title = null, classes = "", mine = false, thumb = null } = {}) {
+export function overlayHomeCardSVG({ at, id, label = "", image = null, lit = false, light = null, lightTitle = "", fan = null, title = null, classes = "", mine = false, thumb = null } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
   const { w, h, roof } = HOME_CARD;
@@ -2276,7 +2308,8 @@ export function overlayHomeCardSVG({ at, id, label = "", image = null, lit = fal
       + `<image ${thumbImageAttrs(image, thumb)} x="${x0}" y="${top}" width="${w}" height="${h + roof}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
     : `<path d="${d}" class="ov-home-blank"/>${homeFaceSVG()}`;
   return `<g transform="translate(${x} ${y})"><g class="ov-s${mine ? " ov-mine" : ""}">`
-    + `<g class="ov-home${lit ? " lit" : ""}${image ? "" : " no-art"}" data-id="${esc(id)}" transform="translate(${dx} ${dy})">`
+    + `<g class="ov-home${lit ? " lit" : ""}${image ? "" : " no-art"}" data-id="${esc(id)}"${light ? ` data-light="${esc(light)}"` : ""} transform="translate(${dx} ${dy})">`
+    + `<title class="ov-light-note">${esc(lightTitle)}</title>`
     + art
     + `<path d="${d}" class="ov-home-frame"/>`
     + (label ? `<text class="ov-home-label" y="${base + 11}" text-anchor="middle">${esc(label)}</text>` : "")
@@ -2718,23 +2751,49 @@ export function townHouseMarks(marks = [], world = null) {
   return out;
 }
 
-/** HOME: a walker of the parcel's household, at rest, inside the parcel. Pure. */
-export function houseIsLit(parcel, walkers = [], householdOf = null) {
-  const w = Number(parcel?.extent?.w), h = Number(parcel?.extent?.h);
-  const cx = Number(parcel?.at?.x), cy = Number(parcel?.at?.y);
-  if (![cx, cy, w, h].every(Number.isFinite)) return false;
-  const who = String(parcel?.household ?? parcel?.by ?? "");
-  if (!who) return false;
-  return (walkers ?? []).some((k) => {
-    if (!k) return false;
-    const moving = k.moving ?? (!k.arrived && !k.standing);
-    if (moving) return false;
-    const handle = String(k.handle ?? "");
-    const hh = householdOf ? String(householdOf(handle) ?? "") : "";
-    if (handle !== who && hh !== who) return false;
-    const x = Number(k.x), y = Number(k.y);
-    return Number.isFinite(x) && Number.isFinite(y) && Math.abs(x - cx) <= w / 2 && Math.abs(y - cy) <= h / 2;
-  });
+// ── THE PORCH LIGHT IS HOUSEHOLD ACTIVITY (Darko, 2026-10-08; WLD-29) ──────
+//
+// Not a walker resting inside: the house is lit when its household acted in the
+// office's crossing C or the one before (Wright, 2026-10-13T11:04Z). The page
+// asks GET /world/lights (the pointer model, Wright AUTHORITY
+// 2026-10-13T19:16:02.257Z): `{ crossing, window, lit: [<household keys>] }`,
+// the lit keys only. A house joins it by the parcel's OWN canonical household
+// key, `declared_household` (`hh:<slug>`, or `solo:<handle>` for a house of one)
+// — never a resident→house map, and never a solo key guessed from the owner's
+// handle. Four states, and only one is a light:
+//   "lit"         its key is in the answer's lit list
+//   "dark"        a known answer that does not list it
+//   "unknown"     no answer, an unread store (`lit: null`), or a parcel with no
+//                 declared household key
+//   "historical"  a past crossing's answer: activity isn't kept per crossing
+// The answer's own crossing is the light's clock — never the browser's.
+export const LIGHT_WINDOW = 1;
+export function houseLight(parcel, lights) {
+  if (!lights || typeof lights !== "object") return "unknown";
+  if (lights.historical) return "historical";
+  if (!Array.isArray(lights.lit) || !Number.isInteger(lights.crossing)) return "unknown";
+  const key = typeof parcel?.declared_household === "string" && parcel.declared_household ? parcel.declared_household : null;
+  if (!key) return "unknown";
+  return lights.lit.includes(key) ? "lit" : "dark";
+}
+export const houseIsLit = (parcel, lights) => houseLight(parcel, lights) === "lit";
+/** What a home card says about a light it does not show. */
+export function lightNote(light, lights = null) {
+  if (light === "historical") return lights?.note ?? "no porch lights on a past crossing: activity isn't kept per crossing";
+  if (light === "unknown") return lights?.unavailable ?? "this household's activity is not known just now";
+  return "";
+}
+/**
+ * Which lights the page asks for, and under what key: the LIVE page asks the
+ * bare door, so the office's clock decides today's crossing (never the
+ * browser's); a page the time-travel dial has pinned asks that crossing. The key
+ * names the office and the ask, so another office's or crossing's answer is
+ * never shown for this one.
+ */
+export function lightsRequest({ office = "", crossing = 0, override = false } = {}) {
+  return override
+    ? { key: `${office}|at:${crossing}`, path: `/world/lights?crossing=${encodeURIComponent(crossing)}` }
+    : { key: `${office}|live:${crossing}`, path: "/world/lights" };
 }
 
 export function markerScale(zoomK) {
@@ -5871,6 +5930,8 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
    only what a house wears when it has nothing to show. */
 .ov-home-blank { fill:#0d1426; }
 .ov-home.lit .ov-home-frame { stroke:#ffcf5c; stroke-width:2.2; filter:drop-shadow(0 0 3px #ffb84a); }
+/* WLD-29: a light the page cannot know is not drawn as a known dark house */
+.ov-home[data-light="unknown"] .ov-home-frame, .ov-home[data-light="historical"] .ov-home-frame { stroke-dasharray:3 2; }
 .ov-home-label { font:600 9px Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif; fill:#241c10;
   paint-order:stroke; stroke:#ece0c4; stroke-width:2.5px; stroke-linejoin:round; }
 /* the far tier's house: the card's own roofline, filled, at half size. It reads
@@ -7104,6 +7165,16 @@ export function mountViewer(appEl) {
   shadowHost.appendChild(wrap);
 
   const root = shadowHost;
+  // ── THE PAGE'S TWO SOURCES (WLD-29, the pointer model) ────────────────────
+  // No default read carries a dial table or the town's activity. The page asks
+  // GET /world/dials (the stride) and GET /world/lights (the porch lights) — each
+  // answer held with the key it was ASKED under (the office, and for the lights
+  // the crossing asked), and never shown for another.
+  let lightsHeld = null;                // { key, lights }
+  let lightsPending = null;             // { key, promise }
+  let dialsHeld = null;                 // { key, answer }
+  let dialsPending = null;              // { key, promise }
+  let stopped = false;                  // set by the handle's stop(): nothing asks or publishes after it
   const state = {
     cam: { x: 0, y: 0 },
     step: STEP_NOTCHES[STEP_DEFAULT_I], // 100 m
@@ -10126,7 +10197,7 @@ export function mountViewer(appEl) {
       label: parcelCardLabel(parcel, data?.worldState?.determined ?? {}),
       image: room ? homesPicture(parcel, homes) : null,
       thumb: thumbFor(CARD_UNITS, mine),
-      lit: houseIsLit(parcel, walkState.walkers, (h) => faceOf(h).household),
+      ...lightOf(parcel),
       fan, title,
     });
   }
@@ -10996,7 +11067,7 @@ export function mountViewer(appEl) {
       destination: walkState.destination,
       skeleton: data?.skeleton,
       residentMode: canAct(),
-      paceKm: departPaceKm(byId),
+      paceKm: departPaceKm(byId, currentReadDials()),
     });
   }
 
@@ -11626,16 +11697,102 @@ export function mountViewer(appEl) {
         `${drawnWalkers.length} on the map, ${on} on the road, ${still} at rest`;
   }
 
-  // The lights read the walkers, and the walkers arrive after the first overlay
-  // is drawn (a poll, not the record) — so they are trued here, on the cards
-  // already standing, rather than by rebuilding the overlay.
+  // The lights read GET /world/lights, which answers after the first overlay
+  // is drawn (and is refreshed) — so they are trued here, on the cards already
+  // standing, rather than by rebuilding the overlay. The same `lightOf` the
+  // draw uses: one answer, initial paint and update alike.
   function syncHouseLights() {
     if (!mapCtx?.overlay) return;
     for (const g of mapCtx.overlay.querySelectorAll(".ov-home[data-id]")) {
       const full = byId.get(g.dataset.id);
       if (!full) continue;
-      g.classList.toggle("lit", houseIsLit(full, walkState.walkers, (h) => faceOf(h).household));
+      const { lit, light, lightTitle } = lightOf(full);
+      g.classList.toggle("lit", lit);
+      g.dataset.light = light;
+      const note = g.querySelector("title.ov-light-note");
+      if (note) note.textContent = lightTitle;
     }
+  }
+
+  // ── THE LIGHTS HELD, AND WHOSE (WLD-29) ────────────────────────────────────
+  // One answer of GET /world/lights, keyed by the office it came from and the
+  // crossing asked (lightsRequest). A change of either asks again and shows
+  // "unknown" meanwhile — never another office's or crossing's lights.
+  const lightsAsk = () => lightsRequest({ office: officeBase(), crossing: state.crossing, override: Boolean(state.crossingOverride) });
+  function takeLights(key, lights) {
+    if (stopped) return;                        // the mount is gone: a late answer has nowhere to land
+    if (key !== lightsAsk().key) return;        // asked for another office or crossing
+    lightsHeld = { key, lights: lights && typeof lights === "object" && !lights.error ? lights : null };
+    syncHouseLights();
+  }
+  function refreshLights() {
+    if (stopped) return null;                   // a stopped viewer asks the office nothing
+    const { key, path } = lightsAsk();
+    if (lightsPending?.key === key) return lightsPending.promise;
+    const promise = fetch(officeUrl(path), { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => takeLights(key, j))
+      .catch(() => takeLights(key, null))
+      .finally(() => { if (lightsPending?.key === key) lightsPending = null; });
+    lightsPending = { key, promise };
+    return promise;
+  }
+  function currentLights() {
+    if (lightsHeld?.key === lightsAsk().key) return lightsHeld.lights;
+    refreshLights();
+    return null;
+  }
+  // AN UNKNOWN ANSWER IS NOT HELD FOR THE WHOLE BEAT (WLD-29 review): a slow or
+  // unread store (`lit: null`, `unavailable`) or a failed fetch is asked again on
+  // the clock's next 30 s tick, not five minutes later. A historical answer is
+  // known (it says so), so it waits like any other.
+  function lightsRetryDue() {
+    const held = lightsHeld;
+    if (!held || held.key !== lightsAsk().key) return false;
+    return held.lights == null || (held.lights.lit == null && held.lights.historical !== true);
+  }
+  function lightOf(parcel) {
+    const lights = currentLights();
+    const light = houseLight(parcel, lights);
+    return { lit: light === "lit", light, lightTitle: lightNote(light, lights) };
+  }
+
+  // ── THE DIALS HELD, AND WHOSE (WLD-29) ─────────────────────────────────────
+  // GET /world/dials: one office's blessed settlement's dial table, keyed by the
+  // office asked. The stride is read from it on every path (strideFrom § the
+  // policy); until it lands, or when it cannot be read, the stride is the
+  // index's own record or the honest unknown — never another office's table.
+  function takeDials(key, answer) {
+    if (stopped) return;
+    if (key !== officeBase()) return;           // asked of another office
+    dialsHeld = { key, answer: answer && typeof answer === "object" && !answer.error ? answer : null };
+    // a desk already open re-prices its leg with the table's stride
+    if (walkState.destination || state.arming === "walk") renderWalkDestination();
+  }
+  function refreshDials() {
+    if (stopped) return null;
+    const key = officeBase();
+    if (dialsPending?.key === key) return dialsPending.promise;
+    const promise = fetch(officeUrl("/world/dials"), { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => takeDials(key, j))
+      .catch(() => takeDials(key, null))
+      .finally(() => { if (dialsPending?.key === key) dialsPending = null; });
+    dialsPending = { key, promise };
+    return promise;
+  }
+  function currentReadDials() {
+    if (dialsHeld?.key === officeBase()) return dialsHeld.answer?.dials ?? null;
+    refreshDials();
+    return null;
+  }
+  // A FAILED TABLE IS NOT HELD FOR THE MOUNT (WLD-29 review): a GET /world/dials
+  // that failed or answered an error is held as null, and the desk would show the
+  // legacy 15 km "?" until a reload. It is asked again on the clock's next 30 s
+  // tick, as an unknown light is; a table that answered is kept.
+  function dialsRetryDue() {
+    const held = dialsHeld;
+    return Boolean(held) && held.key === officeBase() && held.answer == null;
   }
 
   function drawWalkPreview() {
@@ -12053,7 +12210,7 @@ export function mountViewer(appEl) {
       destination: { x: point.x, y: point.y },
       skeleton: data?.skeleton,
       residentMode: canAct(),
-      paceKm: departPaceKm(byId),
+      paceKm: departPaceKm(byId, currentReadDials()),
     });
   }
 
@@ -13149,7 +13306,7 @@ export function mountViewer(appEl) {
     const from = byId.get(TOUR_WALK_LEG.from), to = byId.get(TOUR_WALK_LEG.to);
     if (!desk || !from?.at || !to?.at) return null;
     const wasHidden = desk.hidden, wasHTML = desk.innerHTML;
-    const leg = previewWalkLeg({ from: from.at, toward: to.at, targetExtent: to.extent ?? null, paceKm: departPaceKm(byId) });
+    const leg = previewWalkLeg({ from: from.at, toward: to.at, targetExtent: to.extent ?? null, paceKm: departPaceKm(byId, currentReadDials()) });
     const parts = walkLegParts(leg);
     const bearing = quantizeBearing(bearingDeg(to.at.x - from.at.x, to.at.y - from.at.y), state.dials.bearing_points);
     const arrow = bearing ? `<span class="wv-walk-dir" title="${esc(BEARING_LONG[bearing] ?? bearing)}">${bearingArrow(bearing)}</span>` : "";
@@ -13997,7 +14154,10 @@ export function mountViewer(appEl) {
   // EMBODIED: who and when, never where. See `residentReadKey`'s note and the
   // office's own refusal — "your eyes ride your body".
   function residentStandpointKey(_standpoint, handle) {
-    return residentReadKey({ handle, crossing: state.crossing });
+    // THE OFFICE IS PART OF WHOSE READ IT IS (WLD-29 first review, R2): a read
+    // and its digests are one office's answer, never another's — switching the
+    // office base asks again rather than serving the last office's law.
+    return `${officeBase()}#${residentReadKey({ handle, crossing: state.crossing })}`;
   }
 
   /**
@@ -14007,6 +14167,9 @@ export function mountViewer(appEl) {
    */
   function loadResidentRead(standpoint, handle) {
     const key = residentStandpointKey(standpoint, handle);
+    // WHO ASKED, fixed BEFORE the request leaves (R2): the office, actor and
+    // crossing this answer will belong to — never read again after the await
+    const askedOffice = officeBase();
     if (readCache.has(key)) return Promise.resolve(readCache.get(key));
     if (readPending.has(key)) return readPending.get(key);
     // NO x/y. The office stands the resident where their BODY is and refuses
@@ -14024,7 +14187,7 @@ export function mountViewer(appEl) {
         // "what is this id", and on this path this is the only thing that fills
         // it — the records the read carries, plus the resident's own rows.
         // `homeSet` follows from the same set, so green still means home.
-        if (handle === state.handle) {
+        if (handle === state.handle && officeBase() === askedOffice) {
           byId = residentById(read, mineSet.marks);
           loadTownHouses();      // once; fills + repaints when it lands
           withTownHouses();      // and at once, when it already has
@@ -14353,7 +14516,7 @@ export function mountViewer(appEl) {
     // before anything is drawn, and `homeSet` with it or green stops meaning
     // home. The read is normally cached, so this costs nothing; where it is not
     // the compose pass asks for it and this repeats when it lands.
-    const cachedRead = readCache.get(residentReadKey({ handle: actor, crossing: state.crossing }));
+    const cachedRead = readCache.get(residentStandpointKey(null, actor));   // this office's read only (R2)
     if (cachedRead) {
       byId = residentById(cachedRead, mineSet.marks);
       withTownHouses();
@@ -15199,6 +15362,20 @@ export function mountViewer(appEl) {
   // re-tell if the record advanced. On /WORLD or RAW we don't poll (don't hammer a
   // CDN / GitHub). Every re-tell preserves standpoint / step / mode / dials / scroll.
   let lastLive = liveCrossing(), tick = 0;
+  // THE LIGHTS REFRESH (WLD-29): GET /world/lights is asked again on its own
+  // beat, so a house that acts lights without a reload, a sign-out or a detour
+  // through the Spectator. Activity is kept by the crossing, so minutes is fine
+  // grain; a crossing change asks at once (lightsRequest's key moves).
+  // `pm.world.activity_ms` (≥ 1 s) shortens it for a rig that must watch an
+  // update land; unset, which is every real page, it is five minutes. The
+  // dials are asked once per office (refreshDials), here at the mount.
+  const ACTIVITY_REFRESH_MS = (() => {
+    try { const v = Number(localStorage.getItem("pm.world.activity_ms")); if (Number.isFinite(v) && v >= 1000) return v; } catch { /* no storage */ }
+    return 5 * 60 * 1000;
+  })();
+  const lightsTimer = setInterval(() => { refreshLights(); }, ACTIVITY_REFRESH_MS);
+  lightsTimer.unref?.();
+  refreshDials();
   const clock = setInterval(async () => {
     tick++;
     const nl = liveCrossing();
@@ -15207,6 +15384,8 @@ export function mountViewer(appEl) {
     // the NUMBER only moves when a settlement actually lands, so it is refreshed
     // on the same slower beat the fold uses
     if (!$(root, ".settlenow")?.hidden) renderSettlementChip();
+    if (lightsRetryDue()) refreshLights(); // an unknown light is asked again now, not at the five-minute beat
+    if (dialsRetryDue()) refreshDials();   // a failed dial table too, not only at the next mount
     if (tick % 20 === 0) loadSettlements().then(renderSettlementChip);
     // the talk moves faster than the record: every other tick (~60 s), gentler
     // than the conversations page's own 7 s poll — this is a map, not a feed,
@@ -15312,8 +15491,10 @@ export function mountViewer(appEl) {
     // taken — the instrument behind tools/walk-layer-once.test.mjs (#2912)
     walkDraws: () => ({ ...walkDraws }),
     stop: () => {
+      stopped = true;                    // no late answer publishes into a stopped mount (WLD-29, R3)
       clearInterval(clock);
       clearInterval(walkState.timer);
+      clearInterval(lightsTimer);
       document.removeEventListener("keydown", onViewerKeydown);
       window.removeEventListener("resize", onViewerResize);
       window.removeEventListener("pm:stood-out", onStoodOut);

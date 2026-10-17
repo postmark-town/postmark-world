@@ -66,6 +66,9 @@ function serveFile(res, relPath) {
 const WORLD_DIR = process.env.WORLD_DIR ? normalize(process.env.WORLD_DIR) : null;
 function serveWorld(res, file) {
   if (!WORLD_DIR) return serveFile(res, "WORLD/" + file);
+  // A SYNTHETIC WORLD IS WHOLE (WLD-29): every record file this server hands
+  // the page — the fold, the skeleton AND the ledgers — comes from WORLD_DIR
+  // when it is set, so a fixture never quietly mixes in this clone's real walks.
   const abs = join(WORLD_DIR, file);
   if (!existsSync(abs)) return json(res, 404, { error: `not found: ${abs}` });
   send(res, 200, readFileSync(abs), MIME[".json"]);
@@ -133,7 +136,7 @@ createServer(async (req, res) => {
     // what the page needs is the record, not this server's opinion of it — and
     // serving it here is what lets a local read stand on THIS clone's disk
     // instead of falling through to the published raw file.
-    if (p === "/WORLD/enter-exit-ledger.md") return serveFile(res, "WORLD/enter-exit-ledger.md");
+    if (p === "/WORLD/enter-exit-ledger.md") return serveWorld(res, "enter-exit-ledger.md");
     // ONE NAME. The retired `threshold` spelling was served here too while the
     // record answered to both, and the twin file it read is deleted (2026-08-28,
     // #2152). A route to a file that is not in this package would serve a 404
@@ -147,7 +150,7 @@ createServer(async (req, res) => {
     // got a 404, and quietly read the world repo's main tip instead — a
     // different world from the one on this clone's disk. The fallback is gone
     // now, so this route is not a convenience; it is the answer.
-    if (p === "/WORLD/walk-ledger.md") return serveFile(res, "WORLD/walk-ledger.md");
+    if (p === "/WORLD/walk-ledger.md") return serveWorld(res, "walk-ledger.md");
     // `/seeding/manifest.json` was served here beside it, for the viewer's
     // green. The manifest is deleted (postmark#3025) — green is the fold's
     // answer now — so the route goes with the file rather than answering 404.
@@ -168,12 +171,12 @@ createServer(async (req, res) => {
       const at = raw === null ? fractionalCrossing() : Number(raw);
       if (!Number.isFinite(at) || at < 0) return json(res, 400, { error: "at must be a fractional crossing >= 0" });
       let text = "";
-      try { text = readFileSync(join(ROOT, "WORLD/walk-ledger.md"), "utf8"); } catch { /* no ledger yet */ }
+      try { text = readFileSync(WORLD_DIR ? join(WORLD_DIR, "walk-ledger.md") : join(ROOT, "WORLD/walk-ledger.md"), "utf8"); } catch { /* no ledger yet */ }
       const { departures, unrecognized } = parseWalkLedger(text);
       // the fold, for everyone standing on their own ground; a spectator with no
       // world-state still gets the walk ledger's answer rather than an error
       let worldState = null;
-      try { worldState = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")); } catch { /* ledger only */ }
+      try { worldState = JSON.parse(readFileSync(WORLD_DIR ? join(WORLD_DIR, "world-state.json") : join(ROOT, "WORLD/world-state.json"), "utf8")); } catch { /* ledger only */ }
       const roster = [
         ...departures.map((d) => d.handle),
         ...((worldState?.parcels ?? []).map((pc) => pc.household)),
