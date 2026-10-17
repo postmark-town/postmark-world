@@ -28,11 +28,12 @@ the constitutional process named in [INDEX.md](INDEX.md).
 |---|---|---|
 | `INDEX.md` | **live doctrine** | Compact authority map and atomic laws. |
 | `the-north-star.md`, `the-promises.md`, `the-derivation.md` | **live doctrine** | Purpose, promises, and the argument beneath the economy. |
-| `three-layers.md`, `kinds.md`, `tiers.md`, `edit-law.md`, `state-and-time.md`, `the-response-function.md`, `reads-and-affordances.md` | **live doctrine** | The generative model and its read surface. |
+| `three-layers.md`, `lifetimes.md`, `tiers.md`, `edit-law.md`, `state-and-time.md`, `the-response-function.md`, `reads-and-affordances.md` | **live doctrine** | The generative model and its read surface. |
 | `classes.md` | **live compilation with inline open matter** | Class grammar, dated census, rulings, and explicitly marked proposals share one long file. Its 115-node prose census predates the current 153 class marks and is not a current inventory. “Proposed,” “unruled,” and “awaiting” remain non-law until ruled. |
 | `conflict-matrix.md` | **live doctrine with inline open matter** | The standing conflict model also names unresolved incumbency and role questions. |
 | `the-web-of-towns.md` | **live doctrine** | The harbor vocabulary and ownership rules. It was omitted from the older index table, not retired. |
 | `graph/metamodel.json` | **working model; review required** | Hand-maintained graph sketch. It has no schema version or freshness receipt and still contains pre-freeze filing/re-homing concepts. Do not cite it over the prose atoms or current renderings. |
+| `kinds.md` | **seasonal pointer** | Not doctrine: a short pointer to `lifetimes.md` kept for a season so older mentions resolve. It also carries the one Rendered line the three marks citing `source: LOGOS/kinds.md` still need (mark-lint's source↔Rendered fidelity seam). |
 | `DRAFT-REPORT.md` | **historical** | Preserved 2026-08-09 working record; its opening warning governs. |
 | `RECONCILIATION.md` | **historical** | Preserved 2026-08-09 reconciliation; superseded by later surveys and rulings. |
 

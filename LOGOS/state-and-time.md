@@ -21,7 +21,8 @@ the record's shape as `the-town/the-record-shape` (planted 2026-08-25)
 Everything that ever happened is an action record —
 `{seq, actor, witnesses, class, payload}` — in one of the **two lawful
 substrates**: git commits (structure acts) and the STATE log (dynamic acts).
-Which substrate a class writes is a class param, never an instance's choice.
+When a class's acts become canon (`canon: live | settled`,
+[lifetimes.md](lifetimes.md)) is a class param, never an instance's choice.
 The log is append-only and self-witnessing: an appended record needs no
 second record to prove it, and it is never edited — corrections are
 superseding actions at the same level, **latest appended wins** (file order
@@ -53,8 +54,20 @@ evaluated by the response function
 state ([conflict-matrix.md](conflict-matrix.md)), and every sketchbook is
 rebased onto it. Declarations land in the author's sovereign space instantly;
 the town sees them at the crossing. Classes whose claims cannot conflict
-canonize trivially and read as continuous — the fleeting kinds live at
-conversation speed without any second clock.
+canonize trivially (`canon: live`) and read as continuous — the fleeting
+lifetime lives at conversation speed without any second clock.
+
+**A crossing judges in one order: town, then sovereign, then market**
+(ruled 2026-10-14 14:51, WLD-51). Darko: *"we should do all of the town level
+stuff first, then all of the sovereign level or parcel level stuff, and then
+finally the market stuff. I think that should always just be the sequence
+because that covers the basis of like weird things getting overruled later
+in the sequencing."* The case that raised it, in Wright's settled reading
+(WLD-51's instance line; basis: Darko, *"if we consider the, the new parcel
+first, then the mark stays"*): a parcel published in the same crossing around
+a ✦0 commons mark protects that mark that crossing, because the parcel is
+considered first. The sweep carries the order
+(`tools/settlement-sweep.mjs` § THE ORDER).
 
 The tense law stands: every write target has a tense. A genesis surface
 speaks from creation; a current-truth surface speaks from now; confusing the

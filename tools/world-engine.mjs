@@ -446,18 +446,32 @@ export const MISTS_STRIDE_FLOOR = 1e-4;
  *  or crosses it (with the point where it meets the wall), or `{ factor, deepest }`
  *  — the leg's even stride as a share of the open road's, and how deep into the
  *  fringe it goes (0 untouched, toward 1 at the wall's face). */
-export function mistsRoad(from, toward, crossing, mists) {
+// AN ENTERED MARK IS SHELTER (Darko 2026-10-15): within a mark the walker has entered, the Mists neither slow the
+// walk nor stop it. `shelter` is the caller's test of a point (the engine defines no containment of its own; the
+// office builds it from the walker's enter stack with shelterOf). It follows entering, never standing: with no
+// shelter the road is read exactly as before. And it is shelter only for a road that STARTS inside it: walking
+// in from outside is the Mists as ever (review-shelter #1), so a road whose start is unsheltered reads as before.
+export function mistsRoad(from, toward, crossing, mists, { shelter = null } = {}) {
   const m = mistsAt(crossing, mists);
   if (!m) return null;
   const L = Math.hypot(toward.x - from.x, toward.y - from.y);
   const at = (t) => ({ x: from.x + (toward.x - from.x) * t, y: from.y + (toward.y - from.y) * t });
-  const wallAt = (p) => { const h = mistsHere(p, m); return h.inWall ? 0 : h.wallM; };
+  const cover = shelter && shelter(from) ? shelter : null;
+  const sheltered = (p) => !!cover?.(p);
+  const wallAt = (p) => { if (sheltered(p)) return Infinity; const h = mistsHere(p, m); return h.inWall ? 0 : h.wallM; };
   // standing still is not going anywhere: a stop is never refused, wherever it stands
   if (L === 0) return { factor: 1, deepest: 0 };
   // A WALKER THE WALL HAS OVERTAKEN may walk straight out, slowly: see mistsWalkOut
   if (wallAt(from) <= 0) return mistsWalkOut(from, toward, L, at, m);
+  // a road whose every step in the wall is sheltered is not cut by the wall's sight line either
+  let underCover = false;
+  if (cover) {
+    underCover = true;
+    const n = Math.max(1, Math.ceil(L));
+    for (let i = 0; i <= n && underCover; i += 1) { const p = at(i / n); if (!sheltered(p) && mistsHere(p, m).inWall) underCover = false; }
+  }
   // the road may not pass or end in the wall, nor on its face
-  if (wallAt(toward) <= 0 || (L > 0 && mistsHide(from, toward, m))) {
+  if (wallAt(toward) <= 0 || (L > 0 && !underCover && mistsHide(from, toward, m))) {
     let t = 0;
     if (wallAt(from) > 0) { const n = Math.max(1, Math.ceil(L)); for (let i = 1; i <= n; i += 1) { t = i / n; if (wallAt(at(t)) <= 0) break; } }
     const p = at(t);
@@ -585,13 +599,15 @@ export function lodScore({ extentM, distM, weight = 0, dials = DIALS, dimming = 
 // opts:     { crossing, budget, keep }   keep: a mark id carried beyond the budget when visible
 // Returns a structured telling: the observer's state, the ranked visible marks
 // grouped by bearing→band, far-features on the horizon, and the aggregate tail.
-export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null } = {}) {
+export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null } = {}) {
   const { marks, terrain, heightfield, light, fogCeilingM } = world;
   const fog = fogModel(crossing, dials);
   // the Mists (POS-466): null before the schedule's first crossing, and then
   // nothing below changes by a byte
   const mists = mistsAt(crossing, terrain?.mists);
   const veil = mists ? mists.veil : 0;
+  // AN ENTERED MARK IS SHELTER only for a reader standing inside it: from outside, nothing it holds is uncovered
+  const cover = mists && shelter && shelter(observer) ? shelter : null;
   const groundH = heightfield.elevationAt(observer.x, observer.y);
   const self = statusAt({ x: observer.x, y: observer.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM, veil });
 
@@ -628,6 +644,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   const signalMult = dials.signal_fog_reach_mult;
 
   const seen = [];
+  const bareScore = new Map(); // id → the score at weight 0, for the landmark lift below (POS-632)
   for (const mk of marks) {
     if (!mk.at) continue;                                   // predicated/naming have no site of their own
     // A PARCEL RENDERS IN THE WORLD LIKE ANY OTHER MARK (the home-images
@@ -660,7 +677,11 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     const reach = isSignal ? clearReach * signalMult : clearReach;
     // the Mists: the fringe's reach (a signal cuts it as it cuts the weather),
     // and the wall, which nothing cuts
-    const mistHidden = !!mists && (mistsHide(observer, mk.at, mists)
+    // AN ENTERED MARK IS SHELTER (Darko 2026-10-15): nothing inside a mark the reader has entered is cut by the
+    // Mists, neither the wall nor the fringe's reach, for a reader standing inside it (`cover`, above the
+    // loop: an entered mark you stand outside shelters nothing). `shelter` is the caller's test (the engine defines no
+    // containment of its own): openYourEyes builds it from the reader's enter stack.
+    const mistHidden = !!mists && !cover?.(mk.at) && (mistsHide(observer, mk.at, mists)
       || distM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
     const fogHidden = distM > reach || mistHidden;
 
@@ -678,6 +699,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
     const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
+    bareScore.set(mk.id, lodScore({ extentM, distM, weight: 0, dials, dimming: rankDimming }));
     const visible = !fogHidden && (los.visible || isSignal); // a signal's light is seen even where its footing is occluded
     seen.push({
       id: mk.id, kind: mk.kind, household: mk.household, body: mk.body,
@@ -720,7 +742,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       heightM: ff?.height_m ?? markTop(mk, dials),
       label: ff?.label ?? null, body: mk.body ?? ff?.receipt,
       // a horizon object behind the wall is hidden however tall it stands
-      visible: clearHorizon && !(mists && mistsHide(observer, mk.at, mists)),
+      visible: clearHorizon && !(mists && !cover?.(mk.at) && mistsHide(observer, mk.at, mists)),
     });
   }
 
@@ -729,30 +751,21 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   // rest folded into a clusteredCount you `investigate` to open. This is the LOD
   // law — top-level marks at distance, descend with proximity or attention.
   const ranked = seen.filter((s) => s.visible).sort((a, b) => b.score - a.score);
-  const repByHh = new Map();
-  const collapsed = [];
-  for (const s of ranked) {
-    const far = s.distM > dials.cluster_beyond_m;
-    // the acting home is never folded into (or made the rep of) its household's cluster: it
-    // is carried alone below, and the rest of the household clusters without it (WLD-9)
-    if (far && s.household && !s.signal && s.id !== keep) {
-      const rep = repByHh.get(s.household);
-      if (rep) { rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
-      repByHh.set(s.household, s);
-    }
-    collapsed.push(s);
-  }
-  // THE ACTOR'S HOME RIDES OUTSIDE THE BUDGET (WLD-9, formerly POS-528). `keep`
-  // is one mark id the caller resolved (the acting resident's home). If that mark
-  // is VISIBLE it is carried ONCE and never spends one of the `budget` seats,
-  // wherever it ranks: the other `budget` marks keep theirs, in rank order, and
-  // the home sits at its own rank among them. It never makes a hidden mark
-  // visible; the tail and the counts below describe what is left.
-  const kept = keep == null ? null : collapsed.find((s) => s.id === keep) ?? null;
-  const rest = kept ? collapsed.filter((s) => s !== kept) : collapsed;
-  const seats = new Set(rest.slice(0, budget));
-  const carried = collapsed.filter((s) => s === kept || seats.has(s));
-  const tail = rest.slice(budget);
+  const { collapsed, carried, tail } = seatsOf(ranked, { keep, budget, dials, count: true });
+
+  // THE LANDMARK LIFT (POS-632 G2, Darko 2026-10-14: "a place in view is flagged
+  // landmark when its weight, not its size, puts it there"). The counterfactual,
+  // asked literally: rank the same visible marks with every weight at 0 (same
+  // dimming, same collapse, same budget, same kept home) and see who is seated.
+  // A carried mark that would NOT be seated then was put there by its stamps, and
+  // carries `lifted: true`. Nothing else about the ranking moves: this pass only
+  // reads. The weight floor that makes it a landmark is the reader's (the office's).
+  // from the visible set in RECORD order, not the weighted rank: a sort is stable,
+  // so re-sorting the weighted order would let the stamps break a weight-0 tie
+  // (review-217 § 4)
+  const bareRanked = seen.filter((s) => s.visible).sort((a, b) => bareScore.get(b.id) - bareScore.get(a.id));
+  const bareSeated = new Set(seatsOf(bareRanked, { keep, budget, dials, count: false }).carried.map((s) => s.id));
+  for (const s of carried) if (!bareSeated.has(s.id)) s.lifted = true;
   const tailByBearing = {};
   for (const t of tail) tailByBearing[t.bearing] = (tailByBearing[t.bearing] ?? 0) + 1;
 
@@ -762,7 +775,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       lightLevel: +self.lightLevel.toFixed(2), inFog: self.inFog, aboveFog: self.aboveFog, inDarkness: self.inDarkness,
     },
     crossing: fog.crossing, fog: { thickness: +fog.thickness.toFixed(2) }, sightReachM: Math.round(Math.min(clearReach, mistReach)),
-    ...(mists ? { mists: mistsBlock(mists, mistSelf, observer) } : {}),
+    ...(mists ? { mists: { ...mistsBlock(mists, mistSelf, observer), ...(cover ? { sheltered: true } : {}) } } : {}),
     carried, far: farSeen.filter((f) => f.visible),
     // THE HORIZON THE WALL TOOK (POS-551): a far feature on a horizon that is
     // otherwise clear, gone only because the wall stands in front of it, so the
@@ -777,6 +790,37 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       ...(mists ? { mistHidden: seen.filter((s) => s.mistHidden).length } : {}),
     },
   };
+}
+
+// The seats: collapse each far household's cluster to its best-ranked mark, then
+// carry the kept home plus the first `budget` of the rest. `count` writes each
+// rep's clusteredCount (the real pass); the landmark lift's counterfactual pass
+// asks with count: false, so it never touches a row.
+function seatsOf(ranked, { keep, budget, dials, count }) {
+  const repByHh = new Map();
+  const collapsed = [];
+  for (const s of ranked) {
+    const far = s.distM > dials.cluster_beyond_m;
+    // the acting home is never folded into (or made the rep of) its household's cluster: it
+    // is carried alone below, and the rest of the household clusters without it (WLD-9)
+    if (far && s.household && !s.signal && s.id !== keep) {
+      const rep = repByHh.get(s.household);
+      if (rep) { if (count) rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
+      repByHh.set(s.household, s);
+    }
+    collapsed.push(s);
+  }
+  // THE ACTOR'S HOME RIDES OUTSIDE THE BUDGET (WLD-9, formerly POS-528). `keep`
+  // is one mark id the caller resolved (the acting resident's home). If that mark
+  // is VISIBLE it is carried ONCE and never spends one of the `budget` seats,
+  // wherever it ranks: the other `budget` marks keep theirs, in rank order, and
+  // the home sits at its own rank among them. It never makes a hidden mark
+  // visible; the tail and the counts below describe what is left.
+  const kept = keep == null ? null : collapsed.find((s) => s.id === keep) ?? null;
+  const rest = kept ? collapsed.filter((s) => s !== kept) : collapsed;
+  const seats = new Set(rest.slice(0, budget));
+  const carried = collapsed.filter((s) => s === kept || seats.has(s));
+  return { collapsed, carried, tail: rest.slice(budget) };
 }
 
 // radialSerialize — group a fieldOfView result into bearing → band → marks, the

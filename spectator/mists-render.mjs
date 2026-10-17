@@ -17,6 +17,8 @@
 // clear side of the true face, thinning toward the clear land, at the band's
 // density, so the page and the walk's slowdown agree.
 
+import { MISTS_KEEP } from "../tools/mists-keep.mjs";
+
 // The fog's colour, ONE variable: the skin's variant 2 (Darko 2026-10-10 10:56),
 // its plum-grey between the base and the quiet. The face takes it; depth and the
 // veil darken it toward near-black at the core.
@@ -38,11 +40,11 @@ export const MISTS_PAINT = {
   pxM: 56,               // metres per baked pixel, upscaled smooth (the fog is soft; this keeps a phone's bake small)
   clearingPx: 320,       // a clearing's bake is at most this many pixels across (they are far off)
   clearingLayers: 2,     // and takes the back two layers only
-  keepM: 440,            // the town's margin: past its soft edge plus the widest drift (200 m along, 90 across), so a drifting bank never reaches a mark
+  keepM: MISTS_KEEP.keepM,       // the town's margin (tools/mists-keep.mjs, one definition)
   keepSoftM: 200,        // the margin's soft edge
   keepNoiseM: 420,       // the margin grows by up to this much, by noise, so its edge is ragged (never less than keepM)
   frameInsetM: 260,      // how far over the painted sheet's own edge the fog reaches before its noise
-  townMaxM: 2600,        // past this a mark is open country, not the town
+  townMaxM: MISTS_KEEP.townMaxM, // past this a mark is open country, not the town (tools/mists-keep.mjs)
   faceRampM: 80,         // the least band over which the wall's face rises inside the town's margin
   faceJagM: 700,         // and how far beyond that it may reach, by noise, where the marks leave room
   faceClearM: 70,        // and no part of that band comes nearer a mark than this
@@ -213,34 +215,10 @@ export function mistsBakeFar(m, layer) {
 }
 
 // ── the town's keep-out ─────────────────────────────────────────────────────
-/** The keep-out rectangles, metres: every sited mark's own extent (parcels,
- *  houses, lit marks, districts), grown by MISTS_PAINT.keepM. The world's frame
- *  and its open country are not the town: a mark wider than townMaxM on either
- *  side and the TOWN's own (the root, the sea, the main channel) keeps nothing, unless it stands in
- *  one of `clearings` (the mists block's, or the skeleton's clearings_m). */
-/** The world's open country, which the fog may stand over: a mark of the
- *  town's own (by or household `the-town`) wider than townMaxM on either side.
- *  A household's mark is never open country, whatever its size. */
-export function mistsOpenCountry(mk) {
-  const town = mk?.by === "the-town" || mk?.household === "the-town" || String(mk?.id ?? "").startsWith("the-town/");   // the id too: a path that drops by/household must not keep the root and thin the fog everywhere
-  return town && Math.max(Number(mk?.extent?.w) || 0, Number(mk?.extent?.h) || 0) > MISTS_PAINT.townMaxM;
-}
-export function mistsKeepRects(marks, clearings = []) {
-  const g = MISTS_PAINT.keepM, out = [];
-  const inClearing = (p) => (clearings ?? []).some((k) => Math.hypot(p.x - k.x, p.y - k.y) < (k.r ?? k.r_m));
-  for (const mk of marks ?? []) {
-    if (!mk?.at || !Number.isFinite(mk.at.x) || !Number.isFinite(mk.at.y)) continue;
-    // only the town's own open country goes unkept (the frame, the sea, the main
-    // channel): every household's mark is kept clear at any size (#186 review: a
-    // household's 3.2 km shore went under the fog), and a mark in a clearing too
-    if (mistsOpenCountry(mk) && !inClearing(mk.at)) continue;
-    const w = Math.max(0, Number(mk.extent?.w) || 0) / 2, h = Math.max(0, Number(mk.extent?.h) || 0) / 2;
-    // the mark's own extent (core) and its reach (core grown by the margin)
-    out.push({ cx0: mk.at.x - w, cx1: mk.at.x + w, cy0: mk.at.y - h, cy1: mk.at.y + h,
-      minX: mk.at.x - w - g, maxX: mk.at.x + w + g, minY: mk.at.y - h - g, maxY: mk.at.y + h + g });
-  }
-  return out;
-}
+// The rule itself (which ground is the town's) lives in tools/mists-keep.mjs, one
+// definition shared with the creatures' spawn (WLD-56); the paint re-exports it and
+// adds only the margin's soft edge and its ragged noise, below.
+export { mistsOpenCountry, mistsKeepRects } from "../tools/mists-keep.mjs";
 /** How kept-clear a point is, 0..1: 1 within a mark's margin less the soft
  *  band, 0 outside every rectangle. Pure (the tests' instrument); the bake uses
  *  a raster of the same rule. */
@@ -376,28 +354,42 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
   };
 }
 // ── the creatures in the mist (Darko 2026-10-10 09:45) ──────────────────────
-// Wolves half-seen at the banks' edge, some with their eyes catching the light;
-// crows perched at the edge and lifting off; bats in ones and threes. Sparse at
-// the Mists' first crossing, populated by 284. Seeded by the crossing, so a
-// crossing always shows the same ones and nothing jitters. Never inside the
-// town's keep-out, and never deep in the core, where a silhouette can't be seen.
+// Wolves half-seen in the fog, some with their eyes catching the light; ravens
+// perched and lifting off; bats in ones and threes. Sparse at the Mists' first
+// crossing, populated by 284. Seeded by the crossing, so a crossing always shows
+// the same ones and nothing jitters. Never inside the town's keep-out, and never
+// deep in the core, where a silhouette can't be seen.
+//
+// THE MISTS' OWN, NOT THE TOWN'S CREATURES (WLD-56 D5, Darko 2026-10-15 12:09).
+// The live creatures (tools/creatures.mjs) come out into the fringe, on the clear
+// side, where a resident can reach them and the read knows them. These painted
+// ones stay wholly behind the wall's true face, so a silhouette is never mistaken
+// for a creature that answers, and they are ravens, as the live kind is.
+// WHOLLY means the DRAWN BOX, not the point it is drawn from (review of #219,
+// F1): a wolf is drawn 92% up from its feet and half its size to either side, so
+// its depth is measured from the edge of its box nearest the face. Each face has
+// its own reach toward the clear side (north: the box below the feet; south: the
+// box above them; east and west: half the width), and `depthM` is the gap
+// between that edge and the face.
 export const MISTS_CREATURES = {
   full: 284,
-  wolves: [2, 9], crows: [3, 16], bats: [2, 10],          // at the first crossing and from `full`
-  sizeM: { wolf: 620, crow: 320, bat: 230 },
+  wolves: [2, 9], ravens: [3, 16], bats: [2, 10],         // at the first crossing and from `full`
+  sizeM: { wolf: 620, raven: 320, bat: 230 },
+  // how far behind the wall's true face each silhouette's nearest edge stands, metres (> 0: wholly in the wall)
+  depthM: { wolf: [40, 380], ravenPerch: [30, 300], ravenLift: [60, 420], bat: [50, 360] },
 };
 function seeded(seed) {
   let a = seed >>> 0;
   return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 /** Where the creatures stand at this crossing (metres, the engine's frame):
- *  [{ kind: "wolf"|"crow"|"bat", x, y, sizeM, flip, pose, eyes, phase }]. Pure. */
+ *  [{ kind: "wolf"|"raven"|"bat", x, y, sizeM, flip, pose, eyes, phase }]. Pure. */
 export function mistsCreatures(m, { first = 244, keep = null } = {}) {
   if (!m?.clear) return [];
   const C = MISTS_CREATURES, t = Math.max(0, Math.min(1, (m.crossing - first) / (C.full - first)));
   const count = ([a, b]) => Math.round(a + (b - a) * t);
   const r = seeded(Math.imul((m.crossing | 0) + 1, 2654435761));
-  const reach = mistsReachM(m), c = m.clear;
+  const c = m.clear;
   const sides = [
     { len: c.maxX - c.minX, at: (s, d) => ({ x: c.minX + s, y: c.minY - d }) },   // north: the wall is y < minY
     { len: c.maxX - c.minX, at: (s, d) => ({ x: c.minX + s, y: c.maxY + d }) },   // south
@@ -405,39 +397,44 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
     { len: c.maxY - c.minY, at: (s, d) => ({ x: c.maxX + d, y: c.minY + s }) },   // east
   ];
   const total = sides.reduce((a, sd) => a + sd.len, 0);
-  // a point at true-face distance d (positive into the wall), anywhere round the band
-  const onBand = (dIn, dOut) => {
-    let u = r() * total, sd = sides[0];
-    for (const x of sides) { if (u <= x.len) { sd = x; break; } u -= x.len; }
-    return sd.at(u, dIn + (dOut - dIn) * r());
+  // how far a drawn box reaches from its point toward each face (north, south, west, east)
+  const towardFace = (b) => [b.maxY, -b.minY, b.maxX, -b.minX];
+  // a point whose drawn box's nearest edge stands `dIn..dOut` behind the face, anywhere round the band
+  const onBand = (kind, pose, size, dIn, dOut) => {
+    let u = r() * total, i = 0;
+    for (; i < sides.length - 1; i++) { if (u <= sides[i].len) break; u -= sides[i].len; }
+    const reach = towardFace(mistsCreatureBox({ kind, pose, x: 0, y: 0, sizeM: size }))[i];
+    return sides[i].at(u, reach + dIn + (dOut - dIn) * r());
   };
   const out = [];
   const clearOfTown = (x, y, size) => !keep || [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]].every(([a, b]) => keep(x + a * size, y + b * size) === 0);
   const apart = (x, y, size) => out.every((o) => Math.hypot(o.x - x, o.y - y) > (o.sizeM + size) * 0.75);
-  const place = (kind, dIn, dOut, extra) => {
+  const place = (kind, pose, dIn, dOut, extra) => {
     for (let tries = 0; tries < 60; tries++) {
       // judged where it is drawn (whole metres), so a margin's edge never falls between the two
-      const p = onBand(dIn, dOut), x = Math.round(p.x), y = Math.round(p.y), size = Math.round(C.sizeM[kind] * (0.8 + 0.4 * r()));
-      if (!clearOfTown(x, y, size) || !apart(x, y, size)) continue;
-      const cr = { kind, x, y, sizeM: size, flip: r() < 0.5, phase: +r().toFixed(3), ...extra() };
+      const size = Math.round(C.sizeM[kind] * (0.8 + 0.4 * r()));
+      const p = onBand(kind, pose, size, dIn, dOut), x = Math.round(p.x), y = Math.round(p.y);
+      if (!mistsCreatureBehindWall(m, { kind, pose, x, y, sizeM: size }) || !clearOfTown(x, y, size) || !apart(x, y, size)) continue;
+      const cr = { kind, x, y, sizeM: size, flip: r() < 0.5, phase: +r().toFixed(3), pose, ...extra() };
       out.push(cr);
       return cr;
     }
     return null;
   };
-  for (let i = 0, n = count(C.wolves); i < n; i++) place("wolf", -reach * 0.35, 140, () => ({ pose: "stand", eyes: r() < 0.35 + 0.45 * t }));
-  for (let i = 0, n = count(C.crows); i < n; i++) {
+  for (let i = 0, n = count(C.wolves); i < n; i++) place("wolf", "stand", ...C.depthM.wolf, () => ({ eyes: r() < 0.35 + 0.45 * t }));
+  for (let i = 0, n = count(C.ravens); i < n; i++) {
     const flying = r() < 0.4;
-    place("crow", flying ? -reach * 0.9 : -reach * 0.45, flying ? -reach * 0.15 : 80, () => ({ pose: flying ? "lift" : "perch", eyes: false }));
+    place("raven", flying ? "lift" : "perch", ...(flying ? C.depthM.ravenLift : C.depthM.ravenPerch), () => ({ eyes: false }));
   }
   for (let i = 0, n = count(C.bats); i < n; i++) {
-    const lead = place("bat", -reach * 0.8, 220, () => ({ pose: "flit", eyes: false }));
+    const lead = place("bat", "flit", ...C.depthM.bat, () => ({ eyes: false }));
     if (!lead || r() >= 0.45) continue;
-    // a three: two more close by, if they too stand clear of the town
+    // a three: two more close by, if they too stand wholly behind the wall and clear of the town
     for (const [dx, dy] of [[1.6, -0.7], [-1.3, 0.9]]) {
       const x = Math.round(lead.x + dx * lead.sizeM), y = Math.round(lead.y + dy * lead.sizeM), size = Math.round(lead.sizeM * 0.8);
-      const dd = mistsTrueDistance(m, x, y);
-      if (dd >= -reach * 0.8 && dd <= 220 && clearOfTown(x, y, size)) out.push({ ...lead, x, y, sizeM: size, phase: +r().toFixed(3) });
+      const follower = { ...lead, x, y, sizeM: size };
+      if (mistsCreatureBehindWall(m, follower) && mistsTrueDistance(m, x, y) <= C.depthM.bat[1] + size && clearOfTown(x, y, size))
+        out.push({ ...follower, phase: +r().toFixed(3) });
     }
   }
   return out;
@@ -450,21 +447,51 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
 // point. The site's motifs are the same four shapes.
 const CREATURE_PATHS = {
   wolf: { d: "M8 91 C12 83 22 79 32 81 C28 72 30 61 38 53 C44 47 47 38 47 31 L43 18 L54 24 L58 17 L63 20 L74 8 L82 7 L84 12 L73 21 L81 17 L82 22 L69 33 C66 38 67 43 70 48 L66 46 L70 57 L65 54 L65 83 L70 88 L70 92 L57 92 L55 62 C51 66 48 72 48 77 C49 82 51 86 55 88 L54 92 L35 92 C25 96 14 96 8 91 Z", at: [-50, -92] },
-  crowperch: { d: "M8 80 L25 59 C30 52 36 49 42 44 C47 40 48 31 53 25 C58 18 68 17 75 22 L79 27 L94 32 L94 35 L78 36 C79 43 75 48 74 53 L78 55 L73 57 L75 60 L69 60 C65 66 60 70 53 73 L54 83 L63 86 L62 89 L49 88 L48 76 L41 77 L39 86 L45 89 L43 92 L34 88 L35 77 L13 87 Z", at: [-50, -89] },
-  crowlift: { d: "M6 78 L29 58 C28 43 21 29 17 20 Q18 16 22 20 L29 29 L27 13 Q28 9 32 13 L41 26 L40 8 Q42 5 45 10 L55 28 L55 13 Q58 10 60 16 L63 44 C66 40 73 40 77 44 L81 48 L96 52 L96 55 L81 57 C75 66 68 69 57 69 L51 79 L55 82 L53 85 L45 80 L48 71 L41 74 L34 88 L29 87 L34 76 L12 85 Z", at: [-50, -50] },
+  ravenperch: { d: "M8 80 L25 59 C30 52 36 49 42 44 C47 40 48 31 53 25 C58 18 68 17 75 22 L79 27 L94 32 L94 35 L78 36 C79 43 75 48 74 53 L78 55 L73 57 L75 60 L69 60 C65 66 60 70 53 73 L54 83 L63 86 L62 89 L49 88 L48 76 L41 77 L39 86 L45 89 L43 92 L34 88 L35 77 L13 87 Z", at: [-50, -89] },
+  ravenlift: { d: "M6 78 L29 58 C28 43 21 29 17 20 Q18 16 22 20 L29 29 L27 13 Q28 9 32 13 L41 26 L40 8 Q42 5 45 10 L55 28 L55 13 Q58 10 60 16 L63 44 C66 40 73 40 77 44 L81 48 L96 52 L96 55 L81 57 C75 66 68 69 57 69 L51 79 L55 82 L53 85 L45 80 L48 71 L41 74 L34 88 L29 87 L34 76 L12 85 Z", at: [-50, -50] },
   bat: { d: "M50 39 L44 28 L41 44 C32 37 24 24 7 18 C12 31 11 44 3 57 C17 52 24 56 25 65 C35 60 41 65 43 73 L50 83 L57 73 C59 65 65 60 75 65 C76 56 83 52 97 57 C89 44 88 31 93 18 C76 24 68 37 59 44 L56 28 Z", at: [-50, -50] },
 };
+const creaturePath = (cr) => (cr.kind === "wolf" ? CREATURE_PATHS.wolf : cr.kind === "bat" ? CREATURE_PATHS.bat
+  : cr.pose === "lift" ? CREATURE_PATHS.ravenlift : CREATURE_PATHS.ravenperch);
+/** The box a creature's silhouette is drawn in (metres, the engine's frame): its
+ *  path's 100-unit box at its size, from its point. A flip mirrors it about the
+ *  point, and every path is centred across (`at[0]` is -50), so the box holds. */
+export function mistsCreatureBox(cr) {
+  const P = creaturePath(cr), k = cr.sizeM / 100;
+  return { minX: cr.x + P.at[0] * k, maxX: cr.x + (P.at[0] + 100) * k, minY: cr.y + P.at[1] * k, maxY: cr.y + (P.at[1] + 100) * k };
+}
+/** Does the whole drawn box stand behind the wall's true face: off the clear box, and off every clearing? */
+export function mistsCreatureBehindWall(m, cr) {
+  const b = mistsCreatureBox(cr), c = m.clear;
+  if (!(b.maxX < c.minX || b.minX > c.maxX || b.maxY < c.minY || b.minY > c.maxY)) return false;
+  return (m.clearings ?? []).every((k) => Math.hypot(Math.max(b.minX - k.x, 0, k.x - b.maxX), Math.max(b.minY - k.y, 0, k.y - b.maxY)) > k.r);
+}
 /** One creature as SVG, in the painting's frame. `ink` is the silhouette's
  *  colour (the fog's core); `eye` the light its eyes catch. */
 export function mistsCreatureSVG(cr, { originPx, mPerPx, ink, eye = MISTS_EYE }) {
   const n = (v) => v.toFixed(1), s = cr.sizeM / 100 / mPerPx;
   const x = originPx.x + cr.x / mPerPx, y = originPx.y + cr.y / mPerPx;
-  const P = cr.kind === "wolf" ? CREATURE_PATHS.wolf : cr.kind === "bat" ? CREATURE_PATHS.bat : cr.pose === "lift" ? CREATURE_PATHS.crowlift : CREATURE_PATHS.crowperch;
+  const P = creaturePath(cr);
   // a wolf's eye catches the light on the head, just behind the muzzle's root
   const eyes = cr.eyes ? `<g class="wv-mc-eyes" style="animation-delay:-${n(cr.phase * 9)}s"><circle cx="64" cy="25" r="1.6" fill="${eye}"/><circle cx="64" cy="25" r="4.5" fill="${eye}" opacity="0.3"/></g>` : "";
   return `<g transform="translate(${n(x)} ${n(y)}) scale(${cr.flip ? "-" : ""}${s.toFixed(4)} ${s.toFixed(4)})">`
     + `<g class="wv-mc wv-mc-${cr.kind}${cr.pose ? " wv-mc-" + cr.pose : ""}" style="animation-delay:-${n(cr.phase * 12)}s">`
     + `<g transform="translate(${P.at[0]} ${P.at[1]})"><path d="${P.d}" fill="${ink}"/>${eyes}</g></g></g>`;
+}
+/** The same creature as HTML for the Mists' stage (WLD-43), where a moving part
+ *  is an HTML box and so rides the compositor: the same place, scale and flip,
+ *  the same path, the same motion about the same point (the feet, or a flier's
+ *  middle), and the eyes as a box of their own so their blink is composited too.
+ *  Painting units: the stage's camera scales them. */
+export function mistsCreatureHTML(cr, { originPx, mPerPx, ink, eye = MISTS_EYE }) {
+  const n = (v) => v.toFixed(1), s = cr.sizeM / 100 / mPerPx;
+  const x = originPx.x + cr.x / mPerPx, y = originPx.y + cr.y / mPerPx;
+  const P = creaturePath(cr);
+  const box = `style="left:${P.at[0]}px;top:${P.at[1]}px" width="100" height="100" viewBox="0 0 100 100" aria-hidden="true"`;
+  const eyes = cr.eyes ? `<div class="wv-mc-eyes" style="animation-delay:-${n(cr.phase * 9)}s"><svg class="wv-mc-art" ${box}><circle cx="64" cy="25" r="1.6" fill="${eye}"/><circle cx="64" cy="25" r="4.5" fill="${eye}" opacity="0.3"/></svg></div>` : "";
+  return `<div class="wv-mc-at" style="transform:translate(${n(x)}px,${n(y)}px) scale(${cr.flip ? "-" : ""}${s.toFixed(4)},${s.toFixed(4)})">`
+    + `<div class="wv-mc wv-mc-${cr.kind}${cr.pose ? " wv-mc-" + cr.pose : ""}" style="animation-delay:-${n(cr.phase * 12)}s">`
+    + `<svg class="wv-mc-art" ${box}><path d="${P.d}" fill="${ink}"/></svg>${eyes}</div></div>`;
 }
 
 /** Paint one layer into a canvas over `box` (metres), all at once. */

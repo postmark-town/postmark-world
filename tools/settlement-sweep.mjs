@@ -18,7 +18,8 @@ import {
   writeFileSync,
 } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { markStanding as classifyMark, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
+import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
+import { unpublishVerdict, rowClassOf } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -28,6 +29,7 @@ import {
   // left with the re-home pass on 2026-08-25: re-framing a mark's numbers was
   // something only a MOVE ever needed, and the settlement no longer moves one.
   admissionBase, admitDelta,   // §4: the delta admission, in place of a fold per sketchbook
+  sovereignInResult,           // the fold's own sovereignty, over a crossing's whole result (WLD-51)
   refuseStaleHouseholds,       // the registry-freshness construction (2026-09-09)
   // The loader's own framing walk, for a candidate read one file at a time: it
   // is in its FILE's frame, and admission judges it in the world's (POS-446,
@@ -37,6 +39,7 @@ import {
 // THE REPARENT VERB (POS-102 · postmark#2865, 2026-09-16): a structural edit —
 // a frame's record leaving canon or returning — never moves what stands on it.
 import { snapshotWorld, keepWorldAcross, ReframeRefusal } from "./reparent-keep-world.mjs";
+import { CONSENT_FIELD, consentMap } from "./consent.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -230,6 +233,36 @@ function readAt(repo, ref, path) {
   return git(repo, ["show", `${ref}:${path.replace(/\\/g, "/")}`]);
 }
 
+// WHERE A MARK IS FILED NOW, by its id (postmark#3757, read only under
+// unpublish-verdict's "rederive"). An id is `<by>/<leaf>` (marks-fold.mjs § the
+// id rule): the record's frontmatter `by` plus its directory's name, wherever
+// the directory sits. One tree listing at the first ask, then the few records
+// whose directory carries the leaf are read for their `by`. `null` when no
+// record answers to the id, or when two do (the lint's error, not ours to pick).
+export function filingIndexAt(repo, ref) {
+  let byLeaf = null;
+  return (id) => {
+    const [by, ...rest] = String(id).split("/");
+    const leaf = rest.join("/");
+    if (!by || !leaf || leaf.includes("/")) return null;
+    if (!byLeaf) {
+      byLeaf = new Map();
+      let listing = "";
+      try { listing = git(repo, ["ls-tree", "-r", "--name-only", ref, "--", "WORLD/marks"]); } catch { return null; }
+      for (const path of listing.split("\n")) {
+        if (!path.endsWith("/mark.md")) continue;
+        const name = basename(dirname(path));
+        if (!byLeaf.has(name)) byLeaf.set(name, []);
+        byLeaf.get(name).push(path);
+      }
+    }
+    const found = (byLeaf.get(leaf) ?? []).filter((path) => {
+      try { return /^by:\s*(\S+)\s*$/m.exec(readAt(repo, ref, path))?.[1] === by; } catch { return false; }
+    });
+    return found.length === 1 ? found[0] : null;
+  };
+}
+
 function archiveRef(repo, ref) {
   const dir = mkdtempSync(join(tmpdir(), "postmark-settlement-view-"));
   const archive = join(dir, "world.tar");
@@ -317,6 +350,12 @@ function foldRefInner(repo, ref, stakes) {
     });
     if (state.errors?.length)
       throw new Error(`${ref} folds with ${state.errors.length} error(s): ${JSON.stringify(state.errors[0])}`);
+    // every authored consent word, by mark: the published shape drops it and the
+    // sweep's verdicts read it (§ the consent word rides the view). Not written
+    // anywhere: world-state.json is the exec'd fold's, below.
+    Object.defineProperty(state, "consentOf", {
+      value: new Map(marks.filter((mark) => consentMap(mark)).map((mark) => [mark.id, consentMap(mark)])),
+    });
     return state;
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -983,6 +1022,9 @@ export function settlementSweep({
   repo = ROOT,
   stakesPath,
   mainBranch = "main",
+  // unpublish-verdict.mjs § STALE_ROWS, handed in by tests only: the dial is
+  // the module constant, and a crossing never names it (WLD-51).
+  staleRows = undefined,
   // WHETHER THE REGISTRY WAS VERIFIED THIS CROSSING, stated by the caller that
   // holds the town clone. `{ verifiedAt }`, `{ unverified }`, or null for no
   // crossing context — see refuseStaleHouseholds. It is stored in a
@@ -1020,6 +1062,10 @@ export function settlementSweep({
   // condition cannot be reached in a test is a guard nobody has ever seen work.
   // Nothing in production passes it.
   surveyor = surveySketchbooks,
+  // § the order's admission, injected for the same reason as `surveyor`: the
+  // failure it guards (the result cannot be admitted, so nothing is taken)
+  // cannot be planted through the front door. Nothing in production passes it.
+  resultAdmitter = admitDelta,
 } = {}) {
   resetFoldMeter();
   repo = resolve(repo);
@@ -1108,7 +1154,11 @@ export function settlementSweep({
     (branch) => git(repo, ["rev-parse", `${branch}^{tree}`]).trim() === mainTree,
   ));
   const registry = publicationRegistry(repo, mainBranch);
+  const registryBefore = { ...registry.published };
   const published = [];
+  // Every row that passed its sketchbook's walls, before the market is judged
+  // against the crossing's result (§ the order, WLD-51).
+  const pending = [];
   const leftDrafted = [];
   const withdrawn = []; // the revision family's terminal half (ruled 2026-08-19)
   // Paths whose withdrawal this crossing has ADMITTED so far. The stranded-
@@ -1154,7 +1204,14 @@ export function settlementSweep({
   // all, only k reads at the ref.
   const mainState = foldRef(repo, mainBranch, stakes);
   const admitBase = admissionBase(mainState, { households: wallRegistry.households, stakes });
-  const mainFolded = new Map(mainState.marks.map((mark) => [mark.id, mark]));
+  // THE CONSENT WORD RIDES THE VIEW (WLD-51). The fold's published shape drops
+  // a ground's `consent`, and `classifyMark` reads it (mark-standing.mjs §
+  // groundVerdict: a mark welcomed on another household's parcel stands home).
+  // A view without it reads "market" where the fold's own tier says "home", so
+  // every verdict this sweep reads off a view would part from the fold for a
+  // welcomed mark. `foldRef` hands the words over beside the state.
+  const mainFolded = new Map(mainState.marks.map((mark) => [mark.id,
+    mainState.consentOf?.has(mark.id) ? { ...mark, [CONSENT_FIELD]: mainState.consentOf.get(mark.id) } : mark]));
 
   for (const branch of branches) {
     const household = branch.slice("draft/".length);
@@ -1213,6 +1270,7 @@ export function settlementSweep({
     // exactly as `loadMarks` keeps them; a tree that declares no relative
     // frame keeps its numbers, as the loader leaves them.
     candidateInWorld(candidates, { repo, branch, mainBranch, pathOf: pathOfCandidate });
+    const candidateById = new Map(candidates.map((c) => [c.id, c]));
 
     // THE QUARANTINE, and it is deliberately the FIRST thing in the sketchbook,
     // exactly as when it was a whole-tree fold: nothing is read, published,
@@ -1247,7 +1305,17 @@ export function settlementSweep({
     // candidates laid over. Cross-household composition is NOT decided here and
     // never was — it surfaces at the merged fold below, exactly as §4 says.
     const folded = new Map(mainFolded);
-    for (const [id, view] of admitted.views) folded.set(id, view);
+    // A row the gate's isolation holds back never crosses, so it lends no ground
+    // to its siblings either (WLD-51, B1). It is still ADMITTED with them, so the
+    // sketchbook's errors and parent checks are what they always were (a naming
+    // mark whose parent is the held parcel must not quarantine the household:
+    // review-214, H1). Its view is kept out of the world its siblings are judged
+    // in, and, only in a sketchbook that holds such a row, every sibling's
+    // `sovereign` is read again against the ground that is left (a view's flag
+    // was read against every parcel admitted beside it, the held one included).
+    const held = candidates.filter((c) => suiteQuarantine.has(c.id)).map((c) => c.id);
+    for (const [id, view] of admitted.views) if (!held.includes(id)) folded.set(id, view);
+    if (held.length) sovereignInResult(new Map([...admitted.views].filter(([id]) => !held.includes(id))), folded);
 
     for (const delta of deltas) {
       // SUPERSESSION. The sketchbook has not touched this path since it was cut,
@@ -1347,49 +1415,204 @@ export function settlementSweep({
         continue;
       }
       const view = folded.get(record.id);
+      const n = escrow.get(record.id) ?? 0;
       // ONE standing rule (tools/mark-standing.mjs): the parent-chain walk reaches
       // predicated laws with no coordinates, which the fold's geometric
       // `sovereign` flag structurally misses (Keemin's S1 live-debug catch).
       // The registry's own word for the verdict stays `class` — it is written on
       // disk in every published row, and renaming a field is a migration, not a
       // rename (RECONCILIATION § 9 Q2 ruled the vocabulary, not the ledger).
-      const cls = classifyMark(view ?? record, folded);
-      const rowClass = cls === "market" ? "commons" : cls;
-      const n = escrow.get(record.id) ?? 0;
-      const eligible = rowClass !== "commons" || n > 0;
-      if (!eligible) {
-        leftDrafted.push({ household, id: record.id, path: delta.path, class: rowClass, escrow: n, reason: "commons needs escrow > 0" });
-        continue;
-      }
+      //
+      // This is the SKETCHBOOK'S reading (canon plus this household's own work).
+      // It is no longer the verdict: the class is read off the crossing's whole
+      // result below (§ the order). It stays as the class a row held back before
+      // then is reported with, and as the fallback when the result cannot be
+      // folded.
+      const sketchClass = rowClassOf(classifyMark(view ?? record, folded));
+      // The gate's isolation is asked BEFORE any class (WLD-51, B1): a row it
+      // holds back is not part of the crossing, so nothing may be judged by it.
       if (suiteQuarantine.has(record.id)) {
-        leftDrafted.push({ household, id: record.id, path: delta.path, class: rowClass, escrow: n, reason: SUITE_QUARANTINE_REASON });
-        suiteQuarantined.push({ household, id: record.id, path: delta.path, class: rowClass, escrow: n });
+        leftDrafted.push({ household, id: record.id, path: delta.path, class: sketchClass, escrow: n, reason: SUITE_QUARANTINE_REASON });
+        suiteQuarantined.push({ household, id: record.id, path: delta.path, class: sketchClass, escrow: n });
         continue;
       }
-      published.push({
+      pending.push({
         household,
         id: record.id,
         path: delta.path,
-        class: rowClass,
+        class: sketchClass,
         escrow: n,
         content: readAt(repo, branch, delta.path),
+        candidate: candidateById.get(record.id) ?? null,
       });
     }
   }
 
-  // Only marks previously admitted by this sweep are candidates for unpublish.
-  // Anything absent from the registry is founding estate and stays published.
+  // ── THE ORDER: TOWN, THEN SOVEREIGN, THEN MARKET (Darko, WLD-51, 2026-10-14) ──
+  //
+  //   "The settlement's order is always town, then sovereign (parcels), then
+  //    market. A crossing applies all town-level work first, then all sovereign
+  //    and parcel work, then judges market marks (escrow) against the result,
+  //    so nothing earlier gets overruled by something later."
+  //
+  // TOWN is done before this file runs: the household registry is re-derived
+  // and committed onto main ahead of the sweep (office deploy/settlement-auto.sh),
+  // and nothing the town signs crosses from a sketchbook (the town wall above).
+  //
+  // SOVEREIGN is everything above that is not escrow: every sketchbook's
+  // admission, its walls, its withdrawals. MARKET is "commons needs escrow > 0",
+  // on both sides: a mark publishing, and a mark already published (the
+  // unpublish loop). Both used to be judged too early:
+  //
+  //   · a mark publishing was judged against canon plus ITS OWN household's
+  //     work, so a welcome written on another household's parcel in the same
+  //     crossing did not count;
+  //   · a mark already published was judged against main AS THE CROSSING FOUND
+  //     IT, so a parcel published around a ✦0 commons mark in the same crossing
+  //     did not protect it, and a household's own amend moving its ✦0 mark onto
+  //     its own parcel was published AND unpublished in one crossing (WLD-51's
+  //     gap read, P2: the amend was lost and the mark left).
+  //
+  // Both now read THE RESULT: main, with every withdrawal taken out and every
+  // row this crossing would publish laid on it, ADMITTED TOGETHER by §4's own
+  // delta admission (`admitDelta`, the fold's containment answer over the whole
+  // folded world plus the candidates) rather than one sketchbook at a time.
+  //
+  // Not an overlay of views: a mark already on main carries the containment
+  // the fold gave it then (`placementParent`), so laying a new parcel's view
+  // beside it changes nothing until its containment is asked again. So every
+  // mark the market judges is admitted too, as an amendment of itself, and so
+  // is every main mark its walk then stands on, until no walk reaches a mark
+  // whose containment was not asked again. And not a second whole-world fold:
+  // §4 holds this crossing to ONE (tools/settlement-delta.test.mjs pins it),
+  // and the delta admission exists to answer exactly this question for k marks
+  // without one.
+  //
+  // First the ground-closure hold, so that the result holds no orphan.
+  holdOrphans(pending);
+
+  const gone = new Set(withdrawn.map((item) => item.id));
+  // The marks the unpublish loop will ask standing of: commons rows at ✦0. Never
+  // a mark the town signs: a view drops the `tier` line the constitution
+  // shortcut reads (mark-standing.mjs), so re-admitted it would read market;
+  // the fold's own tier answers for it (review-214, finding 3).
+  const judged = Object.entries(registry.published)
+    .filter(([id, entry]) => entry?.class === "commons" && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
+      && !(mainFolded.has(id) && townOwned(mainFolded.get(id))))
+    .map(([id]) => id);
+  const candidateOf = new Map(pending.filter((row) => row.candidate).map((row) => [row.id, row.candidate]));
+
+  // THE RESULT of laying `rows` on main (with every withdrawal taken out).
+  // `byId`: the result, by id, in the public shape `classifyMark` walks; null
+  // when it could not be admitted. `viewed`: the ids whose containment was asked
+  // again, which are the only ones the market reads a verdict off. `laid`: the
+  // rows it was asked with, so a later hold knows when to ask again.
+  // every admission that failed this crossing, kept for the report: the hold
+  // loop may ask again and get an answer, and the first failure is still news
+  const resultErrors = [];
+  function admitResult(rows) {
+    const out = { byId: null, viewed: new Set(), laid: new Set(rows.map((row) => row.id)), rounds: 0, error: null };
+    if (!rows.length && !gone.size) {
+      // nothing laid on main: main IS the result, and its fold already answers
+      out.byId = mainFolded;
+      for (const id of judged) out.viewed.add(id);
+      return out;
+    }
+    try {
+      const baseMarks = [...mainFolded.values()].filter((mark) => !gone.has(mark.id));
+      const base = admissionBase({ marks: baseMarks }, { households: wallRegistry.households, stakes });
+      // A main mark asked again is handed over as an amendment of itself, with
+      // the edge `loadMarks` would have given it (`_parentMarkId`): a predicate
+      // or a naming mark is contained by that edge, not by geometry.
+      const again = (view) => ({ ...view, _replacing: true, _parentMarkId: view.placementParent ?? null });
+      const asked = new Map(rows.filter((row) => candidateOf.has(row.id)).map((row) => [row.id, candidateOf.get(row.id)]));
+      for (const id of judged) if (!asked.has(id) && mainFolded.has(id)) asked.set(id, again(mainFolded.get(id)));
+      const targets = [...new Set([...out.laid, ...judged])];
+      for (;;) {
+        out.rounds++;
+        const { views } = resultAdmitter([...asked.values()], base);
+        const byId = new Map(baseMarks.map((mark) => [mark.id, mark]));
+        for (const [id, view] of views) byId.set(id, view);
+        sovereignInResult(views, byId);
+        let grew = false;
+        for (const id of targets) {
+          if (!views.has(id)) continue;
+          for (const mark of standingWalk(byId.get(id), byId).chain) {
+            if (asked.has(mark.id) || !mainFolded.has(mark.id) || townOwned(mark)) continue;
+            asked.set(mark.id, again(mainFolded.get(mark.id)));
+            grew = true;
+          }
+        }
+        if (!grew || out.rounds >= 32) {
+          out.byId = byId;
+          out.viewed = new Set([...views.keys()]);
+          return out;
+        }
+      }
+    } catch (error) {
+      // LOUD, AND NEVER THE TOWN'S REFUSAL. The merged fold below is still the
+      // gate for a result that cannot compose; here a failure only means the
+      // order cannot be asked. Publishes fall back to their sketchbook's reading
+      // (the rule before WLD-51); the unpublish loop takes NOTHING, because a
+      // mark is never taken on a walk not run.
+      out.byId = null;
+      out.viewed = new Set();
+      out.error = String(error?.message ?? error).slice(0, 400);
+      resultErrors.push(out.error);
+      console.error(`[the-result] this crossing's result could not be admitted, so the order could not be asked: publishes are judged by their own sketchbooks, and nothing is unpublished. ${out.error}`);
+      return out;
+    }
+  }
+  let result = admitResult(pending);
+
+  // MARKET, PUBLISHING: each row's class is read off the result.
+  for (const { candidate, ...row } of pending) {
+    const rowClass = result.viewed.has(row.id) ? rowClassOf(classifyMark(result.byId.get(row.id), result.byId)) : row.class;
+    if (rowClass !== "commons" || row.escrow > 0) {
+      published.push({ ...row, class: rowClass });
+      continue;
+    }
+    leftDrafted.push({ household: row.household, id: row.id, path: row.path, class: rowClass, escrow: row.escrow, reason: "commons needs escrow > 0" });
+  }
+  // The family crosses together, and a verdict whose ground stayed behind is let go.
+  settlePublished();
+
+  // MARKET, PUBLISHED. Only marks previously admitted by this sweep are
+  // candidates for unpublish. Anything absent from the registry is founding
+  // estate and stays published. THE RULE IS unpublish-verdict.mjs's
+  // (postmark#3757), the one the office's stakes warning reads too; this loop
+  // measures and acts. A verdict of `null` (an input not measured) unpublishes
+  // nothing, as a skipped row always did.
+  //
+  // The standing is the RESULT's (§ the order). A mark the result does not hold
+  // (the fold dropped it, or the crossing withdrew it) walks nowhere: `null`,
+  // and the stored rules decide, as before. A result that could not be folded
+  // answers `undefined`: unread, and nothing is taken.
+  //
+  // Ground the result counts on can still be held back later, by the reparent
+  // verb's door below. A mark kept by such ground is kept this crossing and
+  // judged again at the next: the direction that takes nothing on a premise
+  // that moved.
+  const filingOnMain = filingIndexAt(repo, mainBranch);
   const unpublished = [];
   for (const [id, entry] of Object.entries(registry.published)) {
-    if (entry.class !== "commons" || (escrow.get(id) ?? 0) > 0) continue;
-    if (!hasObject(repo, `${mainBranch}:${entry.path}`)) continue;
+    const verdict = unpublishVerdict(entry, {
+      escrow: escrow.get(id) ?? 0,
+      pathOnMain: () => hasObject(repo, `${mainBranch}:${entry.path}`),
+      standing: () => (!result.byId ? undefined : gone.has(id) || !mainFolded.has(id) ? null
+        : result.byId === mainFolded ? (mainFolded.get(id)?.tier ?? null) // nothing laid on main: the fold's own verdict
+        : result.viewed.has(id) ? classifyMark(result.byId.get(id), result.byId) : undefined),
+      currentPath: () => filingOnMain(id),
+      ...(staleRows ? { staleRows } : {}),
+    });
+    if (verdict.unpublish !== true) continue;
     unpublished.push({
       household: entry.household,
       id,
-      path: entry.path,
+      path: verdict.path,
       class: "commons",
       escrow: escrow.get(id) ?? 0,
-      content: readAt(repo, mainBranch, entry.path),
+      content: readAt(repo, mainBranch, verdict.path),
     });
   }
 
@@ -1410,37 +1633,94 @@ export function settlementSweep({
   // parent crossed alone — its filing orphaned, its frame resolved past the
   // missing mark into the lake, and every settlement since 08-20 17:45Z
   // refused at the gate over it. The family crosses together or the child
-  // waits, loudly — the quarantine's own grammar, one level down.
-  for (let held = true; held;) {
-    held = false;
-    const crossing = new Set(published.map((item) => item.path.replace(/\\/g, "/")));
-    for (let i = published.length - 1; i >= 0; i--) {
-      const item = published[i];
-      const parts = item.path.replace(/\\/g, "/").split("/");
-      // `depth > 3` — the same floor `enclosingMarkId` walks to, and the two must
-      // agree about what an ancestor IS or the hold guards an edge nobody reads.
-      // parts: WORLD marks <first> [ …dirs… ] <slug> mark.md, and that <first>
-      // segment is never a mark's parent: under the fossil tree it is the world
-      // root (always canon, so the old floor only ever reached it to skip it),
-      // and under the id-keyed layout the freeze introduced it is a HOUSEHOLD
-      // namespace with no mark.md in it at all. At the old floor of 2 every mark
-      // filed at its id — "New marks are filed by identity — WORLD/marks/
-      // <household>/<slug>/" — was held forever, waiting on ground that is a
-      // directory rather than a mark and can therefore never cross.
-      for (let depth = parts.length - 2; depth > 3; depth--) {
-        const ancestorDir = parts.slice(0, depth).join("/");
-        const ancestor = `${ancestorDir}/mark.md`;
-        if (!ancestor.startsWith(MARKS_PREFIX)) break;
-        if (crossing.has(ancestor)) continue;                       // crossing together
-        if (hasObject(repo, `${mainBranch}:${ancestor}`)) continue; // already canon
-        if (seatStandsOnMain(repo, mainBranch, ancestorDir)) continue; // a husk: the frame left, its filing stands — the ground is the next frame up, and it is canon (the reparent verb, 2026-09-16)
-        published.splice(i, 1);
-        leftDrafted.push({ household: item.household, id: item.id, path: item.path, class: item.class, escrow: item.escrow,
-          reason: `held: its ground ${ancestorDir.slice(MARKS_PREFIX.length)} is still drafted — the family crosses together (stake the ground, or the child waits)` });
-        held = true;
-        break;
+  // waits, loudly — the quarantine's own grammar, one level down. It runs
+  // twice (WLD-51): over every row before the result is folded, so the result
+  // holds no orphan, and over what publishes after the market is judged.
+  function holdOrphans(rows) {
+    const removed = [];
+    for (let held = true; held;) {
+      held = false;
+      const crossing = new Set(rows.map((item) => item.path.replace(/\\/g, "/")));
+      for (let i = rows.length - 1; i >= 0; i--) {
+        const item = rows[i];
+        const parts = item.path.replace(/\\/g, "/").split("/");
+        // `depth > 3` — the same floor `enclosingMarkId` walks to, and the two must
+        // agree about what an ancestor IS or the hold guards an edge nobody reads.
+        // parts: WORLD marks <first> [ …dirs… ] <slug> mark.md, and that <first>
+        // segment is never a mark's parent: under the fossil tree it is the world
+        // root (always canon, so the old floor only ever reached it to skip it),
+        // and under the id-keyed layout the freeze introduced it is a HOUSEHOLD
+        // namespace with no mark.md in it at all. At the old floor of 2 every mark
+        // filed at its id — "New marks are filed by identity — WORLD/marks/
+        // <household>/<slug>/" — was held forever, waiting on ground that is a
+        // directory rather than a mark and can therefore never cross.
+        for (let depth = parts.length - 2; depth > 3; depth--) {
+          const ancestorDir = parts.slice(0, depth).join("/");
+          const ancestor = `${ancestorDir}/mark.md`;
+          if (!ancestor.startsWith(MARKS_PREFIX)) break;
+          if (crossing.has(ancestor)) continue;                       // crossing together
+          if (hasObject(repo, `${mainBranch}:${ancestor}`)) continue; // already canon
+          if (seatStandsOnMain(repo, mainBranch, ancestorDir)) continue; // a husk: the frame left, its filing stands — the ground is the next frame up, and it is canon (the reparent verb, 2026-09-16)
+          rows.splice(i, 1);
+          removed.push(item);
+          leftDrafted.push({ household: item.household, id: item.id, path: item.path, class: item.class, escrow: item.escrow,
+            reason: `held: its ground ${ancestorDir.slice(MARKS_PREFIX.length)} is still drafted — the family crosses together (stake the ground, or the child waits)` });
+          held = true;
+          break;
+        }
       }
     }
+    return removed;
+  }
+
+  // § A VERDICT WHOSE GROUND STAYED BEHIND (WLD-51, B2). The result the market
+  // was judged on laid every row this crossing MIGHT publish, and some did not
+  // publish (escrow, then the closure hold above, then the reparent verb's door
+  // below). A ✦0 row judged home on ground that then stayed behind would
+  // publish under a "home" row while standing on nothing of its household's,
+  // and the sweep never reaches such a mark again (WLD-51's gap read, R3). So
+  // whenever what publishes is no longer what the result was asked with, the
+  // result is asked again with exactly what publishes, and every row is judged
+  // again on it: a ✦0 row that now walks commons waits in its sketchbook. The
+  // two holds alternate until neither lets anything else go, because a row let
+  // go by one can be the ground or the filing parent the other counted on.
+  function settlePublished() {
+    const removed = [];
+    for (;;) {
+      removed.push(...holdOrphans(published));
+      const now = published.map((row) => row.id);
+      if (now.length === result.laid.size && now.every((id) => result.laid.has(id))) return removed;
+      result = admitResult(published);
+      if (!result.byId) return removed;   // the order could not be asked again: the first reading stands
+      for (let i = published.length - 1; i >= 0; i--) {
+        const row = published[i];
+        if (!result.viewed.has(row.id)) continue;
+        const cls = rowClassOf(classifyMark(result.byId.get(row.id), result.byId));
+        if (cls !== "commons" || row.escrow > 0) { row.class = cls; continue; }
+        published.splice(i, 1);
+        removed.push(row);
+        leftDrafted.push({ household: row.household, id: row.id, path: row.path, class: "commons", escrow: row.escrow,
+          reason: "held: the ground it stood on did not cross this settlement, so it holds none, and commons needs escrow > 0 — it waits in its sketchbook and crosses with its ground" });
+      }
+    }
+  }
+
+  // A row let go AFTER the write (the reparent verb's door) is taken back out of
+  // the tree: main's own copy restored where main holds the path, the file and
+  // its emptied seats removed where it does not, and its registry row put back
+  // as main had it.
+  function unwrite(row) {
+    if (hasObject(repo, `${mainBranch}:${row.path}`)) {
+      writeRepoFile(repo, row.path, readAt(repo, mainBranch, row.path));
+    } else {
+      rmSync(join(repo, row.path), { force: true });
+      const marksRoot = join(repo, "WORLD", "marks");
+      for (let seat = dirname(join(repo, row.path)); seat !== marksRoot && seat.startsWith(marksRoot) && existsSync(seat) && !holdsAStandingMark(seat); seat = dirname(seat))
+        rmSync(seat, { recursive: true, force: true });
+      if (touched.includes(row.path)) touched.splice(touched.indexOf(row.path), 1);
+    }
+    if (registryBefore[row.id]) registry.published[row.id] = registryBefore[row.id];
+    else delete registry.published[row.id];
   }
 
   // ── THE LOUD-EMPTY GUARD (founder-mandated 2026-08-27) ─────────────────────
@@ -1576,6 +1856,9 @@ export function settlementSweep({
           delete registry.published[back.id];
           leftDrafted.push({ household: back.household, id: back.id, path: back.path, class: back.class, escrow: back.escrow,
             reason: `held: ${stuck.id} stands inside it and cannot keep its place exactly if it returns (${stuck.reason}) — the frame waits in its sketchbook until the mark is re-expressed by hand` });
+          // what was judged on it, or filed under it, waits with it (WLD-51, B2)
+          for (const row of settlePublished()) unwrite(row);
+          for (const row of published) if (registry.published[row.id]) registry.published[row.id].class = row.class;
           continue;
         }
         throw e;
@@ -1736,6 +2019,19 @@ export function settlementSweep({
     eol_boundary: gate.irreconcilable,
     // §4's own number, measured rather than asserted.
     fold_stats: { ...foldMeter },
+    // § the order (WLD-51): how many marks this crossing judged against its
+    // result, and why not when it could not (then nothing was unpublished).
+    result: {
+      laid: result.laid.size, admitted: result.viewed.size, rounds: result.rounds,
+      ...(resultErrors.length ? { error: resultErrors.join(" | ") } : {}),
+      // a judged mark the result could not admit (its parent left this crossing,
+      // its stake row is negative, …): kept, because a mark is never taken on a
+      // walk not run, and named, because a keep with no receipt reads as a verdict
+      ...(() => {
+        const unread = judged.filter((id) => mainFolded.has(id) && !result.viewed.has(id));
+        return unread.length ? { judged_unread: unread } : {};
+      })(),
+    },
   };
 }
 

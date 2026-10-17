@@ -30,6 +30,11 @@ export const ENGINE_FILES = [
   // joined 2026-10-10 (POS-449): a mark's first-laid instant, read by both
   // marks-fold.mjs and consent.mjs, so neither imports the other for it.
   "claim-instant.mjs",
+  // joined 2026-10-13 (WLD-5): the lint's portal rules are portals.mjs's, one
+  // definition beside the passage's, and portals.mjs reads the entry law from
+  // enter-exit.mjs.
+  "portals.mjs",
+  "enter-exit.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

@@ -1,0 +1,22 @@
+# The wolf: a creature of the Mists (WLD-56; Sitting E §§ 6–7). Ruled by Darko 2026-10-15 12:09 (D4).
+# Its aggression is display only: no nerve, no harm (tools/creature-kind.mjs refuses either).
+kind: wolf
+name: a grey wolf
+voice: a lean grey wolf at the edge of the fog, its eyes catching what light there is
+about: a wolf out of the Mists; it watches, warns and paces, and goes back when it has had enough
+what: >
+  A wolf that came out of the Mists with the season. It is wary of the town and curious about it in
+  equal measure, and it shows its teeth more than it means them. Come too close and it warns you;
+  frighten it and it is gone back into the grey.
+ring_m: 80
+moods:
+  fear: 0..3 = 1 | unbothered | wary | uneasy | ready to bolt
+  curiosity: 0..3 = 1 | indifferent | watchful | interested | fixed on you
+  hunger: 0..3 = 2 | fed | peckish | hungry | starving
+
+reaction watch "it stands still and watches": when true says At the edge of the Mists a grey wolf stands perfectly still, watching {actor}.
+reaction snarl "it bares its teeth, a warning only": when act.approaching and act.distance_m < 40 says The wolf's lip curls back. It snarls at {actor}, low and steady.
+reaction stalk "it paces along the mist-line with you": when act.verb == "walk" says The wolf paces along the edge of the Mists, keeping level with {actor}, never closer.
+reaction howl "it throws back its head and howls": when self.hunger >= 2 says The wolf throws back its head and howls. Deep in the Mists, something answers.
+reaction slink "it slinks back a step into the fog": when self.fear >= 2 does self.fear -1 says The wolf slinks back a step into the fog, its eyes still on {actor}.
+reaction flee "it turns and is gone": when self.fear >= 3 does flee says The wolf wheels and is gone, a grey shape folding back into the grey.

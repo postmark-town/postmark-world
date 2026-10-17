@@ -99,6 +99,87 @@ export function parseRecord(text, file) {
   return { ...fm, body };
 }
 
+// ---------- what parseRecord would silently lose (WLD-41, Darko 2026-10-13) ----------
+// parseRecord never throws on a value it cannot read whole; it keeps what it can.
+// Two spellings lose words that way, and both read back as if nothing happened:
+//   - a `{…}` that is not strict JSON goes to the number scan, which keeps only
+//     `word: number` pairs: `dials: { stolen: true, clue: "…" }` reads as {}.
+//   - a `#` cuts the line as a comment, even inside a quoted value.
+// This names each one from the raw text, for the lint. It is a guard, not a
+// grammar change: parseRecord reads exactly as it did, and every caller of it
+// is untouched. The rule reads the raw file because the parsed record has
+// already lost the words.
+//
+// A `{…}` value is whole when it is strict JSON or when every comma piece is
+// one `word: number` the scan reads whole (so `{x: 1, y}` and `{x: 1.2.3}` are
+// lossy too). A `#` counts only inside a quoted span; a bare `#` mid-value is
+// the grammar's comment, unchanged. A quote opens a span only at the value's
+// start or after a space or `{[,:`, so an apostrophe in prose is not a quote.
+//
+// A `[…]` value, one that starts with `[` and ends with `]`, is whole only when
+// it is strict JSON (POS-619, Wright 2026-10-14 G6, tightened 00:4x).
+// parseRecord keeps any other `[`-led value as the string it was, so a list
+// written with a bare key or word reads as no list at all.
+const PIECE_RE = /^(\w+)\s*:\s*(-?[\d.]+)$/;
+function quotedHashAt(val) {
+  let q = null;
+  for (let i = 0; i < val.length; i++) {
+    const c = val[i];
+    if (q) {
+      if (c === "\\") { i++; continue; }
+      if (c === q) q = null;
+      else if (c === "#") return i;
+    } else if ((c === '"' || c === "'") && (i === 0 || /[\s{[,:]/.test(val[i - 1]))) q = c;
+    else if (c === "#") return -1; // a comment outside any quote: the grammar's
+  }
+  return -1;
+}
+export function lossyValues(text) {
+  const m = String(text ?? "").match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!m) return [];
+  const out = [];
+  for (const raw of m[1].split(/\r?\n/)) {
+    const kv = raw.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
+    if (!kv) continue;
+    const [, key, valRaw] = kv;
+    const value = valRaw.trim();
+    const hashAt = quotedHashAt(value);
+    if (hashAt >= 0) { out.push({ key, value, why: "hash", kept: value.slice(0, hashAt).trimEnd() }); continue; }
+    const val = valRaw.replace(/#.*$/, "").trim(); // what parseRecord reads
+    if (val.startsWith("[")) {
+      // Only a value that is a list in shape (`[` … `]`): `title: [draft] my
+      // house` is a plain string, kept whole, and loses nothing (Wright 00:4x).
+      if (val.endsWith("]")) try { JSON.parse(val); } catch { out.push({ key, value: val, why: "bracket" }); }
+      continue;
+    }
+    if (!val.startsWith("{")) continue;
+    let json = null;
+    try { json = JSON.parse(val); } catch { /* not JSON: the scan reads it */ }
+    if (json !== null && typeof json === "object") continue;
+    const pieces = val.replace(/[{}]/g, "").split(",").map((p) => p.trim()).filter(Boolean);
+    const lost = pieces.filter((p) => { const n = p.match(PIECE_RE); return !n || !Number.isFinite(Number(n[2])); });
+    if (!lost.length) continue;
+    const readsAs = {};
+    for (const p of pieces) { const n = p.match(/([\w]+)\s*:\s*(-?[\d.]+)/); if (n) readsAs[n[1]] = Number(n[2]); }
+    let strict = null; // the same value with its bare keys quoted, when that is JSON
+    const quoted = val.replace(/([{,]\s*)([A-Za-z_][\w-]*)\s*:/g, '$1"$2":');
+    try { if (typeof JSON.parse(quoted) === "object") strict = quoted; } catch { /* no suggestion */ }
+    out.push({ key, value: val, why: "brace", dropped: lost.map((p) => p.split(":")[0].trim() || p), readsAs, strict });
+  }
+  return out;
+}
+
+// The words for each loss, one sentence and one owner (POS-619, Wright
+// 2026-10-14 G4). mark-lint errs with them on a tree (the PR lane), and the
+// office's two ingests hold or refuse with them, read from the same checkout.
+export function lossyMessage(l) {
+  if (l.why === "hash") return `${l.key}: a '#' inside a quoted value starts a comment, so the record keeps only what comes before it (${l.key}: ${l.kept}) — rephrase without '#'`;
+  if (l.why === "bracket") return `${l.key}: ${l.value} is not strict JSON, so the record keeps it as the string ${l.value}, not a list — write it as strict JSON`;
+  const pairs = Object.entries(l.readsAs);
+  const readsAs = pairs.length ? `{ ${pairs.map(([k, n]) => `${k}: ${n}`).join(", ")} }` : "{}";
+  return `${l.key}: ${l.value} is not strict JSON, so the record keeps only its number pairs and silently drops ${l.dropped.join(", ")} (it reads as ${readsAs}) — write it as strict JSON, every key quoted${l.strict ? `: ${l.key}: ${l.strict}` : ""}`;
+}
+
 // ---------- the frame (SCHEMA v3 § The frame, 2026-08-09) ----------
 // A mark's `at:` is written in ITS OWN FRAME — as an offset from the centre of
 // the mark it sits inside. The world root IS the frame and keeps world numbers;
@@ -439,7 +520,7 @@ function loadStakes() {
   //
   // This used to read `WHITE_PAGES/stamp-ledger.md` under the WORLD root for a
   // `stake:mark:<id>` grammar — two things wrong with that, both now closed:
-  //   1. The stamp ledger is in the TOWN repo (keeminlee/postmark), not this one, so
+  //   1. The stamp ledger is in the TOWN repo (postmark-town/postmark), not this one, so
   //      the path never existed here and every mark's ✦weight was silently 0.
   //   2. `stake:mark:<id>` was never a line the mint could produce — a read-side
   //      orphan (flagged 2026-07-23). The real class, ruled 2026-07-27 and built in
@@ -464,7 +545,7 @@ export { rect, overlapArea, contains, marksContain, polygonOf, ringMatchesClaim 
 import { rect, overlapArea, contains, marksContain, polygonOf, rectInsideRing } from "./geometry.mjs";
 import { deriveOutsiders, outsidersJson, outsidersMarkdown } from "./region-outsiders.mjs";
 import { carve } from "./determination.mjs";
-import { resolveConsent } from "./consent.mjs";
+import { resolveConsent, consentMap, CONSENT_FIELD } from "./consent.mjs";
 
 // placementParent(claim, marks) — the geometry-decides-the-parent primitive the
 // world-write path (world_leave_mark) calls to DECIDE the directory a new mark
@@ -1913,6 +1994,10 @@ function deltaView(mk, cred, rectsByCred, world = null) {
     sovereign: mk.kind === "sited" ? held.some((pr) => contains(pr, rect(mk))) : false,
     body: mk.body,
     ...(contained ? { placementParent: contained } : {}),
+    // a ground's consent word, which the standing walk reads (mark-standing.mjs
+    // § groundVerdict): a ground admitted without it would not welcome what
+    // its author welcomed (WLD-51)
+    ...(consentMap(mk) ? { [CONSENT_FIELD]: consentMap(mk) } : {}),
   };
 }
 
@@ -1929,6 +2014,37 @@ function deltaView(mk, cred, rectsByCred, world = null) {
  * the fold's own error grammar so the crossing's journal reads the same either
  * way.
  */
+/**
+ * SOVEREIGNTY AGAINST A WHOLE RESULT (WLD-51; review-214, D1). `admitDelta`
+ * judges each view's `sovereign` against the parcels admitted before it in
+ * claim order, which is right while one sketchbook is admitted. A sweep judging
+ * a crossing's whole result needs the fold's own answer (§ sovereignty in
+ * `fold`): a sited mark is sovereign inside ANY parcel its credential
+ * household holds in that result, whenever either was claimed. Without it, a
+ * house standing on main reads not-sovereign under a parcel arriving this
+ * crossing, so the walk passes it and reads the PARCEL's consent word instead of
+ * the house's.
+ *
+ * Sets `sovereign` on every sited view in `views`, in place. `world` is the
+ * result by id, its parcels included (main's and the admitted ones).
+ */
+export function sovereignInResult(views, world, { dials = DIALS } = {}) {
+  const rectsByCred = new Map();
+  for (const mk of world.values()) {
+    if (mk.kind !== "parcel") continue;
+    const r = rect(mk);
+    r.w = r.w || dials.parcel_w;
+    r.h = r.h || dials.parcel_h;
+    const cred = mk.declared_household ?? mk.household;
+    if (!rectsByCred.has(cred)) rectsByCred.set(cred, []);
+    rectsByCred.get(cred).push(r);
+  }
+  for (const view of views.values()) {
+    if (view.kind !== "sited") continue;
+    view.sovereign = (rectsByCred.get(view.declared_household ?? view.household) ?? []).some((pr) => contains(pr, rect(view)));
+  }
+}
+
 export function admitDelta(candidates, base, { dials = DIALS } = {}) {
   const errors = [];
   const views = new Map();

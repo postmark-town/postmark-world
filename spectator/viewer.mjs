@@ -21,7 +21,7 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
-import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence } from "../tools/world-verbs.mjs";
+import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
@@ -38,7 +38,7 @@ import { parseEnterExitLedger, occupancyAt, occupantsOf, withinOf, isMark, isEnt
 // is not allowed to hold one, and `tools/record-sources.test.mjs` reads these
 // bytes to prove it.
 import { recordSources, recordAbsenceMessage } from "../tools/record-sources.mjs";
-import { MISTS_PAINT, bakeSheetFeather, mistsBakePlan, mistsBaker, mistsKeepRasterBuilder, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureSVG, bellFor, ringBell } from "./mists-render.mjs";
+import { MISTS_PAINT, bakeSheetFeather, mistsBakePlan, mistsBaker, mistsKeepRasterBuilder, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureHTML, bellFor, ringBell } from "./mists-render.mjs";
 // THE PARCEL'S COLUMN — the atlas's right-hand panel, back (Keemin 2026-09-11).
 // It owns its own markdown reader, its own builder and its own dress, and it
 // takes no viewer internals: the door read, the shelf gate and the handle rule
@@ -950,32 +950,53 @@ export function occupancyHorizon(acts = [], now = 0, skew = OCCUPANCY_SKEW) {
 // again for every drawn body — the acts folded 73 times per draw, on every
 // wheel tick. The acts are a RECORD: they change when the ledger is fetched
 // (a new array) and the fold at a clock changes only when the clock passes an
-// act. So the fold is kept per acts array, tagged with how many leading acts
-// the clock admits — the ledger is chronological (each act stamps the crossing
-// it was written at), so the admitted acts are a prefix and the prefix's
-// length names the fold. A ledger that is NOT chronological is folded on every
-// call, as before: the assumption is checked once per array, never trusted.
-// Same answer as folding afresh, by construction; a fresh array (every test,
-// every fetch) folds afresh.
-const occupancyFolds = new WeakMap();   // acts → { chronological, n, occupancy, manifest }
-const chronological = (acts) => { for (let i = 1; i < acts.length; i++) if (acts[i]?.at < acts[i - 1]?.at) return false; return true; };
+// act. So the fold is kept per acts array, tagged with how many acts the clock
+// admits.
+//
+// THE COUNT NAMES THE FOLD, IN ANY ORDER (WLD-45, 2026-10-14). The tag used to
+// be the length of an admitted PREFIX, which assumed the ledger is in `ferry`
+// order — and prod's is not: it is in the order the acts were written, and the
+// office's ferry stamp steps backwards 52 times in 2,236 acts (by 4 s to 82
+// min). So every poll folded once per drawn body, 0.5–0.9 s a redraw. The fix
+// is not to sort: occupancyAt folds in the ledger's own order, and so does
+// every office reader, and a ferry-sorted fold answers differently at 65 of
+// 1,502 past clocks. What the clock admits is `{ a : a.at <= at }` — a
+// threshold over the stamps — so the NUMBER of admitted acts names the set
+// whatever the order. The stamps are sorted once per array and counted by
+// binary search; the fold itself is occupancyAt on the array, unchanged. A
+// ledger with a stamp that is not a number (NaN does not sort) is folded on
+// every call: checked once per array, never assumed. Same answer as folding
+// afresh, by construction; a fresh array (every test, every fetch) folds afresh.
+const occupancyFolds = new WeakMap();   // acts → { times, n, occupancy, manifest }
+const sortedStamps = (acts) => {
+  const times = [];
+  for (let i = 0; i < acts.length; i++) {
+    const at = acts[i]?.at;
+    if (typeof at !== "number" || Number.isNaN(at)) return null;
+    times.push(at);
+  }
+  return times.sort((a, b) => a - b);
+};
+// how many stamps the clock admits: the first sorted index past it
+const admittedCount = (times, at) => {
+  let lo = 0, hi = times.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (times[mid] <= at) lo = mid + 1; else hi = mid; }
+  return lo;
+};
 function foldedOccupancy(acts, at) {
   const list = Array.isArray(acts) ? acts : [...(acts ?? [])];
   let fold = occupancyFolds.get(list);
-  const inOrder = fold ? fold.chronological : chronological(list);
-  if (inOrder) {
-    let n = fold ? fold.n : 0;
-    while (n < list.length && list[n]?.at <= at) n += 1;
-    while (n > 0 && !(list[n - 1]?.at <= at)) n -= 1;
-    if (fold && fold.n === n) return fold;
+  if (!fold) occupancyFolds.set(list, fold = { times: sortedStamps(list), n: -1 });
+  if (!fold.times) {
     const occupancy = occupancyAt(list, at);
-    fold = { chronological: true, n, occupancy, manifest: occupantsOf(occupancy) };
-    occupancyFolds.set(list, fold);
-    return fold;
+    return { occupancy, manifest: occupantsOf(occupancy) };
   }
-  if (!fold) occupancyFolds.set(list, { chronological: false });
+  const n = admittedCount(fold.times, at);
+  if (fold.n === n) return fold;
   const occupancy = occupancyAt(list, at);
-  return { occupancy, manifest: occupantsOf(occupancy) };
+  fold = { times: fold.times, n, occupancy, manifest: occupantsOf(occupancy) };
+  occupancyFolds.set(list, fold);
+  return fold;
 }
 export function standpointOccupancy({ acts = [], at = Infinity, handle = null } = {}) {
   const who = handle && handle !== SPECTATOR_ACTOR ? handle : null;
@@ -1303,6 +1324,29 @@ export function sceneArtSVG(mark, px) {
   if (!isEmbodiedMark(mark)) return "";
   const href = markImagePath(mark);
   if (!href || !mark.extent) return "";
+  // A RINGED MARK WEARS ITS PICTURE IN ITS RING (POS-662, Darko 2026-10-16 on prod:
+  // "ringed marks like errant/black-water-pool don't draw cropped to their ring").
+  // The far and mid tiers hang a picture through placedArtSVG, whose caller hands
+  // it the ring; this street-zoom pass painted the whole extent rectangle, so the
+  // Unfinished Margin's 14-point shore became a 1300 × 255 m box over the sea. The
+  // ring is read by the ONE ring reader (geometry.mjs § polygonOf, after the fold
+  // has parsed both written forms), the picture fills the ring's box and is clipped
+  // to it, and the frame is the ring's own line. A mark with no ring is untouched.
+  const ring = polygonOf(mark);
+  if (ring) {
+    const pts = ring.map(px);
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    if (x1 - x0 > 0 && y1 - y0 > 0) {
+      const points = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+      const clip = `wv-scene-art-clip-${String(mark.id).replace(/[^a-z0-9-]/gi, "")}`;
+      return `<g class="wv-scene-mark-art wv-scene-mark-art-ringed" data-id="${esc(mark.id)}" pointer-events="none">`
+        + `<clipPath id="${clip}"><polygon points="${points}"/></clipPath>`
+        + `<image href="${esc(href)}" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(y1 - y0).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
+        + `<polygon points="${points}" fill="none" class="wv-scene-art-frame"/>`
+        + `</g>`;
+    }
+  }
   const r = rect(mark);
   const a = px({ x: r.x - r.w / 2, y: r.y - r.h / 2 });
   const b = px({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
@@ -4002,6 +4046,54 @@ export function mistsIntroGate() {
   };
 }
 const mistsRollIn = mistsIntroGate();
+// LITE MODE (WLD-43 part 2, Darko 2026-10-13 19:24: "yes to the fix for
+// everyone, then light mode"), for a machine the Mists are heavy on: their
+// motion held still as prefers-reduced-motion holds it, no roll-in, and the
+// site's bat still. One class on <html>, `wv-lite`, which the viewer's CSS and
+// the site's motif (postmark-site halloween-sprinkle.mjs) both read.
+//
+// Lite mode returns: POS-228's name, retired in POS-285, now the Mists' WLD-43
+// switch (Darko 2026-10-15: "it should be https://postmark.town/world/?lite=1").
+// The build's first name, `?light=`, is ignored, as POS-285 ignored `?lite=`.
+//
+// Who decides, the first that answers:
+//   ?lite=1 / ?lite=0    a link forces it for that page (a support reply can be
+//                        one URL); never stored
+//   the visitor          the toggle beside the bell: auto, on, off, kept on this
+//                        device
+//   auto                 on from the start where the browser says the machine is
+//                        small (hardwareConcurrency ≤ 4, or deviceMemory ≤ 4 GB,
+//                        which only Chromium reports), or once the first layer of
+//                        the bake runs slower than 3 ms per 1,000 px (measured
+//                        here: 1.3 at full speed, 4.8 at 4× throttle), a verdict
+//                        kept so the next visit starts lite
+export const LITE = { choiceKey: "pm_world_lite", slowKey: "pm_world_lite_slow", cores: 4, memoryGB: 4, bakeMsPerKpx: 3 };
+export const LITE_NEXT = { auto: "on", on: "off", off: "auto" };
+// The build stored under `pm_world_light` and `pm_world_light_slow` before the
+// rename: read once where the new key holds nothing, written under the new key,
+// and the old one dropped, so nobody who turned it on loses it. POS-228's own
+// "1"/"0" under `pm_world_lite` are not a choice here, and stay auto.
+export const LITE_OLD = { choiceKey: "pm_world_light", slowKey: "pm_world_light_slow" };
+export function liteCarryOld(store) {
+  for (const k of ["choiceKey", "slowKey"]) {
+    const old = store.get(LITE_OLD[k]);
+    if (old == null) continue;
+    const cur = store.get(LITE[k]);
+    if (k === "choiceKey" ? cur !== "on" && cur !== "off" : cur !== "1") store.set(LITE[k], old);
+    store.set(LITE_OLD[k], null);
+  }
+}
+export function liteModeFor({ query = "", choice = null, slow = false, cores = 0, memory = 0 } = {}) {
+  const q = new URLSearchParams(query).get("lite");
+  if (q === "1") return { on: true, why: "link" };
+  if (q === "0") return { on: false, why: "link" };
+  if (choice === "on") return { on: true, why: "chosen" };
+  if (choice === "off") return { on: false, why: "chosen" };
+  if (slow) return { on: true, why: "slow" };
+  if (cores > 0 && cores <= LITE.cores) return { on: true, why: "cores" };
+  if (memory > 0 && memory <= LITE.memoryGB) return { on: true, why: "memory" };
+  return { on: false, why: "auto" };
+}
 export function mistsVeilSVG(m, { originPx, mPerPx }) {
   if (!m || !(m.veil > 0)) return "";
   const r = MISTS_FAR_M / mPerPx, n = (v) => v.toFixed(1);
@@ -4047,6 +4139,63 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
   const W = b.x - a.x, H = b.y - a.y;
   const fringe = strip("n", a.x, a.y, W, f) + strip("s", a.x, b.y - f, W, f) + strip("w", a.x, a.y, f, H) + strip("e", b.x - f, a.y, f, H);
   return `<g class="wv-mists" aria-hidden="true">${defs}${fringe}${rings}${wall}</g>`;
+}
+
+// THE MISTS' MOTION ON A STAGE OF ITS OWN (WLD-43, Darko 2026-10-13: "yes to the
+// fix for everyone"). The drift and the creatures used to move as CSS transforms
+// on <g>s inside the map's svg. An svg child's transform is laid out and painted
+// with its whole svg, so every frame of the drift re-laid and re-painted the
+// ~4,000-node map: measured at 4× CPU, the page sat at 99% main thread with
+// nobody touching it (17% with the motion held still). Moved by a transform on
+// an HTML element, the same layers ride the compositor: a frame costs a style
+// tick, no layout, and no repaint of the map.
+//
+// So the moving paint stands on a stage: an HTML box laid exactly over the svg,
+// its camera a transform that does to painting units what the svg's viewBox
+// does. The wall, the veil and the sheet's feather hold still and stay in the
+// svg, and the wall still takes the pointer. The two svg layers that drew above
+// the Mists (a conversation's name-box and the housemate edge chevrons) move to
+// an svg at the top of the stage, so the order on screen is the order it was.
+
+// What the svg's viewBox and preserveAspectRatio do to painting units, as one
+// CSS transform for a box the svg's own size: `par` is the svg's
+// preserveAspectRatio.baseVal ({ align, meetOrSlice }, the SVG DOM's numbers).
+const PAR_ALIGN = { 2: [0, 0], 3: [0.5, 0], 4: [1, 0], 5: [0, 0.5], 6: [0.5, 0.5], 7: [1, 0.5], 8: [0, 1], 9: [0.5, 1], 10: [1, 1] };
+export function viewBoxTransform(vb, W, H, par = null) {
+  if (!(vb?.w > 0) || !(vb?.h > 0) || !(W > 0) || !(H > 0)) return "scale(0)";
+  const align = par?.align ?? 6, slice = par?.meetOrSlice === 2;
+  let sx = W / vb.w, sy = H / vb.h, ox = 0, oy = 0;
+  if (align !== 1) {
+    const s = slice ? Math.max(sx, sy) : Math.min(sx, sy), [fx, fy] = PAR_ALIGN[align] ?? PAR_ALIGN[6];
+    sx = sy = s; ox = (W - vb.w * s) * fx; oy = (H - vb.h * s) * fy;
+  }
+  return `matrix(${sx},0,0,${sy},${ox - vb.x * sx},${oy - vb.y * sy})`;
+}
+
+// The moving paint as the stage's markup, in painting units (the stage's camera
+// scales them): one box per layer, its baked images where the svg's <image>s
+// stood, the creatures in the back layer's banks. A layer that holds still
+// (driftM 0, the opaque back layer) carries no animation at all.
+//
+// Each drifting layer gets keyframes of its own with the distance written in,
+// not one set reading it from a custom property: var() in keyframes costs
+// Chromium a fuller style recalc on every frame (measured: about 1.6× the
+// style time of the same motion written literally). They exist only under
+// `prefers-reduced-motion: no-preference` and outside lite mode, so a reader
+// who asked for stillness (or whose machine is given it) gets the layers at rest.
+export function mistsPaintHTML(baked, { originPx, mPerPx, layers, creatures = "" }) {
+  const n = (v) => v.toFixed(1);
+  let motion = "";
+  const banks = layers.map((L, li) => {
+    const d = L.driftM / mPerPx;
+    if (d > 0) motion += `@keyframes wv-mists-drift-${li} { from { transform:translate(-${n(d)}px,-${n(d * 0.45)}px); } to { transform:translate(${n(d)}px,${n(d * 0.45)}px); } }`
+      + ` :root:not(.wv-lite) .wv-mists-cam .wv-mists-drift.wv-mists-l${li} { animation:wv-mists-drift-${li} ${L.driftS}s ease-in-out infinite alternate; }`;
+    return `<div class="wv-mists-bank${d > 0 ? ` wv-mists-drift wv-mists-l${li}` : ""}">`
+      + baked.filter((b) => b.li === li).map((b) => `<img class="wv-mists-img" alt="" draggable="false" src="${b.url}"`
+        + ` style="left:${n(originPx.x + b.box.minX / mPerPx)}px;top:${n(originPx.y + b.box.minY / mPerPx)}px;width:${n(b.w / mPerPx)}px;height:${n(b.h / mPerPx)}px">`).join("")
+      + (li === 0 && creatures ? `<div class="wv-mists-creatures">${creatures}</div>` : "") + `</div>`;
+  });
+  return (motion ? `<style>@media (prefers-reduced-motion:no-preference){ ${motion} }</style>` : "") + banks.join("");
 }
 
 // Place a bubble beside an anchor without letting it leave the painting.
@@ -4706,6 +4855,46 @@ export function enterSheetHTML(answer = {}, markId = "") {
   return "";
 }
 
+/** THE WALK'S ANSWER CARRIES THE DOOR UNDER `entry` (WLD-48, 2026-10-14).
+ *
+ *  The walk door composes the entry and nests the door's answer in the walk's
+ *  own receipt (office world.mjs § walkEntryReceipt): `{ …the walk, entry: {
+ *  awaiting, terms, refused, note, queued_for_arrival, … } }`. This page read
+ *  `awaiting` and `terms` off the walk's top level, where they never are, so a
+ *  terms door reached by a walk showed "on the way" and its accept button could
+ *  never fire. And the top level's `note` is the WALK's sentence ("position
+ *  derives from this record and the clock…"), not the door's, so every other
+ *  answer the door gave (a refusal, "nothing is queued: …") was silent too.
+ *
+ *  So the entry is read where the office puts it. A bare answer with no
+ *  `entry` is read as itself, which is the shape this file assumed before. */
+export const walkEntryOf = (answer = {}) =>
+  answer?.entry && typeof answer.entry === "object" ? answer.entry : (answer ?? {});
+
+/** The sheet a walk-there-and-enter answer gets. Pure.
+ *
+ *  A TERMS door asks with the same sheet the enter button gets, and its accept
+ *  resends the WALK with the walker's word (`data-walk-enter-accept`). Anything
+ *  else is "on the way": the walk stands, whatever the door said, and the body
+ *  is the door's own words — the mark's refusal when it gave one, then the
+ *  office's note on the entry, which says whether anything was queued and what
+ *  to pass if not (Darko's WLD-5 G2, 2026-10-14: "the answer gives the door's
+ *  words plus what to pass"; the viewer's half closed under it on WLD-48 G1).
+ *  NO SILENT CLICK: a refusal never reads as an entry on its way. */
+export function walkEnterSheetHTML(answer = {}, markId = "") {
+  const entry = walkEntryOf(answer);
+  if (isTermsAsk(entry)) return enterSheetHTML(entry, markId).replace("data-enter-accept=", "data-walk-enter-accept=");
+  const refused = typeof entry.refused === "string" ? entry.refused
+    : String(entry.refused?.because ?? entry.refused?.word ?? "");
+  const words = answer?.entry && typeof answer.entry === "object"
+    ? [refused, answer.arrived_note ?? entry.note]
+    : [answer?.note ?? answer?.narration ?? "the office recorded the departure — you cross the threshold when you arrive"];
+  const said = words.map((w) => String(w ?? "").trim()).filter(Boolean);
+  return `<div class="wv-cross-sheet is-terms" data-for="${esc(markId)}"><div class="wv-cross-head">on the way</div>`
+    + (said.length ? said : ["the office recorded the departure"]).map((w) => `<p class="wv-cross-body">${esc(w)}</p>`).join("")
+    + `</div>`;
+}
+
 // ───────── the Actions rail (R16, 2026-08-18) ─────────
 //
 // DERIVED, NEVER LISTED. There is no vocabulary of verbs anywhere in this file,
@@ -5057,8 +5246,21 @@ const STYLE = `
 .wv-main { --rail:212px; display:grid; grid-template-columns:var(--rail) 33rem minmax(0,1fr);
   gap:0; align-items:start; transition:grid-template-columns .3s cubic-bezier(.4,0,.2,1); }
 @media (prefers-reduced-motion:reduce){ .wv-main { transition:none; } }
-.wv-mists-drift { animation:wv-mists-drift 60s ease-in-out infinite alternate; }
-@keyframes wv-mists-drift { from { transform:translate(calc(var(--wv-dx) * -1), calc(var(--wv-dy) * -1)); } to { transform:translate(var(--wv-dx), var(--wv-dy)); } }
+/* THE MISTS' STAGE (WLD-43): an HTML box laid over the map's svg, the svg's own
+   size, slid with it while a drag is under way, and clipped as it is. The
+   moving paint stands on it so its motion is the compositor's, not a repaint of
+   the map (viewBoxTransform). Never a target: the wall in the svg takes the
+   pointer, and z-index auto keeps it under the map's own controls (6 and up). */
+.wv-minimap > .wv-mists-stage { position:absolute; left:0; top:0; overflow:hidden; pointer-events:none; will-change:transform; }
+.wv-minimap > .wv-mists-stage.wv-pan-live, .wv-mists-stage.wv-pan-live > svg { overflow:visible; }
+.wv-mists-stage > svg { position:absolute; left:0; top:0; width:100%; height:100%; }
+.wv-mists-cam { position:absolute; left:0; top:0; transform-origin:0 0; }
+.wv-mists-cam .wv-mists-paint, .wv-mists-cam .wv-mists-bank, .wv-mists-cam .wv-mists-creatures, .wv-mists-cam .wv-mc-at, .wv-mists-cam .wv-mc
+  { position:absolute; left:0; top:0; width:0; height:0; transform-origin:0 0; }
+.wv-mists-cam .wv-mists-img { position:absolute; display:block; max-width:none; max-height:none; margin:0; padding:0; border:0; }
+.wv-mists-cam .wv-mc-eyes, .wv-mists-cam .wv-mc-art { position:absolute; left:0; top:0; overflow:visible; }
+.wv-mists-cam .wv-mc-eyes { width:0; height:0; }
+/* the drift's keyframes are written per layer with the paint (mistsPaintHTML) */
 .wv-mc-flit { animation:wv-mc-flit 4.2s ease-in-out infinite alternate; }
 @keyframes wv-mc-flit { 0% { transform:translate(-14px,4px) rotate(-6deg); } 50% { transform:translate(6px,-8px) rotate(5deg); } 100% { transform:translate(16px,3px) rotate(-3deg); } }
 .wv-mc-lift { animation:wv-mc-lift 9s ease-in-out infinite alternate; }
@@ -5066,6 +5268,20 @@ const STYLE = `
 .wv-mc-eyes { animation:wv-mc-blink 9s steps(1,end) infinite; }
 @keyframes wv-mc-blink { 0%, 46%, 50%, 100% { opacity:1; } 47% { opacity:0; } 90% { opacity:.35; } }
 @media (prefers-reduced-motion:reduce){ .wv-mists-drift, .wv-mc-flit, .wv-mc-lift, .wv-mc-eyes { animation:none; } }
+/* LITE MODE (WLD-43 part 2) holds them still the same way (the drift's own
+   keyframes are written only where it is off: mistsPaintHTML) */
+html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { animation:none; }
+/* the lite toggle and the bell's phone menu (WLD-43 part 2): on a phone the
+   toggle's circle stands down and the bell opens a menu holding both */
+.wv-mapctl-tools { position:relative; }
+@media (max-width:720px){ .wv-mapctl .ctl.wv-lite-toggle { display:none; } }   /* beats .wv-mapctl .ctl, later in the sheet */
+.wv-bell-menu { position:absolute; top:calc(100% + 6px); z-index:8; display:flex; flex-direction:column; gap:2px; padding:5px;
+  background:rgba(13,15,19,.94); border:1px solid rgba(232,197,106,.34); border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.45); }
+.wv-bell-menu[hidden] { display:none; }
+.wv-bell-menu-row { all:unset; box-sizing:border-box; cursor:pointer; white-space:nowrap; padding:8px 12px; border-radius:8px;
+  font-family:var(--mono); font-size:.82rem; color:rgba(232,197,106,.9); }
+.wv-bell-menu-row:hover, .wv-bell-menu-row:focus-visible { background:rgba(232,197,106,.16); }
+.wv-bell-menu-row.on { color:var(--night); background:linear-gradient(180deg,#f0d68f,var(--amber)); }
 .wv-main.no-map { grid-template-columns:var(--rail) minmax(0,1fr); }
 @media (max-width:1160px){ .wv-main,.wv-main.no-map { grid-template-columns:var(--rail) minmax(0,1fr); }
   .wv-map { grid-column:1 / -1; border-top:1px solid var(--line); } .wv-map .wv-sticky { position:static; } }
@@ -7012,6 +7228,28 @@ export function mountViewer(appEl) {
   let byId = new Map();     // id → folded mark, for cell lookups
   let homeSet = new Set();  // ids that render green on the fold's own word: the sovereigns
   let mapCtx = null;
+  // LITE MODE (WLD-43 part 2; the rule is at LITE, above): decided once at
+  // boot, before the map paints, and again whenever the toggle or the bake's
+  // verdict changes it. Storage is a convenience: shut, the choice lasts the page.
+  const liteStore = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch { /* the choice lasts this page */ } },
+  };
+  liteCarryOld(liteStore);
+  let liteChoice = liteStore.get(LITE.choiceKey);          // "on" | "off" | null (auto)
+  if (liteChoice !== "on" && liteChoice !== "off") liteChoice = null;
+  let liteSlow = liteStore.get(LITE.slowKey) === "1";
+  let liteLink = typeof location === "object" ? location.search : "";   // spent once the visitor chooses
+  let lite = { on: false, why: "auto" };
+  function applyLite() {
+    lite = liteModeFor({ query: liteLink, choice: liteChoice, slow: liteSlow,
+      cores: typeof navigator === "object" ? navigator.hardwareConcurrency : 0, memory: typeof navigator === "object" ? navigator.deviceMemory : 0 });
+    const was = document.documentElement.classList.contains("wv-lite");
+    document.documentElement.classList.toggle("wv-lite", lite.on);
+    paintLiteButton();
+    if (was !== lite.on && mapCtx) { mapCtx.mistsKey = null; drawMists(); }
+  }
+  applyLite();
   // ── THE TOWN'S HOUSES ON A RESIDENT'S MAP (2026-09-11) ────────────────────
   //
   // Keemin, on dev as wright: "we still don't have the new parcel cards loaded
@@ -7036,14 +7274,14 @@ export function mountViewer(appEl) {
     if (townHouses || townHousesPending) return townHousesPending;
     townHousesPending = fetchWorldState(recordSources("/WORLD/world-state.json").map((source) => source.url), { credentials: "same-origin" })
       .then(({ json }) => {
-        townWorld = { marks: json?.marks ?? [], parcels: json?.parcels ?? [], households: json?.households ?? {} };
+        townWorld = sightOf({ marks: json?.marks ?? [], parcels: json?.parcels ?? [], households: json?.households ?? {} });
         townHouses = townHouseMarks(townWorld.marks, townWorld);
         // the same record townHouseMarks just read is kept whole: the resident
         // path's index is the read's nearby entries plus these houses, and homes
         // per resident need the record's predicates, parcels and registry
         // the containment chain of every mark, for the rule that hides what is
         // inside a parcel: the read's nearby entries carry no parents
-        townChain = new Map((json?.marks ?? []).map((m) => [m.id, { kind: m.kind ?? null, parent: m.parent ?? null, placementParent: m.placementParent ?? null }]));
+        townChain = new Map(townWorld.marks.map((m) => [m.id, { kind: m.kind ?? null, parent: m.parent ?? null, placementParent: m.placementParent ?? null }]));
         if (onResidentPath()) { withTownHouses(); if (lastRadial) drawOverlay(lastRadial); }
       })
       .catch((e) => { console.warn(`[world] the town's houses could not be read (${String(e?.message ?? e).slice(0, 120)}) — the map shows the read's own`); })
@@ -7180,6 +7418,16 @@ export function mountViewer(appEl) {
   // on the resident path, because nothing there computes a field of view any
   // more — the office does. Everything that used to walk `world.marks` goes
   // through `allMarks()` below, which is the drawn set here and the fold there.
+  // WHAT THE PAGE MAY DRAW INSIDE A DUNGEON (WLD-5, Darko 2026-10-13 20:31) is
+  // the world tools' one answer, never this page's: `standpointSight`, the same
+  // function the office's reads call, asked of the enter ledger at the page's
+  // clock. The Spectator has entered nothing, so every dungeon draws as its own
+  // mark alone. There is no second implementation here, on purpose.
+  const sightOf = (w) => standpointSight(w, {
+    occupancy: occupancyAt(enterExitLedger.acts, occupancyClock()),
+    handle: isSpectating() ? null : (state.handle || null),
+  });
+
   function applyWorldLayer() {
     if (!data?.trueWorld && !data?.myWorld) {
       // no fold in hand: the resident path. `byId` is filled by the read.
@@ -7190,7 +7438,7 @@ export function mountViewer(appEl) {
       return;
     }
     data.worldState = data?.myWorld || data.trueWorld;
-    world = assembleWorld({ worldState: data.worldState, skeleton: data.skeleton });
+    world = sightOf(assembleWorld({ worldState: data.worldState, skeleton: data.skeleton }));
     byId = new Map(allMarks().map((m) => [m.id, m]));
     homeSet = buildHomeSet(world.marks);
     pinnedBuiltId = null; // the record moved: an open bubble is now stale prose
@@ -7882,6 +8130,7 @@ export function mountViewer(appEl) {
     if (!townKeep) { loadMinimap(); return; }  // entered before the town ever loaded
     boxEl.innerHTML = "";
     boxEl.appendChild(townKeep.svg);
+    if (townKeep.ctx.stage) boxEl.appendChild(townKeep.ctx.stage);
     reattach();
     mapCtx = townKeep.ctx;
     // the Mists drawn afresh on the way out, from the baked cache (a bake that
@@ -8110,12 +8359,10 @@ export function mountViewer(appEl) {
       const answer = response?.body ?? {};
       if (answer.error === "bounce") throw new Error([answer.defect, answer.hint].filter(Boolean).join(" — "));
       sheet?.remove();
-      const terms = enterSheetHTML(answer, markId);
-      if (terms && isTermsAsk(answer)) { placeCrossingSheet(liveCard(), terms.replace("data-enter-accept=", "data-walk-enter-accept="), { button }); positionBubbles(); return; }
-      placeCrossingSheet(liveCard(),
-        `<div class="wv-cross-sheet is-terms"><div class="wv-cross-head">on the way</div>`
-        + `<p class="wv-cross-body">${esc(String(answer.note ?? answer.narration ?? "the office recorded the departure — you cross the threshold when you arrive"))}</p></div>`, { button });
+      // the door's answer is the walk's `entry` (WLD-48), so the sheet reads it there
+      placeCrossingSheet(liveCard(), walkEnterSheetHTML(answer, markId), { button });
       positionBubbles();
+      if (isTermsAsk(walkEntryOf(answer))) return;
       await loadEnterExitLedger();
       renderCurrent();
     } catch (err) {
@@ -8967,6 +9214,18 @@ export function mountViewer(appEl) {
     const mistsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     mistsLayer.setAttribute("id", "wv-mists-layer");
     svg.appendChild(mistsLayer);
+    // THE MISTS' STAGE (WLD-43): the moving paint over the wall, on an HTML box
+    // of its own (viewBoxTransform); every layer below this line used to follow
+    // the wall in the svg, and now follows the paint, on the stage's own svg
+    const stage = document.createElement("div");
+    stage.className = "wv-mists-stage";
+    stage.setAttribute("aria-hidden", "true");
+    const mistsCam = document.createElement("div");
+    mistsCam.className = "wv-mists-cam";
+    const stageTop = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    stageTop.setAttribute("class", "wv-stage-top");
+    stageTop.setAttribute("preserveAspectRatio", svg.getAttribute("preserveAspectRatio") ?? "xMidYMid meet");
+    stage.append(mistsCam, stageTop);
     // The wash's name-box rides above the walkers while the washes stay under
     // everything. A wash says nothing until pointed at — the always-on labels
     // died at zoom (their halo strokes shattered into starbursts; Keemin's
@@ -8976,14 +9235,14 @@ export function mountViewer(appEl) {
     convoHoverLayer.setAttribute("id", "wv-convo-hover-layer");
     convoHoverLayer.style.pointerEvents = "none";
     convoHoverLayer.style.display = "none"; // rides the same toggle as its washes
-    svg.appendChild(convoHoverLayer);
+    stageTop.appendChild(convoHoverLayer);
     // YOUR HOUSEMATES OFF THE SCREEN (POS-373): an edge chevron toward each,
     // on top of everything, because it sits on the frame's edge and says where
     // to look. A reading, never a target.
     const housemateEdgeLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     housemateEdgeLayer.setAttribute("id", "wv-housemate-edge-layer");
     housemateEdgeLayer.style.pointerEvents = "none";
-    svg.appendChild(housemateEdgeLayer);
+    stageTop.appendChild(housemateEdgeLayer);
     function renderConvoHover(hit) {
       if (!hit) { convoHoverLayer.innerHTML = ""; return; }
       const bounds = svg.getBoundingClientRect();
@@ -8996,6 +9255,7 @@ export function mountViewer(appEl) {
     }
     boxEl.innerHTML = "";
     boxEl.appendChild(svg);
+    boxEl.appendChild(stage);
     reattachOverlays();
     boxEl.classList.add("pannable");
 
@@ -9053,7 +9313,25 @@ export function mountViewer(appEl) {
       svg.insertBefore(base, mistLayer);
     }
     const view = { ...full };
-    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, housemateEdgeLayer, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, housemateEdgeLayer, stage, mistsCam, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    // THE STAGE FOLLOWS THE SVG (WLD-43): its box is the svg's box, its camera
+    // is the viewBox the svg shows (not `view`, which leads it during a drag),
+    // and while a drag slides the svg it slides the same way (applyView). The
+    // box comes from the observer below, so a camera write measures nothing.
+    const sceneCtx = mapCtx;
+    // (a ground with no viewBox of its own shows painting units as CSS px, until
+    // the first camera write gives it one)
+    let shownVB = svg.hasAttribute("viewBox") ? { ...full } : null;
+    function syncStage() {
+      let W = sceneCtx.paneW, H = sceneCtx.paneH;
+      if (!(W > 0) || !(H > 0)) { const r = svg.getBoundingClientRect(); W = r.width; H = r.height; }
+      if (!(W > 0) || !(H > 0)) return;   // off the page (a room is in): synced again when it returns
+      stage.style.width = `${W}px`; stage.style.height = `${H}px`;
+      mistsCam.style.transform = shownVB ? viewBoxTransform(shownVB, W, H, svg.preserveAspectRatio?.baseVal) : "none";
+      if (shownVB) stageTop.setAttribute("viewBox", `${shownVB.x} ${shownVB.y} ${shownVB.w} ${shownVB.h}`);
+      else stageTop.removeAttribute("viewBox");
+    }
+    sceneCtx.syncStage = syncStage;
     // THE PANE'S WIDTH IS KEPT, NOT MEASURED (POS-228). panePx is read four
     // times a frame by the settle pass (thumbClassKey), right after
     // applyCameraScale has written styles, so every read forced a layout: 13%
@@ -9064,16 +9342,20 @@ export function mountViewer(appEl) {
     // keeps measuring, as before.
     if (typeof ResizeObserver === "function") {
       const ctx = mapCtx;
-      ctx.paneW = svg.getBoundingClientRect().width;
+      const r0 = svg.getBoundingClientRect();
+      ctx.paneW = r0.width; ctx.paneH = r0.height;
       const ro = new ResizeObserver((entries) => {
         const e = entries[entries.length - 1];
         ctx.paneW = e.borderBoxSize?.[0]?.inlineSize ?? e.contentRect.width;
+        ctx.paneH = e.borderBoxSize?.[0]?.blockSize ?? e.contentRect.height;
+        syncStage();
         // a room's svg that has left the page for good stops being watched;
         // the town's is kept (townKeep) and comes back, so it stays observed
         if (!svg.isConnected && townKeep?.ctx !== ctx) ro.disconnect();
       });
       ro.observe(svg);
     }
+    syncStage();
     // a face or a card whose small copy is not there falls back to the
     // original it carries, once (#2940) — the cards live on the overlay, the
     // faces on the walk layer
@@ -9217,7 +9499,9 @@ export function mountViewer(appEl) {
     let gesture = null;   // { at: the view the viewBox shows, sx, sy: px per painting unit }
     function writeViewBox() {
       svg.setAttribute("viewBox", `${view.x} ${view.y} ${view.w} ${view.h}`);
-      svg.style.transform = "";
+      svg.style.transform = stage.style.transform = "";
+      shownVB = { ...view };
+      syncStage();
       if (gesture) gesture.at = { ...view };
     }
     function beginGesture() {
@@ -9226,12 +9510,12 @@ export function mountViewer(appEl) {
       // how far the svg may slide before it runs off the painted margin: most of
       // one pane, which is what the clip-path grows the layer by
       gesture = { at: { ...view }, sx: m.a, sy: m.d, reachX: box.width * 0.8, reachY: box.height * 0.8 };
-      svg.classList.add("wv-pan-live");
+      svg.classList.add("wv-pan-live"); stage.classList.add("wv-pan-live");
     }
     function endGesture() {
       if (!gesture) return;
       gesture = null;
-      svg.classList.remove("wv-pan-live");
+      svg.classList.remove("wv-pan-live"); stage.classList.remove("wv-pan-live");
       applyView();
     }
     // a reader of screen geometry that must see the viewBox and the screen agree
@@ -9244,7 +9528,7 @@ export function mountViewer(appEl) {
       const tx = gesture ? (gesture.at.x - view.x) * gesture.sx : 0, ty = gesture ? (gesture.at.y - view.y) * gesture.sy : 0;
       if (gesture && view.w === gesture.at.w && view.h === gesture.at.h
           && Math.abs(tx) < gesture.reachX && Math.abs(ty) < gesture.reachY) {
-        svg.style.transform = `translate(${tx}px, ${ty}px)`;
+        svg.style.transform = stage.style.transform = `translate(${tx}px, ${ty}px)`;
       } else {
         writeViewBox();
       }
@@ -9929,6 +10213,7 @@ export function mountViewer(appEl) {
     mapCtx.mistsKey = key;
     mapCtx.veilLayer.innerHTML = mistsVeilSVG(m, mapCtx);
     mapCtx.mistsLayer.innerHTML = mistsWallSVG(m, { ...mapCtx, painted: true });
+    mapCtx.mistsCam?.replaceChildren();   // the moving paint, on the stage (WLD-43)
     paintMists(m);
   }
 
@@ -9940,7 +10225,20 @@ export function mountViewer(appEl) {
   // they roll in from the edges and the bell is armed.
   function paintMists(m) {
     const bellBtn = root.querySelector(".wv-bell");
-    if (!m) { if (bellBtn) bellBtn.hidden = true; mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); unmaskSheetWashes(); return; }
+    if (!m) {
+      if (bellBtn) bellBtn.hidden = true;
+      const liteBtn = root.querySelector(".wv-lite-toggle"); if (liteBtn) liteBtn.hidden = true;
+      mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); unmaskSheetWashes(); return;
+    }
+    // LITE MODE SKIPS THE BAKE (WLD-43 part 2, RULED by Darko 2026-10-13 21:11): the wall the
+    // page draws before the paint stands alone, with no feather and no creatures.
+    // The bell still arms once a session, as the roll-in would have armed it.
+    if (lite.on) {
+      mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); unmaskSheetWashes();
+      if (state.crossing <= liveCrossing() && sessionOnce("pm_world_mists_intro")) mistsBellArm(m);
+      mistsBellButton(m);
+      return;
+    }
     // the town the paint keeps clear: every sited mark the world holds (the
     // whole fold, not the resident path's ground set)
     const keepMarks = data?.worldState?.marks ?? allMarks();
@@ -9956,24 +10254,17 @@ export function mountViewer(appEl) {
     // not baked yet: bake it a piece at a time between frames (the vector wall
     // already stands), then paint, if this crossing is still the one on screen
     if (!baked) { bakeMists(m, key, mistsKeepRects(keepMarks, drawn.clearings), JSON.stringify(drawn)); mistsBellButton(drawn); return; }
-    const { originPx, mPerPx } = mapCtx, n = (v) => v.toFixed(1);
-    let html = "";
+    const { originPx, mPerPx } = mapCtx;
     // the creatures, in the back layer's banks (so the front layers veil them)
     const firstMists = data?.skeleton?.mists?.schedule?.[0]?.crossing;
     const ink = mistsCoreHex(m);
     const creatures = mistsCreatures(m, { first: firstMists, keep: mistsKeepAt(mistsKeepRects(keepMarks, drawn.clearings)) })
-      .map((cr) => mistsCreatureSVG(cr, { originPx, mPerPx, ink })).join("");
-    MISTS_PAINT.layers.forEach((L, li) => {
-      const d = L.driftM / mPerPx;
-      html += `<g class="wv-mists-drift" style="--wv-dx:${n(d)}px;--wv-dy:${n(d * 0.45)}px;animation-duration:${L.driftS}s">`
-        + baked.filter((b) => b.li === li).map((b) => `<image href="${b.url}" x="${n(originPx.x + b.box.minX / mPerPx)}" y="${n(originPx.y + b.box.minY / mPerPx)}"`
-          + ` width="${n(b.w / mPerPx)}" height="${n(b.h / mPerPx)}" preserveAspectRatio="none"/>`).join("")
-        + (li === 0 ? `<g class="wv-mists-creatures">${creatures}</g>` : "") + `</g>`;
-    });
-    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-    g.setAttribute("class", "wv-mists-paint"); g.setAttribute("pointer-events", "none"); g.setAttribute("aria-hidden", "true");
-    g.innerHTML = html;
-    mapCtx.mistsLayer.appendChild(g);
+      .map((cr) => mistsCreatureHTML(cr, { originPx, mPerPx, ink })).join("");
+    // on the stage, over the wall (WLD-43): the same paint, moved by the compositor
+    const g = document.createElement("div");
+    g.className = "wv-mists-paint";
+    g.innerHTML = mistsPaintHTML(baked, { originPx, mPerPx, layers: MISTS_PAINT.layers, creatures });
+    mapCtx.mistsCam.replaceChildren(g);
     // the roll-in and the bell belong to the live crossing: dialling ahead shows
     // the paint (as it shows the wall) but neither spends the session's roll-in
     // nor rings the bell
@@ -9984,7 +10275,7 @@ export function mountViewer(appEl) {
     if (mistsBaking.has(key)) return;
     mistsBaking.add(key);
     const plan = mistsBakePlan(m), out = [], rasters = new Map();
-    let baker = null, rows = 2, rasterJob = null, per = 2;
+    let baker = null, rows = 2, rasterJob = null, per = 2, layerMs = 0;
     // every slice is timed and sized to stay near 6 ms (starting small, growing at
     // most twofold a slice), so a slow phone keeps its frames
     const timed = (fn, n, set) => { const t = performance.now(); const more = fn(n); const ms = performance.now() - t; set(Math.max(1, Math.min(400, Math.round(n * Math.min(2, ms > 0 ? 6 / ms : 2))))); return more; };
@@ -9994,7 +10285,7 @@ export function mountViewer(appEl) {
     const step = () => {
       // the town has moved on to another crossing: stop, so a scrubbed dial never
       // queues one bake per crossing it passed
-      if (town?.mistsKey !== drawnKey) { quit(); return; }
+      if (town?.mistsKey !== drawnKey || lite.on) { quit(); return; }
       try { stepOnce(); } catch { quit(); }   // e.g. a null 2d context: free the key, so a later draw retries
     };
     const stepOnce = () => {
@@ -10007,9 +10298,18 @@ export function mountViewer(appEl) {
       }
       baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, keepRaster: rasters.get(rk), canvas: document.createElement("canvas") });
       // a slice of rows, sized to stay near 8 ms, so a phone keeps its frames
-      if (timed((n) => baker.next(n), rows, (n) => { rows = n; })) { setTimeout(step, 0); return; }
+      const t0 = performance.now();
+      const more = timed((n) => baker.next(n), rows, (n) => { rows = n; });
+      layerMs += performance.now() - t0;
+      if (more) { setTimeout(step, 0); return; }
       // encoded off the main thread; the page shows it by an object URL
       const done = baker; baker = null;
+      // THE BAKE'S VERDICT ON THIS MACHINE (WLD-43 part 2): the first layer is the
+      // same work everywhere, so its time per 1,000 px is a fair reading of the
+      // machine. Under auto, a slow one turns lite mode on, and it is kept so
+      // the next visit starts lite.
+      if (out.length === 0) liteVerdict(layerMs / (done.width * done.height / 1000));
+      layerMs = 0;
       done.canvas.toBlob((blob) => { try {
         out.push({ li: p.li, box: p.box, w: done.width * p.pxM, h: done.height * p.pxM, url: blob ? URL.createObjectURL(blob) : done.canvas.toDataURL("image/png") });
         if (out.length < plan.length) { setTimeout(step, 0); return; }
@@ -10022,6 +10322,12 @@ export function mountViewer(appEl) {
     setTimeout(step, 0);
   }
   function paintSheetFeather(frame) {
+    // A ROOM NEVER GETS IT (WLD-21). paintMists schedules this as its own task, and a
+    // room can mount before the task runs: `mapCtx` is then the room's scene, and the
+    // town's feather was laid over the room's floor, hiding every floor past the
+    // sheet's edge. A room is an inside; the sheet's edge is not in it. (The town's
+    // feather comes back on the way out: remountTown draws its Mists afresh.)
+    if (sceneRoomId) return;
     const night = (getComputedStyle(mapCtx.svg).getPropertyValue("--night") || "#14171d").trim();
     const key = JSON.stringify(frame) + night;
     if (!mistsFeather || mistsFeather.key !== key) {
@@ -10071,7 +10377,8 @@ export function mountViewer(appEl) {
   function mistsRollInPlay(item) {
     const { m, g } = item;
     g.style.opacity = "";
-    const reduced = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // held still under reduced motion, and in lite mode (WLD-43), the same way
+    const reduced = lite.on || (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
     if (!reduced && typeof g.animate === "function") {
       const { originPx, mPerPx } = mapCtx;
       const cx = originPx.x + (m.clear.minX + m.clear.maxX) / 2 / mPerPx, cy = originPx.y + (m.clear.minY + m.clear.maxY) / 2 / mPerPx;
@@ -10120,6 +10427,29 @@ export function mountViewer(appEl) {
     };
     for (const ev of GESTURES) document.addEventListener(ev, first, true);
   }
+  // the bell's own act and lite mode's, one each: the buttons beside each other
+  // on a desktop and the bell's menu on a phone both call these
+  function toggleBell() {
+    const on = !bellOn();
+    try { localStorage.setItem("pm_world_bell", on ? "on" : "off"); } catch { /* the choice lasts this page */ }
+    if (!on && mistsBellState.out) { try { mistsBellState.out.gain.setTargetAtTime(0, mistsBellState.ctx.currentTime, 0.15); } catch { /* already quiet */ } }
+    const bell = root.querySelector(".wv-bell"); if (bell) paintBell(bell);
+    paintBellMenu();
+    const cur = sceneRoomId ? null : mistsAt(state.crossing, data?.skeleton?.mists);
+    if (on && cur) mistsBellRing(cur, true);
+  }
+  function cycleLite() {
+    liteChoice = { auto: "on", on: "off", off: null }[liteChoice ?? "auto"];
+    liteStore.set(LITE.choiceKey, liteChoice);
+    liteLink = "";   // the visitor's own word outranks the link they came by
+    applyLite();
+  }
+  // A PHONE HAS NO ROOM FOR A SEVENTH CIRCLE (WLD-43 part 2; Wright's
+  // recommendation, Darko reviews the shots): the map's control row already wraps
+  // over the site's nav at 390 px, so there the bell opens a small menu holding
+  // both, and the lite toggle's own circle stands down (CSS, the same width).
+  const PHONE = "(max-width:720px)";
+  const onPhone = () => typeof matchMedia === "function" && matchMedia(PHONE).matches;
   function mistsBellButton(m) {
     let btn = root.querySelector(".wv-bell");
     if (!btn) {
@@ -10128,16 +10458,86 @@ export function mountViewer(appEl) {
       home.after(btn);
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        const on = !bellOn();
-        try { localStorage.setItem("pm_world_bell", on ? "on" : "off"); } catch { /* the choice lasts this page */ }
-        if (!on && mistsBellState.out) { try { mistsBellState.out.gain.setTargetAtTime(0, mistsBellState.ctx.currentTime, 0.15); } catch { /* already quiet */ } }
-        paintBell(btn);
-        const cur = sceneRoomId ? null : mistsAt(state.crossing, data?.skeleton?.mists);
-        if (on && cur) mistsBellRing(cur, true);
+        if (onPhone()) toggleBellMenu(btn); else toggleBell();
       });
     }
     btn.hidden = false;
     paintBell(btn);
+    mistsLiteButton(btn);
+  }
+  // THE LITE TOGGLE (WLD-43 part 2), beside the bell and only while the Mists
+  // stand: auto, on, off, round and round, the choice kept on this device. Lit
+  // (the cluster's own on-state) while lite mode is in effect, whoever decided.
+  function mistsLiteButton(bell) {
+    let btn = root.querySelector(".wv-lite-toggle");
+    if (!btn) {
+      btn = document.createElement("button"); btn.type = "button"; btn.className = "ctl wv-lite-toggle";
+      bell.after(btn);
+      btn.addEventListener("click", (e) => { e.stopPropagation(); cycleLite(); });
+    }
+    btn.hidden = false;
+    paintLiteButton();
+  }
+  // the bell's menu, on a phone: two rows, each doing what its desktop button does
+  function toggleBellMenu(bell) {
+    let menu = root.querySelector(".wv-bell-menu");
+    if (menu && !menu.hidden) { closeBellMenu(); return; }
+    if (!menu) {
+      menu = document.createElement("div"); menu.className = "wv-bell-menu"; menu.setAttribute("role", "menu");
+      menu.innerHTML = '<button type="button" role="menuitem" class="wv-bell-menu-row" data-act="bell"></button>'
+        + '<button type="button" role="menuitem" class="wv-bell-menu-row" data-act="lite"></button>';
+      bell.parentElement.appendChild(menu);
+      menu.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const act = e.target.closest("[data-act]")?.dataset.act;
+        if (act === "bell") toggleBell(); else if (act === "lite") cycleLite();
+      });
+    }
+    // right-aligned under the bell, inside the row that holds it
+    const row = bell.parentElement;
+    menu.style.right = Math.max(0, row.clientWidth - bell.offsetLeft - bell.offsetWidth) + "px";
+    menu.hidden = false;
+    bell.setAttribute("aria-expanded", "true");
+    paintBellMenu();
+    document.addEventListener("pointerdown", bellMenuOutside, true);
+    document.addEventListener("keydown", bellMenuKey, true);
+  }
+  function bellMenuOutside(e) { const menu = root.querySelector(".wv-bell-menu"); if (menu && !menu.contains(e.target) && !e.target.closest?.(".wv-bell")) closeBellMenu(); }
+  function bellMenuKey(e) { if (e.key === "Escape") closeBellMenu(); }
+  function closeBellMenu() {
+    const menu = root.querySelector(".wv-bell-menu"); if (menu) menu.hidden = true;
+    root.querySelector(".wv-bell")?.setAttribute("aria-expanded", "false");
+    document.removeEventListener("pointerdown", bellMenuOutside, true);
+    document.removeEventListener("keydown", bellMenuKey, true);
+  }
+  function paintBellMenu() {
+    const menu = root.querySelector(".wv-bell-menu"); if (!menu || menu.hidden) return;
+    const mode = liteChoice ?? "auto";
+    menu.querySelector('[data-act="bell"]').textContent = bellOn() ? "🔔 the bell: on" : "🔕 the bell: off";
+    const row = menu.querySelector('[data-act="lite"]');
+    row.textContent = "🍃 lite mode: " + (mode === "auto" ? "auto (" + (lite.on ? "on" : "off") + ")" : mode);
+    row.classList.toggle("on", lite.on);
+  }
+  // the bake's reading of this machine, in ms per 1,000 px of its first layer:
+  // slower than LITE.bakeMsPerKpx turns lite on, under auto only (a link or
+  // the visitor's own choice is never overruled), and is kept for next time
+  function liteVerdict(msPerKpx) {
+    if (!(msPerKpx > LITE.bakeMsPerKpx) || liteSlow) return;
+    liteSlow = true;
+    liteStore.set(LITE.slowKey, "1");
+    applyLite();
+  }
+  const LITE_WHY = { link: "set by the link", chosen: "your choice", slow: "the Mists painted slowly here", cores: "this computer has few cores", memory: "this computer has little memory", auto: "this computer looks able" };
+  function paintLiteButton() {
+    paintBellMenu();
+    const btn = root.querySelector(".wv-lite-toggle");
+    if (!btn) return;
+    const mode = liteChoice ?? "auto";
+    btn.textContent = "🍃";
+    btn.classList.toggle("on", lite.on);
+    btn.setAttribute("aria-pressed", lite.on ? "true" : "false");
+    btn.setAttribute("aria-label", "lite mode: " + (mode === "auto" ? "auto, " + (lite.on ? "on" : "off") : mode));
+    btn.title = "lite mode " + (lite.on ? "on" : "off") + " (" + (mode === "auto" ? "auto: " : "") + LITE_WHY[lite.why] + "): the Mists drawn plain and still, for a slower computer. Click for " + LITE_NEXT[mode] + ".";
   }
   function paintBell(btn) {
     const on = bellOn();
@@ -10145,6 +10545,7 @@ export function mountViewer(appEl) {
     btn.setAttribute("aria-pressed", on ? "true" : "false");
     btn.setAttribute("aria-label", on ? "the bell is on" : "the bell is off");
     btn.title = on ? "the bell: on (it rings once when the Mists come in)" : "the bell: off";
+    if (onPhone()) { btn.setAttribute("aria-haspopup", "menu"); btn.title += ". Tap for the bell and lite mode."; }
   }
 
   function drawOverlay(radial) {

@@ -1,0 +1,21 @@
+# The raven: a creature of the Mists (WLD-56; Sitting E §§ 6–7). Ruled by Darko 2026-10-15 12:09 (D4).
+kind: raven
+name: a raven
+voice: a big black bird on the mist-line, head cocked, one bright eye on you
+about: a raven out of the Mists; it watches, calls back, and fixes on whatever is left behind
+what: >
+  A raven that came out of the Mists with the season. It is more curious than afraid, it answers a
+  voice with its own, and anything set down near it gets its full attention. Come at it too fast and
+  it lifts off; frighten it badly and it is gone into the white.
+ring_m: 60
+moods:
+  fear: 0..3 = 1 | bold | watchful | skittish | ready to fly
+  curiosity: 0..3 = 2 | bored | interested | intent | can't look away
+  hunger: 0..3 = 1 | fed | peckish | hungry | starving
+
+reaction watch "it cocks its head": when true says A raven on the mist-line cocks its head and studies {actor} with one bright eye.
+reaction caw "it calls back, harsh and loud": when act.verb == "say" says The raven answers {actor} with a harsh, rolling caw.
+reaction nearer "it hops a little nearer, curious": when self.curiosity >= 2 and not act.approaching says The raven hops a little nearer to {actor}, head tilted, waiting to see what happens next.
+reaction fix "it fixes on what was left": when act.verb == "drop" or act.verb == "leave-mark" says The raven's eye fixes on what {actor} left behind. It shuffles its wings.
+reaction lift "it lifts off and circles once": when act.approaching and act.distance_m < 20 does self.fear +1 says The raven lifts off with a clap of wings, circles once over {actor}, and settles further along.
+reaction flee "it is gone into the white": when self.fear >= 3 does flee says The raven takes to the air and vanishes into the white.

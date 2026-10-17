@@ -366,3 +366,48 @@ test("POS-369 · a market opposition: the senior at contact may oppose a straddl
   assert.doesNotMatch(out, /"parcelhh\/the-far-parcel" does not touch/, "not that it does not touch");
   assert.doesNotMatch(out, /"pondhh\/the-old-pond"[^\n]*(ignored|not inside)/, "held for POS-572: a welcome on what stands inside your mark is read as before");
 });
+
+// ── WLD-41 · a value the parser silently empties (Darko, 2026-10-13 16:47) ───
+//
+// parseRecord reads a `{…}` value as strict JSON first, and anything else through
+// a number scan that keeps only `word: number` pairs. So the heist's spelling
+// `dials: { stolen: true, clue: "…" }` read as {} with no error, and the candy
+// would have stood movable (Jetto caught it on heist piece 2, WLD-7). A `#` cuts
+// the line as a comment, quotes or not. A correctness guard only: no grammar
+// change, so the lint reads the file and names the loss.
+function lossyTree(lines) {
+  const { dir, root } = fixtureTree();
+  const put = (slug, fm) => {
+    mkdirSync(join(root, slug), { recursive: true });
+    writeFileSync(join(root, slug, "mark.md"), `---\nkind: sited\nby: testerhh\ndate: 2026-10-13\n${fm}\n---\n\nA chest of candy.\n`);
+  };
+  lines.forEach((fm, i) => put(`the-chest-${i}`, `at: { x: ${100 + 50 * i}, y: 900 }\nextent: { w: 4, h: 4 }\n${fm}`));
+  return dir;
+}
+
+test("WLD-41 · the heist's spelling reds, naming the strict-JSON form; {x: 1, y: 2} and JSON stay green", () => {
+  const red = runLint(lossyTree(['dials: { stolen: true, clue: "under the stool" }']));
+  assert.match(red, /\[ERROR\] [^\n]*the-chest-0: dials: \{ stolen: true, clue: "under the stool" \} is not strict JSON, so the record keeps only its number pairs and silently drops stolen, clue \(it reads as \{\}\) — write it as strict JSON, every key quoted: dials: \{ "stolen": true, "clue": "under the stool" \}/,
+    `the heist's spelling must red with the strict form, got:\n${red}`);
+
+  const green = runLint(lossyTree(["dials: {x: 1, y: 2}", 'dials: {"stolen": true, "clue": "under the stool"}', "dials: {}"]));
+  assert.doesNotMatch(green, /not strict JSON|inside a quoted value/, `number pairs, JSON and {} lose nothing, got:\n${green}`);
+  assert.match(green, /CLEAN/, `and the tree is clean, got:\n${green}`);
+});
+
+test("WLD-41 · the pieces the scan cannot read whole red too; a '#' reds only inside quotes", () => {
+  const out = runLint(lossyTree(["dials: {x: 1, y}", "dials: {x: 1.2.3}", 'clue: "room #3"', "clue: Bob's #1 shop"]));
+  assert.match(out, /the-chest-0: dials: \{x: 1, y\} is not strict JSON[^\n]*drops y \(it reads as \{ x: 1 \}\) — write it as strict JSON, every key quoted$/m, `a missing value, got:\n${out}`);
+  assert.match(out, /the-chest-1: dials: \{x: 1\.2\.3\} is not strict JSON[^\n]*drops x \(it reads as \{ x: NaN \}\)/, `a number the scan reads short, got:\n${out}`);
+  assert.match(out, /the-chest-2: clue: a '#' inside a quoted value starts a comment, so the record keeps only what comes before it \(clue: "room\) — rephrase without '#'/, `a quoted '#', got:\n${out}`);
+  assert.doesNotMatch(out, /the-chest-3:[^\n]*'#'/, "an apostrophe is not a quote, and a bare '#' is the grammar's comment");
+});
+
+// ── POS-619 · the lint reds a `[…]` value that isn't strict JSON (G6) ────────
+test("POS-619 · a [ value that isn't JSON reds with marks-fold's sentence; JSON lists stay green", () => {
+  const red = runLint(lossyTree(["implements: [candy, chest]"]));
+  assert.match(red, /\[ERROR\] [^\n]*the-chest-0: implements: \[candy, chest\] is not strict JSON, so the record keeps it as the string \[candy, chest\], not a list — write it as strict JSON/,
+    `a bare-word list must red, got:\n${red}`);
+  const green = runLint(lossyTree(['implements: ["candy", "chest"]', "labels: []", "title: [draft] my house"]));
+  assert.doesNotMatch(green, /not strict JSON/, `JSON lists lose nothing, got:\n${green}`);
+});

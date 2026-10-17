@@ -285,12 +285,20 @@ async function panAway(page) {
     return r ? { x: r.x + r.width / 2, y: r.y + r.height / 2 } : null;
   }, ACTOR);
   await page.mouse.move(at?.x ?? box.x + box.width / 2, at?.y ?? box.y + box.height / 2);
-  for (let i = 0; i < 12; i++) { await page.mouse.wheel(0, -240); await page.waitForTimeout(60); }
-  await page.waitForTimeout(800);
+  // ONE WHEEL, to the zoom floor (the twelve ticks of -240 this was, summed).
+  // The viewer rebuilds 140 ms after the camera settles, and only when the
+  // camera has LEFT the box it last drew; a zoom in never leaves it. Twelve
+  // ticks under a loaded runner could rest past 140 ms mid-zoom, rebuild a box
+  // sized for that zoom, and the pan below never left it: all four bodies stayed
+  // drawn (23 of 54 at six copies at once, 2026-10-14; it held S109). One move
+  // leaves no rest in between, so the box drawn is the final zoom's.
+  await page.mouse.wheel(0, -12 * 240);
+  await page.waitForFunction(() => document.querySelector("#wv-overlay")?.getAttribute("data-tier") === "near",
+    null, { timeout: 30_000 });
   // drag toward the painting's wider side, a few strokes, until the camera is
   // far enough: the housemate beyond the viewport plus its cull margin
   const east = STAND.x < 1300;
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 12; i++) {
     const r = await readBodies(page, MATE);
     const c = worldCentre(r.viewBox);
     if (Math.abs(c.x - AT[MATE].x) > c.w * 2.2 && Math.abs(c.x - AT[TOWNIE].x) > c.w * 2.2) break;
@@ -303,7 +311,13 @@ async function panAway(page) {
     await page.mouse.up();
     await page.waitForTimeout(500);
   }
-  await page.waitForTimeout(1500);
+  // the claim's own condition, not a clock: the rebuild after the pan has culled
+  // the town's other bodies and the chevron is up. A timeout falls through to
+  // the assertions, which say what is missing.
+  await page.waitForFunction(([mate, others]) => {
+    const drawn = [...document.querySelectorAll("#wv-walk-layer g[data-handle]")].map((g) => g.getAttribute("data-handle"));
+    return !drawn.some((h) => others.includes(h)) && !!document.querySelector(`#wv-housemate-edge-layer [data-handle="${mate}"]`);
+  }, [MATE, [TOWNIE, NEAR]], { timeout: 30_000 }).catch(() => { /* the assertions below say what is missing */ });
 }
 
 test("3. panned away, the housemate stays drawn and an edge chevron points at them", async (t) => {
@@ -318,6 +332,10 @@ test("3. panned away, the housemate stays drawn and an edge chevron points at th
   const c = worldCentre(r.viewBox);
   const offBy = Math.abs(c.x - AT[MATE].x) / c.w;
   assert.ok(offBy > 2.2, `the camera left the housemate behind (${offBy.toFixed(2)} viewports): ` + JSON.stringify(r.viewBox));
+  // …and the townie, or the cull below is asked of a body still in the drawn
+  // box (the drag's side is the record's, so a later record can turn it)
+  const townieOffBy = Math.abs(c.x - AT[TOWNIE].x) / c.w;
+  assert.ok(townieOffBy > 2.2, `the camera left the townie behind too (${townieOffBy.toFixed(2)} viewports): ` + JSON.stringify(r.viewBox));
   // the anti-vacuity half: the cull ran, so a body that is not the household's is gone
   assert.ok(!r.drawn.includes(TOWNIE), "the town's other bodies are culled out here: " + JSON.stringify(r.drawn));
   assert.ok(r.drawn.includes(MATE), "the housemate is never culled: " + JSON.stringify(r.drawn));

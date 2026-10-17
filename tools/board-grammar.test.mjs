@@ -318,7 +318,9 @@ test("the '#' truncation: the lint catches the face it CAN see (review O-1)", ()
   // reads the record, so a mid-string hash arrives already truncated and
   // lint-clean — the DOOR's bounce is the real wall (office pin), and the
   // PR lane's human eyes are the belt. What lint does catch is the ask that
-  // STARTS with '#': it parses to empty and the needs-ask error fires.
+  // STARTS with '#': it parses to empty and the needs-ask error fires. Since
+  // WLD-41 the lint also reads the file for a '#' inside a QUOTED value
+  // (marks-fold.mjs § lossyValues); a bare mid-string '#' is still a comment.
   const { dir, board } = fixtureTree();
   const slug = join(board, "a-hash-headed-notice");
   mkdirSync(slug, { recursive: true });

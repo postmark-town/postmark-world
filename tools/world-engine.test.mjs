@@ -70,6 +70,62 @@ test("LOD respects the context budget (render cost capped, not world-proportiona
   assert.ok(fov.aggregate.hidden_by_budget >= 0);
 });
 
+test("the landmark lift: a carried mark its stamps seated is `lifted`; one its size seats is not (POS-632)", () => {
+  // three households near the observer (inside cluster_beyond_m), two seats.
+  // By size alone: big (0.5), mid (0.3), small (0.1). Fifty stamps lift small to
+  // 0.1 × (1 + 0.6·ln 51) ≈ 0.336, past mid, so small takes mid's seat.
+  const marks = [
+    { id: "big/a", kind: "sited", household: "big", at: { x: 200, y: 0 }, extent: { w: 100, h: 100 }, weight: 30 },
+    { id: "mid/b", kind: "sited", household: "mid", at: { x: 0, y: 200 }, extent: { w: 60, h: 60 }, weight: 0 },
+    { id: "small/c", kind: "sited", household: "small", at: { x: -200, y: 0 }, extent: { w: 20, h: 20 }, weight: 50 },
+  ];
+  const fov = fieldOfView({ x: 0, y: 0 }, worldOf(marks), { crossing: 0, budget: 2 });
+  const byId = Object.fromEntries(fov.carried.map((m) => [m.id, m]));
+  assert.deepEqual(Object.keys(byId).sort(), ["big/a", "small/c"], "the stamps seat small over mid");
+  assert.equal(byId["small/c"].lifted, true, "small is in view by its weight, not its size");
+  assert.equal("lifted" in byId["big/a"], false, "big is weighted but its size alone seats it");
+  // the counterfactual only reads: the ranking is the one it always was
+  assert.deepEqual(fov.carried.map((m) => m.id), ["big/a", "small/c"]);
+  // a weightless world carries no lift at all, so its rows are the bytes they were
+  const bare = fieldOfView({ x: 0, y: 0 }, worldOf(marks.map((m) => ({ ...m, weight: 0 }))), { crossing: 0, budget: 2 });
+  assert.ok(bare.carried.every((m) => !("lifted" in m)));
+});
+
+test("the landmark lift never touches a cluster count (the counterfactual pass writes nothing)", () => {
+  // one far household of three marks: its rep carries clusteredCount 2, once
+  // m2 leads in both passes (nearest AND heaviest), so the counterfactual picks the
+  // same rep, and a count it wrote would land on the real one (review-217 § 6)
+  const marks = [0, 1, 2].map((i) => ({ id: `far/m${i}`, kind: "sited", household: "far", at: { x: 2020 - i * 10, y: 0 }, extent: { w: 50, h: 50 }, weight: i * 20 }));
+  const fov = fieldOfView({ x: 0, y: 0 }, worldOf(marks), { crossing: 0 });
+  assert.equal(fov.carried.length, 1);
+  assert.equal(fov.carried[0].clusteredCount, 2);
+});
+
+test("the landmark lift: a weight-0 tie falls to record order, so a mark its stamps seat through a tie is lifted (review-217 § 4)", () => {
+  const marks = [
+    { id: "a/one", kind: "sited", household: "a", at: { x: 200, y: 0 }, extent: { w: 20, h: 20 }, weight: 0 },
+    { id: "b/two", kind: "sited", household: "b", at: { x: -200, y: 0 }, extent: { w: 20, h: 20 }, weight: 5 },
+  ];
+  const fov = fieldOfView({ x: 0, y: 0 }, worldOf(marks), { crossing: 0, budget: 1 });
+  assert.deepEqual(fov.carried.map((m) => m.id), ["b/two"]);
+  assert.equal(fov.carried[0].lifted, true, "at weight 0 a/one holds the seat; b/two is in view by its stamps");
+});
+
+test("the landmark lift keeps the acting home outside the budget in both passes (review-217 § 5)", () => {
+  const marks = [
+    { id: "x/big", kind: "sited", household: "x", at: { x: 200, y: 0 }, extent: { w: 100, h: 100 }, weight: 0 },
+    { id: "y/mid", kind: "sited", household: "y", at: { x: 0, y: 200 }, extent: { w: 60, h: 60 }, weight: 0 },
+    { id: "z/small", kind: "sited", household: "z", at: { x: -200, y: 0 }, extent: { w: 20, h: 20 }, weight: 60 },
+    { id: "me/home", kind: "sited", household: "me", at: { x: 0, y: -200 }, extent: { w: 10, h: 10 }, weight: 50 },
+  ];
+  const fov = fieldOfView({ x: 0, y: 0 }, worldOf(marks), { crossing: 0, budget: 2, keep: "me/home" });
+  const byId = Object.fromEntries(fov.carried.map((m) => [m.id, m]));
+  assert.deepEqual(Object.keys(byId).sort(), ["me/home", "x/big", "z/small"]);
+  assert.equal(byId["z/small"].lifted, true);
+  assert.equal("lifted" in byId["me/home"], false, "the home is carried outside the budget in the counterfactual too");
+  assert.equal("lifted" in byId["x/big"], false);
+});
+
 test("a signal-mark cuts through fog where a plain mark at the same range does not", () => {
   const far = 6000; // beyond a thick-fog reach, within a signal's multiplied reach
   const marks = [

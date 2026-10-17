@@ -225,7 +225,7 @@
     ]
   },
   "mists": {
-    "_ruling": "WORLD/ENGINE.md § The Mists (seasonal; POS-466, POS-468): a border band with a place. The wall stands at the border and creeps in on a crossing schedule; it occludes everything behind it, with no ceiling; its fringe shortens sight on the clear side; its veil dims every light. As it creeps in it may cover a household's marks, for the season (WLD-38, ruled 2026-10-12), and the household is to be told so on its doorstep; the clearings keep the ground the town sized them for. Before the schedule's first crossing there are no Mists and every telling is the one it always was.",
+    "_ruling": "WORLD/ENGINE.md § The Mists (seasonal; POS-466, POS-468): a border band with a place. The wall stands at the border and creeps in on a crossing schedule; it occludes everything behind it, with no ceiling; its fringe shortens sight on the clear side; its veil dims every light. As it creeps in it may cover a household's marks, for the season (WLD-38, ruled 2026-10-12), and the household is to be told so on its doorstep; the clearings keep the ground the town sized them for. Before the schedule's first crossing there are no Mists and every telling is the one it always was. An entered mark is shelter: within it the Mists neither slow the walk nor hide what it holds (Darko 2026-10-15).",
     "border_m": {
       "minX": -4600,
       "minY": -4600,

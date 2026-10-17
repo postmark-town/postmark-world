@@ -28,6 +28,7 @@
 | dials (pace, extents, caps, lifetimes) | code constants + ENGINE.md | should be class-node predicates | currently materialized in code | **VIOLATING** — inversion #1 (dials into the tree); prerequisite for the pilot |
 | fold views (`world-state.json`, `INDEX.md`) | generator | n/a (projection) | regenerable, refuses stampless overwrite | **ADHERES** |
 | crossing-save (`STATE/`) | box | n/a (projection/checkpoint) | replayable from log | **ADHERES** |
+| creatures (spawn, fade, the window's seed and reveal) | office (the writer's creature tick) | live create and withdraw (`faded`), creature class, by `the-town`; a creature's own `react` and `withdraw` (`fled`) are POS-637's | rows in the store's log (`acts`, class `creature`); the schedule re-derives from the revealed seed (`tools/creatures.mjs § auditWindow`); saved to `STATE/log/` and `STATE/snapshot/<N>/creatures.json` every crossing | **BUILDING** (WLD-56; off by the class's `from_crossing` dial until Darko's word) |
 
 ## The town's surfaces (the shadow grammars, ranked by cutover order)
 
@@ -36,7 +37,7 @@
 | movement storage (walk-ledger line grammar) | semantics taxonomized; stored form legacy | proto-log, bespoke grammar | **CUTOVER #1** — worst documented bug farm (era seam, the teleport, four answers to where-is) |
 | identity (pins → `households.json` → credential edges) | household/join classes ruled, unbuilt | three bespoke copies of derivable relations | **CUTOVER #2** — the theorem's guardian deserves graph residence |
 | money (the sealed stamp ledger) | transaction class sketched (double-entry is a graph) | bespoke ledger grammar | **CUTOVER #3** — stakes are half-in already |
-| mail (letters, mail-ledger, ferry) | outside by covenant — reserved seat described in `LOGOS/kinds.md` | complete parallel ontology | **VIOLATING by covenant** — cutover LAST, and only on the founder's explicit word |
+| mail (letters, mail-ledger, ferry) | outside by covenant — reserved seat described in `LOGOS/lifetimes.md` | complete parallel ontology | **VIOLATING by covenant** — cutover LAST, and only on the founder's explicit word |
 | resident surfaces (homes, profiles, windows, doorstep) | node-property writes in spirit | bespoke files | **VIOLATING** — unranked; low pain |
 | votes, residency/blessing requests, bulletin/PSA | small bespoke grammars each | bespoke | **VIOLATING** — unranked; low pain |
 | atlas placements (atlas px → world coords, the Illuminator's seam) | placement is a founder/meep act; no ruled class | atlas hand-kept beside the world; the `world_orient` projection check runs at placement only (step 6.5c) — post-placement moves and atlas-first edits diverge with no second look | **VIOLATING** — unranked; the seam meets the world once (named 2026-08-13; the check that exists is placement-time only) |
@@ -47,4 +48,4 @@
 |---|---|---|---|
 | LOGOS amendments (founder commits) | the amendment act — **exists, unmapped as a class** | structure log (witnessed commits) | **CUTOVER** — the v3 re-homing draws the door on the map (law-doc class, amendment class; the-record → `logos` LANDED with the seed act 2026-08-13; the keeping-works keeps its name — the extent catch, 08-12: geometry is not jurisdiction, and the town's own node is the root) |
 | logos renderings (the-record, renamed by the seed act 2026-08-13) | founder pen | fidelity-linted both directions | **ADHERES** — the seed (`the-town/logos`, slot: law) roots the piecewise accretion; four stale renderings removed after audit, the docs' own Rendered lines vouching for the kept |
-| the serialization mapping (field → predicate star) | — | trichotomy exists in `LOGOS/kinds.md` prose; first machine form LIVE (SERIALIZATION_MAP v0.1.0, the /ops/graph/ "what LOGOS derives" lens — re-homed there when the tier-gap viewer retired with the gap, 2026-08-13) | **CUTOVER** — destination unchanged: payload schemas on class-nodes; the literal deletes itself when they land |
+| the serialization mapping (field → predicate star) | — | trichotomy exists in `LOGOS/lifetimes.md` prose; first machine form LIVE (SERIALIZATION_MAP v0.1.0, the /ops/graph/ "what LOGOS derives" lens — re-homed there when the tier-gap viewer retired with the gap, 2026-08-13) | **CUTOVER** — destination unchanged: payload schemas on class-nodes; the literal deletes itself when they land |

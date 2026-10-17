@@ -89,10 +89,22 @@ export function townOwned(mark) {
 export function markStanding(mark, byId) {
   if (!mark) return "market";
   if ((mark.by ?? mark.household) === TOWN && mark.tier === "constitution") return "constitution";
-  const house = standingHouseholdOf(mark);
+  const { ground } = standingWalk(mark, byId);
+  return ground ? groundVerdict(ground, mark, standingHouseholdOf(mark)) : "market";
+}
+
+// THE WALK ITSELF, which markStanding above reads its verdict off. Exported for
+// the one reader that needs to know WHICH records a verdict rested on: the
+// settlement sweep, which judges a mark against a crossing's whole result and
+// must then let go of a verdict whose ground did not cross after all
+// (settlement-sweep.mjs § the result, WLD-51). `chain` is every record the
+// walk stood on, the mark first; `ground` is the record it stopped at, or null.
+export function standingWalk(mark, byId) {
+  const chain = [];
   let m = mark;
   for (let hops = 0; m && hops < 32; hops++) {
-    if (m.kind === "parcel" || m.sovereign || m._sovereign) return groundVerdict(m, mark, house);
+    chain.push(m);
+    if (m.kind === "parcel" || m.sovereign || m._sovereign) return { ground: m, chain };
     // The containment chain, whatever the caller calls it: `parent` is the
     // authored edge a predicate carries, `_containedBy` the fold's derived
     // containment answer, `_parentMarkId` the loader's directory edge,
@@ -110,7 +122,7 @@ export function markStanding(mark, byId) {
     const up = m.parent ?? m._containedBy ?? m._parentMarkId ?? m.placementParent;
     m = up ? byId?.get?.(up) : null;
   }
-  return "market";
+  return { ground: null, chain };
 }
 
 // The verdict at the ground — the one place the three cases live, and the one

@@ -116,6 +116,11 @@ route) **by extraction from `WORLD/skeleton.json`** — `by: the-town`,
 Every record is `---` frontmatter then a body. The **path owns nothing but
 containment**; everything else is a field.
 
+The field `kind` describes how a mark stands — sited, predicated, parcel,
+naming, or `class` (note ⁷) — and nothing else: standing, living and fleeting
+are lifetimes, a different distinction, kept in
+[LOGOS/lifetimes.md](../../LOGOS/lifetimes.md) (WLD-39).
+
 | field | sited | parcel | predicated | naming |
 |---|---|---|---|---|
 | `kind` | required | required | required | required |

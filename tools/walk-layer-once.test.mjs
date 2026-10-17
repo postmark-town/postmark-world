@@ -22,9 +22,9 @@
 //       and answers exactly what the per-body build answered.
 //   (2) the per-tick helpers are memoised on their DATA, not the frame: the
 //       occupancy fold is taken once per ledger (and again only when the clock
-//       passes an act, or the ledger is not chronological), the vessel set once
-//       per marks array — a second ask iterates neither — and both answer what
-//       a fresh fold answers.
+//       passes an act, in whatever order the ledger holds them: WLD-45), the
+//       vessel set once per marks array — a second ask iterates neither — and
+//       both answer what a fresh fold answers.
 //   (3) on the page, a wheel tick with no data change touches no walker DOM
 //       (the nodes are the same objects; the layer's camera variable moved),
 //       and a walkers answer that moved a body writes the layer exactly once.
@@ -46,7 +46,9 @@
 // Flips: (1) in smallestContainingMark, `const own = ... ? index : ...` →
 // `const own = containmentIndex(marks, { insideRoomId })` — the handed index
 // is ignored and the reads climb with the bodies. (2) in foldedOccupancy,
-// `if (fold && fold.n === n) return fold;` removed — every ask folds again;
+// `if (fold.n === n) return fold;` removed — every ask folds again; the count
+// taken as the old admitted PREFIX (`while (n < list.length && list[n].at <=
+// at) n += 1`) — the unordered ledger answers stale folds (WLD-45);
 // in vesselHandles, `if (known) return known;` removed — every ask scans.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -55,6 +57,7 @@ import {
   bodyPlace, placeLabel, containmentIndex, smallestContainingMark, WORLD_ROOT_ID,
   standpointOccupancy, vesselHandles, sameWalkers, walkerFrameSVG, townRegionMarks,
 } from "../spectator/viewer.mjs";
+import { occupancyAt, occupantsOf } from "./enter-exit.mjs";
 
 // a record shaped like the town's: a root, a parcel, a house on it, a room in
 // the house, a bench, a carried thing at the point, and a tail of predicated
@@ -195,15 +198,91 @@ test("(2) …and folds again exactly when the clock passes an act, forwards or b
   assert.equal(folds, 6, "one fold per distinct admitted prefix, none for a clock inside the same window: folded " + folds);
 });
 
-test("(2) a ledger that is not chronological is folded on every ask — the prefix rule is checked, never assumed", () => {
-  const shuffled = [ledger[2], ledger[0], ledger[3], ledger[1]];
-  const { proxy, walks } = countingIteration(shuffled);
-  const a = standpointOccupancy({ acts: proxy, at: 190.95, handle: "rei" });
+// ── (2) …on a ledger that is NOT in ferry order (WLD-45, 2026-10-14) ─────────
+//
+// Until WLD-45 this section pinned "a ledger that is not chronological is
+// folded on every ask": the memo's tag was an admitted PREFIX, so an unordered
+// ledger had to be refolded at every call. Prod's ledger is unordered — it is
+// in the order the acts were written, and the office's ferry stamp steps
+// backwards 52 times in 2,236 acts — so every poll folded once per drawn body.
+// The tag is now the admitted COUNT, which names the admitted set in any order,
+// and the fold is still occupancyAt on the ledger as it stands. This ledger is
+// shaped on the live record's backward steps (fictional handles): one across
+// two handles (09-09), and the five where the same resident's later-written
+// act carries the earlier stamp (09-11, 09-15, 09-19, 09-22, 09-25).
+const enters = (handle, mark, at) => ({ handle, act: "enters", mark, at, word: "neutral" });
+const exits = (handle, mark, at) => ({ handle, act: "exits", mark, at, word: null });
+const unordered = [
+  enters("alder", "post/the-waiting-room", 178.9072),
+  enters("birch", "limen/the-district", 178.9061),        // across handles
+  enters("cedar", "porch/the-porch", 183.4672),
+  exits("alder", "post/the-waiting-room", 183.4631),
+  enters("alder", "harbour/the-coast", 183.5631),
+  enters("cedar", "town/the-quay", 183.4657),             // cedar's second enter, stamped first
+  enters("dogwood", "limen/the-district", 190.6064),
+  enters("dogwood", "limen/the-district", 190.6046),      // the same door twice
+  enters("elm", "harbour/the-snug-harbour", 198.2550),
+  exits("birch", "limen/the-district", 198.2056),
+  enters("birch", "harbour/the-coast", 198.2855),
+  enters("elm", "harbour/the-coast", 198.2524),           // elm, two rows of others later
+  exits("cedar", "town/the-quay", 204.6083),
+  enters("cedar", "harbour/the-snug", 204.6082),          // an entry a breath before its exit
+  enters("fir", "fir/the-sloop", 211.5798),
+  enters("fir", "harbour/the-coast", 211.5604),
+];
+const handles = [...new Set(unordered.map((a) => a.handle))];
+const stamps = [...new Set(unordered.map((a) => a.at))].sort((a, b) => a - b);
+// every distinct stamp, the midpoint after each, a clock before them all, and today
+const everyClock = [stamps[0] - 1, ...stamps.flatMap((t, i) => (i + 1 < stamps.length ? [t, (t + stamps[i + 1]) / 2] : [t])), Infinity];
+const admitted = (at) => unordered.filter((a) => a.at <= at).length;
+
+test("(2) the unordered ledger is unordered, and sorting it would change answers: the fold keeps the ledger's own order", () => {
+  assert.ok(unordered.some((a, i) => i > 0 && a.at < unordered[i - 1].at), "the fixture has backward stamps");
+  const sorted = [...unordered].sort((a, b) => a.at - b.at);
+  const key = (occ) => JSON.stringify([...occ].sort(([a], [b]) => (a < b ? -1 : 1)));
+  const differ = everyClock.filter((at) => key(occupancyAt(unordered, at)) !== key(occupancyAt(sorted, at)));
+  assert.ok(differ.length > 0, "a ferry-sorted fold answers differently at some clock, which is why the memo does not sort");
+});
+
+test("(2) on an unordered ledger the memo answers what a fresh fold answers, for every handle at every clock, forwards and back", () => {
+  const { proxy } = countingIteration(unordered);
+  for (const at of [...everyClock, ...[...everyClock].reverse()]) {
+    for (const handle of [null, ...handles]) {
+      const memo = standpointOccupancy({ acts: proxy, at, handle });
+      const plain = standpointOccupancy({ acts: [...unordered], at, handle });
+      assert.deepEqual(memo.entered, plain.entered, `at ${at}, ${handle}: entered`);
+      assert.equal(memo.insideOf, plain.insideOf, `at ${at}, ${handle}: insideOf`);
+      assert.deepEqual([...memo.manifest], [...plain.manifest], `at ${at}, ${handle}: the manifest`);
+      assert.deepEqual([...memo.manifest], [...occupantsOf(occupancyAt(unordered, at))], `at ${at}: the manifest is occupancyAt's on the ledger as it stands`);
+    }
+  }
+});
+
+test("(2) on an unordered ledger the fold is taken once per admitted count: every body at one clock walks the acts once", () => {
+  const { proxy, walks } = countingIteration(unordered);
+  const clocks = [...everyClock, ...[...everyClock].reverse()];
+  let folds = 0;
+  for (const at of clocks) {
+    for (let body = 0; body < 70; body++) {
+      const before = walks();
+      standpointOccupancy({ acts: proxy, at, handle: handles[body % handles.length] });
+      if (walks() > before) folds += 1;
+    }
+  }
+  const visits = clocks.map(admitted);
+  const changes = visits.filter((n, i) => i === 0 || n !== visits[i - 1]).length;
+  assert.equal(folds, changes, `one fold per change in the admitted count (${changes}), none per body: folded ${folds}`);
+});
+
+test("(2) a stamp that is not a number takes the memo off that ledger: it is folded on every ask", () => {
+  const odd = [...unordered, { handle: "gorse", act: "enters", mark: "harbour/the-coast", at: Number.NaN, word: "neutral" }];
+  const { proxy, walks } = countingIteration(odd);
+  const a = standpointOccupancy({ acts: proxy, at: 199, handle: "elm" });
   const n1 = walks();
-  const b = standpointOccupancy({ acts: proxy, at: 190.95, handle: "rei" });
-  assert.ok(walks() > n1, "an unordered ledger must not be trusted to a prefix: it was not walked again");
+  const b = standpointOccupancy({ acts: proxy, at: 199, handle: "elm" });
+  assert.ok(walks() > n1, "a NaN stamp does not sort, so the count cannot be trusted: it was not walked again");
   assert.deepEqual(a.entered, b.entered);
-  assert.deepEqual(a.entered, standpointOccupancy({ acts: [...shuffled], at: 190.95, handle: "rei" }).entered, "the answer is the plain fold's — the parcel is admitted, the house's entry at 190.92 too");
+  assert.deepEqual(a.entered, standpointOccupancy({ acts: [...odd], at: 199, handle: "elm" }).entered);
 });
 
 test("(2) the vessel set is scanned once per marks array, and a fresh array is scanned afresh", () => {

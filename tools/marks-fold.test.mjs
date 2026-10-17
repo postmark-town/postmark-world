@@ -7,7 +7,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { fold, parseRecord, isValidMarkDate, placementParent } from "./marks-fold.mjs";
+import { fold, parseRecord, isValidMarkDate, placementParent, lossyValues, lossyMessage } from "./marks-fold.mjs";
 
 test("isValidMarkDate accepts day precision AND full ISO 8601 datetime (world-write rung)", () => {
   for (const ok of ["2026-07-23", "2026-07-23T14:30:00", "2026-07-23T14:30:00Z",
@@ -163,4 +163,32 @@ test("parcel-claim cap (ruled 2026-07-30): 4th claim after the law bounces at cr
   const s4 = fold({ marks: four.slice(0, 3), terrain: { features: [] }, stakes: [], tick: 1 });
   assert.equal(s4.parcels.length, 3);
   assert.equal(s4.errors.length, 0, "solo grain: no grouping without the registry");
+});
+
+// ── POS-619 · a `[…]` value that isn't strict JSON is kept as a string (G6) ──
+// parseRecord keeps a `[`-led value it cannot parse as the string it was, so a
+// list written with a bare word reads as no list at all. lossyValues names it,
+// and lossyMessage is the one sentence the lint and the office's ingests print.
+const fm = (line) => `---\nkind: sited\nby: testerhh\n${line}\n---\n\nbody\n`;
+test("POS-619 · a [ value that isn't strict JSON is lossy, with the one sentence; JSON lists are whole", () => {
+  const rec = parseRecord(fm("implements: [candy, chest]"), "t");
+  assert.equal(rec.implements, "[candy, chest]", "the premise: the parser keeps it as a string");
+  const [l, ...rest] = lossyValues(fm("implements: [candy, chest]"));
+  assert.deepEqual(rest, []);
+  assert.deepEqual({ key: l.key, value: l.value, why: l.why }, { key: "implements", value: "[candy, chest]", why: "bracket" });
+  assert.equal(lossyMessage(l),
+    "implements: [candy, chest] is not strict JSON, so the record keeps it as the string [candy, chest], not a list — write it as strict JSON");
+  for (const whole of ['implements: ["candy", "chest"]', "points: [[0, 0], [4, 0], [4, 4]]", "labels: []", 'actions: [{"verb": "take"}]'])
+    assert.deepEqual(lossyValues(fm(whole)), [], `${whole} is strict JSON`);
+  assert.equal(lossyValues(fm("points: [{x: 1, y: 2}, {x: 3, y: 4}]"))[0]?.why, "bracket", "a bare-key points ring is a string too");
+  assert.equal(parseRecord(fm("title: [draft] my house"), "t").title, "[draft] my house", "the premise: a [-led prose value is kept whole");
+  assert.deepEqual(lossyValues(fm("title: [draft] my house")), [], "a value that starts with [ but doesn't end with ] is prose and loses nothing");
+});
+
+test("POS-619 · lossyMessage keeps the WLD-41 words for { and #", () => {
+  const [brace] = lossyValues(fm('dials: { stolen: true, clue: "No such thing as candy exists" }'));
+  assert.equal(lossyMessage(brace),
+    'dials: { stolen: true, clue: "No such thing as candy exists" } is not strict JSON, so the record keeps only its number pairs and silently drops stolen, clue (it reads as {}) — write it as strict JSON, every key quoted: dials: { "stolen": true, "clue": "No such thing as candy exists" }');
+  const [hash] = lossyValues(fm('clue: "room #3"'));
+  assert.equal(lossyMessage(hash), "clue: a '#' inside a quoted value starts a comment, so the record keeps only what comes before it (clue: \"room) — rephrase without '#'");
 });

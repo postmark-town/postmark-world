@@ -253,7 +253,13 @@ export function walkTargetFor(mark, from, arrival = WALK_ARRIVAL_DEFAULT) {
 
   const canon = WALK_ARRIVAL_CANON[arrival] ?? arrival;
   const anchorInside = pointInPolygon(ax, ay, ring);
-  const point = (x, y) => ({ toward: { x: round1(x), y: round1(y) }, targetExtent: null, ringed: true });
+  // Every point handed here is inside the ring. Rounding it to the line's tenth
+  // of a metre must not carry it out (WLD-5, 2026-10-14): if the rounded point
+  // falls outside, the point is kept as it is.
+  const point = (x, y) => {
+    const q = { x: round1(x), y: round1(y) };
+    return { toward: pointInPolygon(q.x, q.y, ring) ? q : { x, y }, targetExtent: null, ringed: true };
+  };
 
   if (canon === "center" && anchorInside) return point(ax, ay);
   if (pointInPolygon(fx, fy, ring)) return point(fx, fy);
@@ -262,8 +268,10 @@ export function walkTargetFor(mark, from, arrival = WALK_ARRIVAL_DEFAULT) {
   if (hit) return point(hit.x, hit.y);
   // The road never met the ring at all (a degenerate ring, or an anchor the
   // road cannot reach). The anchor is still the mark's own ground if it is
-  // inside; otherwise this mark has no answer and the caller keeps the box,
-  // which is no worse than yesterday and is never silently a lie about a ring.
+  // inside; otherwise this mark has no answer and the caller keeps the box.
+  // (A ring whose anchor is off its own ground, a long bent river, therefore
+  // still arrives off the water: where such a walk should end is a design
+  // call of its own, filed for Darko with the measurement, 2026-10-14.)
   return anchorInside ? point(ax, ay) : null;
 }
 
@@ -340,15 +348,51 @@ export function positionAt(departure, nowFractional = fractionalCrossing()) {
   const t = arrived ? entryT : candidateT;
   const remainingM = Math.max(0, arrivalM - travelledM);
 
+  const raw = { x: from.x + (toward.x - from.x) * t, y: from.y + (toward.y - from.y) * t };
+  // an arrival with no box (a `center` walk, a ring's frozen point, a coordinate) stands
+  // exactly on its `toward`, which is the target's own point: never rounded off it
+  const shown = !arrived ? { x: round1(raw.x), y: round1(raw.y) }
+    : r ? pointOnGround(raw, r) : { x: toward.x, y: toward.y };
+
   return {
-    x: round1(from.x + (toward.x - from.x) * t),
-    y: round1(from.y + (toward.y - from.y) * t),
+    x: shown.x,
+    y: shown.y,
     arrived, standing: arrivalM === 0,
     legM: Math.round(arrivalM),
     travelledM: Math.round(Math.min(travelledM, arrivalM)),
     remainingM: Math.round(remainingM),
     etaCrossings: arrived ? 0 : round2(remainingM / paceM),
   };
+}
+
+// ── AN ARRIVAL STANDS ON ITS TARGET'S GROUND (WLD-5, 2026-10-14) ──────────
+//
+// A rim arrival is the first point of the target's box, which lies ON its edge,
+// and the published position is that point rounded to a tenth of a metre. A
+// rounding that went outward put the walker up to 0.05 m outside the very mark
+// they had arrived at, so the enter's reach (within the extent) refused them.
+// Measured on world 17b64ef1: 1,066 of 14,700 simulated rim arrivals at boxes,
+// including every walk to a mark smaller than the tenth-metre grid (the
+// register entries are 0.02 m). So an arrival is rounded INWARD, never out: the
+// tenth-metre point nearest the arrival that lies on the box; a finer grid when
+// the box is too small for one; the arrival itself, clamped onto the box, when
+// no grid point fits. Checked by `pointInRect` itself, so it is inside by
+// construction. A `center` walk had the same
+// defect at the anchor of a mark smaller than the grid (380 of 14,860), so an
+// arrival with no box stands exactly on its `toward`. A walker who has not
+// arrived keeps the plain rounding.
+const GRIDS = [10, 100, 1000, 1e4, 1e5, 1e6];
+export function pointOnGround(p, r) {
+  const lo = { x: r.x - r.w / 2, y: r.y - r.h / 2 }, hi = { x: r.x + r.w / 2, y: r.y + r.h / 2 };
+  for (const g of GRIDS) {
+    const q = {};
+    for (const k of ["x", "y"]) {
+      const first = Math.ceil(lo[k] * g) / g, last = Math.floor(hi[k] * g) / g;
+      q[k] = first <= last ? Math.min(Math.max(Math.round(p[k] * g) / g, first), last) : NaN;
+    }
+    if (pointInRect(q.x, q.y, r)) return q;
+  }
+  return { x: Math.min(Math.max(p.x, lo.x), hi.x), y: Math.min(Math.max(p.y, lo.y), hi.y) };
 }
 
 // Every resident with a record, at one instant — the presence layer's input

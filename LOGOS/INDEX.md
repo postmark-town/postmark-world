@@ -76,12 +76,23 @@ in trust
 **THE WORLD** — what the function derives
 
 *its nodes:*
-9. **One node type: identity plus predicate children.** Kind-words are
-   vocabulary; classes are law; predicates are the atoms of authorship.
-   *(kinds)*
-10. **A node's tier says whose claim it is; a predicate's tier says what is
+9. **One node type: identity, its class's property values, and the
+   predicates claimed about it.** A class declares properties; an instance
+   carries their values as flat fields, and a flat field must be a declared
+   property; a predicate is anyone's contestable claim about a mark — itself a
+   mark, `predicate` being a subclass of `mark` — and predicates are the
+   atoms of authorship. The `kind` field names the node's
+   own class; lifetimes are vocabulary; classes are law. *(lifetimes ·
+   classes § Property and predicate; property, flat fields and predicate as
+   claim ruled 2026-10-16, 12:41–12:42; predicate as a subclass of mark, 12:50, and
+   the `kind` sentence, 09:36, ruled 15:43, B over Sitting A)*
+   *SUPERSEDED 2026-10-16: "One node type: identity plus predicate children.
+   Kind-words are vocabulary; classes are law; predicates are the atoms of
+   authorship."*
+10. **A node's tier says whose claim it is; a property's tier says what is
    law.** Constitutional overrules wherever it speaks, whatever node carries
-   it. *(classes; ruled 2026-08-13)*
+   it. *(classes; ruled 2026-08-13; "predicate's tier" read as property's
+   from 2026-10-16)*
 11. **Tier is never asserted; standing is derived from ground.** The one walk
    decides; the door refuses the word. *(tiers)*
 
@@ -111,12 +122,16 @@ in trust
 
 ## The law in one breath
 
-One node type: a node is identity plus predicate children. Two registries —
+One node type: a node is identity, its class's property values, and the
+predicates claimed about it (*"identity plus predicate children" until
+2026-10-16*). Two registries —
 node classes and edge classes — both nodes in the constitutional tree, tier
 conferred down it by welcome alone. One action primitive: declare an edge,
 naming its class. Every authored edge is from an action; derived edges such as
 containment and `instance-of` are readings and are never stored. Every property
-is a predicate; every difference is a class param; everything else — standing,
+is declared on a class, the sovereign ones filled on their instances as flat
+fields, and every other claim about a mark is a predicate (*"Every property is a predicate"
+until 2026-10-16*); every difference is a class param; everything else — standing,
 rank, canon, position, affordances — is derived. The town is a single response function:
 neutral by default, opposition compiled into classes, welcome reserved as
 amendment. Events to the log, authorship to nodes, law to classes, provenance
@@ -133,14 +148,14 @@ claim: the seed the piecewise renderings accrete under (Keemin, 2026-08-13).
 | [the-promises.md](the-promises.md) | the seven promises and the one test — no promise, no machine; promise-cost, era-cost, ambition-cost |
 | [the-derivation.md](the-derivation.md) | why a stamp exists: the ladder from majority vote, the evidence law, the money seam, the firewall — the argument the economy's law answers to |
 | [three-layers.md](three-layers.md) | the law → the log → the graph — and which pen writes each |
-| [kinds.md](kinds.md) | one node type; properties are predicates; standing / living / fleeting are lifetimes, not kinds |
-| [classes.md](classes.md) | class-nodes: the registries, the two constitutionalities, the household class, the custody ladder |
+| [lifetimes.md](lifetimes.md) | one node type; property values are flat fields, claims are predicates; standing / living / fleeting are lifetimes, not kinds |
+| [classes.md](classes.md) | class-nodes: the registries, property and predicate, the label → property → subclass ladder, the two constitutionalities, the household class, the custody ladder, the transfer edge and holdings |
 | [edit-law.md](edit-law.md) | the one primitive — declare an edge; create, amend, withdraw; the constitutive flip |
 | [state-and-time.md](state-and-time.md) | the log is the only stored truth; witnesses; crossings are epochs; history is absolute |
 | [tiers.md](tiers.md) | tiers are response outcomes; conferral's two channels; the two apexes; geometry never confers |
 | [the-response-function.md](the-response-function.md) | the one axis: welcomed · neutral · opposed — the town speaks through law, residents through words |
 | [conflict-matrix.md](conflict-matrix.md) | market and canon: claims, rivalry, incumbency, the jury, trueing |
-| [reads-and-affordances.md](reads-and-affordances.md) | the world decoupled from observability; projections; the apex as the class tree's shadow |
+| [reads-and-affordances.md](reads-and-affordances.md) | the world decoupled from observability; projections; the apex as the class tree's shadow; explain climbs the class, investigate goes deeper; a holding reads at its top class; verbs show only when usable |
 | [the-web-of-towns.md](the-web-of-towns.md) | one harbor vocabulary expressed through each connected world's own physics |
 
 [PROPOSED.md](PROPOSED.md) is not law either, and is the one file here that
