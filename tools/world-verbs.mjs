@@ -25,7 +25,7 @@ import {
 } from "./enter-exit.mjs"; // DEMO SLICE — the enter-exit acts (step 5, jetto/enter-exit-demo)
 import {
   pointInMark, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
-  landingOf, enterTargetOf, portalsIn, portalsInto, dungeonLanding,
+  landingOf, passageTargetOf, portalsIn, portalsInto, dungeonLanding,
 } from "./portals.mjs"; // WLD-5: portals and the dungeon class, one home for the verbs and the lint
 // The office loads this file and enter-exit.mjs from the clone, and nothing else,
 // so the portal reads it needs ride out through here.
@@ -349,9 +349,14 @@ export function enter(state, targetId, world, {
   // A mark a dungeon hides from you is no mark at all to you: the same answer
   // as an id that does not exist, so naming one from outside learns nothing.
   if (named && hiddenFrom(marks, held).has(targetId)) return { error: `no mark '${targetId}' to enter` };
+  // ENTERING A MARK ENTERS ITS `into` (WLD-5's ruling, restored by WLD-63): any
+  // mark carrying one is passed through it, the dungeon itself included. The
+  // Starforge Spire carries `into` its vestibule, so entering it from anywhere
+  // in its outline sets you down inside the Gilded Doors; a list asks which.
   if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into });
-  // Inside a dungeon, or into one, the only enter is through a portal: the cure
-  // for the Swiss-cheese exit must not leak on the way in.
+  // Inside a dungeon the only enter is through a portal (G3: the cure for the
+  // Swiss-cheese exit must not leak on the way in), and a dungeon that names no
+  // `into` of its own is entered by the portals that lead into it.
   if (named && dungeonIndex(marks).dungeons.length) {
     const inside = heldDungeon(held, marks);
     const governs = dungeonsOf(named, marks);
@@ -361,7 +366,7 @@ export function enter(state, targetId, world, {
       return {
         error: inside
           ? `you are inside ${d}, a dungeon — inside one, the only way to enter anything is a portal. The portals where you stand: ${ways.map((p) => p.id).join(", ") || "(none)"}`
-          : `${d} is a dungeon — it is entered through its portals, never directly. Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
+          : `${d} is a dungeon that names no way in of its own (no \`into\`), so it is entered through the portals that lead into it. Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
         refused: "dungeon", dungeon: d, portals: ways,
       };
     }
@@ -427,9 +432,9 @@ export function enter(state, targetId, world, {
  *     alone, as the Post Office's stops always did. Every row carries the
  *     portal's word; nothing above a dungeon is written.
  *
- *  `landing` is where he now stands (portals.mjs § landingOf, clamped into
- *  `into`); the office's pen writes it as the walk ledger's zero-length stop,
- *  the same write the Post Office's deposit makes. `portals` are the portals of
+ *  `landing` is where he now stands (portals.mjs § landingOf: inside the room
+ *  entered, a step in from the door); the office's land pen writes it as a
+ *  landing (the-town/land), the same write the Post Office's deposit makes. `portals` are the portals of
  *  the room he lands in: the next step is his to pick. */
 function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick }) {
   const marks = world.marks ?? [];
@@ -468,12 +473,13 @@ function enterThroughPortal(state, portal, world, { held, handle, at, iso, accep
   const intoMark = byId.get(chosen);
   if (!intoMark) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names no mark, so this portal leads nowhere`);
   if (!intoMark.at) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names a mark with no place in the world`);
-  const landing = landingOf(law, intoMark, byId);
+  // where it sets you down is measured in the room it enters (row 68 (a))
+  const target = passageTargetOf(portal, intoMark, marks);
+  const landing = landingOf(law, intoMark, byId, { room: target ?? intoMark, portal });
   if (!landing.ok) return broken(landing.field, landing.value, landing.because);
 
   if (verdict.effect === "terms") return { ...base, crossings: [verdict], stranded: portal.id, awaiting: verdict };
 
-  const target = enterTargetOf(intoMark, marks);
   const chain = target
     ? [...ancestorsByGeometry(target, world, { kinds: THRESHOLD_KINDS }).slice().reverse().map((m) => m.id), target.id]
     : [];

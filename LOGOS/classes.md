@@ -39,7 +39,7 @@ Rendered in the world as `the-town/emission`, `the-town/sound`,
 `the-town/exposure`, `the-town/paper`,
 `the-town/belong-to`, `the-town/grounds`, `the-town/enter`, `the-town/join`,
 `the-town/leave-mark`, `the-town/make-note`, `the-town/say`,
-`the-town/attach`, `the-town/depart`,
+`the-town/attach`, `the-town/depart`, `the-town/land`,
 `the-town/keeping-stake`, `the-town/funding-quest`, `the-town/deed`,
 `the-town/patron-deed`, `the-town/keeping-deed`, `the-town/genesis-line`,
 `the-town/holo-held`, `the-town/backing-gauge`, `the-town/patron-ledger`,
@@ -1634,7 +1634,7 @@ the three must never be read as one mechanism wearing three hats.
 
 *A portal changes where you are when you cross it. A dungeon changes what you may see and how you may leave.*
 
-Rendered in the world as `the-town/dungeon`.
+Rendered in the world as `the-town/dungeon` and `the-town/land`.
 
 Ruled by Darko with Wright in the doors sitting of 2026-10-13 (WLD-5, concluded 20:03 EDT; exit amended 21:13), and
 built on the entry law
@@ -1642,13 +1642,28 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
 
 - **A portal is a mark whose entry law carries `into`.** `into` is a mark, or a list of marks: entering the portal
   enters that mark, and with a list the walker picks, and nothing is recorded until they do. An optional
-  **`lands_at`** (a mark, or coordinates) is where you stand within `into`; it is clamped into `into`'s shape and
-  set about a metre inside. With neither, you stand at `into`'s anchor. A two-way passage is two portals pointing at
-  each other, each with its own word, body and art, so it can be locked from one side only. You enter a portal from
-  anywhere in its extent, by the reach rule every threshold keeps.
+  **`lands_at`** (a mark, or coordinates) names where you come in: the door on the far side, or a point. A two-way
+  passage is two portals pointing at each other, each with its own word, body and art, so it can be locked from one
+  side only. You enter a portal from anywhere in its extent, by the reach rule every threshold keeps, **or from
+  anywhere in a mark you have entered that holds it** (Darko 2026-10-16 19:15, row 68 A1: no walk across a room to
+  its door; on ground you have not entered, you still stand at the portal).
+- **Where a passage sets you down** (Darko 2026-10-16 19:15, row 68 (a)): fully inside the room it enters, first
+  match wins: the room's own `entry.lands_at` (a place may say where its entrants land without naming an `into`);
+  a portal `lands_at` that points inside the room, as written (a point in it, or a mark in it that is not a door);
+  a step in from the door (the paired door, the door picked from a list, or the portal itself when it stands at the
+  room), 1.5 m past the door's own edge, so never on the door's square that touches or straddles the wall, and a
+  `lands_at` that points outside the room comes here too; and with no door at all, the room's anchor. Every
+  landing stands at least a metre off every wall, inside the room. *Superseded:* "it is clamped into `into`'s
+  shape and set about a metre inside. With neither, you stand at `into`'s anchor" (10-13).
+- **A passage lands you; it never walks you** (row 68 B). Where it sets you down is its own line on the record, a
+  landing (`the-town/land`, its body approved by Darko 2026-10-16 19:39), distinct from a departure: so are the
+  whole-dungeon exit's set-down, the Post Office's deposit at a stop, and a ground that places its entrants.
+  Every reader of where you stand reads a landing as it reads an arrived departure. Stopping a walk to go in
+  stays a walk.
 - **One step at a time.** A room's answer lists the portals in it, and you pick the next. There is no
-  route-finding, and leaving a room means walking to the portal that leads out and entering it ("not unreasonable
-  for a DM to make you move your token to the door of a room full of traps").
+  route-finding. *Superseded 2026-10-16 19:15 (row 68 A1):* "leaving a room means walking to the portal that leads
+  out and entering it ('not unreasonable for a DM to make you move your token to the door of a room full of
+  traps')". Inside a room you have entered, every portal of it is at hand.
 - **A portal that leads nowhere refuses, by its own words.** An `into` or a `lands_at` that names no mark leaves the
   walker standing at the portal, and the refusal quotes the field exactly as written.
 - **A dungeon is a sited-mark class**, and its rules reach every mark it geometrically contains, as a parcel's
