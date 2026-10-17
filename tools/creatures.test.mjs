@@ -3,7 +3,10 @@
 // Read against the real world: WORLD/skeleton.json's Mists and WORLD/world-state.json's
 // marks, so "in the band" and "off the town's ground" are asked of the town as it stands.
 // The counts and the band are the law's, read from the creature class marks (D1, D2,
-// Darko 2026-10-15 12:09).
+// Darko 2026-10-15 12:09). The law stands at one creature a window from crossing 259,
+// bat, raven, wolf in turn (Darko 2026-10-17 13:58). The machinery tests
+// run at D2's full strength (FULL), so placement, water and the audit are asked of
+// nine spawns a window; the rotation tests run the law as it stands (STANDING).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -14,7 +17,7 @@ import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { loadMarks } from "./marks-fold.mjs";
 import { pointInPolygon } from "./geometry.mjs";
 import {
-  creatureLaw, CREATURE_DIAL_NAMES, TOWN, TOWN_WATERS, townWaterRings, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
+  creatureLaw, countsFor, CREATURE_DIAL_NAMES, TOWN, TOWN_WATERS, townWaterRings, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
   scheduleFor, dueSpawns, auditWindow, creaturesAt, creaturesWritten, dueFades, creaturesSnapshot,
 } from "./creatures.mjs";
 
@@ -23,7 +26,10 @@ const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")
 const MARKS = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")).marks;
 const SHA = "e5bb5aa561d9b134523ce057fdf5e961876963f6";   // the world sha these inputs stand for
 const LAW = creatureLaw(loadMarks(join(ROOT, "WORLD", "marks")));
-const INPUTS = { mists: MISTS, marks: MARKS, dials: LAW.dials, fromCrossing: 244, world_sha: SHA };
+// D2's numbers (Darko 2026-10-15 12:09) with no rotation: the schedule at full strength.
+const { rotation: _rotation, ...FULL } = { ...LAW.dials, counts: { bat: 3, raven: 4, wolf: 2 } };
+const INPUTS = { mists: MISTS, marks: MARKS, dials: FULL, fromCrossing: 244, world_sha: SHA };
+const STANDING = { mists: MISTS, marks: MARKS, dials: LAW.dials, fromCrossing: LAW.fromCrossing, world_sha: SHA };
 const MASTER = "a test master key, never the box's";
 const t = (ms) => new Date(ms).toISOString();
 
@@ -40,11 +46,13 @@ test("the seed: a secret per crossing, and a commitment that binds it and the wo
   assert.throws(() => secretFor("", 270), /no master key/);
 });
 
-test("the law: the class marks carry the ruled numbers, and the launch dial is off", () => {
-  assert.deepEqual(LAW.dials.counts, { bat: 3, raven: 4, wolf: 2 }, "D2: a wolf 2, a raven 4, a bat 3 a window");
+test("the law: the class marks carry the ruled numbers, and the launch is crossing 259", () => {
+  assert.deepEqual(LAW.dials.counts, { bat: 1, raven: 1, wolf: 1 }, "one a window (Darko 10-17 13:58)");
+  assert.deepEqual(LAW.dials.rotation, ["bat", "raven", "wolf"], "the kinds in turn, a bat first");
   assert.deepEqual([LAW.dials.band_from_m, LAW.dials.band_to_m], [0, 400], "D1: the 400 m fringe on the clear side");
   assert.equal(LAW.dials.span_h, 12, "a creature lasts 12 h from its own spawn");
-  assert.equal(LAW.fromCrossing, null, "off until the town says so");
+  assert.equal(LAW.fromCrossing, 259, "the window opening 2026-10-19 12:00Z");
+  assert.equal(windowOf(259).startMs, Date.parse("2026-10-19T12:00:00Z"));
   assert.deepEqual(LAW.kinds, ["bat", "raven", "wolf"].map((k) => ({ kind: k, kind_file: `WORLD/kinds/${k}.kind` })));
 });
 
@@ -71,7 +79,7 @@ test("the schedule: the law's counts, every one placed in the band, off the town
     const byKind = {};
     for (const s of sched.spawns) byKind[s.kind] = (byKind[s.kind] ?? 0) + 1;
     assert.deepEqual(sched.unplaced, [], `crossing ${N}: every spawn found a place`);
-    assert.deepEqual(byKind, { ...LAW.dials.counts }, `crossing ${N}: the counts`);
+    assert.deepEqual(byKind, { ...FULL.counts }, `crossing ${N}: the counts`);
     for (const s of sched.spawns) {
       const here = mistsHere(s, m);
       assert.equal(here.inWall, false, `${s.id} stands on the clear side`);
@@ -82,7 +90,7 @@ test("the schedule: the law's counts, every one placed in the band, off the town
       assert.ok(s.at_ms >= startMs && s.at_ms < endMs && s.at_ms % 60000 === 0, `${s.id} spawns at a minute in its window`);
       assert.equal(Date.parse(s.fades_at) - s.at_ms, 12 * 3600 * 1000, `${s.id} lives 12 h`);
       assert.equal(s.id, creatureId(s.kind, N, s.index));
-      for (const o of sched.spawns) if (o !== s) assert.ok(Math.hypot(o.x - s.x, o.y - s.y) >= LAW.dials.apart_m, `${s.id} and ${o.id} stand apart`);
+      for (const o of sched.spawns) if (o !== s) assert.ok(Math.hypot(o.x - s.x, o.y - s.y) >= FULL.apart_m, `${s.id} and ${o.id} stand apart`);
     }
     for (let i = 1; i < sched.spawns.length; i += 1) assert.ok(sched.spawns[i - 1].at_ms <= sched.spawns[i].at_ms, "in time order");
   }
@@ -113,7 +121,7 @@ test("the schedule is the secret's alone: the same inputs give the same window, 
   const c = scheduleFor(270, secretFor("another key", 270), INPUTS);
   assert.notDeepEqual(c.spawns.map((s) => [s.x, s.y, s.at]), a.spawns.map((s) => [s.x, s.y, s.at]));
   // one more raven moves no wolf or bat: each spawn's draws are named by its own id
-  const more = scheduleFor(270, secretFor(MASTER, 270), { ...INPUTS, dials: { ...LAW.dials, counts: { ...LAW.dials.counts, raven: 5 } } });
+  const more = scheduleFor(270, secretFor(MASTER, 270), { ...INPUTS, dials: { ...FULL, counts: { ...FULL.counts, raven: 5 } } });
   const wolves = (s) => s.spawns.filter((x) => x.kind === "wolf" || x.kind === "bat").map((x) => `${x.id}@${x.at}(${x.x},${x.y})`).sort();
   assert.deepEqual(wolves(more), wolves(a));
 });
@@ -126,6 +134,58 @@ test("the dial and the season: no schedule when the dial is off, before it, or b
   assert.deepEqual(scheduleFor(270, secret, { ...INPUTS, fromCrossing: 271 }).spawns, [], "before the launch crossing");
   assert.equal(scheduleFor(271, secretFor(MASTER, 271), { ...INPUTS, fromCrossing: 271 }).spawns.length, 9, "from it on");
   assert.deepEqual(scheduleFor(240, secretFor(MASTER, 240), { ...INPUTS, fromCrossing: 0 }).spawns, [], "no Mists before 244, no creatures");
+});
+
+test("the kinds in turn (Darko 2026-10-17 13:58): one creature a window from 259, a bat first, then raven, wolf and round again", () => {
+  assert.deepEqual(scheduleFor(258, secretFor(MASTER, 258), STANDING), { crossing: 258, spawns: [], unplaced: [] }, "nothing before the launch window");
+  const turn = { 259: "bat", 260: "raven", 261: "wolf", 262: "bat", 263: "raven", 264: "wolf", 265: "bat" };
+  for (const [N, kind] of Object.entries(turn).map(([n, k]) => [Number(n), k])) {
+    assert.deepEqual(countsFor(N, LAW.dials, LAW.fromCrossing), { [kind]: 1 }, `crossing ${N}: ${kind}'s turn`);
+    for (let k = 0; k < 20; k += 1) {
+      const sched = scheduleFor(N, secretFor(`turn ${k}`, N), STANDING);
+      assert.deepEqual(sched.unplaced, [], `crossing ${N}: the one creature finds a place`);
+      assert.deepEqual(sched.spawns.map((s) => s.id), [creatureId(kind, N, 1)], `crossing ${N}: one ${kind}, no other`);
+    }
+  }
+  // the turn counts from the launch dial, so a later launch still opens on a bat
+  assert.deepEqual(countsFor(300, LAW.dials, 300), { bat: 1 });
+  assert.deepEqual(countsFor(301, LAW.dials, 300), { raven: 1 });
+  // no rotation: every kind at its own count, as before
+  assert.deepEqual(countsFor(259, FULL, 259), FULL.counts);
+});
+
+test("one a window holds the same ground rules: on land, off the town, never on the water, and its window audits", () => {
+  const rings = townWaterRings(MARKS);
+  let checked = 0;
+  for (let N = 259; N <= 290; N += 1) {
+    for (let k = 0; k < 10; k += 1) {
+      for (const sp of scheduleFor(N, secretFor(`turn water ${k}`, N), STANDING).spawns) {
+        assert.ok(!rings.some((r) => pointInPolygon(sp.x, sp.y, r)), `${sp.id} (${sp.x}, ${sp.y}) stands on the town's water`);
+        checked += 1;
+      }
+    }
+  }
+  assert.equal(checked, 320, "one a window, every window placed");
+  const N = 259, secret = secretFor(MASTER, N), sched = scheduleFor(N, secret, STANDING), { endMs } = windowOf(N);
+  const acts = [
+    { actor: TOWN, action: "seed", object: `window-${N}`, at: t(windowOf(N).startMs), payload: { crossing: N, world_sha: SHA, commitment: commitmentOf(secret, SHA) } },
+    ...sched.spawns.map((s) => ({ actor: TOWN, action: "spawn", object: s.id, at: s.at, payload: { kind: s.kind, crossing: N, x: s.x, y: s.y, at: s.at, fades_at: s.fades_at } })),
+    { actor: TOWN, action: "reveal", object: `window-${N}`, at: t(endMs), payload: { crossing: N, secret } },
+  ];
+  assert.deepEqual(auditWindow(N, acts, STANDING), { ok: true, problems: [] }, "the bat's window re-derives from its reveal");
+  const asFull = auditWindow(N, acts, { ...STANDING, dials: FULL });
+  assert.equal(asFull.ok, false, "read without the rotation, the same log is short eight creatures");
+});
+
+test("the rotation dial is read whole: text naming the class's own kinds in turn, or refused", () => {
+  const cls = (rotation) => ({ kind: "class", by: TOWN, class: "creature", dials: { from_crossing: 270, rotation, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 } });
+  const kind = (k) => ({ kind: "class", by: TOWN, class: k, extends: "creature", dials: { count_per_window: 1 }, kind_file: `WORLD/kinds/${k}.kind` });
+  const law = (rotation, ...ks) => creatureLaw([cls(rotation), ...ks.map(kind)]);
+  assert.deepEqual(law("bat wolf", "bat", "wolf").dials.rotation, ["bat", "wolf"]);
+  assert.deepEqual(law("  wolf   bat ", "bat", "wolf").dials.rotation, ["wolf", "bat"], "spaces are only separators");
+  assert.equal("rotation" in law(null, "bat").dials, false, "null: no rotation");
+  for (const bad of ["", " ", "bat owl", 3, true, ["bat", "wolf"], {}])
+    assert.throws(() => law(bad, "bat", "wolf"), /rotation dial/, `${JSON.stringify(bad)} is refused`);
 });
 
 test("the launch dial fails closed: nothing but a whole crossing number turns it on", () => {

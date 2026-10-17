@@ -965,8 +965,15 @@ two cuts: "it fades or it flees" and "it is no one's".)
   creatures overlap across a crossing rather than turning over at once. In
   w44 a creature stands where it spawned and holds nothing: its stalking and
   circling are lines, and fleeing is its only leaving early.
-- **Off until the town says so.** The class's `from_crossing` dial is null,
-  and a null dial spawns nothing.
+  *SUPERSEDED 2026-10-17 13:58 (Darko, WLD-56): one creature a window, the
+  kinds in turn, a bat first.* Each kind's `count_per_window` is 1, and the class's
+  `rotation` dial names the kinds in turn, `bat raven wolf`: window
+  N brings only the kind whose turn it is, counted from the launch dial
+  (`tools/creatures.mjs § countsFor`). A null `rotation` brings every kind at
+  its own count.
+- **Off until the town says so.** A null `from_crossing` dial spawns nothing.
+  It stands at 259, the window that opens 2026-10-19 at 12:00Z, the first
+  window seeded after that day's 06:00Z settlement.
 
 Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
 

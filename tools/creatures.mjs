@@ -39,6 +39,11 @@
 // creature class's dials and each kind's `count_per_window` (WORLD/marks/…/entity/
 // creature/), read by `creatureLaw`; nothing here hard-codes a creature's numbers.
 //
+// THE KINDS IN TURN (Darko 2026-10-17 13:58, WLD-56): one creature per window, a
+// bat first, then raven, then wolf, and round again. The class's `rotation` dial lists the kinds in turn; window N
+// brings only `rotation[(N - from_crossing) mod length]`, at that kind's
+// `count_per_window`. Absent or null, every kind comes at its own count.
+//
 // ── THE FOLD (W4, W5) ──────────────────────────────────────────────────────────
 // A creature is a fold of the log's rows: `spawn` (the-town, object = its id),
 // its reactions (action `react`, actor = its id; payload `moods_after` and
@@ -109,7 +114,31 @@ export function creatureLaw(marks) {
     dials.counts[kind] = n;
     kinds.push({ kind, kind_file: m.kind_file });
   }
+  const rotation = rotationOf(c.dials?.rotation ?? null, dials.counts);
+  if (rotation) dials.rotation = rotation;
   return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds };
+}
+
+/** The rotation dial, read whole: text naming the class's own kinds in turn
+ *  ("bat raven wolf", the one form that is also a LOGOS v2 property's free-text
+ *  value), or null for none. Anything else throws. */
+function rotationOf(v, counts) {
+  if (v === null) return null;
+  const list = typeof v === "string" ? v.trim().split(/\s+/).filter(Boolean) : null;
+  if (!list?.length || !list.every((k) => Object.hasOwn(counts, k)))
+    throw new Error(`creatureLaw: the creature class's rotation dial is ${JSON.stringify(v)}, not its kinds in turn`);
+  return list;
+}
+
+/** The kinds crossing N brings and how many of each: every kind at its count, or,
+ *  under a rotation, only the kind whose turn N is (counted from the launch dial). */
+export function countsFor(crossing, dials, fromCrossing) {
+  const counts = dials?.counts ?? {};
+  const rotation = dials?.rotation ?? null;
+  if (!rotation) return counts;
+  const from = Number(fromCrossing), len = rotation.length;
+  const kind = rotation[((((crossing | 0) - from) % len) + len) % len];
+  return { [kind]: counts[kind] ?? 0 };
 }
 
 /** A plain object: {…} or Object.create(null); never an array, a date or a boxed value. */
@@ -210,7 +239,7 @@ const TRIES = 64;
  *
  *   mists        the skeleton's `mists` block at the window's opening sha
  *   marks        the standing marks at that sha (the town's keep-out is read from them)
- *   dials        { counts, band_from_m, band_to_m, keep_m, apart_m, span_h }: creatureLaw's
+ *   dials        { counts, rotation?, band_from_m, band_to_m, keep_m, apart_m, span_h }: creatureLaw's
  *   fromCrossing the creature class's launch dial; null is off (W6)
  *
  * Empty when the dial is off for N or the Mists are out of season (mistsAt null).
@@ -233,8 +262,9 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
   // another kind's count never moves it; only "apart" couples spawns, in a fixed
   // order (kinds by name, then index).
   const placed = [];
-  for (const kind of Object.keys(dials.counts ?? {}).sort()) {
-    const n = Math.max(0, Math.floor(Number(dials.counts[kind]) || 0));
+  const counts = countsFor(N, dials, fromCrossing);
+  for (const kind of Object.keys(counts).sort()) {
+    const n = Math.max(0, Math.floor(Number(counts[kind]) || 0));
     for (let i = 1; i <= n; i += 1) {
       const id = creatureId(kind, N, i);
       const minute = Math.floor(draw(secret, `${id}|minute`) * minutes);
