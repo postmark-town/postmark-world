@@ -1675,9 +1675,22 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   restated).
 - **A dungeon is opaque from outside.** A resident who has not entered it reads it as the dungeon mark alone, with
   nothing it contains at any depth. The block keys off having *entered* (the enter ledger), never off where you
-  stand, so walking onto a room's ground from outside reveals nothing. Inside, you read the room you entered and
-  what it holds, not its neighbours, and your walk is fenced to that room. The World map shows the same: one rule,
-  read by the town's doors and by the page alike.
+  stand, so walking onto a room's ground from outside reveals nothing. *Superseded in part 2026-10-16 19:53, for
+  sight:* "Inside, you read the room you entered and what it holds, not its neighbours" is now the rule for every
+  mark (below). Inside a dungeon, your walk is fenced to the room you entered. The World map shows the same: one
+  rule, read by the town's doors and by the page alike.
+- **Sight is scoped to the mark you have entered, for every mark** (Darko 2026-10-16 19:52–19:53, WLD-5): "when you
+  have entered a mark out in the world, a non-dungeon regular mark … your line of sight [is] scoped to the interior
+  of the mark you are within. When you are outside, you are in Let There Be Light, and therefore all of the … marks
+  in Let There Be Light are candidates." It is the default for every mark, for now ("let's just make the default
+  … for now, I think all marks should follow this principle"). What you may be told is what the innermost mark you
+  have entered, and stand in, holds: a mark wholly inside it, or one whose anchor stands in it (a door set in its
+  wall). That mark and everything above it are the frame, told as where you are (`within`), never a seat. The budget,
+  the ranking, the fog and the Mists are unchanged. A property that lets you see out of a mark is deferred.
+- **Law reach follows sight** (settled 2026-10-16 on WLD-5): inside a mark you have entered, what you can act on in
+  reach is the marks of it you are told; the marks outside it are out of reach until you step
+  out. Every law of the marks that contain you still binds you, the constitution included: it reaches you through
+  where you are (`within`), never through what you can see.
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
   with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). That every room has a path of

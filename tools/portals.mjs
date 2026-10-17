@@ -20,7 +20,7 @@
 // so what a portal does and what the lint holds it to are one definition. Pure:
 // no fs, no engine import, browser-safe like geometry.mjs.
 
-import { marksContain, overlapArea, pointInPolygon, pointInRect, polygonOf, rect } from "./geometry.mjs";
+import { marksContain, overlapArea, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "./geometry.mjs";
 import { entryLawOf, isStairs } from "./enter-exit.mjs";
 
 export const DUNGEON_CLASS = "dungeon";
@@ -46,8 +46,22 @@ const area = (m) => (m?.extent?.w ?? 0) * (m?.extent?.h ?? 0);
  *  world's own containment (marksContain), a point mark by its anchor. */
 export function markInside(outer, m) {
   if (!outer?.at || !outer.extent || !m?.at || m === outer || m.id === outer.id) return false;
+  // THE BOX FIRST (review-233, the office holds constant load): a mark whose box
+  // does not meet the outer's box has no point inside it, so it is refused before
+  // marksContain rasterizes it. Exact, not a heuristic: entering the 15 × 13 km
+  // Pando Plains asked the raster of every mark in town.
+  if (!boxesMeet(boxOf(outer), boxOf(m))) return false;
   return m.extent ? marksContain(outer, m) : pointInMark(m.at, outer);
 }
+
+/** A mark's own box: its ring's, when it carries one, else its at/extent rect. */
+const boxOf = (m) => {
+  const ring = polygonOf(m);
+  if (ring) { const b = polygonBBox(ring); return { x0: b.minx, x1: b.maxx, y0: b.miny, y1: b.maxy }; }
+  const r = rect(m);
+  return { x0: r.x - r.w / 2, x1: r.x + r.w / 2, y0: r.y - r.h / 2, y1: r.y + r.h / 2 };
+};
+const boxesMeet = (a, b) => a.x0 <= b.x1 && b.x0 <= a.x1 && a.y0 <= b.y1 && b.y0 <= a.y1;
 
 /** The room a mark stands in: the smallest sited mark with an extent, larger
  *  than it, whose shape holds its anchor. Measured at the anchor on purpose — a
@@ -62,6 +76,35 @@ export function containerOf(m, marks) {
     if (!best || area(c) < area(best)) best = c;
   }
   return best;
+}
+
+/** WHETHER A ROOM HOLDS A MARK, the one test for "what this room has in it"
+ *  (review-233): wholly inside it, or anchored in it as its container, the way
+ *  containerOf finds a mark's room. So a door set IN the room's wall (straddling
+ *  it, the Chapel front-door shape) is the room's, and a door anchored exactly on a
+ *  wall two rooms share is the one room's that portalsIn lists it under. The room
+ *  itself, and any mark that contains it, never are. Read by hiddenFrom (what a
+ *  dungeon hides) and world-verbs § sightFrameOf (what sight may tell). */
+export function roomHolds(room, mk, marks) {
+  if (!room?.at || !room.extent || !mk || mk.id === room.id) return false;
+  if (insideKept(room, mk)) return true;
+  // the anchor branch: a door set in the wall. Only a mark whose anchor stands in the
+  // room and which is not wholly inside it gets here, so this is a handful per room
+  if (!mk.at || !boxesMeet(boxOf(room), boxOf(mk)) || !pointInMark(mk.at, room) || (mk.extent && marksContain(mk, room))) return false;
+  return containerOf(mk, marks)?.id === room.id;
+}
+
+// MARKINSIDE, KEPT PER (room, mark) OBJECT (review-233): the answer is a fact about
+// those two marks alone, and the office's reads hand the eyes a FRESH marks list each
+// time (scopeWorld filters the fold) built of the SAME mark objects, so a cache keyed
+// on the objects, not the list, is paid once per fold: a giant ring's raster with it.
+const INSIDE = new WeakMap();
+function insideKept(room, mk) {
+  let byMark = INSIDE.get(room);
+  if (!byMark) INSIDE.set(room, (byMark = new WeakMap()));
+  let v = byMark.get(mk);
+  if (v === undefined) { v = markInside(room, mk); byMark.set(mk, v); }
+  return v;
 }
 
 // ── the dungeon index ────────────────────────────────────────────────────────
@@ -152,7 +195,7 @@ export function hiddenFrom(marks, held = []) {
     if (!m?.at || heldSet.has(id)) continue;
     if (ds.some((d) => !heldSet.has(d))) { hidden.add(id); continue; }
     const inner = byId.get(innerOf.get(ds[ds.length - 1]));
-    if (!inner || !markInside(inner, m)) hidden.add(id);
+    if (!inner || !roomHolds(inner, m, marks)) hidden.add(id);
   }
   // a predicate or a naming has no place of its own: it is hidden exactly when
   // the mark it describes is (chains of them included)

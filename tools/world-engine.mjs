@@ -599,7 +599,7 @@ export function lodScore({ extentM, distM, weight = 0, dials = DIALS, dimming = 
 // opts:     { crossing, budget, keep }   keep: a mark id carried beyond the budget when visible
 // Returns a structured telling: the observer's state, the ranked visible marks
 // grouped by bearing→band, far-features on the horizon, and the aggregate tail.
-export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null } = {}) {
+export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null, frame = null } = {}) {
   const { marks, terrain, heightfield, light, fogCeilingM } = world;
   const fog = fogModel(crossing, dials);
   // the Mists (POS-466): null before the schedule's first crossing, and then
@@ -647,6 +647,12 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   const bareScore = new Map(); // id → the score at weight 0, for the landmark lift below (POS-632)
   for (const mk of marks) {
     if (!mk.at) continue;                                   // predicated/naming have no site of their own
+    // SIGHT IS SCOPED TO THE MARK YOU HAVE ENTERED (WLD-5, RULED by Darko 2026-10-16
+    // 19:52–19:53): `frame` is the caller's test of "inside the innermost mark the
+    // reader has entered" (openYourEyes builds it from the enter stack, as it builds
+    // `shelter`); only what it holds is a candidate. The entered mark and everything
+    // above it are the frame, told in `within`, never a seat. Null: the whole world.
+    if (frame && !frame(mk)) continue;
     // A PARCEL RENDERS IN THE WORLD LIKE ANY OTHER MARK (the home-images
     // ruling, Keemin 2026-08-21: "make sure parcels render in the World like
     // any other mark. We removed them but that makes no sense if they get the
@@ -732,6 +738,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   const farFeatureById = new Map((terrain?.far_features ?? []).map((f) => [f.id, f]));
   for (const mk of marks) {
     if (!mk.far || !mk.at) continue;
+    if (frame && !frame(mk)) continue;                      // a horizon is not inside the room you entered
     const ff = farFeatureById.get(mk.feature) ?? farFeatureById.get(String(mk.id).split("/").pop());
     const dx = mk.at.x - observer.x, dy = mk.at.y - observer.y;
     farSeen.push({
