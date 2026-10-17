@@ -24,7 +24,8 @@ test("the creature class: a living node, live canon, two ways to leave, and off 
   assert.equal(c.canon, "live");
   assert.deepEqual(c.despawn, [...DESPAWN_REASONS]);
   assert.deepEqual(c.actions, [], "no verbs of its own");
-  assert.equal(c.dials.from_crossing, null, "the launch dial is off: nothing spawns until the town says so");
+  assert.equal(c.dials.from_crossing, 259, "the launch: the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58)");
+  assert.deepEqual(c.dials.rotation, ["bat", "raven", "wolf"], "one a window, the kinds in turn, a bat first");
   assert.equal(c.dials.span_h, 12, "a creature lasts 12 h (ruled), the span's one home");
 });
 
