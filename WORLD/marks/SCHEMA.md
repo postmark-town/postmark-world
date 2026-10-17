@@ -116,10 +116,19 @@ route) **by extraction from `WORLD/skeleton.json`** — `by: the-town`,
 Every record is `---` frontmatter then a body. The **path owns nothing but
 containment**; everything else is a field.
 
-The field `kind` describes how a mark stands — sited, predicated, parcel,
-naming, or `class` (note ⁷) — and nothing else: standing, living and fleeting
+The field `kind` describes how a record stands — sited, predicated, parcel,
+naming, `class` or `property` (note ⁷) — and nothing else: standing, living and fleeting
 are lifetimes, a different distinction, kept in
 [LOGOS/lifetimes.md](../../LOGOS/lifetimes.md) (WLD-39).
+*SUPERSEDED 2026-10-17 (LOGOS v2 part 2, the data change WLD-73 part 2 owed):
+"The field `kind` describes how a mark stands — sited, predicated, parcel,
+naming, or `class` (note ⁷)". A class's property is a node of its own,
+`kind: property`, filed in its class's directory with `name`, `tier`, `default` and a
+body (LOGOS/classes.md § Property and predicate); a child property (a cap or a
+bound) files beside it and names its parent property in `of:`. Ideas and bounties
+are posts in the law (§ Posts), but posts live in the office's post machine: the
+idea and bounty marks stay as they are until a later lane moves them. The kind migration then folds `class:` into `kind:`, so `kind` names
+the node's own class (§ The LOGOS ladder).*
 
 | field | sited | parcel | predicated | naming |
 |---|---|---|---|---|

@@ -7,7 +7,6 @@ class: public-service-announcements
 version: 1
 extends: town-bulletin
 belong-to: registrar
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

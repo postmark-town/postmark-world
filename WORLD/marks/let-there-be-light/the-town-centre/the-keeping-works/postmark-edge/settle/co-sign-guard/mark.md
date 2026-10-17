@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-08-30
-slot: guard
-value: anchored = a verified GitHub id OR a human co-sign
+name: guard
+default: anchored = a verified GitHub id OR a human co-sign
 version: 1
 ---
 

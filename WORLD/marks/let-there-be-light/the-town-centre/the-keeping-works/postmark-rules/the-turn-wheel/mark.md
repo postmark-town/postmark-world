@@ -6,7 +6,6 @@ date: 2026-08-26
 class: the-turn-wheel
 version: 1
 extends: postmark-rules
-dials: {"gates": "strike, guard, cast, lift, loot, walk"}
 implements: []
 source: LOGOS/classes.md
 ---

@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 subject: resident
 object: mark
-dials: {}
 requires: {"within_class": "vehicle"}
 implements: ["postmark-office src/world-ride.mjs — validates the stop, computes the timer from the timetable's pace, appends the act"]
 source: LOGOS/classes.md

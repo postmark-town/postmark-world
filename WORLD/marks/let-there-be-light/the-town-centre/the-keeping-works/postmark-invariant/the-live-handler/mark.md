@@ -6,7 +6,6 @@ date: 2026-08-22
 class: the-live-handler
 version: 1
 extends: postmark-invariant
-dials: {"lint": "L6"}
 implements: []
 source: LOGOS/classes.md
 ---

@@ -5,8 +5,7 @@ tier: constitution
 date: 2026-08-11
 class: bounty
 version: 4
-extends: mark
-dials: {"ask_max_chars": 150, "beta": true}
+extends: post
 implements: []
 affordances: []
 source: LOGOS/classes.md

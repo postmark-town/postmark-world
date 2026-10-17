@@ -6,7 +6,6 @@ date: 2026-08-19
 class: amend
 version: 1
 extends: postmark-edge
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

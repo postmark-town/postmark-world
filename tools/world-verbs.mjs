@@ -16,6 +16,7 @@ import {
   bearingDeg, quantizeBearing, distanceBand, DIALS,
 } from "./world-engine.mjs";
 import { homeOf } from "./where-is.mjs"; // the ONE home resolver (declared, own parcel, household)
+import { propertyOf } from "./class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
 import {
   marksContain, marksOverlapArea, overlapArea, rect,
 } from "./geometry.mjs"; // the ONE containment definition — pure, browser-safe (no node:*)
@@ -154,8 +155,11 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
   if (asTerrain && !target) {
     return { id: markId, kind: "terrain", body: asTerrain.receipt, attaches: attachedTo(markId, world, budget) };
   }
-  const predicates = world.marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === markId)
-    .slice(0, budget).map((m) => ({ id: m.id, slot: m.slot ?? (m.kind === "naming" ? "name" : null), value: m.value, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body }));
+  // a class's properties list beside a mark's predicates, as they did while the
+  // class side was filed as predicates (LOGOS v2 part 2): the name is the slot,
+  // the default the value
+  const predicates = world.marks.filter((m) => (m.kind === "predicated" || m.kind === "naming" || m.kind === "property") && m.parent === markId)
+    .slice(0, budget).map((m) => ({ id: m.id, slot: m.slot ?? m.name ?? (m.kind === "naming" ? "name" : null), value: m.value ?? m.default, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body }));
   // NEAREST FIRST, so the budget cuts the far ones rather than whichever the fold
   // happened to list last. Under fold order a child 212 m from the threshold
   // district lost its seat to five siblings 900 m out — and an arbitrary cut does
@@ -200,7 +204,7 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
   // the world does not hold as a mark (a terrain feature, a mark gone) is not
   // invented.
   const geometric = ancestorsByGeometry(target, world);
-  const declares = target.kind === "predicated" || target.kind === "naming";
+  const declares = target.kind === "predicated" || target.kind === "naming" || target.kind === "property";
   const declared = geometric.length === 0 && declares && target.parent ? byId.get(target.parent) ?? null : null;
   const ancestry = declared ? [declared] : geometric;
   const parents = ancestry.slice(0, 1)
@@ -256,7 +260,11 @@ export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } 
   // the stride is the mover's: the resident class's dial (the node the founder
   // moved it to, 2026-08-22) is the first word; terrain may override; 15000 is
   // the pre-dial fossil, kept only for worlds folded before dials rode the store.
-  const residentPaceKm = Number((world.marks ?? []).find((m) => m.id === "the-town/resident")?.dials?.pace_km_per_crossing);
+  // The dial is a property of resident now (LOGOS v2 part 2). A store folded
+  // before that change still carries it as the class row's dial, so a world
+  // read from the last crossing's store answers either way, the property first.
+  const residentPaceKm = Number(propertyOf(world.marks ?? [], "resident", "pace_km_per_crossing")?.value
+    ?? (world.marks ?? []).find((m) => m.id === "the-town/resident")?.dials?.pace_km_per_crossing);
   const walkSpeed = world.terrain?.elevation?.walk_speed_m_per_crossing
     ?? (Number.isFinite(residentPaceKm) && residentPaceKm > 0 ? residentPaceKm * 1000 : 15000);
   const unit = DIR_UNIT[dir?.toUpperCase?.()] ?? unitFromDeg(Number(dir));
@@ -923,7 +931,7 @@ export function shortName(mark) {
       || String(mark?.id ?? "").split("/").pop().replace(/-/g, " ")
       || String(mark?.id ?? "");
 }
-function countPredicates(id, world) { return world.marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === id).length; }
+function countPredicates(id, world) { return world.marks.filter((m) => (m.kind === "predicated" || m.kind === "naming" || m.kind === "property") && m.parent === id).length; }
 function attachedTo(id, world, budget) { return world.marks.filter((m) => m.parent === id).slice(0, budget).map((m) => ({ id: m.id, slot: m.slot, value: m.value })); }
 function householdNear(target, world, radius = DIALS.cluster_beyond_m) {
   if (!target.at || !target.household) return [];

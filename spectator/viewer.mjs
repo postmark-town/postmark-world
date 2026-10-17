@@ -25,6 +25,7 @@ import { orient, openYourEyes, investigate, containmentChain, mistsSentence, vei
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
+import { propertyOf } from "../tools/class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
 import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mjs";
@@ -742,8 +743,15 @@ function settlementChip(at) {
 // vessel precedent already said so: the post-office sails at its own 405.
 export const STRIDE_CLASS_ID = "the-town/resident";
 export function departPaceKm(marks) {
+  // the dial is a property of the class now (LOGOS v2 part 2), read off the
+  // store. The store is the last crossing's fold, so for the one crossing
+  // after the change lands it still carries the class row's `dials`: read
+  // either, the property first.
   const byMarkId = markIndex(marks);
-  const pace = Number(byMarkId.get(STRIDE_CLASS_ID)?.dials?.pace_km_per_crossing);
+  const stride = byMarkId.get(STRIDE_CLASS_ID);
+  const pace = Number(stride
+    ? (propertyOf([...byMarkId.values()], String(stride.class), "pace_km_per_crossing")?.value ?? stride.dials?.pace_km_per_crossing)
+    : NaN);
   return Number.isFinite(pace) && pace > 0 ? pace : null;
 }
 
@@ -4972,8 +4980,8 @@ export function worldFrameReading(mark, marks = []) {
     body: mark.body,
     // its own attributes are its own — the light axis, the clock, the origin are
     // properties of the frame, not marks living inside it
-    predicates: marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === mark.id)
-      .map((m) => ({ id: m.id, slot: m.slot ?? (m.kind === "naming" ? "name" : null), value: m.value, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body })),
+    predicates: marks.filter((m) => (m.kind === "predicated" || m.kind === "naming" || m.kind === "property") && m.parent === mark.id)
+      .map((m) => ({ id: m.id, slot: m.slot ?? m.name ?? (m.kind === "naming" ? "name" : null), value: m.value ?? m.default, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body })),
     parents: [], children: [], alongside: [],
     more: { predicates: 0, children: 0 },
   };

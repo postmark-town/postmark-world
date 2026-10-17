@@ -21,21 +21,23 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks } from "./marks-fold.mjs";
 import { walk } from "./world-verbs.mjs";
+import { propertyOf } from "./class-properties.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD/marks"));
 const skeleton = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
 const byId = new Map(marks.map((m) => [m.id, m]));
 
-const DIAL = Number(byId.get("the-town/resident")?.dials?.pace_km_per_crossing);
+// the dial is a property of the resident class now (LOGOS v2 part 2)
+const DIAL = Number(propertyOf(marks, "resident", "pace_km_per_crossing")?.value);
 
 /** A pace predicate's number: "<n> km per crossing", or a pointer to a class mark's dial. */
 function paceOf(m) {
-  const v = String(m.value ?? "").trim();
+  const v = String(m.value ?? m.default ?? "").trim();
   const n = /^(\d+(?:\.\d+)?)\s*km per crossing$/.exec(v);
   if (n) return Number(n[1]);
   const target = byId.get(v);
-  if (target) return Number(target.dials?.pace_km_per_crossing);
+  if (target) return Number(propertyOf(marks, String(target.class), "pace_km_per_crossing")?.value);
   return NaN;
 }
 
@@ -44,9 +46,10 @@ test("the resident class carries the dial (the one place the number lives)", () 
 });
 
 test("every pace predicate in the world says the resident dial's number", () => {
-  const paces = marks.filter((m) => m.kind === "predicated" && /^pace\b/.test(String(m.slot ?? "")));
+  // a class's pace is a property now, an instance's a predicate: both state a pace
+  const paces = marks.filter((m) => (m.kind === "predicated" || m.kind === "property") && /^pace\b/.test(String(m.slot ?? m.name ?? "")));
   assert.ok(paces.some((m) => m.id === "the-town/the-walking-pace"), "the-town/the-walking-pace is not in the tree");
-  for (const m of paces) assert.equal(paceOf(m), DIAL, `${m.id} (slot ${m.slot}) reads "${m.value}", the resident dial says ${DIAL}`);
+  for (const m of paces) assert.equal(paceOf(m), DIAL, `${m.id} (slot ${m.slot ?? m.name}) reads "${m.value ?? m.default}", the resident dial says ${DIAL}`);
 });
 
 test("the skeleton's walk speed, which the-walking-pace is generated from, is the dial", () => {

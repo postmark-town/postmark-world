@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 from-class: berth
 to-class: household
-dials: {}
 implements: []
 affordances: []
 source: LOGOS/classes.md

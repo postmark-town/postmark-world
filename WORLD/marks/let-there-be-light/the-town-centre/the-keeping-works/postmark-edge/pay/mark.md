@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 from-class: household
 to-class: household
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

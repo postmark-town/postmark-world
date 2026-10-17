@@ -96,7 +96,11 @@ export function parseRecord(text, file) {
     }
     fm[key] = val;
   }
-  return { ...fm, body };
+  // The file it was read from rides along, unlisted (non-enumerable, so no
+  // spread, key walk or JSON of the record ever sees it): a reader handed bare
+  // records read file by file (the office's creature law at a sha) can still
+  // tell which property node stands under which class by the path.
+  return Object.defineProperty({ ...fm, body }, "_file", { value: file, enumerable: false });
 }
 
 // ---------- what parseRecord would silently lose (WLD-41, Darko 2026-10-13) ----------
@@ -487,8 +491,10 @@ function walkMarks(nodeDir, parentMarkId, out) {
     // predicated/naming take their parent from the enclosing mark dir when nested;
     // at the top level they must name a terrain feature explicitly (terrain:<id>).
     // class marks (the de-siting, 2026-08-18: law has no where) bind the same
-    // way — their registry standing IS the enclosing dir, never geometry.
-    if (rec.kind === "predicated" || rec.kind === "naming" || rec.kind === "class") {
+    // way — their registry standing IS the enclosing dir, never geometry. So do
+    // property nodes (LOGOS v2 part 2): a property stands under the class (or
+    // the property) it belongs to, and that nesting is what it is a property OF.
+    if (rec.kind === "predicated" || rec.kind === "naming" || rec.kind === "class" || rec.kind === "property") {
       if (parentMarkId) rec.parent = parentMarkId;
     } else {
       delete rec.parent; // sited/parcel never carry an authored parent; containment is geometry
@@ -1196,7 +1202,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     }
   }
   for (const mk of byId.values()) {
-    if ((mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "class") && mk.parent) {
+    if ((mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "class" || mk.kind === "property") && mk.parent) {
       if (!byId.has(mk.parent) && !terrainIds.has(mk.parent)) { errors.push({ mark: mk.id, error: `parent '${mk.parent}' not found` }); continue; }
       parentOf.set(mk.id, mk.parent);
     }
@@ -1336,11 +1342,11 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       if (parentOf.has(id)) {
         const eff = effectiveParent(id);
         if (eff.to !== undefined) {
-          es.push({ to: eff.to, channel: (mk.kind === "predicated" || mk.kind === "naming") ? "describes" : "contains", conducts: true });
+          es.push({ to: eff.to, channel: (mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "property") ? "describes" : "contains", conducts: true });
           if (eff.skipped.length) skips.push({ from: id, skipped: eff.skipped, to: eff.to });
         } else {
           // no consenting ancestor anywhere in the chain — flow stops, receipted
-          es.push({ to: parentOf.get(id), channel: (mk.kind === "predicated" || mk.kind === "naming") ? "describes" : "contains", conducts: false });
+          es.push({ to: parentOf.get(id), channel: (mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "property") ? "describes" : "contains", conducts: false });
         }
       }
       if (mk.class !== undefined) {
@@ -1604,7 +1610,21 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // an act the page previews has to be readable by the page. Undefined on
       // every mark that declares none, so a world without dials serializes as
       // it did.
+      //
       dials: mk.dials,
+      // A CLASS'S DIALS ARE PROPERTIES NOW (LOGOS v2 part 2, ruled 2026-10-16:
+      // "every dial is a property, and a locked value is its default"), so no
+      // class node writes `dials:` any more and the line above carries only an
+      // instance's own (the wheelhouse's, the dungeon's portal grounds'), as it
+      // did. The same reason carries a property's own fields: its `name`, the
+      // parent it bounds (`of`), its `default`, and its tier as `property_tier`,
+      // since `tier` here is the derived standing (a property node stands
+      // constitution: it is class space, mark-standing.mjs), and a class's
+      // `extends`, so a page can climb the class to the property it inherits
+      // (tools/class-properties.mjs). Undefined on every other mark, so nothing
+      // else changes.
+      ...(mk.kind === "property" ? { name: mk.name, of: mk.of, default: mk.default, property_tier: mk.tier } : {}),
+      extends: mk.extends,
       // image (2026-08-15): the media-shelf pointer — one allowlisted URL the
       // door validated and the lint re-checks; undefined on every imageless
       // mark, so a world without pictures serializes as before.

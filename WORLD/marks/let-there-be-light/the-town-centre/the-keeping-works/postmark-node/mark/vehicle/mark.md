@@ -7,7 +7,6 @@ class: vehicle
 version: 1
 extends: portal-ground
 mobility: derived
-dials: {}
 implements: ["postmark-office src/world-crossings.mjs — a stop named by the vehicle's timetable is a door into the vehicle; exit sets you down by the deposit rule", "postmark-office src/world-ride.mjs — the ride act and its timer", "tools/vessel.mjs — where the hull is, from the timetable and the clock"]
 actions: [{"action": "ride", "residue": "the-town/ride"}]
 source: LOGOS/classes.md

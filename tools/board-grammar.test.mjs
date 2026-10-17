@@ -31,6 +31,7 @@ const scratch = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); SCR
 after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true }); });
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs";
+import { propertyOf } from "./class-properties.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LINT = join(HERE, "mark-lint.mjs");
@@ -131,9 +132,16 @@ test("a world with no notices serializes without a single new key", () => {
 // Idea Lifecycle is publishing an idea mark — one claim, the resident's own
 // hand, standing in the Think Tank. The whitelist grows by ruling, never by
 // drift, and this line is that ruling carried by name.
-const RESIDENT_INSTANTIABLE = new Set(["bounty", "thing", "note", "idea"]);
+//
+// ⚠ SUPERSEDED 2026-10-16 18:44 (LOGOS/classes.md § Instantiation: "It replaces
+// the hand-kept `RESIDENT_INSTANTIABLE` whitelist"): who may make an instance is
+// the class's `makers` property, a constitution true/false inherited down
+// `extends`, whose roots one principle sets (the-town/nothing-you-control-mints).
+// The list above is the record of how the roots stood until then; the answer
+// below is read off the tree, never kept by hand.
+const residentMay = (live, klass) => propertyOf(live, klass, "makers")?.value === true;
 
-test("LIVE TREE: class law -- town marks define; residents instantiate only the whitelist", () => {
+test("LIVE TREE: class law -- town marks define; residents instantiate only what makers allows", () => {
   const live = loadMarks(MARKS_DIR);
   const classed = live.filter((m) => m.class !== undefined);
 
@@ -206,9 +214,18 @@ test("LIVE TREE: class law -- town marks define; residents instantiate only the 
   ]);
   for (const m of classed.filter((m) => m.by !== "the-town")) {
     if (INSTANCE_EXCEPTIONS_BY_RULING.has(m.id)) continue;
-    assert.ok(RESIDENT_INSTANTIABLE.has(m.class),
-      `${m.id}: residents may instantiate only [${[...RESIDENT_INSTANTIABLE].join(", ")}] today -- "${m.class}" is town-only (#1797)`);
+    assert.ok(residentMay(live, String(m.class)),
+      `${m.id}: "${m.class}" answers makers: false -- it is the town's alone (the-town/nothing-you-control-mints)`);
   }
+  // and the roots answer as ruled (18:44, 19:39; settled 2026-10-17 for
+  // funding-quest, stakeable and home): the false root, the true roots, and the
+  // classes that would put a resident in control of something that mints or
+  // confers standing
+  assert.equal(propertyOf(live, "postmark-node", "makers")?.value, false, "the root answers false");
+  for (const k of ["thing", "note", "post", "predicate", "sited", "idea", "bounty", "candy", "halloween-candy-bowl", "halloween-candy-bag", "naming"])
+    assert.ok(residentMay(live, k), `${k} answers makers: true`);
+  for (const k of ["parcel", "portal-ground", "vehicle", "adversary", "dungeon", "home-mark", "stairs", "funding-quest", "stakeable", "home", "resident", "household", "mark"])
+    assert.equal(residentMay(live, k), false, `${k} answers makers: false`);
   // Notice fields ride only bounty-classed marks (the board grammar); anywhere
   // else they are strays to investigate.
   for (const m of live.filter((m) => m.ask !== undefined || m.reward !== undefined || m.status !== undefined || m.threshold !== undefined))
@@ -343,7 +360,7 @@ test("the '#' truncation: the lint catches the face it CAN see (review O-1)", ()
 // the mark it stands under. Both anchors, one class. Drop either half of the
 // gate and the cases below go red by name.
 test("IDEA: sited OR predicated — \"Ideas can be predicates.\" (2026-09-01); a thoughtless one errs on the one-claim law either way; any other kind is refused quoting the four words; an idea may stand ANYWHERE; the whitelist carries the ruling", () => {
-  assert.ok(RESIDENT_INSTANTIABLE.has("idea"),
+  assert.ok(residentMay(loadMarks(MARKS_DIR), "idea"),
     "the 2026-08-30 ruling: residents publish ideas with their own hand — stage 1 needs no git and no founder");
   const { dir, root } = fixtureTree();
   const works = join(root, "the-keeping-works");
