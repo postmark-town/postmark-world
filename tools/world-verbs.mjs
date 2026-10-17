@@ -680,19 +680,37 @@ export { withinOf };
 // The spine is CONTAINMENT, parents-first (Keemin, 2026-07-23): the root's body
 // opens as the establishing line; then you home inward through the marks you are
 // WITHIN (region → any containing mark); THEN the radial FOV listing.
+//
+// THE TELLING IS THE TOWN'S OWN VOICE (POS-393; Darko 2026-10-13 21:11 EDT,
+// ruling B, inside WLD-29's pointer model). A resident's mark is NAMED here, by
+// its author and its id, and never quoted: its body is read by focus
+// (investigate, or the apex's `mark:`), where it arrives in its own field,
+// beside its author. Woven into the narration, a body that read like the town
+// speaking was delivered inside the town's own sentence to every agent who
+// opened its eyes nearby. The town's own marks (by `the-town`) are the
+// narration, and stay told. This is every place a body enters the telling: the
+// establishing line, the "You are within" clause, the band lines and the
+// horizon lines.
+export const TELLING_TOWN = "the-town";
+const authorOf = (m) => String(m?.by ?? String(m?.id ?? "").split("/")[0] ?? "");
+const townsOwn = (m) => authorOf(m) === TELLING_TOWN;
+/** How the telling names a resident's mark: its author, and its id where the line carries none. */
+export function residentMarkNamed(m, { withId = true } = {}) {
+  return `a mark by ${authorOf(m) || "someone"}${withId ? ` [${m?.id}]` : ""}`;
+}
 function renderTelling(state, radial, fov) {
   const o = radial.observer;
   const within = radial.within ?? [];
   const L = [];
   // 1. the establishing line — the root's body (the frame; never a card)
   const root = within[0];
-  if (root?.body) { L.push(root.body); L.push(""); }
+  if (root?.body) { L.push(townsOwn(root) ? root.body : residentMarkNamed(root)); L.push(""); }
   const who = o.name ?? "You";
   const stands = who === "You" ? "stand" : "stands"; // verb agreement: "You stand" vs "an agent stands"
   L.push(`— ${who} ${stands} at (${o.at?.x ?? state.x}, ${o.at?.y ?? state.y}), ${o.groundElevM} m above the sea.`);
   // 2. the containment spine — home inward through what contains you (skip the root frame)
   const spine = within.slice(1).filter((m) => m.body);
-  if (spine.length) L.push(`You are within ${spine.map((m) => firstLine(m.body).replace(/[.·\s]+$/, "")).join(" · ")}.`);
+  if (spine.length) L.push(`You are within ${spine.map((m) => (townsOwn(m) ? firstLine(m.body).replace(/[.·\s]+$/, "") : residentMarkNamed(m))).join(" · ")}.`);
   const anySignalCarries = fov.carried.some((m) => m.signal); // don't promise lights that aren't there
   // in a season the fog keeps the crossing's own hour; before one, "tonight", as it always said
   const fogWhen = radial.mists ? `this ${hourOf(radial.crossing)}` : "tonight";
@@ -732,12 +750,14 @@ function renderTelling(state, radial, fov) {
       if (m.lost) { parts.push(`  · ${lostHorizonPhrase(m)}`); continue; }
       // the band heads the section, so a horizon line no longer restates it
       if (m.far) { parts.push(`  · ${horizonPhrase(m)}`); continue; }
+      // a resident's mark is named, never quoted (POS-393): the line's own tag carries its id
+      const told = townsOwn(m) ? (firstLine(m.body) || m.id) : residentMarkNamed(m, { withId: false });
       // under a veil a light still carries, but it gutters
       const lit = m.signal ? (radial.mists?.veil > 0 ? " (its light carries, guttering)" : " (its light carries)") : "";
       const occ = m.occluded && m.signal ? " — its footing is hidden, only the light shows" : "";
       const dim = m.dim < 0.5 ? " — dim, at the dark edge" : "";
       const more = m.clusteredCount ? ` (+${m.clusteredCount} more of ${m.household}'s — investigate)` : "";
-      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${firstLine(m.body) || m.id}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
+      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
     }
     if (parts.length) { L.push(`${bandHeading(bandName)}:`); L.push(...parts); }
   }
@@ -1067,12 +1087,15 @@ function regionOf(state, world) {
 function orderBands(keys) { const order = DIALS.distance_bands.map((b) => b.name); return keys.slice().sort((a, b) => order.indexOf(a) - order.indexOf(b)); }
 // band names are written as prose ("a fair way off"); a section head wants sentence case
 function bandHeading(name) { const s = String(name ?? ""); return s.charAt(0).toUpperCase() + s.slice(1); }
+// A horizon's label is the skeleton's (the town's terrain); with none, the
+// body is told only when the mark is the town's own, and a resident's far mark
+// is named by author and id (POS-393, § the telling renderer).
 function lostHorizonPhrase(m) {
-  const name = m.label || shortName(m);
+  const name = m.label || (townsOwn(m) ? shortName(m) : residentMarkNamed(m));
   return `${m.bearing}, where ${name} stood: only grey`;
 }
 function horizonPhrase(m) {
   const km = (m.distM / 1000).toFixed(0);
-  const name = m.label || ellipsize(bodyProse(m.body), 80); // a short label, not the decision-008 arithmetic
+  const name = m.label || (townsOwn(m) ? ellipsize(bodyProse(m.body), 80) : residentMarkNamed(m)); // a short label, not the decision-008 arithmetic
   return `${name} (${m.bearing}, ~${km} km, ${m.heightM} m up)`;
 }
