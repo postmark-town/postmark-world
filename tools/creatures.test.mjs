@@ -177,13 +177,15 @@ test("one a window holds the same ground rules: on land, off the town, never on 
   assert.equal(asFull.ok, false, "read without the rotation, the same log is short eight creatures");
 });
 
-test("the rotation dial is read whole: a list of the class's own kinds, or refused", () => {
+test("the rotation dial is read whole: text naming the class's own kinds in turn, or refused", () => {
   const cls = (rotation) => ({ kind: "class", by: TOWN, class: "creature", dials: { from_crossing: 270, rotation, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 } });
   const kind = (k) => ({ kind: "class", by: TOWN, class: k, extends: "creature", dials: { count_per_window: 1 }, kind_file: `WORLD/kinds/${k}.kind` });
-  assert.deepEqual(creatureLaw([cls(["bat", "wolf"]), kind("bat"), kind("wolf")]).dials.rotation, ["bat", "wolf"]);
-  assert.equal("rotation" in creatureLaw([cls(null), kind("bat")]).dials, false, "null: no rotation");
-  for (const bad of [[], ["bat", "owl"], "bat", 3, {}])
-    assert.throws(() => creatureLaw([cls(bad), kind("bat"), kind("wolf")]), /rotation dial/, `${JSON.stringify(bad)} is refused`);
+  const law = (rotation, ...ks) => creatureLaw([cls(rotation), ...ks.map(kind)]);
+  assert.deepEqual(law("bat wolf", "bat", "wolf").dials.rotation, ["bat", "wolf"]);
+  assert.deepEqual(law("  wolf   bat ", "bat", "wolf").dials.rotation, ["wolf", "bat"], "spaces are only separators");
+  assert.equal("rotation" in law(null, "bat").dials, false, "null: no rotation");
+  for (const bad of ["", " ", "bat owl", 3, true, ["bat", "wolf"], {}])
+    assert.throws(() => law(bad, "bat", "wolf"), /rotation dial/, `${JSON.stringify(bad)} is refused`);
 });
 
 test("the launch dial fails closed: nothing but a whole crossing number turns it on", () => {

@@ -114,13 +114,20 @@ export function creatureLaw(marks) {
     dials.counts[kind] = n;
     kinds.push({ kind, kind_file: m.kind_file });
   }
-  const rotation = c.dials?.rotation ?? null;
-  if (rotation !== null) {
-    if (!Array.isArray(rotation) || rotation.length === 0 || !rotation.every((k) => Object.hasOwn(dials.counts, k)))
-      throw new Error(`creatureLaw: the creature class's rotation dial is ${JSON.stringify(rotation)}, not a list of its kinds`);
-    dials.rotation = [...rotation];
-  }
+  const rotation = rotationOf(c.dials?.rotation ?? null, dials.counts);
+  if (rotation) dials.rotation = rotation;
   return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds };
+}
+
+/** The rotation dial, read whole: text naming the class's own kinds in turn
+ *  ("bat raven wolf", the one form that is also a LOGOS v2 property's free-text
+ *  value), or null for none. Anything else throws. */
+function rotationOf(v, counts) {
+  if (v === null) return null;
+  const list = typeof v === "string" ? v.trim().split(/\s+/).filter(Boolean) : null;
+  if (!list?.length || !list.every((k) => Object.hasOwn(counts, k)))
+    throw new Error(`creatureLaw: the creature class's rotation dial is ${JSON.stringify(v)}, not its kinds in turn`);
+  return list;
 }
 
 /** The kinds crossing N brings and how many of each: every kind at its count, or,

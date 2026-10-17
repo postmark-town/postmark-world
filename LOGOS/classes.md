@@ -967,7 +967,7 @@ two cuts: "it fades or it flees" and "it is no one's".)
   circling are lines, and fleeing is its only leaving early.
   *SUPERSEDED 2026-10-17 13:58 (Darko, WLD-56): one creature a window, the
   kinds in turn, a bat first.* Each kind's `count_per_window` is 1, and the class's
-  `rotation` dial lists the kinds in turn, `["bat", "raven", "wolf"]`: window
+  `rotation` dial names the kinds in turn, `bat raven wolf`: window
   N brings only the kind whose turn it is, counted from the launch dial
   (`tools/creatures.mjs § countsFor`). A null `rotation` brings every kind at
   its own count.
