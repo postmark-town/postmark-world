@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-10-04
-slot: scope
-value: the household's ground, not one resident's
+name: scope
+default: the household's ground, not one resident's
 source: LOGOS/classes.md
 ---
 

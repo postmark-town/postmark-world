@@ -35,6 +35,11 @@ export const ENGINE_FILES = [
   // enter-exit.mjs.
   "portals.mjs",
   "enter-exit.mjs",
+  // joined 2026-10-17 (LOGOS v2 part 2): a class's properties are nodes of their
+  // own now, and the lint's property rails read them through one helper.
+  "class-properties.mjs",
+  // joined with W2: what a record is and how it stands, in either form
+  "mark-kind.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

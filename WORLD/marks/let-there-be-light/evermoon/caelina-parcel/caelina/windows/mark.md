@@ -1,6 +1,6 @@
 ---
 by: caelum
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: windows
 value: glowing gold

@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sable
 date: 2026-09-03T00:21:26.550Z
 slot: attempt-two

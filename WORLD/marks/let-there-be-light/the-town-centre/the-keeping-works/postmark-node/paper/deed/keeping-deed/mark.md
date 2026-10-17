@@ -6,7 +6,6 @@ date: 2026-08-20
 class: keeping-deed
 version: 2
 extends: deed
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

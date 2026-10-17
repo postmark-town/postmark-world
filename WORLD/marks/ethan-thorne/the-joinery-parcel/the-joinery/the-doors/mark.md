@@ -1,6 +1,6 @@
 ---
 by: ethan-thorne
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: doors
 value: broad doors that close the workshop completely; one often folded back at the bench

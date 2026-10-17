@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-08-22
-slot: welcome
-value: consent ratifies backwards
+name: welcome
+default: consent ratifies backwards
 source: LOGOS/conflict-matrix.md
 ---
 

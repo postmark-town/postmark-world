@@ -7,7 +7,6 @@ class: the-read-policy
 version: 0
 extends: uncategorized
 source: LOGOS/reads-and-affordances.md
-dials: {}
 implements: []
 ---
 

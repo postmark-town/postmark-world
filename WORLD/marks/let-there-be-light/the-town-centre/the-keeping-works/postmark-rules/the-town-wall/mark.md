@@ -6,7 +6,6 @@ date: 2026-08-19
 class: the-town-wall
 version: 1
 extends: postmark-rules
-dials: {}
 implements: ["the-town/the-own-hand"]
 source: LOGOS/classes.md
 ---

@@ -6,7 +6,6 @@ date: 2026-08-19
 class: stamp-balance
 version: 1
 extends: postmark-derived
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

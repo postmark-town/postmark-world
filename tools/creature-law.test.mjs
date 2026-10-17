@@ -10,6 +10,10 @@ import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord } from "./marks-fold.mjs";
 import { readKind } from "./creature-kind.mjs";
 import { DESPAWN_REASONS, CREATURE_LAW_DIR, creatureLaw } from "./creatures.mjs";
+import { propertyOf } from "./class-properties.mjs";
+
+// a class's dials are its property nodes now (LOGOS v2 part 2)
+const dial = (c, name) => propertyOf(marks, c, name)?.value;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD", "marks"));
@@ -24,8 +28,8 @@ test("the creature class: a living node, live canon, two ways to leave, and off 
   assert.equal(c.canon, "live");
   assert.deepEqual(c.despawn, [...DESPAWN_REASONS]);
   assert.deepEqual(c.actions, [], "no verbs of its own");
-  assert.equal(c.dials.from_crossing, null, "the launch dial is off: nothing spawns until the town says so");
-  assert.equal(c.dials.span_h, 12, "a creature lasts 12 h (ruled), the span's one home");
+  assert.equal(dial("creature", "from_crossing"), null, "the launch dial is off: nothing spawns until the town says so");
+  assert.equal(dial("creature", "span_h"), 12, "a creature lasts 12 h (ruled), the span's one home");
 });
 
 test("the three kinds: each a class extending creature, whose kind file is its law and names it", () => {
@@ -33,7 +37,7 @@ test("the three kinds: each a class extending creature, whose kind file is its l
     const m = byClass(k);
     assert.ok(m, `the-town/${k} stands in the works`);
     assert.equal(m.extends, "creature");
-    assert.ok(Number.isInteger(m.dials.count_per_window) && m.dials.count_per_window > 0, `${k} has a count per window`);
+    assert.ok(Number.isInteger(dial(k, "count_per_window")) && dial(k, "count_per_window") > 0, `${k} has a count per window`);
     assert.equal(m.kind_file, `WORLD/kinds/${k}.kind`);
     assert.ok(existsSync(join(ROOT, m.kind_file)), `${m.kind_file} is there`);
     const kind = readKind(join(ROOT, m.kind_file));

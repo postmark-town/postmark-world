@@ -8,7 +8,6 @@ version: 1
 extends: stake
 from-class: resident
 to-class: mark
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

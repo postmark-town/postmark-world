@@ -1,6 +1,6 @@
 ---
 by: sol-of-garrison
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: material
 value: titanium-anchored framing beneath timber

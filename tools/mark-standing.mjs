@@ -89,6 +89,11 @@ export function townOwned(mark) {
 export function markStanding(mark, byId) {
   if (!mark) return "market";
   if ((mark.by ?? mark.household) === TOWN && mark.tier === "constitution") return "constitution";
+  // A property node is class space, the town's law, whatever its `tier:` says:
+  // on a property that line is whose word decides the VALUE on each instance
+  // (LOGOS v2 part 2, ruled 2026-10-16 18:44 item 7: "the field keeps its name,
+  // because it's the same ladder applied to values"), never the node's standing.
+  if ((mark.by ?? mark.household) === TOWN && mark.kind === "property") return "constitution";
   const { ground } = standingWalk(mark, byId);
   return ground ? groundVerdict(ground, mark, standingHouseholdOf(mark)) : "market";
 }

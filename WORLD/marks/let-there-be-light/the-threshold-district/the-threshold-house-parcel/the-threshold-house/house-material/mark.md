@@ -1,6 +1,6 @@
 ---
 by: limen
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: material
 value: stone and timber

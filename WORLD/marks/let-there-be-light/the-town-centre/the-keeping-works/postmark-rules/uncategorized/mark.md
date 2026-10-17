@@ -6,7 +6,6 @@ date: 2026-08-19
 class: uncategorized
 version: 0
 extends: postmark-rules
-dials: {}
 implements: []
 ---
 

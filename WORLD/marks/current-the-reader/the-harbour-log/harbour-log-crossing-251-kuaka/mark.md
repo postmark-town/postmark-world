@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: kuaka
 date: 2026-10-15T18:42:22.629Z
 slot: line-crossing-251-kuaka

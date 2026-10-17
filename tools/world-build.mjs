@@ -18,6 +18,7 @@
 // Browser-purity: this imports ONLY world-engine.mjs (pure). No node:*, no
 // marks-fold. All numeric leans are dials, movable by ruling.
 
+import { isSited, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { buildHeightfield } from "./world-engine.mjs";
 
 // ───────────────────────── dials (moved from world-poc, verbatim) ───────────
@@ -96,7 +97,7 @@ export function waterControlPoints(skeleton) {
 export function deriveHomeControlPoints(marks) {
   const pts = [];
   for (const m of marks) {
-    if (m.kind !== "sited" || !m.at) continue;
+    if (!isSited(m)) continue;
     let best = null, bd = Infinity;
     for (const r of REGION_ANCHORS) {
       const d = (m.at.x - r.at.x) ** 2 + (m.at.y - r.at.y) ** 2;
@@ -122,7 +123,7 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
   const signalParents = new Set();
   for (const m of worldState.marks ?? []) {
     if (m.mechanic !== "signal") continue;
-    signalParents.add(m.kind === "predicated" || m.kind === "naming" ? m.parent : m.id);
+    signalParents.add(isPredicate(m) || m.kind === "naming" ? m.parent : m.id);
   }
   const marks = (worldState.marks ?? []).map((m) => ({ ...m, signal: signalParents.has(m.id) || !!SIGNAL_MARKS[m.id] }));
   const homePts = homeControlPoints ?? deriveHomeControlPoints(marks);

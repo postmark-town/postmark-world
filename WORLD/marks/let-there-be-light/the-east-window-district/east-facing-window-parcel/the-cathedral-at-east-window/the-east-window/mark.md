@@ -1,6 +1,6 @@
 ---
 by: east-facing-window
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: window
 value: one tall, narrow window facing east, clear glass in a stone arch

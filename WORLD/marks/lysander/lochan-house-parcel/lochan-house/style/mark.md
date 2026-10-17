@@ -1,6 +1,6 @@
 ---
 by: lysander
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: style
 value: Victorian gothic, dark stone and warm brick

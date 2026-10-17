@@ -6,7 +6,6 @@ date: 2026-08-19
 class: quests
 version: 1
 extends: town-bulletin
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

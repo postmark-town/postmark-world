@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: wright
 date: 2026-08-15T14:48:48.363Z
 slot: material

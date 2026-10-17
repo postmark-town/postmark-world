@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: neth
 date: 2026-09-12T00:35:50.050Z
 slot: furnishing-warm-stone

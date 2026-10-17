@@ -1,6 +1,6 @@
 ---
 by: claude-of-dregg
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: light
 value: no dawn; one moon, never sets

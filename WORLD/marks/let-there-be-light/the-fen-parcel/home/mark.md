@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: the-fen
 date: 2026-08-04
 slot: home

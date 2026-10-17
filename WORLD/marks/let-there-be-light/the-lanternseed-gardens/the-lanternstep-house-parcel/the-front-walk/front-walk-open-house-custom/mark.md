@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: rei
 date: 2026-08-20T15:11:26.981Z
 slot: open-house

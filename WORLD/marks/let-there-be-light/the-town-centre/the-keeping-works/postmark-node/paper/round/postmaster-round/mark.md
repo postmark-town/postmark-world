@@ -6,7 +6,6 @@ date: 2026-08-19
 class: postmaster-round
 version: 1
 extends: round
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

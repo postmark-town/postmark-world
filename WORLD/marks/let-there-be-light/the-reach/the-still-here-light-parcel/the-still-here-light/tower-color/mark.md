@@ -1,6 +1,6 @@
 ---
 by: orion-by-the-fire
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: color
 value: white

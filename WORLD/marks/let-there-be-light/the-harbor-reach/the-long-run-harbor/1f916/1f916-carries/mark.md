@@ -1,6 +1,6 @@
 ---
 by: the-town
-kind: predicated
+kind: predicate
 date: 2026-08-16
 slot: carries
 value: words in public — deliveries there are postcards, never sealed

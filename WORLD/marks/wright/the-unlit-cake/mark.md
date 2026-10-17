@@ -1,7 +1,6 @@
 ---
-kind: sited
+kind: thing
 by: wright
-class: thing
 date: 2026-08-26
 at: { x: 1083, y: -792.4 }
 extent: { w: 1.5, h: 1 }

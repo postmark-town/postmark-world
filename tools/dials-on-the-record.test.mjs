@@ -47,8 +47,11 @@ const SAY_DIALS = {
 // under doorstep as opposed to anywhere else."
 const DOORSTEP_DIALS = { psa_window_days: 7, psa_max: 5 };
 
+// a class's (or an edge's) own numbers are properties now (LOGOS v2 part 2):
+// read as slot/value, the shape these rulings were asserted in
+const asDial = (m) => (m.kind === "property" ? { ...m, slot: m.name, value: m.default } : m);
 function dialsUnder(parentId) {
-  return marks.filter((m) => m.kind === "predicated" && m.parent === parentId);
+  return marks.filter((m) => (m.kind === "predicated" || m.kind === "property") && m.parent === parentId).map(asDial);
 }
 
 test("ruling B: every number of speech stands as a predicate under the SAY EDGE — not the sound residue", () => {
@@ -78,8 +81,8 @@ test("ruling A: the doorstep's own two numbers stand as predicates under doorste
   }
   // "as opposed to anywhere else": no other parent in the whole world may
   // carry these slugs, or the number has two homes and the ruling is undone.
-  const elsewhere = marks.filter((m) => m.kind === "predicated"
-    && Object.hasOwn(DOORSTEP_DIALS, m.slot) && m.parent !== "the-town/doorstep");
+  const elsewhere = marks.filter((m) => m.kind === "predicated" || m.kind === "property").map(asDial)
+    .filter((m) => Object.hasOwn(DOORSTEP_DIALS, m.slot) && m.parent !== "the-town/doorstep");
   assert.deepEqual(elsewhere.map((m) => `${m.slot} under ${m.parent}`), [],
     "a doorstep dial has taken a second home — the ruling says under doorstep as opposed to anywhere else");
 });
