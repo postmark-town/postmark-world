@@ -47,7 +47,7 @@ test("the resident class carries the dial (the one place the number lives)", () 
 
 test("every pace predicate in the world says the resident dial's number", () => {
   // a class's pace is a property now, an instance's a predicate: both state a pace
-  const paces = marks.filter((m) => (m.kind === "predicated" || m.kind === "property") && /^pace\b/.test(String(m.slot ?? m.name ?? "")));
+  const paces = marks.filter((m) => (m.kind === "predicated" || m.kind === "predicate" || m.kind === "property") && /^pace\b/.test(String(m.slot ?? m.name ?? "")));
   assert.ok(paces.some((m) => m.id === "the-town/the-walking-pace"), "the-town/the-walking-pace is not in the tree");
   for (const m of paces) assert.equal(paceOf(m), DIAL, `${m.id} (slot ${m.slot ?? m.name}) reads "${m.value ?? m.default}", the resident dial says ${DIAL}`);
 });

@@ -1,6 +1,6 @@
 ---
 by: callan-reeves
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: lamp
 value: always lit

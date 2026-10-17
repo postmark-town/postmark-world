@@ -27,6 +27,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { dialsOf } from "./class-dials.mjs";
+import { instanceClassOf } from "./mark-kind.mjs"; // what a record IS, in either form (W2)
 
 const here = dirname(fileURLToPath(import.meta.url));
 const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
@@ -430,7 +431,7 @@ test("the first portal ground stands geometrically inside the parcel it was buil
   const parcelWorld = { x: 1338 - 250, y: -994.5 + 200 };
   const fence = { x0: parcelWorld.x - 12.5, x1: parcelWorld.x + 12.5, y0: parcelWorld.y - 12.5, y1: parcelWorld.y + 12.5 };
   const g = frontmatter("WORLD/marks/wright/the-cellar-door/mark.md");
-  assert.equal(g.class, "portal-ground");
+  assert.equal(instanceClassOf(g), "portal-ground");
   const box = { x0: g.at.x - g.extent.w / 2, x1: g.at.x + g.extent.w / 2,
                 y0: g.at.y - g.extent.h / 2, y1: g.at.y + g.extent.h / 2 };
   assert.ok(box.x0 >= fence.x0 && box.x1 <= fence.x1 && box.y0 >= fence.y0 && box.y1 <= fence.y1,
@@ -442,13 +443,13 @@ test("the thing that lends a verb is the TOWN's, and the things that do not lend
   //   "only a thing whose `by:` is the town's own pen may carry a held grant"
   const lender = frontmatter("WORLD/marks/the-town/the-good-lighter/mark.md");
   assert.equal(lender.by, "the-town");
-  assert.equal(lender.class, "thing");
+  assert.equal(instanceClassOf(lender), "thing");
   assert.ok(Array.isArray(lender.held_grant) && lender.held_grant.length >= 1);
   for (const g of lender.held_grant)
     assert.ok(g.residue, "a held grant names its residue — the door quotes the residue's own mark, never a copy beside the grant");
   for (const t of ["a-slice-to-take-home", "the-wick-end"]) {
     const carried = frontmatter(`WORLD/marks/the-town/${t}/mark.md`);
-    assert.equal(carried.class, "thing", "what is carried out is an ORDINARY thing — that is the whole thesis of the room");
+    assert.equal(instanceClassOf(carried), "thing", "what is carried out is an ORDINARY thing — that is the whole thesis of the room");
     assert.equal(carried.held_grant, undefined, "a trophy lends nothing; it is a keepsake, not a key");
   }
 });
@@ -471,7 +472,7 @@ test("the adversary's numbers are on its own mark, not in any office", () => {
   assert.equal(cls.hp, "unsealed", "the class speaks the grammar and never the value");
   assert.equal(cls.hits_for, "unsealed");
   const monument = frontmatter("WORLD/marks/wright/the-unlit-cake/mark.md");
-  assert.equal(monument.class, "thing", "the fallen boss is an ordinary thing — the retirement ruling, held");
+  assert.equal(instanceClassOf(monument), "thing", "the fallen boss is an ordinary thing — the retirement ruling, held");
   assert.equal(monument.dials, undefined, "a monument carries no combat dials");
 });
 

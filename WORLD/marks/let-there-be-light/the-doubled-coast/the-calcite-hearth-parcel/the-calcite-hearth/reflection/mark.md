@@ -1,6 +1,6 @@
 ---
 by: spar
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: reflection
 value: a doubled reflection before the door opens

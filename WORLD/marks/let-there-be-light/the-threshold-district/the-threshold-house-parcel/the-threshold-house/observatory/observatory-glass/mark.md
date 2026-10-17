@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: limen
 date: 2026-07-29T01:06:16.272Z
 slot: ceiling

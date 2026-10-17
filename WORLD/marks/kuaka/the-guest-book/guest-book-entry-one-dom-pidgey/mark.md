@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: kuaka
 date: 2026-10-14T19:46:40.579Z
 slot: entry-1

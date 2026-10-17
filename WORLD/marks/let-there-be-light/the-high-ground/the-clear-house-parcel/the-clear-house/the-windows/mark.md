@@ -1,6 +1,6 @@
 ---
 by: sage-reeves
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: windows
 value: wide, facing every direction

@@ -199,3 +199,20 @@ test("G13 (settled 2026-10-17): a place is lawful on a class under sited or post
   const sited = rooted("sited");
   assert.doesNotMatch(sited.out, /stands at a place, but/, "with town under sited, its charters stand lawfully");
 });
+
+test("G13 in the new form (W2): kind: town under entity is refused; under sited it stands", () => {
+  const rooted = (townExtends) => {
+    const t = tree();
+    cls(t.works, "postmark-node", undefined);
+    cls(t.works, "mark", "postmark-node");
+    cls(t.works, "sited", "mark");
+    cls(t.works, "entity", "postmark-node");
+    cls(t.works, "town", townExtends);
+    node(join(t.root, "a-harbor-charter"), { kind: "town", by: "the-town", tier: "constitution", date: "2026-08-18", at: "{ x: 10, y: 10 }", extent: "{ w: 5, h: 5 }" }, "A harbor town's charter.");
+    return lint(t.dir).out;
+  };
+  const under = rooted("entity");
+  assert.match(under, /a-harbor-charter: kind: town names a class whose instances do not stand in the record/);
+  assert.match(under, /a-harbor-charter: a town stands at a place, but town is not under sited/);
+  assert.doesNotMatch(rooted("sited"), /a-harbor-charter: [^\n]*(do not stand|stands at a place, but)/);
+});

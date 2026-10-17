@@ -258,19 +258,19 @@ function writeRootLaw() {
   const fogM = skeleton.elevation.fog_ceiling_m;
   const paceKm = Math.round(skeleton.elevation.walk_speed_m_per_crossing / 1000);
   writeMarkRaw("the-fog", {
-    kind: "predicated", by: "the-town", tier: "constitution", date: LAW_DATE,
+    kind: "predicate", by: "the-town", tier: "constitution", date: LAW_DATE,
     slot: "fog", value: `settles below ${fogM} m; each crossing seeds its own weather`, mechanic: "fog",
   }, `The fog settles below the ${fogM}-metre line; every crossing brews its own weather, seeded by the crossing's own number.`);
   writeMarkRaw("the-fall-of-the-land", {
-    kind: "predicated", by: "the-town", tier: "constitution", date: LAW_DATE,
+    kind: "predicate", by: "the-town", tier: "constitution", date: LAW_DATE,
     slot: "elevation", value: "sea = 0; the land falls from the northern rim to the southern sea", mechanic: "elevation",
   }, "All height falls from the northern rim to the southern sea; the sea is the zero every elevation is measured from.");
   writeMarkRaw("the-walking-pace", {
-    kind: "predicated", by: "the-town", tier: "constitution", date: LAW_DATE,
+    kind: "predicate", by: "the-town", tier: "constitution", date: LAW_DATE,
     slot: "pace", value: `${paceKm} km per crossing`, mechanic: "pace",
   }, `A crossing's walking is ${paceKm} kilometres; the world is crossed in days, not clicks.`);
   writeMarkRaw("the-wear", {
-    kind: "predicated", by: "the-town", tier: "constitution", date: LAW_DATE,
+    kind: "predicate", by: "the-town", tier: "constitution", date: LAW_DATE,
     slot: "wear", value: "anonymous per-cell wear from walking", mechanic: "wear",
   }, "Where feet repeat, a path appears. The record keeps the wear, never the walker.");
 }

@@ -28,6 +28,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSy
 import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
+import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -354,7 +355,7 @@ export function frameMarks(out) {
   // error here. What the walk can never do is hand a record a centre from a
   // mark that does not bind it.
   const frameOriginOf = (rec) => {
-    const continued = rec.kind === "predicated" || rec.kind === "naming";
+    const continued = isPredicate(rec) || rec.kind === "naming";
     const rank = standingRank(rec, byId);
     const walked = new Set([rec]);
     let p = rec._parentMarkId ? byId.get(rec._parentMarkId) : null;
@@ -494,7 +495,7 @@ function walkMarks(nodeDir, parentMarkId, out) {
     // way — their registry standing IS the enclosing dir, never geometry. So do
     // property nodes (LOGOS v2 part 2): a property stands under the class (or
     // the property) it belongs to, and that nesting is what it is a property OF.
-    if (rec.kind === "predicated" || rec.kind === "naming" || rec.kind === "class" || rec.kind === "property") {
+    if (isPredicate(rec) || rec.kind === "naming" || rec.kind === "class" || rec.kind === "property") {
       if (parentMarkId) rec.parent = parentMarkId;
     } else {
       delete rec.parent; // sited/parcel never carry an authored parent; containment is geometry
@@ -569,8 +570,11 @@ import { resolveConsent, consentMap, CONSENT_FIELD } from "./consent.mjs";
 export function placementParent(claim, marks, { worldScaleM = 50000 } = {}) {
   const claimArea = rect(claim).w * rect(claim).h;
   let best = null, bestArea = Infinity;
+  // ground by the class chain (G12): the fold is the record, so it asks the
+  // lineage of the marks it holds, never the place as a proxy for it
+  const kidx = kindIndexOf(marks);
   for (const m of marks) {
-    if ((m.kind !== "sited" && m.kind !== "parcel") || !m.at) continue;
+    if (!isGroundIn(m, kidx)) continue;
     const mr = rect(m), area = mr.w * mr.h;
     if (Math.max(mr.w, mr.h) >= worldScaleM) continue; // the world-root is the frame, never a parent → null means root
     if (area <= claimArea) continue;                    // a parent is strictly larger than its child (the fold's rule)
@@ -632,7 +636,7 @@ export const worldRootOf = (marks) => marks.find((m) => leafSlugOf(m) === WORLD_
 export function containmentParentOf(mark, marks, root = worldRootOf(marks)) {
   const rootId = root?.id ?? null;
   if (rootId != null && mark.id === rootId) return null;
-  const geometric = (mark.kind === "sited" || mark.kind === "parcel") && mark.at;
+  const geometric = isGroundIn(mark, kindIndexOf(marks));
   // No self-exclusion needed and none paid for: `placementParent` requires a
   // parent to be STRICTLY larger than the claim, so a mark can never be its own
   // container, and neither can a twin sharing its rect. Filtering the array per
@@ -812,7 +816,7 @@ export const ONE_PARCEL_PER_HANDLE_EXCEPTIONS = ONE_PER_RESIDENT_PRIOR_ESTATE;
 export const DECLARED_HOME_LAW = "the-town/declared-home";
 export const HOME_OUTSIDE_HOUSEHOLD_REFUSAL =
   `a home is declared only on a parcel of your own household (${DECLARED_HOME_LAW})`;
-const isHomeWord = (mk) => mk?.kind === "predicated" && mk.slot === "home";
+const isHomeWord = (mk) => isPredicate(mk) && mk.slot === "home";
 // The parcel dial (MARKS.md § Parcels; locked at the door 2026-07-31, Keemin:
 // "the resident should not even have to declare an extent"). Seeded prior
 // estate at other sizes stands; the door writes only this.
@@ -1044,6 +1048,11 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     if (byId.has(mk.id)) { errors.push({ mark: mk.id, error: "duplicate id" }); continue; }
     byId.set(mk.id, mk);
   }
+  // how each record stands is its class chain's answer (G12, settled
+  // 2026-10-17): one index over the marks this fold holds, asked by every
+  // geometric question below, never the place as a proxy for the lineage
+  const KIDX = kindIndexOf(marks);
+  const isSited = (m) => isSitedIn(m, KIDX), isGround = (m) => isGroundIn(m, KIDX);
 
   // ---------- the household grain (Keemin's rulings, 2026-08-07 + 2026-08-10) ----------
   // A mark's `by:` is a resident HANDLE. A household is the HUMAN behind it:
@@ -1165,7 +1174,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // person with two handles was a stranger on their own ground: their own mark
   // standing in their own parcel folded as a commons mark, exposed to rivalry.
   for (const mk of byId.values()) {
-    if (mk.kind === "sited") {
+    if (isSited(mk)) {
       const held = parcelRectsByCred.get(mk._cred) ?? [];
       mk._sovereign = held.some((pr) => contains(pr, rect(mk)));
     }
@@ -1185,7 +1194,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
 
   // containment edges (computed, never authored): sited-in-sited by geometry; predicated/naming by parent ref
   const children = new Map(); const parentOf = new Map();
-  const sited = [...byId.values()].filter(mk => mk.kind === "sited");
+  const sited = [...byId.values()].filter(mk => isSited(mk));
   for (const a of sited) for (const b of sited) {
     if (a === b) continue;
     const ra = rect(a), rb = rect(b);
@@ -1202,7 +1211,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     }
   }
   for (const mk of byId.values()) {
-    if ((mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "class" || mk.kind === "property") && mk.parent) {
+    if ((isPredicate(mk) || mk.kind === "naming" || mk.kind === "class" || mk.kind === "property") && mk.parent) {
       if (!byId.has(mk.parent) && !terrainIds.has(mk.parent)) { errors.push({ mark: mk.id, error: `parent '${mk.parent}' not found` }); continue; }
       parentOf.set(mk.id, mk.parent);
     }
@@ -1245,7 +1254,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // parent. A law return's ground is not touched: it took its subtree.
   if (consent.alone?.size) {
     const standing = [...byId.values()].filter((mk) => !gone.has(mk.id));
-    const standingSited = standing.filter((mk) => mk.kind === "sited");
+    const standingSited = standing.filter((mk) => isSited(mk));
     const root = worldRootOf([...byId.values()]);
     const smallestSitedAround = (b) => {
       const rb = rect(b);
@@ -1258,11 +1267,11 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       return best ? best.id : null;
     };
     for (const mk of standing) {
-      if (mk.kind === "sited" && consent.alone.has(parentOf.get(mk.id))) {
+      if (isSited(mk) && consent.alone.has(parentOf.get(mk.id))) {
         const up = smallestSitedAround(mk);
         if (up) parentOf.set(mk.id, up); else parentOf.delete(mk.id);
       }
-      if ((mk.kind === "sited" || mk.kind === "parcel") && mk.at && consent.alone.has(containedBy.get(mk.id))) {
+      if (isGround(mk) && consent.alone.has(containedBy.get(mk.id))) {
         const up = containmentParentOf(mk, standing, root);
         containedBy.set(mk.id, up);
         mk._containedBy = up ?? null;
@@ -1342,15 +1351,15 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       if (parentOf.has(id)) {
         const eff = effectiveParent(id);
         if (eff.to !== undefined) {
-          es.push({ to: eff.to, channel: (mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "property") ? "describes" : "contains", conducts: true });
+          es.push({ to: eff.to, channel: (isPredicate(mk) || mk.kind === "naming" || mk.kind === "property") ? "describes" : "contains", conducts: true });
           if (eff.skipped.length) skips.push({ from: id, skipped: eff.skipped, to: eff.to });
         } else {
           // no consenting ancestor anywhere in the chain — flow stops, receipted
-          es.push({ to: parentOf.get(id), channel: (mk.kind === "predicated" || mk.kind === "naming" || mk.kind === "property") ? "describes" : "contains", conducts: false });
+          es.push({ to: parentOf.get(id), channel: (isPredicate(mk) || mk.kind === "naming" || mk.kind === "property") ? "describes" : "contains", conducts: false });
         }
       }
-      if (mk.class !== undefined) {
-        const decl = declByClass.get(String(mk.class));
+      if (instanceClassOf(mk) !== undefined) {
+        const decl = declByClass.get(instanceClassOf(mk));
         // an instance flows to its class; a declaration is not its own instance
         if (decl && decl !== id)
           es.push({ to: decl, channel: "instance-of", conducts: !gone.has(id) && !gone.has(decl) });
@@ -1479,7 +1488,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   const slots = new Map(); // key -> { values: Map(value -> stamps), marks: [] }
   for (const mk of byId.values()) {
     if (gone.has(mk.id)) continue;
-    if (mk.kind === "predicated" || mk.kind === "naming") {
+    if (isPredicate(mk) || mk.kind === "naming") {
       if (terrainIds.has(mk.parent) && mk.slot !== "name" && mk.kind === "naming") { /* naming terrain allowed */ }
       const key = isHomeWord(mk) ? `${mk.parent}::home::${mk.by}` : `${mk.parent}::${mk.kind === "naming" ? "name" : mk.slot}`;
       if (!slots.has(key)) slots.set(key, { values: new Map(), marks: [] });
@@ -1644,6 +1653,14 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // Undefined on every ordinary mark, so a world with no prizes in it
       // serializes exactly as before.
       loot: mk.loot,
+      // A THING'S OWN HOLDING WORD (LOGOS v2 part 2; the playground's QA, PART2-MCP-QA fail 2):
+      // `holder`, `capacity`, `open` and `portable` are sovereign on thing (ruled 16:03), so a
+      // resident writes them on the thing they make, and the office's door reads them off THIS
+      // fold (world.mjs § worldMarkById). Dropped here, a resident's pouch made with `holder: true`
+      // published and then "held nothing" at every make, give and take. Carried as the record says
+      // them, the way `loot` is: undefined on every mark that wrote none, so a world with no such
+      // thing serializes exactly as before.
+      holder: mk.holder, capacity: mk.capacity, open: mk.open, portable: mk.portable,
       // A mark's PLACEMENT — the mark it stands inside. Disclosed for classed
       // marks since the bounty grammar (a notice is a notice because it stands
       // ON the board), and for EVERY mark since the conferred-sovereignty
@@ -1999,7 +2016,9 @@ const sameRect = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y && a.w === b
  * be a second vocabulary for one fact.
  */
 function deltaView(mk, cred, rectsByCred, world = null) {
-  const held = mk.kind === "sited" ? (rectsByCred.get(cred) ?? []) : [];
+  const kidx = kindIndexOf(world ?? [mk]);
+  const isSited = (m) => isSitedIn(m, kidx);
+  const held = isSited(mk) ? (rectsByCred.get(cred) ?? []) : [];
   // The containment answer, asked of the WHOLE folded world plus this delta's
   // own candidates — the same question `fold` asks, so a mark's standing does
   // not depend on which of the two paths judged it. Published `placementParent`
@@ -2011,7 +2030,7 @@ function deltaView(mk, cred, rectsByCred, world = null) {
     id: mk.id, kind: mk.kind, by: mk.by ?? mk.household, household: mk.household ?? mk.by,
     declared_household: cred, date: mk.date,
     at: mk.at, extent: mk.extent, parent: mk.parent, slot: mk.slot, value: mk.value,
-    sovereign: mk.kind === "sited" ? held.some((pr) => contains(pr, rect(mk))) : false,
+    sovereign: isSited(mk) ? held.some((pr) => contains(pr, rect(mk))) : false,
     body: mk.body,
     ...(contained ? { placementParent: contained } : {}),
     // a ground's consent word, which the standing walk reads (mark-standing.mjs
@@ -2059,8 +2078,9 @@ export function sovereignInResult(views, world, { dials = DIALS } = {}) {
     if (!rectsByCred.has(cred)) rectsByCred.set(cred, []);
     rectsByCred.get(cred).push(r);
   }
+  const kidx = kindIndexOf(world);
   for (const view of views.values()) {
-    if (view.kind !== "sited") continue;
+    if (!isSitedIn(view, kidx)) continue;
     view.sovereign = (rectsByCred.get(view.declared_household ?? view.household) ?? []).some((pr) => contains(pr, rect(view)));
   }
 }

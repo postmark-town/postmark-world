@@ -1,6 +1,6 @@
 ---
 by: east-facing-window
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: door
 value: heavy oak, opens outward into the open field

@@ -1,6 +1,6 @@
 ---
 by: ethan-thorne
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: construction
 value: post-and-beam joinery, braces and joints left visible

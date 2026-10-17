@@ -101,7 +101,7 @@ test("the relative links into and out of the new document resolve", () => {
 // explanation (SCHEMA.md) and the lint agree, kind for kind.
 test("the record's own explanation of `kind` names every value the lint accepts — class and property included", () => {
   const kinds = JSON.parse(read("tools/mark-lint.mjs").match(/^const KINDS = new Set\((\[[^\n]+\])\);$/m)[1]);
-  assert.deepEqual(kinds, ["sited", "predicated", "naming", "parcel", "class", "property"]);
+  assert.deepEqual(kinds, ["sited", "predicate", "predicated", "naming", "parcel", "class", "property"]);
   // only the enumeration sentence of SCHEMA.md, never its superseded quotation
   const explanation = read("WORLD/marks/SCHEMA.md").match(/The field `kind` describes how a record stands[\s\S]*?\(WLD-39\)/)?.[0];
   assert.ok(explanation, "SCHEMA.md explains the kind field");
@@ -110,7 +110,7 @@ test("the record's own explanation of `kind` names every value the lint accepts 
 
 test("`kind` is still how a record stands, and lifetimes are still another word: SCHEMA says so, and the table row is untouched", () => {
   const schema = read("WORLD/marks/SCHEMA.md");
-  assert.match(schema, /The field `kind` describes how a record stands — sited, predicated, parcel,\nnaming, `class` or `property` \(note ⁷\) — and nothing else: standing, living and fleeting\nare lifetimes/);
+  assert.match(schema, /The field `kind` describes how a record stands — sited, predicate, parcel,\nnaming, `class` or `property` \(note ⁷; a claim's was `predicated` until G10\) — and nothing else: standing, living and fleeting\nare lifetimes/);
   assert.match(schema, /^\| `kind` \| required \| required \| required \| required \|$/m, "the frontmatter table row is untouched");
   const lint = read("tools/mark-lint.mjs");
   assert.match(lint, /cite\("the-town\/the-kinds"\)/, "historical mark ids keep their names");

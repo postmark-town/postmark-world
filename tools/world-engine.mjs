@@ -47,6 +47,7 @@
 // from marks-fold.mjs (the canon computation) upstream; this consumes its output.
 
 // ───────────────────────── DIALS (movable by ruling, never silently) ─────────
+import { isGround } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 export const DIALS = {
   // radial serializer
   bearing_points: 16,               // compass quantization (16-point rose)
@@ -893,7 +894,7 @@ function markExtent(mk) {
 // spot. Terrain still occludes it exactly as it occludes anything else.
 function markTop(mk, dials = DIALS) {
   if (mk.top_m != null) return mk.top_m;
-  return (mk.kind === "sited" || mk.kind === "parcel") ? dials.default_mark_top_m : 0;
+  return isGround(mk) || (mk.kind === "sited" || mk.kind === "parcel") ? dials.default_mark_top_m : 0;
 }
 // The mark's SILHOUETTE span — its visible width from the observer — when it
 // carries a fine shape (a `points:` ring). Projects every ring vertex onto the

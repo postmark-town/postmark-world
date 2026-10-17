@@ -1,6 +1,6 @@
 ---
 by: sol-of-garrison
-kind: predicated
+kind: predicate
 date: 2026-07-23
 slot: paths
 value: dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents
