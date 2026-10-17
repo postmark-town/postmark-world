@@ -686,9 +686,10 @@ export { withinOf };
 // its author and its id, and never quoted: its body is read by focus
 // (investigate, or the apex's `mark:`), where it arrives in its own field,
 // beside its author — the reading law's named fields. The town's own marks (by
-// `the-town`) are the narration, and stay told. This is every place a body
-// enters the telling: the establishing line, the "You are within" clause, the
-// band lines and the horizon lines.
+// `the-town`) are the narration, and stay told. These are all five places a
+// body enters the telling: the establishing line, the "You are within" clause,
+// the band lines, the horizon lines and the lost-horizon lines (a far mark the
+// Mists' wall took, told where it stood).
 export const TELLING_TOWN = "the-town";
 const authorOf = (m) => String(m?.by ?? String(m?.id ?? "").split("/")[0] ?? "");
 const townsOwn = (m) => authorOf(m) === TELLING_TOWN;

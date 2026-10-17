@@ -11742,6 +11742,15 @@ export function mountViewer(appEl) {
     refreshLights();
     return null;
   }
+  // AN UNKNOWN ANSWER IS NOT HELD FOR THE WHOLE BEAT (WLD-29 review): a slow or
+  // unread store (`lit: null`, `unavailable`) or a failed fetch is asked again on
+  // the clock's next 30 s tick, not five minutes later. A historical answer is
+  // known (it says so), so it waits like any other.
+  function lightsRetryDue() {
+    const held = lightsHeld;
+    if (!held || held.key !== lightsAsk().key) return false;
+    return held.lights == null || (held.lights.lit == null && held.lights.historical !== true);
+  }
   function lightOf(parcel) {
     const lights = currentLights();
     const light = houseLight(parcel, lights);
@@ -15367,6 +15376,7 @@ export function mountViewer(appEl) {
     // the NUMBER only moves when a settlement actually lands, so it is refreshed
     // on the same slower beat the fold uses
     if (!$(root, ".settlenow")?.hidden) renderSettlementChip();
+    if (lightsRetryDue()) refreshLights(); // an unknown light is asked again now, not at the five-minute beat
     if (tick % 20 === 0) loadSettlements().then(renderSettlementChip);
     // the talk moves faster than the record: every other tick (~60 s), gentler
     // than the conversations page's own 7 s poll — this is a map, not a feed,

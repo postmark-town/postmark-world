@@ -3,9 +3,11 @@
 // The telling is the town's own voice. A resident's mark is NAMED in it, by its
 // author and its id, and never quoted: its body is read by focus, where it
 // arrives in its own field (Darko 2026-10-13 21:11 EDT, ruling B). A body enters
-// the telling in four places: the establishing line, the "You are within"
-// clause, the band lines and the horizon lines. Each is held here, on a REAL
-// fold of synthetic marks; the town's own marks stay told, as narration.
+// the telling in five places: the establishing line, the "You are within"
+// clause, the band lines, the horizon lines and the lost-horizon lines. The
+// first four are held here, on a REAL fold of synthetic marks; the fifth needs
+// the Mists' wall, so it is held in mists.test.mjs (§ POS-393 · the missing
+// horizon). The town's own marks stay told, as narration.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fold } from "./marks-fold.mjs";

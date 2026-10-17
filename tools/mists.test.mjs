@@ -643,6 +643,18 @@ test("the missing horizon: a far feature the wall takes is told where it stood, 
   assert.match(told, /  · NW, where Pando Peak stood: only grey/);
 });
 
+test("POS-393 · the missing horizon names a resident's far mark, never its body: lost behind the wall with no skeleton label, it is 'a mark by <author> [id]'; the town's own keeps its name", () => {
+  const body = "Zed's beacon tower, whitewashed and very tall.";
+  const zed = { id: "zed/beacon", by: "zed", far: true, kind: "sited", at: { x: 0, y: -1200 }, extent: { w: 30, h: 30 }, body };
+  const town = { id: "the-town/old-mill", by: "the-town", far: true, kind: "sited", at: { x: 1200, y: 0 }, extent: { w: 30, h: 30 }, body: "The old mill, its sails long still." };
+  const e = openYourEyes({ x: 0, y: 0 }, worldOf([zed, town]), { crossing: 10, dials: CLEAR });
+  assert.deepEqual(e.fov.farLost.map((f) => f.id).sort(), ["the-town/old-mill", "zed/beacon"], "both are lost behind the wall (the fixture reaches the line)");
+  const told = e.tell();
+  assert.match(told, /  · N, where a mark by zed \[zed\/beacon\] stood: only grey/);
+  assert.ok(!told.includes(body) && !told.includes("Zed's beacon"), `the resident's words are in the town's telling:\n${told}`);
+  assert.match(told, /  · E, where The old mill stood: only grey/, "the town's own far mark is told by its own name");
+});
+
 test("the air, in one line: absent with no Mists; the weather by the crossing's hour, the rung's edge, its veil, and its line", () => {
   const w = worldOf([NEAR]);
   assert.equal(airLine(orient({ x: 0, y: 0 }, w, { crossing: 9, dials: CLEAR }).you, 9), null);

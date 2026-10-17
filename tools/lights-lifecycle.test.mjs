@@ -50,6 +50,7 @@ function fixture() {
     ${body("takeLights")}
     ${body("refreshLights")}
     ${body("currentLights")}
+    ${body("lightsRetryDue")}
     ${body("takeDials")}
     ${body("refreshDials")}
     ${body("currentReadDials")}
@@ -58,7 +59,7 @@ function fixture() {
     globalThis.probe = {
       state, stop: () => { stopped = true; },
       switchOffice: () => { office = "https://office-b.invalid"; },
-      lights: () => currentLights(), held: () => lightsHeld, refreshLights: () => refreshLights(),
+      lights: () => currentLights(), held: () => lightsHeld, refreshLights: () => refreshLights(), retryDue: () => lightsRetryDue(),
       dials: () => currentReadDials(), dialsHeld: () => dialsHeld, refreshDials: () => refreshDials(),
       read: () => loadResidentRead(null, state.handle),
     };
@@ -168,4 +169,27 @@ test("REMOUNT: each mount's stop clears its own three intervals, and two mounts'
   vm.runInContext(`(() => { ${STOP[1]} })()`, two);
   assert.equal(active.size, 0, `left after both stops: ${[...active].join(",")}`);
   assert.equal(one.stopped, true, "stop marks its own mount stopped");
+});
+
+test("AN UNKNOWN ANSWER IS ASKED AGAIN ON THE NEXT TICK (review-wld29): a slow or unread store (`lit: null`) or a failed fetch is due a retry; a known or historical answer is not; the 30 s clock asks it", async () => {
+  const f = fixture();
+  f.probe.lights();
+  assert.equal(f.probe.retryDue(), false, "nothing held yet: the first ask is already out, not a retry");
+  f.requests[0].answer({ crossing: 500, window: 1, lit: null, unavailable: "household activity did not answer within 1.5 s" }); await tick(); await tick();
+  assert.equal(f.probe.retryDue(), true, "a slow store's answer is unknown, and due again");
+  f.probe.refreshLights();
+  assert.equal(f.requests.length, 2, "the retry asks the same door");
+  f.requests[1].answer(LIGHTS); await tick(); await tick();
+  assert.deepEqual(f.probe.lights(), LIGHTS);
+  assert.equal(f.probe.retryDue(), false, "a known answer waits for the beat");
+  f.probe.refreshLights();
+  f.requests[2].answer({ crossing: 500, window: 1, lit: null, historical: true, note: "activity isn't kept per crossing" }); await tick(); await tick();
+  assert.equal(f.probe.retryDue(), false, "historical is known: it says so, and is not asked again");
+  f.probe.refreshLights();
+  f.requests[3].answer({ error: "the world door tripped" }); await tick(); await tick();
+  assert.equal(f.probe.held().lights, null);
+  assert.equal(f.probe.retryDue(), true, "a failed answer is unknown, and due again");
+  // the clock's 30 s tick is where the retry is asked
+  const clock = source.match(/const clock = setInterval\(async \(\) => \{[\s\S]*?\}, 30000\);/)?.[0] ?? "";
+  assert.match(clock, /if \(lightsRetryDue\(\)\) refreshLights\(\);/, "the 30 s clock re-asks an unknown light");
 });
