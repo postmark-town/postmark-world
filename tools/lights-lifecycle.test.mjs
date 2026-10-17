@@ -54,13 +54,14 @@ function fixture() {
     ${body("takeDials")}
     ${body("refreshDials")}
     ${body("currentReadDials")}
+    ${body("dialsRetryDue")}
     ${body("residentStandpointKey")}
     ${body("loadResidentRead")}
     globalThis.probe = {
       state, stop: () => { stopped = true; },
       switchOffice: () => { office = "https://office-b.invalid"; },
       lights: () => currentLights(), held: () => lightsHeld, refreshLights: () => refreshLights(), retryDue: () => lightsRetryDue(),
-      dials: () => currentReadDials(), dialsHeld: () => dialsHeld, refreshDials: () => refreshDials(),
+      dials: () => currentReadDials(), dialsHeld: () => dialsHeld, refreshDials: () => refreshDials(), dialsRetryDue: () => dialsRetryDue(),
       read: () => loadResidentRead(null, state.handle),
     };
   `, context);
@@ -192,4 +193,24 @@ test("AN UNKNOWN ANSWER IS ASKED AGAIN ON THE NEXT TICK (review-wld29): a slow o
   // the clock's 30 s tick is where the retry is asked
   const clock = source.match(/const clock = setInterval\(async \(\) => \{[\s\S]*?\}, 30000\);/)?.[0] ?? "";
   assert.match(clock, /if \(lightsRetryDue\(\)\) refreshLights\(\);/, "the 30 s clock re-asks an unknown light");
+});
+
+test("A FAILED DIAL TABLE IS ASKED AGAIN ON THE NEXT TICK (review-wld29): a GET /world/dials that failed or answered an error is due a retry, and the answer that lands prices the desk; an answered table is kept; the 30 s clock asks it", async () => {
+  const f = fixture();
+  assert.equal(f.probe.dials(), null, "nothing held: the first ask goes out");
+  assert.equal(f.probe.dialsRetryDue(), false, "the first ask is not a retry");
+  const first = f.requests.find((r) => r.url.endsWith("/world/dials"));
+  first.answer({ error: "the world door tripped" }); await tick(); await tick();
+  assert.equal(f.probe.dialsHeld().answer, null);
+  assert.equal(f.probe.dialsRetryDue(), true, "a failed table is unknown, and due again");
+  f.probe.refreshDials();
+  const again = f.requests.filter((r) => r.url.endsWith("/world/dials"));
+  assert.equal(again.length, 2, "the retry asks the same door");
+  again[1].answer(DIALS); await tick(); await tick();
+  assert.equal(f.probe.dials()["the-town/resident"].pace_km_per_crossing, 77, "the desk's stride, once it lands");
+  assert.equal(f.probe.dialsRetryDue(), false, "an answered table is kept for the mount");
+  f.probe.switchOffice();
+  assert.equal(f.probe.dialsRetryDue(), false, "another office's held answer is never a retry here; that office asks its own");
+  const clock = source.match(/const clock = setInterval\(async \(\) => \{[\s\S]*?\}, 30000\);/)?.[0] ?? "";
+  assert.match(clock, /if \(dialsRetryDue\(\)\) refreshDials\(\);/, "the 30 s clock re-asks a failed table");
 });

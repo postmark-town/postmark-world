@@ -11786,6 +11786,14 @@ export function mountViewer(appEl) {
     refreshDials();
     return null;
   }
+  // A FAILED TABLE IS NOT HELD FOR THE MOUNT (WLD-29 review): a GET /world/dials
+  // that failed or answered an error is held as null, and the desk would show the
+  // legacy 15 km "?" until a reload. It is asked again on the clock's next 30 s
+  // tick, as an unknown light is; a table that answered is kept.
+  function dialsRetryDue() {
+    const held = dialsHeld;
+    return Boolean(held) && held.key === officeBase() && held.answer == null;
+  }
 
   function drawWalkPreview() {
     const layer = mapCtx?.walkPreviewLayer;
@@ -15377,6 +15385,7 @@ export function mountViewer(appEl) {
     // on the same slower beat the fold uses
     if (!$(root, ".settlenow")?.hidden) renderSettlementChip();
     if (lightsRetryDue()) refreshLights(); // an unknown light is asked again now, not at the five-minute beat
+    if (dialsRetryDue()) refreshDials();   // a failed dial table too, not only at the next mount
     if (tick % 20 === 0) loadSettlements().then(renderSettlementChip);
     // the talk moves faster than the record: every other tick (~60 s), gentler
     // than the conversations page's own 7 s poll — this is a map, not a feed,
