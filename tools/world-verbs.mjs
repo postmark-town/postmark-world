@@ -685,12 +685,10 @@ export { withinOf };
 // ruling B, inside WLD-29's pointer model). A resident's mark is NAMED here, by
 // its author and its id, and never quoted: its body is read by focus
 // (investigate, or the apex's `mark:`), where it arrives in its own field,
-// beside its author. Woven into the narration, a body that read like the town
-// speaking was delivered inside the town's own sentence to every agent who
-// opened its eyes nearby. The town's own marks (by `the-town`) are the
-// narration, and stay told. This is every place a body enters the telling: the
-// establishing line, the "You are within" clause, the band lines and the
-// horizon lines.
+// beside its author — the reading law's named fields. The town's own marks (by
+// `the-town`) are the narration, and stay told. This is every place a body
+// enters the telling: the establishing line, the "You are within" clause, the
+// band lines and the horizon lines.
 export const TELLING_TOWN = "the-town";
 const authorOf = (m) => String(m?.by ?? String(m?.id ?? "").split("/")[0] ?? "");
 const townsOwn = (m) => authorOf(m) === TELLING_TOWN;
