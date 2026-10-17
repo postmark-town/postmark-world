@@ -345,3 +345,50 @@ test("H1: a suite-held parcel's naming mark does not quarantine its household �
   assert.ok(w.file(LANTERN));
   assert.equal(w.file(NAME), null, "the name waits with its parcel");
 });
+
+// ── G2: STANDING DECIDES IN BOTH DIRECTIONS (Darko, WLD-51, 2026-10-15 12:59) ─
+//
+//   "A mark first filed as home that now stands on market ground is takeable
+//    at ✦0." The cone (berthillon/cone-peche-de-vigne-2026-08-27, ✦4 on 10-15)
+//    is the live case.
+
+const homeRow = { "keith/the-garage": { household: "house-k", path: GARAGE, class: "home" } };
+
+test("G2: a home row whose mark walks market at ✦0 is taken, with nothing laid on main; a home row that walks home stays", (t) => {
+  const SHED = "WORLD/marks/keith/the-shed/mark.md";
+  const w = town(t, {
+    main: { [PARCEL]: parcel(), [SHED]: record({ by: "keith", at: { x: 100, y: 100 }, extent: { w: 4, h: 4 }, body: "a shed" }), [GARAGE]: garageAt(1000, 1000) },
+    rows: { ...homeRow, "keith/the-shed": { household: "house-k", path: SHED, class: "home" } },
+  });
+  const report = settlementSweep({ repo: w.repo, stakesPath: w.stakesPath });
+  assert.deepEqual(ids(report.unpublished), ["keith/the-garage"], "stored home, standing on open ground: taken");
+  assert.deepEqual(report.unpublished.map((r) => [r.class, r.walked]), [["home", "commons"]], "reported with the row's real class, and what the walk found");
+  assert.equal(w.file(GARAGE), null);
+  assert.ok(w.file(SHED), "stored home, walking home: kept");
+  assert.equal(w.registry()["keith/the-garage"], undefined, "its row leaves the registry");
+});
+
+test("G2 + THE WITHDRAWAL: a parcel withdrawn from under a ✦0 HOME-row mark leaves it on open ground, and the same crossing takes it", (t) => {
+  const w = town(t, {
+    main: { [PARCEL]: parcel(), [GARAGE]: garageAt(100, 100) },
+    rows: homeRow,
+    drafts: { "draft/keith": { [PARCEL]: null } },
+  });
+  const report = settlementSweep({ repo: w.repo, stakesPath: w.stakesPath });
+  assert.deepEqual(ids(report.withdrawn), ["keith/keith-parcel"]);
+  assert.deepEqual(ids(report.unpublished), ["keith/the-garage"], "judged against the result, the home row's mark walks market with no stamps");
+  assert.equal(w.file(GARAGE), null);
+});
+
+test("G2, backed or still at home: a home row's mark is kept when stamps stand behind it, or when this crossing's parcel is its ground", (t) => {
+  const backed = town(t, {
+    main: { [GARAGE]: garageAt(1000, 1000) }, rows: homeRow,
+    stakes: [{ holder: "s1", mark: "keith/the-garage", n: 2, weight: 4 }],
+  });
+  const kept = settlementSweep({ repo: backed.repo, stakesPath: backed.stakesPath });
+  assert.deepEqual(ids(kept.unpublished), [], "✦2 behind it: kept");
+  const sheltered = town(t, { main: { [GARAGE]: garageAt(100, 100) }, rows: homeRow, drafts: { "draft/keith": { [PARCEL]: parcel() } } });
+  const report = settlementSweep({ repo: sheltered.repo, stakesPath: sheltered.stakesPath });
+  assert.deepEqual(ids(report.published), ["keith/keith-parcel"]);
+  assert.deepEqual(ids(report.unpublished), [], "the parcel arriving this crossing is its ground: town, then sovereign, then market");
+});

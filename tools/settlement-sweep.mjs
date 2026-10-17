@@ -19,7 +19,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
-import { unpublishVerdict, rowClassOf } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
+import { unpublishVerdict, rowClassOf, isCandidateRow } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -1492,12 +1492,14 @@ export function settlementSweep({
   holdOrphans(pending);
 
   const gone = new Set(withdrawn.map((item) => item.id));
-  // The marks the unpublish loop will ask standing of: commons rows at ✦0. Never
+  // The marks the unpublish loop will ask standing of: candidate rows at ✦0,
+  // commons and home alike, because standing decides in both directions (WLD-51
+  // G2: a home row whose mark now walks market is taken like any other). Never
   // a mark the town signs: a view drops the `tier` line the constitution
   // shortcut reads (mark-standing.mjs), so re-admitted it would read market;
   // the fold's own tier answers for it (review-214, finding 3).
   const judged = Object.entries(registry.published)
-    .filter(([id, entry]) => entry?.class === "commons" && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
+    .filter(([id, entry]) => isCandidateRow(entry) && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
       && !(mainFolded.has(id) && townOwned(mainFolded.get(id))))
     .map(([id]) => id);
   const candidateOf = new Map(pending.filter((row) => row.candidate).map((row) => [row.id, row.candidate]));
@@ -1606,11 +1608,15 @@ export function settlementSweep({
       ...(staleRows ? { staleRows } : {}),
     });
     if (verdict.unpublish !== true) continue;
+    // `class` is the ROW's, as the registry holds it (a home row taken under G2
+    // says home), and `walked` is what the walk found: every take walks commons.
+    // The row's class is also what a kept frame's row is put back with, below.
     unpublished.push({
       household: entry.household,
       id,
       path: verdict.path,
-      class: "commons",
+      class: entry.class,
+      walked: "commons",
       escrow: escrow.get(id) ?? 0,
       content: readAt(repo, mainBranch, verdict.path),
     });

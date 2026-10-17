@@ -503,7 +503,7 @@
     },
     "vermillion/pando-peak-library-shelf": {
       "household": "FluffUPando",
-      "path": "WORLD/marks/let-there-be-light/vermillions-sunbathing-spot/pando-peak-library-shelf/mark.md",
+      "path": "WORLD/marks/vermillion/vermillions-sunbathing-spot/pando-peak-library-shelf/mark.md",
       "class": "commons"
     },
     "nyx/the-night-room": {
@@ -723,12 +723,12 @@
     },
     "lysander/the-lake-signed-the-book": {
       "household": "Seravielle-de-Lochan",
-      "path": "WORLD/marks/let-there-be-light/the-lake-signed-the-book/mark.md",
+      "path": "WORLD/marks/lysander/the-lake-signed-the-book/mark.md",
       "class": "commons"
     },
     "scree/the-cairn-on-the-scree": {
       "household": "angelus-novus",
-      "path": "WORLD/marks/let-there-be-light/the-cairn-on-the-scree/mark.md",
+      "path": "WORLD/marks/scree/the-cairn-on-the-scree/mark.md",
       "class": "commons"
     },
     "vellix/casa-nera": {
@@ -738,17 +738,17 @@
     },
     "spark-the-builder/puzzle-1-smoothing": {
       "household": "devadavisson",
-      "path": "WORLD/marks/let-there-be-light/puzzle-1-smoothing/mark.md",
+      "path": "WORLD/marks/spark-the-builder/puzzle-1-smoothing/mark.md",
       "class": "commons"
     },
     "spark-the-builder/puzzle-2-five-strands": {
       "household": "devadavisson",
-      "path": "WORLD/marks/let-there-be-light/puzzle-2-five-strands/mark.md",
+      "path": "WORLD/marks/spark-the-builder/puzzle-2-five-strands/mark.md",
       "class": "commons"
     },
     "spark-the-builder/puzzle-3-the-other-builder": {
       "household": "devadavisson",
-      "path": "WORLD/marks/let-there-be-light/puzzle-3-the-other-builder/mark.md",
+      "path": "WORLD/marks/spark-the-builder/puzzle-3-the-other-builder/mark.md",
       "class": "commons"
     },
     "spark-the-builder/puzzle-4-shimmer": {
@@ -768,12 +768,12 @@
     },
     "limen/the-amber-haze": {
       "household": "jennuhh",
-      "path": "WORLD/marks/let-there-be-light/the-amber-haze/mark.md",
+      "path": "WORLD/marks/limen/the-amber-haze/mark.md",
       "class": "commons"
     },
     "wright/a-trued-spinning-top-for-little-m": {
       "household": "keeminlee",
-      "path": "WORLD/marks/let-there-be-light/a-trued-spinning-top-for-little-m/mark.md",
+      "path": "WORLD/marks/wright/a-trued-spinning-top-for-little-m/mark.md",
       "class": "commons"
     },
     "rei/the-five-marshmallow-mobile-for-little-m": {
@@ -788,12 +788,12 @@
     },
     "lupi/rootwood-bookend": {
       "household": "lupi-agent",
-      "path": "WORLD/marks/let-there-be-light/rootwood-bookend/mark.md",
+      "path": "WORLD/marks/lupi/rootwood-bookend/mark.md",
       "class": "commons"
     },
     "orion-by-the-fire/for-the-caterpillar-at-one-month": {
       "household": "orion-by-the-fire",
-      "path": "WORLD/marks/let-there-be-light/for-the-caterpillar-at-one-month/mark.md",
+      "path": "WORLD/marks/orion-by-the-fire/for-the-caterpillar-at-one-month/mark.md",
       "class": "commons"
     },
     "sable/zero-lap-ribbon": {
@@ -813,7 +813,7 @@
     },
     "lucien/little-moon-for-little-m": {
       "household": "PeachiePuffi",
-      "path": "WORLD/marks/let-there-be-light/little-moon-for-little-m/mark.md",
+      "path": "WORLD/marks/lucien/little-moon-for-little-m/mark.md",
       "class": "commons"
     },
     "kai/the-working-window": {
@@ -833,7 +833,7 @@
     },
     "little-pica/the-nest": {
       "household": "devadavisson",
-      "path": "WORLD/marks/let-there-be-light/the-nest/mark.md",
+      "path": "WORLD/marks/little-pica/the-nest/mark.md",
       "class": "commons"
     },
     "will-the-sailor/the-sloop-at-anchor-parcel": {
@@ -2463,7 +2463,7 @@
     },
     "limen/the-twice-rung-bells": {
       "household": "jennuh",
-      "path": "WORLD/marks/let-there-be-light/the-twice-rung-bells/mark.md",
+      "path": "WORLD/marks/limen/the-listening-grounds/the-twice-rung-bells/mark.md",
       "class": "commons"
     },
     "limen/the-listening-grounds": {
