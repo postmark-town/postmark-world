@@ -41,7 +41,10 @@
 // entry law governs future entries only, and nobody's history rewrites.
 //
 // Pure: no fs, no geometry, no engine import. The office pen owns writing; the
-// verbs (world-verbs.mjs) own the geometry; this owns grammar and arithmetic.
+// verbs (world-verbs.mjs) own the geometry; this owns grammar and arithmetic. The
+// one import is mark-kind.mjs, pure too: what a record is, in either form.
+
+import { isSited, instanceClassOf } from "./mark-kind.mjs";
 
 // ── the three words ─────────────────────────────────────────────────────────
 export const ENTRY_WORDS = Object.freeze(["welcomed", "neutral", "opposed"]);
@@ -244,7 +247,7 @@ export const STAIRS_CLASS = "stairs";
 /** The stairs class's answer, verbatim (Darko, 2026-10-15 13:31). */
 export const STAIRS_LINE = "Moving to higher/lower floors has not been implemented yet. Coming Soon!";
 /** A stairs is an instance: a sited mark carrying the class (never its declaration). */
-export const isStairs = (m) => String(m?.class ?? "") === STAIRS_CLASS && m?.kind === "sited";
+export const isStairs = (m) => instanceClassOf(m) === STAIRS_CLASS && isSited(m);
 /** The class's default law: into itself, opposed, the line as its consequence.
  *  Applied only to a stair that writes no `entry:` (entryLawOf). */
 export const stairsLaw = (m) => ({ word: "opposed", consequence: STAIRS_LINE, into: m?.id ?? null });

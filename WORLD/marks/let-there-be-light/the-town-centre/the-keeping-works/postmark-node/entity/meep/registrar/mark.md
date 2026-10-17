@@ -7,7 +7,6 @@ class: registrar
 version: 1
 extends: meep
 reports-to: postmaster
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

@@ -26,6 +26,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { markStateClasses } from "../spectator/viewer.mjs";
+import { instanceClassOf } from "./mark-kind.mjs"; // either form: class: beside a standing word, or the kind (W2)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
@@ -37,9 +38,9 @@ const BASKET = MARKS.find((m) => m.id === "rei/the-mending-basket");
 
 test("THE FALSIFIER: two marks that differ ONLY in `class:` do not render identically", () => {
   assert.ok(DOOR && BASKET, "both marks are in the committed world");
-  assert.equal(DOOR.class, "portal-ground", "the door says what it is, on the record");
+  assert.equal(instanceClassOf(DOOR), "portal-ground", "the door says what it is, on the record");
   // the basket is an ordinary sited mark with no class — the control
-  assert.equal(BASKET.class, undefined, "the basket says nothing, which is the ordinary case");
+  assert.equal(instanceClassOf(BASKET), undefined, "the basket says nothing, which is the ordinary case");
   // and they are the same on every OTHER axis the mint reads, so a difference
   // in the answer can only have come from the class
   const same = { tier: "market", draft: false };

@@ -21,10 +21,12 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
+import { isGround, instanceClassOf, isPredicate } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
+import { propertyOf } from "../tools/class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
 import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mjs";
@@ -80,7 +82,7 @@ const markIndex = (marks) => marks instanceof Map
 
 export function isEmbodiedMark(mark) {
   const w = Number(mark?.extent?.w), h = Number(mark?.extent?.h);
-  return (mark?.kind === "sited" || mark?.kind === "parcel")
+  return isGround(mark)
     && [mark?.at?.x, mark?.at?.y, w, h].every(Number.isFinite)
     && w > 0 && h > 0;
 }
@@ -88,7 +90,7 @@ export function isEmbodiedMark(mark) {
 export function isAmbientMark(mark, marks = []) {
   if (!mark) return false;
   if (mark.id === WORLD_ROOT_ID) return true;
-  if (mark.kind !== "predicated" && mark.kind !== "naming") return false;
+  if (!isPredicate(mark) && mark.kind !== "naming") return false;
   const byMarkId = markIndex(marks);
   const seen = new Set([mark.id]);
   let parentId = mark.parent;
@@ -378,7 +380,7 @@ const classToken = (raw) => String(raw ?? "").trim().toLowerCase()
 
 export function markStateClasses({ tier = "market", draft = false, mark = null } = {}) {
   const accent = tier === "home" || tier === "constitution" ? tier : "market";
-  const cls = classToken(mark?.class);
+  const cls = classToken(instanceClassOf(mark));
   return `t-${accent}${draft ? " is-draft" : ""}${cls ? ` c-${cls}` : ""}`;
 }
 
@@ -742,8 +744,15 @@ function settlementChip(at) {
 // vessel precedent already said so: the post-office sails at its own 405.
 export const STRIDE_CLASS_ID = "the-town/resident";
 export function departPaceKm(marks) {
+  // the dial is a property of the class now (LOGOS v2 part 2), read off the
+  // store. The store is the last crossing's fold, so for the one crossing
+  // after the change lands it still carries the class row's `dials`: read
+  // either, the property first.
   const byMarkId = markIndex(marks);
-  const pace = Number(byMarkId.get(STRIDE_CLASS_ID)?.dials?.pace_km_per_crossing);
+  const stride = byMarkId.get(STRIDE_CLASS_ID);
+  const pace = Number(stride
+    ? (propertyOf([...byMarkId.values()], String(stride.class), "pace_km_per_crossing")?.value ?? stride.dials?.pace_km_per_crossing)
+    : NaN);
   return Number.isFinite(pace) && pace > 0 ? pace : null;
 }
 
@@ -1292,6 +1301,29 @@ export function sceneArtSVG(mark, px) {
   if (!isEmbodiedMark(mark)) return "";
   const href = markImagePath(mark);
   if (!href || !mark.extent) return "";
+  // A RINGED MARK WEARS ITS PICTURE IN ITS RING (POS-662, Darko 2026-10-16 on prod:
+  // "ringed marks like errant/black-water-pool don't draw cropped to their ring").
+  // The far and mid tiers hang a picture through placedArtSVG, whose caller hands
+  // it the ring; this street-zoom pass painted the whole extent rectangle, so the
+  // Unfinished Margin's 14-point shore became a 1300 × 255 m box over the sea. The
+  // ring is read by the ONE ring reader (geometry.mjs § polygonOf, after the fold
+  // has parsed both written forms), the picture fills the ring's box and is clipped
+  // to it, and the frame is the ring's own line. A mark with no ring is untouched.
+  const ring = polygonOf(mark);
+  if (ring) {
+    const pts = ring.map(px);
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    if (x1 - x0 > 0 && y1 - y0 > 0) {
+      const points = pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
+      const clip = `wv-scene-art-clip-${String(mark.id).replace(/[^a-z0-9-]/gi, "")}`;
+      return `<g class="wv-scene-mark-art wv-scene-mark-art-ringed" data-id="${esc(mark.id)}" pointer-events="none">`
+        + `<clipPath id="${clip}"><polygon points="${points}"/></clipPath>`
+        + `<image href="${esc(href)}" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(y1 - y0).toFixed(1)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clip})"/>`
+        + `<polygon points="${points}" fill="none" class="wv-scene-art-frame"/>`
+        + `</g>`;
+    }
+  }
   const r = rect(mark);
   const a = px({ x: r.x - r.w / 2, y: r.y - r.h / 2 });
   const b = px({ x: r.x + r.w / 2, y: r.y + r.h / 2 });
@@ -1355,7 +1387,7 @@ export function placeholderExtentSVG(mark, px, { ignoreArt = false } = {}) {
   // the record's OWN word for what this is, through the same mint every other
   // coloured surface reads — so the floor, the pips and the stylesheet cannot
   // hold three private notions of what counts as a door
-  const portal = classToken(mark?.class) === "portal-ground";
+  const portal = classToken(instanceClassOf(mark)) === "portal-ground";
   const fill = `hsl(${hue} 22% 76%)`, edge = `hsl(${hue} 26% 58%)`;
   const attrs = `class="wv-ph-extent${portal ? " c-portal-ground" : ""}" data-id="${esc(mark.id)}" fill="${fill}" stroke="${edge}"`;
   const ring = polygonOf(mark);
@@ -4190,7 +4222,7 @@ export function paintingMarkIds({ radialIds = [], mineIds = [] } = {}) {
 export const WALK_TARGET_MAX_EXTENT_M = 2000;
 export function isWalkableTarget(mark) {
   if (!mark?.at) return false;
-  if (mark.kind !== "sited" && mark.kind !== "parcel") return false;
+  if (!isGround(mark)) return false;
   if (mark.tier === "constitution") return false;
   const span = Math.max(Number(mark.extent?.w ?? 0), Number(mark.extent?.h ?? 0));
   return span < WALK_TARGET_MAX_EXTENT_M;
@@ -4470,7 +4502,7 @@ export function containmentIndex(marks = [], { insideRoomId = null } = {}) {
   const encloses = (mark) => !!insideRoomId
     && (mark?.id === insideRoomId || (room && mark?.at && mark?.extent ? marksContain(mark, room) : false));
   const ground = (marks ?? [])
-    .filter((mark) => mark?.class !== "thing" && !encloses(mark) && isEmbodiedMark(mark) && !isAmbientMark(mark, byMarkId))
+    .filter((mark) => instanceClassOf(mark) !== "thing" && !encloses(mark) && isEmbodiedMark(mark) && !isAmbientMark(mark, byMarkId))
     .map((mark) => ({ mark, area: Number(mark.extent.w) * Number(mark.extent.h) }))
     .sort((a, b) => a.area - b.area || String(a.mark.id).localeCompare(String(b.mark.id)));
   return { byMarkId, ground, insideRoomId: insideRoomId ?? null };
@@ -4527,7 +4559,7 @@ export function createMarkInteractionStore() {
 }
 
 const isPredicateAttribute = (mark) =>
-  mark?.kind === "predicated" || mark?.kind === "naming";
+  isPredicate(mark) || mark?.kind === "naming";
 
 // Cells v1.5 folds only one safe level: a predicate/naming mark may become an
 // attribute of a rendered, non-predicate subject cell. Predicated-on-predicated
@@ -4577,7 +4609,7 @@ export function backingButton(markId, stamps = 0) {
  *  ask: enter refuses a mark with no extent — "a point has no inside" — so a
  *  naming, a predicate, or a bare coordinate affords nothing. */
 export function enterableMark(mark) {
-  if (!mark || mark.kind === "predicated" || mark.kind === "naming") return false;
+  if (!mark || isPredicate(mark) || mark.kind === "naming") return false;
   const at = mark.at, extent = mark.extent;
   if (!at || !Number.isFinite(Number(at.x)) || !Number.isFinite(Number(at.y))) return false;
   return Number(extent?.w) > 0 && Number(extent?.h) > 0;
@@ -4949,8 +4981,8 @@ export function worldFrameReading(mark, marks = []) {
     body: mark.body,
     // its own attributes are its own — the light axis, the clock, the origin are
     // properties of the frame, not marks living inside it
-    predicates: marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === mark.id)
-      .map((m) => ({ id: m.id, slot: m.slot ?? (m.kind === "naming" ? "name" : null), value: m.value, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body })),
+    predicates: marks.filter((m) => (isPredicate(m) || m.kind === "naming" || m.kind === "property") && m.parent === mark.id)
+      .map((m) => ({ id: m.id, slot: m.slot ?? m.name ?? (m.kind === "naming" ? "name" : null), value: m.value ?? m.default, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body })),
     parents: [], children: [], alongside: [],
     more: { predicates: 0, children: 0 },
   };

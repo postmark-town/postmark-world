@@ -6,7 +6,6 @@ date: 2026-08-22
 class: the-consulted-doctrine
 version: 1
 extends: postmark-invariant
-dials: {"lint": "L5"}
 implements: []
 source: LOGOS/classes.md
 ---

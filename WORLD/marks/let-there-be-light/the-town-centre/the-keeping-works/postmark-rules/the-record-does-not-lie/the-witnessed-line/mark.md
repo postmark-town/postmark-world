@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-08-22
-slot: witness
-value: anchor and offset on every line
+name: witness
+default: anchor and offset on every line
 source: LOGOS/state-and-time.md
 ---
 

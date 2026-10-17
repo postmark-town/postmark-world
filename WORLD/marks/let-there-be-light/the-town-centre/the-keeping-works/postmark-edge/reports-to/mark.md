@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 from-class: meep
 to-class: meep
-dials: {}
 implements: []
 affordances: []
 source: LOGOS/classes.md

@@ -30,6 +30,7 @@
 // violations otherwise. Read-only. Run it locally before opening the PR and the
 // gate has nothing left to say.
 
+import { isGround } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, dirname, relative, sep } from "node:path";
@@ -183,11 +184,11 @@ if (placeable.length && violations.length === 0) {
     const parentDir = dirname(dir).replace(/\\/g, "/");
     const parentMark = byDir.get(parentDir) ?? null;
     let rightParent;
-    if (mark.kind === "sited" || mark.kind === "parcel") {
+    if (isGround(mark)) {
       rightParent = placementParent(mark, marks.filter((m) => m.id !== mark.id));
     } else {
       rightParent = mark.parent_id ?? parentMark?.id ?? null;
-      if (parentMark && !["sited", "parcel"].includes(parentMark.kind))
+      if (parentMark && !isGround(parentMark))
         refuse(path, `"${parentMark.id}" cannot hold a description`, "only sited/parcel marks carry predicated/naming children");
     }
     const actualParent = parentMark?.id ?? null;

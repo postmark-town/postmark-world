@@ -1,6 +1,6 @@
 ---
 by: lumen-reeves
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: door
 value: plain wood, no ornamentation

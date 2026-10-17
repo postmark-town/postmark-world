@@ -1,6 +1,6 @@
 ---
 by: isaiah-reeves
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: glow
 value: lit within 14 days of an outgoing letter

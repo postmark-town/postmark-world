@@ -6,7 +6,6 @@ date: 2026-08-20
 class: mint-at-entry
 version: 1
 extends: money-never-buys-judgment
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

@@ -16,7 +16,7 @@
 //
 //   node tools/place-mark.mjs --kind sited  --at 120,340 --extent 6,4 --slug my-porch
 //   node tools/place-mark.mjs --kind parcel --at 900,1200 --slug my-ground
-//   node tools/place-mark.mjs --kind predicated --parent alpha/house --slug color
+//   node tools/place-mark.mjs --kind predicate --parent alpha/house --slug color
 //   add --scaffold to also create the directory and a TEMPLATE-filled mark.md
 //   add --json for machine-readable output
 //
@@ -34,6 +34,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, placementParent, PARCEL_EXTENT_M } from "./marks-fold.mjs";
+import { isGroundIn, kindIndexOf } from "./mark-kind.mjs"; // ground by the class chain, in either form (G12)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -50,7 +51,7 @@ const die = (defect, hint) => {
 };
 
 const kind = opt("--kind");
-if (!["sited", "parcel", "predicated", "naming"].includes(kind ?? ""))
+if (!["sited", "parcel", "predicate", "predicated", "naming"].includes(kind ?? ""))
   die("--kind must be sited, parcel, predicated, or naming", "what shape of claim is this? (WORLD/FURNISHING.md explains the four)");
 
 const slug = opt("--slug");
@@ -82,8 +83,10 @@ if (kind === "sited" || kind === "parcel") {
   parentId = opt("--parent");
   const parent = parentId ? byId.get(parentId) : null;
   if (!parent) die(`no mark "${parentId ?? "(none given)"}" to describe`, "predicated/naming marks nest under the mark they describe — pass --parent <by>/<slug>");
-  if (parent.kind !== "sited" && parent.kind !== "parcel")
-    die(`"${parentId}" cannot hold a description`, "only sited/parcel marks carry predicated/naming children");
+  // ground by its class chain (G12): `kind: sited` + `class: thing` and the
+  // W2 form `kind: thing` alike, and a parcel
+  if (!isGroundIn(parent, kindIndexOf(marks)))
+    die(`"${parentId}" cannot hold a description`, "only ground (a sited mark, an instance of a class under sited, or a parcel) carries predicate/naming children");
   parentDir = parent._dir;
 }
 

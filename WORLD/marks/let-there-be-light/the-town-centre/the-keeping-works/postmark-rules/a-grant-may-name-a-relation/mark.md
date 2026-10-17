@@ -6,7 +6,6 @@ date: 2026-08-26
 class: a-grant-may-name-a-relation
 version: 1
 extends: postmark-rules
-dials: {"scope": "own-ground"}
 implements: []
 source: LOGOS/classes.md
 ---

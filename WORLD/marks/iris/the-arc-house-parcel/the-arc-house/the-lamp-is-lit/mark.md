@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: iris
 date: 2026-08-10T18:49:14.706Z
 slot: status

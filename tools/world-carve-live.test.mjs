@@ -294,7 +294,7 @@ function silentWeights(input, rows, houses, ground, tick) {
   }
   for (const m of input) {
     assert.equal(Object.keys(m.consent ?? {}).length, 0, `${m.id}: the premise is silence`);
-    if (["predicated", "naming", "class"].includes(m.kind) && m.parent) parent.set(m.id, m.parent);
+    if (["predicated", "predicate", "naming", "class"].includes(m.kind) && m.parent) parent.set(m.id, m.parent); // predicate: G10
   }
   const expected = new Map([...byId.keys(), ...terrainIds].map((id) => [id, 0]));
   const house = (id) => houses?.[byId.get(id)?.household] ?? `solo:${byId.get(id)?.household}`;

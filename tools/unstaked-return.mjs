@@ -119,6 +119,7 @@
 // instead would have fixed only the sovereignty flip, left the other children
 // relocated, and kept unstaked marks standing, which weakens the rule.
 
+import { isPredicate } from "./mark-kind.mjs"; // a predicate in either spelling (G10: kind: predicated → predicate)
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, realpathSync, rmSync } from "node:fs";
 import { join, dirname, relative, basename } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -480,7 +481,7 @@ for (const m of S) {
     if (!child || Sids.has(child.id)) continue;      // it leaves too, or holds no mark
     const cm = byId.get(child.id);
     if (!cm) continue;
-    if (cm.kind === "predicated" || cm.kind === "naming" || cm.kind === "class") {
+    if (isPredicate(cm) || cm.kind === "naming" || cm.kind === "class") {
       reparents.push({ child: cm.id, kind: cm.kind, by: cm.by, losing: m.id, path: dirRel(p) });
     } else {
       shifts.push({ child: cm.id, kind: cm.kind, losing: m.id });

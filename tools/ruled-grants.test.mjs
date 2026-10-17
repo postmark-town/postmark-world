@@ -44,11 +44,15 @@ test("the resident's pace dial is 60 (decision 008b; regressed by sweep 652fdb44
   // 2026-08-22 (Keemin: the stride sits under RESIDENT — the mover owns its
   // pace, never the verb) — the
   // guard follows the id; the guarded number is the ruling and never moves.
+  // the dial is a property node under the class now (LOGOS v2 part 2: "every
+  // dial is a property, and a locked value is its default"), still read off
+  // the file
   const text = readFileSync(join(here, "..",
-    "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/resident/mark.md"), "utf8");
-  const line = text.split("\n").find((l) => l.startsWith("dials:"));
-  assert.ok(line, "the resident class carries a dials: line");
-  assert.equal(JSON.parse(line.slice("dials:".length).trim()).pace_km_per_crossing, 60,
+    "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/resident/resident-pace-km-per-crossing/mark.md"), "utf8");
+  assert.match(text, /^kind: property$/m, "the resident's stride is a property node of the resident class");
+  assert.match(text, /^name: pace_km_per_crossing$/m);
+  assert.match(text, /^tier: constitution$/m, "and locked: the town's word, never an instance's");
+  assert.equal(Number((text.match(/^default: (.*)$/m) ?? [])[1]), 60,
     "the resident stride is RULED text (008b: 5 km/h, a person's walk) — a stale copy reverting it is the #1697 class");
 });
 
@@ -74,7 +78,7 @@ test("the resident's enter and exit grants stand, residue the-town/entry (ruled 
 test("the exit-law slot is unsealed in scope and constitutional in custody — no sovereign jails (ruled 2026-08-18)", () => {
   const slot = readFileSync(join(here, "..",
     "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/exit-law-slot/mark.md"), "utf8");
-  assert.match(slot, /value: unsealed/, "per-mark exit laws may exist (the Post Office underway)");
+  assert.match(slot, /default: unsealed/, "per-mark exit laws may exist (the Post Office underway) — a property's default since LOGOS v2 part 2, its value: before");
   assert.match(slot, /values-tier: constitution/,
     "only the town's pen bars a leaving — a resident exit law is nothing");
 });

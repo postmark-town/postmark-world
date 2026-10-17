@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: limen
 date: 2026-10-03T20:29:11.056Z
 slot: physics

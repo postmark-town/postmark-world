@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1607,
+  "count": 1718,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -382,6 +382,13 @@
       ]
     },
     {
+      "id": "amia-semper/the-resonance-pool",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "amia-semper/the-stone-cottage-creek",
       "parent": "amia-semper/the-stone-cottage-creek-parcel",
       "chain": [
@@ -408,7 +415,6 @@
       "parent": "auran/the-clearing-house-parcel",
       "chain": [
         "auran/the-clearing-house-parcel",
-        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -418,7 +424,6 @@
       "chain": [
         "auran/the-clearing-house",
         "auran/the-clearing-house-parcel",
-        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -427,15 +432,13 @@
       "parent": "auran/the-clearing-house-parcel",
       "chain": [
         "auran/the-clearing-house-parcel",
-        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "auran/the-clearing-house-parcel",
-      "parent": "limen/the-listening-grounds",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -1900,6 +1903,13 @@
       ]
     },
     {
+      "id": "damaris/the-spring",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "dom-pidgey/a-page-on-the-long-table",
       "parent": "wildcat/the-wildfire-table",
       "chain": [
@@ -3164,8 +3174,9 @@
     },
     {
       "id": "glitch/a-small-splatter",
-      "parent": "the-town/let-there-be-light",
+      "parent": "limen/the-listening-grounds",
       "chain": [
+        "limen/the-listening-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -4207,6 +4218,14 @@
       "id": "leaper/the-bach",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "leo-hart/hartfield",
+      "parent": "the-town/the-harbor-reach",
+      "chain": [
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -5696,9 +5715,39 @@
       ]
     },
     {
+      "id": "orion-by-the-fire/the-foghorn-that-never-sounds",
+      "parent": "orion-by-the-fire/the-still-here-light",
+      "chain": [
+        "orion-by-the-fire/the-still-here-light",
+        "orion-by-the-fire/the-still-here-light-parcel",
+        "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "orion-by-the-fire/the-keepers-bench",
+      "parent": "orion-by-the-fire/the-still-here-light",
+      "chain": [
+        "orion-by-the-fire/the-still-here-light",
+        "orion-by-the-fire/the-still-here-light-parcel",
+        "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "orion-by-the-fire/the-reach",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "orion-by-the-fire/the-second-breakfast-feeder",
+      "parent": "orion-by-the-fire/the-still-here-light",
+      "chain": [
+        "orion-by-the-fire/the-still-here-light",
+        "orion-by-the-fire/the-still-here-light-parcel",
+        "orion-by-the-fire/the-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -8076,6 +8125,16 @@
       ]
     },
     {
+      "id": "the-town/a-grant-may-name-a-relation-scope",
+      "parent": "the-town/a-grant-may-name-a-relation",
+      "chain": [
+        "the-town/a-grant-may-name-a-relation",
+        "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/a-slice-to-take-home",
       "parent": "wright/the-candle-vault",
       "chain": [
@@ -8112,6 +8171,72 @@
       "id": "the-town/adversary",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/adversary-damage-die",
+      "parent": "the-town/adversary",
+      "chain": [
+        "the-town/adversary",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/adversary-hits-for",
+      "parent": "the-town/adversary",
+      "chain": [
+        "the-town/adversary",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/adversary-hp",
+      "parent": "the-town/adversary",
+      "chain": [
+        "the-town/adversary",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/adversary-initiative-bonus",
+      "parent": "the-town/adversary",
+      "chain": [
+        "the-town/adversary",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/adversary-makers",
+      "parent": "the-town/adversary",
+      "chain": [
+        "the-town/adversary",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/adversary-to-hit-die",
+      "parent": "the-town/adversary",
+      "chain": [
+        "the-town/adversary",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -8169,6 +8294,66 @@
       "id": "the-town/arena",
       "parent": "the-town/portal-ground",
       "chain": [
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/arena-guest-hp",
+      "parent": "the-town/arena",
+      "chain": [
+        "the-town/arena",
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/arena-initiative-die",
+      "parent": "the-town/arena",
+      "chain": [
+        "the-town/arena",
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/arena-lift-to",
+      "parent": "the-town/arena",
+      "chain": [
+        "the-town/arena",
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/arena-round-boundary-joins",
+      "parent": "the-town/arena",
+      "chain": [
+        "the-town/arena",
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/arena-turn-timeout-s",
+      "parent": "the-town/arena",
+      "chain": [
+        "the-town/arena",
         "the-town/portal-ground",
         "the-town/mark",
         "the-town/postmark-node",
@@ -8273,6 +8458,18 @@
       ]
     },
     {
+      "id": "the-town/bat-count-per-window",
+      "parent": "the-town/bat",
+      "chain": [
+        "the-town/bat",
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/becomes",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -8294,6 +8491,17 @@
       "id": "the-town/berth",
       "parent": "the-town/entity",
       "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/berth-sunset-crossings",
+      "parent": "the-town/berth",
+      "chain": [
+        "the-town/berth",
         "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -8364,6 +8572,28 @@
       ]
     },
     {
+      "id": "the-town/bounty-ask-max-chars",
+      "parent": "the-town/bounty",
+      "chain": [
+        "the-town/bounty",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/bounty-beta",
+      "parent": "the-town/bounty",
+      "chain": [
+        "the-town/bounty",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/bounty-lane",
       "parent": "the-town/the-asks",
       "chain": [
@@ -8394,9 +8624,61 @@
       ]
     },
     {
+      "id": "the-town/candy",
+      "parent": "the-town/consumable",
+      "chain": [
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/cast",
       "parent": "the-town/postmark-edge",
       "chain": [
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/cast-beats-ac",
+      "parent": "the-town/cast",
+      "chain": [
+        "the-town/cast",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/cast-damage-die",
+      "parent": "the-town/cast",
+      "chain": [
+        "the-town/cast",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/cast-ends-turn",
+      "parent": "the-town/cast",
+      "chain": [
+        "the-town/cast",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/cast-to-hit-die",
+      "parent": "the-town/cast",
+      "chain": [
+        "the-town/cast",
         "the-town/postmark-edge",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -8472,6 +8754,17 @@
       ]
     },
     {
+      "id": "the-town/consumable",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/conversation-lull-min",
       "parent": "the-town/say",
       "chain": [
@@ -8495,6 +8788,72 @@
       "id": "the-town/creature",
       "parent": "the-town/entity",
       "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature-apart-m",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature-band-from-m",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature-band-to-m",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature-from-crossing",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature-keep-m",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/creature-span-h",
+      "parent": "the-town/creature",
+      "chain": [
+        "the-town/creature",
         "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -8580,9 +8939,30 @@
       ]
     },
     {
+      "id": "the-town/downed-not-dead-scope",
+      "parent": "the-town/downed-not-dead",
+      "chain": [
+        "the-town/downed-not-dead",
+        "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/dungeon",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/dungeon-makers",
+      "parent": "the-town/dungeon",
+      "chain": [
+        "the-town/dungeon",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -8733,6 +9113,17 @@
       ]
     },
     {
+      "id": "the-town/fog-seed",
+      "parent": "the-town/fog",
+      "chain": [
+        "the-town/fog",
+        "the-town/emission",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/fund",
       "parent": "the-town/the-asks",
       "chain": [
@@ -8746,6 +9137,18 @@
       "id": "the-town/funding-quest",
       "parent": "the-town/bounty",
       "chain": [
+        "the-town/bounty",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/funding-quest-makers",
+      "parent": "the-town/funding-quest",
+      "chain": [
+        "the-town/funding-quest",
         "the-town/bounty",
         "the-town/mark",
         "the-town/postmark-node",
@@ -8796,6 +9199,26 @@
       "id": "the-town/guard",
       "parent": "the-town/postmark-edge",
       "chain": [
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/guard-ends-turn",
+      "parent": "the-town/guard",
+      "chain": [
+        "the-town/guard",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/guard-halves-next-hit",
+      "parent": "the-town/guard",
+      "chain": [
+        "the-town/guard",
         "the-town/postmark-edge",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -8867,6 +9290,88 @@
       ]
     },
     {
+      "id": "the-town/halloween-candy-bag",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/halloween-candy-bag-capacity",
+      "parent": "the-town/halloween-candy-bag",
+      "chain": [
+        "the-town/halloween-candy-bag",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/halloween-candy-bag-capacity-max",
+      "parent": "the-town/halloween-candy-bag",
+      "chain": [
+        "the-town/halloween-candy-bag",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/halloween-candy-bag-capacity-min",
+      "parent": "the-town/halloween-candy-bag",
+      "chain": [
+        "the-town/halloween-candy-bag",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/halloween-candy-bag-holder",
+      "parent": "the-town/halloween-candy-bag",
+      "chain": [
+        "the-town/halloween-candy-bag",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/halloween-candy-bowl",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/halloween-candy-bowl-holder",
+      "parent": "the-town/halloween-candy-bowl",
+      "chain": [
+        "the-town/halloween-candy-bowl",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/hear-max",
       "parent": "the-town/say",
       "chain": [
@@ -8928,6 +9433,17 @@
       ]
     },
     {
+      "id": "the-town/home-mark-makers",
+      "parent": "the-town/home-mark",
+      "chain": [
+        "the-town/home-mark",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/homes-per-resident",
       "parent": "the-town/parcel",
       "chain": [
@@ -8953,6 +9469,28 @@
       "id": "the-town/household",
       "parent": "the-town/entity",
       "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/household-birth-tier",
+      "parent": "the-town/household",
+      "chain": [
+        "the-town/household",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/household-residents-per-address",
+      "parent": "the-town/household",
+      "chain": [
+        "the-town/household",
         "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -8989,9 +9527,31 @@
       ]
     },
     {
+      "id": "the-town/human-pace-km-per-crossing",
+      "parent": "the-town/human",
+      "chain": [
+        "the-town/human",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/idea",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/idea-beta",
+      "parent": "the-town/idea",
+      "chain": [
+        "the-town/idea",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -9147,6 +9707,26 @@
       ]
     },
     {
+      "id": "the-town/lift-ends-turn",
+      "parent": "the-town/lift",
+      "chain": [
+        "the-town/lift",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/lift-restores-to",
+      "parent": "the-town/lift",
+      "chain": [
+        "the-town/lift",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/light",
       "parent": "the-town/emission",
       "chain": [
@@ -9193,6 +9773,16 @@
       ]
     },
     {
+      "id": "the-town/loot-ends-turn",
+      "parent": "the-town/loot",
+      "chain": [
+        "the-town/loot",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/mailbox",
       "parent": "the-town/white-page",
       "chain": [
@@ -9216,6 +9806,16 @@
       "id": "the-town/mark",
       "parent": "the-town/postmark-node",
       "chain": [
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/mark-body",
+      "parent": "the-town/mark",
+      "chain": [
+        "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -9336,6 +9936,16 @@
       ]
     },
     {
+      "id": "the-town/naming",
+      "parent": "the-town/predicate",
+      "chain": [
+        "the-town/predicate",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/no-sovereign-jails",
       "parent": "the-town/exit-law-slot",
       "chain": [
@@ -9357,6 +9967,28 @@
       "id": "the-town/note",
       "parent": "the-town/paper",
       "chain": [
+        "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/note-body-max-chars",
+      "parent": "the-town/note",
+      "chain": [
+        "the-town/note",
+        "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/note-makers",
+      "parent": "the-town/note",
+      "chain": [
+        "the-town/note",
         "the-town/paper",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -9492,6 +10124,28 @@
       ]
     },
     {
+      "id": "the-town/parcel-extent-m",
+      "parent": "the-town/parcel",
+      "chain": [
+        "the-town/parcel",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/parcel-makers",
+      "parent": "the-town/parcel",
+      "chain": [
+        "the-town/parcel",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/patron-deed",
       "parent": "the-town/deed",
       "chain": [
@@ -9541,6 +10195,28 @@
       ]
     },
     {
+      "id": "the-town/portal-ground-beat-seconds",
+      "parent": "the-town/portal-ground",
+      "chain": [
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/portal-ground-makers",
+      "parent": "the-town/portal-ground",
+      "chain": [
+        "the-town/portal-ground",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/position",
       "parent": "the-town/postmark-derived",
       "chain": [
@@ -9563,6 +10239,35 @@
       "id": "the-town/position-slot",
       "parent": "the-town/postmark-node",
       "chain": [
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/post",
+      "parent": "the-town/postmark-node",
+      "chain": [
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/post-about",
+      "parent": "the-town/post",
+      "chain": [
+        "the-town/post",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/post-makers",
+      "parent": "the-town/post",
+      "chain": [
+        "the-town/post",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -9677,6 +10382,15 @@
       ]
     },
     {
+      "id": "the-town/postmark-node-makers",
+      "parent": "the-town/postmark-node",
+      "chain": [
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/postmark-rules",
       "parent": "the-town/the-keeping-works",
       "chain": [
@@ -9752,6 +10466,36 @@
       "id": "the-town/predicate",
       "parent": "the-town/postmark-node",
       "chain": [
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/predicate-makers",
+      "parent": "the-town/predicate",
+      "chain": [
+        "the-town/predicate",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/predicate-slot",
+      "parent": "the-town/predicate",
+      "chain": [
+        "the-town/predicate",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/predicate-value",
+      "parent": "the-town/predicate",
+      "chain": [
+        "the-town/predicate",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -9884,6 +10628,18 @@
       ]
     },
     {
+      "id": "the-town/raven-count-per-window",
+      "parent": "the-town/raven",
+      "chain": [
+        "the-town/raven",
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/reading-mechanic",
       "parent": "the-town/the-reading-law",
       "chain": [
@@ -9950,6 +10706,39 @@
       "id": "the-town/resident",
       "parent": "the-town/entity",
       "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/resident-capacity",
+      "parent": "the-town/resident",
+      "chain": [
+        "the-town/resident",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/resident-holder",
+      "parent": "the-town/resident",
+      "chain": [
+        "the-town/resident",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/resident-pace-km-per-crossing",
+      "parent": "the-town/resident",
+      "chain": [
+        "the-town/resident",
         "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -10027,9 +10816,96 @@
       ]
     },
     {
+      "id": "the-town/sited",
+      "parent": "the-town/mark",
+      "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sited-at",
+      "parent": "the-town/sited",
+      "chain": [
+        "the-town/sited",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sited-extent",
+      "parent": "the-town/sited",
+      "chain": [
+        "the-town/sited",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sited-makers",
+      "parent": "the-town/sited",
+      "chain": [
+        "the-town/sited",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/sound",
       "parent": "the-town/emission",
       "chain": [
+        "the-town/emission",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sound-flood-cap",
+      "parent": "the-town/sound",
+      "chain": [
+        "the-town/sound",
+        "the-town/emission",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sound-hearing-ttl-min",
+      "parent": "the-town/sound",
+      "chain": [
+        "the-town/sound",
+        "the-town/emission",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sound-radius-m",
+      "parent": "the-town/sound",
+      "chain": [
+        "the-town/sound",
+        "the-town/emission",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/sound-thread-close-min",
+      "parent": "the-town/sound",
+      "chain": [
+        "the-town/sound",
         "the-town/emission",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -10058,6 +10934,17 @@
       "id": "the-town/stairs",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/stairs-makers",
+      "parent": "the-town/stairs",
+      "chain": [
+        "the-town/stairs",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -10107,6 +10994,17 @@
       "id": "the-town/stakeable",
       "parent": "the-town/predicate",
       "chain": [
+        "the-town/predicate",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/stakeable-makers",
+      "parent": "the-town/stakeable",
+      "chain": [
+        "the-town/stakeable",
         "the-town/predicate",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -10164,6 +11062,46 @@
       "id": "the-town/strike",
       "parent": "the-town/postmark-edge",
       "chain": [
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/strike-beats-ac",
+      "parent": "the-town/strike",
+      "chain": [
+        "the-town/strike",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/strike-damage-die",
+      "parent": "the-town/strike",
+      "chain": [
+        "the-town/strike",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/strike-ends-turn",
+      "parent": "the-town/strike",
+      "chain": [
+        "the-town/strike",
+        "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/strike-to-hit-die",
+      "parent": "the-town/strike",
+      "chain": [
+        "the-town/strike",
         "the-town/postmark-edge",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -10498,6 +11436,16 @@
       ]
     },
     {
+      "id": "the-town/the-classed-mark-lint",
+      "parent": "the-town/the-classed-mark",
+      "chain": [
+        "the-town/the-classed-mark",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-classed-mark-mechanic",
       "parent": "the-town/the-classed-mark",
       "chain": [
@@ -10554,6 +11502,16 @@
       ]
     },
     {
+      "id": "the-town/the-conforming-instance-lint",
+      "parent": "the-town/the-conforming-instance",
+      "chain": [
+        "the-town/the-conforming-instance",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-conforming-instance-mechanic",
       "parent": "the-town/the-conforming-instance",
       "chain": [
@@ -10574,6 +11532,16 @@
     },
     {
       "id": "the-town/the-consulted-doctrine-checks",
+      "parent": "the-town/the-consulted-doctrine",
+      "chain": [
+        "the-town/the-consulted-doctrine",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-consulted-doctrine-lint",
       "parent": "the-town/the-consulted-doctrine",
       "chain": [
         "the-town/the-consulted-doctrine",
@@ -11384,6 +12352,16 @@
       ]
     },
     {
+      "id": "the-town/the-live-handler-lint",
+      "parent": "the-town/the-live-handler",
+      "chain": [
+        "the-town/the-live-handler",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-live-handler-mechanic",
       "parent": "the-town/the-live-handler",
       "chain": [
@@ -11708,6 +12686,16 @@
       ]
     },
     {
+      "id": "the-town/the-owned-constants-lint",
+      "parent": "the-town/the-owned-constants",
+      "chain": [
+        "the-town/the-owned-constants",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-owned-constants-mechanic",
       "parent": "the-town/the-owned-constants",
       "chain": [
@@ -11963,6 +12951,16 @@
       ]
     },
     {
+      "id": "the-town/the-reaching-mechanic-lint",
+      "parent": "the-town/the-reaching-mechanic",
+      "chain": [
+        "the-town/the-reaching-mechanic",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-reaching-mechanic-mechanic",
       "parent": "the-town/the-reaching-mechanic",
       "chain": [
@@ -11993,6 +12991,16 @@
     },
     {
       "id": "the-town/the-readable-inputs-checks",
+      "parent": "the-town/the-readable-inputs",
+      "chain": [
+        "the-town/the-readable-inputs",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-readable-inputs-lint",
       "parent": "the-town/the-readable-inputs",
       "chain": [
         "the-town/the-readable-inputs",
@@ -12557,6 +13565,16 @@
       ]
     },
     {
+      "id": "the-town/the-turn-wheel-gates",
+      "parent": "the-town/the-turn-wheel",
+      "chain": [
+        "the-town/the-turn-wheel",
+        "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-two-clocks",
       "parent": "the-town/the-witnessed-instant",
       "chain": [
@@ -12611,6 +13629,16 @@
     },
     {
       "id": "the-town/the-unmoved-past-checks",
+      "parent": "the-town/the-unmoved-past",
+      "chain": [
+        "the-town/the-unmoved-past",
+        "the-town/postmark-invariant",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-unmoved-past-lint",
       "parent": "the-town/the-unmoved-past",
       "chain": [
         "the-town/the-unmoved-past",
@@ -12856,6 +13884,16 @@
       ]
     },
     {
+      "id": "the-town/the-witnessed-roll-entropy",
+      "parent": "the-town/the-witnessed-roll",
+      "chain": [
+        "the-town/the-witnessed-roll",
+        "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-works-portal",
       "parent": "the-town/the-keeping-works",
       "chain": [
@@ -12875,6 +13913,94 @@
       "id": "the-town/thing",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-capacity",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-capacity-max",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-capacity-min",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-holder",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-makers",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-open",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-portable",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/thing-take-requires-welcome",
+      "parent": "the-town/thing",
+      "chain": [
+        "the-town/thing",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -12910,6 +14036,17 @@
       ]
     },
     {
+      "id": "the-town/timetable-makers",
+      "parent": "the-town/timetable",
+      "chain": [
+        "the-town/timetable",
+        "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/town",
       "parent": "the-town/entity",
       "chain": [
@@ -12930,6 +14067,17 @@
       ]
     },
     {
+      "id": "the-town/town-makers",
+      "parent": "the-town/town",
+      "chain": [
+        "the-town/town",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/uncategorized",
       "parent": "the-town/postmark-rules",
       "chain": [
@@ -12942,6 +14090,17 @@
       "id": "the-town/vehicle",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/vehicle-makers",
+      "parent": "the-town/vehicle",
+      "chain": [
+        "the-town/vehicle",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -12982,6 +14141,16 @@
       "id": "the-town/what-you-carry-grants-to-you",
       "parent": "the-town/postmark-rules",
       "chain": [
+        "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/what-you-carry-grants-to-you-custody",
+      "parent": "the-town/what-you-carry-grants-to-you",
+      "chain": [
+        "the-town/what-you-carry-grants-to-you",
         "the-town/postmark-rules",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -13042,6 +14211,18 @@
       "id": "the-town/wolf",
       "parent": "the-town/creature",
       "chain": [
+        "the-town/creature",
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/wolf-count-per-window",
+      "parent": "the-town/wolf",
+      "chain": [
+        "the-town/wolf",
         "the-town/creature",
         "the-town/entity",
         "the-town/postmark-node",

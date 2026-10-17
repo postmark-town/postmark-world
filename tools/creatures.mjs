@@ -66,6 +66,7 @@ import { mistsAt, mistsHere } from "./world-engine.mjs";
 import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
 import { pointInPolygon, polygonOf } from "./geometry.mjs";
+import { classIndex, propertyOf } from "./class-properties.mjs";
 
 export const TOWN = "the-town";
 export const DESPAWN_REASONS = Object.freeze(["faded", "fled"]);
@@ -87,29 +88,50 @@ export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "k
  *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m, span_h }
  *   kinds         [{ kind, kind_file }], by name
  * `marks` are parsed mark records (`loadMarks`, or `parseRecord` on each file read
- * at a ref). Only the-town's classes count. Null when there is no creature class:
- * no class, no creatures. A class missing a dial, or a kind with no whole count or
- * no kind file, throws: the law is read whole or not at all.
+ * at a ref). Only the-town's classes count. Each dial is a property of its class
+ * (LOGOS v2 part 2: "every dial is a property, and a locked value is its
+ * default"), read up `extends` by tools/class-properties.mjs. Records read file by
+ * file carry no id or parent, so those are taken from the path each was read at
+ * (`nestedByPath`). Null when there is no creature class: no class, no creatures.
+ * A class missing a dial, or a kind with no whole count or no kind file, throws:
+ * the law is read whole or not at all.
  */
-export function creatureLaw(marks) {
-  const classes = (marks ?? []).filter((m) => m?.kind === "class" && m.by === TOWN);
+export function creatureLaw(records) {
+  const marks = nestedByPath(records ?? []);
+  const classes = marks.filter((m) => m?.kind === "class" && m.by === TOWN);
   const c = classes.find((m) => String(m.class) === "creature");
   if (!c) return null;
+  const idx = classIndex(marks);
+  const dial = (name, k) => propertyOf(idx, name, k)?.value;
   const dials = { counts: {} };
   for (const k of CREATURE_DIAL_NAMES) {
-    const v = c.dials?.[k];
+    const v = dial("creature", k);
     if (typeof v !== "number" || !Number.isFinite(v) || v < 0) throw new Error(`creatureLaw: the creature class's ${k} dial is ${JSON.stringify(v)}, not a number ≥ 0`);
     dials[k] = v;
   }
   const kinds = [];
   for (const m of classes.filter((x) => x.extends === "creature").sort((a, b) => (String(a.class) < String(b.class) ? -1 : 1))) {
-    const kind = String(m.class), n = m.dials?.count_per_window;
+    const kind = String(m.class), n = dial(kind, "count_per_window");
     if (!Number.isInteger(n) || n < 0) throw new Error(`creatureLaw: ${kind}'s count_per_window is ${JSON.stringify(n)}, not a whole number`);
     if (typeof m.kind_file !== "string" || !m.kind_file) throw new Error(`creatureLaw: ${kind} names no kind_file`);
     dials.counts[kind] = n;
     kinds.push({ kind, kind_file: m.kind_file });
   }
-  return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds };
+  return { fromCrossing: dial("creature", "from_crossing") ?? null, dials, kinds };
+}
+
+// A record from `parseRecord` alone has no id and no parent; the file it was read
+// from does (`_file`, unlisted), and the directory above a property's is the node
+// it stands under. Loader records already carry both and pass through unchanged.
+function nestedByPath(records) {
+  if (records.every((m) => m?.id != null)) return records;
+  const dirOf = (file) => String(file ?? "").replace(/\\/g, "/").replace(/(^|\/)mark\.md$/, "");
+  const up = (dir) => (dir.includes("/") ? dir.slice(0, dir.lastIndexOf("/")) : "");
+  return records.map((m) => {
+    if (!m || m.id != null || m._file == null) return m;
+    const dir = dirOf(m._file);
+    return { ...m, id: `path:${dir}`, parent: `path:${up(dir)}` };
+  });
 }
 
 /** A plain object: {…} or Object.create(null); never an array, a date or a boxed value. */

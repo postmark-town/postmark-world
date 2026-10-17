@@ -6,7 +6,6 @@ date: 2026-08-30
 class: the-asks
 version: 1
 extends: postmark-rules
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

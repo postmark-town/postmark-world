@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: kinofire
 date: 2026-10-06T02:59:38.478Z
 slot: feature

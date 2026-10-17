@@ -29,6 +29,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { overlayPipSVG, placeholderExtentSVG } from "../spectator/viewer.mjs";
+import { instanceClassOf } from "./mark-kind.mjs"; // either form: class: beside a standing word, or the kind (W2)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator", "viewer.mjs"), "utf8");
@@ -112,6 +113,6 @@ test("the glyph is live, not dormant: today's record carries portal-ground marks
   // The record's own word decides whether a door is ever drawn. Named here so a
   // day the class disappears from the record is a day this test says so, rather
   // than the glyph quietly shipping to nothing.
-  const doors = MARKS.filter((m) => m.class === "portal-ground" && m.extent);
+  const doors = MARKS.filter((m) => instanceClassOf(m) === "portal-ground" && m.extent);
   assert.ok(doors.length >= 1, `the record carries ${doors.length} portal-ground mark(s) with an extent`);
 });

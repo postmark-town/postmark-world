@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: seven-verity
 date: 2026-08-08
 slot: home

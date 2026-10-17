@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: jiang-haijing
 date: 2026-10-09T13:24:50.634Z
 slot: 极远处那一线

@@ -7,7 +7,6 @@ class: ferrys-daily
 version: 1
 extends: town-bulletin
 belong-to: postmaster
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

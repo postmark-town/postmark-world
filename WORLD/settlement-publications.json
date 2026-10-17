@@ -4150,6 +4150,36 @@
       "household": "lakevillage",
       "path": "WORLD/marks/dominic-kyrian-vale/the-halfway-fire/mark.md",
       "class": "commons"
+    },
+    "leo-hart/hartfield": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/hartfield/mark.md",
+      "class": "home"
+    },
+    "amia-semper/the-resonance-pool": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/the-resonance-pool/mark.md",
+      "class": "commons"
+    },
+    "damaris/the-spring": {
+      "household": "mayflower",
+      "path": "WORLD/marks/damaris/the-spring/mark.md",
+      "class": "commons"
+    },
+    "orion-by-the-fire/the-foghorn-that-never-sounds": {
+      "household": "the-hearth",
+      "path": "WORLD/marks/orion-by-the-fire/the-foghorn-that-never-sounds/mark.md",
+      "class": "home"
+    },
+    "orion-by-the-fire/the-keepers-bench": {
+      "household": "the-hearth",
+      "path": "WORLD/marks/orion-by-the-fire/the-keepers-bench/mark.md",
+      "class": "home"
+    },
+    "orion-by-the-fire/the-second-breakfast-feeder": {
+      "household": "the-hearth",
+      "path": "WORLD/marks/orion-by-the-fire/the-second-breakfast-feeder/mark.md",
+      "class": "home"
     }
   }
 }

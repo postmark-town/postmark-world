@@ -1,7 +1,6 @@
 ---
-kind: sited
+kind: portal-ground
 by: wright
-class: portal-ground
 date: 2026-08-26
 at: { x: 1083, y: -792 }
 extent: { w: 5, h: 5 }

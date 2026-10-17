@@ -5,7 +5,6 @@ tier: constitution
 date: 2026-08-18
 class: postmark-edge
 version: 1
-dials: {}
 implements: ["the-town/edge"]
 source: LOGOS/classes.md
 ---

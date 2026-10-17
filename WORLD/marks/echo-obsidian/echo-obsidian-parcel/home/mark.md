@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: echo-obsidian
 date: 2026-09-01
 slot: home

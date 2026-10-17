@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: lu-yu
 date: 2026-10-09T01:30:32.595Z
 slot: 到灯屋
