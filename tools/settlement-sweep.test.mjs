@@ -1723,7 +1723,7 @@ test("THE S58 CLASS, the guard: a modify/delete on a path this crossing did NOT 
     "a deletion this crossing did not make is not the sweep's to resolve — it refuses by branch name, as before");
 });
 
-test("THE STALE ROW (postmark#3757): a registry row whose path left main is skipped by today's rule; under WLD-51's \"rederive\" a home mark stays and a market mark leaves from where it is filed now", (t) => {
+test("THE STALE ROW (postmark#3757): a registry row whose path left main was skipped under \"skip\"; under \"rederive\", the dial since WLD-51 ruling 2, a home mark stays and a market mark leaves from where it is filed now", (t) => {
   // kinofire's fireplace was re-filed under spin-ghar-manor by hand (world
   // #140, 10-04) and its row kept the old root path and the class commons. The
   // sweep skipped it every crossing while the doorstep warned of a sweep. Both
@@ -1769,17 +1769,17 @@ test("THE STALE ROW (postmark#3757): a registry row whose path left main is skip
     return { repo, stakesPath, fireplace, bookend, registry };
   };
 
-  // today's rule (the default): both stale rows are skipped
+  // the rule before ruling 2: both stale rows are skipped
   const today = build();
-  const skip = settlementSweep({ repo: today.repo, stakesPath: today.stakesPath });
+  const skip = settlementSweep({ repo: today.repo, stakesPath: today.stakesPath, staleRows: "skip" });
   assert.deepEqual(skip.unpublished, [], "neither stale row is a candidate under \"skip\"");
   assert.equal(existsSync(join(today.repo, today.fireplace)), true);
   assert.equal(existsSync(join(today.repo, today.bookend)), true);
   assert.deepEqual(Object.keys(today.registry()).sort(), ["kino/the-fireplace", "lupi/the-bookend"], "and the rows stand as they were");
 
-  // WLD-51's other branch, through the sweep's own measuring
+  // ruling 2 (Darko, 10-14 14:51: "just take them"): the default dial, through the sweep's own measuring
   const ruled = build();
-  const rederive = settlementSweep({ repo: ruled.repo, stakesPath: ruled.stakesPath, staleRows: "rederive" });
+  const rederive = settlementSweep({ repo: ruled.repo, stakesPath: ruled.stakesPath });
   assert.deepEqual(rederive.unpublished.map((r) => [r.id, r.path]), [["lupi/the-bookend", ruled.bookend]],
     "the market bookend leaves from its current filing; the home fireplace does not");
   assert.equal(existsSync(join(ruled.repo, ruled.fireplace)), true, "the fireplace stands");
