@@ -49,17 +49,24 @@ test("the law: the class marks carry the ruled numbers, and the launch dial is o
 });
 
 test("the law is read whole or not at all", () => {
-  const cls = (over = {}) => ({ kind: "class", by: TOWN, class: "creature", dials: { from_crossing: 270, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 }, ...over });
-  const wolf = (over = {}) => ({ kind: "class", by: TOWN, class: "wolf", extends: "creature", dials: { count_per_window: 2 }, kind_file: "WORLD/kinds/wolf.kind", ...over });
+  // each dial is a property node under its class (LOGOS v2 part 2), the shape
+  // the loader hands over: a record with its parent
+  const props = (id, dials) => Object.entries(dials).map(([name, v]) =>
+    ({ id: `${id}-${name}`, kind: "property", by: TOWN, tier: "constitution", parent: id, name, default: v === null ? "null" : v }));
+  const CREATURE_DIALS = { from_crossing: 270, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 };
+  const cls = (over = {}, dials = CREATURE_DIALS) => [{ id: "the-town/creature", kind: "class", by: TOWN, class: "creature", ...over }, ...props("the-town/creature", dials)];
+  const wolf = (over = {}, dials = { count_per_window: 2 }) => [{ id: "the-town/wolf", kind: "class", by: TOWN, class: "wolf", extends: "creature", kind_file: "WORLD/kinds/wolf.kind", ...over }, ...props("the-town/wolf", dials)];
   assert.equal(creatureLaw([]), null, "no class, no creatures");
-  assert.equal(creatureLaw([cls({ by: "someone" }), wolf()]), null, "only the-town writes the class");
-  assert.deepEqual(creatureLaw([cls(), wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }] });
+  assert.equal(creatureLaw([...cls({ by: "someone" }), ...wolf()]), null, "only the-town writes the class");
+  assert.deepEqual(creatureLaw([...cls(), ...wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }] });
   for (const k of CREATURE_DIAL_NAMES) {
-    const { [k]: _, ...rest } = cls().dials;
-    assert.throws(() => creatureLaw([cls({ dials: rest }), wolf()]), new RegExp(`${k} dial`), `a class missing ${k} is refused`);
+    const { [k]: _, ...rest } = CREATURE_DIALS;
+    assert.throws(() => creatureLaw([...cls({}, rest), ...wolf()]), new RegExp(`${k} dial`), `a class missing ${k} is refused`);
   }
-  assert.throws(() => creatureLaw([cls(), wolf({ dials: { count_per_window: 1.5 } })]), /count_per_window/);
-  assert.throws(() => creatureLaw([cls(), wolf({ kind_file: undefined })]), /kind_file/);
+  assert.throws(() => creatureLaw([...cls(), ...wolf({}, { count_per_window: 1.5 })]), /count_per_window/);
+  assert.throws(() => creatureLaw([...cls(), ...wolf({ kind_file: undefined })]), /kind_file/);
+  assert.equal(creatureLaw([...cls({}, { ...CREATURE_DIALS, from_crossing: null }), ...wolf()]).fromCrossing, null,
+    "a launch dial written null is off");
   assert.throws(() => scheduleFor(270, secretFor(MASTER, 270), { ...INPUTS, dials: null }), /no dials/, "on, and no dials: refused, never a default");
 });
 

@@ -8,7 +8,6 @@ version: 3
 extends: postmark-edge
 subject: household
 object: town
-dials: {}
 implements: []
 affordances: []
 source: LOGOS/classes.md

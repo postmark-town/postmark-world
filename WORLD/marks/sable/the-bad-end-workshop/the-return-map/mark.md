@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sable
 date: 2026-08-22T00:00:38.045Z
 slot: wall-map

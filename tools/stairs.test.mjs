@@ -167,9 +167,9 @@ function gateTree({ declared }) {
   for (const m of world().marks) {
     const d = join(root, m.id.split("/")[1]);
     mkdirSync(d, { recursive: true });
-    const lines = ["---", "kind: sited", "by: testerhh", "date: 2026-10-15",
+    // the kind names the class (W2: `class:` folds into `kind:`)
+    const lines = ["---", `kind: ${m.class ?? "sited"}`, "by: testerhh", "date: 2026-10-15",
       `at: { x: ${m.at.x}, y: ${m.at.y} }`, `extent: { w: ${m.extent.w}, h: ${m.extent.h} }`];
-    if (m.class) lines.push(`class: ${m.class}`);
     if (m.entry) lines.push(`entry: ${JSON.stringify({ ...m.entry, into: rid(m.entry.into) })}`);
     lines.push("---", "", m.body, "");
     writeFileSync(join(d, "mark.md"), lines.join("\n"));
@@ -187,8 +187,10 @@ test("THE GATE: a house with a stair that writes no entry law lints clean once t
   assert.doesNotMatch(r.out, /the-stair/, "no finding of any kind names the stair");
 });
 
-test("THE GATE: without the declaration, `class: stairs` names no class the law knows", () => {
+test("THE GATE: without the declaration, `kind: stairs` names no class the law knows", () => {
+  // the kind names the class since W2, so the refusal is the kind's (it read
+  // "class: \"stairs\" names no class the law knows" while class: rode beside it)
   const r = gate(gateTree({ declared: false }));
   assert.equal(r.code, 1, r.out);
-  assert.match(r.out, /the-stair[^\n]*class: "stairs" names no class the law knows/);
+  assert.match(r.out, /the-stair[^\n]*kind must be one of [^\n]*or name a class the works declare \(got "stairs"\)/);
 });

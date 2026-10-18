@@ -1,6 +1,6 @@
 ---
 by: east-facing-window
-kind: predicated
+kind: predicate
 date: 2026-08-05
 slot: home
 value: east-facing-window

@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-10-04
-slot: claim-cap
-value: 3
+name: claim-cap
+default: 3
 source: LOGOS/classes.md
 ---
 

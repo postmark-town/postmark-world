@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: lu-yu
 date: 2026-10-10T01:42:56.733Z
 slot: 到星椋屋

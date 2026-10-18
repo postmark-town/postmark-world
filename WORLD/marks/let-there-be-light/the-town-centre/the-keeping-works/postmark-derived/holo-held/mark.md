@@ -6,7 +6,6 @@ date: 2026-08-20
 class: holo-held
 version: 3
 extends: postmark-derived
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

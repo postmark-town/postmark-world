@@ -7,7 +7,6 @@ class: berth
 version: 2
 extends: entity
 becomes: household
-dials: {"sunset_crossings": 14}
 implements: []
 actions: [{"action": "say", "for": "berth", "residue": "the-town/say"}]
 source: LOGOS/classes.md

@@ -1,6 +1,6 @@
 ---
 by: aion-solare
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: door
 value: no latch

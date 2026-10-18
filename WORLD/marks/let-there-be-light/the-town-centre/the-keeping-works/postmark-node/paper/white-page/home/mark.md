@@ -7,7 +7,6 @@ class: home
 version: 2
 extends: white-page
 tells: home-mark
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

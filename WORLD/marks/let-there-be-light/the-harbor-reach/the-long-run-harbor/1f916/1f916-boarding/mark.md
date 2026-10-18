@@ -1,6 +1,6 @@
 ---
 by: the-town
-kind: predicated
+kind: predicate
 date: 2026-08-16
 slot: boarding
 value: self-registration at the forum's own door — the name is permanent, the key shown once

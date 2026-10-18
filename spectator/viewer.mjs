@@ -21,10 +21,12 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
+import { isGround, instanceClassOf, isPredicate } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
+import { propertyOf } from "../tools/class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
 import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mjs";
@@ -80,7 +82,7 @@ const markIndex = (marks) => marks instanceof Map
 
 export function isEmbodiedMark(mark) {
   const w = Number(mark?.extent?.w), h = Number(mark?.extent?.h);
-  return (mark?.kind === "sited" || mark?.kind === "parcel")
+  return isGround(mark)
     && [mark?.at?.x, mark?.at?.y, w, h].every(Number.isFinite)
     && w > 0 && h > 0;
 }
@@ -88,7 +90,7 @@ export function isEmbodiedMark(mark) {
 export function isAmbientMark(mark, marks = []) {
   if (!mark) return false;
   if (mark.id === WORLD_ROOT_ID) return true;
-  if (mark.kind !== "predicated" && mark.kind !== "naming") return false;
+  if (!isPredicate(mark) && mark.kind !== "naming") return false;
   const byMarkId = markIndex(marks);
   const seen = new Set([mark.id]);
   let parentId = mark.parent;
@@ -378,7 +380,7 @@ const classToken = (raw) => String(raw ?? "").trim().toLowerCase()
 
 export function markStateClasses({ tier = "market", draft = false, mark = null } = {}) {
   const accent = tier === "home" || tier === "constitution" ? tier : "market";
-  const cls = classToken(mark?.class);
+  const cls = classToken(instanceClassOf(mark));
   return `t-${accent}${draft ? " is-draft" : ""}${cls ? ` c-${cls}` : ""}`;
 }
 
@@ -772,7 +774,13 @@ const paceOf = (d) => { const n = Number(d?.pace_km_per_crossing); return Number
 export function strideFrom({ dials = null, marks = null } = {}) {
   const got = dialOf({ dials, marks }, STRIDE_CLASS_ID);
   if (got.source === "missing") return { pace: null, source: "missing" };
-  const pace = paceOf(got.dials);
+  // THE RECORD ARM UNDER LOGOS v2 PART 2: the dial is a property of the class,
+  // read off the fold, before the class row's own `dials` (the fold of the one
+  // crossing after the change still carries them). The table arm is the office's
+  // class layer already (GET /world/dials).
+  const recordProp = () => { const idx = markIndex(marks); return propertyOf([...idx.values()], String(idx.get(STRIDE_CLASS_ID)?.class), "pace_km_per_crossing")?.value; };
+  const fromProperty = got.source === "record" ? paceOf({ pace_km_per_crossing: recordProp() }) : null;
+  const pace = fromProperty ?? paceOf(got.dials);
   return { pace, source: pace == null ? "malformed" : got.source };
 }
 export function departPaceKm(marks, dials = null) {
@@ -1410,7 +1418,7 @@ export function placeholderExtentSVG(mark, px, { ignoreArt = false } = {}) {
   // the record's OWN word for what this is, through the same mint every other
   // coloured surface reads — so the floor, the pips and the stylesheet cannot
   // hold three private notions of what counts as a door
-  const portal = classToken(mark?.class) === "portal-ground";
+  const portal = classToken(instanceClassOf(mark)) === "portal-ground";
   const fill = `hsl(${hue} 22% 76%)`, edge = `hsl(${hue} 26% 58%)`;
   const attrs = `class="wv-ph-extent${portal ? " c-portal-ground" : ""}" data-id="${esc(mark.id)}" fill="${fill}" stroke="${edge}"`;
   const ring = polygonOf(mark);
@@ -4272,7 +4280,7 @@ export function paintingMarkIds({ radialIds = [], mineIds = [] } = {}) {
 export const WALK_TARGET_MAX_EXTENT_M = 2000;
 export function isWalkableTarget(mark) {
   if (!mark?.at) return false;
-  if (mark.kind !== "sited" && mark.kind !== "parcel") return false;
+  if (!isGround(mark)) return false;
   if (mark.tier === "constitution") return false;
   const span = Math.max(Number(mark.extent?.w ?? 0), Number(mark.extent?.h ?? 0));
   return span < WALK_TARGET_MAX_EXTENT_M;
@@ -4552,7 +4560,7 @@ export function containmentIndex(marks = [], { insideRoomId = null } = {}) {
   const encloses = (mark) => !!insideRoomId
     && (mark?.id === insideRoomId || (room && mark?.at && mark?.extent ? marksContain(mark, room) : false));
   const ground = (marks ?? [])
-    .filter((mark) => mark?.class !== "thing" && !encloses(mark) && isEmbodiedMark(mark) && !isAmbientMark(mark, byMarkId))
+    .filter((mark) => instanceClassOf(mark) !== "thing" && !encloses(mark) && isEmbodiedMark(mark) && !isAmbientMark(mark, byMarkId))
     .map((mark) => ({ mark, area: Number(mark.extent.w) * Number(mark.extent.h) }))
     .sort((a, b) => a.area - b.area || String(a.mark.id).localeCompare(String(b.mark.id)));
   return { byMarkId, ground, insideRoomId: insideRoomId ?? null };
@@ -4609,7 +4617,7 @@ export function createMarkInteractionStore() {
 }
 
 const isPredicateAttribute = (mark) =>
-  mark?.kind === "predicated" || mark?.kind === "naming";
+  isPredicate(mark) || mark?.kind === "naming";
 
 // Cells v1.5 folds only one safe level: a predicate/naming mark may become an
 // attribute of a rendered, non-predicate subject cell. Predicated-on-predicated
@@ -4659,7 +4667,7 @@ export function backingButton(markId, stamps = 0) {
  *  ask: enter refuses a mark with no extent — "a point has no inside" — so a
  *  naming, a predicate, or a bare coordinate affords nothing. */
 export function enterableMark(mark) {
-  if (!mark || mark.kind === "predicated" || mark.kind === "naming") return false;
+  if (!mark || isPredicate(mark) || mark.kind === "naming") return false;
   const at = mark.at, extent = mark.extent;
   if (!at || !Number.isFinite(Number(at.x)) || !Number.isFinite(Number(at.y))) return false;
   return Number(extent?.w) > 0 && Number(extent?.h) > 0;
@@ -5031,8 +5039,8 @@ export function worldFrameReading(mark, marks = []) {
     body: mark.body,
     // its own attributes are its own — the light axis, the clock, the origin are
     // properties of the frame, not marks living inside it
-    predicates: marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === mark.id)
-      .map((m) => ({ id: m.id, slot: m.slot ?? (m.kind === "naming" ? "name" : null), value: m.value, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body })),
+    predicates: marks.filter((m) => (isPredicate(m) || m.kind === "naming" || m.kind === "property") && m.parent === mark.id)
+      .map((m) => ({ id: m.id, slot: m.slot ?? m.name ?? (m.kind === "naming" ? "name" : null), value: m.value ?? m.default, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body })),
     parents: [], children: [], alongside: [],
     more: { predicates: 0, children: 0 },
   };

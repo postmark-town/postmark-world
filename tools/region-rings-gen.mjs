@@ -85,6 +85,7 @@
 // bounding box, so the coarse claim never lies about the fine shape. Receding
 // and smoothing move those boxes again, so the restatement happens after both.
 
+import { isPredicate } from "./mark-kind.mjs"; // a predicate in either spelling (G10: kind: predicated → predicate)
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -805,7 +806,7 @@ const subtreeOf = (marks, id) => {
   return marks.filter((m) => {
     const dir = String(m._dir ?? "").replaceAll("\\", "/");
     if (!dir.startsWith(prefix)) return false;
-    if (m.kind === "predicated" || m.kind === "naming" || m.kind === "class") return false; // no geometry of their own
+    if (isPredicate(m) || m.kind === "naming" || m.kind === "class") return false; // no geometry of their own
     if (m.far) return false;
     return !!m.at;
   });

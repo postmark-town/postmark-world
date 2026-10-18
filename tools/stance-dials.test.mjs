@@ -73,13 +73,14 @@ test("the stance verb declares both of its standing numbers as predicate childre
     const rel = `${STANCE}/${dir}/mark.md`;
     assert.ok(existsSync(at(rel)),
       `${slot} has no node — src/world-stance.mjs runs on ${constant} and "an orphan number is a rule nobody declared"`);
-    assert.equal(scalar(rel, "kind"), "predicated",
-      `${slot} is a dial, and "a number the law carries rides a predicate child, never a frontmatter JSON"`);
-    assert.equal(Number(scalar(rel, "value")), value,
+    // a predicate child until LOGOS v2 part 2, a property node now (slot → name, value → default)
+    assert.equal(scalar(rel, "kind"), "property",
+      `${slot} is a dial, and "a number the law carries rides a predicate child, never a frontmatter JSON" — a property node, since 2026-10-16`);
+    assert.equal(Number(scalar(rel, "default")), value,
       `${slot} must equal the constant the door actually runs on (${constant} = ${value}, src/world-stance.mjs)`);
     assert.equal(scalar(rel, "by"), "the-town", `${slot} is the town's own declaration`);
     assert.equal(scalar(rel, "tier"), "constitution", `${slot} is law, not furniture`);
-    assert.equal(scalar(rel, "slot"), slot, `${slot}'s slot name is what a reader would ask for`);
+    assert.equal(scalar(rel, "name"), slot, `${slot}'s slot name is what a reader would ask for`);
   }
 });
 
@@ -98,9 +99,10 @@ test("the numbers have ONE home: the class frontmatter does not restate them", (
   // Having just planted these, the cheapest way to acquire that bug is to also
   // write them into `dials:` on the class node.
   const cls = read(`${STANCE}/mark.md`);
+  // since LOGOS v2 part 2 a class node carries no `dials:` line at all; if one
+  // ever returns, it must not restate these
   const line = cls.split("\n").find((l) => l.startsWith("dials:"));
-  assert.ok(line, "the class carries a dials: line");
-  const dials = JSON.parse(line.slice("dials:".length).trim());
+  const dials = line ? JSON.parse(line.slice("dials:".length).trim()) : {};
   for (const slot of Object.keys(DIALS))
     assert.equal(dials[slot], undefined,
       `${slot} is restated in the class's frontmatter — the dial children are its home, and a second copy is the walk-pace bug again`);

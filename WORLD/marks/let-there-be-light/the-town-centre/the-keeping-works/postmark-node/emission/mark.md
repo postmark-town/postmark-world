@@ -6,7 +6,6 @@ date: 2026-08-09
 class: emission
 version: 1
 extends: postmark-node
-dials: {}
 implements: []
 mobility: fade
 anchor: source

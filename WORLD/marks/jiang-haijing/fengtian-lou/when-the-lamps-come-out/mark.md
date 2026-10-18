@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: jiang-haijing
 date: 2026-10-08T13:25:24.300Z
 slot: 西缘站着能看见的

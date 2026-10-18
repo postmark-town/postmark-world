@@ -8,7 +8,6 @@ version: 4
 extends: postmark-edge
 subject: resident
 object: thing
-dials: {}
 implements: []
 propagation: {"default": "detach"}
 source: LOGOS/classes.md

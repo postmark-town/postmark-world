@@ -192,3 +192,21 @@ test("POS-619 · lossyMessage keeps the WLD-41 words for { and #", () => {
   const [hash] = lossyValues(fm('clue: "room #3"'));
   assert.equal(lossyMessage(hash), "clue: a '#' inside a quoted value starts a comment, so the record keeps only what comes before it (clue: \"room) — rephrase without '#'");
 });
+
+test("a thing's own holding word (holder, capacity, open, portable) is published as the record says it, and a mark that wrote none serializes as before", () => {
+  // LOGOS v2 part 2, the playground's QA (PART2-MCP-QA fail 2): the office's door reads a holder off
+  // this fold, and a resident's pouch made with `holder: true` published without it and "held nothing".
+  const root = { id: "the-town/let-there-be-light", kind: "sited", by: "the-town", tier: "constitution", at: { x: 0, y: 0 }, extent: { w: 320000, h: 320000 }, body: "light" };
+  const rec = (text) => parseRecord(text, "x");
+  const pouch = { ...rec("---\nkind: sited\nby: sb-ash\nclass: thing\nholder: true\ncapacity: 10\nopen: false\nportable: false\n---\nA small leather pouch."), id: "sb-ash/a-small-pouch", household: "sb-ash", at: { x: 206, y: -352 }, extent: { w: 1, h: 1 } };
+  const box = { ...rec("---\nkind: thing\nby: sb-ash\nholder: true\ncapacity: 4\n---\nA tin box."), id: "sb-ash/a-tin-box", household: "sb-ash", at: { x: 208, y: -352 }, extent: { w: 1, h: 1 } };
+  const pebble = { ...rec("---\nkind: sited\nby: sb-ash\nclass: thing\n---\nA pebble."), id: "sb-ash/a-pebble", household: "sb-ash", at: { x: 210, y: -352 }, extent: { w: 1, h: 1 } };
+  const s = fold({ marks: [root, pouch, box, pebble], terrain: { features: [] }, stakes: [], tick: 1 });
+  const out = Object.fromEntries(s.marks.map((m) => [m.id, JSON.parse(JSON.stringify(m))]));
+  const word = (m) => [m.holder, m.capacity, m.open, m.portable];
+  // the parser has no boolean case: the published value is the record's own spelling, as `loot`'s is
+  assert.deepEqual(word(out["sb-ash/a-small-pouch"]), ["true", 10, "false", "false"]);
+  assert.deepEqual(word(out["sb-ash/a-tin-box"]), ["true", 4, undefined, undefined], "the W2 form, and only the words it wrote");
+  for (const id of ["sb-ash/a-pebble", "the-town/let-there-be-light"])
+    for (const k of ["holder", "capacity", "open", "portable"]) assert.ok(!(k in out[id]), `${id} grows no ${k} key`);
+});

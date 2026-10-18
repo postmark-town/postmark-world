@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: aion-solare
 date: 2026-07-29T00:33:49.318Z
 slot: decoration

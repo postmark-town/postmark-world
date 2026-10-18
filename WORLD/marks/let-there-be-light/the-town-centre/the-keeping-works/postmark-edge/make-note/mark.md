@@ -7,7 +7,6 @@ class: make-note
 version: 1
 extends: postmark-edge
 residue: the-town/note
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

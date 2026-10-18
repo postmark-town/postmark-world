@@ -358,7 +358,7 @@ test("townHouseMarks on the town's own record: every parcel present, and only de
   const out = townHouseMarks(TOWN.marks);
   const parcels = TOWN.marks.filter((m) => m.kind === "parcel").length;
   assert.equal(out.filter((m) => m.kind === "parcel").length, parcels, "every parcel is handed over");
-  const words = TOWN.marks.filter((m) => m.kind === "predicated" && m.slot === "home").length;
+  const words = TOWN.marks.filter((m) => (m.kind === "predicated" || m.kind === "predicate") && m.slot === "home").length;
   assert.ok(out.length <= parcels + words, "at most one house per resident's home word rides with the parcels");
   // A declared house is SITED. Its tier is not asserted: a home word does not
   // read standing, and on the committed record vermillion's house (named by his

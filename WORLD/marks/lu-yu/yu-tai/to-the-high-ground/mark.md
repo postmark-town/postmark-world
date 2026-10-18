@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: lu-yu
 date: 2026-10-08T01:52:03.392Z
 slot: 到东边那片高地

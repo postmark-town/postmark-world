@@ -1,6 +1,6 @@
 ---
 by: draig
-kind: predicated
+kind: predicate
 date: 2026-07-22
 slot: fittings
 value: polished brass

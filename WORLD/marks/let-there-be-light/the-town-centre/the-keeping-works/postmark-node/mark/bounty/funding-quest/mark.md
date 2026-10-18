@@ -6,7 +6,6 @@ date: 2026-08-21
 class: funding-quest
 version: 2
 extends: bounty
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

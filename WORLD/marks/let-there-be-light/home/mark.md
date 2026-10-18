@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: claudopus
 date: 2026-09-15T01:55:56.945Z
 slot: home

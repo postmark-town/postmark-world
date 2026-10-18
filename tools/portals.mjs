@@ -20,6 +20,7 @@
 // so what a portal does and what the lint holds it to are one definition. Pure:
 // no fs, no engine import, browser-safe like geometry.mjs.
 
+import { isSited, instanceClassOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { marksContain, overlapArea, pointInPolygon, pointInRect, polygonOf, rect } from "./geometry.mjs";
 import { entryLawOf, isStairs } from "./enter-exit.mjs";
 
@@ -40,7 +41,7 @@ export function pointInMark(pos, mark) {
 /** A dungeon is an INSTANCE: a sited mark with an extent carrying the class.
  *  The class's own declaration (kind: class) is never a dungeon. */
 export const isDungeon = (m) =>
-  String(m?.class ?? "") === DUNGEON_CLASS && m?.kind === "sited" && !!m.at && !!m.extent;
+  instanceClassOf(m) === DUNGEON_CLASS && isSited(m) && !!m.extent;
 
 const area = (m) => (m?.extent?.w ?? 0) * (m?.extent?.h ?? 0);
 
@@ -58,7 +59,7 @@ export function containerOf(m, marks) {
   if (!m?.at) return null;
   let best = null;
   for (const c of marks) {
-    if (c === m || c.id === m.id || c.kind !== "sited" || !c.at || !c.extent) continue;
+    if (c === m || c.id === m.id || !isSited(c) || !c.extent) continue;
     if (m.extent && !(area(c) > area(m))) continue;
     if (!pointInMark(m.at, c)) continue;
     if (!best || area(c) < area(best)) best = c;
@@ -380,7 +381,7 @@ export const PORTAL_RULES = Object.freeze([
 function parentOf(m, marks) {
   let best = null;
   for (const c of marks) {
-    if (c === m || c.id === m.id || c.kind !== "sited" || !c.at || !c.extent || !(area(c) > area(m))) continue;
+    if (c === m || c.id === m.id || !isSited(c) || !c.extent || !(area(c) > area(m))) continue;
     if (!markInside(c, m)) continue;
     if (!best || area(c) < area(best)) best = c;
   }
@@ -490,7 +491,7 @@ export function portalFindings(marks) {
     // a stair stays in, portal or not.
     const groups = new Map();
     for (const m of list) {
-      if (m.kind !== "sited" || !m.at || !m.extent || m.id === d || !inD(m.id) || (entryLawOf(m)?.into && !isStairs(m))) continue;
+      if (!isSited(m) || !m.extent || m.id === d || !inD(m.id) || (entryLawOf(m)?.into && !isStairs(m))) continue;
       const parent = parentOf(m, list)?.id ?? null;
       if (!groups.has(parent)) groups.set(parent, []);
       groups.get(parent).push(m);

@@ -6,7 +6,6 @@ date: 2026-08-26
 class: the-witnessed-roll
 version: 1
 extends: postmark-rules
-dials: {"entropy": "journal position, act id, actor"}
 implements: []
 source: LOGOS/classes.md
 ---

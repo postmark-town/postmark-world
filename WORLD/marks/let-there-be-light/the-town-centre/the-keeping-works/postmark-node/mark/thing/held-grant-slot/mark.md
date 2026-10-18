@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-08-26
-slot: held-grant
-value: unsealed
+name: held-grant
+default: unsealed
 values-tier: constitution
 ---
 

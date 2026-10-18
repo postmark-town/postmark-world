@@ -29,6 +29,10 @@ test("NO DIGEST ENTRY: the record answers (the spectator's fold, an older office
   assert.deepEqual(strideFrom({ dials: null, marks: [rec("x")] }), { pace: null, source: "malformed" });
   assert.deepEqual(strideFrom({ dials: null, marks: [] }), { pace: null, source: "missing" });
   assert.deepEqual(strideFrom({}), { pace: null, source: "missing" });
+  // LOGOS v2 part 2: a class node with no `dials:` and its pace as a property node
+  const W2 = [{ id: STRIDE_CLASS_ID, kind: "class", by: "the-town", class: "resident" },
+    { id: "the-town/resident-pace-km-per-crossing", kind: "property", by: "the-town", tier: "constitution", name: "pace_km_per_crossing", default: 60, parent: STRIDE_CLASS_ID }];
+  assert.deepEqual(strideFrom({ dials: null, marks: W2 }), { pace: 60, source: "record" }, "the record arm reads the class property");
 });
 
 test("THE UNKNOWN STAYS HONEST ON THE DESK: no stride → the legacy 15 and its note; a digest stride → no note", () => {

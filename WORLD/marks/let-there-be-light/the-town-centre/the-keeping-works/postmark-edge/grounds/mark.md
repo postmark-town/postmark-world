@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 subject: ["parcel"]
 object: ["home-mark"]
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---
