@@ -157,7 +157,12 @@ export const stampAt = (fc) => Math.floor(Number(fc) * 1e4) / 1e4;
 export function formatEnterExit({ handle, act, mark, at, word = null, iso = null }) {
   const stamp = iso ?? new Date().toISOString();
   const said = act === "enters" && isEntryWord(word) ? ` · word ${word}` : "";
-  return `- ${stamp} · ${handle} · ${act} ${mark} · ${FERRY_FIELD} ${stampAt(at).toFixed(4)}${said}`;
+  // `at` arrives as the record's value: every writer hands this row stampAt's
+  // floor (the office's passageInstant, src/world-crossings.mjs). It is printed,
+  // never floored again. In floats stampAt is not idempotent ((k/1e4)·1e4 can land
+  // just under k), so a second floor wrote about 9% of rows 0.0001 crossing early
+  // (POS-699, 2026-10-19).
+  return `- ${stamp} · ${handle} · ${act} ${mark} · ${FERRY_FIELD} ${Number(at).toFixed(4)}${said}`;
 }
 
 export function parseEnterExitLedger(text) {
