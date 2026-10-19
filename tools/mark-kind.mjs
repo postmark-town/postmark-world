@@ -62,6 +62,44 @@ export const isGround = (m) => !!m && !!m.at && (m.kind === "parcel" || isSited(
 const PREDICATE_KINDS = new Set(["predicated", "predicate", "naming"]);
 export const isPredicate = (m) => PREDICATE_KINDS.has(m?.kind);
 
+// ── PUBLISHED, NOT PLACED (POS-688, ruled by Darko 2026-10-18 20:58) ────────
+//
+// A held thing stays the same mark (its maker, its words, its id) and loses its
+// ground position while held: the settlement prints it with the holder's name
+// in this field and no `at`/`extent`, and a drop prints a fresh `at`. The value
+// is the holder: a resident's handle, or a holder thing's id (a thing in a chest
+// is held by the chest). `holder` is NOT this field: `holder: true` is the
+// thing's own "can hold" property (LOGOS/classes.md § The transfer edge).
+//
+// ONE NAME, so a rename is this line (the office keeps its twin of it, held
+// equal by a test that reads this file).
+export const HELD_BY = "held_by";
+
+/** Who holds this record, as printed, or null when it is placed. */
+export const heldBy = (m) => {
+  const v = m?.[HELD_BY];
+  return typeof v === "string" && v.trim() ? v.trim() : null;
+};
+export const isHeld = (m) => heldBy(m) != null;
+
+/** The fields a hand-off moves: where it is, or whose hands it is in. Nothing else. */
+const HOLD_FIELDS = new Set(["at", "extent", "points", HELD_BY]);
+
+/**
+ * Is `after` the same mark as `before`, moved into or out of hands and nothing
+ * else? The settlement prints a hand-off (POS-688) as exactly this change, and it
+ * is the town's record of where a thing is, not a publication of new work, so the
+ * sweep lets it land whatever stands behind the thing. Internal keys (`_…`) are
+ * the loader's, never the record's. PURE.
+ */
+export function holdOnlyChange(before, after) {
+  if (!before || !after) return false;
+  if (isHeld(before) === isHeld(after) && heldBy(before) === heldBy(after)
+    && JSON.stringify(before.at ?? null) === JSON.stringify(after.at ?? null)) return false; // no hand moved
+  const rest = (r) => JSON.stringify(Object.keys(r).filter((k) => !k.startsWith("_") && !HOLD_FIELDS.has(k)).sort().map((k) => [k, r[k]]));
+  return rest(before) === rest(after) && (isHeld(before) || isHeld(after));
+}
+
 // ── the chain's answer (G12) ─────────────────────────────────────────────────
 
 const INDEXES = new WeakMap();

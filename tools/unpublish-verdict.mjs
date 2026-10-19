@@ -88,12 +88,17 @@ const ask = (x) => (typeof x === "function" ? x() : x);
  *                    the verdict is null: a mark is never taken on a walk not run.
  * @param currentPath where the mark is filed now, or a function returning it.
  *                    Read only under "rederive", for a stale row it sweeps.
+ * @param held        does the mark stand printed as HELD (`held_by`, POS-688)? A boolean or a
+ *                    function returning one. A held thing is published but unplaced, so it is
+ *                    never a candidate while held (POS-688 D4, built as recommended until Darko
+ *                    rules; a held thing's tier and ground-class are left alone).
  * @param staleRows   the dial; callers pass it only in tests.
  * @returns `{ unpublish: true | false | null, why, path? }`. `path` is the file
  *          the sweep removes, present when `unpublish` is true.
  */
-export function unpublishVerdict(entry, { escrow = null, pathOnMain = null, standing, currentPath, staleRows = STALE_ROWS } = {}) {
+export function unpublishVerdict(entry, { escrow = null, pathOnMain = null, standing, currentPath, held = false, staleRows = STALE_ROWS } = {}) {
   if (entry?.class !== "commons") return { unpublish: false, why: "not-commons" };
+  if (ask(held) === true) return { unpublish: false, why: "held" };
   if (escrow === null || escrow === undefined) return { unpublish: null, why: "escrow-unread" };
   if (Number(escrow) > 0) return { unpublish: false, why: "backed" };
   // the safety half: the standing walked now outranks the class stored once

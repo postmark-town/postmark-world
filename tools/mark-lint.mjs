@@ -38,7 +38,7 @@ import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inC
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
-import { instanceClassOf, isSited, isPredicate } from "./mark-kind.mjs";
+import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy } from "./mark-kind.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -389,8 +389,22 @@ for (const rec of marks) {
   }
 
   // 4. kind-specific shape
+  // 4a. A HELD THING IS PUBLISHED BUT UNPLACED (POS-688, Darko 2026-10-18 20:58):
+  // the settlement prints `held_by: <its holder>` and no `at`/`extent`, so a held
+  // record carries the holder instead of a place, never both, and only a thing is
+  // ever held (a parcel or a building is ground, and ground is not carried).
+  const holderOf = heldBy(rec);
+  if (rec[HELD_BY] !== undefined && holderOf == null)
+    err(rec, `${HELD_BY}: names the holder (a resident's handle, or a holder thing's id); got ${JSON.stringify(rec[HELD_BY])}`);
+  if (holderOf != null) {
+    const klass = instanceClassOf(rec);
+    if (!klass || !chainOf(klass).includes("thing"))
+      err(rec, `${HELD_BY}: only a thing is held — a held thing rides its holder, and this record is ${klass ? `a ${klass}` : `kind: ${JSON.stringify(rec.kind)}`}, not a thing`);
+    if (rec.at !== undefined || rec.extent !== undefined || rec.points !== undefined)
+      err(rec, `a held thing carries no at/extent — it is published but unplaced, and shows as ${holderOf}'s contents until it is set down (POS-688)`);
+  }
   if (standing === "sited" || standing === "parcel") {
-    if (standing === "sited" && !hasGeom(rec)) err(rec, `sited marks need at {x,y} and extent {w,h} in grid meters${cite("the-town/the-kinds")}`);
+    if (standing === "sited" && holderOf == null && !hasGeom(rec)) err(rec, `sited marks need at {x,y} and extent {w,h} in grid meters${cite("the-town/the-kinds")}`);
     if (standing === "parcel" && rec.at == null) err(rec, `parcel marks need at {x,y} (extent defaults to 25x25)${cite("the-town/the-kinds")}`);
     if (rec.slot !== undefined || rec.value !== undefined) err(rec, `${rec.kind} marks carry no slot/value (those are for predicated/naming)`);
     if (rec._explicitParent) err(rec, `${rec.kind} marks never declare a parent — containment is computed from geometry, not authored`);
@@ -605,7 +619,8 @@ for (const rec of marks) {
 // own lines (kind, class, tier, body). One warning per class and field, with a
 // count, so the inventory reads as an inventory.
 {
-  const RESERVED = new Set(["id", "by", "date", "household", "declared_household", "parent", "placementParent", "stamps", "weight", "sovereign", "kind", "class", "tier", "body", "slug"]);
+  // `held_by` is the record grammar's, like placementParent: where a held thing is instead of a place (POS-688)
+  const RESERVED = new Set(["id", "by", "date", "household", "declared_household", "parent", "placementParent", "stamps", "weight", "sovereign", "kind", "class", "tier", "body", "slug", HELD_BY]);
   // how a mark stands names its class until W2 folds `class:` into `kind:`
   const STANDING_CLASS = { sited: "sited", parcel: "parcel", predicated: "predicate", naming: "naming" };
   const STANDING_FIELDS = { sited: ["at", "extent"], parcel: ["at", "extent"], predicated: ["slot", "value"], naming: ["slot", "value"] };

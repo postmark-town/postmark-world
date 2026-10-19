@@ -20,6 +20,7 @@ import {
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
 import { unpublishVerdict, rowClassOf } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
+import { isHeld, heldBy, holdOnlyChange } from "./mark-kind.mjs"; // POS-688: published but unplaced
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -597,6 +598,16 @@ export function recordAt(repo, ref, path) {
   const record = parseRecord(readAt(repo, ref, path), path);
   const slug = basename(dirname(path));
   return { ...record, slug, id: `${record.by}/${slug}` };
+}
+
+/** The ids of the marks filed inside `path`'s directory at `ref` that carry a place of their own (POS-688). */
+export function positionedInside(repo, ref, path) {
+  const dirPrefix = path.replace(/\/mark\.md$/, "/");
+  return git(repo, ["ls-tree", "-r", ref, "--name-only", "--", dirPrefix])
+    .split(/\r?\n/).map((l) => l.trim())
+    .filter((l) => l.endsWith("mark.md") && l !== path)
+    .map((l) => { try { const r = recordAt(repo, ref, l); return r.at ? r.id : null; } catch { return null; } })
+    .filter(Boolean);
 }
 
 // A name for a row the crossing is only ever going to REPORT. It must not be
@@ -1436,6 +1447,21 @@ export function settlementSweep({
         suiteQuarantined.push({ household, id: record.id, path: delta.path, class: sketchClass, escrow: n });
         continue;
       }
+      // A HAND-OFF THAT WOULD MOVE OTHER MARKS (POS-688). A thing printed as held has
+      // no centre, and a mark filed inside its directory writes its numbers against
+      // that centre: unplacing the frame would move them (the harm gate's "moved").
+      // Two such things stood on main on 2026-10-18 (sable/one-month-paper-boat and
+      // sol-am-lichterfenster/little-m-first-month-letter, each at {0,0} inside a
+      // thing). The printout waits, by name, and the reads still show it in hands.
+      const holdOnly = holdOnlyChange(recordAt(repo, mainBranch, delta.path), record);
+      if (holdOnly && isHeld(record)) {
+        const framed = positionedInside(repo, mainBranch, delta.path);
+        if (framed.length) {
+          leftDrafted.push({ household, id: record.id, path: delta.path, class: sketchClass, escrow: n,
+            reason: `a hand-off cannot print yet: ${framed.length} mark(s) filed inside it write their place against it (${framed.slice(0, 4).join(", ")}) and would move; the reads still show it in ${heldBy(record)}'s hands` });
+          continue;
+        }
+      }
       pending.push({
         household,
         id: record.id,
@@ -1444,6 +1470,10 @@ export function settlementSweep({
         escrow: n,
         content: readAt(repo, branch, delta.path),
         candidate: candidateById.get(record.id) ?? null,
+        // A HAND-OFF, PRINTED (POS-688): the same mark moved into or out of hands and
+        // nothing else. It is the town's record of where a thing is, never a
+        // publication, so no escrow is asked of it below.
+        hold_only: holdOnly,
       });
     }
   }
@@ -1568,7 +1598,7 @@ export function settlementSweep({
   // MARKET, PUBLISHING: each row's class is read off the result.
   for (const { candidate, ...row } of pending) {
     const rowClass = result.viewed.has(row.id) ? rowClassOf(classifyMark(result.byId.get(row.id), result.byId)) : row.class;
-    if (rowClass !== "commons" || row.escrow > 0) {
+    if (rowClass !== "commons" || row.escrow > 0 || row.hold_only) {
       published.push({ ...row, class: rowClass });
       continue;
     }
@@ -1603,6 +1633,8 @@ export function settlementSweep({
         : result.byId === mainFolded ? (mainFolded.get(id)?.tier ?? null) // nothing laid on main: the fold's own verdict
         : result.viewed.has(id) ? classifyMark(result.byId.get(id), result.byId) : undefined),
       currentPath: () => filingOnMain(id),
+      // a held thing is published but unplaced: never a candidate while held (POS-688)
+      held: () => isHeld(result.byId?.get(id) ?? mainFolded.get(id)),
       ...(staleRows ? { staleRows } : {}),
     });
     if (verdict.unpublish !== true) continue;

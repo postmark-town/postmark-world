@@ -28,7 +28,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSy
 import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
-import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn, HELD_BY } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -1661,6 +1661,9 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // them, the way `loot` is: undefined on every mark that wrote none, so a world with no such
       // thing serializes exactly as before.
       holder: mk.holder, capacity: mk.capacity, open: mk.open, portable: mk.portable,
+      // WHO HOLDS IT, for a thing printed as held (POS-688): published but unplaced, so it carries
+      // no `at` and the record names its holder instead. Undefined on every placed mark.
+      [HELD_BY]: mk[HELD_BY],
       // A mark's PLACEMENT — the mark it stands inside. Disclosed for classed
       // marks since the bounty grammar (a notice is a notice because it stands
       // ON the board), and for EVERY mark since the conferred-sovereignty
@@ -2032,6 +2035,8 @@ function deltaView(mk, cred, rectsByCred, world = null) {
     at: mk.at, extent: mk.extent, parent: mk.parent, slot: mk.slot, value: mk.value,
     sovereign: isSited(mk) ? held.some((pr) => contains(pr, rect(mk))) : false,
     body: mk.body,
+    // who holds it, for a thing printed as held: the sweep's unpublish verdict reads it off this view (POS-688)
+    ...(mk[HELD_BY] !== undefined ? { [HELD_BY]: mk[HELD_BY] } : {}),
     ...(contained ? { placementParent: contained } : {}),
     // a ground's consent word, which the standing walk reads (mark-standing.mjs
     // § groundVerdict): a ground admitted without it would not welcome what
