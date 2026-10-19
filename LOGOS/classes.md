@@ -2350,6 +2350,16 @@ from the one record, the store. Why (Darko, 20:57): placed, a resident holding
 unpublished, a hand-off would break authorship "when the person who made the
 object and the person who took the object are two different people".
 
+**A drop off its maker's ground is staked (ruled 2026-10-19 09:27, POS-688,
+Darko).** Set down, a thing is a mark on the ground again, judged by where it
+now stands and for its maker, as every mark is judged for its author. On its
+maker's ground it stands free. Anywhere else it stands on the commons, and the
+drop stakes 1✦ from the dropper onto it, the same as leave-mark's "elsewhere you
+stake 1✦" (nothing more when stamps already stand behind it). The drop shows
+its terms and records nothing until the dropper accepts; a dropper who holds no
+stamps is refused, and nothing is written. A thing on the commons with no stamp
+behind it leaves the world at the settlement, as any commons mark does.
+
 **The reach of a hold (ruled 2026-09-07, the founder's word: "taking something
 should require moving into its coords extent (just like enter/exit), and you
 should be able to drop something right where you stand").**
