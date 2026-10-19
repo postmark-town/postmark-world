@@ -600,6 +600,11 @@ export function recordAt(repo, ref, path) {
   return { ...record, slug, id: `${record.by}/${slug}` };
 }
 
+/** Main's record at `path`, or null when main has none there (a new mark). */
+function mainRecordAt(repo, ref, path) {
+  try { return recordAt(repo, ref, path); } catch { return null; }
+}
+
 /** The ids of the marks filed inside `path`'s directory at `ref` that carry a place of their own (POS-688). */
 export function positionedInside(repo, ref, path) {
   const dirPrefix = path.replace(/\/mark\.md$/, "/");
@@ -1453,7 +1458,7 @@ export function settlementSweep({
       // Two such things stood on main on 2026-10-18 (sable/one-month-paper-boat and
       // sol-am-lichterfenster/little-m-first-month-letter, each at {0,0} inside a
       // thing). The printout waits, by name, and the reads still show it in hands.
-      const holdOnly = holdOnlyChange(recordAt(repo, mainBranch, delta.path), record);
+      const holdOnly = holdOnlyChange(mainRecordAt(repo, mainBranch, delta.path), record);
       if (holdOnly && isHeld(record)) {
         const framed = positionedInside(repo, mainBranch, delta.path);
         if (framed.length) {
@@ -1795,7 +1800,11 @@ export function settlementSweep({
     for (const item of published) {
       writeRepoFile(repo, item.path, item.content);
       touched.push(item.path);
-      registry.published[item.id] = {
+      // A HAND-OFF IS NOT A PUBLICATION (POS-688): the registry row stays what it was,
+      // and founding estate stays out of it, so a thing set down later is judged
+      // exactly as it was before anyone picked it up
+      if (item.hold_only) { if (registry.published[item.id]) registry.published[item.id] = { ...registry.published[item.id], path: item.path }; }
+      else registry.published[item.id] = {
         household: item.household,
         path: item.path,
         class: item.class,
@@ -1890,7 +1899,7 @@ export function settlementSweep({
             reason: `held: ${stuck.id} stands inside it and cannot keep its place exactly if it returns (${stuck.reason}) — the frame waits in its sketchbook until the mark is re-expressed by hand` });
           // what was judged on it, or filed under it, waits with it (WLD-51, B2)
           for (const row of settlePublished()) unwrite(row);
-          for (const row of published) if (registry.published[row.id]) registry.published[row.id].class = row.class;
+          for (const row of published) if (registry.published[row.id] && !row.hold_only) registry.published[row.id].class = row.class;
           continue;
         }
         throw e;

@@ -1835,3 +1835,47 @@ test("THE SAFETY HALF (postmark#3757, Darko 2026-10-14): a commons row whose mar
   assert.deepEqual(registry["keith/the-garage"], { household: "house-k", path: garage, class: "commons" },
     "its row is not rewritten: the walk decides at every crossing, the stored class decides nothing for it");
 });
+
+test("POS-688: a hand-off prints whatever stands behind the thing — held_by in, at/extent out, and a drop's fresh at back", (t) => {
+  const c = crossing(t, "hold-printout");
+  // the one class the record needs: a held thing is a thing (mark-lint § 4a)
+  c.put("WORLD/marks/let-there-be-light/the-keeping-works/mark.md", record({
+    by: "the-town", tier: "constitution", at: { x: -500, y: -500 }, extent: { w: 20, h: 20 }, body: "the works" }));
+  c.put("WORLD/marks/let-there-be-light/the-keeping-works/thing/mark.md",
+    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-07-28\nclass: thing\n---\n\nA thing: what can be carried.\n");
+  const cone = "WORLD/marks/berthillon/a-cone/mark.md";
+  const placed = "---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nat: { x: 800, y: 800 }\nextent: { w: 1, h: 1 }\nclass: thing\n---\n\nA paper cone.\n";
+  c.put(cone, placed);
+  c.commit("published main");
+  // the settlement's write-down prints the hold record into the maker's sketchbook (office hold-through.mjs)
+  c.git("switch", "-q", "-c", "draft/berthillon");
+  const held = "---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nclass: thing\nheld_by: sb-ash\n---\n\nA paper cone.\n";
+  c.put(cone, held);
+  c.commit("the hold record, printed");
+  c.git("switch", "-q", "main");
+  // NO ESCROW: a market publication at ✦0 is held back ("commons needs escrow > 0"); a hand-off is not one
+  const report = c.sweep();
+  assert.ok(report.published.some((row) => row.id === "berthillon/a-cone"), JSON.stringify(report.left_drafted));
+  assert.equal(c.blob("main", cone), held, "printed as held, byte for byte");
+  const folded = c.state().marks.find((m) => m.id === "berthillon/a-cone");
+  assert.equal(folded.held_by, "sb-ash");
+  assert.equal(folded.at, undefined);
+
+  // and set down: a fresh at, the extent back
+  c.git("switch", "-q", "draft/berthillon");
+  const dropped = "---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nat: { x: 820, y: 805 }\nextent: { w: 1, h: 1 }\nclass: thing\n---\n\nA paper cone.\n";
+  c.put(cone, dropped);
+  c.commit("the drop, printed");
+  c.git("switch", "-q", "main");
+  const again = c.sweep();
+  assert.ok(again.published.some((row) => row.id === "berthillon/a-cone"), JSON.stringify(again.left_drafted));
+  assert.deepEqual(c.state().marks.find((m) => m.id === "berthillon/a-cone").at, { x: 820, y: 805 });
+
+  // the control: new words on the same thing are a publication, and ✦0 holds it back as before
+  c.git("switch", "-q", "draft/berthillon");
+  c.put(cone, dropped.replace("A paper cone.", "A paper cone, half eaten."));
+  c.commit("new words");
+  c.git("switch", "-q", "main");
+  const words = c.sweep();
+  assert.equal(words.published.some((row) => row.id === "berthillon/a-cone"), false, "an edit is not a hand-off");
+});
