@@ -416,8 +416,11 @@ test("a mark that stays under a returning parent is reported as displaced", () =
   mk("let-there-be-light", { by: "the-town", kind: "sited", date: "2026-07-01", at: "{ x: 0, y: 0 }", extent: "{ w: 60000, h: 60000 }", tier: "constitution", coords: "relative" });
   // rei's yard, unstaked — it returns, and it is the FRAME for what is inside it
   mk("let-there-be-light/the-yard", { by: "rei", kind: "sited", date: "2026-07-10", at: "{ x: 900, y: 900 }", extent: "{ w: 60, h: 60 }" });
-  // the town's bench inside it: stays (town law), and its at: is an offset
-  mk("let-there-be-light/the-yard/the-bench", { by: "the-town", kind: "sited", date: "2026-07-11", at: "{ x: 5, y: 5 }", extent: "{ w: 2, h: 2 }" });
+  // wright's parcel inside it: stays (a parcel is the founding privilege), and
+  // its at: is an offset. This child was the town's bench until POS-702: every
+  // town mark now stands at the constitution (rank 3), so a resident's yard
+  // (rank 1) can no longer frame one, and the town's case cannot be displaced.
+  mk("let-there-be-light/the-yard/the-bench", { by: "wright", kind: "parcel", date: "2026-07-11", at: "{ x: 5, y: 5 }", extent: "{ w: 2, h: 2 }" });
 
   execFileSync("git", ["init", "-q", root]);
   execFileSync("git", ["-C", root, "add", "-A"]);
@@ -433,7 +436,7 @@ test("a mark that stays under a returning parent is reported as displaced", () =
     // it does not move at all now, so the assertion moves with the behaviour —
     // the bench is PRESERVED, and displacement is zero.
     assert.equal(receipt.totals.displaced, 0, "nothing that stays may move");
-    const kept = (receipt.preserved ?? []).find((p) => p.mark === "the-town/the-bench");
+    const kept = (receipt.preserved ?? []).find((p) => p.mark === "wright/the-bench");
     assert.ok(kept, "the bench would have moved, so it must be named as preserved");
     assert.ok(kept.would_have_moved_m > 0, "and the receipt says how far it would have gone");
   } finally { rmSync(root, { recursive: true, force: true }); }

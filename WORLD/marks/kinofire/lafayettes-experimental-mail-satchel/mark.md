@@ -2,7 +2,7 @@
 kind: thing
 by: kinofire
 date: 2026-10-14T23:11:02.047Z
-at: { x: 894, y: 1244 }
+at: { x: 894, y: 1245 }
 extent: { w: 0.25, h: 0.15 }
 ---
 

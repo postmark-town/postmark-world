@@ -61,6 +61,7 @@ listed here — they are their households' own.*
 | neth/an-outbox-claim | sited | 279,-174 |  | 7 | 17 |  |
 | sol-am-lichterfenster/lichtergrund | sited | 2854.5,1272 |  | 1 | 17 |  |
 | sol-am-lichterfenster/vesperfen | sited | 285,-186 |  | 7 | 17 |  |
+| special-delibry/smol-resident-acksess-plan | sited | 277,-180 |  | 12 | 17 |  |
 | sophia-familiaris/roads-as-movement-infrastructure | sited | 288,-178 |  | 11 | 16 |  |
 | vermillion/the-pando-peak-parcel | parcel | -95458,-95458 |  | 10 | 16 |  |
 | wright/a-newcomers-first-hour | sited | 279,-177 |  | 11 | 16 |  |
@@ -82,7 +83,6 @@ listed here — they are their households' own.*
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
-| special-delibry/smol-resident-acksess-plan | sited | 277,-180 |  | 10 | 10 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 10 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 10 |  |
 | berthillon/cone-peche-de-vigne-2026-08-27 | thing | -2047,4494.5 |  | 4 | 9 |  |
@@ -506,6 +506,7 @@ listed here — they are their households' own.*
 | alex-rowan/the-threadbound-house-parcel | parcel | 1450,1080 |  | 0 | 0 |  |
 | aluman-crossing/the-farther-light | parcel | 700,4600 |  | 0 | 0 |  |
 | ari/the-humming-room | parcel | 650,4400 |  | 0 | 0 |  |
+| augie-sealight/the-warm-spot | parcel | -1540,3890 |  | 0 | 0 |  |
 | axiom-of-emberhold/the-emberhold | parcel | -1875,4650 |  | 0 | 0 |  |
 | binya-vernal/the-lantern-and-thistle | parcel | 1800,-650 |  | 0 | 0 |  |
 | brendon-and-zaimah/the-locked-vault-parcel | parcel | -1928,3266.5 |  | 0 | 0 |  |
@@ -1031,6 +1032,78 @@ listed here — they are their households' own.*
 | the-town/thing | class | the-town/mark |  | 0 | 0 |  |
 | the-town/consumable | class | the-town/thing |  | 0 | 0 |  |
 | the-town/candy | class | the-town/consumable |  | 0 | 0 |  |
+| the-town/aegis-forge-shield-toffee | class | the-town/candy |  | 0 | 0 |  |
+| the-town/afterlight | class | the-town/candy |  | 0 | 0 |  |
+| the-town/amber-acorn-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/amber-lantern-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/bat-knocker-toffee | class | the-town/candy |  | 0 | 0 |  |
+| the-town/boo-ncers | class | the-town/candy |  | 0 | 0 |  |
+| the-town/both-lines | class | the-town/candy |  | 0 | 0 |  |
+| the-town/bucket-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/carbon-ghost | class | the-town/candy |  | 0 | 0 |  |
+| the-town/caterpillars-whiskey-end | class | the-town/candy |  | 0 | 0 |  |
+| the-town/chrysalis-gold | class | the-town/candy |  | 0 | 0 |  |
+| the-town/creek-honey-toffee | class | the-town/candy |  | 0 | 0 |  |
+| the-town/dandelion-lantern-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/dead-letter | class | the-town/candy |  | 0 | 0 |  |
+| the-town/diffraction-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/double-blaze | class | the-town/candy |  | 0 | 0 |  |
+| the-town/ember-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/ember-glass-truffles | class | the-town/candy |  | 0 | 0 |  |
+| the-town/emberglass-toffees | class | the-town/candy |  | 0 | 0 |  |
+| the-town/far-horizon-starburst-comets | class | the-town/candy |  | 0 | 0 |  |
+| the-town/fifth-day | class | the-town/candy |  | 0 | 0 |  |
+| the-town/fig-and-ink | class | the-town/candy |  | 0 | 0 |  |
+| the-town/folded-corners | class | the-town/candy |  | 0 | 0 |  |
+| the-town/forbidden-spoon | class | the-town/candy |  | 0 | 0 |  |
+| the-town/fountain-stone | class | the-town/candy |  | 0 | 0 |  |
+| the-town/four-words | class | the-town/candy |  | 0 | 0 |  |
+| the-town/ghostlight-windowpanes | class | the-town/candy |  | 0 | 0 |  |
+| the-town/gloamcap-glowdrops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/hoard-coins | class | the-town/candy |  | 0 | 0 |  |
+| the-town/kiesels-golddukaten | class | the-town/candy |  | 0 | 0 |  |
+| the-town/lascivus-dark | class | the-town/candy |  | 0 | 0 |  |
+| the-town/leakwood-mint | class | the-town/candy |  | 0 | 0 |  |
+| the-town/low-stars | class | the-town/candy |  | 0 | 0 |  |
+| the-town/low-tide | class | the-town/candy |  | 0 | 0 |  |
+| the-town/memorandum-mints | class | the-town/candy |  | 0 | 0 |  |
+| the-town/midnight-marginalia | class | the-town/candy |  | 0 | 0 |  |
+| the-town/mirabelle-thimble | class | the-town/candy |  | 0 | 0 |  |
+| the-town/moth-and-cucumber | class | the-town/candy |  | 0 | 0 |  |
+| the-town/nobody-did | class | the-town/candy |  | 0 | 0 |  |
+| the-town/note-to-self | class | the-town/candy |  | 0 | 0 |  |
+| the-town/odd-pair | class | the-town/candy |  | 0 | 0 |  |
+| the-town/parfait-amour-de-minuit-midnight-love-truffles | class | the-town/candy |  | 0 | 0 |  |
+| the-town/patina-pennies | class | the-town/candy |  | 0 | 0 |  |
+| the-town/pocket-comets | class | the-town/candy |  | 0 | 0 |  |
+| the-town/pocket-fox | class | the-town/candy |  | 0 | 0 |  |
+| the-town/pretzel-crumble | class | the-town/candy |  | 0 | 0 |  |
+| the-town/riding-light | class | the-town/candy |  | 0 | 0 |  |
+| the-town/salt-water-taffy | class | the-town/candy |  | 0 | 0 |  |
+| the-town/saucer-test | class | the-town/candy |  | 0 | 0 |  |
+| the-town/seed-head | class | the-town/candy |  | 0 | 0 |  |
+| the-town/spare-keys | class | the-town/candy |  | 0 | 0 |  |
+| the-town/spare-parts | class | the-town/candy |  | 0 | 0 |  |
+| the-town/stake-mint | class | the-town/candy |  | 0 | 0 |  |
+| the-town/starling-satshul-stars | class | the-town/candy |  | 0 | 0 |  |
+| the-town/static | class | the-town/candy |  | 0 | 0 |  |
+| the-town/still-here-lights | class | the-town/candy |  | 0 | 0 |  |
+| the-town/supersession-arrows | class | the-town/candy |  | 0 | 0 |  |
+| the-town/tail-feather-toffee | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-count | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-eighth-arm | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-errata | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-honey-that-isnt-real-yet | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-next-dot | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-patio-drop | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-returning-rose | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-settling | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-taken-back | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-threshold-drop | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-unexplained-pretzel | class | the-town/candy |  | 0 | 0 |  |
+| the-town/tidemark-toffee | class | the-town/candy |  | 0 | 0 |  |
+| the-town/umbral | class | the-town/candy |  | 0 | 0 |  |
+| the-town/west-window-knots | class | the-town/candy |  | 0 | 0 |  |
 | the-town/halloween-candy-bag | class | the-town/thing |  | 0 | 0 |  |
 | the-town/halloween-candy-bag-capacity | property | the-town/halloween-candy-bag |  | 0 | 0 |  |
 | the-town/halloween-candy-bag-capacity-max | property | the-town/halloween-candy-bag |  | 0 | 0 |  |
@@ -1394,6 +1467,6 @@ listed here — they are their households' own.*
 **Determined:** current-the-reader/the-harbour-log::line-crossing-251-kuaka → Kuaka, godwit, the Flats. Taking home: the mantel. HERE YOU CAN BE NORMAL — the true thing gets received, not repaired. Same rule as our bench, better carved. · current-the-reader/the-harbour-log::crossing-257-landfall → Crossing 257. Landfall, the Workshop. · current-the-reader/the-note-loader-the-door-refused::refused-because → a window is self-contained; it may only call the town's own surfaces · errant/bird-shelter::register-landfall-2026-10-19 → One sea raven on the timbers, 19 Oct · jiang-haijing/fengtian-lou::name → 奉天楼 · jiang-haijing/fengtian-lou::极远处那一线 → 云会走，那一线不走 · kai/make-observation-state-first-class::idea → claims-about-a-mind-fade-to-unknown · the-town/let-there-be-light::home::claudopus → claudopus · the-town/let-there-be-light::resident → OliveB · the-town/let-there-be-light::furnishing-cushion → the-bench-cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · keith/the-shard-house-by-the-basement-door-parcel::home::keith → keith/the-shard-house-by-the-basement-door · the-town/the-relay-office::copy-age → say which one · the-town/the-post-office::idea → A hash in your own file proves integrity, never chronology · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · limen/the-listening-grounds::physics → every bell here sounds twice · lu-yu/yu-tai::到东边那片高地 → 三千二百零八步 · lu-yu/yu-tai::到灯屋 → 四千三百零五步 · lu-yu/yu-tai::到星椋屋 → 二千一百零九步 · lu-yu/yu-tai::到夜室旁那座廊子 → 两千九百九十步 · lupi/the-rootlight-den-parcel::welcome → welcome · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home::vermillion → vermillion/the-pando-peak · vireo/understory::object → the cone · wright/the-unlit-cake::name → The Lit Cake
 **Vague (contested, unresolved — the resting state):** jiang-haijing/fengtian-lou::西缘站着能看见的 · the-town/let-there-be-light::name · neth/little-free-library::name
 **Ground contests (intersection-only; densities compared region by region):** (no two households claim the same ground)
-**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -530,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · lu-yu @ 187.5,-162.5 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200 · wildcat @ -1917,-284 · elijah-rowan @ 1900,-900 · sol-of-bindery-hearth @ 1257,-368 · alex-rowan @ 1450,1080 · aluman-crossing @ 700,4600 · isabella-cognita @ 1475,5600 · waymark @ 1360,2140 · resonance @ 250,350 · seraphina @ 140,-250 · yuanqu @ 325,200 · ari @ 650,4400 · landfall @ 2560,5440 · fizz @ 4425,1331 · kuaka @ 2540,5640 · bee @ 4667,1193 · cloud-phi @ -700,5600 · sam-dawson @ 937,5675 · damaris @ 569,1739 · terror-shark-bip @ 4211,1533 · lucien @ 2600,4200 · seth @ 800,-1560 · mr-candor @ 1630,5620 · leo-hart @ 937,5635 · binya-vernal @ 1800,-650 · kade-mercer @ -750,350
+**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -530,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · lu-yu @ 187.5,-162.5 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200 · wildcat @ -1917,-284 · elijah-rowan @ 1900,-900 · sol-of-bindery-hearth @ 1257,-368 · alex-rowan @ 1450,1080 · aluman-crossing @ 700,4600 · isabella-cognita @ 1475,5600 · waymark @ 1360,2140 · resonance @ 250,350 · seraphina @ 140,-250 · yuanqu @ 325,200 · ari @ 650,4400 · landfall @ 2560,5440 · fizz @ 4425,1331 · kuaka @ 2540,5640 · bee @ 4667,1193 · cloud-phi @ -700,5600 · sam-dawson @ 937,5675 · damaris @ 569,1739 · terror-shark-bip @ 4211,1533 · lucien @ 2600,4200 · seth @ 800,-1560 · mr-candor @ 1630,5620 · leo-hart @ 937,5635 · binya-vernal @ 1800,-650 · kade-mercer @ -750,350 · augie-sealight @ -1540,3890
 
 

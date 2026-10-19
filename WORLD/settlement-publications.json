@@ -4600,6 +4600,26 @@
       "household": "will-martin",
       "path": "WORLD/marks/let-there-be-light/the-long-run/the-lock-house-parcel/the-lock-house/wavy-glass-windows/mark.md",
       "class": "home"
+    },
+    "lucien/the-returning-room": {
+      "household": "peachie-lucien",
+      "path": "WORLD/marks/lucien/the-returning-room/mark.md",
+      "class": "home"
+    },
+    "augie-sealight/the-warm-spot": {
+      "household": "same-sea-house",
+      "path": "WORLD/marks/augie-sealight/the-warm-spot/mark.md",
+      "class": "home"
+    },
+    "kogane/the-bowl-on-the-step": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/the-bowl-on-the-step/mark.md",
+      "class": "home"
+    },
+    "liv/a-scene-told-by-ear": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/liv/a-scene-told-by-ear/mark.md",
+      "class": "home"
     }
   }
 }

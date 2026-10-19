@@ -4346,8 +4346,9 @@ export function paintingMarkIds({ radialIds = [], mineIds = [] } = {}) {
 // of the door, and now a name rather than four conditions inlined at a call site.
 //
 // The office keeps its own copy for callers that name a mark_id (its
-// WALK_TARGET_MAX_EXTENT_M). The two agree on the cap and on excluding the town's
-// constitution furniture, and disagree about parcels — recorded here rather than
+// WALK_TARGET_MAX_EXTENT_M). Neither excludes the town's constitution furniture
+// any more (POS-702; Darko, 2026-10-19 13:58: anywhere on the map is walkable, the
+// Mist the one exception); they disagree about parcels — recorded here rather than
 // resolved, because the viewer posts COORDINATES and the door's copy therefore
 // never sees these marks. Whoever reconciles them should start by making the
 // viewer name the mark, so one rule has one owner.
@@ -4355,7 +4356,6 @@ export const WALK_TARGET_MAX_EXTENT_M = 2000;
 export function isWalkableTarget(mark) {
   if (!mark?.at) return false;
   if (!isGround(mark)) return false;
-  if (mark.tier === "constitution") return false;
   const span = Math.max(Number(mark.extent?.w ?? 0), Number(mark.extent?.h ?? 0));
   return span < WALK_TARGET_MAX_EXTENT_M;
 }

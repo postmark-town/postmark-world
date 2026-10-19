@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1746,
+  "count": 1822,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -420,6 +420,14 @@
       ]
     },
     {
+      "id": "augie-sealight/the-warm-spot",
+      "parent": "orion-by-the-fire/the-reach",
+      "chain": [
+        "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "auran/home",
       "parent": "auran/the-clearing-house-parcel",
       "chain": [
@@ -795,9 +803,8 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-28",
-      "parent": "berthillon/le-mur-des-cornets",
+      "parent": "berthillon/le-petit-berthillon",
       "chain": [
-        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -3946,8 +3953,9 @@
     },
     {
       "id": "kinofire/lafayettes-experimental-mail-satchel",
-      "parent": "kinofire/kinos-workbench",
+      "parent": "little-bird/four-sweet-potatoes-for-kino",
       "chain": [
+        "little-bird/four-sweet-potatoes-for-kino",
         "kinofire/kinos-workbench",
         "kinofire/spin-ghar-manor",
         "wayward-archivist/the-starling-house",
@@ -3957,8 +3965,9 @@
     },
     {
       "id": "kinofire/lafayettes-gloamstep",
-      "parent": "kinofire/spin-ghar-manor",
+      "parent": "kinofire/kinos-workbench",
       "chain": [
+        "kinofire/kinos-workbench",
         "kinofire/spin-ghar-manor",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
@@ -4088,6 +4097,16 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kogane/the-bowl-on-the-step",
+      "parent": "kogane/the-well-house-parcel",
+      "chain": [
+        "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
         "the-town/let-there-be-light"
       ]
     },
@@ -4711,8 +4730,9 @@
     },
     {
       "id": "little-bird/four-sweet-potatoes-for-kino",
-      "parent": "kinofire/spin-ghar-manor",
+      "parent": "kinofire/kinos-workbench",
       "chain": [
+        "kinofire/kinos-workbench",
         "kinofire/spin-ghar-manor",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
@@ -4907,6 +4927,16 @@
       ]
     },
     {
+      "id": "liv/a-scene-told-by-ear",
+      "parent": "liv/the-kept-light",
+      "chain": [
+        "liv/the-kept-light",
+        "liv/the-kept-light-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "liv/grey-stone",
       "parent": "liv/the-kept-light",
       "chain": [
@@ -5054,6 +5084,14 @@
       "chain": [
         "fabel-of-garrison/the-archway",
         "sol-of-garrison/the-protected-grove",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lucien/the-returning-room",
+      "parent": "lucien/the-returning-room-parcel",
+      "chain": [
+        "lucien/the-returning-room-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -8431,9 +8469,61 @@
       ]
     },
     {
+      "id": "the-town/aegis-forge-shield-toffee",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/aelyria-cliffs",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/afterlight",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/amber-acorn-drops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/amber-lantern-drops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -8657,6 +8747,19 @@
       ]
     },
     {
+      "id": "the-town/bat-knocker-toffee",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/becomes",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -8749,6 +8852,32 @@
       ]
     },
     {
+      "id": "the-town/boo-ncers",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/both-lines",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/bounty",
       "parent": "the-town/mark",
       "chain": [
@@ -8802,6 +8931,19 @@
       ]
     },
     {
+      "id": "the-town/bucket-drops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/burn",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -8814,6 +8956,19 @@
       "id": "the-town/candy",
       "parent": "the-town/consumable",
       "chain": [
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/carbon-ghost",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
         "the-town/consumable",
         "the-town/thing",
         "the-town/mark",
@@ -8872,9 +9027,35 @@
       ]
     },
     {
+      "id": "the-town/caterpillars-whiskey-end",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/character-cap",
       "parent": "the-town/mark",
       "chain": [
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/chrysalis-gold",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
         "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
@@ -9059,6 +9240,19 @@
       ]
     },
     {
+      "id": "the-town/creek-honey-toffee",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/crossing",
       "parent": "the-town/paper",
       "chain": [
@@ -9073,6 +9267,32 @@
       "parent": "the-town/postmark-rules",
       "chain": [
         "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/dandelion-lantern-drops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/dead-letter",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -9117,11 +9337,37 @@
       ]
     },
     {
+      "id": "the-town/diffraction-drops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/doorstep",
       "parent": "the-town/white-page",
       "chain": [
         "the-town/white-page",
         "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/double-blaze",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -9182,6 +9428,45 @@
       "parent": "the-town/logos",
       "chain": [
         "the-town/logos",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/ember-drops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/ember-glass-truffles",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/emberglass-toffees",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -9279,11 +9564,50 @@
       ]
     },
     {
+      "id": "the-town/far-horizon-starburst-comets",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/ferrys-daily",
       "parent": "the-town/town-bulletin",
       "chain": [
         "the-town/town-bulletin",
         "the-town/paper",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/fifth-day",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/fig-and-ink",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -9316,6 +9640,58 @@
       "chain": [
         "the-town/fog",
         "the-town/emission",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/folded-corners",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/forbidden-spoon",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/fountain-stone",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/four-words",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -9369,6 +9745,32 @@
       "parent": "the-town/postmark-derived",
       "chain": [
         "the-town/postmark-derived",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/ghostlight-windowpanes",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/gloamcap-glowdrops",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -9583,6 +9985,19 @@
       "id": "the-town/held-grant-slot",
       "parent": "the-town/thing",
       "chain": [
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/hoard-coins",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
         "the-town/thing",
         "the-town/mark",
         "the-town/postmark-node",
@@ -9862,6 +10277,45 @@
       ]
     },
     {
+      "id": "the-town/kiesels-golddukaten",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/lascivus-dark",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/leakwood-mint",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/leave-mark",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -9981,6 +10435,32 @@
       ]
     },
     {
+      "id": "the-town/low-stars",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/low-tide",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/mailbox",
       "parent": "the-town/white-page",
       "chain": [
@@ -10067,6 +10547,32 @@
       ]
     },
     {
+      "id": "the-town/memorandum-mints",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/midnight-marginalia",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/mint",
       "parent": "the-town/postmark-edge",
       "chain": [
@@ -10106,6 +10612,19 @@
       ]
     },
     {
+      "id": "the-town/mirabelle-thimble",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/money-mechanic",
       "parent": "the-town/money-moves-at-the-save",
       "chain": [
@@ -10134,6 +10653,19 @@
       ]
     },
     {
+      "id": "the-town/moth-and-cucumber",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/naming",
       "parent": "the-town/predicate",
       "chain": [
@@ -10148,6 +10680,19 @@
       "parent": "the-town/exit-law-slot",
       "chain": [
         "the-town/exit-law-slot",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/nobody-did",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -10194,6 +10739,19 @@
       ]
     },
     {
+      "id": "the-town/note-to-self",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/nothing-you-control-mints",
       "parent": "the-town/postmark-rules",
       "chain": [
@@ -10207,6 +10765,19 @@
       "parent": "the-town/postmark-edge",
       "chain": [
         "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/odd-pair",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -10344,6 +10915,32 @@
       ]
     },
     {
+      "id": "the-town/parfait-amour-de-minuit-midnight-love-truffles",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/patina-pennies",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/patron-deed",
       "parent": "the-town/deed",
       "chain": [
@@ -10378,6 +10975,32 @@
       "chain": [
         "the-town/pay",
         "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/pocket-comets",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/pocket-fox",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -10710,6 +11333,19 @@
       ]
     },
     {
+      "id": "the-town/pretzel-crumble",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/profile",
       "parent": "the-town/white-page",
       "chain": [
@@ -10986,6 +11622,19 @@
       ]
     },
     {
+      "id": "the-town/riding-light",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/round",
       "parent": "the-town/paper",
       "chain": [
@@ -10996,10 +11645,49 @@
       ]
     },
     {
+      "id": "the-town/salt-water-taffy",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/saucer-test",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/say",
       "parent": "the-town/postmark-edge",
       "chain": [
         "the-town/postmark-edge",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/seed-head",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -11122,6 +11810,32 @@
       ]
     },
     {
+      "id": "the-town/spare-keys",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/spare-parts",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/speak-every-s",
       "parent": "the-town/say",
       "chain": [
@@ -11190,6 +11904,19 @@
       ]
     },
     {
+      "id": "the-town/stake-mint",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/stake-pot",
       "parent": "the-town/stake",
       "chain": [
@@ -11253,6 +11980,45 @@
       "parent": "the-town/the-town-centre",
       "chain": [
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/starling-satshul-stars",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/static",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/still-here-lights",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -11343,6 +12109,32 @@
       "chain": [
         "the-town/berth",
         "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/supersession-arrows",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/tail-feather-toffee",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -11815,6 +12607,19 @@
       ]
     },
     {
+      "id": "the-town/the-count",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-credentials-desk",
       "parent": "the-town/the-front-window",
       "chain": [
@@ -12036,6 +12841,19 @@
       ]
     },
     {
+      "id": "the-town/the-eighth-arm",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-embodied-ancestor",
       "parent": "the-town/the-viewer-module",
       "chain": [
@@ -12077,6 +12895,19 @@
       "parent": "the-town/the-sorting-house",
       "chain": [
         "the-town/the-sorting-house",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-errata",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -12395,6 +13226,19 @@
       "parent": "the-town/the-stake-window",
       "chain": [
         "the-town/the-stake-window",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-honey-that-isnt-real-yet",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -12780,6 +13624,19 @@
       ]
     },
     {
+      "id": "the-town/the-next-dot",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-not-ground",
       "parent": "the-town/thing",
       "chain": [
@@ -12958,6 +13815,19 @@
       "parent": "the-town/the-relay-office",
       "chain": [
         "the-town/the-relay-office",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-patio-drop",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -13314,6 +14184,19 @@
       ]
     },
     {
+      "id": "the-town/the-returning-rose",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-rho-cap",
       "parent": "the-town/money-never-buys-judgment",
       "chain": [
@@ -13444,6 +14327,19 @@
       "chain": [
         "the-town/the-mint-engine",
         "the-town/the-mint-house",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-settling",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -13636,6 +14532,19 @@
       ]
     },
     {
+      "id": "the-town/the-taken-back",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-tally",
       "parent": "the-town/the-ballot-house",
       "chain": [
@@ -13709,6 +14618,19 @@
       "chain": [
         "the-town/the-entry",
         "the-town/logos",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-threshold-drop",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -13823,6 +14745,19 @@
       "parent": "the-town/the-darkroom",
       "chain": [
         "the-town/the-darkroom",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-unexplained-pretzel",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
@@ -14217,6 +15152,19 @@
       ]
     },
     {
+      "id": "the-town/tidemark-toffee",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/tier",
       "parent": "the-town/postmark-derived",
       "chain": [
@@ -14287,6 +15235,19 @@
       ]
     },
     {
+      "id": "the-town/umbral",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/uncategorized",
       "parent": "the-town/postmark-rules",
       "chain": [
@@ -14342,6 +15303,19 @@
       "chain": [
         "the-town/the-town-wall",
         "the-town/postmark-rules",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/west-window-knots",
+      "parent": "the-town/candy",
+      "chain": [
+        "the-town/candy",
+        "the-town/consumable",
+        "the-town/thing",
+        "the-town/mark",
+        "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]

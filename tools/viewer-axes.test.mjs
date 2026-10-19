@@ -1126,7 +1126,7 @@ test("a mark you cannot set out for is still not a destination", () => {
   assert.equal(isWalkableTarget(house), true);
   assert.equal(isWalkableTarget(parcel), true, "a parcel is ground you can stand on");
   assert.equal(isWalkableTarget(district), false, "2,325 m across is a region, not a destination");
-  assert.equal(isWalkableTarget(crossing), false, "the town's own furniture is not a destination");
+  assert.equal(isWalkableTarget(crossing), true, "POS-702: the town's own furniture is a destination too (Darko, 2026-10-19 13:58)");
   assert.equal(isWalkableTarget({ ...house, at: null }), false, "an unplaced mark is nowhere to go");
   assert.equal(isWalkableTarget({ ...house, kind: "predicated" }), false, "a property of a thing has no ground");
   assert.equal(isWalkableTarget({ ...house, extent: { w: WALK_TARGET_MAX_EXTENT_M, h: 1 } }), false, "the cap is exclusive");
@@ -2229,4 +2229,13 @@ test("a nameplate stands BESIDE a mark's drawn ground, not over its middle (Dark
   // a number reaches both ways; zero is the old rule exactly
   assert.deepEqual(placeBubble({ anchor, size, box, reach: 0 }), bare);
   assert.equal(placeBubble({ anchor, size, box, reach: 30 }).x, bare.x + 30);
+});
+
+test("FALSIFIER, POS-702: the town's deck and quay are walk targets; a law node with no place is not", () => {
+  const deck = { id: "the-town/the-deck", kind: "sited", tier: "constitution", at: { x: 1400, y: 5665 }, extent: { w: 40, h: 12 } };
+  const quay = { id: "the-town/the-quay", kind: "sited", tier: "constitution", at: { x: 1390, y: 5665 }, extent: { w: 80, h: 20 } };
+  const law = { id: "the-town/walk-verb", kind: "predicate", tier: "constitution" };
+  assert.equal(isWalkableTarget(deck), true);
+  assert.equal(isWalkableTarget(quay), true);
+  assert.equal(isWalkableTarget(law), false);
 });

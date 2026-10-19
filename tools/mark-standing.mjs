@@ -79,21 +79,25 @@ export function standingHouseholdOf(mark) {
 // name. The settlement sweep's town wall reads this (#1697, after the-town/berth
 // was widened by a resurrected draft copy on 2026-08-18).
 //
-// Deliberately broader than the constitution shortcut in markStanding below: the
-// town also signs terrain, the LOGOS nodes and the quay's furniture with no
-// `tier:` line at all, and none of that is a resident's to publish either.
+// The town also signs terrain, the LOGOS nodes and the quay's furniture with no
+// `tier:` line at all, and none of that is a resident's to publish either. It is
+// the same set markStanding below calls the constitution (POS-702).
 export function townOwned(mark) {
   return (mark?.by ?? mark?.household) === TOWN;
 }
 
 export function markStanding(mark, byId) {
   if (!mark) return "market";
-  if ((mark.by ?? mark.household) === TOWN && mark.tier === "constitution") return "constitution";
-  // A property node is class space, the town's law, whatever its `tier:` says:
-  // on a property that line is whose word decides the VALUE on each instance
-  // (LOGOS v2 part 2, ruled 2026-10-16 18:44 item 7: "the field keeps its name,
-  // because it's the same ladder applied to values"), never the node's standing.
-  if ((mark.by ?? mark.household) === TOWN && mark.kind === "property") return "constitution";
+  // THE CONSTITUTION IS THE TOWN'S OWN MARKS, BY DEFINITION (POS-702; Darko,
+  // 2026-10-19 09:59: "Constitutional and the town's own marks are synonymous…
+  // By definition, the constitutional marks are the ones that are belonging to
+  // the town"). It used to need `tier: constitution` on the record as well, or
+  // a property, so 58 town marks with no `tier:` line (LOGOS predicates, the
+  // quay's furniture, the town's things) walked their ground and read `market`.
+  // A `tier:` line on a town record now states nothing, as on a resident's; on
+  // a property it still says whose word decides the VALUE on each instance
+  // (LOGOS v2 part 2, 2026-10-16 18:44 item 7), never the node's standing.
+  if (townOwned(mark)) return "constitution";
   const { ground } = standingWalk(mark, byId);
   return ground ? groundVerdict(ground, mark, standingHouseholdOf(mark)) : "market";
 }
