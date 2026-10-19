@@ -2309,6 +2309,21 @@ holder as a rider rides the deck; what may anchor where is class contract
 under a thing by geometry, and a walk onto it sets you down on what it stands
 on (rendered as `the-town/the-not-ground`).
 
+**Published is not placed (ruled 2026-10-18 20:58, POS-688, Darko: *"I totally
+forgot that we made it so that held marks are still technically considered
+marks. I think that's the best of both worlds and just the cleanest and most
+commonsensical solution."*).** A held thing stays the same mark (its maker, its
+words, its id: authorship never moves with a hand-off) and is UNPLACED while
+held: it has no ground position, never appears in anyone's field of view as a
+mark of its own, and reads as its holder's contents, exactly as a thing in a
+chest does. Riding its holder means this, and nothing about a place. The
+settlement prints it with `held_by: <its holder>` and no `at`/`extent`; a drop
+prints a fresh `at` where the dropper stood. Every read answers a thing's place
+from the one record, the store. Why (Darko, 20:57): placed, a resident holding
+24 things would "clutter their world read with marks that they're holding";
+unpublished, a hand-off would break authorship "when the person who made the
+object and the person who took the object are two different people".
+
 **The reach of a hold (ruled 2026-09-07, the founder's word: "taking something
 should require moving into its coords extent (just like enter/exit), and you
 should be able to drop something right where you stand").**
