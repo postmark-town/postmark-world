@@ -38,7 +38,7 @@ import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inC
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
-import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy } from "./mark-kind.mjs";
+import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -403,6 +403,18 @@ for (const rec of marks) {
     if (rec.at !== undefined || rec.extent !== undefined || rec.points !== undefined)
       err(rec, `a held thing carries no at/extent — it is published but unplaced, and shows as ${holderOf}'s contents until it is set down (POS-688)`);
   }
+  // 4b. ITS OWNER, when not its maker (POS-688, Darko 2026-10-19): a resident's
+  // handle, never the maker's own (the maker owns it unprinted), and only a thing.
+  const ownerOf = ownedBy(rec);
+  if (rec[OWNED_BY] !== undefined && (ownerOf == null || ownerOf.includes("/")))
+    err(rec, `${OWNED_BY}: names the owner, a resident's handle; got ${JSON.stringify(rec[OWNED_BY])}`);
+  if (ownerOf != null && !ownerOf.includes("/")) {
+    const klass = instanceClassOf(rec);
+    if (!klass || !chainOf(klass).includes("thing"))
+      err(rec, `${OWNED_BY}: only a thing is owned apart from its maker, and this record is ${klass ? `a ${klass}` : `kind: ${JSON.stringify(rec.kind)}`}, not a thing`);
+    if (ownerOf === rec.by)
+      err(rec, `${OWNED_BY}: ${ownerOf} made it, and a maker's own thing prints no owner (POS-688)`);
+  }
   if (standing === "sited" || standing === "parcel") {
     if (standing === "sited" && holderOf == null && !hasGeom(rec)) err(rec, `sited marks need at {x,y} and extent {w,h} in grid meters${cite("the-town/the-kinds")}`);
     if (standing === "parcel" && rec.at == null) err(rec, `parcel marks need at {x,y} (extent defaults to 25x25)${cite("the-town/the-kinds")}`);
@@ -620,7 +632,7 @@ for (const rec of marks) {
 // count, so the inventory reads as an inventory.
 {
   // `held_by` is the record grammar's, like placementParent: where a held thing is instead of a place (POS-688)
-  const RESERVED = new Set(["id", "by", "date", "household", "declared_household", "parent", "placementParent", "stamps", "weight", "sovereign", "kind", "class", "tier", "body", "slug", HELD_BY]);
+  const RESERVED = new Set(["id", "by", "date", "household", "declared_household", "parent", "placementParent", "stamps", "weight", "sovereign", "kind", "class", "tier", "body", "slug", HELD_BY, OWNED_BY]);
   // how a mark stands names its class until W2 folds `class:` into `kind:`
   const STANDING_CLASS = { sited: "sited", parcel: "parcel", predicated: "predicate", naming: "naming" };
   const STANDING_FIELDS = { sited: ["at", "extent"], parcel: ["at", "extent"], predicated: ["slot", "value"], naming: ["slot", "value"] };

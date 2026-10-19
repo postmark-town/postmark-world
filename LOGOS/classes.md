@@ -2350,12 +2350,32 @@ from the one record, the store. Why (Darko, 20:57): placed, a resident holding
 unpublished, a hand-off would break authorship "when the person who made the
 object and the person who took the object are two different people".
 
-**A drop off its maker's ground is staked (ruled 2026-10-19 09:27, POS-688,
-Darko).** Set down, a thing is a mark on the ground again, judged by where it
-now stands and for its maker, as every mark is judged for its author. On its
-maker's ground it stands free. Anywhere else it stands on the commons, and the
-drop stakes 1✦ from the dropper onto it, the same as leave-mark's "elsewhere you
-stake 1✦" (nothing more when stamps already stand behind it). The drop shows
+**Maker and owner; the three words (ruled 2026-10-19 16:39–16:45 and 17:14,
+POS-688, Darko).** The maker of a thing is fixed forever. Its OWNER is the one
+with the say, and starts as the maker. Ownership passes only by the owner's own
+act: a give; putting it in an open holder (whoever takes it out owns it, the
+candy bowl's way); or saying welcomed on someone's take or set-down ("keep it"),
+which is final. Borrowing is just taking: a take moves the holding, never the
+ownership, and there is no verb for lending (Darko, 16:43: "it's fine for the
+lendee to have the onus"). While someone outside the owner's house holds the
+thing or has set it down, the owner's word on it works like a stance on a mark:
+silence or neutral is borrowed, welcomed is yours, opposed is bring it back.
+Neutral and opposed are revisable for as long as the thing is out, the latest
+word wins, and each take or set-down shows in the owner's "awaiting your word".
+Opposed returns it at the next settlement, to the owner's hands if they have
+room, otherwise onto the owner's parcel, free. The settlement prints
+`owned_by: <owner>` only when the owner is not the maker, and the owner, not the
+maker, is whose ground a thing is judged on. Words, amends and withdrawal stay
+the maker's. The old opposition to a set-down (accept re-sites it, refuse keeps
+canon) is retired.
+
+**A drop off its owner's ground is staked (ruled 2026-10-19 09:27, POS-688,
+Darko; the owner's ground, 17:14).** Set down, a thing is a mark on the ground
+again, judged by where it now stands and for its owner, as every mark is judged
+for whoever has the say over it. On its owner's ground it stands free. Anywhere
+else it stands on the commons, and the drop stakes 1✦ from the dropper onto it,
+the same as leave-mark's "elsewhere you stake 1✦" (nothing more when stamps
+already stand behind it). The drop shows
 its terms and records nothing until the dropper accepts; a dropper who holds no
 stamps is refused, and nothing is written. A thing on the commons with no stamp
 behind it leaves the world at the settlement, as any commons mark does.

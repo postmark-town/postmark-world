@@ -82,8 +82,25 @@ export const heldBy = (m) => {
 };
 export const isHeld = (m) => heldBy(m) != null;
 
-/** The fields a hand-off moves: where it is, or whose hands it is in. Nothing else. */
-const HOLD_FIELDS = new Set(["at", "extent", "points", HELD_BY]);
+// ── MAKER AND OWNER (POS-688, ruled by Darko 2026-10-19 16:39–16:45 and 17:14) ──
+//
+// The maker is the record's `by` and never moves. The OWNER is the one with the
+// say over the thing, and starts as the maker; ownership passes only by the
+// owner's own act (a give, putting it in an open holder, a welcomed on someone's
+// take or set-down). The settlement prints `owned_by: <owner>` only when the
+// owner is not the maker, the way `held_by` prints only when held. A thing is
+// judged on its ground by its owner (D-O2): the fold resolves the owner's
+// household onto the record, and the standing walk reads it.
+export const OWNED_BY = "owned_by";
+
+/** Who owns this record, as printed, or null when its maker does. */
+export const ownedBy = (m) => {
+  const v = m?.[OWNED_BY];
+  return typeof v === "string" && v.trim() ? v.trim() : null;
+};
+
+/** The fields a hand-off moves: where it is, whose hands it is in, or whose it is. Nothing else. */
+const HOLD_FIELDS = new Set(["at", "extent", "points", HELD_BY, OWNED_BY]);
 
 /**
  * Is `after` the same mark as `before`, moved into or out of hands and nothing
@@ -94,10 +111,11 @@ const HOLD_FIELDS = new Set(["at", "extent", "points", HELD_BY]);
  */
 export function holdOnlyChange(before, after) {
   if (!before || !after) return false;
-  if (isHeld(before) === isHeld(after) && heldBy(before) === heldBy(after)
+  const owned = ownedBy(before) !== ownedBy(after);
+  if (!owned && isHeld(before) === isHeld(after) && heldBy(before) === heldBy(after)
     && JSON.stringify(before.at ?? null) === JSON.stringify(after.at ?? null)) return false; // no hand moved
   const rest = (r) => JSON.stringify(Object.keys(r).filter((k) => !k.startsWith("_") && !HOLD_FIELDS.has(k)).sort().map((k) => [k, r[k]]));
-  return rest(before) === rest(after) && (isHeld(before) || isHeld(after));
+  return rest(before) === rest(after) && (isHeld(before) || isHeld(after) || owned);
 }
 
 // ── the chain's answer (G12) ─────────────────────────────────────────────────

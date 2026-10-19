@@ -20,7 +20,8 @@ import { cpSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wri
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { HELD_BY, heldBy, isHeld, holdOnlyChange } from "./mark-kind.mjs";
+import { HELD_BY, heldBy, isHeld, holdOnlyChange, OWNED_BY, ownedBy } from "./mark-kind.mjs";
+import { standingHouseholdOf } from "./mark-standing.mjs";
 import { unpublishVerdict } from "./unpublish-verdict.mjs";
 import { judge } from "./harm-gate.mjs";
 import { positionedInside } from "./settlement-sweep.mjs";
@@ -154,4 +155,54 @@ test("8. the harm gate reads a hand-off as no harm: a held thing has no place to
   assert.equal(verdict.checks.find((c) => c.name === "lost").ok, true);
   const back = judge({ before: now, after: new Map([[CONE, { id: CONE, at: { x: 10, y: 20 } }]]), sweep: { published: [{ id: CONE }] }, state: { marks: [] } });
   assert.equal(back.ok, true, "a drop prints a fresh at: no harm either");
+});
+
+// ── MAKER AND OWNER (POS-688; Darko 2026-10-19 16:39–16:45, D-O1 and D-O2 at 17:14) ──
+/** The cone, printed owned by someone other than its maker. */
+function ownCone(repo, owner = "sb-ash") {
+  const p = join(repo, CONE_FILE);
+  const t = readFileSync(p, "utf8").replace(/^---\r?\n\r?\n/m, `${OWNED_BY}: ${owner}\n---\n\n`);
+  writeFileSync(p, t);
+  return t;
+}
+
+test("9. D-O1: a thing owned apart from its maker prints owned_by and lints CLEAN; the maker's own name there, a mark id, or a building is refused", () => {
+  assert.equal(OWNED_BY, "owned_by");
+  assert.equal(ownedBy({ [OWNED_BY]: " sb-ash " }), "sb-ash");
+  const clean = realTree();
+  ownCone(clean);
+  const out = lint(clean);
+  assert.deepEqual(errorsOf(out), [], out.slice(-600));
+  assert.doesNotMatch(out, /flat field owned_by/, "owned_by is the record grammar's");
+  const self = realTree();
+  ownCone(self, "berthillon");
+  assert.ok(errorsOf(lint(self)).some((e) => /owned_by: berthillon made it, and a maker's own thing prints no owner/.test(e)));
+  const id = realTree();
+  ownCone(id, "sb-ash/a-bowl");
+  assert.ok(errorsOf(lint(id)).some((e) => /owned_by: names the owner, a resident's handle/.test(e)));
+  const wall = realTree();
+  const p = join(wall, "WORLD", "marks", "berthillon", "le-mur-des-cornets", "mark.md");
+  writeFileSync(p, readFileSync(p, "utf8").replace(/^---\r?\n\r?\n/m, `${OWNED_BY}: sb-ash\n---\n\n`));
+  assert.ok(errorsOf(lint(wall)).some((e) => /le-mur-des-cornets: owned_by: only a thing is owned apart from its maker/.test(e)));
+});
+
+test("10. D-O2: the fold carries the owner and judges the thing in the OWNER's household; the standing walk reads the owner", () => {
+  const repo = realTree();
+  const fold = (dir) => JSON.parse(execFileSync("node", [FOLD, "--marks-dir", dir, "--no-write", "--json", "--allow-stampless"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 << 20 }));
+  const before = fold(join(repo, "WORLD", "marks")).marks.find((m) => m.id === CONE);
+  ownCone(repo);
+  const after = fold(join(repo, "WORLD", "marks")).marks.find((m) => m.id === CONE);
+  assert.equal(after[OWNED_BY], "sb-ash");
+  assert.equal(after.by, "berthillon", "the maker is fixed");
+  assert.notEqual(after.declared_household, before.declared_household, "its household is its owner's now");
+  assert.equal(standingHouseholdOf({ by: "berthillon", household: "berthillon", [OWNED_BY]: "sb-ash" }), "sb-ash", "unfolded, the walk reads the owner too");
+  assert.equal(standingHouseholdOf({ by: "berthillon", household: "berthillon" }), "berthillon");
+});
+
+test("11. a change of owner alone is a hold-only change, on the ground or in hands; new words with it are not", () => {
+  const placed = { kind: "thing", by: "berthillon", date: "2026-08-26", at: { x: 221, y: 95.5 }, extent: { w: 1, h: 1 }, body: "A cone." };
+  assert.equal(holdOnlyChange(placed, { ...placed, [OWNED_BY]: "sb-ash" }), true, "welcomed where it lies");
+  const { at, extent, ...rest } = placed;
+  assert.equal(holdOnlyChange({ ...rest, [HELD_BY]: "sb-ash" }, { ...rest, [HELD_BY]: "sb-ash", [OWNED_BY]: "sb-ash" }), true, "welcomed in hand");
+  assert.equal(holdOnlyChange(placed, { ...placed, [OWNED_BY]: "sb-ash", body: "Mine now." }), false);
 });

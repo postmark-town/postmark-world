@@ -21,7 +21,7 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
-import { isGround, instanceClassOf, isPredicate, heldBy } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
@@ -14120,6 +14120,8 @@ export function mountViewer(appEl) {
         // its full description, which the short line opens to (row 70)
         detail: typeof p.body === "string" ? p.body : null }))),
       law?.consequence ? { label: "at the door", value: law.consequence } : null,
+      // whose it is, when not its maker's (POS-688): the record's `owned_by`
+      ownedBy(mark) ? { label: "owned by", value: ownedBy(mark) === hands.for ? "you" : ownedBy(mark) } : null,
       ...holdingFacts(holding),
     ].filter(Boolean);
     const ring = polygonOf(mark), bb = ring ? polygonBBox(ring) : null;

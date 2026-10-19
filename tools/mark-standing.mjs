@@ -53,6 +53,7 @@
 //                     law and belongs to consent.mjs; nothing here touches it.
 
 import { consentMap } from "./consent.mjs";
+import { ownedBy } from "./mark-kind.mjs"; // POS-688 D-O2: a thing's owner
 
 const TOWN = "the-town";
 
@@ -69,7 +70,8 @@ const TOWN = "the-town";
 // ground. A grain difference there cannot move a mark or change a refusal —
 // tier-frames.test.mjs holds that as its own assertion.
 export function standingHouseholdOf(mark) {
-  return mark?._cred ?? mark?.declared_household ?? mark?.household ?? mark?.by ?? null;
+  // a thing owned apart from its maker answers for its OWNER's household (POS-688 D-O2); the fold resolves it into `_cred`
+  return mark?._cred ?? mark?.declared_household ?? ownedBy(mark) ?? mark?.household ?? mark?.by ?? null;
 }
 
 // THE TOWN'S OWN HAND. `by: the-town` is not a household's pen — the town keeps

@@ -28,7 +28,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSy
 import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
-import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn, HELD_BY } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn, HELD_BY, OWNED_BY, ownedBy } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -1079,7 +1079,8 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // household (`solo:<handle>`): registry lag never blocks a new resident, it only
   // leaves them ungrouped until the town knows them.
   const credHh = (handle) => households?.[handle] ?? `solo:${handle}`;
-  for (const mk of byId.values()) mk._cred = credHh(mk.household);
+  // a thing owned apart from its maker stands in its OWNER's household (POS-688 D-O2): its ground is judged by whoever has the say
+  for (const mk of byId.values()) mk._cred = credHh(ownedBy(mk) ?? mk.household);
 
   // admissibility: parcels never overlap (first-in-order wins), one per resident (the-town/one-per-resident),
   // and — the claim cap, ruled 2026-07-30 — at most PARCEL_CLAIM_CAP claims per
@@ -1664,6 +1665,8 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // WHO HOLDS IT, for a thing printed as held (POS-688): published but unplaced, so it carries
       // no `at` and the record names its holder instead. Undefined on every placed mark.
       [HELD_BY]: mk[HELD_BY],
+      // WHOSE IT IS, when not its maker's (POS-688): undefined on every mark its maker owns.
+      [OWNED_BY]: mk[OWNED_BY],
       // A mark's PLACEMENT — the mark it stands inside. Disclosed for classed
       // marks since the bounty grammar (a notice is a notice because it stands
       // ON the board), and for EVERY mark since the conferred-sovereignty
@@ -2037,6 +2040,7 @@ function deltaView(mk, cred, rectsByCred, world = null) {
     body: mk.body,
     // who holds it, for a thing printed as held: the sweep's unpublish verdict reads it off this view (POS-688)
     ...(mk[HELD_BY] !== undefined ? { [HELD_BY]: mk[HELD_BY] } : {}),
+    ...(mk[OWNED_BY] !== undefined ? { [OWNED_BY]: mk[OWNED_BY] } : {}),
     ...(contained ? { placementParent: contained } : {}),
     // a ground's consent word, which the standing walk reads (mark-standing.mjs
     // § groundVerdict): a ground admitted without it would not welcome what
@@ -2184,7 +2188,8 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
       continue;
     }
 
-    views.set(mk.id, deltaView(mk, cred, rectsByCred, deltaWorld));
+    // a thing owned apart from its maker stands in its OWNER's household (POS-688 D-O2), as the fold reads it
+    views.set(mk.id, deltaView(mk, ownedBy(mk) ? base.credOf(ownedBy(mk)) : cred, rectsByCred, deltaWorld));
   }
   return { views, errors };
 }

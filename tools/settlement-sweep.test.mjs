@@ -1904,9 +1904,9 @@ function heldThingCrossing(t, name, { registryClass = "commons", parcel = false 
   execFileSync("git", ["init", "--bare", "-q", remote]);
   c.git("remote", "add", "origin", remote);
   c.git("push", "-q", "origin", "main");
-  const drop = (at) => {
+  const drop = (at, { owner = null } = {}) => {
     c.git("switch", "-q", "-c", "draft/berthillon");
-    c.put(cone, `---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nat: { x: ${at.x}, y: ${at.y} }\nextent: { w: 1, h: 1 }\nclass: thing\n---\n\nA paper cone.\n`);
+    c.put(cone, `---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nat: { x: ${at.x}, y: ${at.y} }\nextent: { w: 1, h: 1 }\nclass: thing\n${owner ? `owned_by: ${owner}\n` : ""}---\n\nA paper cone.\n`);
     c.commit("the drop, printed");
     c.git("switch", "-q", "main");
   };
@@ -1953,7 +1953,7 @@ test("POS-688 D4 step 3: a held thing dropped on its maker's own ground is free 
   assert.deepEqual(c.sweep().unpublished.map((r) => r.id), []);
 });
 
-test("POS-688 D4 step 3: whose ground is free is the MAKER's — a stranger's thing on the holder's own parcel walks commons, so the door asks the holder's 1✦ there", (t) => {
+test("POS-688 D4 step 3: whose ground is free is the OWNER's (here, its maker) — a thing borrowed onto the holder's own parcel walks commons, so the door asks the holder's 1✦ there", (t) => {
   for (const [stakes, leaves] of [[[], true], [[{ mark: "berthillon/a-cone", n: 1 }], false]]) {
     const c = heldThingCrossing(t, `drop-holders-ground-${leaves}`);
     c.put("WORLD/marks/sb-ash/sb-ash-parcel/mark.md", record({ kind: "parcel", by: "sb-ash", at: { x: 3000, y: 3000 }, extent: { w: 25, h: 25 }, body: "ash's ground" }));
@@ -1963,5 +1963,21 @@ test("POS-688 D4 step 3: whose ground is free is the MAKER's — a stranger's th
     c.stakes(stakes);
     const gone = c.sweep().unpublished.map((r) => r.id);
     assert.deepEqual(gone, leaves ? ["berthillon/a-cone"] : [], leaves ? "at ✦0 the settlement takes it: the ground is ash's, the thing is berthillon's" : "backed, it stands");
+  }
+});
+
+test("POS-688 D-O2 (Darko 2026-10-19 17:14): a thing owned by sb-ash is judged on sb-ash's ground — free on the owner's parcel at ✦0, commons on its maker's", (t) => {
+  for (const [where, leaves] of [[{ x: 3005, y: 3005 }, false], [{ x: 805, y: 805 }, true]]) {
+    const c = heldThingCrossing(t, `owner-ground-${leaves}`, { parcel: true });
+    c.put("WORLD/marks/sb-ash/sb-ash-parcel/mark.md", record({ kind: "parcel", by: "sb-ash", at: { x: 3000, y: 3000 }, extent: { w: 25, h: 25 }, body: "ash's ground" }));
+    c.commit("ash's parcel");
+    c.git("push", "-q", "origin", "main");
+    c.drop(where, { owner: "sb-ash" });
+    c.stakes([]);
+    const report = c.sweep();
+    assert.ok(report.published.some((row) => row.id === "berthillon/a-cone"), JSON.stringify(report.left_drafted));
+    assert.deepEqual(report.unpublished.map((r) => r.id), leaves ? ["berthillon/a-cone"] : [],
+      leaves ? "on its maker's parcel it is not its owner's ground: commons at ✦0, it leaves" : "on its owner's parcel it stands free");
+    if (!leaves) assert.equal(c.state().marks.find((m) => m.id === "berthillon/a-cone")?.owned_by, "sb-ash");
   }
 });
