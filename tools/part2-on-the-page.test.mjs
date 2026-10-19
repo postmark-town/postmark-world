@@ -9,10 +9,11 @@
 //
 //   1. a holder's column says what it holds, by kind, with its room and
 //      whether it is open; a resident's column says what is in their hands
-//   2. a bag in your own hands is drawn with you, and its column says "in
-//      your hands", never "11 m southeast of you"
-//   2b. a kite someone held and set down leaves their hands at the next ground
-//      read, and is drawn where it was set down (review-241 H2)
+//   2. a bag in your own hands is never drawn as a mark of its own (POS-688,
+//      Darko 2026-10-18 20:58: published but unplaced), and its column says
+//      "in your hands", never "11 m southeast of you"
+//   2b. a kite set down is drawn where it was set down: the office's read
+//      places it there (review-241 H2; POS-688: the record says so)
 //   4. a Halloween bowl reads as a thing, never "A place", on the map before
 //      any column is opened (review-241 N2)
 //   5. the say card says the office's numbers (the stub's are off the
@@ -21,11 +22,10 @@
 //
 // ── THE CAN-FAIL FLIPS ─────────────────────────────────────────────────────
 //   drop `...holdingFacts(holding)` from markColumnView      → 1 reds
-//   drop the carried relocation in overlayMarks              → 2 reds (the pips part)
-//   radialWhere without the carried line                     → 2 reds (the column says "11 m · southeast of you")
-//   a ground row with no holder that only sets (carriersFrom) → 2b reds
+//   overlayMarks drawing a held thing (no held_by filter)    → 2 and 4d red (the pips part)
+//   radialWhere without the held line                        → 2 reds (the column says "11 m · southeast of you")
 //   the kicker read raw off `household` (page fix 1)           → 1c reds ("hh:rig-house")
-//   the column ignoring its close look's stands.holder (fix 4) → 4d reds (no "held by", the old spot)
+//   the column ignoring the record's held_by (fix 4)          → 4d reds (no "held by")
 //   ownIds without the docket (page fix 1)                     → 1c reds (no "Yours")
 //   markWhat without thingClasses                            → 4 reds
 //   iconsOf without askLineage                               → 4's draw-time row reds
@@ -70,12 +70,10 @@ const BOWL = "rig-ash/a-halloween-bowl";
 const BAG = "rig-ash/a-cloth-bag-one";
 const CLEO = "rig-cleo";               // stands on the bowl too, so her body is drawn where the bowl's pip is
 const KITE = "rig-cleo/a-kite";
-const KITE_CANON = { x: 240, y: 80 };
 const STOOL = "rig-ash/a-stool";       // where the kite is set down: its pip is the reference
 const STOOL_AT = { x: 205, y: 110 };
 // the Candy Bag in the OLD form (kind: sited, class: <kind>), as the playground's sb-ash wrote it
 const CANDY_BAG = "rig-ash/a-candy-bag";
-const CANDY_AT = { x: 236, y: 112 };
 // a tin box the actor set down: the office files its re-site as a pending amend (office #613),
 // which /world/my-marks lists on the DOCKET with the store's registry key for its household
 const TIN_BOX = "rig-ash/a-tin-box";
@@ -84,11 +82,14 @@ const TIN_BOX_DOCKET = { id: TIN_BOX, by: ACTOR, kind: "thing", tier: "market", 
 const RECORDS = {
   [BOWL]: { id: BOWL, by: ACTOR, household: ACTOR, kind: "halloween-candy-bowl", tier: "market", at: { ...HERE }, extent: { w: 1, h: 1 },
     body: "A second pumpkin bowl." },
-  // its canon place, ~11 m southeast of where the actor stands: where the page used to draw it
-  [BAG]: { id: BAG, by: ACTOR, household: ACTOR, kind: "thing", holder: true, capacity: 3, tier: "market", at: { x: 229, y: 103.5 }, extent: { w: 1, h: 1 },
+  // in the actor's hands: published but unplaced (POS-688), as the office's placed read gives it
+  // (its canon place was ~11 m southeast of where the actor stands: where the page used to draw it)
+  [BAG]: { id: BAG, by: ACTOR, household: ACTOR, kind: "thing", holder: true, capacity: 3, tier: "market", held_by: ACTOR,
     body: "A cloth bag." },
-  [KITE]: { id: KITE, by: CLEO, household: CLEO, kind: "thing", tier: "market", at: { ...KITE_CANON }, extent: { w: 1, h: 1 }, body: "A paper kite." },
-  [CANDY_BAG]: { id: CANDY_BAG, by: ACTOR, household: ACTOR, kind: "sited", class: "halloween-candy-bag", tier: "market", at: { ...CANDY_AT }, extent: { w: 1, h: 1 },
+  // set down by cleo on the stool's spot: the office's read places it where it was set down
+  [KITE]: { id: KITE, by: CLEO, household: CLEO, kind: "thing", tier: "market", at: { ...STOOL_AT }, extent: { w: 1, h: 1 }, body: "A paper kite." },
+  // given into the bowl: held by the bowl, so unplaced too
+  [CANDY_BAG]: { id: CANDY_BAG, by: ACTOR, household: ACTOR, kind: "sited", class: "halloween-candy-bag", tier: "market", held_by: BOWL,
     body: "A bag for gathering candy." },
   [STOOL]: { id: STOOL, by: ACTOR, household: ACTOR, kind: "sited", tier: "market", at: { ...STOOL_AT }, extent: { w: 1, h: 1 }, body: "A stool." },
 };
@@ -98,10 +99,9 @@ const READ = {
   within: [],
   nearby: [
     { id: BOWL, at: { ...HERE }, bearing: "N", distance_m: 0, kind: "halloween-candy-bowl", tier: "market" },
-    { id: BAG, at: { x: 229, y: 103.5 }, bearing: "SE", distance_m: 11, kind: "thing", tier: "market" },
-    { id: KITE, at: { ...KITE_CANON }, bearing: "NE", distance_m: 24, kind: "thing", tier: "market" },
+    // the bag and the candy bag are held: never in anyone's field of view as marks of their own (POS-688)
+    { id: KITE, at: { ...STOOL_AT }, bearing: "SW", distance_m: 21, kind: "thing", tier: "market" },
     { id: STOOL, at: { ...STOOL_AT }, bearing: "SW", distance_m: 21, kind: "sited", tier: "market" },
-    { id: CANDY_BAG, at: { ...CANDY_AT }, bearing: "SE", distance_m: 22, kind: "sited", tier: "market" },
   ],
   // the ground set, as a real read carries it: townGround refuses a set with no region rings
   records: { ...Object.fromEntries(townRegionMarks(SERVED.marks).map((m) => [m.id, m])), ...RECORDS },
@@ -124,8 +124,8 @@ const FOCUS = {
   [CANDY_BAG]: { id: CANDY_BAG, body: "A bag for gathering candy.", holder: { capacity: 200, open: true },
     holds: { holder: CANDY_BAG, count: 8, class: "candy", shows: "8 candies", kinds: [{ kind: "candy", count: 8, shows: "8 candies" }] },
     can: ["take", "give"], class_pointer: 'kind: sited · a mark — explain: "sited"',
-    // given into the bowl: its own close look says the bowl holds it (world.mjs § whereThingStands, as MCP gave it)
-    stands: { where: null, source: "holder", holder: BOWL, says: `${BOWL} is holding it, and a held thing rides its holder (the-town/the-anchor)` } },
+    // given into the bowl: its close look names its holder and gives no place (POS-688)
+    held_by: BOWL },
   [STOOL]: { id: STOOL, body: "A stool.", can: [], class_pointer: 'kind: sited · a mark — explain: "sited"' },
 };
 // world-hold.mjs § world_holdings, and the ground within reach (groundRow)
@@ -143,13 +143,11 @@ const TAKE = {
 const INVESTIGATED = {
   [ACTOR]: { kind: "resident", handle: ACTOR, holds: [{ id: BAG, name: "A Cloth Bag", body: "A cloth bag." }],
     holds_by_kind: { holder: ACTOR, count: 3, class: "candy", shows: "3 candies", kinds: [{ kind: "candy", count: 3, shows: "3 candies" }] } },
-  [CLEO]: { kind: "resident", handle: CLEO, holds: [{ id: KITE, name: "A Paper Kite", body: "A paper kite." }] },
+  [CLEO]: { kind: "resident", handle: CLEO, holds: [] },
 };
 // class-read.mjs § explainClass: the whole chain, which the page asks once at draw time
 const EXPLAIN = { "halloween-candy-bowl": { explains: "halloween-candy-bowl", class: "the-town/halloween-candy-bowl", what: "A Halloween Candy Bowl is a thing that holds.",
   extends: [{ class: "thing" }, { class: "sited" }, { class: "mark" }, { class: "postmark-node" }] } };
-// the kite set down: a ground row with no holder (world-hold.mjs § groundRow, place_from "set-down")
-const KITE_SET_DOWN = { thing: KITE, made_by: CLEO, stands_at: { ...STOOL_AT }, place_from: "set-down", distance_m: 21, takeable: true };
 // voices.mjs § conversations
 const CONVERSATIONS = { now: "2026-10-18T03:00:00.000Z", earshot_m: 45, fade_minutes: 20, hearable_since: "2026-10-17T22:00:00.000Z",
   close_minutes: 30, live: [], closed: [] };
@@ -225,10 +223,10 @@ before(async () => {
   await page.waitForFunction(() => !!window.__pmViewer, null, { timeout: 60_000 });
   const until = Date.now() + 60_000;
   while (Date.now() < until && !office.asked.some((p) => p.includes("read=take"))) await new Promise((r) => setTimeout(r, 250));
-  await page.waitForFunction((bag) => !!document.querySelector(`circle.ov-pip[data-id="${bag}"]`), BAG, { timeout: 60_000 })
+  await page.waitForFunction((bowl) => !!document.querySelector(`circle.ov-pip[data-id="${bowl}"]`), BOWL, { timeout: 60_000 })
     .catch(async (e) => {
       const pips = await page.evaluate(() => [...document.querySelectorAll("circle.ov-pip[data-id]")].map((c) => c.getAttribute("data-id")).slice(0, 20));
-      throw new Error(`the bag was never drawn: pips ${JSON.stringify(pips)}; asked ${JSON.stringify(office.asked.slice(0, 40))}; errors ${JSON.stringify(errors)}; ${e.message}`);
+      throw new Error(`the bowl was never drawn: pips ${JSON.stringify(pips)}; asked ${JSON.stringify(office.asked.slice(0, 40))}; errors ${JSON.stringify(errors)}; ${e.message}`);
     });
   await page.waitForTimeout(1500);
 });
@@ -312,21 +310,12 @@ test("1b. a resident's column says what is in their hands", async (t) => {
   assert.deepEqual(carrying?.items, [BAG], "their whole things, each a way into its column");
 });
 
-test("2. a bag in your hands is drawn with you, and its column says so", async (t) => {
+test("2. a bag in your hands is never drawn as a mark of its own, and its column says it is in your hands (POS-688)", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  // your hands land after the read (read: "take"); under a loaded machine that can trail the
-  // first draw, so the pips are read once the hands have moved the bag, for up to 15 s
-  for (let i = 0; i < 60; i++) {
-    const [b, g] = [await pipAt(BOWL), await pipAt(BAG)];
-    if (b && g && Math.hypot(g.x - b.x, g.y - b.y) < 0.01) break;
-    await page.waitForTimeout(250);
-  }
-  const bowl = await pipAt(BOWL), bag = await pipAt(BAG);
-  assert.ok(bowl && bag, "both pips drawn");
-  assert.ok(Math.hypot(bag.x - bowl.x, bag.y - bowl.y) < 0.01,
-    `the bag rides you, at your body (where the bowl you stand on is): bag ${JSON.stringify(bag)}, bowl ${JSON.stringify(bowl)}`);
-  // the place line comes from your hands (already read); the contents from the bag's own close
-  // look, which lands after the column opens: wait for both (columnFor's bounded wait, 20 s)
+  // SUPERSEDED: "a bag in your hands is drawn with you". A held thing is published but unplaced: it
+  // shows as its holder's contents (your column's "whole things") and never as a pip of its own.
+  await page.waitForTimeout(500);
+  assert.equal(await pipAt(BAG), null, "no pip for a thing in your hands");
   const col = await columnFor(BAG, { until: "2 candies · 2 of 3" });
   assert.equal(col.meta, "in your hands", "never its old place: " + JSON.stringify(col.meta));
   assert.equal(col.facts.contents, "2 candies · 2 of 3");
@@ -334,30 +323,17 @@ test("2. a bag in your hands is drawn with you, and its column says so", async (
   assert.deepEqual(heldBy?.items, [`walker:${ACTOR}`]);
 });
 
-test("2b. a kite set down leaves her hands at the next ground read, and is drawn where it was set down", async (t) => {
+test("2b. a kite set down is drawn where it was set down, and its column says no one's hands", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  const col = await columnFor(`walker:${CLEO}`, { until: "whole things" });
-  assert.ok(col.open, "her column opened, and with it her close look: she holds the kite");
+  const col = await columnFor(`walker:${CLEO}`);
+  assert.ok(col.open, "her column opened");
   // she stands at the bowl: her place line names the ground under it, never the bowl (a kind of thing)
-  assert.doesNotMatch(col.meta, /Halloween Bowl/, "never \"on A Halloween Bowl's ground\": " + JSON.stringify(col.meta));
-  for (let i = 0; i < 80; i++) {
-    const [k, b] = [await pipAt(KITE), await pipAt(BOWL)];
-    if (k && b && Math.hypot(k.x - b.x, k.y - b.y) < 0.01) break;
-    await page.waitForTimeout(250);
-  }
-  const held = await pipAt(KITE), body = await pipAt(BOWL);
-  assert.ok(held && Math.hypot(held.x - body.x, held.y - body.y) < 0.01, `in her hands, at her body: kite ${JSON.stringify(held)}, her spot ${JSON.stringify(body)}`);
-  // she sets it down; the next read of the ground (the walkers poll's) says so, while her close look is still fresh
-  TAKE.ground.things.push(KITE_SET_DOWN);
-  try {
-    await page.evaluate(() => window.__pmViewer.handsAgain());
-    await page.waitForTimeout(800);
-    const down = await pipAt(KITE), stool = await pipAt(STOOL);
-    assert.ok(down && stool && Math.hypot(down.x - stool.x, down.y - stool.y) < 0.01,
-      `on the ground where she set it down, not in her hands: kite ${JSON.stringify(down)}, the set-down spot ${JSON.stringify(stool)}`);
-    const kiteCol = await columnFor(KITE);
-    assert.ok(!/hands/.test(kiteCol.meta), "its column no longer says it is in anyone's hands: " + JSON.stringify(kiteCol.meta));
-  } finally { TAKE.ground.things.pop(); }
+  assert.doesNotMatch(col.meta, /Halloween Bowl/, "never on A Halloween Bowl's ground: " + JSON.stringify(col.meta));
+  const down = await pipAt(KITE), stool = await pipAt(STOOL);
+  assert.ok(down && stool && Math.hypot(down.x - stool.x, down.y - stool.y) < 0.01,
+    `on the ground where she set it down: kite ${JSON.stringify(down)}, the set-down spot ${JSON.stringify(stool)}`);
+  const kiteCol = await columnFor(KITE);
+  assert.ok(!/hands/.test(kiteCol.meta), "its column does not say it is in anyone's hands: " + JSON.stringify(kiteCol.meta));
 });
 
 test("4. a Halloween bowl reads as a thing, never a place", async (t) => {
@@ -376,19 +352,19 @@ test("4b. the Candy Bag (old form, kind: sited + class) reads as a thing; it off
   assert.equal(col.facts.contents, "8 candies · 8 of 200");
   assert.ok(col.icons.includes("ic-thing"), "a thing: " + JSON.stringify(col.icons));
   assert.ok(!col.meanings.some((m) => /^A place/.test(m)), "never \"A place\": " + JSON.stringify(col.meanings));
-  // the office's enter takes any mark with a place and an extent, a thing included (Darko's F1 ruling, a)
-  assert.equal(col.enter, true, "the page offers what the office grants");
+  // the office's enter takes any mark with a place and an extent, a thing included (Darko's F1 ruling, a);
+  // this one is in the bowl, so it has no place to enter (POS-688: published but unplaced)
+  assert.equal(col.enter, false, "a held thing has no door to offer");
 });
 
-test("4d. a thing held inside a holder names that holder, and is drawn at it (page fix 4)", async (t) => {
+test("4d. a thing held inside a holder names that holder, and is not drawn (page fix 4; POS-688)", async (t) => {
   if (!chromium) return t.skip(skipReason);
   const col = await columnFor(CANDY_BAG, { until: "8 of 200" });
   const heldBy = col.relations.find((r) => r.label === "held by");
   assert.deepEqual(heldBy?.items, [BOWL], "held by the bowl, a way into its column: " + JSON.stringify(col.relations));
   assert.equal(col.meta, "inside A Halloween Bowl", "never the spot it stood before: " + JSON.stringify(col.meta));
   await page.waitForTimeout(400);
-  const bag = await pipAt(CANDY_BAG), bowl = await pipAt(BOWL);
-  assert.ok(bag && bowl && Math.hypot(bag.x - bowl.x, bag.y - bowl.y) < 0.01, `drawn at the bowl: bag ${JSON.stringify(bag)}, bowl ${JSON.stringify(bowl)}`);
+  assert.equal(await pipAt(CANDY_BAG), null, "a thing in a holder is its holder's contents, never a pip of its own");
 });
 
 test("5. the say card says the office's numbers", async (t) => {
