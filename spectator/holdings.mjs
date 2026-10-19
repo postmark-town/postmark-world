@@ -16,17 +16,10 @@
 //   handsLines(holdings)             your own hands, world_holdings (GET
 //                                    /world/holdings, or read: "take"'s
 //                                    `holdings`): `holding` and `kinds`.
-//   carriersFrom(reads)              which thing is in whose hands, from the
-//                                    reads that say so, the freshest winning:
-//                                    your hands, the ground within reach (read:
-//                                    "take"'s `ground`, each row naming its
-//                                    `holder` or none), and any resident you
-//                                    have looked at closely. A thing inside a
-//                                    bag is not moved (no read names it).
-//   carriedAt / carriedWords         a held thing is drawn with its carrier and
-//                                    told as in someone's hands, never at the
-//                                    place it was last set (QA: "11 m southeast
-//                                    of you" for a bag in your own hands).
+//   heldWords(holder)                whose hands a thing is in, from the record's
+//                                    `held_by` (POS-688): a held thing is never
+//                                    drawn, and is told as in someone's hands
+//                                    or inside a holder, never at a place.
 //   sayCardNote(sources)             the say card's sentence, from the say
 //                                    class's dials as the office reads them.
 //   isThingKind(cls, lineage)        a kind of thing is a thing, by its class
@@ -168,105 +161,26 @@ export function holdingParts(lines, { nameOf = (id) => id } = {}) {
   };
 }
 
-// ── WHO CARRIES WHAT ─────────────────────────────────────────────────────────
+// ── WHOSE HANDS IT IS IN ────────────────────────────────────────────────────
 //
-// "Where a thing stands is derived, never stored: a held thing rides its
-// holder" (office world-apex.mjs § groundWithinReach's reading_law). The page
-// derives nothing of its own: it takes what each read says, and for each thing
-// the FRESHEST read wins.
-//
-//   a holder's own list   your hands (world_holdings) or a resident's close look
-//                         (investigate: `holds`): "this resident holds these".
-//                         A complete list also says they hold nothing else, so a
-//                         thing they set down leaves them.
-//   a ground row          read: "take"'s `ground.things`: a row with `holder` is
-//                         held by that resident; a row without one is NOT held,
-//                         and a fresher such row clears an older claim. A
-//                         set-down row stands at its `stands_at`.
-//
-// A THING INSIDE A BAG IS NOT MOVED (a known gap). No office read says a thing
-// is inside a holder: the ground read drops a row whose holder is a thing
-// (whereThingStands gives it no place), and a close look gives a holder's
-// holding as counts, never ids. So a bag in your hands rides you, and a bag
-// inside that bag stays drawn where it was. That needs an office read first.
+// A HELD THING IS PUBLISHED BUT UNPLACED (POS-688, Darko 2026-10-18 20:58): it
+// keeps its maker, words and id, has no place while held, and shows as its
+// holder's contents, the way a thing in a chest does. The record says who holds
+// it (`held_by`, carried by the office's world read and printed at the
+// settlement), so the page derives nothing: it reads the one field, draws no
+// held thing, and says whose hands it is in. (This replaced a freshest-read-wins
+// derivation over your hands, the ground in reach and the close looks: a second
+// owner of "where is this thing", POS-688's one question with two answers.)
 
 /** A thing's id is `<by>/<slug>`; a resident is a bare handle. */
 export const isThingId = (id) => typeof id === "string" && id.includes("/");
-const pointOf = (p) => (p && Number.isFinite(Number(p.x)) && Number.isFinite(Number(p.y)) ? { x: Number(p.x), y: Number(p.y) } : null);
 
-/**
- * A resident's close look as a holder's list: their whole things, complete
- * (the look lists every one), saying nothing once it is `maxAgeMs` old (it
- * then `expires`). Null when the look carried no list.
- */
-export function residentList(handle, investigated, at = 0, maxAgeMs = Infinity) {
-  if (!handle || !investigated || investigated.error || !Array.isArray(investigated.holds)) return null;
-  return { at, holder: String(handle), things: investigated.holds.map(heldIdOf), complete: true, expires: at + maxAgeMs };
-}
-
-/** Your hands as a holder's list: complete only when the page holds every thing the read counted. */
-export function handsList(handle, holdings, at = 0) {
-  if (!handle || !holdings || holdings.error || !Array.isArray(holdings.holding)) return null;
-  const things = holdings.holding.map((h) => String(h?.thing ?? h)).filter(Boolean);
-  const total = countOf(holdings.count) ?? things.length;
-  return { at, holder: String(handle), things, complete: holdings.complete !== false && things.length >= total };
-}
-
-/**
- * What the page knows of who carries what, from reads taken at `at` (ms):
- *   { at, holder, things, complete }   a holder's own list
- *   { at, ground: [rows] }             the ground within reach
- * Applied oldest first, so the freshest read wins for each thing. A read whose
- * `expires` is at or before `now` says nothing: a held thing it alone placed
- * falls back to where the record has it, as before any read. Returns
- * `holders` (thing → resident) and `placed` (thing → where a set-down row
- * says it stands).
- */
-export function carriersFrom(reads = [], { now = -Infinity } = {}) {
-  const holders = new Map(), placed = new Map();
-  for (const r of [...(reads ?? [])].filter((r) => r && !(Number(r.expires) <= now)).sort((a, b) => (Number(a.at) || 0) - (Number(b.at) || 0))) {
-    if (Array.isArray(r.ground)) for (const row of r.ground) {
-      if (!row?.thing) continue;
-      const id = String(row.thing);
-      // a resident's hands; a thing as holder is a row the office never sends, and it moves nothing
-      const holder = row.holder != null && !isThingId(String(row.holder)) ? String(row.holder) : null;
-      if (holder) { holders.set(id, holder); placed.delete(id); continue; }
-      holders.delete(id);
-      const at = row.place_from === "set-down" ? pointOf(row.stands_at) : null;
-      if (at) placed.set(id, at); else placed.delete(id);
-    }
-    if (r.holder != null) {
-      const holder = String(r.holder);
-      const things = new Set((r.things ?? []).map(heldIdOf));
-      if (r.complete !== false) for (const [id, who] of holders) if (who === holder && !things.has(id)) holders.delete(id);
-      for (const id of things) { holders.set(id, holder); placed.delete(id); }
-    }
-  }
-  return { holders, placed };
-}
-
-/**
- * Where the page draws a thing the reads have spoken of: a held thing at its
- * carrier's body (`bodyAt(handle)`), or nowhere (`unplaced`) when the carrier
- * cannot be placed, never at the place it used to be; a set-down thing where
- * the ground read says it stands. Null when no read has spoken of it.
- */
-export function carriedAt(id, known, { bodyAt = () => null } = {}) {
-  const key = String(id);
-  const holder = known?.holders?.get?.(key);
-  if (holder != null) {
-    const at = pointOf(bodyAt(holder));
-    return at ? { ...at, holder } : { x: null, y: null, holder, unplaced: true };
-  }
-  const set = known?.placed?.get?.(key);
-  return set ? { ...set, holder: null, setDown: true } : null;
-}
-
-/** "in your hands", "in sb-ash's hands"; null when no read says anyone holds it. */
-export function carriedWords(id, known, { self = null } = {}) {
-  const holder = known?.holders?.get?.(String(id));
-  if (holder == null) return null;
-  return self != null && holder === self ? "in your hands" : `in ${holder}'s hands`;
+/** "in your hands", "in sb-ash's hands", "inside A Halloween Bowl"; null when nobody holds it. */
+export function heldWords(holder, { self = null, nameOf = (id) => id } = {}) {
+  if (typeof holder !== "string" || !holder.trim()) return null;
+  const h = holder.trim();
+  if (isThingId(h)) return `inside ${nameOf(h)}`;
+  return self != null && h === self ? "in your hands" : `in ${h}'s hands`;
 }
 
 // ── THE SAY CARD ─────────────────────────────────────────────────────────────

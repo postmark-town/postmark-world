@@ -18,12 +18,10 @@
 // ── THE CAN-FAIL FLIPS ─────────────────────────────────────────────────────
 //   holderLines ignoring `kinds`                 → 1 reds
 //   holderLines dropping holder.capacity/open    → 1 and 2 red
-//   carriersFrom ignoring the ground's holder    → 4 reds
-//   carriedAt using the thing's own `at`         → 4 and 5 red
-//   a ground row with no holder that only sets    → 6 reds (the kite stays in her hands)
+//   heldWords reading a holder thing as hands     → 4 reds
+//   the viewer drawing a held thing at its holder → 5 reds (POS-688: never drawn)
 //   handsLines counting holding.length            → 3b reds
 //   a close look's holds read as bare ids         → 3 and 6b red (review-241 H3)
-//   carriersFrom ignoring `expires`               → 6c reds (review-241 N9)
 //   holderLines re-counting past a `whole` list    → 10 reds ("9 whole things" beside the office's 17)
 //   holdingParts ignoring the hands read's `shows`  → 11 reds
 //   sayCardNote with the old "five minutes"      → 7 reds
@@ -33,7 +31,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   holderLines, residentHoldLines, handsLines, holdingParts,
-  handsList, residentList, carriersFrom, carriedAt, carriedWords,
+  heldWords,
   sayCardNote, isThingKind,
 } from "../spectator/holdings.mjs";
 
@@ -97,83 +95,27 @@ test("3b. your hands count what the door counted, not the page it sent (20 a pag
   assert.equal(lines.whole, 3, "the three the page did not list");
   assert.equal(holdingParts(lines).head, "24 things");
   assert.match(holdingParts(lines).items.at(-1), /^3 whole things$/);
-  const list = handsList("sb-ash", { count: 23, complete: false, holding: page }, 5);
-  assert.equal(list.complete, false, "a page short of the count says nothing about the rest");
 });
 
-const at = (x, y) => ({ x, y });
-const bodies = { "sb-ash": at(214, -352), "sb-cleo": at(210, -350) };
-const places = { bodyAt: (h) => bodies[h] ?? null };
-
-test("4. a carried thing is drawn with its carrier: your hands, the ground's holder, a looked-at resident", () => {
-  const known = carriersFrom([
-    handsList("sb-ash", { count: 1, complete: true, holding: [{ thing: "sb-ash/a-cloth-bag-two", made_by: "sb-ash" }] }, 10),
-    { at: 10, ground: [
-      { thing: "sb-cleo/a-lantern", holder: "sb-cleo", stands_at: at(210, -350), place_from: "holder" },
-      { thing: "the-town/a-stool", stands_at: at(1, 1), place_from: "fold", takeable: true },
-    ] },
-    { at: 8, holder: "sb-dov", things: ["sb-dov/a-kite"], complete: true },
-  ]);
-  assert.equal(known.holders.get("sb-ash/a-cloth-bag-two"), "sb-ash");
-  assert.equal(known.holders.get("sb-cleo/a-lantern"), "sb-cleo");
-  assert.equal(known.holders.get("sb-dov/a-kite"), "sb-dov");
-  assert.equal(known.holders.has("the-town/a-stool"), false, "a thing nobody holds stays where it stands");
-  assert.equal(known.placed.has("the-town/a-stool"), false, "and a canon place is the record's own, not moved");
-  const two = carriedAt("sb-ash/a-cloth-bag-two", known, places);
-  assert.deepEqual([two.x, two.y, two.holder], [214, -352, "sb-ash"]);
-  assert.equal(carriedWords("sb-ash/a-cloth-bag-two", known, { self: "sb-ash" }), "in your hands");
-  assert.equal(carriedWords("sb-cleo/a-lantern", known, { self: "sb-ash" }), "in sb-cleo's hands");
-  assert.equal(carriedWords("the-town/a-stool", known, { self: "sb-ash" }), null);
+// POS-688 (Darko 2026-10-18 20:58): a held thing is published but unplaced. The
+// record says who holds it (`held_by`), the page draws it nowhere, and says whose
+// hands it is in. The freshest-read-wins derivation these tests used to pin is gone:
+// it was a second owner of "where is this thing".
+test("4. whose hands, from the record's held_by: yours, a resident's, inside a holder thing, or nobody's", () => {
+  const nameOf = (id) => ({ "sb-ash/a-halloween-bowl": "A Halloween Bowl" })[id] ?? id;
+  assert.equal(heldWords("sb-ash", { self: "sb-ash", nameOf }), "in your hands");
+  assert.equal(heldWords("sb-cleo", { self: "sb-ash", nameOf }), "in sb-cleo's hands");
+  assert.equal(heldWords("sb-ash/a-halloween-bowl", { self: "sb-ash", nameOf }), "inside A Halloween Bowl");
+  assert.equal(heldWords(null, { self: "sb-ash" }), null, "placed: nobody's hands");
+  assert.equal(heldWords("", { self: "sb-ash" }), null);
 });
 
-test("4b. A THING INSIDE A BAG IS NOT MOVED (a known gap): no read names it, and a thing-holder row moves nothing", () => {
-  // the office never sends this row (whereThingStands gives a thing-held thing no place); if it did, the page claims nothing
-  const known = carriersFrom([{ at: 1, ground: [{ thing: "sb-ash/a-cloth-bag-one", holder: "sb-ash/a-cloth-bag-two", stands_at: at(203, -344) }] }]);
-  assert.equal(known.holders.has("sb-ash/a-cloth-bag-one"), false);
-  assert.equal(carriedAt("sb-ash/a-cloth-bag-one", known, places), null, "drawn where the record has it");
-  assert.equal(carriedWords("sb-ash/a-cloth-bag-one", known, { self: "sb-ash" }), null);
-});
-
-test("5. a thing whose carrier cannot be placed is drawn nowhere, never where it used to stand", () => {
-  const known = carriersFrom([{ at: 1, holder: "sb-far", things: ["sb-far/a-hat"], complete: true }]);
-  const far = carriedAt("sb-far/a-hat", known, places);
-  assert.equal(far.unplaced, true);
-  assert.equal(far.x, null);
-  assert.equal(carriedAt("the-town/a-stool", known, places), null, "nobody holds it: it stands where it stands");
-});
-
-test("6. the freshest read wins: a kite set down leaves its holder, and stands where the ground read says", () => {
-  const looked = { at: 100, holder: "sb-cleo", things: ["sb-cleo/a-kite"], complete: true };
-  assert.equal(carriersFrom([looked]).holders.get("sb-cleo/a-kite"), "sb-cleo");
-  const dropped = { at: 200, ground: [{ thing: "sb-cleo/a-kite", stands_at: at(230, -360), place_from: "set-down", takeable: true }] };
-  const known = carriersFrom([dropped, looked]);   // handed in any order: applied oldest first
-  assert.equal(known.holders.has("sb-cleo/a-kite"), false, "the fresher row with no holder clears the older look");
-  assert.deepEqual(carriedAt("sb-cleo/a-kite", known, places), { x: 230, y: -360, holder: null, setDown: true });
-  assert.equal(carriersFrom([{ ...dropped, at: 50 }, looked]).holders.get("sb-cleo/a-kite"), "sb-cleo", "an older row does not undo a fresher look");
-  // a complete list says the holder holds nothing else; an incomplete one says nothing about the rest
-  const before = { at: 10, holder: "sb-ash", things: ["sb-ash/a-pouch", "sb-ash/a-bag"], complete: true };
-  assert.equal(carriersFrom([before, { at: 20, holder: "sb-ash", things: ["sb-ash/a-bag"], complete: true }]).holders.has("sb-ash/a-pouch"), false);
-  assert.equal(carriersFrom([before, { at: 20, holder: "sb-ash", things: ["sb-ash/a-bag"], complete: false }]).holders.get("sb-ash/a-pouch"), "sb-ash");
-});
-
-test("6b. a resident's close look names her lantern by its row, so it stays in her hands (review-241 H3)", () => {
-  const ground = { at: 100, ground: [{ thing: "sb-cleo/a-lantern", holder: "sb-cleo", stands_at: at(210, -350), place_from: "holder" }] };
-  const look = residentList("sb-cleo", { handle: "sb-cleo", holds: [{ id: "sb-cleo/a-lantern", name: "A Lantern", body: "" }] }, 200, 30_000);
-  assert.deepEqual(look.things, ["sb-cleo/a-lantern"]);
-  const known = carriersFrom([ground, look], { now: 210 });
-  assert.equal(known.holders.get("sb-cleo/a-lantern"), "sb-cleo", "her complete list names it: it is not cleared");
-  assert.deepEqual(carriedAt("sb-cleo/a-lantern", known, places), { x: 210, y: -350, holder: "sb-cleo" });
-  assert.equal(residentList("sb-cleo", { holds: { unavailable: "x" } }, 200), null, "an unreadable holding clears nothing");
-});
-
-test("6c. an expired close look no longer pins a thing: with no fresher read it falls back to the record's place (review-241 N9)", () => {
-  const look = residentList("sb-cleo", { handle: "sb-cleo", holds: [{ id: "sb-cleo/a-kite", name: "A Kite", body: "" }] }, 1_000, 30_000);
-  assert.equal(carriersFrom([look], { now: 30_999 }).holders.get("sb-cleo/a-kite"), "sb-cleo", "fresh, it says she holds it");
-  const later = carriersFrom([look], { now: 31_000 });
-  assert.equal(later.holders.has("sb-cleo/a-kite"), false, "at CLOSE_LOOK_MS it says nothing");
-  assert.equal(carriedAt("sb-cleo/a-kite", later, places), null, "so the kite is drawn where the record has it, as before this page knew");
-  assert.equal(carriersFrom([{ at: 1, holder: "sb-ash", things: ["sb-ash/a-bag"], complete: true }], { now: 1e12 }).holders.get("sb-ash/a-bag"), "sb-ash",
-    "a read with no expiry (your hands, kept fresh by the poll) is not aged out here");
+test("5. THE PAGE DRAWS NO HELD THING: the viewer filters on the record's held_by, and keeps no derivation of its own", async () => {
+  const { readFileSync } = await import("node:fs");
+  const src = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
+  assert.ok(src.includes("return out.filter((m) => !heldBy(byId.get(m.id) ?? m));"), "a held thing is never drawn");
+  for (const gone of ["carriersFrom", "carriedAt", "carriedWords", "carriedPlace", "carriers()", "residentList", "handsList"])
+    assert.equal(src.includes(gone), false, `the page's own derivation is deleted: ${gone}`);
 });
 
 test("7. the say card's numbers are the office's: 60 m, drawn 15 minutes, heard until the settlement", () => {
