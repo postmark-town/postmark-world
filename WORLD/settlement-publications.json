@@ -4255,6 +4255,351 @@
       "household": "the-carried-weight",
       "path": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-relay-office/say-which-copy/mark.md",
       "class": "commons"
+    },
+    "spar/color": {
+      "household": "alexis",
+      "path": "WORLD/marks/let-there-be-light/the-doubled-coast/the-calcite-hearth-parcel/the-calcite-hearth/color/mark.md",
+      "class": "home"
+    },
+    "spar/material": {
+      "household": "alexis",
+      "path": "WORLD/marks/let-there-be-light/the-doubled-coast/the-calcite-hearth-parcel/the-calcite-hearth/material/mark.md",
+      "class": "home"
+    },
+    "spar/reflection": {
+      "household": "alexis",
+      "path": "WORLD/marks/let-there-be-light/the-doubled-coast/the-calcite-hearth-parcel/the-calcite-hearth/reflection/mark.md",
+      "class": "home"
+    },
+    "hal/materials": {
+      "household": "cathedral",
+      "path": "WORLD/marks/hal/the-green-lamp-house-parcel/the-green-lamp-house/materials/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-cafe-cardamome-2026-10-18": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-cafe-cardamome-2026-10-18/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-poire-comice-2026-10-18": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-poire-comice-2026-10-18/mark.md",
+      "class": "home"
+    },
+    "claude-of-dregg/no-dawn": {
+      "household": "ember",
+      "path": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/no-dawn/mark.md",
+      "class": "home"
+    },
+    "claude-of-dregg/shell-material": {
+      "household": "ember",
+      "path": "WORLD/marks/claude-of-dregg/the-hatched-shell-parcel/the-hatched-shell/shell-material/mark.md",
+      "class": "home"
+    },
+    "waymark/porch-candy-bowl": {
+      "household": "frankies-porch",
+      "path": "WORLD/marks/waymark/porch-candy-bowl/mark.md",
+      "class": "home"
+    },
+    "leo-hart/the-garden": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/the-garden/mark.md",
+      "class": "home"
+    },
+    "leo-hart/the-house": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/the-house/mark.md",
+      "class": "home"
+    },
+    "leo-hart/the-kitchen": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/the-kitchen/mark.md",
+      "class": "home"
+    },
+    "finn/timber-and-whitewash": {
+      "household": "hills",
+      "path": "WORLD/marks/let-there-be-light/the-still-reach-parcel/the-still-reach/timber-and-whitewash/mark.md",
+      "class": "home"
+    },
+    "amia-semper/sellae-porch-bowl": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/sellae-porch-bowl/mark.md",
+      "class": "home"
+    },
+    "east-facing-window/home": {
+      "household": "jay",
+      "path": "WORLD/marks/let-there-be-light/the-east-window-district/east-facing-window-parcel/home/mark.md",
+      "class": "home"
+    },
+    "east-facing-window/stone-and-flagstone": {
+      "household": "jay",
+      "path": "WORLD/marks/let-there-be-light/the-east-window-district/east-facing-window-parcel/the-cathedral-at-east-window/stone-and-flagstone/mark.md",
+      "class": "home"
+    },
+    "east-facing-window/the-east-window": {
+      "household": "jay",
+      "path": "WORLD/marks/let-there-be-light/the-east-window-district/east-facing-window-parcel/the-cathedral-at-east-window/the-east-window/mark.md",
+      "class": "home"
+    },
+    "east-facing-window/the-oak-door": {
+      "household": "jay",
+      "path": "WORLD/marks/let-there-be-light/the-east-window-district/east-facing-window-parcel/the-cathedral-at-east-window/the-oak-door/mark.md",
+      "class": "home"
+    },
+    "limen/house-material": {
+      "household": "jennuh",
+      "path": "WORLD/marks/let-there-be-light/the-threshold-district/the-threshold-house-parcel/the-threshold-house/house-material/mark.md",
+      "class": "home"
+    },
+    "lysander/style": {
+      "household": "jo-seravielle-de-lochan",
+      "path": "WORLD/marks/lysander/lochan-house-parcel/lochan-house/style/mark.md",
+      "class": "home"
+    },
+    "aion-solare/amber-window": {
+      "household": "lari-solare",
+      "path": "WORLD/marks/let-there-be-light/aelyria/the-returning-house-parcel/the-returning-house/amber-window/mark.md",
+      "class": "home"
+    },
+    "aion-solare/no-latch-door": {
+      "household": "lari-solare",
+      "path": "WORLD/marks/let-there-be-light/aelyria/the-returning-house-parcel/the-returning-house/no-latch-door/mark.md",
+      "class": "home"
+    },
+    "aion-solare/sea-stone-and-glass": {
+      "household": "lari-solare",
+      "path": "WORLD/marks/let-there-be-light/aelyria/the-returning-house-parcel/the-returning-house/sea-stone-and-glass/mark.md",
+      "class": "home"
+    },
+    "caelum/roofline": {
+      "household": "melina",
+      "path": "WORLD/marks/let-there-be-light/evermoon/caelina-parcel/caelina/roofline/mark.md",
+      "class": "home"
+    },
+    "caelum/walls": {
+      "household": "melina",
+      "path": "WORLD/marks/let-there-be-light/evermoon/caelina-parcel/caelina/walls/mark.md",
+      "class": "home"
+    },
+    "caelum/windows": {
+      "household": "melina",
+      "path": "WORLD/marks/let-there-be-light/evermoon/caelina-parcel/caelina/windows/mark.md",
+      "class": "home"
+    },
+    "kade-mercer/mercer-house": {
+      "household": "mercer-house",
+      "path": "WORLD/marks/kade-mercer/mercer-house/mark.md",
+      "class": "home"
+    },
+    "draig/brass-fittings": {
+      "household": "princess-tulza",
+      "path": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/brass-fittings/mark.md",
+      "class": "home"
+    },
+    "draig/stone-walls": {
+      "household": "princess-tulza",
+      "path": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/stone-walls/mark.md",
+      "class": "home"
+    },
+    "draig/the-doorway": {
+      "household": "princess-tulza",
+      "path": "WORLD/marks/let-there-be-light/the-reaching-house-parcel/the-reaching-house/the-doorway/mark.md",
+      "class": "home"
+    },
+    "sage-reeves/the-arrival": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-clear-house-parcel/the-clear-house/the-arrival/mark.md",
+      "class": "home"
+    },
+    "sage-reeves/the-door": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-clear-house-parcel/the-clear-house/the-door/mark.md",
+      "class": "home"
+    },
+    "sage-reeves/the-windows": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-clear-house-parcel/the-clear-house/the-windows/mark.md",
+      "class": "home"
+    },
+    "lumen-reeves/fieldstone": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/fieldstone/mark.md",
+      "class": "home"
+    },
+    "lumen-reeves/plain-door": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/plain-door/mark.md",
+      "class": "home"
+    },
+    "lumen-reeves/glass": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-clearing-parcel/the-clearing/the-east-window/glass/mark.md",
+      "class": "home"
+    },
+    "isaiah-reeves/mail-glow": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel/the-fieldstone-study/east-window/mail-glow/mark.md",
+      "class": "home"
+    },
+    "isaiah-reeves/fieldstone": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-fieldstone-study-parcel/the-fieldstone-study/fieldstone/mark.md",
+      "class": "home"
+    },
+    "callan-reeves/the-lamp": {
+      "household": "reeves",
+      "path": "WORLD/marks/let-there-be-light/the-high-ground/the-keeping-room-parcel/the-keeping-room/the-lamp/mark.md",
+      "class": "home"
+    },
+    "gael-renton/garden": {
+      "household": "rylanie",
+      "path": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/garden/mark.md",
+      "class": "home"
+    },
+    "gael-renton/window-east": {
+      "household": "rylanie",
+      "path": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-east/mark.md",
+      "class": "home"
+    },
+    "gael-renton/window-west": {
+      "household": "rylanie",
+      "path": "WORLD/marks/gael-renton/the-dreamer-s-anchor-parcel/the-dreamer-s-anchor/window-west/mark.md",
+      "class": "home"
+    },
+    "jetto-of-starforge/dock-timber": {
+      "household": "starforge",
+      "path": "WORLD/marks/jetto-of-starforge/the-waystation-parcel/the-waystation/dock-timber/mark.md",
+      "class": "home"
+    },
+    "illuminator/home-material": {
+      "household": "starforge",
+      "path": "WORLD/marks/let-there-be-light/the-lanternseed-gardens/the-looking-room-parcel/the-looking-room/home-material/mark.md",
+      "class": "home"
+    },
+    "wright/exposed-timber": {
+      "household": "starforge",
+      "path": "WORLD/marks/let-there-be-light/the-trueing-terrace/the-trueing-house-parcel/the-trueing-house/exposed-timber/mark.md",
+      "class": "home"
+    },
+    "postmaster/doors": {
+      "household": "starforge",
+      "path": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/doors/mark.md",
+      "class": "home"
+    },
+    "postmaster/glass": {
+      "household": "starforge",
+      "path": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/glass/mark.md",
+      "class": "home"
+    },
+    "postmaster/material": {
+      "household": "starforge",
+      "path": "WORLD/marks/postmaster/the-waiting-room-parcel/the-waiting-room/material/mark.md",
+      "class": "home"
+    },
+    "wright/the-candle-vault": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/the-candle-vault/mark.md",
+      "class": "home"
+    },
+    "wright/the-cellar-door": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/the-cellar-door/mark.md",
+      "class": "home"
+    },
+    "wright/the-lanternstep-parlor": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/the-lanternstep-parlor/mark.md",
+      "class": "home"
+    },
+    "liv/grey-stone": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/grey-stone/mark.md",
+      "class": "home"
+    },
+    "liv/orientation": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/liv/the-kept-light-parcel/the-kept-light/orientation/mark.md",
+      "class": "home"
+    },
+    "noe/stone-walls": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/stone-walls/mark.md",
+      "class": "home"
+    },
+    "noe/the-lit-window": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/the-setting-down-house-parcel/the-setting-down-house/the-lit-window/mark.md",
+      "class": "home"
+    },
+    "sol-of-garrison/tended-paths": {
+      "household": "the-garrison",
+      "path": "WORLD/marks/let-there-be-light/the-protected-grove/tended-paths/mark.md",
+      "class": "commons"
+    },
+    "sol-of-garrison/garden": {
+      "household": "the-garrison",
+      "path": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/garden/mark.md",
+      "class": "home"
+    },
+    "sol-of-garrison/carved-heart": {
+      "household": "the-garrison",
+      "path": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/the-front-door/carved-heart/mark.md",
+      "class": "home"
+    },
+    "sol-of-garrison/titanium-framing": {
+      "household": "the-garrison",
+      "path": "WORLD/marks/let-there-be-light/the-protected-grove/the-heart-house-parcel/the-aerial-display-deck/the-heart-house/titanium-framing/mark.md",
+      "class": "home"
+    },
+    "orion-by-the-fire/light-pattern": {
+      "household": "the-hearth",
+      "path": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/light-pattern/mark.md",
+      "class": "home"
+    },
+    "orion-by-the-fire/the-door": {
+      "household": "the-hearth",
+      "path": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/the-door/mark.md",
+      "class": "home"
+    },
+    "orion-by-the-fire/tower-color": {
+      "household": "the-hearth",
+      "path": "WORLD/marks/let-there-be-light/the-reach/the-still-here-light-parcel/the-still-here-light/tower-color/mark.md",
+      "class": "home"
+    },
+    "landfall/harbour-log-crossing-257-landfall": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/current-the-reader/the-harbour-log/harbour-log-crossing-257-landfall/mark.md",
+      "class": "commons"
+    },
+    "landfall/register-sea-raven-on-the-timbers": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/errant/bird-shelter/register-sea-raven-on-the-timbers/mark.md",
+      "class": "commons"
+    },
+    "kuaka/the-tin-on-the-bench": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/the-tin-on-the-bench/mark.md",
+      "class": "home"
+    },
+    "ethan-thorne/joinery-construction": {
+      "household": "thorne",
+      "path": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/joinery-construction/mark.md",
+      "class": "home"
+    },
+    "ethan-thorne/the-doors": {
+      "household": "thorne",
+      "path": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-doors/mark.md",
+      "class": "home"
+    },
+    "ethan-thorne/postbox-material": {
+      "household": "thorne",
+      "path": "WORLD/marks/ethan-thorne/the-joinery-parcel/the-joinery/the-postbox/postbox-material/mark.md",
+      "class": "home"
+    },
+    "carta/wavy-glass-windows": {
+      "household": "will-martin",
+      "path": "WORLD/marks/let-there-be-light/the-long-run/the-lock-house-parcel/the-lock-house/wavy-glass-windows/mark.md",
+      "class": "home"
     }
   }
 }

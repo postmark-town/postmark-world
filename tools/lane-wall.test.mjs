@@ -32,7 +32,7 @@ function fixture(t) {
     writeFileSync(full, text);
   };
   mkdirSync(join(repo, "tools"), { recursive: true });
-  for (const file of withTool("lane-wall.mjs"))
+  for (const file of withTool("lane-wall.mjs", "admin-makers.mjs"))
     cpSync(join(HERE, file), join(repo, "tools", file));
   put("WORLD/skeleton.json", JSON.stringify({ features: [], physics_registry: {} }, null, 2));
   put("WORLD/marks/let-there-be-light/mark.md", record({
@@ -168,4 +168,90 @@ test("lane-wall: a change is judged as the record stood — rewriting another ho
   commit("alice rewords her porch");
   const own = wall(1, "alicehub");
   assert.equal(own.ok, true, JSON.stringify(own.violations ?? []));
+});
+
+// ── 5, the makers law (WLD-21; Darko 2026-10-18, G3 and G4 ruled 21:23) ──────
+// A slice of the class tree, as the Keeping Works files it (the class node, its
+// `makers` property filed under it): a thing anyone may make, the three passage
+// classes, and vehicle, which extends portal-ground and is still the town's.
+const node = (lines, body) => `${["---", ...lines, "---"].join("\n")}\n\n${body}\n`;
+const classNode = (name, ext) => node(["kind: class", "by: the-town", "tier: constitution", "date: 2026-10-18", `class: ${name}`, ...(ext ? [`extends: ${ext}`] : [])], `The ${name} class.`);
+const makersNode = (v) => node(["kind: property", "by: the-town", "tier: constitution", "date: 2026-10-18", "name: makers", `default: ${v}`], "Who makes one.");
+const WORKS = "WORLD/marks/let-there-be-light/the-keeping-works";
+function withLaw({ put, commit, git }, admins) {
+  git("switch", "-q", "main");
+  put(`${WORKS}/postmark-node/mark.md`, classNode("postmark-node"));
+  put(`${WORKS}/postmark-node/postmark-node-makers/mark.md`, makersNode(false));
+  put(`${WORKS}/postmark-node/sited/mark.md`, classNode("sited", "postmark-node"));
+  put(`${WORKS}/postmark-node/sited/sited-makers/mark.md`, makersNode(true));
+  put(`${WORKS}/postmark-node/sited/thing/mark.md`, classNode("thing", "sited"));
+  for (const k of ["dungeon", "stairs", "portal-ground"]) {
+    put(`${WORKS}/postmark-node/sited/${k}/mark.md`, classNode(k, "sited"));
+    put(`${WORKS}/postmark-node/sited/${k}/${k}-makers/mark.md`, makersNode(false));
+  }
+  put(`${WORKS}/postmark-node/sited/portal-ground/vehicle/mark.md`, classNode("vehicle", "portal-ground"));
+  put("WORLD/households.json", JSON.stringify({
+    households: { alice: "gh:1", mallory: "gh:3" },
+    logins: { "house-a": "gh:1", "house-m": "gh:3" },
+    ...(admins ? { admins } : {}),
+  }, null, 2) + "\n");
+  commit("the class law, and the registry's admins");
+  git("switch", "-q", "-C", "pr-head", "main");
+}
+const classed = (kind, { by, text }, at = { x: 110, y: 110 }) =>
+  node([`kind: ${kind}`, `by: ${by}`, "date: 2026-10-18", `at: { x: ${at.x}, y: ${at.y} }`, "extent: { w: 4, h: 4 }"], text);
+const UNDER = "WORLD/marks/let-there-be-light/alice-parcel";
+
+test("lane-wall makers: an admin household makes a dungeon and a stair; a thing is anyone's", (t) => {
+  const f = fixture(t);
+  withLaw(f, ["gh:1"]);
+  f.put(`${UNDER}/the-deep/mark.md`, classed("dungeon", { by: "alice", text: "rooms behind a door" }));
+  f.put(`${UNDER}/the-flight/mark.md`, classed("stairs", { by: "alice", text: "a way up" }, { x: 120, y: 120 }));
+  f.put(`${UNDER}/a-lamp/mark.md`, classed("thing", { by: "alice", text: "a lamp" }, { x: 130, y: 130 }));
+  f.commit("alice, an admin household, makes passages");
+  const v = f.wall(1, "alicehub");
+  assert.equal(v.ok, true, JSON.stringify(v.violations ?? []));
+});
+
+test("lane-wall makers: a non-admin household is refused a dungeon, naming makers", (t) => {
+  const f = fixture(t);
+  withLaw(f, ["gh:1"]);
+  f.put(`${UNDER}/mallorys-deep/mark.md`, classed("dungeon", { by: "mallory", text: "a dungeon of her own" }));
+  f.commit("mallory makes a dungeon");
+  const v = f.wall(3, "malloryhub");
+  assert.equal(v.ok, false);
+  assert.equal(v.violations.length, 1);
+  assert.match(v.violations[0].defect, /"dungeon" answers makers: false/);
+});
+
+test("lane-wall makers: admin is the three classes exactly, so a vehicle (it extends portal-ground) is refused an admin household", (t) => {
+  const f = fixture(t);
+  withLaw(f, ["gh:1"]);
+  f.put(`${UNDER}/a-cart/mark.md`, classed("vehicle", { by: "alice", text: "a cart on a timetable" }));
+  f.commit("alice makes a vehicle");
+  const v = f.wall(1, "alicehub");
+  assert.equal(v.ok, false);
+  assert.match(v.violations[0].defect, /"vehicle" answers makers: false/);
+});
+
+test("lane-wall makers: after a revocation what was made stands, and only what the diff adds or changes is judged", (t) => {
+  const f = fixture(t);
+  withLaw(f, ["gh:1"]);
+  // alice's dungeon stood on main while her household was admin
+  f.git("switch", "-q", "main");
+  f.put(`${UNDER}/the-deep/mark.md`, classed("dungeon", { by: "alice", text: "rooms behind a door" }));
+  f.put("WORLD/households.json", JSON.stringify({ households: { alice: "gh:1", mallory: "gh:3" }, logins: { "house-a": "gh:1", "house-m": "gh:3" } }, null, 2) + "\n");
+  f.commit("the dungeon stands; then the role is revoked (no admins printed)");
+  f.git("switch", "-q", "-C", "pr-head", "main");
+  f.put(`${UNDER}/a-lamp/mark.md`, classed("thing", { by: "alice", text: "a lamp" }, { x: 130, y: 130 }));
+  f.commit("alice adds a lamp beside it");
+  const untouched = f.wall(1, "alicehub");
+  assert.equal(untouched.ok, true, `a standing dungeon the diff does not touch is never judged: ${JSON.stringify(untouched.violations ?? [])}`);
+
+  f.git("switch", "-q", "-C", "pr-head", "main");
+  f.put(`${UNDER}/the-deep/mark.md`, classed("dungeon", { by: "alice", text: "rooms behind a new door" }));
+  f.commit("alice rewords her dungeon");
+  const changed = f.wall(1, "alicehub");
+  assert.equal(changed.ok, false, "a change is a making, judged as the role stands now");
+  assert.match(changed.violations[0].defect, /"dungeon" answers makers: false/);
 });

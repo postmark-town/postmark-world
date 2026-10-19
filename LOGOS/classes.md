@@ -259,6 +259,32 @@ instances of any of them.
 it was ruled from wrote it as `town | sovereign`, a one-of, which 15:12 rules
 out …, so the shape waits on Darko's read."*
 
+**Admin households may make the passage classes (ruled 2026-10-18 19:38,
+19:51 and 19:52, and 21:23 on the gap read's six calls; WLD-21).** A household
+is an admin household when a GitHub account in the household's own registry
+entry, the account the household is tied to, is an owner of the
+`postmark-town` GitHub organisation (19:51: *"map the GitHub account to the
+household and then scope the admin to the household rather than expect
+resident scoped GitHub accounts"*). A resident's own GitHub account never
+makes its household admin, and every resident of an admin household acts with
+the household's admin. An admin household may make instances of exactly three
+classes whose `makers` answers false: `the-town/dungeon`, `the-town/stairs`
+and `the-town/portal-ground`. It is the classes themselves and not what
+extends them, so `arena` and `vehicle` stay the town's. Admin never reaches
+`parcel`, nor any class whose instance mints or confers standing, and
+`the-town/nothing-you-control-mints` holds for everything else (19:52).
+Whether a household is admin is derived in one record, the office's role
+registry, refreshed from GitHub at each settlement and printed into
+`WORLD/households.json` (`admins`) for the World's gates; no gate asks GitHub
+itself (19:52). A refresh that cannot read GitHub keeps the last answer and
+says it is unverified. When the ownership ends, the next refresh removes the
+role: from then on the household makes no new instance and changes none it
+made, and what it already made stands. Enforced: `tools/admin-makers.mjs` (the
+three names and the one check), read by `tools/lane-wall.mjs` § 5 over what a
+PR adds or changes, by `tools/board-grammar.test.mjs` over the live tree, and
+by the office's leave-mark door. *"Nothing super fancy yet. We don't need to
+populate an entire scoped, fine-grained permission system"* (19:38).
+
 **An idea is a class, never a place or a kind (founder-ruled 2026-09-01 —
 "Ideas can be predicates.").** `class: idea` says what a mark IS; where it
 stands says only what it is an idea OF. So an idea may stand **sited**

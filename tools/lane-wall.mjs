@@ -25,6 +25,11 @@
 //      the fold, and the lint use); predicated/naming sit in their parent's
 //      directory. The refusal prints the correct path.
 //   4. NOTES — one file, your handle, ≤2000 characters (the world_note cap).
+//   5. MAKERS — every added or changed mark names a class its author may make:
+//      the class's `makers` answers true, or it is one of the three passage
+//      classes and the author's household is admin (admin-makers.mjs; WLD-21,
+//      Darko 2026-10-18, G3 ruled 21:23). Only what the diff adds or changes is
+//      judged, so a standing mark is never stranded by a revoked role (G4).
 //
 // Exit 0 with a one-line verdict (or {ok:true} with --json); exit 1 with the
 // violations otherwise. Read-only. Run it locally before opening the PR and the
@@ -36,6 +41,8 @@ import { execFileSync } from "node:child_process";
 import { join, dirname, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord, placementParent } from "./marks-fold.mjs";
+import { instanceClassOf } from "./mark-kind.mjs";
+import { mayMake, makersRefusal } from "./admin-makers.mjs"; // who may make a class: makers, then admin (WLD-21)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -60,6 +67,7 @@ const showAt = (ref, path) => git(["show", `${ref}:${path.replace(/\\/g, "/")}`]
 // (The path law below refuses any head-side registry edit regardless.)
 let registry = {};
 let logins = {};
+let registryFile = {}; // the whole printout: `admins` rides beside `households` (WLD-21)
 // THE STAMP THIS LANE READ, put on the surface (2026-09-09). It is NOT a refusal
 // here, deliberately, and the reason is worth writing down: this lane runs in CI
 // on somebody's pull request with no pinned town sha to compare against, so a
@@ -73,6 +81,7 @@ let registryTownSha = null;
 try {
   const regPath = opt("--registry");
   const r = JSON.parse(regPath ? readFileSync(regPath, "utf8") : showAt(BASE, "WORLD/households.json"));
+  registryFile = r;
   registry = r.households ?? {};
   logins = r.logins ?? {};
   registryTownSha = r.town_sha ?? null;
@@ -170,8 +179,11 @@ for (const { status, path } of changes) {
 
 // 3 — placement law, against the composed head tree
 const placeable = changes.filter((c) => c.status !== "D" && MARK_RE.test(c.path));
-if (placeable.length && violations.length === 0) {
-  const marks = loadMarks(MARKS_DIR);
+let composed = null;
+const composedMarks = () => (composed ??= loadMarks(MARKS_DIR));
+const yoursSoFar = violations.length === 0; // paths and pens hold; placement and makers both read the composed tree
+if (placeable.length && yoursSoFar) {
+  const marks = composedMarks();
   const byId = new Map(marks.map((m) => [m.id, m]));
   // keys are diff-shaped ("WORLD/marks/…"), derived from the marks ROOT — so a
   // --marks-dir outside the repo (CI's composed worktree) keys identically
@@ -199,6 +211,20 @@ if (placeable.length && violations.length === 0) {
       refuse(path, `geometry files this mark under ${rightParent ?? "the open ground"}, not ${actualParent ?? "the root"}`,
         `its record belongs at: ${wantDir}/${dir.split("/").pop()}/mark.md — tools/place-mark.mjs answers this before the gate has to`);
     }
+  }
+}
+
+// 5 — makers law: the class each added or changed mark names, read from the
+// composed tree's own class nodes, and the registry's admins (the office's role
+// registry, printed into WORLD/households.json each settlement)
+if (placeable.length && yoursSoFar) {
+  for (const { path } of placeable) {
+    let record;
+    try { record = parseRecord(showAt(HEAD, path), path); } catch { continue; } // the handles law already named it
+    const klass = instanceClassOf(record);
+    if (klass === undefined) continue;
+    if (!mayMake({ klass, by: record.by, marks: composedMarks(), registry: registryFile }).may)
+      refuse(path, makersRefusal(klass), "a resident makes what the class's makers allows; world { explain: \"" + klass + "\" } says who makes what");
   }
 }
 

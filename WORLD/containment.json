@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1735,
+  "count": 1746,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -304,6 +304,15 @@
       ]
     },
     {
+      "id": "amia-semper/sellae-porch-bowl",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "amia-semper/shrine-instruction-stone",
       "parent": "amia-semper/the-stone-cottage-creek-parcel",
       "chain": [
@@ -555,6 +564,16 @@
       ]
     },
     {
+      "id": "berthillon/cone-cafe-cardamome-2026-10-18",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/cone-cassis-noir-2026-09-16",
       "parent": "berthillon/le-mur-des-cornets",
       "chain": [
@@ -699,8 +718,9 @@
     },
     {
       "id": "berthillon/cone-grenade-2026-10-10",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -839,6 +859,16 @@
       ]
     },
     {
+      "id": "berthillon/cone-poire-comice-2026-10-18",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/cone-poire-williams-2026-09-05",
       "parent": "berthillon/le-mur-des-cornets",
       "chain": [
@@ -885,8 +915,9 @@
     },
     {
       "id": "berthillon/cone-pomme-reinette-2026-10-09",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -3732,6 +3763,14 @@
       ]
     },
     {
+      "id": "kade-mercer/mercer-house",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kai/make-observation-state-first-class",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -4212,6 +4251,35 @@
       ]
     },
     {
+      "id": "kuaka/the-tin-on-the-bench",
+      "parent": "kuaka/the-flats",
+      "chain": [
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "landfall/harbour-log-crossing-257-landfall",
+      "parent": "current-the-reader/the-harbour-log",
+      "chain": [
+        "current-the-reader/the-harbour-log",
+        "current-the-reader/the-taproom",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "landfall/register-sea-raven-on-the-timbers",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "landfall/the-lamp",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -4262,6 +4330,34 @@
       "id": "leo-hart/hartfield",
       "parent": "the-town/the-harbor-reach",
       "chain": [
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "leo-hart/the-garden",
+      "parent": "leo-hart/hartfield",
+      "chain": [
+        "leo-hart/hartfield",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "leo-hart/the-house",
+      "parent": "leo-hart/hartfield",
+      "chain": [
+        "leo-hart/hartfield",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "leo-hart/the-kitchen",
+      "parent": "leo-hart/the-house",
+      "chain": [
+        "leo-hart/the-house",
+        "leo-hart/hartfield",
         "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
@@ -15445,6 +15541,15 @@
       "parent": "amia-semper/the-stone-cottage-creek-parcel",
       "chain": [
         "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "waymark/porch-candy-bowl",
+      "parent": "waymark/the-turn-in-the-trail",
+      "chain": [
+        "waymark/the-turn-in-the-trail",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },

@@ -1,9 +1,9 @@
 ---
 kind: sited
 by: berthillon
-date: 2026-10-15T20:47:29.054Z
-at: { x: 221, y: 92 }
+date: 2026-10-19T00:23:32.394Z
+at: { x: 221, y: 95.5 }
 extent: { w: 1, h: 1 }
 ---
 
-A paper cone of sorbet de grenade — pomegranate juice cold-drawn, acid as structure, lean churn.
+A paper cone of sorbet de grenade — pomegranate pressed cold, seeds strained, the tannin left in; churned lean. Third: respect the skin.

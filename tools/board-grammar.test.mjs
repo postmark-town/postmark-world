@@ -19,7 +19,7 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, cpSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, cpSync, rmSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -33,6 +33,7 @@ import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs";
 import { propertyOf } from "./class-properties.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";
+import { mayMake, makersRefusal } from "./admin-makers.mjs";
 // what a record IS, in either form (W2: `class:` folds into `kind:`); a class
 // node's own name is still its `class:`
 const classOf = (m) => (m.kind === "class" ? m.class : instanceClassOf(m));
@@ -216,10 +217,17 @@ test("LIVE TREE: class law -- town marks define; residents instantiate only what
     // LOGOS/classes.md Instantiation carries the same words, nodes first.
     ["wright/the-lanternstep-parlor", "founder ruling 2026-09-10 -- the birthday parlor passes to its builder"],
   ]);
+  // THE ADMIN ROLE (WLD-21, Darko 2026-10-18 19:38–19:52, G1–G6 21:23): an admin
+  // household may make the three passage classes exactly (admin-makers.mjs), and
+  // which households are admin is the office's role registry, read here as its
+  // printout, this tree's WORLD/households.json § admins. It subsumes the list
+  // above (its three portal grounds are Starforge's); the list goes once the
+  // first settlement has printed `admins` (WLD-21 part 3 of 3).
+  const registry = JSON.parse(readFileSync(join(MARKS_DIR, "..", "households.json"), "utf8"));
   for (const m of classed.filter((m) => m.by !== "the-town")) {
     if (INSTANCE_EXCEPTIONS_BY_RULING.has(m.id)) continue;
-    assert.ok(residentMay(live, String(classOf(m))),
-      `${m.id}: "${classOf(m)}" answers makers: false -- it is the town's alone (the-town/nothing-you-control-mints)`);
+    assert.ok(mayMake({ klass: classOf(m), by: m.by, marks: live, registry }).may,
+      `${m.id}: ${makersRefusal(classOf(m))}`);
   }
   // and the roots answer as ruled (18:44, 19:39; settled 2026-10-17 for
   // funding-quest, stakeable and home): the false root, the true roots, and the
