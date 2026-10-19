@@ -1479,6 +1479,10 @@ export function settlementSweep({
         // nothing else. It is the town's record of where a thing is, never a
         // publication, so no escrow is asked of it below.
         hold_only: holdOnly,
+        // A DROP (POS-688 D4 step 3, Darko 2026-10-19 09:27): out of hands onto ground. It
+        // asks no escrow to print, like any hand-off, but where it now stands is judged
+        // the way any mark is, so the registry takes the class its new place walks.
+        ...(holdOnly && !isHeld(record) ? { dropped: true } : {}),
       });
     }
   }
@@ -1630,7 +1634,10 @@ export function settlementSweep({
   // that moved.
   const filingOnMain = filingIndexAt(repo, mainBranch);
   const unpublished = [];
-  for (const [id, entry] of Object.entries(registry.published)) {
+  // a drop is judged where it now stands, at this settlement (POS-688 D4 step 3)
+  const droppedTo = new Map(published.filter((row) => row.dropped).map((row) => [row.id, row.class]));
+  for (const [id, row] of Object.entries(registry.published)) {
+    const entry = droppedTo.has(id) ? { ...row, class: droppedTo.get(id) } : row;
     const verdict = unpublishVerdict(entry, {
       escrow: escrow.get(id) ?? 0,
       pathOnMain: () => hasObject(repo, `${mainBranch}:${entry.path}`),
@@ -1801,9 +1808,10 @@ export function settlementSweep({
       writeRepoFile(repo, item.path, item.content);
       touched.push(item.path);
       // A HAND-OFF IS NOT A PUBLICATION (POS-688): the registry row stays what it was,
-      // and founding estate stays out of it, so a thing set down later is judged
-      // exactly as it was before anyone picked it up
-      if (item.hold_only) { if (registry.published[item.id]) registry.published[item.id] = { ...registry.published[item.id], path: item.path }; }
+      // and founding estate stays out of it. A DROP onto ground takes the class its
+      // new place walks (D4 step 3): a thing born at home and set down on the commons
+      // is a commons mark now, and the dropper's 1✦ is what keeps it.
+      if (item.hold_only) { if (registry.published[item.id]) registry.published[item.id] = { ...registry.published[item.id], path: item.path, ...(item.dropped ? { class: item.class } : {}) }; }
       else registry.published[item.id] = {
         household: item.household,
         path: item.path,
@@ -1899,7 +1907,7 @@ export function settlementSweep({
             reason: `held: ${stuck.id} stands inside it and cannot keep its place exactly if it returns (${stuck.reason}) — the frame waits in its sketchbook until the mark is re-expressed by hand` });
           // what was judged on it, or filed under it, waits with it (WLD-51, B2)
           for (const row of settlePublished()) unwrite(row);
-          for (const row of published) if (registry.published[row.id] && !row.hold_only) registry.published[row.id].class = row.class;
+          for (const row of published) if (registry.published[row.id] && (!row.hold_only || row.dropped)) registry.published[row.id].class = row.class;
           continue;
         }
         throw e;

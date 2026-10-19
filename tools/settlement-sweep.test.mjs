@@ -1879,3 +1879,89 @@ test("POS-688: a hand-off prints whatever stands behind the thing — held_by in
   const words = c.sweep();
   assert.equal(words.published.some((row) => row.id === "berthillon/a-cone"), false, "an edit is not a hand-off");
 });
+
+// POS-688 D4 step 3 (Darko 2026-10-19 09:27): a held thing dropped on commons
+// ground is a commons mark at its new place. The dropper's 1✦ (the office's
+// drop door stakes it, the way leave-mark's "elsewhere you stake 1✦" does) is
+// what keeps it; without it the settlement takes it, as it takes any commons
+// mark with no stamps behind it.
+function heldThingCrossing(t, name, { registryClass = "commons", parcel = false } = {}) {
+  const c = crossing(t, name);
+  c.put("WORLD/marks/let-there-be-light/the-keeping-works/mark.md", record({
+    by: "the-town", tier: "constitution", at: { x: -500, y: -500 }, extent: { w: 20, h: 20 }, body: "the works" }));
+  c.put("WORLD/marks/let-there-be-light/the-keeping-works/thing/mark.md",
+    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-07-28\nclass: thing\n---\n\nA thing: what can be carried.\n");
+  if (parcel) c.put("WORLD/marks/berthillon/berthillon-parcel/mark.md",
+    record({ kind: "parcel", by: "berthillon", at: { x: 800, y: 800 }, extent: { w: 25, h: 25 }, body: "berthillon's ground" }));
+  const cone = "WORLD/marks/berthillon/a-cone/mark.md";
+  c.put(cone, "---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nclass: thing\nheld_by: sb-ash\n---\n\nA paper cone.\n");
+  c.put("WORLD/settlement-publications.json", JSON.stringify({
+    version: 1, published: { "berthillon/a-cone": { household: "house-b", path: cone, class: registryClass } },
+  }, null, 2) + "\n");
+  c.commit("published main: the cone, held");
+  const remote = mkdtempSync(join(tmpdir(), `postmark-${name}-remote-`));
+  t.after(() => rmSync(remote, { recursive: true, force: true }));
+  execFileSync("git", ["init", "--bare", "-q", remote]);
+  c.git("remote", "add", "origin", remote);
+  c.git("push", "-q", "origin", "main");
+  const drop = (at) => {
+    c.git("switch", "-q", "-c", "draft/berthillon");
+    c.put(cone, `---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nat: { x: ${at.x}, y: ${at.y} }\nextent: { w: 1, h: 1 }\nclass: thing\n---\n\nA paper cone.\n`);
+    c.commit("the drop, printed");
+    c.git("switch", "-q", "main");
+  };
+  return { ...c, cone, drop };
+}
+
+test("POS-688 D4 step 3: a held thing dropped on commons with the dropper's 1✦ behind it prints at its new place and stands", (t) => {
+  const c = heldThingCrossing(t, "drop-commons-backed");
+  c.drop({ x: 2000, y: 2000 });
+  c.stakes([{ mark: "berthillon/a-cone", n: 1 }]);
+  const report = c.sweep();
+  assert.ok(report.published.some((row) => row.id === "berthillon/a-cone"), JSON.stringify(report.left_drafted));
+  assert.deepEqual(report.unpublished.map((r) => r.id), []);
+  assert.deepEqual(c.state().marks.find((m) => m.id === "berthillon/a-cone")?.at, { x: 2000, y: 2000 });
+  const again = c.sweep();
+  assert.deepEqual(again.unpublished.map((r) => r.id), [], "and at the next settlement too: it is backed");
+});
+
+test("POS-688 D4 step 3 FALSIFIER: take the dropper's stake away and the dropped thing leaves the world at the settlement", (t) => {
+  const c = heldThingCrossing(t, "drop-commons-unbacked");
+  c.drop({ x: 2000, y: 2000 });
+  c.stakes([]);
+  const report = c.sweep();
+  assert.deepEqual(report.unpublished.map((r) => r.id), ["berthillon/a-cone"], JSON.stringify({ first: report.unpublished, left: report.left_drafted }));
+  assert.equal(existsSync(join(c.repo, c.cone)), false, "the cone's record is gone");
+});
+
+test("POS-688 D4 step 3: a thing first published on its maker's ground, dropped on commons with no stake, is a commons mark now and leaves", (t) => {
+  const c = heldThingCrossing(t, "drop-commons-from-home", { registryClass: "home", parcel: true });
+  c.drop({ x: 2000, y: 2000 });
+  c.stakes([]);
+  const report = c.sweep();
+  console.log("WHICH", report.unpublished.length, JSON.stringify(report.published.map(r=>r.id)));
+  assert.deepEqual(report.unpublished.map((r) => r.id), ["berthillon/a-cone"], JSON.stringify({ first: report.unpublished, left: report.left_drafted, pub: report.published }));
+});
+
+test("POS-688 D4 step 3: a held thing dropped on its maker's own ground is free and stands at ✦0", (t) => {
+  const c = heldThingCrossing(t, "drop-own-ground", { registryClass: "home", parcel: true });
+  c.drop({ x: 805, y: 805 });
+  c.stakes([]);
+  const report = c.sweep();
+  assert.ok(report.published.some((row) => row.id === "berthillon/a-cone"), JSON.stringify(report.left_drafted));
+  assert.deepEqual(report.unpublished.map((r) => r.id), []);
+  assert.deepEqual(c.sweep().unpublished.map((r) => r.id), []);
+});
+
+test("POS-688 D4 step 3: whose ground is free is the MAKER's — a stranger's thing on the holder's own parcel walks commons, so the door asks the holder's 1✦ there", (t) => {
+  for (const [stakes, leaves] of [[[], true], [[{ mark: "berthillon/a-cone", n: 1 }], false]]) {
+    const c = heldThingCrossing(t, `drop-holders-ground-${leaves}`);
+    c.put("WORLD/marks/sb-ash/sb-ash-parcel/mark.md", record({ kind: "parcel", by: "sb-ash", at: { x: 3000, y: 3000 }, extent: { w: 25, h: 25 }, body: "ash's ground" }));
+    c.commit("ash's parcel");
+    c.git("push", "-q", "origin", "main");
+    c.drop({ x: 3005, y: 3005 });
+    c.stakes(stakes);
+    const gone = c.sweep().unpublished.map((r) => r.id);
+    assert.deepEqual(gone, leaves ? ["berthillon/a-cone"] : [], leaves ? "at ✦0 the settlement takes it: the ground is ash's, the thing is berthillon's" : "backed, it stands");
+  }
+});
