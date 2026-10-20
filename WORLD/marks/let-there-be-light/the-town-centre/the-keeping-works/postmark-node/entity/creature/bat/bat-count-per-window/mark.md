@@ -4,7 +4,7 @@ by: the-town
 tier: constitution
 date: 2026-10-17
 name: count_per_window
-default: 1
+default: 2
 ---
 
 How many bats one window brings.
