@@ -251,7 +251,7 @@ test("[pin] A PARCEL IS NOT FURNITURE — its card is its whole drawing", () => 
     "the furnishing pass excludes parcels");
   // …and it is excluded in the FURNISHING pass, not somewhere that would also
   // stop the card being drawn. The card's own call site must be untouched.
-  assert.match(SOURCE, /s \+= homeCard\(full, p, fanned\.has\(m\.id\) \? fanOffsetPx\(m\.id\) : null, nameOf\(m\), tier\)/,
+  assert.match(SOURCE, /s \+= homeCard\(full, p, null, nameOf\(m\), tier\)/,
     "the card is still drawn from the drawn set");
   // ⚑ THE FLIP: drop the filter and a parcel carrying a picture is furnished
   //   again — which on dev is the square over the card, and on the spectator

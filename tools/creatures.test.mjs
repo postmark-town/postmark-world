@@ -3,10 +3,12 @@
 // Read against the real world: WORLD/skeleton.json's Mists and WORLD/world-state.json's
 // marks, so "in the band" and "off the town's ground" are asked of the town as it stands.
 // The counts and the band are the law's, read from the creature class marks (D1, D2,
-// Darko 2026-10-15 12:09). The law stands at one creature a window from crossing 259,
-// bat, raven, wolf in turn (Darko 2026-10-17 13:58). The machinery tests
+// Darko 2026-10-15 12:09). The law stands at THE RAMP (Darko 2026-10-19 20:05, WLD-84):
+// no rotation, every kind every window from crossing 259, 2 bats, 3 ravens and 1 wolf.
+// It replaced one creature a window, bat, raven, wolf in turn (Darko 2026-10-17 13:58),
+// whose machinery stays and is tested on that rotation (ROTATING). The machinery tests
 // run at D2's full strength (FULL), so placement, water and the audit are asked of
-// nine spawns a window; the rotation tests run the law as it stands (STANDING).
+// nine spawns a window; the ramp's tests run the law as it stands (STANDING).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -30,6 +32,12 @@ const LAW = creatureLaw(loadMarks(join(ROOT, "WORLD", "marks")));
 const { rotation: _rotation, ...FULL } = { ...LAW.dials, counts: { bat: 3, raven: 4, wolf: 2 } };
 const INPUTS = { mists: MISTS, marks: MARKS, dials: FULL, fromCrossing: 244, world_sha: SHA };
 const STANDING = { mists: MISTS, marks: MARKS, dials: LAW.dials, fromCrossing: LAW.fromCrossing, world_sha: SHA };
+// the ramp's counts (Darko 2026-10-19 20:05, WLD-84): six creatures a window
+const RAMP = { bat: 2, raven: 3, wolf: 1 };
+const RAMP_N = Object.values(RAMP).reduce((a, b) => a + b, 0);
+// the 10-17 rotation (one a window, a bat first), kept as the machinery's own case
+const ROTATING = { ...LAW.dials, counts: { bat: 1, raven: 1, wolf: 1 }, rotation: ["bat", "raven", "wolf"] };
+const ROTATING_IN = { ...STANDING, dials: ROTATING };
 const MASTER = "a test master key, never the box's";
 const t = (ms) => new Date(ms).toISOString();
 
@@ -46,9 +54,9 @@ test("the seed: a secret per crossing, and a commitment that binds it and the wo
   assert.throws(() => secretFor("", 270), /no master key/);
 });
 
-test("the law: the class marks carry the ruled numbers, and the launch is crossing 259", () => {
-  assert.deepEqual(LAW.dials.counts, { bat: 1, raven: 1, wolf: 1 }, "one a window (Darko 10-17 13:58)");
-  assert.deepEqual(LAW.dials.rotation, ["bat", "raven", "wolf"], "the kinds in turn, a bat first");
+test("the law: the class marks carry the ruled numbers (the ramp, Darko 2026-10-19 20:05), and the launch is crossing 259", () => {
+  assert.deepEqual(LAW.dials.counts, RAMP, "the ramp: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
+  assert.equal("rotation" in LAW.dials, false, "the ramp: rotation null, every kind every window");
   assert.deepEqual([LAW.dials.band_from_m, LAW.dials.band_to_m], [0, 400], "D1: the 400 m fringe on the clear side");
   assert.equal(LAW.dials.span_h, 12, "a creature lasts 12 h from its own spawn");
   assert.equal(LAW.fromCrossing, 259, "the window opening 2026-10-19 12:00Z");
@@ -144,45 +152,66 @@ test("the dial and the season: no schedule when the dial is off, before it, or b
   assert.deepEqual(scheduleFor(240, secretFor(MASTER, 240), { ...INPUTS, fromCrossing: 0 }).spawns, [], "no Mists before 244, no creatures");
 });
 
-test("the kinds in turn (Darko 2026-10-17 13:58): one creature a window from 259, a bat first, then raven, wolf and round again", () => {
+test("the ramp (Darko 2026-10-19 20:05, WLD-84): every kind every window from 259, 2 bats, 3 ravens and 1 wolf", () => {
   assert.deepEqual(scheduleFor(258, secretFor(MASTER, 258), STANDING), { crossing: 258, spawns: [], unplaced: [] }, "nothing before the launch window");
+  for (let N = 259; N <= 265; N += 1) {
+    assert.deepEqual(countsFor(N, LAW.dials, LAW.fromCrossing), RAMP, `crossing ${N}: every kind at its count`);
+    for (let k = 0; k < 20; k += 1) {
+      const sched = scheduleFor(N, secretFor(`ramp ${k}`, N), STANDING);
+      assert.deepEqual(sched.unplaced, [], `crossing ${N}: all six find a place`);
+      const ids = sched.spawns.map((s) => s.id).sort();
+      const want = Object.entries(RAMP).flatMap(([kind, n]) => Array.from({ length: n }, (_, i) => creatureId(kind, N, i + 1))).sort();
+      assert.deepEqual(ids, want, `crossing ${N}: 2 bats, 3 ravens, 1 wolf, no other`);
+    }
+  }
+});
+
+test("the kinds in turn, the machinery kept (Darko 2026-10-17 13:58, superseded by the ramp 10-19 20:05): one a window, a bat first, then raven, wolf and round again", () => {
   const turn = { 259: "bat", 260: "raven", 261: "wolf", 262: "bat", 263: "raven", 264: "wolf", 265: "bat" };
   for (const [N, kind] of Object.entries(turn).map(([n, k]) => [Number(n), k])) {
-    assert.deepEqual(countsFor(N, LAW.dials, LAW.fromCrossing), { [kind]: 1 }, `crossing ${N}: ${kind}'s turn`);
+    assert.deepEqual(countsFor(N, ROTATING, LAW.fromCrossing), { [kind]: 1 }, `crossing ${N}: ${kind}'s turn`);
     for (let k = 0; k < 20; k += 1) {
-      const sched = scheduleFor(N, secretFor(`turn ${k}`, N), STANDING);
+      const sched = scheduleFor(N, secretFor(`turn ${k}`, N), ROTATING_IN);
       assert.deepEqual(sched.unplaced, [], `crossing ${N}: the one creature finds a place`);
       assert.deepEqual(sched.spawns.map((s) => s.id), [creatureId(kind, N, 1)], `crossing ${N}: one ${kind}, no other`);
     }
   }
   // the turn counts from the launch dial, so a later launch still opens on a bat
-  assert.deepEqual(countsFor(300, LAW.dials, 300), { bat: 1 });
-  assert.deepEqual(countsFor(301, LAW.dials, 300), { raven: 1 });
+  assert.deepEqual(countsFor(300, ROTATING, 300), { bat: 1 });
+  assert.deepEqual(countsFor(301, ROTATING, 300), { raven: 1 });
   // no rotation: every kind at its own count, as before
   assert.deepEqual(countsFor(259, FULL, 259), FULL.counts);
 });
 
-test("one a window holds the same ground rules: on land, off the town, never on the water, and its window audits", () => {
-  const rings = townWaterRings(MARKS);
+test("the ramp holds the same ground rules (Darko 2026-10-19 20:05): on land, off the town, never on the water, apart, and its window audits", () => {
+  const rings = townWaterRings(MARKS), keep = mistsKeepRects(MARKS, MISTS.clearings_m);
   let checked = 0;
   for (let N = 259; N <= 290; N += 1) {
     for (let k = 0; k < 10; k += 1) {
-      for (const sp of scheduleFor(N, secretFor(`turn water ${k}`, N), STANDING).spawns) {
+      const sched = scheduleFor(N, secretFor(`turn water ${k}`, N), STANDING);
+      assert.deepEqual(sched.unplaced, [], `crossing ${N}: every spawn found a place`);
+      for (const sp of sched.spawns) {
+        assert.equal(keptByTheTown(keep, sp.x, sp.y), false, `${sp.id} is off the town's ground`);
+        assert.equal(mistsHere(sp, mistsAt(N, MISTS)).inWall, false, `${sp.id} stands on the clear side`);
+        for (const o of sched.spawns) if (o !== sp) assert.ok(Math.hypot(o.x - sp.x, o.y - sp.y) >= LAW.dials.apart_m, `${sp.id} and ${o.id} stand apart`);
         assert.ok(!rings.some((r) => pointInPolygon(sp.x, sp.y, r)), `${sp.id} (${sp.x}, ${sp.y}) stands on the town's water`);
         checked += 1;
       }
     }
   }
-  assert.equal(checked, 320, "one a window, every window placed");
+  assert.equal(checked, 32 * 10 * RAMP_N, "the ramp's six a window, every window placed (1920)");
   const N = 259, secret = secretFor(MASTER, N), sched = scheduleFor(N, secret, STANDING), { endMs } = windowOf(N);
   const acts = [
     { actor: TOWN, action: "seed", object: `window-${N}`, at: t(windowOf(N).startMs), payload: { crossing: N, world_sha: SHA, commitment: commitmentOf(secret, SHA) } },
     ...sched.spawns.map((s) => ({ actor: TOWN, action: "spawn", object: s.id, at: s.at, payload: { kind: s.kind, crossing: N, x: s.x, y: s.y, at: s.at, fades_at: s.fades_at } })),
     { actor: TOWN, action: "reveal", object: `window-${N}`, at: t(endMs), payload: { crossing: N, secret } },
   ];
-  assert.deepEqual(auditWindow(N, acts, STANDING), { ok: true, problems: [] }, "the bat's window re-derives from its reveal");
+  assert.equal(sched.spawns.length, RAMP_N);
+  assert.deepEqual(auditWindow(N, acts, STANDING), { ok: true, problems: [] }, "the ramp's window re-derives from its reveal");
   const asFull = auditWindow(N, acts, { ...STANDING, dials: FULL });
-  assert.equal(asFull.ok, false, "read without the rotation, the same log is short eight creatures");
+  assert.equal(asFull.ok, false, "read at D2's full strength, the same log is short three creatures");
+  const asTurn = auditWindow(N, acts, ROTATING_IN);
+  assert.equal(asTurn.ok, false, "read as the 10-17 rotation, the same log has five creatures too many");
 });
 
 test("the rotation dial is read whole: text naming the class's own kinds in turn, or refused", () => {

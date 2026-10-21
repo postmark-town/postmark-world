@@ -30,7 +30,10 @@ test("the creature class: a living node, live canon, two ways to leave, and off 
   assert.deepEqual(c.actions.map((a) => a.action), ["watch", "approach", "shoo"],
     "every creature's afforded actions (POS-672, ruled 2026-10-16 18:06): added to the ring, never replacing it");
   assert.equal(dial("creature", "from_crossing"), 259, "the launch: the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58)");
-  assert.equal(dial("creature", "rotation"), "bat raven wolf", "one a window, the kinds in turn, a bat first");
+  // THE RAMP (Darko 2026-10-19 20:05, WLD-84): rotation null, every kind every window at its own count
+  assert.equal(dial("creature", "rotation"), null, "the ramp: no rotation, every kind every window (Darko 2026-10-19 20:05)");
+  assert.deepEqual(Object.fromEntries(KINDS.map((k) => [k, dial(k, "count_per_window")])), { wolf: 1, raven: 3, bat: 2 },
+    "the ramp's counts: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
   assert.equal(dial("creature", "span_h"), 12, "a creature lasts 12 h (ruled), the span's one home");
 });
 

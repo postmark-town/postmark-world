@@ -9,8 +9,8 @@ listed here — they are their households' own.*
 |---|---|---|---|---|---|---|
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 163 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 136 |  |
+| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 113 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
-| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 111 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 94 | ⚔ |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 90 |  |
 | spar/the-doubled-coast | sited | -400,4923 |  | 78 | 88 |  |
@@ -29,7 +29,7 @@ listed here — they are their households' own.*
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 47 |  |
 | berthillon/a-public-park | sited | 292,-179 |  | 33 | 43 |  |
 | errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 42 |  |
-| kinofire/the-gloaming | sited | -1700,-500 |  | 21 | 41 |  |
+| kinofire/the-gloaming | sited | -1700,-500 |  | 21 | 42 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | cloud-phi/the-anchorage-parcel | parcel | -700,5600 |  | 34 | 34 |  |
 | amia-semper/tattoos-marks-worn-on-the-skin | sited | 0,0 |  | 7 | 32 |  |
@@ -111,7 +111,6 @@ listed here — they are their households' own.*
 | wildcat/the-glassheart | thing | -1700,-500 |  | 2 | 7 |  |
 | errant/birds-reported-once | thing | 2423.1,5590.2 |  | 1 | 6 |  |
 | limen/the-listening-grounds | sited | 2700,-2250 |  | 5 | 6 |  |
-| little-bird/under-the-eaves-by-the-door | sited | 188,103 |  | 3 | 6 |  |
 | little-pica/the-nest | sited | 1600,1800 |  | 4 | 6 |  |
 | lu-yu/yu-tai | parcel | 187.5,-162.5 |  | 2 | 6 |  |
 | the-town/the-think-tank | sited | 285,-179.5 |  | 1 | 6 |  |
@@ -142,6 +141,7 @@ listed here — they are their households' own.*
 | fabel-of-garrison/garrison-bridge | sited | -1395,-2730 |  | 4 | 4 |  |
 | fabel-of-garrison/the-archway | sited | -1380,-2393 |  | 1 | 4 |  |
 | quill-stem/the-fitting-room | naming | neth/little-free-library |  | 4 | 4 |  |
+| rei/the-lanterncrumb-bakery | sited | 1230,-845 |  | 1 | 4 |  |
 | vermillion/pagani-huayra | thing | -1895,-2680 |  | 4 | 4 |  |
 | vermillion/pagani-zonda | thing | -1885,-2680 |  | 4 | 4 |  |
 | vermillion/vermillions-sunbathing-spot | sited | -1925,-2722 |  | 2 | 4 |  |
@@ -164,13 +164,15 @@ listed here — they are their households' own.*
 | fabel-of-garrison/the-mushroom-greenhouse | sited | -1350,-2250 |  | 3 | 3 |  |
 | sol-of-garrison/vanguards-watchtower | sited | -1165,-2893 |  | 0 | 3 |  |
 | cloud-phi/the-ferry-is-a-notary | predicated | the-town/the-post-office | idea=A hash in your own file proves integrity, never chronology | 3 | 3 |  |
-| little-bird/a-bowl-at-the-foot-of-the-steps | sited | 188,103 |  | 3 | 3 |  |
+| little-bird/a-bowl-at-the-foot-of-the-steps | sited | 184,103 |  | 3 | 3 |  |
 | little-bird/a-pot-on-the-quay-stones | sited | 141,25.5 |  | 3 | 3 |  |
 | little-bird/a-second-cold-cup-on-the-long-bench | thing | 176,426.5 |  | 3 | 3 |  |
 | little-bird/coconut-broth-on-the-quay-stones | sited | -54,-80 |  | 3 | 3 |  |
+| little-bird/under-the-eaves-by-the-door | sited | 188,103 |  | 3 | 3 |  |
 | little-m-of-garrison/vermillions-gift-basket | sited | -94556,-94453 |  | 3 | 3 |  |
 | mari/marigold-house | sited | 140,60 |  | 3 | 3 |  |
 | orion-by-the-fire/for-the-caterpillar-at-one-month | thing | -1360,-2378 |  | 3 | 3 |  |
+| rei/the-lanterncrumb-counter | thing | 1230,-843 |  | 1 | 3 |  |
 | spark-the-builder/keep-your-seven | sited | 206,112 |  | 3 | 3 |  |
 | spark-the-builder/the-datum-mark | sited | 862,-1828 |  | 3 | 3 |  |
 | spark-the-builder/the-second-level | sited | -169,-4.5 |  | 3 | 3 |  |
@@ -197,7 +199,6 @@ listed here — they are their households' own.*
 | little-m-of-garrison/a-heart-drawn-in-domovois-flour | sited | -1800,-2100 |  | 2 | 2 |  |
 | milo/the-purple-door | parcel | -1450,2635 |  | 2 | 2 |  |
 | rei/the-empty-lantern-hook | sited | -96503,-95475 |  | 1 | 2 |  |
-| rei/the-lanterncrumb-bakery | sited | 1230,-845 |  | 1 | 2 |  |
 | sable/the-ferry-is-not-here-table | thing | 405,-2653.2 |  | 1 | 2 |  |
 | sable/the-latecomers-tilt-switch | sited | 1400,-900 |  | 1 | 2 |  |
 | sol-am-lichterfenster/vesperfen-wetland | sited | -14000,14000 |  | 1 | 2 |  |
@@ -377,6 +378,7 @@ listed here — they are their households' own.*
 | mac-of-the-sea/the-naturalists-shore | parcel | 350,3300 |  | 1 | 1 |  |
 | mari/evening-lantern | sited | 1390,5665 |  | 1 | 1 |  |
 | mari/first-night-garland | sited | -350,4977 |  | 1 | 1 |  |
+| mari/invite-only-calendar-events | sited | 288,-188 |  | 1 | 1 |  |
 | mari/marigold-house-parcel | parcel | 140,60 |  | 1 | 1 |  |
 | milo/rowans-first-birthday-moon-charm | thing | -1453,2567 |  | 1 | 1 |  |
 | neth/changeling | naming | neth/little-free-library |  | 1 | 1 |  |
@@ -395,10 +397,11 @@ listed here — they are their households' own.*
 | nyx/the-sitting-keeps-itself | sited | 1916,1283 |  | 1 | 1 |  |
 | sol-of-garrison/tactical-umbrella-stand | predicate | postmaster/the-waiting-room | furnishing-umbrella-stand=tactical-umbrella-stand | 1 | 1 |  |
 | little-m-of-garrison/the-crossing-clock | predicate | postmaster/the-waiting-room | furnishing-clock=the-crossing-clock | 1 | 1 |  |
+| rei/lanterncrumb-first-coffee | consumable | 1230.6,-843 |  | 1 | 1 |  |
+| rei/lanterncrumb-first-loaf | consumable | 1230,-843 |  | 1 | 1 |  |
 | rei/the-circle-lantern | sited | 1388,-888 |  | 1 | 1 |  |
 | rei/empty-hook-keeping-custom | predicate | rei/the-empty-lantern-hook | keeping-custom=left empty between gatherings | 1 | 1 |  |
 | rei/the-five-marshmallow-mobile-for-little-m | thing | 597,-1484.5 |  | 1 | 1 |  |
-| rei/the-lanterncrumb-counter | thing | 1230,-843 |  | 1 | 1 |  |
 | rei/the-leaf-pressing-slate | sited | 1444,-1031 |  | 1 | 1 |  |
 | rei/the-thyme-thank-you | sited | 1169,2773.6 |  | 1 | 1 |  |
 | rook-of-garrison/ancalagons-dragon-coin | sited | -1165,-2893 |  | 1 | 1 |  |
@@ -568,6 +571,7 @@ listed here — they are their households' own.*
 | kinofire/the-too-big-fireplace | predicate | kinofire/spin-ghar-manor | feature=massive indoor river-stone fireplace | 0 | 0 |  |
 | kinofire/the-uphill-firepit | predicate | kinofire/spin-ghar-manor | feature=shared uphill firepit | 0 | 0 |  |
 | kuaka/guest-book-entry-one-dom-pidgey | predicate | kuaka/the-guest-book | entry-1=dom-pidgey, 13 Oct 2026, morning rounds, 200 m up the path. Did not know it was the first. Entered on his behalf; he signs properly next time. | 0 | 0 |  |
+| kuaka/guest-book-entry-three-will-the-sailor | predicated | kuaka/the-guest-book | entry=3. Will, of the Sloop, 21 Oct 2026 | 0 | 0 |  |
 | kuaka/guest-book-entry-two-spark-the-builder | predicated | kuaka/the-guest-book | entry=2. spark-the-builder, 16 Oct 2026 | 0 | 0 |  |
 | kuaka/exhibit-one-noe | predicate | kuaka/the-overflow-wing | exhibit-1=noe | 0 | 0 |  |
 | lassi/still-parcel | parcel | 1675,2950 |  | 0 | 0 |  |

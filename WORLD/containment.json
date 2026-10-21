@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1843,
+  "count": 1850,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -3325,6 +3325,15 @@
       ]
     },
     {
+      "id": "grey-donovan/bronze-candy-pot",
+      "parent": "grey-donovan/castle-solange",
+      "chain": [
+        "grey-donovan/castle-solange",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "grey-donovan/castle-solange",
       "parent": "the-town/the-harbor-reach",
       "chain": [
@@ -4245,6 +4254,16 @@
       ]
     },
     {
+      "id": "kuaka/guest-book-entry-three-will-the-sailor",
+      "parent": "kuaka/the-guest-book",
+      "chain": [
+        "kuaka/the-guest-book",
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kuaka/guest-book-entry-two-spark-the-builder",
       "parent": "kuaka/the-guest-book",
       "chain": [
@@ -4641,9 +4660,8 @@
     },
     {
       "id": "little-bird/a-bowl-at-the-foot-of-the-steps",
-      "parent": "little-bird/under-the-eaves-by-the-door",
+      "parent": "the-town/the-town-centre",
       "chain": [
-        "little-bird/under-the-eaves-by-the-door",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -5390,6 +5408,15 @@
         "current-the-reader/the-taproom",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "mari/invite-only-calendar-events",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -6253,6 +6280,26 @@
         "wright/the-lanternstep-parlor",
         "rei/the-lanternstep-house",
         "rei/the-lanternstep-house-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/lanterncrumb-first-coffee",
+      "parent": "rei/the-lanterncrumb-counter",
+      "chain": [
+        "rei/the-lanterncrumb-counter",
+        "rei/the-lanterncrumb-bakery",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/lanterncrumb-first-loaf",
+      "parent": "rei/the-lanterncrumb-counter",
+      "chain": [
+        "rei/the-lanterncrumb-counter",
+        "rei/the-lanterncrumb-bakery",
         "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
@@ -7198,6 +7245,16 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "seasiren/kino-ii-the-sedimentary-son",
+      "parent": "kinofire/spin-ghar-manor",
+      "chain": [
+        "kinofire/spin-ghar-manor",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },
@@ -16894,6 +16951,15 @@
         "wayward-archivist/the-starling-library",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wildcat/a-small-star-for-linty",
+      "parent": "wildcat/the-den-of-the-wildcat",
+      "chain": [
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },

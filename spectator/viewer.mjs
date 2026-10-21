@@ -2222,7 +2222,7 @@ const isPortalGround = (classes) => /(?:^|\s)c-portal-ground(?:\s|$)/.test(Strin
 // a glyph centred on the dot (mark-icons.mjs § iconSVG), drawn the same way the
 // doorway is — over the circle, never instead of it — and it replaces the
 // doorway, which is the door glyph's older, smaller self.
-export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "" } = {}) {
+export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "", badges = [] } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
   const dx = Number(fan?.dx) || 0, dy = Number(fan?.dy) || 0;
@@ -2233,7 +2233,28 @@ export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, 
     + (inner ? `<g class="ov-ic-in" transform="translate(${dx} ${dy})">${inner}</g>`
       : isPortalGround(classes)
       ? `<path class="ov-pip-door" transform="translate(${dx} ${dy})" d="${PIP_DOOR}" pointer-events="none"/>` : "")
+    + (badges?.length ? `<g transform="translate(${dx} ${dy})">${pipBadgesSVG(badges)}</g>` : "")
     + `</g></g>`;
+}
+
+// THE STATES SIT ON THE PIP (WLD-95, Darko 2026-10-20 22:19). They rode in a
+// pill beside it, and where a few marks stand metres apart (a fair's stalls)
+// the pills, nudged down a row so as not to overlap, read as markers of their
+// own: a field of ✦ discs that belonged to nobody. Now each state is a small
+// dark disc seated on its pip's own rim, the first at its top right and the
+// rest following clockwise, inside the pip's scaled group, so it holds its size
+// on screen as the pip does and goes where the pip goes. The pill still opens on
+// hover (fix 37) and carries them in words, so they step aside while it is up.
+export const PIP_BADGE = Object.freeze({ r: 4.6, glyph: 6.4, start: -Math.PI / 4, step: Math.PI / 4 });
+export function pipBadgesSVG(states = []) {
+  if (!states?.length) return "";
+  const { r, glyph, start, step } = PIP_BADGE;
+  return `<g class="ov-pip-badges">` + states.map((icon, i) => {
+    const a = start + i * step;
+    const x = +(Math.cos(a) * OVERLAY_PIP_R).toFixed(2), y = +(Math.sin(a) * OVERLAY_PIP_R).toFixed(2);
+    return `<g transform="translate(${x} ${y})"><circle r="${r}" class="ov-badge-bg"/>`
+      + iconSVG(icon, { x: -glyph / 2, y: -glyph / 2, size: glyph }) + `</g>`;
+  }).join("") + `</g>`;
 }
 
 /** THE STATE PILL: a mark's icons in a small dark pill, in the overlay's scaled
@@ -4453,6 +4474,18 @@ export const chooserIdsFrom = (id) =>
     ? id.slice(CHOOSER_PREFIX.length).split(" ").filter(Boolean)
     : null;
 
+// YOUR HOUSEHOLD'S STAKE ON A MARK (WLD-95): the stamps its open escrow
+// positions hold there, read from the portfolio the page already walks for a
+// signed-in household (`backed`, household grain: every resident's position).
+// Zero for a reader signed out, and for a mark the household has not backed.
+export function householdStakeOn(markId, { signedIn = false, portfolio = null } = {}) {
+  if (!signedIn || !markId) return 0;
+  let n = 0;
+  for (const row of portfolio?.backed ?? [])
+    if ((row?.id ?? row?.mark) === markId) n += Math.max(0, Number(row?.stamps ?? 0) || 0);
+  return n;
+}
+
 export const WALKER_HOVER_PREFIX = "walker:";
 export const walkerHoverId = (handle) => `${WALKER_HOVER_PREFIX}${handle}`;
 export const walkerHandleFromHoverId = (id) =>
@@ -4776,6 +4809,9 @@ export function orderInnermostFirst(ids, byId) {
 // every pip in a pile jump the moment one of them appears, disappears, or is
 // filtered out. Hash-derived, a mark's offset is the same on every render, in
 // every clone, forever.
+//
+// ⚑ The map no longer fans (WLD-95, Darko 2026-10-20 22:19: every pin at its
+// anchor). These stay as the pure, tested helpers they are, unused by the draw.
 export const FAN_RADIUS_PX = 5;
 // Only once the map is zoomed in enough that a few pixels means anything. Below
 // this the pips genuinely overlap and separating them would be a lie about how
@@ -6391,6 +6427,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-hl-box.is-hover.t-constitution { fill:rgba(123,167,224,.13); }
 .wv-hl-box.is-hover.is-draft { fill:rgba(160,160,160,.12); }
 .ov-s.is-hovering > .ov-pip, .ov-s.is-hovering > .ov-pip-door, .ov-s.is-hovering > .ov-ic-in { opacity:0; }
+.ov-s.is-hovering > g > .ov-pip-badges { opacity:0; }
 .wv-hl-dot { stroke:#fff; stroke-width:1.5; vector-effect:non-scaling-stroke; }
 .wv-hl-dot.t-constitution { fill:var(--blue); }
 .wv-hl-dot.t-home { fill:var(--green); }
@@ -7012,6 +7049,8 @@ ${MARK_ICON_CSS}
 /* the map's icons (mark-icons.mjs): the pill a state rides in, and the glyph
    cut into a pip, in the page's own dark like the doorway it replaces */
 .ov-icons-bg { fill:rgba(13,20,38,.88); stroke:rgba(232,224,207,.28); stroke-width:.6; }
+.ov-badge-bg { fill:rgba(13,20,38,.92); stroke:rgba(232,224,207,.32); stroke-width:.6; }
+.ov-pip-badges .ov-ic { pointer-events:visiblePainted; }
 .ov-icons .ov-ic, .ov-ic-in .ov-ic { pointer-events:visiblePainted; }
 .ov-ic rect { pointer-events:all; }
 `;
@@ -8337,7 +8376,9 @@ export function mountViewer(appEl) {
     for (const m of marks ?? []) { const cls = classToken(instanceClassOf(m)); if (cls && !seen.has(cls)) { seen.add(cls); askLineage(cls); } }
     return thingClasses();
   }
-  function iconsOf(m, inside = null) {
+  // `map`: the map's ✦ is your household's stake (WLD-95); the column and the
+  // nameplate keep the mark's general ✦ figure
+  function iconsOf(m, inside = null, { map = false } = {}) {
     const full = byId.get(m?.id) ?? m;
     if (!full) return [];
     const occupants = inside ?? occupantsOf(liveOccupancy());
@@ -8346,6 +8387,7 @@ export function mountViewer(appEl) {
     return markIcons(full, {
       cls, creatureClasses: creatureClasses(), thingClasses: thingClasses(),
       yours: isOwnMark(full), weight: effectiveWeight(full), inside: (occupants.get(full.id) ?? []).length,
+      ...(map ? { ownStake: householdStakeOn(full.id, { signedIn: !!pmKey(), portfolio: state.portfolio }) } : {}),
     });
   }
   // ───────── the telling view ─────────
@@ -11610,7 +11652,9 @@ export function mountViewer(appEl) {
     // would be the same word, later and uglier.
     const named = tier !== "far" && !state.paintingOnly;
     const nameOf = (m) => (named ? markIdentity(m) : null);
-    const fanned = mapCtx?.zoomK >= FAN_MIN_ZOOM ? coLocatedMarkIds(drawn) : new Set();
+    // NO FAN (WLD-95, Darko 2026-10-20 22:19): every pin is drawn at its own
+    // anchor. Marks a metre apart sit together, as they stand; the chooser
+    // (row 55) is how the reader picks among them.
     // ── THE ICONS, AT STREET ZOOM ONLY (Darko, playground sitting 2026-10-15) ──
     //
     // "a small icon per mark saying WHAT it is, plus tiny STATE badges. No
@@ -11666,7 +11710,7 @@ export function mountViewer(appEl) {
       return pointInRect(Number(mark.at.x), Number(mark.at.y), r);
     });
     const parcelPill = (parcel, at, fan) => {
-      const states = iconsOf(parcel, insideNow).filter((icon) => icon.kind === "state");
+      const states = iconsOf(parcel, insideNow, { map: true }).filter((icon) => icon.kind === "state");
       return placePill(states, at, (Number(fan?.dx) || 0) + 18, (Number(fan?.dy) || 0) - 37, isOwnMark(parcel));
     };
     for (const m of drawn) {
@@ -11683,26 +11727,23 @@ export function mountViewer(appEl) {
       // divided it by k.
       glyphIds.add(m.id);
       if (full.kind === "parcel") {
-        s += homeCard(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null, nameOf(m), tier);
-        if (iconsHere) pills += parcelPill(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null);
+        s += homeCard(full, p, null, nameOf(m), tier);
+        if (iconsHere) pills += parcelPill(full, p, null);
         continue;
       }
-      const fan = fanned.has(m.id) ? fanOffsetPx(m.id) : null;
-      const icons = iconsHere && !underCard(full) ? iconsOf(full, insideNow) : [];
+      const icons = iconsHere && !underCard(full) ? iconsOf(full, insideNow, { map: true }) : [];
       const what = icons[0]?.kind === "what" ? icons[0] : null;
       // the dot stands down for a picture only where it carries no icon (fix 48)
       const isPictured = pictured.has(m.id) && !what;
       s += overlayPipSVG({
         at: p, id: m.id, classes: markClasses(m) + (isPictured ? " ov-pip-pictured" : ""),
-        fan,
         // the OS tooltip stands down in painting-only for the same reason the SVG
         // label does: the bubble is already saying this word, sooner and better
         title: nameOf(m),
         inner: what ? iconSVG(what, { x: -PIP_GLYPH / 2, y: -PIP_GLYPH / 2, size: PIP_GLYPH, ink: "var(--night)" }) : "",
+        // its states on its own pip's rim (WLD-95): never a pill beside it
+        badges: what ? icons.slice(1) : icons,
       });
-      // its states beside its pip, as every mark's are: never a corner pill of its own
-      if (icons.length > (what ? 1 : 0))
-        pills += placePill(what ? icons.slice(1) : icons, p, (Number(fan?.dx) || 0) + OVERLAY_PIP_R + 2, (Number(fan?.dy) || 0) - 6.5);
     }
     // THE TOWN'S HOUSES ARE ALWAYS ON THE MAP. The atlas drew every home on its
     // sheet, whoever was looking; the field-of-view rule above is right for the
@@ -14832,7 +14873,7 @@ export function mountViewer(appEl) {
     const full = byId.get(id);
     if (!full) return "";
     const identity = markName(full);
-    const icons = iconsOf(full);
+    const icons = iconsOf(full, null, { map: true });   // the pip opened: its ✦ is the pip's (WLD-95)
     const what = icons[0]?.kind === "what" ? icons[0] : null;
     const states = what ? icons.slice(1) : icons;
     // the cap is the pip: its icon only where the pip itself wears one

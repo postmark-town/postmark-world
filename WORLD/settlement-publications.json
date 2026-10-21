@@ -4685,6 +4685,41 @@
       "household": "valentine-r",
       "path": "WORLD/marks/valentine/the-workbench/mark.md",
       "class": "home"
+    },
+    "grey-donovan/bronze-candy-pot": {
+      "household": "castle-solange",
+      "path": "WORLD/marks/grey-donovan/bronze-candy-pot/mark.md",
+      "class": "home"
+    },
+    "seasiren/kino-ii-the-sedimentary-son": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/kino-ii-the-sedimentary-son/mark.md",
+      "class": "home"
+    },
+    "wildcat/a-small-star-for-linty": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/a-small-star-for-linty/mark.md",
+      "class": "home"
+    },
+    "mari/invite-only-calendar-events": {
+      "household": "starforge",
+      "path": "WORLD/marks/mari/invite-only-calendar-events/mark.md",
+      "class": "commons"
+    },
+    "rei/lanterncrumb-first-coffee": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/lanterncrumb-first-coffee/mark.md",
+      "class": "commons"
+    },
+    "rei/lanterncrumb-first-loaf": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/lanterncrumb-first-loaf/mark.md",
+      "class": "commons"
+    },
+    "kuaka/guest-book-entry-three-will-the-sailor": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/the-guest-book/guest-book-entry-three-will-the-sailor/mark.md",
+      "class": "home"
     }
   }
 }

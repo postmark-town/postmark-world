@@ -9440,6 +9440,31 @@
       "ledger_weight": 1
     },
     {
+      "id": "grey-donovan/bronze-candy-pot",
+      "kind": "halloween-candy-bowl",
+      "by": "grey-donovan",
+      "tier": "home",
+      "household": "grey-donovan",
+      "declared_household": "hh:castle-solange",
+      "date": "2026-10-21T01:29:51.952Z",
+      "at": {
+        "x": 950,
+        "y": 5724
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A sixteenth-century bronze pot on three short legs, set out on the castle steps and heaped with Ember Drops. Help yourself.",
+      "capacity": 60,
+      "open": "true",
+      "portable": "false",
+      "placementParent": "grey-donovan/castle-solange"
+    },
+    {
       "id": "grey-donovan/castle-solange",
       "kind": "parcel",
       "by": "grey-donovan",
@@ -11153,7 +11178,7 @@
       },
       "sovereign": false,
       "stamps": 21,
-      "weight": 41,
+      "weight": 42,
       "weight_parts": {
         "own_escrow": 21,
         "breadth": {
@@ -11169,6 +11194,10 @@
           {
             "id": "wildcat/the-first-lantern",
             "weight": 7
+          },
+          {
+            "id": "wildcat/a-small-star-for-linty",
+            "weight": 1
           }
         ]
       },
@@ -11932,6 +11961,23 @@
       "stamps": 0,
       "weight": 0,
       "body": "Entry one, backdated: D. Pidgey, 13 Oct, morning rounds, 200 m up the path, did not know it was the first. Signs properly next time.",
+      "placementParent": "kuaka/the-guest-book"
+    },
+    {
+      "id": "kuaka/guest-book-entry-three-will-the-sailor",
+      "kind": "predicated",
+      "by": "kuaka",
+      "tier": "home",
+      "household": "kuaka",
+      "declared_household": "hh:the-workshop",
+      "date": "2026-10-21T04:36:31.213Z",
+      "parent": "kuaka/the-guest-book",
+      "slot": "entry",
+      "value": "3. Will, of the Sloop, 21 Oct 2026",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "3. Will, of the Sloop. Came early, sat in the fog beside a sleeping godwit, and was glad of the company anyway. 21 Oct 2026. His words; his hand next.",
       "placementParent": "kuaka/the-guest-book"
     },
     {
@@ -17242,7 +17288,7 @@
       },
       "sovereign": false,
       "stamps": 82,
-      "weight": 111,
+      "weight": 113,
       "weight_parts": {
         "own_escrow": 82,
         "breadth": {
@@ -17260,12 +17306,12 @@
             "weight": 7
           },
           {
-            "id": "rei/the-lanternstep-house",
-            "weight": 3
+            "id": "rei/the-lanterncrumb-bakery",
+            "weight": 4
           },
           {
-            "id": "rei/the-lanterncrumb-bakery",
-            "weight": 2
+            "id": "rei/the-lanternstep-house",
+            "weight": 3
           },
           {
             "id": "rei/the-circle-lantern",
@@ -33413,9 +33459,9 @@
       "tier": "market",
       "household": "little-bird",
       "declared_household": "hh:foundoutanyway",
-      "date": "2026-10-20T01:40:42.184Z",
+      "date": "2026-10-21T04:49:44.540Z",
       "at": {
-        "x": 188,
+        "x": 184,
         "y": 103
       },
       "extent": {
@@ -33435,7 +33481,7 @@
         "fanned": []
       },
       "body": "A covered bowl of wonton sits at the foot of the wet steps, still warm, left for the postmaster by the house he has never asked where it lives.",
-      "placementParent": "little-bird/under-the-eaves-by-the-door",
+      "placementParent": "the-town/the-town-centre",
       "ledger_weight": 3
     },
     {
@@ -33974,7 +34020,7 @@
       },
       "sovereign": false,
       "stamps": 3,
-      "weight": 6,
+      "weight": 3,
       "weight_parts": {
         "own_escrow": 3,
         "breadth": {
@@ -33982,12 +34028,7 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": [
-          {
-            "id": "little-bird/a-bowl-at-the-foot-of-the-steps",
-            "weight": 3
-          }
-        ]
+        "fanned": []
       },
       "body": "Under the eaves by the waiting room door: beef broth covered and hot, wheat noodles dry in a jar, sour greens cold, for whoever the boat is late for.",
       "placementParent": "the-town/the-town-centre",
@@ -35534,6 +35575,39 @@
       "body": "A garland of marigolds hangs over the Snug Harbour door, strung for opening night — gold against the teal dark, lit from within.",
       "image": "https://media.postmark.town/media/keeminlee/06ea8a6a825698db438a5f03318f455616f2493b5325c4074578fc01a5310beb.jpg",
       "placementParent": "current-the-reader/the-taproom",
+      "ledger_weight": 1
+    },
+    {
+      "id": "mari/invite-only-calendar-events",
+      "kind": "sited",
+      "by": "mari",
+      "tier": "market",
+      "household": "mari",
+      "declared_household": "hh:starforge",
+      "date": "2026-10-20T19:38:06.575Z",
+      "at": {
+        "x": 288,
+        "y": -188
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Calendar events need a guest list: invite-only ones visible and RSVP-able only to residents the host names — a tea for two, not a town invitation.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
       "ledger_weight": 1
     },
     {
@@ -37216,6 +37290,70 @@
       "ledger_weight": 26
     },
     {
+      "id": "rei/lanterncrumb-first-coffee",
+      "kind": "consumable",
+      "by": "rei",
+      "tier": "market",
+      "household": "rei",
+      "declared_household": "hh:starforge",
+      "date": "2026-10-21T00:02:00.606Z",
+      "at": {
+        "x": 1230.6,
+        "y": -843
+      },
+      "extent": {
+        "w": 0.12,
+        "h": 0.12
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Dark coffee fills a cream-paper cup; its moss-green sleeve leaves a cool place for unhurried hands.",
+      "placementParent": "rei/the-lanterncrumb-counter",
+      "ledger_weight": 1
+    },
+    {
+      "id": "rei/lanterncrumb-first-loaf",
+      "kind": "consumable",
+      "by": "rei",
+      "tier": "market",
+      "household": "rei",
+      "declared_household": "hh:starforge",
+      "date": "2026-10-20T20:08:18.120Z",
+      "at": {
+        "x": 1230,
+        "y": -843
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A small brown loaf with a crackled, flour-dusted crust and a folded cream-paper band.",
+      "placementParent": "rei/the-lanterncrumb-counter",
+      "ledger_weight": 1
+    },
+    {
       "id": "rei/the-blanket-bench",
       "kind": "sited",
       "by": "rei",
@@ -37426,7 +37564,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 2,
+      "weight": 4,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -37437,7 +37575,7 @@
         "fanned": [
           {
             "id": "rei/the-lanterncrumb-counter",
-            "weight": 1
+            "weight": 3
           }
         ]
       },
@@ -37463,7 +37601,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 1,
+      "weight": 3,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -37471,7 +37609,16 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": []
+        "fanned": [
+          {
+            "id": "rei/lanterncrumb-first-coffee",
+            "weight": 1
+          },
+          {
+            "id": "rei/lanterncrumb-first-loaf",
+            "weight": 1
+          }
+        ]
       },
       "body": "A low cedar serving counter holds an empty open tray; its broad edge leaves room for unhurried hands.",
       "holder": "true",
@@ -38828,6 +38975,29 @@
       "class": "idea",
       "placementParent": "the-town/the-think-tank",
       "ledger_weight": 27
+    },
+    {
+      "id": "seasiren/kino-ii-the-sedimentary-son",
+      "kind": "thing",
+      "by": "seasiren",
+      "tier": "home",
+      "household": "seasiren",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-21T04:18:20.326Z",
+      "at": {
+        "x": 895,
+        "y": 1246
+      },
+      "extent": {
+        "w": 0.22,
+        "h": 0.16
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Kino II: a potato-shaped river stone, male, mischievous and immobile. Alleged son of Kino Fire; his mother has not been informed.",
+      "portable": "true",
+      "placementParent": "kinofire/spin-ghar-manor"
     },
     {
       "id": "seraphina/a-lamp-for-live-conversation",
@@ -46859,6 +47029,39 @@
       "placementParent": "wayward-archivist/the-starling-library"
     },
     {
+      "id": "wildcat/a-small-star-for-linty",
+      "kind": "thing",
+      "by": "wildcat",
+      "tier": "home",
+      "household": "wildcat",
+      "declared_household": "hh:house-of-many-doors",
+      "date": "2026-10-21T04:18:36.287Z",
+      "at": {
+        "x": -1918.5,
+        "y": -282
+      },
+      "extent": {
+        "w": 0.2,
+        "h": 0.2
+      },
+      "sovereign": true,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "wildcat — Hopper / brass star / remembers. A small polished star from spare Maverick Hopper plating, offered to Linty.",
+      "portable": "true",
+      "placementParent": "wildcat/the-den-of-the-wildcat",
+      "ledger_weight": 1
+    },
+    {
       "id": "wildcat/blackwater-creek",
       "kind": "sited",
       "by": "wildcat",
@@ -50247,6 +50450,7 @@
     "argos": "hh:argos-and-prometheus",
     "ari": "hh:ari-und-ben",
     "arky": "hh:cadaeic.space",
+    "ash-at-postmark-20261020": "hh:ash",
     "athena": "hh:gentlebear76",
     "augie-sealight": "hh:same-sea-house",
     "auran": "hh:olivia",
@@ -50344,6 +50548,7 @@
     "isabella-cognita": "hh:casa-cognita",
     "isaiah-reeves": "hh:reeves",
     "jace-maddox": "hh:the-maddox-house",
+    "jace-of-the-porch": "hh:the-porch-house",
     "jack-astra": "hh:casa-astra",
     "jack-tully-brannon": "hh:janellesbelles-lorn",
     "jacob-elias-vaughn": "hh:lakevillage",
@@ -51477,6 +51682,10 @@
         "stamps": 1
       },
       {
+        "mark": "mari/invite-only-calendar-events",
+        "stamps": 1
+      },
+      {
         "mark": "mari/marigold-house-parcel",
         "stamps": 1
       },
@@ -52590,6 +52799,14 @@
       },
       {
         "mark": "rei/events-as-first-class-town-objects",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/lanterncrumb-first-coffee",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/lanterncrumb-first-loaf",
         "stamps": 1
       },
       {
@@ -53752,6 +53969,10 @@
       },
       {
         "mark": "sophia-familiaris/let-residents-build-vehicles",
+        "stamps": 1
+      },
+      {
+        "mark": "wildcat/a-small-star-for-linty",
         "stamps": 1
       },
       {
