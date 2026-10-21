@@ -5,6 +5,14 @@
 // spawn is a LIVE create by `the-town`, its reactions are its own live acts, and it
 // leaves by a live withdraw, reason `faded` (12 h after its spawn) or `fled` (the
 // only leaving by outcome). Each crossing's save photographs the living ones.
+//
+// A NAMED CREATURE (WLD-25, Darko 2026-10-20 22:47 and 22:56; W1–W11 settled by
+// Wright). A kind class may declare named creatures (`named` on its mark): each
+// one place, spawned once ever by the-town with `stays: true` in place of
+// `fades_at`. It never fades and never flees (its kind is `finishable`); residents
+// finish it (the office's `finish` rows), and the settlement after the first
+// finish ENDS it: a withdraw by the-town, reason `ended`, the one leaving a named
+// creature has. What it `carries` goes to the first finisher at that settlement.
 // Engineering settled by Wright on WLD-56 (W1–W8), from Plumb's gap read.
 //
 // Everything here is PURE: no clock, no store, no network. The office's writer tick
@@ -79,7 +87,9 @@ import { classIndex, propertyOf } from "./class-properties.mjs";
 import { AFFORDED_VERBS } from "./creature-kind.mjs";
 
 export const TOWN = "the-town";
-export const DESPAWN_REASONS = Object.freeze(["faded", "fled"]);
+export const DESPAWN_REASONS = Object.freeze(["faded", "fled", "ended"]);
+/** The one withdraw only the-town writes: a named creature's ending at its settlement (WLD-25). */
+export const ENDED = "ended";
 export const ID_PREFIX = "creature:";
 /** A creature's own act: its reaction, as the office writes it (POS-637 W4). */
 export const REACT_ACTION = "react";
@@ -144,7 +154,39 @@ export function creatureLaw(records) {
       throw new Error(`creatureLaw: ${kind} declares ${a.action}, which every creature already has`);
     afforded[kind] = [...shared, ...own];
   }
-  return { fromCrossing: dial("creature", "from_crossing") ?? null, dials, kinds, afforded };
+  // the named creatures (WLD-25): each kind class's own `named`, read whole; one id, one creature
+  const named = [];
+  for (const { kind } of kinds)
+    for (const d of namedOf(classes.find((m) => String(m.class) === kind), kind)) {
+      if (named.some((x) => x.id === d.id)) throw new Error(`creatureLaw: the named creature ${d.id} is declared twice`);
+      named.push(d);
+    }
+  return { fromCrossing: dial("creature", "from_crossing") ?? null, dials, kinds, afforded, named };
+}
+
+/**
+ * A kind class's named creatures (WLD-25), its mark's `named`: a list of
+ * { slug, at: { x, y }, carries?, from_crossing? }, read whole like `actions`.
+ * Each is one creature, `creature:<kind>-<slug>`, standing at `at` from its
+ * crossing on (the class's launch dial when it names none), and carrying the
+ * standing thing `carries` names, which goes to its first finisher. A bad slug,
+ * no place, a carries that is not a mark's id, or a crossing that is not a whole
+ * number throws. An absent or empty `named` is none.
+ */
+function namedOf(mark, kind) {
+  const raw = mark?.named ?? [];
+  const list = typeof raw === "string" ? JSON.parse(raw) : raw;
+  if (!Array.isArray(list)) throw new Error(`creatureLaw: ${kind}'s named creatures are not a list`);
+  return list.map((d) => {
+    const where = `creatureLaw: ${kind}'s named creature ${JSON.stringify(d?.slug)}`;
+    if (typeof d?.slug !== "string" || !/^[a-z][a-z0-9-]*$/.test(d.slug)) throw new Error(`${where} needs a lowercase slug`);
+    const x = Number(d.at?.x), y = Number(d.at?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error(`${where} has no place (at: { x, y })`);
+    if (d.carries != null && (typeof d.carries !== "string" || !d.carries.includes("/"))) throw new Error(`${where} carries ${JSON.stringify(d.carries)}, not a mark's id (<by>/<slug>)`);
+    if (d.from_crossing != null && !Number.isInteger(d.from_crossing)) throw new Error(`${where}'s from_crossing is ${JSON.stringify(d.from_crossing)}, not a whole crossing`);
+    return { id: `${ID_PREFIX}${kind}-${d.slug}`, kind, x, y, ...(d.carries != null ? { carries: d.carries } : {}),
+      ...(d.from_crossing != null ? { from_crossing: d.from_crossing } : {}), declared: `${TOWN}/${kind}#${d.slug}` };
+  });
 }
 
 /** WHERE AN AFFORDED ACTION MAY BE TAKEN FROM: in sight of the creature, or inside its ring. */
@@ -412,7 +454,7 @@ const msOf = (v) => (typeof v === "number" ? v : Date.parse(v));
  */
 export function creaturesAt(snapshot, acts, atMs) {
   const living = creaturesWritten(snapshot, acts, atMs);
-  for (const [id, c] of living) if (msOf(c.fades_at) <= atMs) living.delete(id);
+  for (const [id, c] of living) if (!c.stays && msOf(c.fades_at) <= atMs) living.delete(id); // one that stays never fades (WLD-25)
   return living;
 }
 
@@ -421,14 +463,14 @@ export function creaturesAt(snapshot, acts, atMs) {
  *  payload { reason: "faded", fades_at }. */
 export function dueFades(snapshot, acts, nowMs) {
   return [...creaturesWritten(snapshot, acts, nowMs).values()]
-    .filter((c) => msOf(c.fades_at) <= nowMs)
+    .filter((c) => !c.stays && msOf(c.fades_at) <= nowMs)
     .map((c) => ({ id: c.id, reason: "faded", fades_at: c.fades_at }));
 }
 
 /** Is this row a withdraw the record honours? By the-town or the creature itself,
- *  for a reason in DESPAWN_REASONS. */
+ *  for a reason in DESPAWN_REASONS; an ending only by the-town (WLD-25). */
 const lawfulWithdraw = (a) => a.action === "withdraw" && isCreatureId(a.object)
-  && (a.actor === TOWN || a.actor === a.object) && DESPAWN_REASONS.includes(a.payload?.reason);
+  && (a.actor === TOWN || (a.actor === a.object && a.payload?.reason !== ENDED)) && DESPAWN_REASONS.includes(a.payload?.reason);
 
 /** The written fold: spawned, revised by its own acts, removed only by a lawful
  *  withdraw, over the rows written after the snapshot's instant and by `atMs`. */
@@ -446,8 +488,10 @@ export function creaturesWritten(snapshot, acts, atMs) {
       const p = a.payload ?? {};
       living.set(a.object, {
         id: a.object, kind: p.kind, crossing: p.crossing, x: p.x, y: p.y,
-        spawned_at: new Date(msOf(p.at ?? a.at)).toISOString(), fades_at: p.fades_at,
+        spawned_at: new Date(msOf(p.at ?? a.at)).toISOString(), fades_at: p.stays === true ? null : p.fades_at,
         moods: isPlainObject(p.moods) ? { ...p.moods } : {}, flags: Array.isArray(p.flags) ? [...p.flags].sort() : [],
+        // a named creature (WLD-25): it stays, and names what it carries
+        ...(p.stays === true ? { stays: true, ...(typeof p.carries === "string" ? { carries: p.carries } : {}) } : {}),
       });
     } else if (lawfulWithdraw(a)) {
       living.delete(a.object);
@@ -471,6 +515,7 @@ export function creaturesWritten(snapshot, acts, atMs) {
 export function creaturesSnapshot(crossing, evaluatedAtMs, previous, acts) {
   const creatures = [...creaturesWritten(previous, acts, evaluatedAtMs).values()]
     .map((c) => ({ id: c.id, kind: c.kind, crossing: c.crossing, x: c.x, y: c.y, spawned_at: c.spawned_at, fades_at: c.fades_at,
+      ...(c.stays ? { stays: true, ...(c.carries ? { carries: c.carries } : {}) } : {}),
       moods: Object.fromEntries(Object.keys(c.moods ?? {}).sort().map((k) => [k, c.moods[k]])), flags: [...(c.flags ?? [])].sort() }))
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {

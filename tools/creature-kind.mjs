@@ -54,6 +54,15 @@
 // `self.<mood> -n` (clamped to its range), or `flee` (it goes back into the Mists
 // at once: a withdraw with reason `fled`). Several are joined by " ; ".
 //
+// A CREATURE THAT IS FINISHED (WLD-25, Darko 2026-10-20 22:47 and 22:56): a kind
+// that says `finishable: true` may carry the effect `finish`: the acting resident
+// has finished it. That changes nothing else; the creature stays until its
+// settlement ends it (reason `ended`), and every resident who finished it before
+// then is on the record, the first by act order taking what it carries. A
+// finishable kind never flees (D6): it leaves only by its ending. And it may write
+// its own ending's line, `ending: …`, naming {finisher}, {names} (the others who
+// took part) and {carried} (what it carried), all three filled by code.
+//
 // A line may name `{actor}`, the acting resident, and two slots CODE fills, never a
 // model: `{offered}`, the name of the kind offered, only on a reaction whose
 // condition requires `act.verb == "offer"`; and `{heard}`, a few words a resident
@@ -206,6 +215,7 @@ export function parseEffects(src, { moods, flags }) {
     let m;
     if (s === "nothing") return { do: "nothing" };
     if (s === "flee") return { do: "flee" };
+    if (s === "finish") return { do: "finish" };
     if ((m = /^(set|clear)\s+([\w-]+)$/.exec(s))) {
       if (!flags.includes(m[2])) throw new Error(`the effect "${s}" names a flag the kind does not declare (flags: ${flags.join(", ") || "none"})`);
       return { do: m[1], flag: m[2] };
@@ -221,7 +231,9 @@ export function parseEffects(src, { moods, flags }) {
 // ── the kind file ───────────────────────────────────────────────────────────────
 const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/;
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
-const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes"]);
+const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending"]);
+/** The slots an ending's line may name (WLD-25), each filled by code at the settlement. */
+export const ENDING_SLOTS = Object.freeze(["finisher", "names", "carried"]);
 /** The longest line a kind file may hold (the reaction pattern is not linear in a
  *  hostile line's length; kind files are reviewed law, and this closes it anyway). */
 export const MAX_LINE = 2000;
@@ -281,6 +293,15 @@ export function parseKind(text, { source = "kind file" } = {}) {
   kind.ring_m = ring;
   if (!Object.keys(kind.moods).length) throw new Error(`${source}: a kind needs at least one mood`);
   for (const f of kind.flags) if (!/^[a-z][\w-]*$/.test(f) || Object.hasOwn(kind.moods, f)) throw new Error(`${source}: the flag "${f}" must be a slug and not a mood's name`);
+  // finishable: true or nothing (WLD-25); an ending's line only on a finishable kind, naming only its slots
+  if (kind.finishable !== undefined && kind.finishable !== "true") throw new Error(`${source}: finishable: is true or absent (got ${JSON.stringify(kind.finishable)})`);
+  kind.finishable = kind.finishable === "true";
+  if (kind.ending !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: ending: belongs to a finishable kind`);
+    if (!kind.ending) throw new Error(`${source}: ending: says something`);
+    for (const [, x] of kind.ending.matchAll(/\{([^}]*)\}/g))
+      if (!ENDING_SLOTS.includes(x)) throw new Error(`${source}: an ending may name {finisher}, {names} or {carried} and nothing else (got {${x}})`);
+  }
 
   const known = new Set([...ACT_FIELDS, ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`)]);
   for (const { n, m } of pending) {
@@ -294,6 +315,8 @@ export function parseKind(text, { source = "kind file" } = {}) {
       fail(n, `act.verb is never "${v}": a creature notices only ${RING_VERBS.join(", ")}, and is aimed at only by ${AFFORDED_VERBS.join(", ")}`);
     let effects;
     try { effects = parseEffects(does ?? "nothing", kind); } catch (e) { fail(n, e.message); }
+    if (effects.some((e) => e.do === "finish") && !kind.finishable) fail(n, `only a finishable kind can be finished (finishable: true); a Mists creature fades or flees`);
+    if (effects.some((e) => e.do === "flee") && kind.finishable) fail(n, `a finishable kind never flees: it stays until its settlement ends it`);
     const line = says.trim();
     if (!line) fail(n, `a reaction says something`);
     const names = [...line.matchAll(/\{([^}]*)\}/g)].map((x) => x[1]);
@@ -337,12 +360,14 @@ export function allowedReactions(kind, scope) {
 }
 
 /** Apply a reaction's effects to a state, without touching the original. Moods are
- *  clamped to their range. `fled` is true when it went back into the Mists. */
+ *  clamped to their range. `fled` is true when it went back into the Mists, and
+ *  `finished` when the acting resident finished it (WLD-25). */
 export function applyEffects(kind, state, effects) {
   const next = { moods: { ...state.moods }, flags: [...(state.flags ?? [])] };
-  let fled = false;
+  let fled = false, finished = false;
   for (const e of effects) {
     if (e.do === "flee") fled = true;
+    else if (e.do === "finish") finished = true;
     else if (e.do === "set" && !next.flags.includes(e.flag)) next.flags.push(e.flag);
     else if (e.do === "clear") next.flags = next.flags.filter((f) => f !== e.flag);
     else if (e.do === "add") {
@@ -352,7 +377,7 @@ export function applyEffects(kind, state, effects) {
     }
   }
   next.flags.sort();
-  return { state: next, fled };
+  return { state: next, fled, finished };
 }
 
 const wordsOf = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
