@@ -7,4 +7,4 @@ slot: household-grain
 value: a household's wall is its own
 ---
 
-Media is a household's own: the quota walls by resident count, the uploading hand rides every row, and no other house writes on your wall.
+Media is a household's own: one wall per household, one size for all; the uploading hand rides every row, and no other house writes on your wall.
