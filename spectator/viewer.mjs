@@ -2222,7 +2222,7 @@ const isPortalGround = (classes) => /(?:^|\s)c-portal-ground(?:\s|$)/.test(Strin
 // a glyph centred on the dot (mark-icons.mjs § iconSVG), drawn the same way the
 // doorway is — over the circle, never instead of it — and it replaces the
 // doorway, which is the door glyph's older, smaller self.
-export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "" } = {}) {
+export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "", badges = [] } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
   const dx = Number(fan?.dx) || 0, dy = Number(fan?.dy) || 0;
@@ -2233,7 +2233,28 @@ export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, 
     + (inner ? `<g class="ov-ic-in" transform="translate(${dx} ${dy})">${inner}</g>`
       : isPortalGround(classes)
       ? `<path class="ov-pip-door" transform="translate(${dx} ${dy})" d="${PIP_DOOR}" pointer-events="none"/>` : "")
+    + (badges?.length ? `<g transform="translate(${dx} ${dy})">${pipBadgesSVG(badges)}</g>` : "")
     + `</g></g>`;
+}
+
+// THE STATES SIT ON THE PIP (WLD-95, Darko 2026-10-20 22:19). They rode in a
+// pill beside it, and where a few marks stand metres apart (a fair's stalls)
+// the pills, nudged down a row so as not to overlap, read as markers of their
+// own: a field of ✦ discs that belonged to nobody. Now each state is a small
+// dark disc seated on its pip's own rim, the first at its top right and the
+// rest following clockwise, inside the pip's scaled group, so it holds its size
+// on screen as the pip does and goes where the pip goes. The pill still opens on
+// hover (fix 37) and carries them in words, so they step aside while it is up.
+export const PIP_BADGE = Object.freeze({ r: 4.6, glyph: 6.4, start: -Math.PI / 4, step: Math.PI / 4 });
+export function pipBadgesSVG(states = []) {
+  if (!states?.length) return "";
+  const { r, glyph, start, step } = PIP_BADGE;
+  return `<g class="ov-pip-badges">` + states.map((icon, i) => {
+    const a = start + i * step;
+    const x = +(Math.cos(a) * OVERLAY_PIP_R).toFixed(2), y = +(Math.sin(a) * OVERLAY_PIP_R).toFixed(2);
+    return `<g transform="translate(${x} ${y})"><circle r="${r}" class="ov-badge-bg"/>`
+      + iconSVG(icon, { x: -glyph / 2, y: -glyph / 2, size: glyph }) + `</g>`;
+  }).join("") + `</g>`;
 }
 
 /** THE STATE PILL: a mark's icons in a small dark pill, in the overlay's scaled
@@ -3777,6 +3798,53 @@ export function residentFace(handle, meta = null) {
   };
 }
 
+// THE RESIDENT'S COLUMN IS THE WHOLE PROFILE (WLD-83, Darko 2026-10-19 17:50:
+// "This should really be where we have everything"): what they look like, their
+// bio, their colour and what they run on, beside where they are and what they
+// carry. Pure, so it is tested without a browser.
+//
+// `card` is the office's GET /residents/{handle} answer (its `profile` is the
+// resident's PROFILE.md bubble, its `appearance` their own tree, canon live);
+// `look` is their close look (`world { investigate }`), whose `appearance` is
+// the same tree. The close look's is preferred: it is the read the page already
+// holds fresh. Every value is the resident's own text, set as text, never HTML.
+//
+// THE ONE PICTURE (WLD-83 part 1): the URL at the town's media door first, then
+// the face the map already draws; the live card can only make it newer.
+export function residentProfileView(card = null, look = null, face = null) {
+  const profile = card?.profile && typeof card.profile === "object" ? card.profile : {};
+  const tree = (look?.appearance && !look.appearance.unavailable ? look.appearance : null)
+    ?? (card?.appearance && !card.appearance.unavailable ? card.appearance : null);
+  const text = (v) => (typeof v === "string" && v.trim() ? v.trim() : null);
+  const facts = [];
+  if (tree && text(tree.body)) {
+    facts.push({ label: "looks", value: text(tree.body) });
+    for (const p of tree.predicates ?? []) {
+      if (!text(p?.slot)) continue;
+      const value = text(p.value) ?? "";
+      const body = text(p.body);
+      facts.push({ label: p.slot, value: value || body || "", ...(body && body !== value ? { detail: body } : {}) });
+    }
+    const more = Number(tree.more?.predicates ?? 0);
+    if (more > 0) facts.push({ label: "and", value: `${more} more detail${more === 1 ? "" : "s"}, on a closer look` });
+  }
+  // the colour they chose, or none: never the map's default gold (safeHexColor's
+  // fallback), because a colour on this line reads as theirs
+  const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(profile.color ?? "").trim());
+  const color = hex ? `#${hex[1].toLowerCase()}` : null;
+  const colorName = text(profile.color_name);
+  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · ") });
+  if (text(profile.runtime)) facts.push({ label: "runs on", value: text(profile.runtime) });
+  // A shelf picture travels by the page's own /shelf/ route, as a mark's does
+  // (markImagePath): the column's <img> then loads wherever the page is served
+  // (prod, the rig, the sandbox), never by asking the media host from the browser.
+  const shown = (url) => (url && MARK_IMAGE_SHELF.test(url) ? markImagePath({ image: url }) : url) ?? null;
+  const picture = shown(safeAvatarUrl(profile.avatar_url) ?? face?.avatar ?? null);
+  // their pronouns beside the name: the close look's, else the card's; absent when unwritten
+  const pronouns = text(look?.pronouns) ?? text(card?.pronouns);
+  return { facts, bio: text(profile.bio), picture, pronouns };
+}
+
 // The resident page for a handle. Handles are lowercase-hyphenated by the
 // town's own law, but this is a link built from map data, so it is encoded
 // rather than trusted — and a handle that isn't handle-shaped gets no link at
@@ -4406,12 +4474,40 @@ export const chooserIdsFrom = (id) =>
     ? id.slice(CHOOSER_PREFIX.length).split(" ").filter(Boolean)
     : null;
 
+// YOUR HOUSEHOLD'S STAKE ON A MARK (WLD-95): the stamps its open escrow
+// positions hold there, read from the portfolio the page already walks for a
+// signed-in household (`backed`, household grain: every resident's position).
+// Zero for a reader signed out, and for a mark the household has not backed.
+export function householdStakeOn(markId, { signedIn = false, portfolio = null } = {}) {
+  if (!signedIn || !markId) return 0;
+  let n = 0;
+  for (const row of portfolio?.backed ?? [])
+    if ((row?.id ?? row?.mark) === markId) n += Math.max(0, Number(row?.stamps ?? 0) || 0);
+  return n;
+}
+
 export const WALKER_HOVER_PREFIX = "walker:";
 export const walkerHoverId = (handle) => `${WALKER_HOVER_PREFIX}${handle}`;
 export const walkerHandleFromHoverId = (id) =>
   typeof id === "string" && id.startsWith(WALKER_HOVER_PREFIX)
     ? id.slice(WALKER_HOVER_PREFIX.length) || null
     : null;
+
+// THE HIT TARGET STANDS WHERE THE BODY IS DRAWN (WLD-94, Darko 2026-10-20 21:52).
+// Since row 69 a moving body is drawn each frame at its walk record's place
+// (`liveBody`), while the hover snap, the click's chooser and the hover disc
+// still read the poll's row: the face walked on along its dashed path and the
+// disc and the click stayed at the older point. So each body is placed through
+// `bodyOf`, the same function the draw places it with, before it is projected.
+// Every row stays a candidate (a boat too, which has no hit disc to read).
+export function walkerCandidatesAt(rows, { bodyOf = (w) => w, toScreen }) {
+  return (rows ?? []).flatMap((row) => {
+    const w = bodyOf(row);
+    if (!w?.handle || ![w.x, w.y].every(Number.isFinite)) return [];
+    const screen = toScreen(w);
+    return [{ id: walkerHoverId(w.handle), x: screen.x, y: screen.y }];
+  });
+}
 
 // ── THE LIVE CREATURES (play fix 35) ────────────────────────────────────────
 //
@@ -4713,6 +4809,9 @@ export function orderInnermostFirst(ids, byId) {
 // every pip in a pile jump the moment one of them appears, disappears, or is
 // filtered out. Hash-derived, a mark's offset is the same on every render, in
 // every clone, forever.
+//
+// ⚑ The map no longer fans (WLD-95, Darko 2026-10-20 22:19: every pin at its
+// anchor). These stay as the pure, tested helpers they are, unused by the draw.
 export const FAN_RADIUS_PX = 5;
 // Only once the map is zoomed in enough that a few pixels means anything. Below
 // this the pips genuinely overlap and separating them would be a lie about how
@@ -6328,6 +6427,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-hl-box.is-hover.t-constitution { fill:rgba(123,167,224,.13); }
 .wv-hl-box.is-hover.is-draft { fill:rgba(160,160,160,.12); }
 .ov-s.is-hovering > .ov-pip, .ov-s.is-hovering > .ov-pip-door, .ov-s.is-hovering > .ov-ic-in { opacity:0; }
+.ov-s.is-hovering > g > .ov-pip-badges { opacity:0; }
 .wv-hl-dot { stroke:#fff; stroke-width:1.5; vector-effect:non-scaling-stroke; }
 .wv-hl-dot.t-constitution { fill:var(--blue); }
 .wv-hl-dot.t-home { fill:var(--green); }
@@ -6949,6 +7049,8 @@ ${MARK_ICON_CSS}
 /* the map's icons (mark-icons.mjs): the pill a state rides in, and the glyph
    cut into a pip, in the page's own dark like the doorway it replaces */
 .ov-icons-bg { fill:rgba(13,20,38,.88); stroke:rgba(232,224,207,.28); stroke-width:.6; }
+.ov-badge-bg { fill:rgba(13,20,38,.92); stroke:rgba(232,224,207,.32); stroke-width:.6; }
+.ov-pip-badges .ov-ic { pointer-events:visiblePainted; }
 .ov-icons .ov-ic, .ov-ic-in .ov-ic { pointer-events:visiblePainted; }
 .ov-ic rect { pointer-events:all; }
 `;
@@ -8274,7 +8376,9 @@ export function mountViewer(appEl) {
     for (const m of marks ?? []) { const cls = classToken(instanceClassOf(m)); if (cls && !seen.has(cls)) { seen.add(cls); askLineage(cls); } }
     return thingClasses();
   }
-  function iconsOf(m, inside = null) {
+  // `map`: the map's ✦ is your household's stake (WLD-95); the column and the
+  // nameplate keep the mark's general ✦ figure
+  function iconsOf(m, inside = null, { map = false } = {}) {
     const full = byId.get(m?.id) ?? m;
     if (!full) return [];
     const occupants = inside ?? occupantsOf(liveOccupancy());
@@ -8283,6 +8387,7 @@ export function mountViewer(appEl) {
     return markIcons(full, {
       cls, creatureClasses: creatureClasses(), thingClasses: thingClasses(),
       yours: isOwnMark(full), weight: effectiveWeight(full), inside: (occupants.get(full.id) ?? []).length,
+      ...(map ? { ownStake: householdStakeOn(full.id, { signedIn: !!pmKey(), portfolio: state.portfolio }) } : {}),
     });
   }
   // ───────── the telling view ─────────
@@ -10557,18 +10662,17 @@ export function mountViewer(appEl) {
     });
     const toldHere = () => toldPaintingMarks(lastRadial, allMarks());
     const paintingMarkForEvent = (event) => markAt(event, toldHere());
-    // walkers, in the same screen-space shape the mark snap already eats
+    // walkers, in the same screen-space shape the mark snap already eats, each
+    // where the draw puts it (WLD-94: liveBody, never the poll's row)
     function screenWalkerCandidates() {
       const matrix = svg.getScreenCTM();
       if (!matrix) return [];
-      return (walkState.walkers ?? []).flatMap((w) => {
-        if (!w?.handle || ![w.x, w.y].every(Number.isFinite)) return [];
+      return walkerCandidatesAt(walkState.walkers, { bodyOf: liveBody, toScreen: (w) => {
         const point = svg.createSVGPoint();
         point.x = originPx.x + w.x / mPerPx;
         point.y = originPx.y + w.y / mPerPx;
-        const screen = point.matrixTransform(matrix);
-        return [{ id: walkerHoverId(w.handle), x: screen.x, y: screen.y }];
-      });
+        return point.matrixTransform(matrix);
+      } });
     }
     // the live creatures, in the same shape: a creature is pointed at like a face (play fix 35)
     function screenCreatureCandidates() {
@@ -11548,7 +11652,9 @@ export function mountViewer(appEl) {
     // would be the same word, later and uglier.
     const named = tier !== "far" && !state.paintingOnly;
     const nameOf = (m) => (named ? markIdentity(m) : null);
-    const fanned = mapCtx?.zoomK >= FAN_MIN_ZOOM ? coLocatedMarkIds(drawn) : new Set();
+    // NO FAN (WLD-95, Darko 2026-10-20 22:19): every pin is drawn at its own
+    // anchor. Marks a metre apart sit together, as they stand; the chooser
+    // (row 55) is how the reader picks among them.
     // ── THE ICONS, AT STREET ZOOM ONLY (Darko, playground sitting 2026-10-15) ──
     //
     // "a small icon per mark saying WHAT it is, plus tiny STATE badges. No
@@ -11604,7 +11710,7 @@ export function mountViewer(appEl) {
       return pointInRect(Number(mark.at.x), Number(mark.at.y), r);
     });
     const parcelPill = (parcel, at, fan) => {
-      const states = iconsOf(parcel, insideNow).filter((icon) => icon.kind === "state");
+      const states = iconsOf(parcel, insideNow, { map: true }).filter((icon) => icon.kind === "state");
       return placePill(states, at, (Number(fan?.dx) || 0) + 18, (Number(fan?.dy) || 0) - 37, isOwnMark(parcel));
     };
     for (const m of drawn) {
@@ -11621,26 +11727,23 @@ export function mountViewer(appEl) {
       // divided it by k.
       glyphIds.add(m.id);
       if (full.kind === "parcel") {
-        s += homeCard(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null, nameOf(m), tier);
-        if (iconsHere) pills += parcelPill(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null);
+        s += homeCard(full, p, null, nameOf(m), tier);
+        if (iconsHere) pills += parcelPill(full, p, null);
         continue;
       }
-      const fan = fanned.has(m.id) ? fanOffsetPx(m.id) : null;
-      const icons = iconsHere && !underCard(full) ? iconsOf(full, insideNow) : [];
+      const icons = iconsHere && !underCard(full) ? iconsOf(full, insideNow, { map: true }) : [];
       const what = icons[0]?.kind === "what" ? icons[0] : null;
       // the dot stands down for a picture only where it carries no icon (fix 48)
       const isPictured = pictured.has(m.id) && !what;
       s += overlayPipSVG({
         at: p, id: m.id, classes: markClasses(m) + (isPictured ? " ov-pip-pictured" : ""),
-        fan,
         // the OS tooltip stands down in painting-only for the same reason the SVG
         // label does: the bubble is already saying this word, sooner and better
         title: nameOf(m),
         inner: what ? iconSVG(what, { x: -PIP_GLYPH / 2, y: -PIP_GLYPH / 2, size: PIP_GLYPH, ink: "var(--night)" }) : "",
+        // its states on its own pip's rim (WLD-95): never a pill beside it
+        badges: what ? icons.slice(1) : icons,
       });
-      // its states beside its pip, as every mark's are: never a corner pill of its own
-      if (icons.length > (what ? 1 : 0))
-        pills += placePill(what ? icons.slice(1) : icons, p, (Number(fan?.dx) || 0) + OVERLAY_PIP_R + 2, (Number(fan?.dy) || 0) - 6.5);
     }
     // THE TOWN'S HOUSES ARE ALWAYS ON THE MAP. The atlas drew every home on its
     // sheet, whoever was looking; the field-of-view rule above is right for the
@@ -11813,7 +11916,9 @@ export function mountViewer(appEl) {
   // the painting, instead of the OS tooltip a <title> used to raise.
   function renderWalkerHighlight(handle) {
     if (!mapCtx) return "";
-    const w = (walkState.walkers ?? []).find((x) => x?.handle === handle);
+    // the disc stands on the body as drawn (WLD-94), and follows it: writeWalkLayer repaints it
+    const row = (walkState.walkers ?? []).find((x) => x?.handle === handle);
+    const w = row ? liveBody(row) : null;
     if (!w || ![w.x, w.y].every(Number.isFinite)) return "";
     const k = markerScale(mapCtx.zoomK);
     const p = { x: mapCtx.originPx.x + w.x / mapCtx.mPerPx, y: mapCtx.originPx.y + w.y / mapCtx.mPerPx };
@@ -12624,6 +12729,9 @@ export function mountViewer(appEl) {
       walkDraws.layerSkips += 1;
     }
     walkState.lastDrawn = drawnWalkers;
+    // a lit body's disc moves with it (WLD-94); an unchanged disc is not rewritten (writeHighlight)
+    const lit = markInteraction.getState();
+    if (walkerHandleFromHoverId(lit.selectedId) || walkerHandleFromHoverId(lit.hoveredId)) renderMarkHighlight();
     walkReadout(drawnWalkers);
     syncHouseLights();
     syncActorPosition();
@@ -14326,6 +14434,32 @@ export function mountViewer(appEl) {
   /** The close look in hand for a mark, or null while it is being asked. */
   function markCloseLook(id) { return loadCloseLook("mark", id)?.read ?? null; }
   function residentCloseLook(handle) { return loadCloseLook("investigate", handle)?.read ?? null; }
+  // THE RESIDENT'S CARD (WLD-83): GET /residents/{handle}, keyless and public,
+  // asked at most every CLOSE_LOOK_MS while their column is open. Its picture is
+  // the one the office holds now, so a picture changed since the site last built
+  // `residents-meta.json` reaches the map's face the moment the column is opened.
+  const residentCards = new Map();   // handle -> { at, card, pending }
+  function residentCard(handle) {
+    const held = residentCards.get(handle);
+    if (held && (held.pending || Date.now() - held.at < CLOSE_LOOK_MS)) return held.card ?? null;
+    residentCards.set(handle, { ...(held ?? {}), pending: true, at: held?.at ?? 0 });
+    fetch(officeUrl(`/residents/${encodeURIComponent(handle)}`), { headers: { accept: "application/json" }, credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((card) => {
+        residentCards.set(handle, { at: Date.now(), card: card && !card.error ? card : null });
+        const live = safeAvatarUrl(card?.profile?.avatar_url);
+        const meta = residentsMeta.get(handle) ?? null;
+        if (live && meta?.avatar !== live) {
+          residentsMeta.set(handle, { ...(meta ?? {}), avatar: live });
+          // the faces are the walker layer's: redraw it, and the overlay beside it
+          drawWalkers();
+          if (lastRadial && mapCtx) drawOverlay(lastRadial);
+        }
+      })
+      .catch(() => residentCards.set(handle, { at: Date.now(), card: null }))
+      .finally(() => syncMarkInteractionViews());
+    return held?.card ?? null;
+  }
   // what a close look says a kind IS: only a yes is kept (holdings.mjs § thingKindLedger)
   function noteThingKind(mark, focus) { thingKinds.fromLook(classToken(instanceClassOf(mark)), focus); }
   // A KIND THE PAGE HOLDS NO CLASS MARK FOR is asked of the class layer once, at
@@ -14462,20 +14596,25 @@ export function mountViewer(appEl) {
     const moving = w.moving ?? (!w.arrived && !w.standing);
     const things = lines?.things ?? [];
     const region = moving ? walkingLabel(w.remaining_m, w.eta_crossings) : walkerPlace(w);
+    // the whole profile (WLD-83): the office's card, read live like the close look
+    const card = residentCard(handle);
+    const profile = residentProfileView(card, inv, face);
     return {
       // the place line is in the key: it changes when the page learns a kind is a thing (not ground)
-      key: ["resident", handle, carriersEpoch, inv ? "read" : "-", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
+      key: ["resident", handle, carriersEpoch, inv ? "read" : "-", card ? "card" : "-", JSON.stringify(profile.facts), profile.picture ?? "", profile.pronouns ?? "", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
       handle, residentLink: false,
       residentHref: residentHref(handle),
       kicker: face.household || "a resident",
       title: face.name || handle,
+      pronouns: profile.pronouns,
       region,
-      leadImage: null,
-      door: { description: "" },
+      leadImage: profile.picture,
+      // their bio, in their own words, is the column's body
+      door: { description: profile.bio ?? "" },
       byline: handle === state.handle && onResidentPath() ? "you" : handle,
       // the whole things are the relation below, each a way into its own column
-      facts: lines ? holdingFacts({ ...lines, things: [] }, "carrying")
-        : closeLooks.get(`${asWho()}|investigate|${handle}`)?.at ? [] : [{ label: "carrying", value: "reading their hands…" }],
+      facts: [...profile.facts, ...(lines ? holdingFacts({ ...lines, things: [] }, "carrying")
+        : closeLooks.get(`${asWho()}|investigate|${handle}`)?.at ? [] : [{ label: "carrying", value: "reading their hands…" }])],
       relations: things.length ? [{ label: "whole things", items: things.map((t) => ({ id: t, name: lines.names?.get(t) ?? markIdentity(byId.get(t) ?? { id: t }) })) }] : [],
     };
   }
@@ -14734,7 +14873,7 @@ export function mountViewer(appEl) {
     const full = byId.get(id);
     if (!full) return "";
     const identity = markName(full);
-    const icons = iconsOf(full);
+    const icons = iconsOf(full, null, { map: true });   // the pip opened: its ✦ is the pip's (WLD-95)
     const what = icons[0]?.kind === "what" ? icons[0] : null;
     const states = what ? icons.slice(1) : icons;
     // the cap is the pip: its icon only where the pip itself wears one

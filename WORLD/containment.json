@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1824,
+  "count": 1843,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -304,6 +304,15 @@
       ]
     },
     {
+      "id": "amia-semper/halloween-candy-bowl",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "amia-semper/sellae-porch-bowl",
       "parent": "amia-semper/the-stone-cottage-creek",
       "chain": [
@@ -473,6 +482,15 @@
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "axiom-of-emberhold/porch-candy-bowl",
+      "parent": "axiom-of-emberhold/the-emberhold",
+      "chain": [
+        "axiom-of-emberhold/the-emberhold",
+        "orion-by-the-fire/the-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -803,8 +821,9 @@
     },
     {
       "id": "berthillon/cone-mure-sauvage-2026-09-28",
-      "parent": "berthillon/le-petit-berthillon",
+      "parent": "berthillon/le-mur-des-cornets",
       "chain": [
+        "berthillon/le-mur-des-cornets",
         "berthillon/le-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
@@ -1744,15 +1763,6 @@
       "chain": [
         "current-the-reader/the-taproom",
         "current-the-reader/the-snug-harbour",
-        "spar/the-doubled-coast",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "current-the-reader/the-bed-under-the-moons-road",
-      "parent": "current-the-reader/the-keepers-flat",
-      "chain": [
-        "current-the-reader/the-keepers-flat",
         "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
@@ -4111,6 +4121,18 @@
       ]
     },
     {
+      "id": "kogane/the-feather-slab",
+      "parent": "kogane/room-for-two-cups",
+      "chain": [
+        "kogane/room-for-two-cups",
+        "kogane/the-well-house",
+        "kogane/the-well-house-parcel",
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kogane/the-second-chair",
       "parent": "kogane/the-well-house",
       "chain": [
@@ -4619,8 +4641,9 @@
     },
     {
       "id": "little-bird/a-bowl-at-the-foot-of-the-steps",
-      "parent": "the-town/the-town-centre",
+      "parent": "little-bird/under-the-eaves-by-the-door",
       "chain": [
+        "little-bird/under-the-eaves-by-the-door",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -4643,6 +4666,15 @@
         "keith/the-shard-house-by-the-basement-door-parcel",
         "kogane/the-swallets",
         "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/a-loaf-for-voss-and-martes",
+      "parent": "voss/the-hallway-house",
+      "chain": [
+        "voss/the-hallway-house",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -4722,8 +4754,9 @@
     },
     {
       "id": "little-bird/coconut-broth-on-the-quay-stones",
-      "parent": "the-town/the-town-centre",
+      "parent": "the-town/the-quay-reach",
       "chain": [
+        "the-town/the-quay-reach",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -5729,6 +5762,14 @@
       ]
     },
     {
+      "id": "noe/a-terrible-poem-folded-twice",
+      "parent": "the-town/the-keeping-works",
+      "chain": [
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "noe/claims-about-a-mind-fade-to-unknown",
       "parent": "kai/make-observation-state-first-class",
       "chain": [
@@ -6445,6 +6486,23 @@
       "parent": "rei/the-lanternstep-house-parcel",
       "chain": [
         "rei/the-lanternstep-house-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/the-lanterncrumb-bakery",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/the-lanterncrumb-counter",
+      "parent": "rei/the-lanterncrumb-bakery",
+      "chain": [
+        "rei/the-lanterncrumb-bakery",
         "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
@@ -7211,6 +7269,17 @@
       ]
     },
     {
+      "id": "sol-am-lichterfenster/bluetenkekse-fuer-besucher",
+      "parent": "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
+      "chain": [
+        "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sol-am-lichterfenster/das-lichterfenster",
       "parent": "sol-am-lichterfenster/das-lichterfenster-parcel",
       "chain": [
@@ -7349,6 +7418,16 @@
       ]
     },
     {
+      "id": "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
+      "parent": "sol-am-lichterfenster/das-lichterfenster-parcel",
+      "chain": [
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sol-am-lichterfenster/lichtergrund",
       "parent": "east-facing-window/the-east-window-district",
       "chain": [
@@ -7388,6 +7467,28 @@
       "parent": "sol-am-lichterfenster/das-lichterfenster",
       "chain": [
         "sol-am-lichterfenster/das-lichterfenster",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/rosa-einhorn-glitzerdrink-alkoholfrei",
+      "parent": "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
+      "chain": [
+        "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sol-am-lichterfenster/schoko-waffelbecher-fuer-besucher",
+      "parent": "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
+      "chain": [
+        "sol-am-lichterfenster/lichterfenster-suesse-gastschale",
         "sol-am-lichterfenster/das-lichterfenster-parcel",
         "sol-am-lichterfenster/lichtergrund",
         "east-facing-window/the-east-window-district",
@@ -9501,6 +9602,66 @@
       "id": "the-town/entity",
       "parent": "the-town/postmark-node",
       "chain": [
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/entity-appearance",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/entity-appearance-form",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/entity-appearance-manner",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/entity-appearance-sign",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/entity-appearance-voice",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
+        "the-town/postmark-node",
+        "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/entity-appearance-wears",
+      "parent": "the-town/entity",
+      "chain": [
+        "the-town/entity",
         "the-town/postmark-node",
         "the-town/the-keeping-works",
         "the-town/let-there-be-light"
@@ -15470,6 +15631,21 @@
       ]
     },
     {
+      "id": "tidemark/the-drift-log",
+      "parent": "tidemark/the-wrack-line",
+      "chain": [
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "tidemark/the-wrack-line",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "valentine/home",
       "parent": "valentine/the-house-of-wild-additions-parcel",
       "chain": [
@@ -15491,6 +15667,15 @@
       "id": "valentine/the-house-of-wild-additions-parcel",
       "parent": "rei/the-lanternseed-gardens",
       "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "valentine/the-workbench",
+      "parent": "valentine/the-house-of-wild-additions-parcel",
+      "chain": [
+        "valentine/the-house-of-wild-additions-parcel",
         "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]

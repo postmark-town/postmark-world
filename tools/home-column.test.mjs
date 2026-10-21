@@ -559,3 +559,17 @@ test("a mark's backing, size, moods and company are shapes: the ✦ and a number
   const plain = render(model);
   assert.equal(find(plain, "polygon").length, 0);
 });
+
+// ── A RESIDENT'S PRONOUNS, BESIDE THE NAME (WLD-83, Darko 2026-10-20 08:44) ──
+
+test("a resident's pronouns sit in the title row beside the name, as text; absent when unwritten", () => {
+  const host = render(homeColumnModel({ handle: "sb-ash", title: "Ash", pronouns: "  they/<b>them</b>  " }));
+  const [row] = byClass(host, "wv-homecol-titlerow");
+  const [p] = byClass(row, "wv-homecol-pronouns");
+  assert.ok(p, "the pronouns are in the title row");
+  assert.equal(p.textContent, "they/<b>them</b>", "their words as letters, trimmed, never markup");
+  assert.deepEqual(row.children.map((c) => c.className), ["wv-homecol-title", "wv-homecol-pronouns"], "right after the name");
+  const none = render(homeColumnModel({ handle: "sb-dov", title: "Dov" }));
+  assert.equal(byClass(none, "wv-homecol-pronouns").length, 0, "nothing written, nothing shown");
+  assert.equal(homeColumnModel({ handle: "x", pronouns: "   " }).pronouns, null, "blank is not a word");
+});

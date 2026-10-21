@@ -220,7 +220,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -293,6 +293,9 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // chat-only human's agent, by id. The viewer builds the text at the press,
     // from its own record, so the column carries no prose of its own here.
     copy: String(copyId ?? "").trim() ? { id: String(copyId).trim() } : null,
+    // A RESIDENT'S PRONOUNS, beside the name (WLD-83, Darko 2026-10-20 08:44): their own
+    // word from their appearance tree, shown only when written, never guessed
+    pronouns: typeof pronouns === "string" && pronouns.trim() ? pronouns.trim() : null,
     // the way back to the mark this column was reached from, named
     back: back && String(back.id ?? "").trim()
       ? { id: String(back.id).trim(), name: String(back.name ?? back.id).trim() } : null,
@@ -494,6 +497,11 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
   const title = el(doc, "h2", "wv-homecol-title");
   title.textContent = model.title;
   titleRow.appendChild(title);
+  if (model.pronouns) {
+    const theirs = el(doc, "span", "wv-homecol-pronouns");
+    theirs.textContent = model.pronouns;   // their own words: text, never markup
+    titleRow.appendChild(theirs);
+  }
   if (enter) titleRow.appendChild(enter);
   scroll.appendChild(titleRow);
 
@@ -815,6 +823,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       bars: view.bars ?? [],
       tokens: view.tokens ?? [],
       copyId: view.copyId ?? null,
+      pronouns: view.pronouns ?? null,
     }), { imagePath });
   };
 
@@ -883,6 +892,7 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-title { margin:0; color:var(--paper); font-size:1.22rem; line-height:1.25; }
 /* the door beside the name (founder, 2026-09-11) */
 .wv-homecol-titlerow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.wv-homecol-pronouns { color:var(--muted, #9aa3ad); font-size:.82rem; font-style:italic; }
 .wv-homecol-titlerow .wv-enter { flex:none; margin:0; font-size:.82rem; padding:2px 11px; }
 .wv-homecol-meta { margin-top:.25rem; color:var(--dim); font-size:.78rem; font-style:italic; }
 .wv-homecol-lead { margin:.9rem 0 0; }

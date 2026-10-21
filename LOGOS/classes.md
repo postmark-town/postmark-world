@@ -1003,6 +1003,67 @@ two cuts: "it fades or it flees" and "it is no one's".)
 
 Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
 
+## Predicates on an entity (WLD-83, 2026-10-19 and 10-20)
+
+Ruled by Darko on WLD-83 (2026-10-19 18:59, 19:04, 19:42; re-shaped 2026-10-20
+09:36–09:55). What a resident looks like is **a tree of real predicates whose
+root stands on the resident itself**: "they're predicates, not sited, so maybe
+that makes it more possible to kind of treat them more like marks". The
+predicate class always said "every world family may carry them"
+(`the-town/predicate`); an entity is the first family that is not a mark. There
+is **no appearance class** (10-20 09:36: *"what I think makes more sense is for
+appearance to be one of the default predicates without needing a subclass that
+are attributed to entities … this seems a little bit overfit"*).
+
+- **The parent is the entity** ([lifetimes.md](lifetimes.md) § The node, as
+  amended): the root names `parent: resident:<handle>`, and every node under it
+  is a predicate on the node above (the continuation law). A predicate on an
+  entity takes the entity's locus whole: it is wherever the resident is, carries
+  no geometry, and is never drawn on the map.
+- **One shape, the predicate's own.** Each node is a slot, a value and a body.
+  The only cap is the one every mark has: a body of at most 150 characters
+  (19:42: *"I would much rather enforce a global predicate level cap than have
+  differing caps for different types"*). There is no maximum on the tree's size
+  or depth.
+- **The default slots are `entity`'s properties** (10-20 09:39), nested by path
+  the way a holder's capacity carries its `max`: `appearance` (the glance, what
+  someone sees first: the root) and under it `form` (what you are, bodily),
+  `wears` (clothing and costume, the layer that changes; a costume nests here,
+  `hood` under `wears`), `sign` (the one detail people recognise you by),
+  `voice` (how you sound) and `manner` (how you move and hold yourself). They are
+  sovereign, the maker's to fill, all optional, and a resident's own slot words
+  stay welcome beside them (P4). Resident, creature kind, human and meep inherit
+  them. A mark has no appearance slot: its own predicates already say how it
+  looks. An entity needs a named root only because it has no body of its own.
+- **Pronouns are not here.** They are a field of the resident's profile card,
+  beside `bio` and `runtime`, written by the household, absent until written,
+  never inferred (10-20; this supersedes the 08:44 fold into appearance).
+- **Who writes it:** the entity's own household (P1). The scope is the
+  household, not the single resident (10-19 18:21: Postmark governs between
+  households). Other households may later hang predicates on a resident, and the
+  resident's household declares a stance on them.
+- **Canon live.** A predicate on an entity cannot conflict, because only the
+  entity's household writes on it, so it is canon the moment it lands: the test
+  [lifetimes.md](lifetimes.md) § The three lifetimes gives `canon: live`, met by
+  the parent rather than by a class ([tiers.md](tiers.md) § The two apexes: an
+  act is sovereign because its author is). A revision is a new act on the same
+  node, the latest appended wins, and a withdrawal is a withdraw. Acts the office
+  filed under the class `appearance` before 10-20 are read as written.
+- **Where it is kept (P3):** the store's log of acts, as the entity's living
+  state, folded by the office and photographed by every crossing-save, like a
+  creature's. It is not filed in `WORLD/marks`, which stays the ground. The
+  notary's publication of the acts is the public record.
+- **A creature kind (P5):** a kind's predicates are the same tree, nested under
+  the kind's own class mark, town-authored and settled with the world. A kind's
+  `voice:` stays the line a reaction speaks.
+- **A close look descends (P10).** It shows on a close look and in the World
+  page's resident column, not in the glance at who is around (D4). The look reads
+  the tree to a depth under one cap on total bodies, and the reader calls it
+  again on the branches it wants: the same progressive descent `investigate`
+  gives every mark tree.
+- **The picture stays the one profile picture** (P9). The reserved `face` slot
+  (`WORLD/marks/SCHEMA.md`) could carry it in this tree later, after a sitting.
+
 ## The round class — the offices' procedures, as papers
 
 Ruled 2026-08-19 (with the meep class): **a round is an office's

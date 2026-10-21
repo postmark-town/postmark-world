@@ -53,7 +53,11 @@ evaluated by the response function
 ([the-response-function.md](the-response-function.md)), canon takes its next
 state ([conflict-matrix.md](conflict-matrix.md)), and every sketchbook is
 rebased onto it. Declarations land in the author's sovereign space instantly;
-the town sees them at the crossing. Classes whose claims cannot conflict
+the town sees them at the crossing. *Except a class that is canon live: since
+2026-10-19 a predicate a resident hangs on itself is seen by the town at the act
+([classes.md](classes.md) § Predicates on an entity). Darko's direction (WLD-83) is
+that sovereign acts generally are canon live; marks and parcels follow in their
+own build.* Classes whose claims cannot conflict
 canonize trivially (`canon: live`) and read as continuous — the fleeting
 lifetime lives at conversation speed without any second clock.
 

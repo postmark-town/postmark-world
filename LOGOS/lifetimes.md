@@ -54,6 +54,12 @@ is the sovereign `body` property of `mark`, its 150-character cap a
 constitution child of it (12:48–12:52). So a node is identity, its class's
 property values as flat fields, and the predicates claimed about it.*
 
+*Amended 2026-10-19 (Darko, WLD-83, 19:04 and 19:42): a predicate's parent is a
+mark, a terrain feature, or **an entity**, a living node with no mark of its own,
+named `<class>:<id>` (today `resident:<handle>`). The entity's household is its
+author by default; the predicate takes the entity's locus, carries no geometry
+and is never drawn; it is canon live, since only that household writes on it. [classes.md](classes.md) § Predicates on an entity.*
+
 What is *not* a property, and therefore not a predicate (*read from
 2026-10-16: neither a property nor a predicate*):
 
