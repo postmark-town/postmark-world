@@ -120,3 +120,20 @@ test("a press's line names whom it landed on, filled by code as plain text", () 
   assert.equal(voiceLine(bristle, { actor: "kai", target: "$& {actor}" }), "It bristles at kai and turns on $& {actor}.");
   assert.equal(voiceLine(bristle, { actor: "kai" }), "It bristles at kai and turns on kai.", "no target handed: the actor");
 });
+
+test("the ring and the actor in it: counts and the actor's own, read only by a finishable kind; \"only <verb>\" on a per-resident ease", () => {
+  const k = parseKind(`${HEAD}finishable: true
+ease: 3 mine only watch
+reaction party "it sees a party": when ring.households >= 2 and actor.housemates == 0 says It sees {actor} came alone into a crowd.
+reaction worn "it sees the worn": when actor.nerve <= 2 and not actor.struck and ring.residents > 1 says It looks at {actor}.
+`);
+  assert.deepEqual(k.ease, { target: 3, by: "mine", only: "watch" });
+  const s0 = startState(k);
+  const menu = (enc) => allowedReactions(k, scopeOf(s0, { verb: "say", distance_m: 5 }, {}, enc)).map((r) => r.name);
+  assert.deepEqual(menu({ ring: { residents: 3, households: 2 }, actor: { housemates: 0, nerve: 6 } }), ["party"]);
+  assert.deepEqual(menu({ ring: { residents: 3, households: 1 }, actor: { housemates: 2, nerve: 2, struck: false } }), ["worn"]);
+  assert.deepEqual(menu({}), [], "no window handed: every count reads 0");
+  assert.throws(() => parseKind(`${HEAD}reaction a "a": when ring.residents > 1 says A.\n`), /reads "ring\.residents", which a creature cannot know/);
+  assert.throws(() => parseKind(`${HEAD}finishable: true\nease: 3 households only call\nreaction a "a": when true says A.\n`), /"only <verb>" belongs to an ease each resident fills/);
+  assert.throws(() => parseKind(`${HEAD}finishable: true\nease: 3 mine only dance\nreaction a "a": when true says A.\n`), /only "dance" is not a verb/);
+});

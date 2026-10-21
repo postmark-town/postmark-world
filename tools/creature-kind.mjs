@@ -97,11 +97,13 @@
 //                                  and strike come together or not at all
 //   ease: 3 mine                   the peaceful test's target, each resident filling their own,
 //   ease: 3 households             or shared by the ring, one point per household per window
+//   ease: 3 mine only watch        each resident's own, and any other act of theirs in its ring empties it
 //
 // Its reactions may key on the ENCOUNTER_VERBS (act.verb == "strike", "steady",
 // "shield") and read self.resolve (resolve left this window), ease.mine (the
 // actor's own ease, or their household's point), ease.all (the shared ease) and
-// ease.first_m (minutes since the actor's first point this window). Their
+// ease.first_m (minutes since the actor's first point this window), and
+// ring.residents, ring.households, actor.housemates, actor.nerve and actor.struck. Their
 // effects may be:
 //
 //   press <n>                      a nerve cost (1..PRESS_MAX) aimed at one resident in the
@@ -148,6 +150,10 @@ const ACT_FIELDS = new Set(["act.verb", "act.distance_m", "act.approaching", "ac
 /** What a finishable kind's condition may read besides (self.resolve with a resolve, ease.* with an ease). */
 const RESOLVE_FIELDS = new Set(["self.resolve"]);
 const EASE_FIELDS = new Set(["ease.mine", "ease.all", "ease.first_m"]);
+/** What every finishable kind's condition may read of its ring and the actor in it, this window
+ *  (D4: the creature knows the dyad): how many residents and households stand in its ring, the
+ *  actor's housemates there, the actor's nerve, and whether the actor has struck it. */
+const RING_FIELDS = new Set(["ring.residents", "ring.households", "actor.housemates", "actor.nerve", "actor.struck"]);
 
 // ── the expression language ────────────────────────────────────────────────────
 const TOKEN = /\s*(?:(\d+(?:\.\d+)?)|("(?:[^"\\]|\\.)*")|(==|!=|<=|>=|<|>|\(|\))|([A-Za-z_][\w.-]*))/y;
@@ -340,9 +346,13 @@ function encounterOf(kind, source) {
     if (Object.hasOwn(kind.moods, "resolve") || kind.flags.includes("resolve")) throw new Error(`${source}: a kind with resolve: has no mood or flag named resolve (self.resolve is its resolve)`);
   }
   if (kind.ease !== undefined) {
-    const m = /^(\S+)\s+(\S+)$/.exec(kind.ease);
-    if (!m || !EASE_BY.includes(m[2])) throw new Error(`${source}: ease: is "<n> ${EASE_BY.join("\" or \"<n> ")}" (got ${JSON.stringify(kind.ease)})`);
-    kind.ease = { target: whole("ease", m[1], 1), by: m[2] };
+    // `only <verb>` (a per-resident ease): any other act of yours charged in its ring empties your own ease,
+    // answered or not, so an act inside the 10 s window still breaks the test (code's, not a reaction's)
+    const m = /^(\S+)\s+(\S+)(?:\s+only\s+(\S+))?$/.exec(kind.ease);
+    if (!m || !EASE_BY.includes(m[2])) throw new Error(`${source}: ease: is "<n> ${EASE_BY.join("\" or \"<n> ")}", optionally "<n> mine only <verb>" (got ${JSON.stringify(kind.ease)})`);
+    if (m[3] && m[2] !== "mine") throw new Error(`${source}: ease: "only <verb>" belongs to an ease each resident fills (mine)`);
+    if (m[3] && ![...RING_VERBS, ...AFFORDED_VERBS, ...ENCOUNTER_VERBS].includes(m[3])) throw new Error(`${source}: ease: only "${m[3]}" is not a verb a creature notices`);
+    kind.ease = { target: whole("ease", m[1], 1), by: m[2], ...(m[3] ? { only: m[3] } : {}) };
   }
 }
 
@@ -428,7 +438,7 @@ export function parseKind(text, { source = "kind file" } = {}) {
   encounterOf(kind, source);
 
   const known = new Set([...ACT_FIELDS, ...(kind.fragments ? TOLD_FIELDS : []), ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`),
-    ...(kind.resolve ? RESOLVE_FIELDS : []), ...(kind.ease ? EASE_FIELDS : [])]);
+    ...(kind.resolve ? RESOLVE_FIELDS : []), ...(kind.ease ? EASE_FIELDS : []), ...(kind.finishable ? RING_FIELDS : [])]);
   const verbs = kind.finishable ? [...RING_VERBS, ...AFFORDED_VERBS, ...ENCOUNTER_VERBS] : [...RING_VERBS, ...AFFORDED_VERBS];
   for (const { n, m } of pending) {
     const [, name, sentence, cond, does, says] = m;
@@ -472,7 +482,8 @@ export function startState(kind) {
 /** The scope a condition is read against. `state` is { moods, flags }, `act`
  *  { verb, distance_m, approaching, heard? } (heard: the words the creature could
  *  repeat, or none), `actor` { times }. `encounter` is a finishable kind's
- *  window, as the office counts it: { resolve, ease: { mine, all, first_m } };
+ *  window, as the office counts it: { resolve, ease: { mine, all, first_m },
+ *  ring: { residents, households }, actor: { housemates, nerve, struck } };
  *  absent, every number reads 0. */
 export function scopeOf(state, act = {}, actor = {}, encounter = {}) {
   const self = { ...state.moods };
@@ -482,7 +493,8 @@ export function scopeOf(state, act = {}, actor = {}, encounter = {}) {
   return {
     self,
     act: { verb: act.verb, distance_m: act.distance_m, approaching: !!act.approaching },
-    actor: { times: Number(actor.times) || 0 },
+    actor: { times: Number(actor.times) || 0, housemates: num(encounter.actor?.housemates), nerve: num(encounter.actor?.nerve), struck: !!encounter.actor?.struck },
+    ring: { residents: num(encounter.ring?.residents), households: num(encounter.ring?.households) },
     heard: { any: wordsOf(act.heard) !== "" },
     ease: { mine: num(encounter.ease?.mine), all: num(encounter.ease?.all), first_m: num(encounter.ease?.first_m) },
     // POS-712: the office's word on a telling creature's act; a kind that does not tell never reads it
