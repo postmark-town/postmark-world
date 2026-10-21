@@ -945,6 +945,10 @@ two cuts: "it fades or it flees" and "it is no one's".)
   it goes back into the mist, on its own clock. `fled`: a reaction sent it
   back at once — the only leaving by outcome. Nothing a creature is ever
   vanishes otherwise, and it is never tamed or befriended: it is no one's.
+  *A season's named creature (WLD-25, ruled 2026-10-20 22:56) neither fades nor
+  flees: it stays until a settlement ends it, a third reason, `ended`, written
+  only by the-town. Its mechanics are the season's (WORLD/ENGINE.md § The
+  season's named creatures), not this law's.*
 - **No verbs of its own to be acted on.** A creature has an awareness ring;
   every ordinary public act a resident takes inside it — a walk, an entry or
   exit, a say, a take, give or drop, a mark left — is its trigger. The

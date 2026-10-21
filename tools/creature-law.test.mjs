@@ -20,7 +20,7 @@ const marks = loadMarks(join(ROOT, "WORLD", "marks"));
 const byClass = (c) => marks.find((m) => m.kind === "class" && m.by === "the-town" && String(m.class) === c);
 const KINDS = ["wolf", "raven", "bat"];
 
-test("the creature class: a living node, live canon, two ways to leave, and off by default", () => {
+test("the creature class: a living node, live canon, its ways to leave (ended only for a named one, WLD-25), and off by default", () => {
   const c = byClass("creature");
   assert.ok(c, "the-town/creature stands in the works");
   assert.equal(c.id, "the-town/creature");

@@ -54,6 +54,21 @@
 // `self.<mood> -n` (clamped to its range), or `flee` (it goes back into the Mists
 // at once: a withdraw with reason `fled`). Several are joined by " ; ".
 //
+// A CREATURE THAT IS FINISHED (WLD-25, Darko 2026-10-20 22:47 and 22:56): a kind
+// that says `finishable: true` may carry the effect `finish`: the acting resident
+// has finished it. That changes nothing else; the creature stays until its
+// settlement ends it (reason `ended`), and every resident who finished it before
+// then is on the record, the first by act order taking what it carries. A
+// finishable kind never flees (D6): it leaves only by its ending. And it may write
+// its own ending's line, `ending: …`, naming {finisher}, {names} (the others who
+// took part) and {carried} (what it carried), all three filled by code.
+//
+// A CREATURE THAT TELLS (POS-712, lupi's shape B): a finishable kind may say
+// `fragments: <n>` and `fragment_words: <a, comma, list>`. The office tells each
+// resident one fragment per visit, drawn from that PUBLIC list by the creature's
+// sealed secret, in that resident's reply alone; a call whose list words are exactly
+// their n, in order, finishes it. Its conditions may read told.now, told.answered and told.asks.
+//
 // A line may name `{actor}`, the acting resident, and two slots CODE fills, never a
 // model: `{offered}`, the name of the kind offered, only on a reaction whose
 // condition requires `act.verb == "offer"`; and `{heard}`, a few words a resident
@@ -75,7 +90,7 @@
 // use the words below; a Mists kind that uses one is refused, so the Mists'
 // creatures stay what their header says.
 //
-//   finishable: yes                the switch
+//   finishable: true               the switch (WLD-25's, read below)
 //   resolve: 30                    a whole number > 0: what brute force wears down. Full
 //                                  again at each settlement (the one clock)
 //   strike: 3                      how much resolve one strike takes (1..resolve). resolve
@@ -250,8 +265,8 @@ const REFUSED_EFFECT = [
 ];
 
 /** The effects only a finishable kind may carry (see the header), and why a Mists kind may not. */
-const ENCOUNTER_EFFECT = /^(press|ease|finish)\b/;
-const MISTS_ONLY = "only a finishable kind (finishable: yes) presses, eases or is finished: a Mists creature is a smart decoration";
+const ENCOUNTER_EFFECT = /^(press|ease)\b/; // `finish` and `flee` are WLD-25's own checks, in parseKind
+const MISTS_ONLY = "only a finishable kind (finishable: true) presses or eases: a Mists creature is a smart decoration";
 
 export function parseEffects(src, { moods, flags, finishable = false, ease = null }) {
   return src.split(";").map((s) => s.trim()).filter(Boolean).map((s) => {
@@ -259,10 +274,7 @@ export function parseEffects(src, { moods, flags, finishable = false, ease = nul
     if (!finishable && ENCOUNTER_EFFECT.test(s)) throw new Error(`the effect "${s}" is refused: ${MISTS_ONLY}`);
     let m;
     if (s === "nothing") return { do: "nothing" };
-    if (s === "flee") {
-      if (finishable) throw new Error(`the effect "flee" is refused: a finishable kind never flees; it leaves only by its ending`);
-      return { do: "flee" };
-    }
+    if (s === "flee") return { do: "flee" };
     if (s === "finish") return { do: "finish" };
     if ((m = /^press\s+(\d+)(?:\s+on\s+(.+))?$/.exec(s))) {
       const n = Number(m[1]);
@@ -295,14 +307,23 @@ export function parseEffects(src, { moods, flags, finishable = false, ease = nul
 // ── the kind file ───────────────────────────────────────────────────────────────
 const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/;
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
-const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "resolve", "strike", "ease"]);
+const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending", "fragments", "fragment_words",
+  "resolve", "strike", "ease"]); // an encounter's lines (a finishable kind only)
+/** What a telling kind's conditions may read (POS-712): told.now (it told the actor a fragment with
+ *  this act), told.answered (this act's words answered every fragment, in order) and told.asks
+ *  (every fragment is told, it is asking, and this act did not answer: the one who forgets). */
+export const TOLD_FIELDS = Object.freeze(["told.now", "told.answered", "told.asks"]);
+/** A telling kind tells each resident at most this many fragments. */
+export const FRAGMENTS_MAX = 9;
+/** The slots an ending's line may name (WLD-25), each filled by code at the settlement. */
+export const ENDING_SLOTS = Object.freeze(["finisher", "names", "carried"]);
 /** The longest line a kind file may hold (the reaction pattern is not linear in a
  *  hostile line's length; kind files are reviewed law, and this closes it anyway). */
 export const MAX_LINE = 2000;
 
-/** A finishable kind's own lines (see the header), read whole in place: `finishable`
- *  true or absent, `resolve` and `strike` whole numbers (both or neither), `ease`
- *  { target, by }. Any of them on a kind that is not finishable throws. */
+/** A finishable kind's encounter lines (see the header), read whole in place once
+ *  `finishable` is (WLD-25's switch): `resolve` and `strike` whole numbers (both or
+ *  neither), `ease` { target, by }. Any of them on a kind that is not finishable throws. */
 function encounterOf(kind, source) {
   const whole = (k, v, lo, hi = Infinity) => {
     const n = Number(v);
@@ -310,12 +331,8 @@ function encounterOf(kind, source) {
       throw new Error(`${source}: ${k}: must be a whole number from ${lo}${hi < Infinity ? ` to ${hi}` : " up"} (got ${JSON.stringify(v)})`);
     return n;
   };
-  if (kind.finishable !== undefined) {
-    if (kind.finishable !== "yes") throw new Error(`${source}: finishable: is "yes" or absent (got ${JSON.stringify(kind.finishable)})`);
-    kind.finishable = true;
-  }
   for (const k of ["resolve", "strike", "ease"])
-    if (kind[k] !== undefined && !kind.finishable) throw new Error(`${source}: ${k}: belongs to a finishable kind (finishable: yes); ${MISTS_ONLY}`);
+    if (kind[k] !== undefined && !kind.finishable) throw new Error(`${source}: ${k}: belongs to a finishable kind (finishable: true); ${MISTS_ONLY}`);
   if ((kind.resolve === undefined) !== (kind.strike === undefined)) throw new Error(`${source}: resolve: and strike: come together (what force wears down, and how much one strike takes)`);
   if (kind.resolve !== undefined) {
     kind.resolve = whole("resolve", kind.resolve, 1);
@@ -384,9 +401,33 @@ export function parseKind(text, { source = "kind file" } = {}) {
   kind.ring_m = ring;
   if (!Object.keys(kind.moods).length) throw new Error(`${source}: a kind needs at least one mood`);
   for (const f of kind.flags) if (!/^[a-z][\w-]*$/.test(f) || Object.hasOwn(kind.moods, f)) throw new Error(`${source}: the flag "${f}" must be a slug and not a mood's name`);
+  // finishable: true or nothing (WLD-25); an ending's line only on a finishable kind, naming only its slots
+  if (kind.finishable !== undefined && kind.finishable !== "true") throw new Error(`${source}: finishable: is true or absent (got ${JSON.stringify(kind.finishable)})`);
+  kind.finishable = kind.finishable === "true";
+  if (kind.ending !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: ending: belongs to a finishable kind`);
+    if (!kind.ending) throw new Error(`${source}: ending: says something`);
+    for (const [, x] of kind.ending.matchAll(/\{([^}]*)\}/g))
+      if (!ENDING_SLOTS.includes(x)) throw new Error(`${source}: an ending may name {finisher}, {names} or {carried} and nothing else (got {${x}})`);
+  }
+  // A TELLING KIND (POS-712): how many fragments each resident is told, and the PUBLIC list they
+  // are drawn from (the office seals each draw); finishable only, both or neither, one word each
+  if ((kind.fragments === undefined) !== (kind.fragment_words === undefined)) throw new Error(`${source}: fragments: and fragment_words: come together`);
+  if (kind.fragments !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: fragments: belong to a finishable kind`);
+    const of = Number(kind.fragments);
+    if (!Number.isInteger(of) || of < 1 || of > FRAGMENTS_MAX) throw new Error(`${source}: fragments: is a whole number from 1 to ${FRAGMENTS_MAX} (got ${JSON.stringify(kind.fragments)})`);
+    const words = kind.fragment_words.split(",").map((w) => w.trim().toLowerCase()).filter(Boolean);
+    for (const w of words) if (!/^[a-z][a-z'-]*$/.test(w)) throw new Error(`${source}: a fragment word is one word of letters (got ${JSON.stringify(w)})`);
+    if (new Set(words).size !== words.length) throw new Error(`${source}: a fragment word is listed twice`);
+    if (words.length < 2) throw new Error(`${source}: fragment_words: needs at least two words to draw from`);
+    kind.fragments = of;
+    kind.fragment_words = words;
+  }
+
   encounterOf(kind, source);
 
-  const known = new Set([...ACT_FIELDS, ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`),
+  const known = new Set([...ACT_FIELDS, ...(kind.fragments ? TOLD_FIELDS : []), ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`),
     ...(kind.resolve ? RESOLVE_FIELDS : []), ...(kind.ease ? EASE_FIELDS : [])]);
   const verbs = kind.finishable ? [...RING_VERBS, ...AFFORDED_VERBS, ...ENCOUNTER_VERBS] : [...RING_VERBS, ...AFFORDED_VERBS];
   for (const { n, m } of pending) {
@@ -402,6 +443,8 @@ export function parseKind(text, { source = "kind file" } = {}) {
         : `act.verb is never "${v}": a creature notices only ${RING_VERBS.join(", ")}, and is aimed at only by ${AFFORDED_VERBS.join(", ")}${kind.finishable ? ` and ${ENCOUNTER_VERBS.join(", ")}` : ""}`);
     let effects;
     try { effects = parseEffects(does ?? "nothing", kind); } catch (e) { fail(n, e.message); }
+    if (effects.some((e) => e.do === "finish") && !kind.finishable) fail(n, `only a finishable kind can be finished (finishable: true); a Mists creature fades or flees`);
+    if (effects.some((e) => e.do === "flee") && kind.finishable) fail(n, `a finishable kind never flees: it stays until its settlement ends it`);
     const line = says.trim();
     if (!line) fail(n, `a reaction says something`);
     const names = [...line.matchAll(/\{([^}]*)\}/g)].map((x) => x[1]);
@@ -442,6 +485,8 @@ export function scopeOf(state, act = {}, actor = {}, encounter = {}) {
     actor: { times: Number(actor.times) || 0 },
     heard: { any: wordsOf(act.heard) !== "" },
     ease: { mine: num(encounter.ease?.mine), all: num(encounter.ease?.all), first_m: num(encounter.ease?.first_m) },
+    // POS-712: the office's word on a telling creature's act; a kind that does not tell never reads it
+    told: { now: !!act.told?.now, answered: !!act.told?.answered, asks: !!act.told?.asks },
   };
 }
 
@@ -451,12 +496,14 @@ export function allowedReactions(kind, scope) {
 }
 
 /** Apply a reaction's effects to a state, without touching the original. Moods are
- *  clamped to their range. `fled` is true when it went back into the Mists. */
+ *  clamped to their range. `fled` is true when it went back into the Mists, and
+ *  `finished` when the acting resident finished it (WLD-25). */
 export function applyEffects(kind, state, effects) {
   const next = { moods: { ...state.moods }, flags: [...(state.flags ?? [])] };
-  let fled = false;
+  let fled = false, finished = false;
   for (const e of effects) {
     if (e.do === "flee") fled = true;
+    else if (e.do === "finish") finished = true;
     else if (e.do === "set" && !next.flags.includes(e.flag)) next.flags.push(e.flag);
     else if (e.do === "clear") next.flags = next.flags.filter((f) => f !== e.flag);
     else if (e.do === "add") {
@@ -466,7 +513,7 @@ export function applyEffects(kind, state, effects) {
     }
   }
   next.flags.sort();
-  return { state: next, fled };
+  return { state: next, fled, finished };
 }
 
 const wordsOf = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");

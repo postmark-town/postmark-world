@@ -21,7 +21,7 @@
 // no fs, no engine import, browser-safe like geometry.mjs.
 
 import { isSited, instanceClassOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
-import { marksContain, overlapArea, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "./geometry.mjs";
+import { marksContain, overlapArea, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect, rectCorners } from "./geometry.mjs";
 import { entryLawOf, isStairs } from "./enter-exit.mjs";
 import { nameInSentence } from "./mark-name.mjs";
 
@@ -94,6 +94,45 @@ export function roomHolds(room, mk, marks) {
   // room and which is not wholly inside it gets here, so this is a handful per room
   if (!mk.at || !boxesMeet(boxOf(room), boxOf(mk)) || !pointInMark(mk.at, room) || (mk.extent && marksContain(mk, room))) return false;
   return containerOf(mk, marks)?.id === room.id;
+}
+
+// ── A CREATURE'S RING STOPS AT ITS ROOM'S WALLS (WLD-25, 2026-10-21) ───────────
+//
+// A ring has no line of sight (WLD-56), so without this a creature in one room of
+// a dungeon would hear and answer acts in the room next door. Indoors, a ring is
+// the creature's ring_m AND the room it stands in; outdoors (the Mists' fringe)
+// there is no room and the ring is the plain circle it always was. The office's
+// ring (who a creature hears, and where an action "from the ring" may be taken)
+// and the page's drawn ring both read these two, so they cannot differ.
+
+/** The room a creature at `point` hears inside, or null outdoors: the smallest
+ *  sited mark with an extent whose shape holds the point, when a dungeon governs
+ *  it (or it is one). A thing or a door is never a room: a creature on a table or
+ *  in a doorway hears the room around it. */
+export function ringRoomOf(point, marks) {
+  if (!point || !Number.isFinite(Number(point.x)) || !Number.isFinite(Number(point.y))) return null;
+  let best = null;
+  for (const c of marks ?? []) {
+    if (!isSited(c) || !c.extent || c.entry || instanceClassOf(c) === "thing") continue;
+    if (best && !(area(c) < area(best))) continue;
+    if (pointInMark(point, c)) best = c;
+  }
+  return best && dungeonsOf(best, marks).length ? best : null;
+}
+
+/** The outline a ring stops at, as [{x, y}] in metres: the room's ring when it
+ *  carries one, else its at/extent box. Null for no room. */
+export function ringRoomOutline(room) {
+  if (!room?.at) return null;
+  return polygonOf(room) ?? rectCorners(rect(room));
+}
+
+/** Whether `point` is inside a creature's ring: within `ringM` of `centre`, and
+ *  inside `room` when it stands in one (ringRoomOf). */
+export function inCreatureRing(point, centre, ringM, room = null) {
+  const dx = Number(point?.x) - Number(centre?.x), dy = Number(point?.y) - Number(centre?.y);
+  if (!(Math.hypot(dx, dy) <= Number(ringM))) return false;
+  return room ? pointInMark(point, room) : true;
 }
 
 // MARKINSIDE, KEPT PER (room, mark) OBJECT (review-233): the answer is a fact about

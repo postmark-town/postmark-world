@@ -23,6 +23,7 @@
 // the office has explaining to do.
 import { isGround, instanceClassOf, isPredicate } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
+import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creature's ring stops at its room's walls (WLD-25)
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
@@ -4654,11 +4655,20 @@ export function creatureGlyphSVG({ creature, at, silhouette = null, title = null
  *  hears in (the office's find row carries it, from the kind's own law), drawn in
  *  painting pixels so it holds its true size as the map zooms. It wears the
  *  map's one faint-ring style (.wv-faint-ring, the expired conversation's line)
- *  in the creature's red. No ring_m, no ring. Pure. */
-export function creatureRingSVG({ at, ringM, mPerPx } = {}) {
+ *  in the creature's red. No ring_m, no ring. Pure.
+ *  INDOORS THE RING STOPS AT THE WALLS (WLD-25, 2026-10-21): `room`, the outline
+ *  of the room it hears inside (tools/portals.mjs § ringRoomOf), in painting
+ *  pixels, clips the circle to it under `clipId`. Outdoors there is none. */
+export function creatureRingSVG({ at, ringM, mPerPx, room = null, clipId = null } = {}) {
   const x = Number(at?.x), y = Number(at?.y), r = Number(ringM) / Number(mPerPx);
   if (![x, y].every(Number.isFinite) || !(r > 0) || !Number.isFinite(r)) return "";
-  return `<circle cx="${+x.toFixed(1)}" cy="${+y.toFixed(1)}" r="${+r.toFixed(2)}" class="wv-faint-ring ov-creature-aware"/>`;
+  const pts = Array.isArray(room) && room.length >= 3 && clipId
+    && room.every((p) => Number.isFinite(Number(p?.x)) && Number.isFinite(Number(p?.y)))
+    ? room.map((p) => `${+Number(p.x).toFixed(1)},${+Number(p.y).toFixed(1)}`).join(" ") : null;
+  const circle = `<circle cx="${+x.toFixed(1)}" cy="${+y.toFixed(1)}" r="${+r.toFixed(2)}" class="wv-faint-ring ov-creature-aware"`;
+  if (!pts) return `${circle}/>`;
+  const id = String(clipId).replace(/[^\w-]/g, "-");
+  return `<clipPath id="${id}"><polygon points="${pts}"/></clipPath>${circle} clip-path="url(#${id})"/>`;
 }
 
 // ── A MARK IS HIT BY WHAT WAS DRAWN FOR IT (Keemin, 2026-09-11: "make parcels
@@ -14676,8 +14686,10 @@ export function mountViewer(appEl) {
     for (const c of liveCreatures.values()) {
       if (sceneRoomId && !(box && pointInRect(c.x, c.y, box))) continue;
       if (m && mistsHere({ x: c.x, y: c.y }, m).inWall) continue;
-      // its awareness ring (WLD-82), under every token
-      rings += creatureRingSVG({ at: px({ x: c.x, y: c.y }), ringM: c.ring_m, mPerPx: mapCtx?.mPerPx });
+      // its awareness ring (WLD-82), under every token; indoors it stops at the room's walls
+      const ringRoom = c.ring_m ? ringRoomOutline(ringRoomOf({ x: c.x, y: c.y }, allMarks())) : null;
+      rings += creatureRingSVG({ at: px({ x: c.x, y: c.y }), ringM: c.ring_m, mPerPx: mapCtx?.mPerPx,
+        room: ringRoom ? ringRoom.map((p) => px(p)) : null, clipId: `wv-ring-${c.id}` });
       // far: the plain token, as a resident is the blank walker there (fix 49)
       const plain = tier === "far";
       out += creatureGlyphSVG({ creature: c, at: px({ x: c.x, y: c.y }), silhouette: plain ? null : creatureSilhouette(c.kind),

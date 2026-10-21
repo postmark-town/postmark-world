@@ -17,7 +17,7 @@ what: >
 moods:
   temper: 0..3 = 1 | calm | stirred | angry | wild
 `;
-const FIXTURE = `${HEAD}finishable: yes
+const FIXTURE = `${HEAD}finishable: true
 resolve: 20
 strike: 4
 ease: 3 mine
@@ -42,8 +42,8 @@ test("a finishable kind reads whole: the switch, resolve and strike, ease, and i
   assert.deepEqual(fx.regard, [{ do: "ease", by: 1 }]);
   assert.deepEqual(fx.startle, [{ do: "ease", reset: true }, { do: "press", n: 1, on: [...PRESS_ON] }]);
   assert.deepEqual(fx.yield, [{ do: "finish" }]);
-  assert.deepEqual(parseKind(`${HEAD}finishable: yes\nease: 3 households\nreaction a "a": when true says A.\n`).ease, { target: 3, by: "households" });
-  const bare = parseKind(`${HEAD}finishable: yes\nreaction a "a": when true does finish says A.\n`);
+  assert.deepEqual(parseKind(`${HEAD}finishable: true\nease: 3 households\nreaction a "a": when true says A.\n`).ease, { target: 3, by: "households" });
+  const bare = parseKind(`${HEAD}finishable: true\nreaction a "a": when true does finish says A.\n`);
   assert.equal(bare.resolve, undefined, "a kind may be finishable by its reactions alone");
 });
 
@@ -62,16 +62,16 @@ test("a Mists kind uses none of it: each line, effect, verb and field is refused
   assert.throws(mists("resolve: 20\nstrike: 4"), /resolve: belongs to a finishable kind/);
   assert.throws(mists("ease: 3 mine"), /ease: belongs to a finishable kind/);
   assert.throws(mists("", `reaction a "a": when true does press 1 says A.`), /press 1" is refused: only a finishable kind/);
-  assert.throws(mists("", `reaction a "a": when true does finish says A.`), /"finish" is refused: only a finishable kind/);
+  assert.throws(mists("", `reaction a "a": when true does finish says A.`), /only a finishable kind can be finished/);
   assert.throws(mists("", `reaction a "a": when true does ease +1 says A.`), /"ease \+1" is refused: only a finishable kind/);
   assert.throws(mists("", `reaction a "a": when act.verb == "strike" says A.`), /act\.verb is never "strike" here: only a finishable kind/);
   assert.throws(mists("", `reaction a "a": when self.resolve > 1 says A.`), /reads "self\.resolve", which a creature cannot know/);
   assert.throws(mists("", `reaction a "a": when ease.mine > 1 says A.`), /reads "ease\.mine", which a creature cannot know/);
-  assert.throws(mists("finishable: no"), /finishable: is "yes" or absent/);
+  assert.throws(mists("finishable: no"), /finishable: is true or absent/);
 });
 
 test("a finishable kind's numbers are held to their bounds at parse", () => {
-  const fin = (extra, reaction = `reaction a "a": when true says A.`) => () => parseKind(`${HEAD}finishable: yes\n${extra}\n${reaction}\n`);
+  const fin = (extra, reaction = `reaction a "a": when true says A.`) => () => parseKind(`${HEAD}finishable: true\n${extra}\n${reaction}\n`);
   assert.throws(fin("resolve: 20"), /resolve: and strike: come together/);
   assert.throws(fin("strike: 2"), /resolve: and strike: come together/);
   assert.throws(fin("resolve: 2.5\nstrike: 1"), /resolve: must be a whole number/);
@@ -105,12 +105,12 @@ test("the menu reads the window the office hands it: resolve left, and the actor
   assert.equal(Object.hasOwn(sc.self, "resolve"), false, "no resolve handed: self.resolve is unset, never a guess");
 });
 
-test("applyEffects changes only moods and flags: a press, an ease and a finish are the office's to apply", () => {
+test("applyEffects changes only moods and flags: a press and an ease are the office's to apply, and a finish is only said", () => {
   const k = parseKind(FIXTURE), s = startState(k);
   const bristle = k.reactions.find((r) => r.name === "bristle");
-  assert.deepEqual(applyEffects(k, s, bristle.effects), { state: { moods: { temper: 2 }, flags: [] }, fled: false });
+  assert.deepEqual(applyEffects(k, s, bristle.effects), { state: { moods: { temper: 2 }, flags: [] }, fled: false, finished: false });
   const yieldR = k.reactions.find((r) => r.name === "yield");
-  assert.deepEqual(applyEffects(k, s, yieldR.effects), { state: { moods: { temper: 1 }, flags: [] }, fled: false });
+  assert.deepEqual(applyEffects(k, s, yieldR.effects), { state: { moods: { temper: 1 }, flags: [] }, fled: false, finished: true });
 });
 
 test("a press's line names whom it landed on, filled by code as plain text", () => {
