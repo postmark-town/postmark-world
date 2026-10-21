@@ -52,7 +52,8 @@ test("the law is read whole or not at all", () => {
   const wolf = (over = {}) => ({ kind: "class", by: TOWN, class: "wolf", extends: "creature", dials: { count_per_window: 2 }, kind_file: "WORLD/kinds/wolf.kind", ...over });
   assert.equal(creatureLaw([]), null, "no class, no creatures");
   assert.equal(creatureLaw([cls({ by: "someone" }), wolf()]), null, "only the-town writes the class");
-  assert.deepEqual(creatureLaw([cls(), wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }] });
+  assert.deepEqual(creatureLaw([cls(), wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }], afforded: { wolf: [] } },
+    "a class with no actions affords none (POS-672)");
   for (const k of CREATURE_DIAL_NAMES) {
     const { [k]: _, ...rest } = cls().dials;
     assert.throws(() => creatureLaw([cls({ dials: rest }), wolf()]), new RegExp(`${k} dial`), `a class missing ${k} is refused`);

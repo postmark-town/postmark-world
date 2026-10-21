@@ -64,6 +64,7 @@ import { createHash, createHmac } from "node:crypto";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
 import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
+import { AFFORDED_VERBS } from "./creature-kind.mjs";
 
 export const TOWN = "the-town";
 export const DESPAWN_REASONS = Object.freeze(["faded", "fled"]);
@@ -84,6 +85,9 @@ export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "k
  *   fromCrossing  the class's launch dial (null is off, W6)
  *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m, span_h }
  *   kinds         [{ kind, kind_file }], by name
+ *   afforded      { <kind>: [{ action, who, from, effect, residue, from_class }] }: the
+ *                 afforded actions a resident may aim at a creature of that kind
+ *                 (POS-672), the creature class's first, then the kind's own
  * `marks` are parsed mark records (`loadMarks`, or `parseRecord` on each file read
  * at a ref). Only the-town's classes count. Null when there is no creature class:
  * no class, no creatures. A class missing a dial, or a kind with no whole count or
@@ -107,7 +111,40 @@ export function creatureLaw(marks) {
     dials.counts[kind] = n;
     kinds.push({ kind, kind_file: m.kind_file });
   }
-  return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds };
+  const shared = affordedOf(c);
+  const afforded = {};
+  for (const { kind } of kinds) {
+    const own = affordedOf(classes.find((m) => String(m.class) === kind));
+    for (const a of own) if (shared.some((x) => x.action === a.action))
+      throw new Error(`creatureLaw: ${kind} declares ${a.action}, which every creature already has`);
+    afforded[kind] = [...shared, ...own];
+  }
+  return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds, afforded };
+}
+
+/** WHERE AN AFFORDED ACTION MAY BE TAKEN FROM: in sight of the creature, or inside its ring. */
+export const AFFORDED_FROM = Object.freeze(["sight", "ring"]);
+
+/**
+ * A creature class's own afforded actions, its mark's `actions` (the Candy Bowl's
+ * shape: { action, who, from, effect, residue }), read whole: an action outside
+ * AFFORDED_VERBS, a `from` outside AFFORDED_FROM, a missing field or a verb
+ * declared twice throws. An absent or empty `actions` is none.
+ */
+function affordedOf(mark) {
+  const raw = mark?.actions ?? [];
+  const list = typeof raw === "string" ? JSON.parse(raw) : raw;
+  if (!Array.isArray(list)) throw new Error(`creatureLaw: ${mark.class}'s actions are not a list`);
+  const seen = new Set();
+  return list.map((a) => {
+    const where = `creatureLaw: ${mark.class}'s afforded action ${JSON.stringify(a?.action)}`;
+    if (!AFFORDED_VERBS.includes(a?.action)) throw new Error(`${where} is not one of ${AFFORDED_VERBS.join(", ")}`);
+    if (seen.has(a.action)) throw new Error(`${where} is declared twice`);
+    seen.add(a.action);
+    if (!AFFORDED_FROM.includes(a.from)) throw new Error(`${where} is taken from ${JSON.stringify(a.from)}, not ${AFFORDED_FROM.join(" or ")}`);
+    for (const f of ["who", "effect", "residue"]) if (typeof a[f] !== "string" || !a[f].trim()) throw new Error(`${where} names no ${f}`);
+    return { action: a.action, who: a.who, from: a.from, effect: a.effect, residue: a.residue, from_class: `${TOWN}/${mark.class}` };
+  });
 }
 
 /** A plain object: {…} or Object.create(null); never an array, a date or a boxed value. */
