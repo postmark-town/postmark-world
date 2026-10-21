@@ -27,51 +27,21 @@
 // parcel BINDS to it, which is what owning your ground means.
 //
 // Three quadrants, two refusals, and a falsifier. The quadrants say what the
-// rule means; the falsifier says the change that introduced it moved no ground.
+// rule means; the falsifier says no crossing moves a mark nobody touched.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync, renameSync, readFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadMarks, placementParent, tierRank, standingRank, TIER_RANK, COORDS_FIELD, COORDS_RELATIVE } from "./marks-fold.mjs";
 import { markStanding, standingHouseholdOf } from "./mark-standing.mjs";
-import { deriveOutsiders } from "./region-outsiders.mjs";
-import { overlapArea, polygonOf, rectInsideRing } from "./geometry.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
-
-// The declared act's own receipt. The GATE stopped reading it at the freeze —
-// there is no containment clause left for it to except — but the ref-diff
-// falsifier below still needs it: a region re-shape legitimately moves
-// `placementParent` for the marks it names, and that is the re-shape arriving,
-// not a regression in the tier binding.
-//
-// DERIVED, not read off WORLD/region-outsiders.json (POS-175, 2026-09-21). The
-// committed json is a fold artifact and is stale for the whole interval between
-// an operator's pre-act and the next crossing, so an exemption read from it goes
-// missing exactly when a re-shape has just happened — which is the only moment
-// it is needed. This is an ALLOWANCE consumed by a different assertion, never
-// the subject of one, so deriving it here is not a test agreeing with itself.
-const DISPLACED_BY_DECLARED_ACT = new Set(
-  deriveOutsiders(loadMarks(join(ROOT, "WORLD/marks")), { rectInsideRing, polygonOf, overlapArea })
-    .map((r) => r.mark));
 const LINT = join(HERE, "mark-lint.mjs");
-
-// The household a handle belongs to — the town's own registry (WORLD/households.json,
-// handle → credential key). Handles absent from it fold as their own household
-// (solo:<handle>), so two unregistered handles are never accidentally "the same".
-// Used only by the ref-diff falsifier's within-household allowance (Keemin's
-// 2026-08-22 ruling), which is about a CONTAINMENT answer moving between two
-// handles behind one human — never about anyone's filing, which no longer moves.
-const HOUSEHOLDS = (() => {
-  try { return JSON.parse(readFileSync(join(ROOT, "WORLD/households.json"), "utf8")).households ?? {}; }
-  catch { return {}; }
-})();
-const HOUSEHOLD_OF = (handle) => HOUSEHOLDS[handle] ?? `solo:${handle}`;
 
 // ── fixtures ─────────────────────────────────────────────────────────────────
 // Same shape as coords-frame.test.mjs: a spec is { path, fm }, the path IS the
@@ -568,478 +538,184 @@ test("the walk keeps climbing past a parent that does not bind, to the first anc
   });
 });
 
-// ── THE FALSIFIER ────────────────────────────────────────────────────────────
+// ── THE FALSIFIER: one crossing at a time (WLD-101, 2026-10-21) ─────────────
 //
-// Everything above says what the rule MEANS. This says what the change that
-// introduced it DID, to the 623 real marks the town has actually made, and it
-// is allowed to answer "it moved the world".
+// Everything above says what the rule MEANS. This says the frame law moves
+// nothing nobody touched, over the real world, and it is allowed to answer "it
+// moved the world".
 //
 // Two real programs over two real trees, the discipline of
-// tools/coords-equivalence.mjs: the PRE-RULE marks loaded by the PRE-RULE
-// tools/marks-fold.mjs, extracted read-only at the commit before the rule
-// landed, against this tree loaded with these tools. Neither side is a
-// transcription, and neither is a snapshot the change took of itself.
+// tools/coords-equivalence.mjs: the tree BEFORE the newest crossing, loaded by
+// its own tools/marks-fold.mjs (extracted read-only at that commit), against
+// this tree loaded with these tools. Neither side is a transcription.
 //
-// The ref LOCATES ITSELF — the parent of the commit that introduced `tierRank`
-// — so this keeps meaning the same thing after the branch merges, rather than
-// quietly comparing the tree against itself once `origin/main` moves on.
-test("THE FALSIFIER: every mark in the real world composes to EXACTLY the position it held before the tier binding", async () => {
-  const git = (...a) => execFileSync("git", ["-C", ROOT, ...a], { encoding: "utf8" }).trim();
-  const introduced = git("log", "--format=%H", "-S", "export const tierRank", "--", "tools/marks-fold.mjs")
-    .split(/\r?\n/).filter(Boolean);
-  assert.ok(introduced.length, "the commit that introduced the rule must be findable — without it there is no before-side, and a falsifier that cannot locate its own baseline is not a falsifier");
-  const REF = `${introduced[0]}^`;
+// The invariant, and the whole of it: a mark whose own file is the same on both
+// sides, and whose frame chain holds no file that changed, composes to the same
+// position, on the same frame, standing on the same ground. A mark whose file
+// changed was changed by an act (a move by its author, a take, a withdrawal, a
+// re-file, a crossing's publication), and that act's own gates judge it, so no
+// list here has to know the act exists. A mark whose FRAME changed rides that
+// act, and on an unchanged frame it must move by exactly the frame's delta.
+//
+// It used to compare today's tree with the 2026-08-11 one, the commit before the
+// tier binding, and it carried six hand lists of every mark that had lawfully
+// changed since. Each new lawful verb turned a crossing red until it had its own
+// clause. The merge it gated landed in August; this is the invariant it kept,
+// asked of one crossing (snapshot per settlement, compute only the delta). Its
+// neighbours still guard the frame law over the whole tree:
+// reparent-keep-world (frames leave and return, nothing else moves),
+// geometry-parity (the store and the loader agree), position-law, and mark-lint
+// gate A.
 
-  // The ref side never changes for a given sha, so it is carved once into a
-  // tmpdir cache and reused. The marker is written LAST and the stage renamed
-  // into place whole, so a killed run cannot leave a half cache that gets
-  // trusted; a marker-less dir under the cache name is a corpse, never a cache.
-  const refSha = git("rev-parse", REF);
-  const scratch = join(tmpdir(), `tier-falsifier-cache-${refSha.slice(0, 12)}`);
-  if (!existsSync(join(scratch, ".complete"))) {
-    if (existsSync(scratch)) rmSync(scratch, { recursive: true, force: true });
-    const stage = mkdtempSync(join(tmpdir(), "tier-falsifier-stage-"));
-    execFileSync("git", ["-C", ROOT, "archive", "-o", join(stage, "ref.tar"), REF, "WORLD/marks", "tools"]);
-    execFileSync("tar", ["-xf", "ref.tar"], { cwd: stage });
-    rmSync(join(stage, "ref.tar"));
-    writeFileSync(join(stage, ".complete"), refSha);
-    try { renameSync(stage, scratch); }
-    catch (e) {
-      if (!existsSync(join(scratch, ".complete"))) throw e;
-      rmSync(stage, { recursive: true, force: true }); // lost the race to a peer whose cache is complete
+// One side of a crossing: its loaded records, each record's own file as
+// written, and that side's answer to "whose ground is this standing on".
+const sideOf = (marks, placement) => ({
+  marks,
+  text: (m) => readFileSync(join(m._dir, "mark.md"), "utf8").replace(/\r\n/g, "\n"),
+  ground: (m) => placement(m, marks),
+});
+
+// The comparison, over two sides. Returns what moved that nobody moved.
+function crossingFindings(before, after) {
+  const A = new Map(before.marks.map((m) => [m.id, m]));
+  const B = new Map(after.marks.map((m) => [m.id, m]));
+  const changed = new Set();
+  for (const id of new Set([...A.keys(), ...B.keys()]))
+    if (!A.has(id) || !B.has(id) || before.text(A.get(id)) !== after.text(B.get(id))) changed.add(id);
+  // the marks a record's numbers are written against, nearest first (`_frameId`)
+  const chainOf = (map, id) => {
+    const out = [], seen = new Set([id]);
+    for (let f = map.get(id)?._frameId; f && !seen.has(f); f = map.get(f)?._frameId) { out.push(f); seen.add(f); }
+    return out;
+  };
+  const rides = (id) => [...chainOf(A, id), ...chainOf(B, id)].some((f) => changed.has(f));
+  const touched = (id) => id != null && (changed.has(id) || rides(id));
+  const at = (m) => (m.at ? `${m.at.x},${m.at.y}` : "no position");
+  const shape = (m) => JSON.stringify({ extent: m.extent ?? null, points: m.points ?? null });
+
+  const findings = [];
+  let untouched = 0, riders = 0;
+  for (const [id, a] of A) {
+    if (changed.has(id)) continue;
+    const b = B.get(id);
+    if (rides(id)) {
+      riders++;
+      if (a._frameId === b._frameId && a.at && b.at && a._origin && b._origin) {
+        const dx = b.at.x - a.at.x, dy = b.at.y - a.at.y;
+        const fx = b._origin.x - a._origin.x, fy = b._origin.y - a._origin.y;
+        if (dx !== fx || dy !== fy) findings.push(`${id}: rode ${a._frameId} but moved ${dx},${dy}, not the frame's ${fx},${fy}`);
+      }
+      continue;
     }
+    untouched++;
+    if (at(a) !== at(b)) findings.push(`${id}: moved ${at(a)} -> ${at(b)}`);
+    else if (shape(a) !== shape(b)) findings.push(`${id}: its extent or ring changed`);
+    if ((a._frameId ?? null) !== (b._frameId ?? null)) findings.push(`${id}: re-framed ${a._frameId ?? "the world"} -> ${b._frameId ?? "the world"}`);
+    if (!a.at || !b.at) continue;
+    // a ground that changed, appeared or left is that act's to judge
+    const ga = before.ground(a), gb = after.ground(b);
+    if (ga !== gb && !touched(ga) && !touched(gb)) findings.push(`${id}: ground ${ga ?? "the root"} -> ${gb ?? "the root"}`);
   }
-  try {
-    const old = await import(pathToFileURL(join(scratch, "tools/marks-fold.mjs")).href);
-    assert.equal(old.tierRank, undefined, "the ref side must NOT know the rule, or the two sides agree for free");
+  return { findings, changed: changed.size, untouched, riders };
+}
 
+// The two halves of the check on fixtures, so each run shows it can fail.
+const crossingTrees = (before, after, fn) => {
+  const a = treeOf(before), b = treeOf(after);
+  try { return fn(loadMarks(a), loadMarks(b)); }
+  finally { rmSync(a, { recursive: true, force: true }); rmSync(b, { recursive: true, force: true }); }
+};
+const HOUSE = { path: `${R}/the-house`, fm: mark("market", { x: 200, y: 200 }, { w: 40, h: 40 }) };
+const CHAIR = { path: `${R}/the-house/the-chair`, fm: mark("market", { x: 2, y: 2 }, { w: 2, h: 2 }) };
+const STONE = { path: `${R}/the-stone`, fm: mark("market", { x: 500, y: 500 }, { w: 2, h: 2 }, { by: "u" }) };
+const LAMP = { path: `${R}/the-lamp`, fm: mark("market", { x: 600, y: 600 }, { w: 2, h: 2 }) };
+const CUP = { path: `${R}/the-cup`, fm: mark("market", { x: 700, y: 700 }, { w: 1, h: 1 }) };
+const BEFORE = [THE_ROOT, HOUSE, CHAIR, STONE, LAMP, CUP];
+
+test("the falsifier CAN fail: a mark nobody touched that moves, re-frames or changes ground is a finding", () => {
+  crossingTrees(BEFORE, BEFORE, (A, B) => {
+    const clean = crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent));
+    assert.deepEqual(clean.findings, [], "the same tree on both sides moves nothing");
+    assert.equal(clean.changed, 0);
+
+    // the after side composes an untouched mark somewhere else, its file the same
+    const stone = B.find((m) => m.id === "u/the-stone");
+    stone.at = { x: stone.at.x + 1, y: stone.at.y };
+    const moved = crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent));
+    assert.equal(moved.findings.length, 1);
+    assert.match(moved.findings[0], /^u\/the-stone: moved /);
+    stone.at = { x: stone.at.x - 1, y: stone.at.y };
+
+    // …or frames it on another mark
+    const frame = stone._frameId;
+    stone._frameId = "t/the-house";
+    assert.deepEqual(crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent)).findings,
+      [`u/the-stone: re-framed ${frame} -> t/the-house`]);
+    stone._frameId = frame;
+
+    // …or answers that it stands on other ground, though nothing near it changed
+    const elsewhere = (m, ms) => (m.id === "u/the-stone" ? "t/the-house" : placementParent(m, ms));
+    assert.deepEqual(crossingFindings(sideOf(A, placementParent), sideOf(B, elsewhere)).findings,
+      ["u/the-stone: ground the root -> t/the-house"]);
+  });
+});
+
+test("the falsifier passes a mark whose own file changed: a move by its author, a take, and what rides or stands on them", () => {
+  const RUG = { path: `${R}/the-rug`, fm: mark("market", { x: 500, y: 500 }, { w: 10, h: 10 }, { by: "v", date: "2026-10-21" }) };
+  const after = [
+    THE_ROOT,
+    // the author moves the house, and the chair (same household, its file untouched) rides it
+    { ...HOUSE, fm: { ...HOUSE.fm, at: { x: 260, y: 230 }, date: "2026-10-21" } },
+    CHAIR,
+    STONE,
+    // the author moves the lamp
+    { ...LAMP, fm: { ...LAMP.fm, at: { x: 640, y: 600 }, date: "2026-10-21" } },
+    // a resident takes the cup: it rides its holder and has no position of its own
+    { ...CUP, fm: (({ at, extent, ...rest }) => ({ ...rest, held_by: "u", date: "2026-10-21" }))(CUP.fm) },
+    // a new mark is published over the stone, so the stone's ground is new
+    RUG,
+  ];
+  crossingTrees(BEFORE, after, (A, B) => {
+    const r = crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent));
+    assert.deepEqual(r.findings, []);
+    assert.equal(r.changed, 4, "the house, the lamp, the cup and the rug");
+    assert.equal(r.riders, 1, "the chair rode the house");
+    const chairA = A.find((m) => m.id === "t/the-chair"), chairB = B.find((m) => m.id === "t/the-chair");
+    assert.deepEqual([chairB.at.x - chairA.at.x, chairB.at.y - chairA.at.y], [60, 30], "by exactly the house's move");
+    assert.equal(placementParent(B.find((m) => m.id === "u/the-stone"), B), "v/the-rug", "the stone stands on the new rug, which judged itself");
+
+    // a rider that does not move by its frame's delta is still a finding
+    chairB.at = { x: chairB.at.x + 1, y: chairB.at.y };
+    assert.match(crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent)).findings.join("\n"),
+      /t\/the-chair: rode t\/the-house but moved 61,30, not the frame's 60,30/);
+  });
+});
+
+test("THE FALSIFIER: across the newest crossing, every mark nobody touched composes to exactly where it stood, on the same ground", async (t) => {
+  const git = (...a) => execFileSync("git", ["-C", ROOT, ...a], { encoding: "utf8" }).trim();
+  // The newest crossing is the newest sweep commit. On the box the suite runs
+  // over the sweep's working tree before it commits (the before side is then
+  // the parent of the previous crossing, and this crossing is in the working
+  // tree) and again after (HEAD is the crossing). Either way the delta read is
+  // bounded and holds the crossing.
+  const crossing = git("log", "-1", "--format=%H", "--grep=^settlement: sweep", "HEAD");
+  assert.ok(crossing, "the newest crossing must be findable; without it there is no before side");
+  const refSha = git("rev-parse", `${crossing}^`);
+  const scratch = mkdtempSync(join(tmpdir(), "tier-falsifier-"));
+  try {
+    execFileSync("git", ["-C", ROOT, "archive", "-o", join(scratch, "ref.tar"), refSha, "WORLD/marks", "tools"]);
+    execFileSync("tar", ["-xf", "ref.tar"], { cwd: scratch });
+    const old = await import(pathToFileURL(join(scratch, "tools/marks-fold.mjs")).href);
     const A = old.loadMarks(join(scratch, "WORLD/marks")).filter((m) => !m._error);
     const B = loadMarks(join(ROOT, "WORLD/marks")).filter((m) => !m._error);
-    assert.ok(A.length >= 600, `the real tree, not a fixture (${A.length} records at the ref)`);
+    assert.ok(A.length >= 600 && B.length >= 600, `the real tree, not a fixture (${A.length} before, ${B.length} after)`);
 
-    // The census first, ONE WAY: a change that DROPPED a record would otherwise
-    // pass, since a mark that is not there has no position to disagree about.
-    // This also buys the loop below its footing — every A-side id is present in
-    // B, so a B-side lookup is a lookup and not a hope.
-    //
-    // NOTHING VANISHES WITHOUT A DECLARING ACT (the loss check's amendment,
-    // teed 2026-08-13 with the equality retirement; first lawful customer the
-    // same day). These ids left the census by named founder act — the seed act:
-    // the-record renamed to logos (the id rides the slug; the rename is the
-    // declaration), and four stale renderings removed after audit, each of
-    // which said OTHER than its v2 source now says. The declaring act is the
-    // commit carrying this list; when the withdraw verb ships, this list
-    // becomes a query over the log and the constant retires.
-    const WITHDRAWN_BY_DECLARED_ACT = new Set([
-      "the-town/the-record",           // renamed → the-town/logos (the seed, 2026-08-13)
-      "the-town/the-three-layers",     // said word/world/living; v2 three-layers.md says law/log/graph
-      "the-town/the-binding-channels", // rendered the superseded binding claim; v2's channels are law→machinery
-      "the-town/the-three-kinds",      // "only the first is kept" — retired by the third supersession
-      "the-town/the-kinds",            // four kinds as law; v2: one node type, the vocabulary is serialization
-      // the graduation merge (2026-08-20): the verb-form + tense renames ruled
-      // at the grammar sittings — the id rides the slug, the rename is the
-      // declaration (the-record precedent above); the declaring act is the
-      // merge commit carrying this list.
-      "the-town/the-tense",            // renamed → the-town/the-witnessed-instant (Tier-2 rename, 08-19)
-      "the-town/the-three-tenses",     // renamed → the-town/the-three-balances (Tier-2 rename, 08-19)
-      "the-town/attachment",           // renamed → the-town/attach (verb-form grammar)
-      "the-town/departure",            // renamed → the-town/depart (verb-form grammar)
-      // BLACKWATER BEND CHANGED HANDS (founder, 2026-09-10, verbatim: "the inlet
-      // is terrain; everything else is just a mark, and belongs to the resident/
-      // household"). A mark's id is `<by>/<slug>`, so when `by:` moves the id
-      // moves with it and the old id leaves the census — the same shape as the
-      // renames above, where the id rides the slug. The mark did not go
-      // anywhere; only this name did. The declaring act is the founder's ruling,
-      // carried by the transfer commit (f1ffaaae) and by the freeze manifest,
-      // whose rows for these three are re-keyed to the ids they carry now.
-      "the-town/blackwater-bend-footbridge",  // → merrick-nocturne/blackwater-bend-footbridge
-      "the-town/blackwater-bend-grove",       // → merrick-nocturne/blackwater-bend-grove
-      "the-town/blackwater-bend-stone-path",  // → merrick-nocturne/blackwater-bend-stone-path
-    ]);
-    const idsA = new Set(A.map((m) => m.id)), idsB = new Set(B.map((m) => m.id));
-    // THE WITHDRAW VERB SHIPPED (2026-08-19), so the constant's own retirement
-    // clause comes due: for losses after the hand-list's era, the declaring act
-    // is QUERIED off the record's own history — the deleting commit must be a
-    // settlement sweep (the canon half of world_withdraw_mark) or a founder-hand
-    // withdraw. First lawful customer: nyx/the-night-room, whose withdrawal
-    // refused the 2026-08-21 crossing while this was still a hand list.
-    // THE CROSSING IN PROGRESS IS A DECLARING ACT (2026-09-16, the 09-16
-    // return's first crossing). The sweep runs this suite over its WORKING TREE
-    // before it commits, so a mark it unpublished this crossing has no deleting
-    // commit yet — the `git log` clause below cannot see it, and 52 lawful
-    // returns read as losses (S71's morning crossing refused on exactly this).
-    // What the working tree DOES carry is the sweep's own ledger: a row present
-    // in WORLD/settlement-publications.json at HEAD and absent in the tree is a
-    // mark this crossing unpublished through its own channel — the return rule
-    // (PSA 2026-09-09: "every commons mark with no stake behind it returns to
-    // its household's drafts"). On a clean tree the two sets agree and this
-    // clause names nothing.
-    const registryIds = (text) => { try { return Object.keys(JSON.parse(text).published ?? {}); } catch { return []; } };
-    const registryAt = (ref) => registryIds((() => { try { return git("show", `${ref}:WORLD/settlement-publications.json`); } catch { return "{}"; } })());
-    // …AND THE CROSSING JUST COMMITTED IS ONE TOO (2026-09-16, the 17:45Z
-    // crossing). On the box this suite runs AFTER the sweep commits and before
-    // it pushes, so HEAD is the settlement commit itself: its registry already
-    // lacks the rows the crossing removed, and the clause above names nothing.
-    // The rows a crossing removed are its parent's minus its own — so HEAD~1 is
-    // read too. Before the commit the parent's registry is simply an older
-    // superset; on a clean tree the sets agree and nothing is named.
-    const registryAtHead = new Set([...registryAt("HEAD"), ...registryAt("HEAD~1")]);
-    const registryPath = join(ROOT, "WORLD/settlement-publications.json");
-    const registryInTree = new Set(registryIds(existsSync(registryPath) ? readFileSync(registryPath, "utf8") : "{}"));
-    const unpublishedThisCrossing = new Set([...registryAtHead].filter((id) => !registryInTree.has(id)));
-    const lostIds = [...idsA].filter((i) => !idsB.has(i) && !WITHDRAWN_BY_DECLARED_ACT.has(i));
-    const marksRootA = join(scratch, "WORLD", "marks").replace(/\\/g, "/");
-    // THE DELETING COMMIT IS FOUND BY THE MARK'S FILING, NOT BY ITS REF-ERA PATH
-    // (2026-09-16, the 17:45Z crossing). lysander/the-jetty was re-filed under
-    // the lochan after the ref (fdf9a60f, the region re-shape); asked by its
-    // 08-11 path, the log answered with that re-filing, and the settlement that
-    // lawfully returned it read as a loss with no act — the one rehomed mark
-    // among fifty. The freeze manifest IS the filing ("A mark's directory is its
-    // historical filing… it never moves again"), so a frozen id is asked by its
-    // frozen seat; a mark the fossil never held keeps the ref-era path, which is
-    // the only filing it ever had.
-    const frozenFiling = new Map(Object.entries((() => {
-      try { return JSON.parse(readFileSync(join(ROOT, "WORLD/filing-freeze.json"), "utf8")).marks ?? {}; } catch { return {}; }
-    })()));
-    const lawfullyWithdrawn = new Set();
-    for (const id of lostIds) {
-      if (unpublishedThisCrossing.has(id)) { lawfullyWithdrawn.add(id); continue; }
-      const frozenSeat = frozenFiling.get(id);
-      const dirA = String(A.find((m) => m.id === id)?._dir ?? "").replace(/\\/g, "/");
-      if (!frozenSeat && !dirA.startsWith(marksRootA)) continue;
-      const rel = frozenSeat ? `${frozenSeat}/mark.md` : `WORLD/marks${dirA.slice(marksRootA.length)}/mark.md`;
-      let subject = "";
-      try { subject = git("log", "-1", "--format=%s", "--diff-filter=D", "HEAD", "--", rel).trim(); } catch { /* no deleting commit — stays a loss */ }
-      // Three deleting subjects are declared acts: the settlement sweep (the
-      // canon half of world_withdraw_mark), a founder-hand withdraw, and an
-      // amend's supersession (the id continues, and if it later leaves, that
-      // leaving carries its own act — nyx's room did exactly this chain).
-      if (/^(settlement: |withdraw|amend: )/.test(subject)) lawfullyWithdrawn.add(id);
-    }
-    assert.deepEqual(lostIds.filter((i) => !lawfullyWithdrawn.has(i)), [],
-      "no record was lost without a declaring act");
-    // All A-side positions below are looked up in B; the withdrawn ids are
-    // predicated (no `at`), so the geometry loop never meets them — asserted
-    // here so a future withdrawal of a POSITIONED mark fails loud instead of
-    // crashing the loop on an undefined lookup.
-    // attachment and departure were positioned at the ref; their geometry exit
-    // was already declared (DESITED_BY_DECLARED_ACT below — the loop is
-    // taught), and their id exit is the verb-form rename — two declarations,
-    // one lawful act each. Any OTHER positioned withdrawal still fails loud.
-    //
-    // The Blackwater three were positioned at the ref and are positioned still —
-    // under the ids they carry now, which is the whole of what a transfer does.
-    // They are NOT de-sited: the loops below skip them by name rather than
-    // pretending they left geometry. WHAT THAT COSTS, said plainly: this
-    // falsifier no longer diffs their A-side position against their B-side one,
-    // because the two sides call them different things and no line here may
-    // hold the pair without becoming the register this file just deleted. What
-    // still reads them: geometry-parity (store vs loader), mark-lint gate A
-    // (the freeze row, re-keyed), position-law, and the region gates.
-    const WITHDRAWN_WHILE_POSITIONED = new Set([
-      "the-town/attachment", "the-town/departure",
-      "the-town/blackwater-bend-footbridge", "the-town/blackwater-bend-grove",
-      "the-town/blackwater-bend-stone-path",
-    ]);
-    for (const id of WITHDRAWN_BY_DECLARED_ACT)
-      assert.ok(!A.find((m) => m.id === id)?.at || WITHDRAWN_WHILE_POSITIONED.has(id),
-        `${id} was predicated — a positioned withdrawal needs the loop below taught, not just this list`);
-    // The other direction — "and none appeared" — is RETIRED, and it is worth
-    // saying why rather than leaving a hole. It was the tier-binding MERGE's
-    // gate: a migration that FABRICATED records would otherwise have passed,
-    // because an id with no before-side has no position to disagree about
-    // either. That merge landed. What is left is a permanent regression test,
-    // and the permanent invariant is loss + geometry over the ids the two sides
-    // share — forward growth is the town lawfully admitting marks, the exact
-    // ordinary event a falsifier must never refuse. An equality assertion here
-    // would keep re-reading the world's 2026-08-11 census as a law, and moving
-    // the baseline forward does not repair that; it only re-dates it.
-
-    const posOf = (ms) => new Map(ms.filter((m) => m.at).map((m) => [m.id, {
-      at: `${m.at.x},${m.at.y}`,
-      extent: JSON.stringify(m.extent ? { w: m.extent.w, h: m.extent.h } : null),
-      points: JSON.stringify(m.points ?? null),
-    }]));
-    const pa = posOf(A), pb = posOf(B);
-    const heldOnB = new Set(B.filter((m) => m.held_by).map((m) => m.id));
-    assert.ok(pa.size > 300, `enough positioned records to be worth checking (${pa.size})`);
-    // NOTHING MOVES WITHOUT A DECLARING ACT (the loss check's doctrine,
-    // extended to geometry 2026-08-17; first lawful customer the same day):
-    // the ship weighed anchor for the quay's water at Keemin's word (world
-    // 97139c0d — the waitees ride aboard; deck and stone in mutual earshot).
-    // An exemption names its exact before AND after — a second move of the
-    // same mark fails loud until declared here. When the amend verb ships,
-    // this list becomes a query over the log and the constant retires.
-    // THE AUTHOR'S OWN MOVE IS A DECLARING ACT (S120, 2026-10-20). The amend verb
-    // shipped, so the hand list below became the query its own comment promised:
-    // a record whose author rewrote it (its `date:` is newer) AND whose own file
-    // numbers changed was MOVED BY ITS AUTHOR, and that is the ordinary, lawful
-    // event a falsifier must never refuse. S120 sat untagged because little-bird
-    // carried three bowls of broth to the waiting-room door and the quay, and this
-    // test read the 2026-08 positions as law. What it still guards: a mark whose
-    // own record did NOT change must compose to exactly where it stood.
-    const recA = new Map(A.map((m) => [m.id, m])), recB = new Map(B.map((m) => [m.id, m]));
-    const fileAt = (m) => (m?._fileAt ? `${m._fileAt.x},${m._fileAt.y}` : m?.at ? `${m.at.x},${m.at.y}` : null);
-    const movedByItsAuthor = (id) => {
-      const a = recA.get(id), b = recB.get(id);
-      return !!(a && b && String(a.date ?? "") !== String(b.date ?? "") && fileAt(a) !== fileAt(b));
-    };
-    const MOVED_BY_DECLARED_ACT = new Map([
-      ["the-town/the-ship-at-anchor", { from: "1210,5720", to: "1350,5665" }],
-    ]);
-    // THE REGION POLYGON RULING (Keemin, founder, 2026-08-21: "region overlap
-    // ruling has been relitigated ad nauseum. polygons. now."; 2026-08-22: "use
-    // polygons to represent the regions so they fit based on the atlas… feel
-    // free to tweak the polygons a bit if it would otherwise exclude an existing
-    // resident of that region"). Twelve regions took the shape the Atlas draws
-    // for them, and the claim-honesty gate then restates each one's at/extent as
-    // its ring's bounding box — so twelve claims moved, and their extents and
-    // rings changed with them. Each names its exact before and after, as the
-    // ship above does.
-    const RESHAPED_BY_DECLARED_ACT = new Map([
-      ["the-town/the-town-centre", { from: "-75,-75", to: "-54,-79.5" }],
-      ["wright/the-trueing-terrace", { from: "925,-2400", to: "967,-2450.5" }],
-      ["rei/the-lanternseed-gardens", { from: "1325,-1000", to: "1338,-994.5" }],
-      ["limen/the-threshold-district", { from: "1488,1808", to: "1520,1793" }],
-      ["carta/the-long-run", { from: "1325,5150", to: "1364,5141.5" }],
-      ["sol-of-garrison/the-protected-grove", { from: "-1375,-2625", to: "-1380,-2618" }],
-      ["spar/the-doubled-coast", { from: "-400,4900", to: "-400,4923" }],
-      ["aion-solare/aelyria", { from: "3675,4950", to: "3637.5,4938.5" }],
-      ["orion-by-the-fire/the-reach", { from: "-2075,4500", to: "-2047,4494.5" }],
-      ["east-facing-window/the-east-window-district", { from: "3025,1860", to: "3079.5,1882" }],
-      ["sage-reeves/the-high-ground", { from: "2575,200", to: "2563,221" }],
-      ["caelum/evermoon", { from: "-1900,2150", to: "-1953,2116.5" }],
-    ]);
-    // …and 219 marks moved WITH them, which is not a second act but the frame law
-    // doing exactly what it is for: "A bound child is framed by its parent — its
-    // `at:` is an offset from that parent's centre, and moving the parent carries
-    // it" (WORLD/marks/SCHEMA.md § The frame). So they are declared as a RULE and
-    // not as a hand list, and the rule is the stronger assertion: a carried mark
-    // must have moved by EXACTLY its region's delta, to the metre. A mark that
-    // drifted by anything else — or that moved while standing under no reshaped
-    // region — is still an undeclared move and still fails here.
-    const deltaOf = (d) => {
-      const [fx, fy] = d.from.split(",").map(Number), [tx, ty] = d.to.split(",").map(Number);
-      return { dx: tx - fx, dy: ty - fy };
-    };
-    const bById = new Map(B.map((m) => [m.id, m]));
-    // THE CARRIER IS ASKED OF EITHER TREE (POS-441, 2026-10-07). The household
-    // un-nesting re-filed another household's marks at their ids, places kept,
-    // so a mark a region carried in the 08-22 reshape may no longer be filed
-    // under that region today — while the ref still files it there. The
-    // question is whether the region carried it, which the ref's own filing
-    // answers; a mark re-filed under a region after the ref (lysander's jetty)
-    // is answered by today's. The delta below must still match to the metre.
-    const aById = new Map(A.map((m) => [m.id, m]));
-    const framerIn = (map, id) => {
-      const seen = new Set();
-      let p = map.get(id)?._parentMarkId;
-      while (p && !seen.has(p)) { if (RESHAPED_BY_DECLARED_ACT.has(p)) return p; seen.add(p); p = map.get(p)?._parentMarkId; }
-      return null;
-    };
-    const reshapedFramerOf = (id) => framerIn(bById, id) ?? framerIn(aById, id);
-    const carriedByAReshapedRegion = (id, aAt, bAt) => {
-      const framer = reshapedFramerOf(id);
-      if (!framer) return false;
-      const { dx, dy } = deltaOf(RESHAPED_BY_DECLARED_ACT.get(framer));
-      const [ax, ay] = aAt.split(",").map(Number), [bx, by] = bAt.split(",").map(Number);
-      return bx - ax === dx && by - ay === dy;
-    };
-    // THE DE-SITING (Keemin's ruling, 2026-08-18 night — the node-ontology
-    // planting): law has no where. Class-nodes leave geometry entirely
-    // (kind: class, no at/extent) — a rule's extent is its jurisdiction,
-    // enumerable, never measurable. A withdrawal FROM GEOMETRY is declared
-    // per id: the B side must still HOLD the record (losing it entirely
-    // still fails the loss check above), just without a position. Only ids
-    // positioned on the A side matter here; listing the whole census keeps
-    // the declaration whole.
-    const DESITED_BY_DECLARED_ACT = new Set([
-      "the-town/address", "the-town/attachment", "the-town/berth",
-      "the-town/bounty", "the-town/crossing",
-      "the-town/departure", "the-town/emission", "the-town/entity",
-      "the-town/fog", "the-town/home", "the-town/household",
-      "the-town/human", "the-town/light", "the-town/member-of",
-      "the-town/note", "the-town/parcel", "the-town/profile",
-      "the-town/resident", "the-town/response-edge", "the-town/sound",
-      "the-town/stake", "the-town/thing", "the-town/timetable",
-      "the-town/town", "the-town/window",
-    ]);
-    const moved = [], extentChanged = [], ringChanged = [];
-    for (const [id, a] of pa) {
-      if (lawfullyWithdrawn.has(id)) continue; // gone by the log's own declaring act — nothing to compare
-      if (DESITED_BY_DECLARED_ACT.has(id)) {
-        // withdrawn from geometry by declared act: the record must still
-        // stand on the B side (the loss gate above catches disappearance);
-        // here we hold only that it carries no position anymore
-        assert.ok(!pb.has(id), `${id} was de-sited by declared act, but the B side still positions it at ${pb.get(id)?.at}`);
-        continue;
-      }
-      // the id left the census by the hand list's own act (a rename, or a
-      // transfer — the id rides the slug or the author), so nothing on the B
-      // side answers to it. Checked AFTER the de-sited branch so that branch's
-      // "and the B side must not still position it" still runs for its own ids.
-      if (WITHDRAWN_BY_DECLARED_ACT.has(id)) continue;
-      // a take is a declaring act: a mark the B side holds (held_by) rides its holder
-      // and carries no position of its own (LOGOS: a held thing rides its holder; S123,
-      // 2026-10-21, POS-688). Like the de-sited branch, hold only that it lost the position.
-      if (heldOnB.has(id)) {
-        assert.ok(!pb.has(id), `${id} is held on the B side, but the B side still positions it at ${pb.get(id)?.at}`);
-        continue;
-      }
-      const b = pb.get(id);
-      const reshaped = RESHAPED_BY_DECLARED_ACT.get(id);
-      if (a.at !== b.at) {
-        const d = MOVED_BY_DECLARED_ACT.get(id) ?? reshaped;
-        if (!(d && d.from === a.at && d.to === b.at) && !carriedByAReshapedRegion(id, a.at, b.at) && !movedByItsAuthor(id))
-          moved.push(`${id}: ${a.at} -> ${b.at}`);
-      }
-      // a size is not a position; it must not move — except where the claim was
-      // restated as a ring's bbox by the declared reshape above
-      if (a.extent !== b.extent && !reshaped) extentChanged.push(id);
-      // a ring IS a set of positions and rides with `at` — and a region taking
-      // its true shape is precisely a ring appearing where there was none
-      if (a.points !== b.points && !reshaped) ringChanged.push(id);
-    }
-    assert.deepEqual(moved, [], `${moved.length} mark(s) MOVED — the change was not position-preserving`);
-    assert.deepEqual(extentChanged, []);
-    assert.deepEqual(ringChanged, []);
-
-    // …and the ANSWER TO "what contains this" is unchanged too, which is the
-    // half a position check cannot see: the six re-framed records carry
-    // different digits now, and if any of them had been re-framed onto the
-    // wrong origin their footprint would have landed in a different
-    // container while the composed centre still matched by luck.
-    // RE-HOMED BY DECLARED ACT (2026-08-22): lysander's jetty walks out from
-    // Lochan House "to meet the water", and it stands in the lochan — but at 3 x
-    // 12 m it owned no 5 m coverage cell, so `marksContain` had been answering
-    // that the lake contained nothing at all. With that grid-phase bug fixed the
-    // lake is the jetty's tightest container, which is what the record's own
-    // prose has said all along. The jetty does not MOVE (its offset was rewritten
-    // by exactly the lochan's centre, and the position check above holds it); only
-    // the edge naming its container is repointed.
-    const ROOT_ID = "the-town/let-there-be-light";
-    const REFILED_GROUND = new Map();
-    for (const block of (() => { try { return JSON.parse(readFileSync(join(ROOT, "WORLD/filing-freeze.json"), "utf8")).reframed ?? []; } catch { return []; } })())
-      for (const rows of [block.rows ?? {}, block.unfrozen ?? {}])
-        for (const [id, r] of Object.entries(rows)) REFILED_GROUND.set(id, r.ground ?? null);
-    const REHOMED_BY_DECLARED_ACT = new Map([
-      ["lysander/the-jetty", { from: null, to: "the-town/the-lochan" }],
-      // THE PARTY'S GATHERING PLACE, declared 2026-08-29. The parlor is a
-      // portal ground the town stood inside rei's house at the founder's ask,
-      // and four of rei's furniture marks stand within its footprint, so
-      // containment files them to the room they are in. Each is pinned from
-      // and to: any other movement of these four still fails here.
-      ["rei/the-front-window-worktable", { from: "rei/the-lanternstep-house", to: "wright/the-lanternstep-parlor" }],
-      ["rei/the-mending-basket",         { from: "rei/the-lanternstep-house", to: "wright/the-lanternstep-parlor" }],
-      ["rei/the-pocket-lantern-for-hal", { from: "rei/the-lanternstep-house", to: "wright/the-lanternstep-parlor" }],
-      ["rei/the-small-kitchen",          { from: "rei/the-lanternstep-house", to: "wright/the-lanternstep-parlor" }],
-    ]);
-    for (const m of A) {
-      // a de-sited record has left geometry: its containment answer is now
-      // class-space's (the extends: lattice), which geometry cannot see
-      if (DESITED_BY_DECLARED_ACT.has(m.id)) continue;
-      if (lawfullyWithdrawn.has(m.id)) continue; // withdrawn by declared act — no B side to ask
-      if (WITHDRAWN_BY_DECLARED_ACT.has(m.id)) continue; // ditto, by the hand list rather than the log
-      // A RECORD WITH NO POSITION HAS NO FOOTPRINT TO CONTAIN (corrected
-      // 2026-08-22). This loop's own reason is the sentence above it — "if any of
-      // them had been re-framed onto the wrong origin their FOOTPRINT would have
-      // landed in a different container" — and a predicated/naming/class record
-      // has none: `rect()` reads it as a 1 x 1 m square at the world origin, so
-      // what the loop was really asking of 289 of them was "which mark covers
-      // 0,0", an answer that has nothing to do with where they were framed. The
-      // Centre's quay-reach rode the Centre's restated centre 63 m east and came
-      // to cover the origin, and every one of those 289 answers flipped at once
-      // while not one of them describes a place. Positioned records — the ones
-      // the sentence is about — are all still checked.
-      if (!m.at) continue;
-      const before = old.placementParent(m, A);
-      const after = placementParent(pb.has(m.id) ? B.find((x) => x.id === m.id) : m, B);
-      // WITHIN-HOUSEHOLD RE-HOMES ARE ALLOWED (founder ruling, Keemin 2026-08-22):
-      // when a household publishes a new container over its own ground, the mark
-      // it re-homes shares that household, and the move is fully reversible by
-      // the one human behind both handles — not a tier-binding regression the
-      // falsifier must refuse. First lawful customer: rook-of-garrison's
-      // aerial-display-deck re-homing sol-of-garrison's heart-house (party night;
-      // both gh:260462838). Cross-household captures still fail loud.
-      if (after !== before) {
-        const afterBy = (B.find((x) => x.id === after))?.by;
-        if (afterBy && HOUSEHOLD_OF(afterBy) === HOUSEHOLD_OF(m.by)) continue;
-      }
-      // AND the explicit allowlist, which covers what the rule above cannot.
-      // These are two generations of one guard and they are NOT redundant: the
-      // within-household ruling forgives a move between two handles behind one
-      // human, and the single entry below is a CROSS-household re-home — the
-      // Lochan is the-town's and the jetty is lysander's. It exists because this
-      // branch gives the Lochan its true ring, and a region acquiring real
-      // geometry newly contains a mark that had no placement parent at all
-      // (`from: null`). That is the region arriving, not a household capturing.
-      // ── DISPLACED BY THE REGION RE-SHAPE (the founder's pivot, 2026-08-24) ──
-      //
-      // The third generation of this guard, and the one that needed a law rather
-      // than an allowlist. The pivot drew the regions to match their atlas
-      // renders and DELIBERATELY DECOUPLED GROUND FROM FILING: a mark can now
-      // stand outside the ring of the region it is filed under, and that is a
-      // heads-up on WORLD/region-outsiders.json, not a re-home and not a lie.
-      //
-      // So `placementParent` — which answers "whose ground is this standing on"
-      // — legitimately moves for these marks, while the thing this falsifier
-      // actually protects does not. What it protects is that nothing MOVED and
-      // nobody's filing was changed under them, and both are asserted here
-      // rather than waved through: the mark is on the generated list, its
-      // directory parent is the same one it had before, and its composed world
-      // position is unchanged to the metre.
-      //
-      // A mark whose placementParent moved and is NOT on the list still fails,
-      // which is the whole point — the exemption comes from the declared act's
-      // own receipt and from nowhere softer.
-      if (DISPLACED_BY_DECLARED_ACT.has(m.id)) {
-        const bRec = B.find((x) => x.id === m.id);
-        assert.equal(bRec?._parentMarkId, m._parentMarkId,
-          `${m.id} is displaced by the re-shape, but its FILING changed too — the pivot moves boundaries, never anyone's paper`);
-        continue;
-      }
-      // ── A ROOT-PARKED MARK THAT A GROWN RING NOW HOLDS ─────────────────────
-      // Pass 3 widened every region to the outer wash, and two marks the draft
-      // door had parked at the ROOT with no filing at all now stand inside one.
-      // Their placementParent moves from nothing to something — and there is no
-      // author's word for the geometry to contradict, which is precisely the
-      // lint's own the-parked clause: "the door parked this mark at the root and
-      // its author chose no filing… the save files it by geometry, numbers
-      // re-framed, so the mark does not move." A mark that HAD a filing and had
-      // it changed still fails; this arm only forgives the case where the before
-      // side is nothing.
-      if (before === null) continue;
-      const rehome = REHOMED_BY_DECLARED_ACT.get(m.id);
-      if (rehome && rehome.from === before && rehome.to === after) continue;
-      // ── THE GROUND LEFT BY A DECLARING ACT (the reparent verb, 2026-09-16 —
-      // POS-102 · postmark#2865). `placementParent` answers "whose ground is
-      // this standing on". When that ground's own record leaves canon by a
-      // declaring act — the return, a withdrawal — the mark stands on the next
-      // ground up BY CONSTRUCTION and did not move to get there: the loss check
-      // above owns the leaving, and the geometry loop above has already held this
-      // mark's world position to the metre (the verb re-expressed its numbers so
-      // that it would). A parent that left lawfully is not a parent that moved.
-      // A parent that is still standing, or that vanished with no declaring act,
-      // fails here exactly as before. First customer: the 09-16 return's five
-      // frames (limen's terraces, rei's experiment garden) and the eleven marks
-      // filed on them.
-      if (lawfullyWithdrawn.has(before) || WITHDRAWN_BY_DECLARED_ACT.has(before)) continue;
-      // ── RE-FILED BY THE HOUSEHOLD UN-NESTING (POS-441, ruled 2026-10-07) ──────
-      // The un-nesting re-filed another household's marks at their ids, places
-      // kept, so a mark the re-shape had displaced is no longer filed in the
-      // region it stands outside and leaves the outsiders list the allowance
-      // above reads. Its declaring act's receipt (filing-freeze.json `reframed`)
-      // names the ground it stood on when it was re-filed, which the verb's own
-      // falsifier proved unchanged; the answer must still be that ground.
-      if (REFILED_GROUND.has(m.id) && REFILED_GROUND.get(m.id) === (after ?? ROOT_ID)) continue;
-      // a mark its author carried somewhere else stands on new ground by its own
-      // declaring act (S120: the author's move, above)
-      if (movedByItsAuthor(m.id)) continue;
-      assert.equal(after, before, `placementParent moved for ${m.id}`);
-    }
+    const r = crossingFindings(sideOf(A, old.placementParent), sideOf(B, placementParent));
+    t.diagnostic(`before ${refSha.slice(0, 8)} (the crossing ${crossing.slice(0, 8)}'s parent): ${r.changed} changed, ${r.riders} rode a change, ${r.untouched} untouched`);
+    assert.ok(r.untouched > 300, `enough untouched records to be worth checking (${r.untouched})`);
+    assert.deepEqual(r.findings, [], `${r.findings.length} mark(s) nobody touched moved, re-framed or changed ground`);
   } finally {
-    // nothing to reap: the ref-side cache persists in tmpdir by design,
-    // keyed by the ref sha and trusted only behind its .complete marker
+    rmSync(scratch, { recursive: true, force: true });
   }
 });
 
