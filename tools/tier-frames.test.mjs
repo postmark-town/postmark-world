@@ -50,7 +50,7 @@ const LINT = join(HERE, "mark-lint.mjs");
 // outranking child's are the world's.
 function treeOf(records) {
   const dir = mkdtempSync(join(tmpdir(), "tier-frames-"));
-  for (const { path, fm } of records) {
+  for (const { path, fm, body = "A record in a fixture." } of records) {
     const d = join(dir, ...path.split("/"));
     mkdirSync(d, { recursive: true });
     const lines = Object.entries(fm).map(([k, v]) => {
@@ -58,7 +58,7 @@ function treeOf(records) {
       if (k === "extent") return `extent: { w: ${v.w}, h: ${v.h} }`;
       return `${k}: ${v}`;
     });
-    writeFileSync(join(d, "mark.md"), `---\n${lines.join("\n")}\n---\n\nA record in a fixture.\n`);
+    writeFileSync(join(d, "mark.md"), `---\n${lines.join("\n")}\n---\n\n${body}\n`);
   }
   return dir;
 }
@@ -549,13 +549,15 @@ test("the walk keeps climbing past a parent that does not bind, to the first anc
 // its own tools/marks-fold.mjs (extracted read-only at that commit), against
 // this tree loaded with these tools. Neither side is a transcription.
 //
-// The invariant, and the whole of it: a mark whose own file is the same on both
-// sides, and whose frame chain holds no file that changed, composes to the same
-// position, on the same frame, standing on the same ground. A mark whose file
-// changed was changed by an act (a move by its author, a take, a withdrawal, a
-// re-file, a crossing's publication), and that act's own gates judge it, so no
-// list here has to know the act exists. A mark whose FRAME changed rides that
-// act, and on an unchanged frame it must move by exactly the frame's delta.
+// The invariant, and the whole of it: a mark whose own frontmatter is the same
+// on both sides, and whose frame chain holds no frontmatter that changed,
+// composes to the same position, on the same frame, standing on the same ground.
+// A mark whose frontmatter changed was changed by an act (a move by its author,
+// a take, a withdrawal, a re-file, a crossing's publication), and that act's own
+// gates judge it, so no list here has to know the act exists. Prose is not
+// geometry: a body edit touches nothing. A mark whose FRAME changed rides that
+// act: it keeps that frame and its own extent, and moves by exactly the frame's
+// delta.
 //
 // It used to compare today's tree with the 2026-08-11 one, the commit before the
 // tier binding, and it carried six hand lists of every mark that had lawfully
@@ -567,11 +569,12 @@ test("the walk keeps climbing past a parent that does not bind, to the first anc
 // geometry-parity (the store and the loader agree), position-law, and mark-lint
 // gate A.
 
-// One side of a crossing: its loaded records, each record's own file as
-// written, and that side's answer to "whose ground is this standing on".
+// One side of a crossing: its loaded records, each record's own frontmatter as
+// written (the body is prose, never geometry), and that side's answer to "whose
+// ground is this standing on".
 const sideOf = (marks, placement) => ({
   marks,
-  text: (m) => readFileSync(join(m._dir, "mark.md"), "utf8").replace(/\r\n/g, "\n"),
+  text: (m) => readFileSync(join(m._dir, "mark.md"), "utf8").replace(/\r\n/g, "\n").split("\n---\n")[0],
   ground: (m) => placement(m, marks),
 });
 
@@ -600,7 +603,17 @@ function crossingFindings(before, after) {
     const b = B.get(id);
     if (rides(id)) {
       riders++;
-      if (a._frameId === b._frameId && a.at && b.at && a._origin && b._origin) {
+      // a positioned rider keeps its frame and its own size, and moves by exactly
+      // the frame's delta. A rider with no position (a name, a predicate) has
+      // nothing a frame can move: when its framer is taken and loses its own
+      // position, it is framed on the next ancestor, and that is the take's.
+      if ((a._frameId ?? null) !== (b._frameId ?? null)) {
+        if (a.at || b.at) findings.push(`${id}: rode ${a._frameId ?? "the world"} but was re-framed to ${b._frameId ?? "the world"}`);
+        continue;
+      }
+      if (JSON.stringify(a.extent ?? null) !== JSON.stringify(b.extent ?? null)) findings.push(`${id}: rode ${a._frameId} but its extent changed`);
+      if (!a.at !== !b.at) findings.push(`${id}: rode ${a._frameId} but ${a.at ? "lost" : "gained"} a position`);
+      else if (a.at && a._origin && b._origin) {
         const dx = b.at.x - a.at.x, dy = b.at.y - a.at.y;
         const fx = b._origin.x - a._origin.x, fy = b._origin.y - a._origin.y;
         if (dx !== fx || dy !== fy) findings.push(`${id}: rode ${a._frameId} but moved ${dx},${dy}, not the frame's ${fx},${fy}`);
@@ -688,6 +701,52 @@ test("the falsifier passes a mark whose own file changed: a move by its author, 
     chairB.at = { x: chairB.at.x + 1, y: chairB.at.y };
     assert.match(crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent)).findings.join("\n"),
       /t\/the-chair: rode t\/the-house but moved 61,30, not the frame's 60,30/);
+  });
+});
+
+test("the falsifier and the frame: a prose edit touches nothing, and a rider keeps its frame and its size", () => {
+  const BOWL = { path: `${R}/the-house/the-chair/the-bowl`, fm: mark("market", { x: 0.5, y: 0.5 }, { w: 0.5, h: 0.5 }) };
+  const before = [THE_ROOT, HOUSE, CHAIR, BOWL];
+  const check = (A, B) => crossingFindings(sideOf(A, placementParent), sideOf(B, placementParent));
+
+  // 1. the house's prose alone is edited: nothing is touched, so the chair and the
+  //    bowl are held as untouched, and a change to the chair's extent is red
+  crossingTrees(before, [THE_ROOT, { ...HOUSE, body: "The house, its prose rewritten." }, CHAIR, BOWL], (A, B) => {
+    const clean = check(A, B);
+    assert.deepEqual([clean.findings, clean.changed, clean.riders, clean.untouched], [[], 0, 0, 4], "a prose edit touches nothing");
+    B.find((m) => m.id === "t/the-chair").extent = { w: 3, h: 3 };
+    assert.deepEqual(check(A, B).findings, ["t/the-chair: its extent or ring changed"]);
+  });
+
+  // the house moved by its author: the chair and the bowl ride it
+  const moved = [THE_ROOT, { ...HOUSE, fm: { ...HOUSE.fm, at: { x: 260, y: 230 }, date: "2026-10-21" } }, CHAIR, BOWL];
+  crossingTrees(before, moved, (A, B) => {
+    // 3. riding a frame that moved lawfully is green, child and grandchild alike
+    const rode = check(A, B);
+    assert.deepEqual([rode.findings, rode.changed, rode.riders], [[], 1, 2]);
+    // 2. a rider moved off its frame onto the world is red
+    const chair = B.find((m) => m.id === "t/the-chair");
+    const kept = { at: chair.at, frame: chair._frameId, extent: chair.extent };
+    chair.at = { x: 9999, y: 9999 };
+    chair._frameId = "the-town/let-there-be-light";
+    assert.deepEqual(check(A, B).findings, ["t/the-chair: rode t/the-house but was re-framed to the-town/let-there-be-light"]);
+    Object.assign(chair, { at: kept.at, _frameId: kept.frame });
+    // …and so is a rider whose size changed on its frame
+    chair.extent = { w: 3, h: 3 };
+    assert.deepEqual(check(A, B).findings, ["t/the-chair: rode t/the-house but its extent changed"]);
+    chair.extent = kept.extent;
+    assert.deepEqual(check(A, B).findings, []);
+  });
+
+  // a rider with no position: the cup is taken, and its name, framed on the cup,
+  // is framed on the world now. Nothing of the name's moved, so it is green.
+  const NAME = { path: `${R}/the-cup/the-cup-name`, fm: { kind: "naming", by: "t", date: "2026-08-11", slot: "name", value: "the cup" } };
+  const taken = { ...CUP, fm: (({ at, extent, ...rest }) => ({ ...rest, held_by: "u", date: "2026-10-21" }))(CUP.fm) };
+  crossingTrees([THE_ROOT, CUP, NAME], [THE_ROOT, taken, NAME], (A, B) => {
+    const nameA = A.find((m) => m.id === "t/the-cup-name"), nameB = B.find((m) => m.id === "t/the-cup-name");
+    assert.notEqual(nameA._frameId ?? null, nameB._frameId ?? null, "the name's frame did change with the take");
+    const r = check(A, B);
+    assert.deepEqual([r.findings, r.changed, r.riders], [[], 1, 1]);
   });
 });
 
