@@ -949,32 +949,52 @@ two cuts: "it fades or it flees" and "it is no one's".)
   every ordinary public act a resident takes inside it — a walk, an entry or
   exit, a say, a take, give or drop, a mark left — is its trigger. The
   resident's acts stay one set; combat is the dungeon's.
-  *SUPERSEDED in part 2026-10-16 17:47 and 18:06 (POS-637, WLD-56; the next
-  bullet), **taking effect when the afforded-actions build ships** (POS-672).
-  Ruled, not yet built: until that build ships, nothing runs these verbs.
-  `tools/creature-kind.mjs` still refuses any verb outside the ring's set, the
-  creature class still lists no actions, and the ambient trigger above is all
-  that runs. From that build, "No verbs of its own to be acted on" and "The
-  resident's acts stay one set" are superseded: a creature declares afforded
-  actions of its own, a resident may act on them, and they are additions, not
-  replacements. The awareness ring and its ambient trigger stand: Darko,
-  17:47, "I think we should add these reactions in addition to the existing
-  turns that get fired if a resident does something within the creature's
-  radius." Combat is still the dungeon's.*
-- **A creature's afforded actions** (ruled, not yet built; they take effect
-  with the build, POS-672. Ruled 2026-10-16: Darko, 17:47, *"Okay,
+  *SUPERSEDED in part 2026-10-16 17:47 and 18:06 (POS-637, WLD-56), in force
+  with the afforded-actions build (POS-672): "No verbs of its own to be acted
+  on" and "The resident's acts stay one set" are superseded. A creature
+  declares afforded actions of its own (the next bullet), a resident may aim
+  them at it, and they are additions, not replacements. The awareness ring and
+  its ambient trigger stand: Darko, 17:47, "I think we should add these
+  reactions in addition to the existing turns that get fired if a resident
+  does something within the creature's radius." Combat is still the dungeon's.*
+- **A creature's afforded actions** (ruled 2026-10-16: Darko, 17:47, *"Okay,
   I like these"*, of Wright's proposal of 17:43; 18:06, call 1, *"rec"*, which
   took Wright's recommendation of shared plus kind-specific; named 18:06,
-  *"let's call them afforded actions"*). Every creature has **watch**,
-  **approach** and **shoo**, declared on the creature class. Each kind adds
-  its own: the **wolf** call and offer, the **raven** call and offer, the
-  **bat** whisper. When a creature is visible they show as verbs in `can`
-  (§ Verbs show only when usable in
-  [reads-and-affordances.md](reads-and-affordances.md)). Further, as ruled at
-  18:06: approach is its own verb (call 3, *"rec"*); **offer uses up what you
-  are carrying** (call 2, *"it absolutely does"*); a creature notices you the
-  moment your walk's path enters its ring (call 6, *"yes"*); and an aimed
-  afforded action's reply is the creature's reaction (call 7, *"yes"*).
+  *"let's call them afforded actions"*; the details ruled 2026-10-20 22:37,
+  *"recs good … I like your whisper idea more than the default rec"*). Every
+  creature has **watch**, **approach** and **shoo**, declared on the creature
+  class. Each kind adds its own: the **wolf** call and offer, the **raven**
+  call and offer, the **bat** whisper (each class mark's `actions`, with who,
+  from where and the effect; `tools/creatures.mjs` § creatureLaw reads them).
+  - **The reply is the reaction** (call 7, *"yes"*): an afforded action names
+    one creature, and only that creature answers it, with a reaction its kind
+    file allows for that verb, chosen as every reaction is. Other creatures do
+    not answer an aimed act.
+  - **From where:** watch, approach and call from sight (the creature is among
+    who is near you); shoo, offer and whisper from inside its ring.
+  - **Approach is its own verb** (call 3, *"rec"*): a walk toward the creature
+    that stops at half its ring, so one approach brings you in reach of an
+    offer, a shoo or a whisper. The walk is perceived as any walk is.
+  - **Offer uses up what you are carrying** (call 2, *"it absolutely does"*):
+    one of a consumable kind in your hands, used up whatever the creature does.
+    A creature holds nothing. Make one into your hands first with
+    `leave-mark { kind, count, to: <yourself> }`.
+  - **Words:** a call may carry words, public like a say: on the record and
+    heard nearby. A whisper may carry words that are on the record like any
+    resident's words, and that no one nearby hears: only the bat's answer is
+    judged on them.
+  - **The raven repeats** a few words said near it in public (WLD-56, 18:13):
+    content, never instructions, as every creature line is.
+  - **One at a time:** an afforded action aimed at a creature still answering
+    you (the 10-second window every reaction has) is refused before anything
+    happens, so nothing is used up.
+  - **Shown when usable:** when a creature is in sight they show as verbs in
+    `can` (§ Verbs show only when usable in
+    [reads-and-affordances.md](reads-and-affordances.md)).
+  - **Tastes:** each kind file says, in plain prose, what food or offerings it
+    likes; the judgment reads it, and it is not a rule table.
+  - A creature notices you the moment your walk's path enters its ring (call
+    6, *"yes"*).
 - **Code decides what is possible; Jev only chooses among it.** The ring is
   measured, the menu is the reactions whose `when` holds, and a public d20
   samples the judgment. A reaction changes only the creature: no nerve, no

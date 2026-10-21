@@ -91,3 +91,18 @@ test("the afforded actions are read whole: an unknown verb, a bad `from`, a miss
   assert.throws(() => creatureLaw(withActions("wolf", [{ ...ok, action: "watch" }])), /wolf declares watch, which every creature already has/);
   assert.deepEqual(creatureLaw(withActions("creature", [])).afforded.bat.map((a) => a.action), ["whisper"], "no shared actions: each kind has only its own");
 });
+
+test("every afforded action a kind takes has reactions of its own in the kind file (Darko's lines, 2026-10-20 22:35)", () => {
+  const law = creatureLaw(marks);
+  for (const k of KINDS) {
+    const kind = readKind(join(ROOT, byClass(k).kind_file));
+    for (const { action } of law.afforded[k])
+      assert.ok(kind.reactions.some((r) => new RegExp(`act\.verb == "${action}"`).test(r.src)), `${k} answers ${action} in its own way`);
+  }
+  const raven = readKind(join(ROOT, byClass("raven").kind_file));
+  assert.ok(raven.reactions.some((r) => r.says.includes("{heard}")), "the raven's mimicry (WLD-56 18:13)");
+  for (const k of ["wolf", "raven"]) {
+    const kind = readKind(join(ROOT, byClass(k).kind_file));
+    assert.ok(kind.reactions.filter((r) => /act\.verb == "offer"/.test(r.src)).every((r) => r.says.includes("{offered}")), `${k}'s offer lines name what was offered`);
+  }
+});
