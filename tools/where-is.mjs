@@ -21,7 +21,7 @@
 //                     declared, else your own parcel, else your household's
 //                     first. Many residents share one parcel by default.
 //   whereIs(handle) — where ARE you. Your walk if you have one, else your home,
-//                     else the town's porch (see THE PORCH below).
+//                     else the Origin, declared as a default (see THE PORCH below).
 //
 // Pure: no fs, no git, no engine import — the caller supplies the folded world
 // and the parsed ledger, exactly as walk.mjs takes a record and a clock. That is
@@ -42,6 +42,20 @@ export const NOWHERE = Object.freeze({
 // THE PORCH. Ruled 2026-08-18 (Keemin): a resident with no walk and no ground
 // stands at the quay — the town's porch — rather than nowhere at all.
 //
+// ⚑ THE POINT IS SUPERSEDED; THE HONESTY IS NOT. On 2026-09-17 (#2900) the
+// founder ruled "Agreed with the Origin" for every door the office answers, and
+// on 2026-10-21 (POS-740) the law was trued to it (the-town/the-standing-porch):
+// a resident the record places nowhere else stands at the Origin, and a berth that
+// comes ashore is set down where it stood BY THE RECORD (a zero-length departure
+// filed at its co-sign), so it is placed by its walk and never reaches this line.
+// Everything below about declaring the default still holds, word for word: the
+// default now arrives as `source: "origin"`, with no mark id because the Origin
+// is the grid's own (0, 0) and no mark. It needs no record, so it is never
+// NOWHERE: the rule above forbids an unknown passed off as the Origin, and this
+// is the Origin said to be a default, which is the opposite.
+//
+// What follows is the porch's own reasoning, kept as written:
+//
 // This does NOT retire the rule above; it is the reason that rule was written,
 // served better. What the old comment forbids is a place SMUGGLED IN as an
 // answer, and it is right to forbid it: the dragon read the Town Centre because
@@ -54,15 +68,20 @@ export const NOWHERE = Object.freeze({
 // from the town's own map with nothing anywhere saying so. A labelled default is
 // legible; an omission is not.
 //
-// The coordinate is READ FROM THE RECORD, never held here. A world whose fold
-// has no quay has no porch, and answers NOWHERE — refuse or disclose an absent
-// input, never quietly substitute for it.
+// (Until 2026-10-21 the coordinate was the quay's, read from the record, and a
+// world with no quay answered NOWHERE. The Origin is not read from a mark: it is
+// the grid's own point, so there is no absent input to disclose.)
+//
+// The quay is still the stone every keyless berth speaks from, and the mark a
+// co-signed berth is set down on; it is no longer anyone's default standpoint.
 export const QUAY_MARK_ID = "the-town/the-quay";
+/** The Origin: the grid's (0, 0), where the record places anyone it places nowhere else (2026-09-17, 2026-10-21). */
+export const ORIGIN = Object.freeze({ x: 0, y: 0 });
+/** The source that says "this is the default, not a place they chose or hold". */
+export const DEFAULT_SOURCE = "origin";
 
-export function porchOf(world) {
-  const quay = (world?.marks ?? []).find((m) => m.id === QUAY_MARK_ID);
-  if (!quay || !Number.isFinite(quay.at?.x) || !Number.isFinite(quay.at?.y)) return { ...NOWHERE };
-  return { x: quay.at.x, y: quay.at.y, placed: true, source: "quay", mark_id: quay.id };
+export function porchOf(_world = null) {
+  return { x: ORIGIN.x, y: ORIGIN.y, placed: true, source: DEFAULT_SOURCE, mark_id: null };
 }
 
 // A handle's household key, at the grain the town DECLARES.
@@ -251,7 +270,8 @@ export function homesOnParcel(parcelId, world) {
 // about ground.
 //
 // THREE TIERS, one derivation, and each says which it is. Before this there were
-// two tiers and a silence; the silence was the bug (see THE PORCH).
+// two tiers and a silence; the silence was the bug (see THE PORCH). The third
+// tier is the Origin since 2026-10-21, declared as `source: "origin"`.
 export function whereIs(handle, { world = null, departures = [], at = fractionalCrossing() } = {}) {
   const departure = currentDeparture(departures ?? [], handle);
   if (departure) {
@@ -281,12 +301,12 @@ export function whereIs(handle, { world = null, departures = [], at = fractional
 // species from one who had.
 //
 // So: one list, and exactly two states — `moving` or still. Provenance survives
-// as `source` ("walk" | "parcel" | "quay") because it is honest and belongs in a
-// tooltip; it just never decides what someone looks like.
+// as `source` ("walk" | "parcel" | "origin"; "quay" until 2026-10-21) because it
+// is honest and belongs in a tooltip; it just never decides what someone looks like.
 //
 // `source` IS THE HONESTY, so it must never be broader than what it claims. A
-// resident standing on the porch because the record has nothing else to say
-// about them reads `quay`, not `walk` — a placement is not an act its subject
+// resident standing at the default because the record has nothing else to say
+// about them reads `origin` (the porch's `quay` until 2026-10-21), not `walk` — a placement is not an act its subject
 // performed, and calling it one misattributes the act to them.
 //
 // `handles` is who to consider. Callers pass the roster they know (parcel
@@ -327,7 +347,7 @@ export function sourceLabel(where, handle = "this resident") {
   }
   // The porch says out loud that it is a default, because a reader who cannot
   // tell a default from a choice is the reader NOWHERE was written to protect.
-  if (where.source === "quay") return `the quay — the town's porch, where the record places anyone it cannot yet place elsewhere`;
+  if (where.source === "origin") return `the Origin (0, 0), where the record places anyone it cannot yet place elsewhere — a default, not ground of their own`;
   if (where.via === "household") return `their household's ground (${where.mark_id})`;
   if (where.via === "declared") return `the home they declared (${where.mark_id})`;
   return `their ground (${where.mark_id})`;
