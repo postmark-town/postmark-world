@@ -25,8 +25,9 @@
 // Run: node server.mjs   → http://localhost:4877
 import { createServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
-import { parseWalkLedger, publicWalkers, fractionalCrossing } from "../tools/walk.mjs";
+import { publicWalkers, fractionalCrossing } from "../tools/walk.mjs";
 import { publicResidents } from "../tools/where-is.mjs";
+import { spectatorDepartures, officeWalks } from "../tools/movement-records.mjs";
 import { dirname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -170,9 +171,9 @@ createServer(async (req, res) => {
       const raw = url.searchParams.get("at");
       const at = raw === null ? fractionalCrossing() : Number(raw);
       if (!Number.isFinite(at) || at < 0) return json(res, 400, { error: "at must be a fractional crossing >= 0" });
-      let text = "";
-      try { text = readFileSync(WORLD_DIR ? join(WORLD_DIR, "walk-ledger.md") : join(ROOT, "WORLD/walk-ledger.md"), "utf8"); } catch { /* no ledger yet */ }
-      const { departures, unrecognized } = parseWalkLedger(text);
+      // BOTH ERAS (WLD-98): the frozen ledger and every departure in STATE/log since
+      // the seam, by the engine's one movement read; a synthetic WORLD_DIR is its ledger alone
+      const { departures, unrecognized } = spectatorDepartures(ROOT, { worldDir: WORLD_DIR });
       // the fold, for everyone standing on their own ground; a spectator with no
       // world-state still gets the walk ledger's answer rather than an error
       let worldState = null;
@@ -194,6 +195,17 @@ createServer(async (req, res) => {
       });
     }
 
+    // THE OFFICE'S WALKS, ANSWERED HERE (WLD-98). The viewer reads walks office
+    // first, and a local page's office base is /api, so it asked this server for
+    // /api/world2/walks, got a 404, and fell back to the ledger frozen at 08-10:
+    // Lately showed nothing since the seam. This answers the office's own shape
+    // from the same both-era read as /api/walks, off this clone's disk.
+    if (p === "/api/world2/walks") {
+      const since = url.searchParams.get("since");
+      if (since !== null && !Number.isFinite(Date.parse(since))) return json(res, 400, { error: "since must be an ISO instant" });
+      return json(res, 200, officeWalks(spectatorDepartures(ROOT, { worldDir: WORLD_DIR }).departures, { since }));
+    }
+
     if (p.startsWith("/atlas/") || p.startsWith("/media/")) return proxyTown(res, p);
     // THE SHELF, which is a different host from the town. An SVG <image href> may
     // carry no protocol and no host (safeAvatarUrl refuses both — escaping is the
@@ -203,7 +215,7 @@ createServer(async (req, res) => {
     // shelves hold different files under identical-looking paths.
     if (p.startsWith(SHELF_ROUTE)) return proxyOrigin(res, SHELF_ORIGIN, "/media/" + p.slice(SHELF_ROUTE.length));
 
-    json(res, 404, { error: "not found — /, /world-engine/**, /WORLD/*.json, /WORLD/enter-exit-ledger.md, /api/stakes?holder=, /api/walks?at=, /atlas/*, /media/*" });
+    json(res, 404, { error: "not found — /, /world-engine/**, /WORLD/*.json, /WORLD/enter-exit-ledger.md, /api/stakes?holder=, /api/walks?at=, /api/world2/walks?since=, /atlas/*, /media/*" });
   } catch (e) {
     json(res, 500, { error: String(e?.message ?? e) });
   }
