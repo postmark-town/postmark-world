@@ -7,6 +7,7 @@ class: bat
 version: 1
 extends: creature
 kind_file: WORLD/kinds/bat.kind
+actions: [{"action":"whisper","who":"anyone","from":"ring","effect":"you whisper to it; its reaction is your reply","residue":"the-town/bat"}]
 implements: ["WORLD/kinds/bat.kind — its moods, ring, span, reactions and lines, read by tools/creature-kind.mjs"]
 source: LOGOS/classes.md
 ---

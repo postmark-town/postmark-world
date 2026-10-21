@@ -8,8 +8,8 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord } from "./marks-fold.mjs";
-import { readKind } from "./creature-kind.mjs";
-import { DESPAWN_REASONS, CREATURE_LAW_DIR, creatureLaw } from "./creatures.mjs";
+import { readKind, AFFORDED_VERBS } from "./creature-kind.mjs";
+import { DESPAWN_REASONS, CREATURE_LAW_DIR, AFFORDED_FROM, creatureLaw } from "./creatures.mjs";
 import { propertyOf } from "./class-properties.mjs";
 
 // a class's dials are its property nodes now (LOGOS v2 part 2)
@@ -27,7 +27,8 @@ test("the creature class: a living node, live canon, two ways to leave, and off 
   assert.equal(c.extends, "entity", "a creature is an entity: it lives");
   assert.equal(c.canon, "live");
   assert.deepEqual(c.despawn, [...DESPAWN_REASONS]);
-  assert.deepEqual(c.actions, [], "no verbs of its own");
+  assert.deepEqual(c.actions.map((a) => a.action), ["watch", "approach", "shoo"],
+    "every creature's afforded actions (POS-672, ruled 2026-10-16 18:06): added to the ring, never replacing it");
   assert.equal(dial("creature", "from_crossing"), 259, "the launch: the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58)");
   assert.equal(dial("creature", "rotation"), "bat raven wolf", "one a window, the kinds in turn, a bat first");
   assert.equal(dial("creature", "span_h"), 12, "a creature lasts 12 h (ruled), the span's one home");
@@ -54,4 +55,39 @@ test("the law's directory: the class and its kinds all stand under CREATURE_LAW_
   const under = files.map((p) => parseRecord(readFileSync(join(ROOT, CREATURE_LAW_DIR, p), "utf8"), p));
   assert.deepEqual(creatureLaw(under), creatureLaw(marks), "the directory alone reads the same law as the whole world");
   assert.deepEqual(under.filter((m) => m.kind === "class").map((m) => String(m.class)).sort(), ["bat", "creature", "raven", "wolf"]);
+});
+
+test("the afforded actions (POS-672): the shared three, each kind's own, and every reaction keyed on one is the kind's", () => {
+  const law = creatureLaw(marks);
+  const verbs = (k) => law.afforded[k].map((a) => a.action);
+  assert.deepEqual(verbs("wolf"), ["watch", "approach", "shoo", "call", "offer"]);
+  assert.deepEqual(verbs("raven"), ["watch", "approach", "shoo", "call", "offer"]);
+  assert.deepEqual(verbs("bat"), ["watch", "approach", "shoo", "whisper"]);
+  for (const k of KINDS) {
+    for (const a of law.afforded[k]) {
+      assert.ok(AFFORDED_FROM.includes(a.from), `${k} ${a.action} is taken from sight or the ring`);
+      assert.equal(a.who, "anyone", "any resident with feet (C5)");
+      assert.match(a.effect, /its reaction is your reply$/, "the reply IS the reaction (call 7)");
+    }
+    assert.equal(law.afforded[k].find((a) => a.action === "watch").from_class, "the-town/creature");
+    // a kind file may key a reaction only on a ring verb or an afforded action its classes declare
+    const kind = readKind(join(ROOT, byClass(k).kind_file));
+    for (const r of kind.reactions)
+      for (const v of String(r.src).matchAll(/act\.verb\s*==\s*"([^"]+)"|"([^"]+)"\s*==\s*act\.verb/g)) {
+        const verb = v[1] ?? v[2];
+        if (AFFORDED_VERBS.includes(verb)) assert.ok(verbs(k).includes(verb), `${k}'s ${r.name} keys on ${verb}, which is not a ${k}'s`);
+      }
+    assert.ok(typeof kind.tastes === "string" && kind.tastes.trim(), `${k} says what it likes (call 8)`);
+  }
+});
+
+test("the afforded actions are read whole: an unknown verb, a bad `from`, a missing field or a shared verb redeclared throws", () => {
+  const withActions = (cls, actions) => marks.map((m) => (m.kind === "class" && m.by === "the-town" && String(m.class) === cls ? { ...m, actions } : m));
+  const ok = { action: "call", who: "anyone", from: "sight", effect: "e", residue: "the-town/wolf" };
+  assert.throws(() => creatureLaw(withActions("wolf", [{ ...ok, action: "strike" }])), /is not one of watch, approach, shoo, call, offer, whisper/);
+  assert.throws(() => creatureLaw(withActions("wolf", [{ ...ok, from: "anywhere" }])), /taken from "anywhere", not sight or ring/);
+  assert.throws(() => creatureLaw(withActions("wolf", [{ ...ok, effect: "" }])), /names no effect/);
+  assert.throws(() => creatureLaw(withActions("wolf", [ok, ok])), /declared twice/);
+  assert.throws(() => creatureLaw(withActions("wolf", [{ ...ok, action: "watch" }])), /wolf declares watch, which every creature already has/);
+  assert.deepEqual(creatureLaw(withActions("creature", [])).afforded.bat.map((a) => a.action), ["whisper"], "no shared actions: each kind has only its own");
 });
