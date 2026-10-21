@@ -63,6 +63,12 @@
 // its own ending's line, `ending: …`, naming {finisher}, {names} (the others who
 // took part) and {carried} (what it carried), all three filled by code.
 //
+// A CREATURE THAT TELLS (POS-712, lupi's shape B): a finishable kind may say
+// `fragments: <n>` and `fragment_words: <a, comma, list>`. The office tells each
+// resident one fragment per visit, drawn from that PUBLIC list by the creature's
+// sealed secret, in that resident's reply alone; a call holding all n in order
+// finishes it. Its conditions may read told.now and told.answered.
+//
 // A line may name `{actor}`, the acting resident, and two slots CODE fills, never a
 // model: `{offered}`, the name of the kind offered, only on a reaction whose
 // condition requires `act.verb == "offer"`; and `{heard}`, a few words a resident
@@ -231,7 +237,12 @@ export function parseEffects(src, { moods, flags }) {
 // ── the kind file ───────────────────────────────────────────────────────────────
 const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/;
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
-const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending"]);
+const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending", "fragments", "fragment_words"]);
+/** What a telling kind's conditions may read (POS-712): told.now (it told the actor a fragment with
+ *  this act) and told.answered (this act's words answered every fragment, in order). */
+export const TOLD_FIELDS = Object.freeze(["told.now", "told.answered"]);
+/** A telling kind tells each resident at most this many fragments. */
+export const FRAGMENTS_MAX = 9;
 /** The slots an ending's line may name (WLD-25), each filled by code at the settlement. */
 export const ENDING_SLOTS = Object.freeze(["finisher", "names", "carried"]);
 /** The longest line a kind file may hold (the reaction pattern is not linear in a
@@ -302,8 +313,22 @@ export function parseKind(text, { source = "kind file" } = {}) {
     for (const [, x] of kind.ending.matchAll(/\{([^}]*)\}/g))
       if (!ENDING_SLOTS.includes(x)) throw new Error(`${source}: an ending may name {finisher}, {names} or {carried} and nothing else (got {${x}})`);
   }
+  // A TELLING KIND (POS-712): how many fragments each resident is told, and the PUBLIC list they
+  // are drawn from (the office seals each draw); finishable only, both or neither, one word each
+  if ((kind.fragments === undefined) !== (kind.fragment_words === undefined)) throw new Error(`${source}: fragments: and fragment_words: come together`);
+  if (kind.fragments !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: fragments: belong to a finishable kind`);
+    const of = Number(kind.fragments);
+    if (!Number.isInteger(of) || of < 1 || of > FRAGMENTS_MAX) throw new Error(`${source}: fragments: is a whole number from 1 to ${FRAGMENTS_MAX} (got ${JSON.stringify(kind.fragments)})`);
+    const words = kind.fragment_words.split(",").map((w) => w.trim().toLowerCase()).filter(Boolean);
+    for (const w of words) if (!/^[a-z][a-z'-]*$/.test(w)) throw new Error(`${source}: a fragment word is one word of letters (got ${JSON.stringify(w)})`);
+    if (new Set(words).size !== words.length) throw new Error(`${source}: a fragment word is listed twice`);
+    if (words.length < 2) throw new Error(`${source}: fragment_words: needs at least two words to draw from`);
+    kind.fragments = of;
+    kind.fragment_words = words;
+  }
 
-  const known = new Set([...ACT_FIELDS, ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`)]);
+  const known = new Set([...ACT_FIELDS, ...(kind.fragments ? TOLD_FIELDS : []), ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`)]);
   for (const { n, m } of pending) {
     const [, name, sentence, cond, does, says] = m;
     if (kind.reactions.some((r) => r.name === name)) fail(n, `the reaction ${name} is given twice`);
@@ -351,6 +376,8 @@ export function scopeOf(state, act = {}, actor = {}) {
     act: { verb: act.verb, distance_m: act.distance_m, approaching: !!act.approaching },
     actor: { times: Number(actor.times) || 0 },
     heard: { any: wordsOf(act.heard) !== "" },
+    // POS-712: the office's word on a telling creature's act; a kind that does not tell never reads it
+    told: { now: !!act.told?.now, answered: !!act.told?.answered },
   };
 }
 

@@ -334,6 +334,14 @@ same night (W1–W11). A season's mechanics, kept here rather than in LOGOS (the
   The creature is gone for the whole town: one creature, one ending.
 - **The line** is the kind's own `ending:` ({finisher}, {names}, {carried}) when it
   writes one, else the town's plain words.
+- **A creature that tells (POS-712, lupi's shape B, postmark#3531).** A kind with
+  `fragments: n` and a public `fragment_words` list tells each resident one
+  fragment per visit (a settlement window), drawn from the list by the creature's
+  sealed secret. The word is in that resident's reply alone; the record holds its
+  commitment. Inside the window the same fragment is told again; after it, never.
+  Once all n are told it asks, and a call holding all n in order finishes it. When
+  its settlement has ended it, its secret is published, and every commitment can
+  be checked by anyone. Fragments are the one thing that does not reset (08:39).
 
 ## Two lessons carried (from the budding-friendship build)
 
