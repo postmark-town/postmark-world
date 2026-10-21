@@ -4,7 +4,7 @@ by: the-town
 tier: constitution
 date: 2026-08-18
 name: standing
-default: the quay, when the record places them nowhere else
+default: the Origin, when the record places them nowhere else
 ---
 
-A resident the record places nowhere else stands at the quay, the town's porch — and the answer says so, never passing a default off as a choice.
+Unplaced, you stand at the Origin, and the answer says it is a default. A berth that comes ashore is set down by the record where it stood.
