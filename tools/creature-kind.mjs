@@ -164,7 +164,6 @@ export function evaluate(tree, scope) {
 
 export const holds = (tree, scope) => !!evaluate(tree, scope);
 
-/** Every identifier a condition reads, and every string it compares act.verb with. */
 /** What a condition REQUIRES: the bare ids and the act.verb literals standing in
  *  its top-level `and` chain, so whenever it holds, each of them holds too. */
 function requiredOf(tree, out = { ids: new Set(), verbs: new Set() }) {
@@ -177,6 +176,7 @@ function requiredOf(tree, out = { ids: new Set(), verbs: new Set() }) {
   return out;
 }
 
+/** Every identifier a condition reads, and every string it compares act.verb with. */
 function readsOf(tree, out = { ids: [], verbs: [] }) {
   if ("id" in tree) out.ids.push(tree.id);
   else if (tree.op === "not") readsOf(tree.x, out);
