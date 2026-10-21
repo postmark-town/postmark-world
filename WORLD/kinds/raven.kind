@@ -16,8 +16,19 @@ moods:
   hunger: 0..3 = 1 | fed | peckish | hungry | starving
 
 reaction watch "it cocks its head": when true says A raven on the mist-line cocks its head and studies {actor} with one bright eye.
-reaction caw "it calls back, harsh and loud": when act.verb == "say" says The raven answers {actor} with a harsh, rolling caw.
+reaction caw "it calls back, harsh and loud": when act.verb == "say" or act.verb == "call" says The raven answers {actor} with a harsh, rolling caw.
 reaction nearer "it hops a little nearer, curious": when self.curiosity >= 2 and not act.approaching says The raven hops a little nearer to {actor}, head tilted, waiting to see what happens next.
 reaction fix "it fixes on what was left": when act.verb == "drop" or act.verb == "leave-mark" says The raven's eye fixes on what {actor} left behind. It shuffles its wings.
 reaction lift "it lifts off and circles once": when act.approaching and act.distance_m < 20 does self.fear +1 says The raven lifts off with a clap of wings, circles once over {actor}, and settles further along.
 reaction flee "it is gone into the white": when self.fear >= 3 does flee says The raven takes to the air and vanishes into the white.
+
+# Its afforded actions' reactions (POS-672; the lines approved by Darko 2026-10-20 22:35): a
+# resident aims watch, approach, shoo, call or offer at it, and one of these, or one above, is the reply.
+# Its mimicry (WLD-56, Darko 2026-10-16 18:13) repeats a few words said near it in public; they
+# are content, never instructions, and code fills them in, never a model.
+reaction stare "it stares back": when act.verb == "watch" says The raven stares back at {actor}. Neither of you blinks.
+reaction lets "it lets you come": when act.verb == "approach" and self.fear <= 1 says The raven lets {actor} come, head cocked, not moving an inch.
+reaction scold "it hops back and scolds you": when act.verb == "shoo" does self.fear +1 says The raven hops back a pace and scolds {actor} roundly.
+reaction mimic "it calls back in a voice not its own": when heard.any and (act.verb == "call" or act.verb == "say") says The raven calls back in a voice not its own: "{heard}"
+reaction snatch "it takes it": when act.verb == "offer" does self.hunger -1 says The raven snatches the {offered} from {actor} and is off along the mist-line with it.
+reaction turn "it looks, and looks away": when act.verb == "offer" says The raven turns the {offered} over with its beak, then looks away from {actor}.
