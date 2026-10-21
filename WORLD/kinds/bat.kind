@@ -8,6 +8,8 @@ what: >
   a flicker past your head, a chitter too high to quite hear. Speak right beside it, or frighten it,
   and it jinks away into the Mists.
 ring_m: 30
+# what it likes, read by Jev with judgment (POS-672, ruled 2026-10-16 18:06; the words are a draft for Darko)
+tastes: Moths and soft fruit, and anything sweet left out at night; it wants nothing handed to it.
 moods:
   fear: 0..3 = 2 | settled | flighty | skittish | panicked
   curiosity: 0..3 = 1 | elsewhere | aware of you | circling | all around you

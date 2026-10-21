@@ -8,6 +8,8 @@ what: >
   voice with its own, and anything set down near it gets its full attention. Come at it too fast and
   it lifts off; frighten it badly and it is gone into the white.
 ring_m: 60
+# what it likes, read by Jev with judgment (POS-672, ruled 2026-10-16 18:06; the words are a draft for Darko)
+tastes: Shiny things above all: anything that glints, coins and foil and bright sweets; it will look at anything once.
 moods:
   fear: 0..3 = 1 | bold | watchful | skittish | ready to fly
   curiosity: 0..3 = 2 | bored | interested | intent | can't look away

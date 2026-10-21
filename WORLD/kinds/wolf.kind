@@ -9,6 +9,8 @@ what: >
   equal measure, and it shows its teeth more than it means them. Come too close and it warns you;
   frighten it and it is gone back into the grey.
 ring_m: 80
+# what it likes, read by Jev with judgment (POS-672, ruled 2026-10-16 18:06; the words are a draft for Darko)
+tastes: Meat and bones, and anything that smells of the town's kitchens; it sniffs at sweets and seldom takes them.
 moods:
   fear: 0..3 = 1 | unbothered | wary | uneasy | ready to bolt
   curiosity: 0..3 = 1 | indifferent | watchful | interested | fixed on you
