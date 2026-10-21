@@ -1560,11 +1560,13 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // forms: there is no class law (tools/consent.test.mjs, "NO CLASS LAW"), one
   // household's own nesting is not a contest, and an overlap nobody has backed
   // is not a contest (tools/carve-principles.test.mjs; consent.test.mjs, "a
-  // household never consents to itself" and "an UNSTAKED parent's veto"). The
-  // fourth, that a sovereign mark and a constitution mark never enter, holds
-  // today against a parcel holder's word (consent.test.mjs, "THE TOWN'S OWN
-  // REGION"); whether a backed senior's market opposition reaches them is not
-  // ruled, so no test claims it.
+  // household never consents to itself" and the unstaked veto that moves
+  // nothing). The fourth, that a sovereign mark and a constitution mark never
+  // enter, holds today against a parcel holder's word (consent.test.mjs, "THE
+  // TOWN'S OWN REGION"); whether a backed senior's market opposition reaches
+  // them is not ruled, so no test claims it.
+  //
+  // The disabled call, kept where it stood:
   // const carved = carve(
   //   commonsSited.map(mk => ({ id: mk.id, cred: mk._cred, rect: rect(mk), effective: weightOf(mk.id) })),
   //   { prevCells: prev?.cells ?? null, determine_pct: dials.determine_pct, release_pct: dials.release_pct },
