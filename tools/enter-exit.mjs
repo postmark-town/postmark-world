@@ -217,6 +217,17 @@ export function parseEnterExitLedger(text) {
 // quoting the field, and a quote that has been tidied is not the field.
 // Present only when written, so every law without them reads as before.
 //
+// ── A DOOR THAT OPENS WHEN IT HOLDS WHAT IT ASKS FOR (WLD-5 B) ───────────────
+//
+//   requires  — { holds: [ids], in: <holder id>, says: "…" } on a portal. The
+//               passage is refused until the holder (`in`; absent, the portal
+//               itself) holds every mark `holds` names; then it passes for
+//               everyone. `says` is the refusal's own line, and `{held}` and
+//               `{asks}` in it read as the counts. What the holder holds is the
+//               record's, so the office hands it to the passage (`holdings`);
+//               a passage told nothing holds nothing, and the door stays shut.
+//               Carried exactly as written, present only when written.
+//
 // ── THE STAIRS CLASS (WLD-21, ruled by Darko 2026-10-15) ─────────────────────
 //
 // A mark of class `stairs` that writes no `entry:` at all is a portal by its
@@ -236,7 +247,21 @@ export function entryLawOf(mark) {
     word, edge, consequence, from: mark.id ?? null,
     ...(into ? { into } : {}),
     ...(raw.lands_at !== undefined && raw.lands_at !== null ? { lands_at: raw.lands_at } : {}),
+    ...(raw.requires !== undefined && raw.requires !== null ? { requires: requiresOf(raw.requires) } : {}),
   };
+}
+
+/** `requires` as `{ holds, in, says }`, or `{ malformed: <why> }` when it is not
+ *  that shape (the lint names it, and the passage refuses: a door whose
+ *  condition cannot be read stays shut, never open). */
+export function requiresOf(v) {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return { malformed: "requires is { holds: [ids], in, says }" };
+  const holds = Array.isArray(v.holds) ? v.holds : v.holds === undefined ? null : [v.holds];
+  if (!holds || !holds.length || !holds.every((x) => typeof x === "string" && x !== ""))
+    return { malformed: "requires.holds is a list of mark ids, at least one" };
+  if (v.in !== undefined && v.in !== null && (typeof v.in !== "string" || v.in === "")) return { malformed: "requires.in is a mark id" };
+  if (v.says !== undefined && v.says !== null && typeof v.says !== "string") return { malformed: "requires.says is a line of words" };
+  return { holds: [...holds], in: v.in ?? null, says: v.says ?? null };
 }
 
 /** `into` as a list of ids, in the order written; null when the key is absent.

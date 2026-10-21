@@ -1849,8 +1849,15 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone. A portal let through anyway is let through by name, in
   `WORLD/portal-lint-exceptions.json`, and every lint run says so.
 
-**Later** (named in the sitting, not law yet): `requires:` on a portal (town-written conditions, so locked portals
-with keys), secret portals (a hidden entry in the list), and exit routing for marks that are not dungeons.
+- **A door that opens when it holds what it asks for** (WLD-5 B; ruled 2026-10-18 21:23, 2026-10-19 17:48): a
+  portal's entry may carry `requires: { holds: [ids], in, says }`. The passage is refused, and nothing is recorded,
+  until the holder (`in`, or the portal itself, a thing with `holder: true`) holds every mark `holds` names; then it
+  passes for everyone. Things go in by an ordinary give. The refusal says `says`, the door's own line, with
+  `{held}` and `{asks}` read as the counts, so the door shows how far it has come. An exit never carries one (locked
+  from the outside, never from the inside), and the lint holds every id it names to a mark.
+
+**Later** (named in the sitting, not law yet): other `requires:` conditions on a portal, secret portals (a hidden
+entry in the list), and exit routing for marks that are not dungeons.
 
 **Terminology.** "Portal" now names this mechanism, a third sense beside ① the read-root slot and ② the verb-lending
 ground. The read-root slot is to be renamed (proposed: lens), and live identifiers are renamed only after the
@@ -1978,7 +1985,12 @@ Rendered as `the-town/downed-not-dead`. Ruled by the founder 2026-08-26.
   - **On `thing`:** `holder` is sovereign, default false, so a thing holds
     nothing unless its maker says so. When it is true, `capacity` (sovereign,
     default 30, with constitution children `min` 1 and `max` 120) and `open`
-    (sovereign, default true) apply.
+    (sovereign, default true) apply. So do `accepts` and `keeps` (WLD-5 B,
+    ruled 2026-10-18 21:23 and 2026-10-19 17:48, for a door that holds what it
+    asks for): `accepts` (sovereign, default none) lists by id the marks it
+    takes in, and a give of anything else into it is refused at the door;
+    `keeps` (sovereign, default false) means what goes in stays, and nothing is
+    taken back out, by anyone.
   *SUPERSEDED 2026-10-16 16:03–16:05: "A holder is whatever can take (11:12:
   "a holder should literally just be that which has the capability to hold …
   whatever has the take verb exposed to it is considered a holder"). There is

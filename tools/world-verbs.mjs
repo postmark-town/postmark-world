@@ -28,10 +28,11 @@ import {
 import {
   pointInMark, markInside, roomHolds, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
   landingOf, passageTargetOf, portalsIn, portalsInto, dungeonLanding, exitLockWords, lockStandsWords, lockedPassage, hhmmZ,
+  unmetRequires, requiresHolderOf,
 } from "./portals.mjs"; // WLD-5: portals and the dungeon class, one home for the verbs and the lint
 // The office loads this file and enter-exit.mjs from the clone, and nothing else,
 // so the portal reads it needs ride out through here.
-export { dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence, portalsIn, portalsInto, dungeonLanding, isDungeon, pointInMark, hhmmZ };
+export { dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence, portalsIn, portalsInto, dungeonLanding, isDungeon, pointInMark, hhmmZ, requiresHolderOf };
 
 // ───────────────────────── orient — charter + your state ────────────────────
 // The establishing line of every telling: the let-there-be-light root (light
@@ -434,7 +435,7 @@ export function enterExitPlan(state, targetId, world, { occupancy = new Map(), h
  *  a resident should not be asked to affirm a hallway).
  */
 export function enter(state, targetId, world, {
-  occupancy = new Map(), handle = null, at = 0, iso = null, accepted = false, into = null, lockedOut = null,
+  occupancy = new Map(), handle = null, at = 0, iso = null, accepted = false, into = null, lockedOut = null, holdings = null,
 } = {}) {
   // ── WLD-5: what a dungeon hides, a portal, and the dungeon's one way in ──
   const marks = world.marks ?? [];
@@ -447,7 +448,7 @@ export function enter(state, targetId, world, {
   // mark carrying one is passed through it, the dungeon itself included. The
   // Starforge Spire carries `into` its vestibule, so entering it from anywhere
   // in its outline sets you down inside the Gilded Doors; a list asks which.
-  if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into, lockedOut });
+  if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into, lockedOut, holdings });
   // Inside a dungeon the only enter is through a portal (G3: the cure for the
   // Swiss-cheese exit must not leak on the way in), and a dungeon that names no
   // `into` of its own is entered by the portals that lead into it.
@@ -535,12 +536,19 @@ export function enter(state, targetId, world, {
  *     dungeon this walker left by `exit` before the settlement now in force
  *     (`lockedOut`, the office's record) is refused before any word, pick or
  *     terms, and nothing is written. Every way into a dungeon passes here: its
- *     portals, and the dungeon itself, which carries `into`. */
-function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick, lockedOut = null }) {
+ *     portals, and the dungeon itself, which carries `into`.
+ *  0b. THEN WHAT THE DOOR ASKS FOR (WLD-5 B): a portal whose entry carries
+ *     `requires` passes no one until its holder holds every mark it names
+ *     (`holdings`, the office's record), and then everyone. Nothing is written. */
+function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick, lockedOut = null, holdings = null }) {
   const marks = world.marks ?? [];
   const byId = new Map(marks.map((m) => [m.id, m]));
   const lock = lockedPassage(portal, { pick: pick == null ? null : String(pick), marks, held, lockedOut, determined: world.determined ?? {} });
   if (lock) return { error: lock.words, refused: "dungeon-locked", dungeon: lock.dungeon, locked_until: lock.until, left_at: lock.left_at ?? null };
+  // A DOOR THAT ASKS (WLD-5 B): shut until its holder holds all it asks for, then
+  // open for everyone. Asked before any word, pick or terms, and nothing is written.
+  const unmet = unmetRequires(portal, { holdings, determined: world.determined ?? {} });
+  if (unmet) return { error: unmet.words, refused: "requires", requires: unmet.requires };
   const law = entryLawOf(portal);
   const said = accepted === true ? null : new Set(Array.isArray(accepted) ? accepted : accepted ? [accepted] : []);
   const standing = portal.at ? pointWithinMark(state, portal) : false;

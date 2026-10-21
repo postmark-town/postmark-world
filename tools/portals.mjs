@@ -626,6 +626,46 @@ export function lockedPassage(portal, { pick = null, marks = [], held = [], lock
   return { ...lock, words: lockedOutWords({ ...lock, determined }) };
 }
 
+// ── A DOOR THAT OPENS WHEN IT HOLDS WHAT IT ASKS FOR (WLD-5 B) ───────────────
+//
+// A portal whose entry carries `requires: { holds: [ids], in, says }` passes no
+// one until its holder (`in`, or the portal itself) holds every mark `holds`
+// names; then it passes for everyone. What a holder holds is the record's, and
+// the office hands it in as `holdings` ({ holder id: [the ids it holds] }). A
+// holder the passage was told nothing about holds nothing, and a condition that
+// cannot be read refuses: the door stays shut, never open. Nothing is written.
+
+/** The holder a portal's `requires` asks, or null when it asks nothing. */
+export function requiresHolderOf(portal) {
+  const req = entryLawOf(portal)?.requires;
+  return req ? (req.in ?? portal?.id ?? null) : null;
+}
+
+/** The refusal's words. `says` is the door's own line, `{held}` and `{asks}` in
+ *  it read as the counts; with no line of its own, the town's plain one. */
+export function requiresWords({ portal, holder, held, asks, says = null, determined = {} }) {
+  const line = says
+    ? String(says).replace(/{held}/g, String(held)).replace(/{asks}/g, String(asks))
+    : `${nameInSentence(portal, determined).replace(/^./, (c) => c.toUpperCase())} opens only when ${holder === portal ? "it holds" : `${nameInSentence(holder, determined)} holds`} the ${asks} ${asks === 1 ? "thing" : "things"} it asks for, and it holds ${held}.`;
+  return `${line.trim()} Nothing was recorded.`;
+}
+
+/** Null when `portal` asks nothing, or its holder holds all it asks for;
+ *  otherwise `{ words, requires: { in, holds, held, missing } }`. */
+export function unmetRequires(portal, { holdings = null, determined = {} } = {}) {
+  const req = entryLawOf(portal)?.requires;
+  if (!req) return null;
+  const holder = req.in ?? portal.id;
+  if (req.malformed) return { words: `${portal.id}'s entry asks for something it does not say plainly (${req.malformed}), so it stays shut. Nothing was recorded.`, requires: { in: holder, malformed: req.malformed } };
+  const inside = new Set((holdings && Array.isArray(holdings[holder]) ? holdings[holder] : []).map(String));
+  const held = req.holds.filter((id) => inside.has(id));
+  if (held.length === req.holds.length) return null;
+  return {
+    words: requiresWords({ portal: portal.id, holder, held: held.length, asks: req.holds.length, says: req.says, determined }),
+    requires: { in: holder, holds: [...req.holds], held, missing: req.holds.filter((id) => !inside.has(id)) },
+  };
+}
+
 // ── the lint (mark-lint.mjs § portals reads this) ────────────────────────────
 //
 // The rules, each with a name an exception can cite:
@@ -643,6 +683,11 @@ export function lockedPassage(portal, { pick = null, marks = [], held = [], lock
 //                          nobody; the finding comes back with sev "WARN"
 //   landing-inside         a passage into a ring room sets you down inside its
 //                          ring (row 68 (a); a rectangle always holds one)
+//   requires-names-marks   a portal's `requires` is readable, and every id in
+//                          `holds` and its `in` names a mark (WLD-5 B)
+//   requires-in-a-holder   the mark `requires` asks writes `holder: true`
+//   exit-carries-no-requires a portal out of a dungeon asks nothing: like an
+//                          exit's word, a condition locks from the outside only
 //   rooms-do-not-overlap   inside a dungeon, two marks with the same parent
 //                          never overlap (Darko, 2026-10-13 20:31: siblings
 //                          only; a room's contents sit inside it, and floors
@@ -653,7 +698,7 @@ export function lockedPassage(portal, { pick = null, marks = [], held = [], lock
 // honoured so the record shows the portal was let through, and by whom.
 export const PORTAL_RULES = Object.freeze([
   "into-names-a-mark", "lands-at-names-a-mark", "lands-at-reaches-into", "exit-never-opposed", "path-to-an-exit",
-  "rooms-do-not-overlap", "landing-inside",
+  "rooms-do-not-overlap", "landing-inside", "requires-names-marks", "requires-in-a-holder", "exit-carries-no-requires",
 ]);
 
 /** A mark's parent, by true containment: the smallest sited mark with an
@@ -728,6 +773,20 @@ export function portalFindings(marks) {
           say(m.id, "lands-at-reaches-into", `entry.lands_at stands ${Math.round(d)} m from ${id} — a landing is set down inside its into, and one more than ${LANDING_REACH_M} m away is a portal drawn in the wrong place`);
       }
     }
+    // A DOOR THAT ASKS (WLD-5 B): what it asks for and where it looks are marks,
+    // and where it looks is a holder
+    if (law.requires) {
+      const req = law.requires;
+      if (req.malformed) say(m.id, "requires-names-marks", `entry.requires: ${req.malformed}`);
+      else {
+        for (const id of req.holds) if (!byId.has(id)) say(m.id, "requires-names-marks", `entry.requires.holds: ${JSON.stringify(id)} names no mark — the door would ask for something that does not exist`);
+        const holderId = req.in ?? m.id;
+        const holder = byId.get(holderId);
+        if (!holder) say(m.id, "requires-names-marks", `entry.requires.in: ${JSON.stringify(holderId)} names no mark`);
+        else if (holder.holder !== true && String(holder.holder) !== "true")
+          say(m.id, "requires-in-a-holder", `${holderId} is asked to hold what this door requires, but it does not write holder: true — nothing can ever be put in it`);
+      }
+    }
     // THE LANDING STANDS INSIDE THE ROOM IT ENTERS (row 68 (a), review-231). A
     // rectangle always holds one; a ring drawn too thin or degenerate may hold
     // none, and the passage would set you down on its wall
@@ -748,9 +807,12 @@ export function portalFindings(marks) {
     const inD = (id) => id === d || (idx.of.get(id) ?? []).includes(d);
     const inner = portals.filter(({ m }) => inD(m.id));
     const isExit = (m, law) => law.into.some((id) => byId.has(id) && !inD(nodeOf(id, m) ?? id));
-    for (const { m, law } of inner)
+    for (const { m, law } of inner) {
       if (isExit(m, law) && law.word === "opposed")
         say(m.id, "exit-never-opposed", `this portal leads out of ${d} and answers "opposed" — an exit is locked from the outside, never from the inside. No jails`);
+      if (isExit(m, law) && law.requires)
+        say(m.id, "exit-carries-no-requires", `this portal leads out of ${d} and asks for something before it passes — an exit is locked from the outside, never from the inside. No jails`);
+    }
 
     // rooms: every place inside the dungeon a passage can put you, and every
     // room a portal inside it stands in. An OPPOSED portal into itself (a stair whose
@@ -761,7 +823,7 @@ export function portalFindings(marks) {
     for (const { m } of inner) { const c = containerOf(m, list)?.id; if (c && inD(c)) rooms.add(c); }
     const out = new Map([...rooms].map((r) => [r, { exit: false, to: new Set() }]));
     for (const { m, law } of inner) {
-      if (law.word === "opposed") continue;
+      if (law.word === "opposed" || law.requires) continue;   // a door that asks may be shut: it is no unlocked way
       const from = containerOf(m, list)?.id;
       if (!out.has(from)) continue;
       for (const id of law.into) {
