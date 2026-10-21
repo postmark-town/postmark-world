@@ -100,6 +100,14 @@ test("3. only a thing is held: held_by on a mark whose class is not a thing is r
   assert.ok(errs.some((e) => /le-mur-des-cornets: held_by: only a thing is held — .*a idea, not a thing/.test(e)), errs.join("\n"));
 });
 
+test("3c. a sited mark whose class is ground (a vehicle, which extends portal-ground) still refuses held_by: ground is not carried", () => {
+  const repo = realTree();
+  const p = join(repo, "WORLD", "marks", "berthillon", "le-mur-des-cornets", "mark.md");
+  writeFileSync(p, readFileSync(p, "utf8").replace(/^kind: sited\r?$/m, "kind: sited\nclass: vehicle").replace(/^at: .*\r?\n/m, "").replace(/^extent: .*\r?\n/m, "").replace(/^---\r?\n\r?\n/m, `${HELD_BY}: sb-ash\n---\n\n`));
+  const errs = errorsOf(lint(repo));
+  assert.ok(errs.some((e) => /le-mur-des-cornets: held_by: only a thing is held — .*a vehicle, not a thing/.test(e)), errs.join("\n"));
+});
+
 // S123 (2026-10-21): the take door takes an untyped sited mark (it refuses only portable: false), and the hold
 // record has held them since 08-31 (berthillon's cones, a cup, a coin). Their printout is what the record holds.
 const LEGACY = join("WORLD", "marks", "berthillon", "cone-blue-moon-2026-08-30", "mark.md");
