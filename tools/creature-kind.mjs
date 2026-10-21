@@ -144,7 +144,7 @@ export const PRESS_MAX = 2;
 export const EASE_BY = Object.freeze(["mine", "households"]);
 
 /** The slots a line may name: the actor, and the code fills (see the header). */
-export const LINE_SLOTS = Object.freeze(["actor", "offered", "heard", "target"]);
+export const LINE_SLOTS = Object.freeze(["actor", "offered", "heard", "target", "ally"]);
 
 /** What a condition may read beyond the creature's own moods and flags. */
 const ACT_FIELDS = new Set(["act.verb", "act.distance_m", "act.approaching", "actor.times", "heard.any"]);
@@ -471,7 +471,9 @@ export function parseKind(text, { source = "kind file" } = {}) {
     const line = says.trim();
     if (!line) fail(n, `a reaction says something`);
     const names = [...line.matchAll(/\{([^}]*)\}/g)].map((x) => x[1]);
-    for (const x of names) if (!LINE_SLOTS.includes(x)) fail(n, `a line may name {actor}, {offered}, {heard} or {target} and nothing else (got {${x}})`);
+    for (const x of names) if (!LINE_SLOTS.includes(x)) fail(n, `a line may name {actor}, {offered}, {heard}, {target} or {ally} and nothing else (got {${x}})`);
+    // {ally}: the other resident in the ring a creature that tempts named in this exchange (its temptation's ally), filled by code
+    if (names.includes("ally") && kind.tempts === undefined) fail(n, `a line naming {ally} belongs to a creature that tempts (tempts:): {ally} is the resident its temptation named`);
     const needs = requiredOf(when);
     if (names.includes("offered") && !needs.verbs.has("offer")) fail(n, `a line naming {offered} needs a condition that requires act.verb == "offer" (in its top-level and)`);
     if (names.includes("heard") && !needs.ids.has("heard.any")) fail(n, `a line naming {heard} needs a condition that requires heard.any (in its top-level and)`);
@@ -546,7 +548,8 @@ const wordsOf = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : 
 /** The line a reaction leaves: its template, with the acting resident named, and
  *  the offered kind's name and the heard words where the line names them. One pass,
  *  by a function: "$&" in a name, or "{heard}" in what was said, is only text. */
-export function voiceLine(reaction, { actor, offered = null, heard = null, target = null } = {}) {
-  const fill = { actor: String(actor), offered: wordsOf(offered) || "offering", heard: wordsOf(heard) || "…", target: wordsOf(target) || String(actor) };
-  return reaction.says.replace(/\{(actor|offered|heard|target)\}/g, (_, slot) => fill[slot]);
+export function voiceLine(reaction, { actor, offered = null, heard = null, target = null, ally = null } = {}) {
+  const fill = { actor: String(actor), offered: wordsOf(offered) || "offering", heard: wordsOf(heard) || "…", target: wordsOf(target) || String(actor),
+    ally: wordsOf(ally) || "someone" };
+  return reaction.says.replace(/\{(actor|offered|heard|target|ally)\}/g, (_, slot) => fill[slot]);
 }

@@ -4,7 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TEMPT_ACTS, TEMPT_AIMS, MENU_SLOTS, WHISPER_MAX, ROADS, lintWhisper, parseMenu, fillWhisper } from "./creature-tempts.mjs";
-import { parseKind } from "./creature-kind.mjs";
+import { parseKind, voiceLine } from "./creature-kind.mjs";
 
 const WHO = "a-tempter";
 const menu = (over = {}) => JSON.stringify({
@@ -80,4 +80,12 @@ test("a kind that tempts: tempts:, who: and fight_size: together, finishable, an
   assert.throws(() => parseKind(`${HEAD}tempts: t.json\nwho: a-tempter\nfight_size: 30\n`), /belongs to a finishable kind/);
   assert.throws(() => parseKind(`${HEAD}finishable: true\ntempts: t.json\nwho: a-tempter\nfight_size: 30\nresolve: 10\nstrike: 2\n`), /never a resolve/);
   assert.throws(() => parseKind(`${HEAD}finishable: true\ntempts: ../x.json\nwho: a-tempter\nfight_size: 30\n`), /names a menu file beside it/);
+});
+
+test("a tempting kind's line may name {ally}, the resident its temptation named, filled by code; no other kind's may", () => {
+  const HEAD = `kind: tempter\nname: a test tempter\nring_m: 30\nwhat: >\n  A fixture.\nmoods:\n  sweet: 0..3 = 1 | a | b | c | d\n`;
+  const k = parseKind(`${HEAD}finishable: true\ntempts: t.json\nwho: a-tempter\nfight_size: 30\nreaction r "r": when act.verb == "shield" says {actor} stood in front of {ally}.\n`);
+  assert.equal(voiceLine(k.reactions[0], { actor: "kai", ally: "ren" }), "kai stood in front of ren.");
+  assert.equal(voiceLine(k.reactions[0], { actor: "kai" }), "kai stood in front of someone.");
+  assert.throws(() => parseKind(`${HEAD}finishable: true\nreaction r "r": when true says {ally}.\n`), /\{ally\} belongs to a creature that tempts/);
 });
