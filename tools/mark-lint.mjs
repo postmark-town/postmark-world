@@ -393,12 +393,22 @@ for (const rec of marks) {
   // the settlement prints `held_by: <its holder>` and no `at`/`extent`, so a held
   // record carries the holder instead of a place, never both, and only a thing is
   // ever held (a parcel or a building is ground, and ground is not carried).
+  // WHAT THE RECORD CAN HOLD (S123, 2026-10-21): a thing, or a sited mark that
+  // declares no class at all. The take door has always taken an untyped sited
+  // mark (it refuses only `portable: false`), and the hold record holds them:
+  // berthillon's cones since 08-31, a cup, a pot, a coin. Each prints held like
+  // any thing. A record that names a class is held only when that class is a
+  // thing; a parcel never is.
+  const carriable = (r) => {
+    const k = instanceClassOf(r);
+    return k ? chainOf(k).includes("thing") : standing === "sited";
+  };
   const holderOf = heldBy(rec);
   if (rec[HELD_BY] !== undefined && holderOf == null)
     err(rec, `${HELD_BY}: names the holder (a resident's handle, or a holder thing's id); got ${JSON.stringify(rec[HELD_BY])}`);
   if (holderOf != null) {
     const klass = instanceClassOf(rec);
-    if (!klass || !chainOf(klass).includes("thing"))
+    if (!carriable(rec))
       err(rec, `${HELD_BY}: only a thing is held — a held thing rides its holder, and this record is ${klass ? `a ${klass}` : `kind: ${JSON.stringify(rec.kind)}`}, not a thing`);
     if (rec.at !== undefined || rec.extent !== undefined || rec.points !== undefined)
       err(rec, `a held thing carries no at/extent — it is published but unplaced, and shows as ${holderOf}'s contents until it is set down (POS-688)`);
@@ -410,7 +420,7 @@ for (const rec of marks) {
     err(rec, `${OWNED_BY}: names the owner, a resident's handle; got ${JSON.stringify(rec[OWNED_BY])}`);
   if (ownerOf != null && !ownerOf.includes("/")) {
     const klass = instanceClassOf(rec);
-    if (!klass || !chainOf(klass).includes("thing"))
+    if (!carriable(rec))
       err(rec, `${OWNED_BY}: only a thing is owned apart from its maker, and this record is ${klass ? `a ${klass}` : `kind: ${JSON.stringify(rec.kind)}`}, not a thing`);
     if (ownerOf === rec.by)
       err(rec, `${OWNED_BY}: ${ownerOf} made it, and a maker's own thing prints no owner (POS-688)`);

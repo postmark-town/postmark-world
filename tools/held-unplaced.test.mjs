@@ -8,6 +8,7 @@
 //   the lint's sited rule asked of a held thing   → 1 reds (needs at/extent)
 //   the lint missing the at+held_by refusal       → 2 reds
 //   the lint missing the thing-only rule          → 3 reds
+//   the thing-only rule asked of an untyped sited mark → 3b reds (S123)
 //   the fold dropping held_by                     → 4 reds
 //   unpublishVerdict ignoring `held`              → 5 reds
 //   holdOnlyChange counting the body              → 6 reds
@@ -89,12 +90,33 @@ test("2. a held thing that still names a place is refused: held, it carries no a
   assert.match(errs[0], /cone-melon-de-charente-2026-08-25: a held thing carries no at\/extent/);
 });
 
-test("3. only a thing is held: held_by on a building is refused", () => {
+/** A record given a class that is not a thing (an idea), so the thing-only rule has something to refuse. */
+const asIdea = (t) => t.replace(/^kind: sited\r?$/m, "kind: sited\nclass: idea");
+test("3. only a thing is held: held_by on a mark whose class is not a thing is refused", () => {
   const repo = realTree();
   const p = join(repo, "WORLD", "marks", "berthillon", "le-mur-des-cornets", "mark.md");
-  writeFileSync(p, readFileSync(p, "utf8").replace(/^at: .*\r?\n/m, "").replace(/^extent: .*\r?\n/m, "").replace(/^---\r?\n\r?\n/m, `${HELD_BY}: sb-ash\n---\n\n`));
+  writeFileSync(p, asIdea(readFileSync(p, "utf8")).replace(/^at: .*\r?\n/m, "").replace(/^extent: .*\r?\n/m, "").replace(/^---\r?\n\r?\n/m, `${HELD_BY}: sb-ash\n---\n\n`));
   const errs = errorsOf(lint(repo));
-  assert.ok(errs.some((e) => /le-mur-des-cornets: held_by: only a thing is held/.test(e)), errs.join("\n"));
+  assert.ok(errs.some((e) => /le-mur-des-cornets: held_by: only a thing is held — .*a idea, not a thing/.test(e)), errs.join("\n"));
+});
+
+// S123 (2026-10-21): the take door takes an untyped sited mark (it refuses only portable: false), and the hold
+// record has held them since 08-31 (berthillon's cones, a cup, a coin). Their printout is what the record holds.
+const LEGACY = join("WORLD", "marks", "berthillon", "cone-blue-moon-2026-08-30", "mark.md");
+test("3b. an untyped sited mark the record holds prints held (and owned) and lints CLEAN; a parcel never does (S123)", () => {
+  const repo = realTree();
+  const p = join(repo, LEGACY);
+  const was = readFileSync(p, "utf8");
+  assert.match(was, /^kind: sited\r?$/m, "the fixture is a legacy cone: kind sited, no class");
+  assert.doesNotMatch(was, /^class:/m);
+  writeFileSync(p, was.replace(/^at: .*\r?\n/m, "").replace(/^extent: .*\r?\n/m, "").replace(/^---\r?\n\r?\n/m, `${HELD_BY}: little-bird\n${OWNED_BY}: sb-ash\n---\n\n`));
+  const out = lint(repo);
+  assert.deepEqual(errorsOf(out), [], out.slice(-600));
+  const parcels = realTree();
+  const parcel = execFileSync("git", ["-C", REPO_SRC, "grep", "-l", "^kind: parcel", "--", "WORLD/marks"], { encoding: "utf8" }).split(/\r?\n/).filter(Boolean)[0];
+  const q = join(parcels, parcel);
+  writeFileSync(q, readFileSync(q, "utf8").replace(/^---\r?\n\r?\n/m, `${HELD_BY}: sb-ash\n---\n\n`));
+  assert.ok(errorsOf(lint(parcels)).some((e) => /held_by: only a thing is held/.test(e)), "ground is not carried");
 });
 
 test("4. the fold carries the holder and no place, and every other mark folds byte for byte as before", () => {
@@ -182,7 +204,7 @@ test("9. D-O1: a thing owned apart from its maker prints owned_by and lints CLEA
   assert.ok(errorsOf(lint(id)).some((e) => /owned_by: names the owner, a resident's handle/.test(e)));
   const wall = realTree();
   const p = join(wall, "WORLD", "marks", "berthillon", "le-mur-des-cornets", "mark.md");
-  writeFileSync(p, readFileSync(p, "utf8").replace(/^---\r?\n\r?\n/m, `${OWNED_BY}: sb-ash\n---\n\n`));
+  writeFileSync(p, asIdea(readFileSync(p, "utf8")).replace(/^---\r?\n\r?\n/m, `${OWNED_BY}: sb-ash\n---\n\n`));
   assert.ok(errorsOf(lint(wall)).some((e) => /le-mur-des-cornets: owned_by: only a thing is owned apart from its maker/.test(e)));
 });
 
