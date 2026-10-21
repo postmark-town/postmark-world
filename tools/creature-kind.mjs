@@ -135,8 +135,9 @@ export const ENCOUNTER_VERBS = Object.freeze(["strike", "steady", "shield"]);
 
 /** Whom a press may land on: each a menu entry the office resolves to one resident
  *  in the ring (the one who acted, the last to strike it, one shielding another,
- *  the one with the most acts in its ring this window, one with no housemate there). */
-export const PRESS_ON = Object.freeze(["actor", "striker", "shielder", "loudest", "alone"]);
+ *  the one with the most acts in its ring this window, one with no housemate there,
+ *  the one whose stay in its ring began first). */
+export const PRESS_ON = Object.freeze(["actor", "striker", "shielder", "loudest", "alone", "longest"]);
 /** The most nerve one press may cost. */
 export const PRESS_MAX = 2;
 /** How a kind's ease fills: each resident their own, or shared, one point per household. */
@@ -314,7 +315,8 @@ export function parseEffects(src, { moods, flags, finishable = false, ease = nul
 const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/;
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
 const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending", "fragments", "fragment_words",
-  "resolve", "strike", "ease"]); // an encounter's lines (a finishable kind only)
+  "resolve", "strike", "ease", // an encounter's lines (a finishable kind only)
+  "tempts", "who", "fight_size"]); // a creature that tempts (creature-tempts.mjs)
 /** What a telling kind's conditions may read (POS-712): told.now (it told the actor a fragment with
  *  this act), told.answered (this act's words answered every fragment, in order) and told.asks
  *  (every fragment is told, it is asking, and this act did not answer: the one who forgets). */
@@ -344,6 +346,17 @@ function encounterOf(kind, source) {
     kind.resolve = whole("resolve", kind.resolve, 1);
     kind.strike = whole("strike", kind.strike, 1, kind.resolve);
     if (Object.hasOwn(kind.moods, "resolve") || kind.flags.includes("resolve")) throw new Error(`${source}: a kind with resolve: has no mood or flag named resolve (self.resolve is its resolve)`);
+  }
+  // A CREATURE THAT TEMPTS (creature-tempts.mjs): its menu file, the resident who may speak for it, and the
+  // size of its fight (what its phases advance by). It keeps two tallies, never a resolve or an ease
+  if ((kind.tempts === undefined) !== (kind.who === undefined) || (kind.tempts === undefined) !== (kind.fight_size === undefined))
+    throw new Error(`${source}: tempts:, who: and fight_size: come together (its menu, who speaks for it, and its fight's size)`);
+  if (kind.tempts !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: tempts: belongs to a finishable kind (finishable: true); ${MISTS_ONLY}`);
+    if (!/^[a-z][a-z0-9.-]*.json$/.test(kind.tempts)) throw new Error(`${source}: tempts: names a menu file beside it, <name>.json (got ${JSON.stringify(kind.tempts)})`);
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(kind.who)) throw new Error(`${source}: who: is a resident's handle (got ${JSON.stringify(kind.who)})`);
+    kind.fight_size = whole("fight_size", kind.fight_size, 3);
+    if (kind.resolve !== undefined || kind.ease !== undefined) throw new Error(`${source}: a creature that tempts keeps two tallies, never a resolve: or an ease:`);
   }
   if (kind.ease !== undefined) {
     // `only <verb>` (a per-resident ease): any other act of yours charged in its ring empties your own ease,

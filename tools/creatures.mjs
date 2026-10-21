@@ -166,7 +166,9 @@ export function creatureLaw(records) {
 
 /**
  * A kind class's named creatures (WLD-25), its mark's `named`: a list of
- * { slug, at: { x, y }, carries?, from_crossing? }, read whole like `actions`.
+ * { slug, at: { x, y }, carries?, from_crossing?, after? }, read whole like `actions`.
+ * `after` (a creature that tempts, its fight's opening): the ids of named
+ * creatures (creature:<kind>-<slug>) that must all have ended before it comes out.
  * Each is one creature, `creature:<kind>-<slug>`, standing at `at` from its
  * crossing on (the class's launch dial when it names none), and carrying the
  * standing thing `carries` names, which goes to its first finisher. A bad slug,
@@ -184,8 +186,11 @@ function namedOf(mark, kind) {
     if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error(`${where} has no place (at: { x, y })`);
     if (d.carries != null && (typeof d.carries !== "string" || !d.carries.includes("/"))) throw new Error(`${where} carries ${JSON.stringify(d.carries)}, not a mark's id (<by>/<slug>)`);
     if (d.from_crossing != null && !Number.isInteger(d.from_crossing)) throw new Error(`${where}'s from_crossing is ${JSON.stringify(d.from_crossing)}, not a whole crossing`);
+    if (d.after != null && (!Array.isArray(d.after) || !d.after.length || d.after.some((a) => !isCreatureId(a))))
+      throw new Error(`${where}'s after is ${JSON.stringify(d.after)}, not a list of named creatures' ids`);
     return { id: `${ID_PREFIX}${kind}-${d.slug}`, kind, x, y, ...(d.carries != null ? { carries: d.carries } : {}),
-      ...(d.from_crossing != null ? { from_crossing: d.from_crossing } : {}), declared: `${TOWN}/${kind}#${d.slug}` };
+      ...(d.from_crossing != null ? { from_crossing: d.from_crossing } : {}), ...(d.after != null ? { after: [...d.after] } : {}),
+      declared: `${TOWN}/${kind}#${d.slug}` };
   });
 }
 

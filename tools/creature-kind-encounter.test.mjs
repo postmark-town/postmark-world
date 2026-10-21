@@ -49,7 +49,7 @@ test("a finishable kind reads whole: the switch, resolve and strike, ease, and i
 
 test("the encounter's words are frozen, and its verbs are neither the ring's nor the afforded", () => {
   assert.deepEqual(ENCOUNTER_VERBS, ["strike", "steady", "shield"]);
-  assert.deepEqual(PRESS_ON, ["actor", "striker", "shielder", "loudest", "alone"]);
+  assert.deepEqual(PRESS_ON, ["actor", "striker", "shielder", "loudest", "alone", "longest"]);
   assert.equal(PRESS_MAX, 2);
   assert.deepEqual(EASE_BY, ["mine", "households"]);
   assert.ok(LINE_SLOTS.includes("target"));
