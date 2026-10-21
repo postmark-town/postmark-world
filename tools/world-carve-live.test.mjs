@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // world-carve-live.test.mjs — the falsifiers, run against THE REAL WORLD.
 //
-// Everything in determination.test.mjs and consent.test.mjs is a two-rectangle
-// fixture, which is how you check that a rule says what you think it says. This
-// file checks something else: that the rule, turned loose on every mark the
-// town has actually made, moves EXACTLY what was predicted and nothing else.
+// Everything in consent.test.mjs is a two-rectangle fixture, which is how you
+// check that a rule says what you think it says. This file checks something
+// else: that the rule, turned loose on every mark the town has actually made,
+// moves EXACTLY what was predicted and nothing else.
 //
 // Escrow comes from WORLD/fixtures/stakes-2026-08-10.json — the town's own
 // derived export (`node tools/world-stake.mjs --escrow --json` in a town clone at
@@ -214,53 +214,9 @@ test("one-parcel-per stays at HANDLE grain — the Reeves legally hold four", ()
 
 // ── STAGE 2: the region carve ────────────────────────────────────────────────
 
-// CARVE-DISABLED-2026-08-22: skipped — asserts carve output, which marks-fold.mjs no longer
-// computes. Restore with the carve call under the same marker.
-test.skip("THE PANDO SLOT DISSOLVES: 28 marks are no longer one contest, and the peak keeps its ground", () => {
-  // Before: one site-slot chained 28 marks — a peak, its porch, its garden, five
-  // trees, a lantern hook — totalling 194 with a 46% top share, which is below the
-  // 50% determine threshold and therefore VAGUE FOREVER by construction.
-  const pandoIds = new Set(state.marks
-    .filter((m) => m.at && Math.abs(m.at.x + 95458) < 2000 && Math.abs(m.at.y + 95458) < 2000)
-    .map((m) => m.id));
-  assert.ok(pandoIds.size >= 20, "the Pando neighbourhood is still densely built");
-
-  // no slot rivalry survives there at all
-  assert.equal(state.rivalries.filter((r) => r.kind === "slot").length, 0);
-
-  // the contests that remain are intersection-only and cross-household, every one
-  const pando = groundContests.filter((r) => r.claims.some(([id]) => pandoIds.has(id)));
-  for (const c of pando) {
-    const creds = new Set(c.claims.map(([id]) => households[state.marks.find((m) => m.id === id).household] ?? id));
-    assert.ok(creds.size > 1, `${c.claims.map(([i]) => i).join(" vs ")} — a contest needs two households`);
-    assert.ok(c.determined !== null, "and every one of them RESOLVES, where the 28-mark slot never could");
-  }
-
-  // vermillion's peak keeps the meadow. Its own garden, view-peak and lake caves
-  // hold their own cells inside it — that is composition, and the overlay files it
-  // as `within`. What it LOSES, to another household, is 90 m² out of 12,960,000:
-  // a lantern hook, a pot, a window, a lantern, a wall line.
-  const peak = state.determination["vermillion/the-pando-peak"];
-  assert.ok(peak, "the peak has an overlay");
-  assert.equal(peak.held_area + peak.within_area + peak.lost_area + peak.vague_area, peak.area, "the overlay tiles the claim exactly");
-  assert.ok(peak.lost_area > 0, "it genuinely loses the cells the dense foreign claims hold");
-  assert.ok(peak.lost_area / peak.area < 0.0001, `and only those — ${peak.lost_area} m² of ${peak.area}`);
-  assert.ok(peak.within_area > peak.lost_area * 1000, "what looks like loss is overwhelmingly its own composition");
-});
-
-// CARVE-DISABLED-2026-08-22: skipped — asserts carve output, which marks-fold.mjs no longer
-// computes. Restore with the carve call under the same marker.
-test.skip("the dense pond carves the thin meadow, live: every mark that takes ground off the peak is denser than it", () => {
-  const peakArea = 3600 * 3600;
-  const peakDensity = w("vermillion/the-pando-peak") / peakArea;
-  const takers = new Set((state.determination["vermillion/the-pando-peak"].lost ?? []).map((r) => r.to));
-  assert.ok(takers.size >= 4, `several claims carve out of the peak (${[...takers].join(", ")})`);
-  for (const id of takers) {
-    const m = state.marks.find((x) => x.id === id);
-    const d = m.weight / (m.extent.w * m.extent.h);
-    assert.ok(d > peakDensity, `${id} at ${d.toExponential(2)} is denser than the peak at ${peakDensity.toExponential(2)}`);
-  }
-});
+// The carve itself is disabled (CARVE-DISABLED-2026-08-22) and its tests are
+// retired; the note beside the disabled code in marks-fold.mjs says what they
+// asserted. What still runs here is that the fold moves nothing on disk.
 
 test("the carve is an OVERLAY on the real world — not one claim on disk was moved or resized", () => {
   // The falsifier for "derived, never stored", run over every mark: every published
@@ -370,75 +326,4 @@ test("wright's trueing terrace KEEPS its 6 — the one place the credential grai
   // exact difference between the two grains, on the real tree.
   assert.equal(w("wright/the-trueing-terrace"), 6);
   assert.equal(households["rei"], households["wright"]);
-});
-
-// CARVE-DISABLED-2026-08-22: skipped — asserts carve output, which marks-fold.mjs no longer
-// computes. Restore with the carve call under the same marker.
-test.skip("THERE IS NO CLASS LAW: a region is an ordinary marketplace mark and takes nothing for being one", () => {
-  // The founder's ruling. An earlier draft of this branch gave the world root and
-  // the town's own containers an automatic +1 from everything sited within them,
-  // on "a region is exactly as real as what stands in it". That is gone: a region
-  // wanting the weight of what stands in it must be BACKED, like anything else, or
-  // be welcomed in by the marks themselves.
-  //
-  // The world root is the sharpest case. It geometrically contains every mark,
-  // so under class law it summed nearly the whole world (147) and read as the most
-  // significant thing in it by construction rather than by anyone's choice. It is
-  // now worth exactly what is staked on it.
-  assert.equal(w("the-town/let-there-be-light"), 18, "the root is worth its own backing, not the world's");
-  assert.equal(w("the-town/pando-peak"), 18);
-  assert.equal(w("the-town/the-town-centre"), 0, "and an unbacked region is worth nothing, plainly");
-
-  // the marker itself is gone from the tree — not merely ignored by the law, which
-  // would leave three records asserting something nothing honours
-  assert.equal(marks.filter((m) => m.region_container !== undefined).length, 0, "no mark still declares it");
-
-  // and the removal is visible in the GROUND, not only in the weights. The town
-  // centre still appears in contests — it still claims that ground — but it now
-  // wins none of them. Under class law its borrowed 12 beat limen's threshold
-  // district (share 0.616) and took the whole 258,250 m² it shared with rei's
-  // lanternseed gardens; a region was carving ground off residents on weight it
-  // had been handed for existing. At its own backing of 0 it determines nothing.
-  assert.equal(w("the-town/the-town-centre"), 0);
-  const centreWins = groundContests.filter((r) => r.determined === "the-town/the-town-centre");
-  assert.deepEqual(centreWins, [], "an unbacked region determines no ground at all");
-
-  // ── superseded 2026-08-11: the Centre was raised to constitution tier ───────
-  // This test used to check the Centre's five contests one by one, and the
-  // sharpest of them by name: `overLimen`, where the ground class law had taken
-  // from limen went back to limen. That contest no longer exists. Constitution
-  // ground binds without stamps and cannot be rivaled, so the fold filters the
-  // Centre out of the carve before it runs (`commonsSited`) and it now appears
-  // in NO contest at all — a stronger form of this test's own claim, not a
-  // weaker one: a region that takes nothing for being one, and is not even at
-  // the table.
-  //
-  // What matters is that nobody's ground moved to make that true, which is
-  // checked here rather than asserted in prose. The Centre leaves the overlay
-  // entirely; so do the ten marks whose only rival was the Centre (four of
-  // little-bird's and six of the town's own) — an ABSENT overlay entry means a
-  // mark holds its whole claim UNCONTESTED, never that it lost it. The one
-  // resident whose numbers change, changes upward.
-  assert.deepEqual(groundContests.filter((r) => r.claims.some(([id]) => id === "the-town/the-town-centre")), [],
-    "a constitution-tier region is not in the contest at all");
-  assert.equal(state.determination["the-town/the-town-centre"], undefined,
-    "…so it carries no carve overlay, and determines nothing anywhere");
-  for (const id of ["little-bird/a-pot-on-the-quay-stones", "little-bird/a-bowl-at-the-foot-of-the-steps",
-    "little-bird/coconut-broth-on-the-quay-stones", "little-bird/under-the-eaves-by-the-door"])
-    assert.equal(state.determination[id], undefined, `${id} is uncontested now, not dispossessed`);
-  const limen = state.determination["limen/the-threshold-district"];
-  assert.equal(limen.lost.some((p) => p.to === "the-town/the-town-centre"), false,
-    "limen loses no ground to the town — the claim that used to take it is out of the carve");
-  const gardens = state.determination["rei/the-lanternseed-gardens"];
-  // BOUNDS, NOT PINS (2026-08-22). These two used to pin the live areas to the
-  // square metre (held 2,379,964 · vague 56,250), and the S45 rehearsal refused
-  // a lawful crossing over 29.25 m² of boundary drift from a neighbour's swept
-  // mark edits — no contest, no ground lost, the pin was just stale. The claim
-  // this test owns is the CENTRE's: ~261,250 m² that its class-law weight made
-  // vague stays held now that the weight is gone. The bounds are sized to that
-  // claim — if the Centre's carve ever returns, held drops and vague jumps by
-  // ~261k and both bounds break; a neighbour's sliver moves neither past them.
-  assert.ok(gardens.held_area > 2_300_000, `rei's gardens hold the ground the Centre used to make vague (held ${gardens.held_area})`);
-  assert.ok(gardens.vague_area < 60_000, `…and it did not drift back to vague (vague ${gardens.vague_area})`);
-  assert.equal(gardens.lost_area, 0);
 });

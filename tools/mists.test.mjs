@@ -287,10 +287,10 @@ function nearestSighted({ skeleton, worldState, withM, without }) {
 // veil must not re-rank it. Every parcel whose standpoint stands out of the wall
 // and its fringe (inside them, sight is the fringe's own law, held above),
 // Pando's with them, at the first keyframe and the last.
-function lawReach({ skeleton, worldState, withM, without }, { near = () => true } = {}) {
+function lawReach({ skeleton, worldState, withM, without }, { pick = (ps) => ps } = {}) {
   const ks = keyframesOf(skeleton);
-  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && near(m))
-    .sort((p, q) => (p.id < q.id ? -1 : 1));
+  const parcels = pick(worldState.marks.filter((m) => m.kind === "parcel" && m.at)
+    .sort((p, q) => (p.id < q.id ? -1 : 1)));
   const reachOf = (fov) => [...fov.carried.map((s) => s.id), ...fov.far.map((f) => f.id)].sort();
   let checked = 0;
   const fogged = [];
@@ -309,6 +309,43 @@ function lawReach({ skeleton, worldState, withM, without }, { near = () => true 
   return { checked, fogged };
 }
 
+// A FIXED SAMPLE (WLD-101, 2026-10-21). These reads cost a field of view per
+// standpoint per crossing, and run in order inside this file, so reading every
+// parcel and every crossing made this the suite's slowest file. Each check
+// below keeps its assertions and reads a fixed sample instead: the same sample
+// every run, so a red one reproduces.
+//
+// mulberry32: a seeded, deterministic pick of n of the items
+const seededPick = (items, n, seed = 101) => {
+  let a = seed >>> 0;
+  const rand = () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i -= 1) { const j = Math.floor(rand() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
+  return out.slice(0, n);
+};
+const clearAt = (p, m) => { const h = mistsHere(p.at, m); return !h.inWall && h.thickness === 0; };
+// LAW REACH's parcels: the one nearest each side of the map (closest to the
+// wall; on the map, as THE PARCEL NEAREST EACH SIDE reads it) and Pando's (in a
+// clearing past it), plus 20 by the seeded pick, of those whose standpoint
+// stands clear at both keyframes it reads.
+const lawSample = ({ skeleton }, n = 20) => (parcels) => {
+  const ks = keyframesOf(skeleton);
+  const clear = parcels.filter((p) => [ks[0], ks.at(-1)].every((c) => clearAt(p, mistsAt(c, skeleton.mists))));
+  const onTheMap = clear.filter((p) => Math.abs(p.at.x) < 6000 && Math.abs(p.at.y) < 10000);
+  const side = (better) => onTheMap.reduce((a, p) => (better(p, a) ? p : a));
+  const head = [...new Set([
+    side((p, a) => p.at.y < a.at.y), side((p, a) => p.at.y > a.at.y), side((p, a) => p.at.x > a.at.x), side((p, a) => p.at.x < a.at.x),
+    ...clear.filter((p) => p.id === PANDO),
+  ])];
+  return [...head, ...seededPick(clear.filter((p) => !head.includes(p)), n)];
+};
+// The season's crossings: its keyframes (the Mists' schedule and the ladder's
+// rungs) and the last crossing read, with one crossing between each pair.
+const seasonCrossings = (skeleton, last = 300) => {
+  const keys = [...new Set([...keyframesOf(skeleton), ...SEASON_LADDER.map((r) => r.from), last])].sort((a, b) => a - b);
+  return keys.flatMap((c, i) => (i && c - keys[i - 1] > 1 ? [Math.floor((keys[i - 1] + c) / 2), c] : [c]));
+};
+
 test("THE CLEARINGS HOLD: each stands as committed, and the town's marks in one stay clear of the wall AND its fringe, at every crossing; the households' ground they were sized for is told about, never failed", (t) => {
   const notes = clearingsHold(real());
   t.diagnostic(notes.length ? notes.join("; ") : "the ground each clearing was sized for stands clear, Pando's parcel in its own");
@@ -326,8 +363,11 @@ test("THE PARCEL NEAREST EACH SIDE, of those clear all season, stays fully sight
 
 test("LAW REACH: from a parcel, the Mists change what is reached only by what the wall hides, never by the veil", () => {
   assert.ok(real().worldState.marks.filter((m) => m.kind === "parcel" && m.at).length >= 117);
-  const { checked } = lawReach(real());
-  assert.ok(checked >= 150, `every sighted parcel, at both keyframes (${checked})`);
+  const sample = lawSample(real())(real().worldState.marks.filter((m) => m.kind === "parcel" && m.at));
+  assert.ok(sample.length >= 24 && sample.some((p) => p.id === PANDO), `the sample: each side, Pando's, and 20 more (${sample.map((p) => p.id).join(", ")})`);
+  const { checked, fogged } = lawReach(real(), { pick: lawSample(real()) });
+  assert.deepEqual(fogged, [], "every sampled standpoint stands clear");
+  assert.equal(checked, sample.length * 2, `every sampled parcel, at both keyframes (${checked})`);
 });
 
 // MAY COVER (WLD-38): a household's placement never holds a settlement. On
@@ -367,9 +407,13 @@ test("MAY COVER: a household's mark straddling the wall, a parcel in its fringe,
     assert.ok(covered[ks.at(-1)].includes(id), `${id} is counted covered at ${ks.at(-1)}`);
   const nearest = nearestSighted(rec);
   assert.ok(!extra.some((x) => Object.values(nearest).includes(x)), "the nearest sighted parcel is never one the Mists reach");
-  // law reach from the parcels round the added ones (the whole record is the test above)
-  const near = (p) => extra.some((x) => Math.hypot(p.at.x - x.at.x, p.at.y - x.at.y) < 2500);
-  const { checked, fogged } = lawReach(rec, { near });
+  // law reach from the added parcels and the real parcel nearest each added mark (the whole record is the test above)
+  const added = new Set(extra.map((x) => x.id));
+  const pick = (ps) => [...new Set([
+    ...ps.filter((p) => added.has(p.id)),
+    ...extra.map((x) => ps.filter((p) => !added.has(p.id)).reduce((a, p) => (Math.hypot(p.at.x - x.at.x, p.at.y - x.at.y) < Math.hypot(a.at.x - x.at.x, a.at.y - x.at.y) ? p : a))),
+  ])];
+  const { checked, fogged } = lawReach(rec, { pick });
   t.diagnostic(`law reach: ${checked} standpoints checked; out of it, in the wall or the fringe: ${fogged.join(", ")}`);
   assert.ok(checked > 0, "the parcels round them were read");
   assert.ok(fogged.includes(`a-household/a-parcel-in-the-fringe@${ks.at(-1)}`) && fogged.includes(`a-household/a-parcel-behind-the-wall@${ks.at(-1)}`));
@@ -554,7 +598,9 @@ test("the season line: the crossing picks it (crossing % 3); inside the wall or 
   const { withM, worldState } = real();
   assert.ok(openYourEyes({ x: 0, y: 0 }, withM, { crossing: 273 }).tell().includes(BELL));
   const landing = worldState.marks.find((m) => m.id === "the-town/the-pando-landing").at;
-  for (let c = 244; c <= 300; c += 1) {
+  const season = seasonCrossings(real().skeleton);
+  assert.deepEqual(new Set(season.map((c) => c % 3)), new Set([0, 1, 2]), `the season's crossings pick every line (${season.join(", ")})`);
+  for (const c of season) {
     const o = orient(landing, withM, { crossing: c });
     assert.doesNotMatch(openYourEyes(landing, withM, { crossing: c }).tell(), /north edge/, `the landing's telling at ${c}`);
     assert.doesNotMatch(airLine(o.you, c), /north edge/, `the landing's air at ${c}`);
@@ -574,11 +620,13 @@ test("the edge and veil sentences escalate in the telling, rung by rung; under t
   assert.match(openYourEyes({ x: -1900, y: 2150 }, withM, { crossing: 243 }).tell(), /dark end of the world/);
 });
 
-test("THE DARK END, UNDER THE VEIL: no daylight sentence is told at the quay or the Pando landing at any crossing of the season", () => {
+test("THE DARK END, UNDER THE VEIL: no daylight sentence is told at the quay or the Pando landing at the season's keyframes or between them", () => {
   const { withM, worldState } = real();
   const spots = ["the-town/the-quay", "the-town/the-pando-landing"].map((id) => worldState.marks.find((m) => m.id === id).at);
+  const season = seasonCrossings(real().skeleton);
+  assert.deepEqual(new Set(season.map((c) => c % 2)), new Set([0, 1]), `the season's crossings read evening and morning (${season.join(", ")})`);
   for (const at of spots)
-    for (let c = 244; c <= 300; c += 1) {
+    for (const c of season) {
       assert.doesNotMatch(openYourEyes(at, withM, { crossing: c }).tell(), DAYLIGHT, `telling at (${at.x}, ${at.y}), ${c}`);
       assert.doesNotMatch(airLine(orient(at, withM, { crossing: c }).you, c), DAYLIGHT, `air at (${at.x}, ${at.y}), ${c}`);
     }

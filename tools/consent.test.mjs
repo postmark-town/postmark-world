@@ -5,6 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fold } from "./marks-fold.mjs";
+import { firstLaidOrdered } from "./consent.mjs";
 
 const terrain = { features: [] };
 const sited = (id, by, x, y, w, h, extra = {}) => ({
@@ -20,6 +21,12 @@ const parcel = (id, by, x, y, extra = {}) => ({
 const stake = (holder, mark, n) => ({ holder, mark, n, weight: n, tick: 0 });
 const w = (state, id) => state.marks.find((m) => m.id === id)?.weight;
 const standing = (state, id) => state.marks.some((m) => m.id === id);
+// A commons senior is laid before the sited default, so its word is read on the
+// ruled path, seniority at contact (WLD-101), never the same-instant fallback
+// held for POS-572. Each test below that leans on it says so.
+const SENIOR = "2026-08-01";
+const onTheRuledPath = (senior, child) =>
+  assert.ok(firstLaidOrdered(senior, child), `${senior.id} and ${child.id} are first laid in order, so seniority decides, not the containment edge`);
 
 // ── the default table ────────────────────────────────────────────────────────
 
@@ -214,7 +221,7 @@ test("POS-449 · the PARCEL's age is its first claim too: a parcel amended later
   assert.equal(state.returned[0].authority, "parcel (absolute)");
 });
 
-test("a parcel's word is ABSOLUTE where a commons parent's is EARNED — the same unstaked grantor, two outcomes", () => {
+test("a parcel's word is ABSOLUTE where a commons senior's is EARNED — the same unstaked grantor, two outcomes", () => {
   // Both grantors have staked nothing. On parcel ground that changes nothing: the
   // holder's word stands on its own, and the hall is returned. On a commons edge
   // the identical word moves nothing at all, because there the veto must be earned.
@@ -225,22 +232,25 @@ test("a parcel's word is ABSOLUTE where a commons parent's is EARNED — the sam
   assert.equal(standing(onGround, "foreign/hall"), false, "a parcel holder need not out-stake anyone on their own ground");
   assert.equal(onGround.returned[0].state, "returned");
 
-  const onCommons = fold({ marks: [sited("estate", "holder", 0, 0, 1000, 1000, { consent: word }), hall], terrain, tick: 1, stakes: [] });
+  const senior = sited("estate", "holder", 0, 0, 1000, 1000, { consent: word, date: SENIOR });
+  onTheRuledPath(senior, hall);
+  const onCommons = fold({ marks: [senior, hall], terrain, tick: 1, stakes: [] });
   assert.equal(standing(onCommons, "foreign/hall"), true, "the same unstaked word in the commons moves nothing");
 });
 
-test("on a COMMONS edge the veto is EARNED: a backed parent turns away a weak child, a weak parent cannot", () => {
-  const estate = (consent) => sited("estate", "a", 0, 0, 1000, 1000, { consent });
+test("on a COMMONS edge the veto is EARNED: a backed senior turns away a weak child, a weak senior cannot", () => {
+  const estate = (consent) => sited("estate", "a", 0, 0, 1000, 1000, { consent, date: SENIOR });
   const shed = sited("shed", "b", 0, 0, 100, 100);
   const word = { "b/shed": "opposed" };
+  onTheRuledPath(estate(word), shed);
 
   const strong = fold({ marks: [estate(word), shed], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
-  assert.equal(standing(strong, "b/shed"), false, "a parent at density 1e-4 turns away a child at 0");
+  assert.equal(standing(strong, "b/shed"), false, "a senior at density 1e-4 turns away a child at 0");
   assert.equal(strong.returned[0].authority, "commons edge (earned)");
 
   const outmatched = fold({ marks: [estate(word), shed], terrain, tick: 1,
     stakes: [stake("s", "a/estate", 100), stake("s", "b/shed", 5)] });
-  assert.equal(standing(outmatched, "b/shed"), true, "a child at 5e-4 outweighs the same parent and stands");
+  assert.equal(standing(outmatched, "b/shed"), true, "a child at 5e-4 outweighs the same senior and stands");
   // …and it was never VETOED in the first place. Standing alone does not say that:
   // a rule comparing RAW stamps would read 5 against 100, veto the shed, and then
   // hand it straight back as `pending-escrow` because it carries escrow — the mark
@@ -248,7 +258,7 @@ test("on a COMMONS edge the veto is EARNED: a backed parent turns away a weak ch
   assert.equal(outmatched.returned.length, 0, "no veto was earned here, so nothing was returned at all");
 });
 
-test("the veto weighs the parent's OWN stamps, never its fan-up — a rich WING does not arm its estate", () => {
+test("the veto weighs the senior's OWN stamps, never its fan-up — a rich WING does not arm its estate", () => {
   // The estate has staked nothing itself. Inside it, a wing of its OWN household
   // carries 500, which fans up, so the estate's WEIGHT is 500 while its own escrow
   // is 0. It opposes an unstaked foreign shed.
@@ -259,9 +269,10 @@ test("the veto weighs the parent's OWN stamps, never its fan-up — a rich WING 
   // circular — under a cross-household edge the fan-up would include the very mark
   // being judged — and it would quietly make "an unstaked parent's veto moves
   // nothing" false for every parent with a well-backed child.
-  const estate = sited("estate", "a", 0, 0, 1000, 1000, { consent: { "b/shed": "opposed" } });
+  const estate = sited("estate", "a", 0, 0, 1000, 1000, { consent: { "b/shed": "opposed" }, date: SENIOR });
   const wing = sited("wing", "a", 0, 0, 100, 100);          // same household: fans up by structure
   const shed = sited("shed", "b", 300, 300, 50, 50);        // unstaked, so a real veto would truly return it
+  onTheRuledPath(estate, shed);
   const state = fold({ marks: [estate, wing, shed], terrain, tick: 1, stakes: [stake("s", "a/wing", 500)] });
 
   assert.equal(w(state, "a/estate"), 500, "the estate's weight is entirely borrowed from its wing");
@@ -270,12 +281,12 @@ test("the veto weighs the parent's OWN stamps, never its fan-up — a rich WING 
   assert.equal(state.returned.length, 0);
 });
 
-test("an UNSTAKED parent's veto moves nothing — with nobody backing either side, a word is only a word", () => {
-  const state = fold({
-    marks: [sited("estate", "a", 0, 0, 1000, 1000, { consent: { "b/shed": "opposed" } }), sited("shed", "b", 0, 0, 100, 100)],
-    terrain, tick: 1, stakes: [],
-  });
-  assert.equal(standing(state, "b/shed"), true, "influence is proportional to backing, and this parent has none");
+test("an UNSTAKED senior's veto moves nothing — with nobody backing either side, a word is only a word", () => {
+  const estate = sited("estate", "a", 0, 0, 1000, 1000, { consent: { "b/shed": "opposed" }, date: SENIOR });
+  const shed = sited("shed", "b", 0, 0, 100, 100);
+  onTheRuledPath(estate, shed);
+  const state = fold({ marks: [estate, shed], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(state, "b/shed"), true, "influence is proportional to backing, and this senior has none");
   assert.equal(state.returned.length, 0);
 });
 

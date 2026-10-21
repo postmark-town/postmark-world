@@ -1525,14 +1525,48 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // Weight does not depend on it — weight_parts is computed ~100 lines above
   // this call from own_escrow + breadth + fanned children, never from ground.
   //
-  // TESTS DISABLED WITH IT (same marker — `grep -rn CARVE-DISABLED-2026-08-22`):
-  //   tools/world-carve-live.test.mjs
-  //   tools/determination.test.mjs
-  //   (plus any other file the marker appears in)
+  // ── THE CARVE'S TESTS, RETIRED (WLD-101, 2026-10-21) ──────────────────────
+  // Thirteen tests were skipped under this marker from 2026-08-22: all ten of
+  // tools/determination.test.mjs and three in tools/world-carve-live.test.mjs.
+  // Their last text is at postmark-world 7f5f61c8, for the record. They are
+  // retired, not waiting to be restored: the carve hands ground cell by cell to
+  // the denser claim and keeps an incumbent's seat by hysteresis, and both are
+  // superseded. Roles come from seniority at contact, not containment, and a
+  // mark is returned whole, never clipped (LOGOS conflict-matrix § Roles from
+  // seniority, RULED 2026-10-04); incumbency was always a class-mark rule,
+  // never sited ground (§ Incumbency holds ties, corrected 2026-08-25). A carve
+  // that came back would need a fresh ruling that fits seniority at contact.
   //
-  // TO RESTORE: uncomment the carve() call, delete the empty literal, and
-  // un-skip every file carrying the marker. Restore it as a whole or not at
-  // all — a half-restored carve is a world that disagrees with its own tests.
+  //   determination.test.mjs, the two-rectangle law of the carve:
+  //     §9.2 verbatim: a dense pond determines its own cells inside a thin
+  //       meadow, and the meadow keeps the rest
+  //     contests are intersection-only
+  //     the carve is derived: a claim that loses ground keeps its rect whole
+  //     rect-minus-rect is an L: held ground tiles the claim minus the bite
+  //     one household's own nesting is not a contest
+  //     hysteresis per cell: an incumbent between release and determine keeps
+  //       its seat, and falls below release
+  //     vague is a resting state: a fallen incumbent with no challenger past
+  //       determine leaves the ground to nobody
+  //     incumbency survives a re-cut of the grid
+  //     an overlap nobody has backed is not a contest
+  //     a sovereign mark and a constitution mark never enter the carve
+  //   world-carve-live.test.mjs, the carve over the real world:
+  //     the Pando slot dissolves: 28 marks are no longer one contest
+  //     the dense pond carves the thin meadow, live
+  //     there is no class law: a region takes nothing for being one
+  //
+  // Four of their principles were named as outliving the carve. Three have live
+  // forms: there is no class law (tools/consent.test.mjs, "NO CLASS LAW"), one
+  // household's own nesting is not a contest, and an overlap nobody has backed
+  // is not a contest (tools/carve-principles.test.mjs; consent.test.mjs, "a
+  // household never consents to itself" and the unstaked veto that moves
+  // nothing). The fourth, that a sovereign mark and a constitution mark never
+  // enter, holds today against a parcel holder's word (consent.test.mjs, "THE
+  // TOWN'S OWN REGION"); whether a backed senior's market opposition reaches
+  // them is not ruled, so no test claims it.
+  //
+  // The disabled call, kept where it stood:
   // const carved = carve(
   //   commonsSited.map(mk => ({ id: mk.id, cred: mk._cred, rect: rect(mk), effective: weightOf(mk.id) })),
   //   { prevCells: prev?.cells ?? null, determine_pct: dials.determine_pct, release_pct: dials.release_pct },
