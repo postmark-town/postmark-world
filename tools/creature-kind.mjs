@@ -17,7 +17,15 @@
 // and a reaction may change only the creature itself: its moods and its flags, or
 // send it back into the Mists (`flee`). An effect on the actor (nerve, harm), a
 // take, or a telegraphed spring is the dungeon's and is refused at parse. So is a
-// condition on a verb outside the ring's list.
+// condition on a verb outside the ring's list and the afforded actions.
+//
+// A CREATURE'S AFFORDED ACTIONS (POS-672; ruled 2026-10-16 17:47 and 18:06, LOGOS
+// classes.md § A creature's afforded actions): a resident may aim one at a
+// creature, and the creature's reaction is the act's reply. They are ADDITIONS to
+// the ring (Darko 17:47): the ambient trigger stands. The creature class and each
+// kind class declare which are theirs (their marks' `actions`); a kind file keys
+// reactions on them through `act.verb`, exactly as on a ring verb. Code still
+// decides what is possible and Jev only chooses among it.
 //
 // THE FORMAT (one line each unless said; `#` starts a comment):
 //
@@ -27,6 +35,8 @@
 //   about: …                       one line on what it does
 //   what: >                        a paragraph (the indented lines that follow)
 //   ring_m: 80                     its awareness ring, in metres (no line of sight, like earshot)
+//   tastes: …                      one line of plain prose on what food or offerings it likes,
+//                                  read by Jev with judgment, never a rule table (POS-672, call 8)
 //   moods:                         each mood a range, its start, and one label per
 //     fear: 0..3 = 1 | calm | uneasy | frightened | terrified
 //                                  level, required (what Jev's Score reads)
@@ -34,8 +44,9 @@
 //   reaction <name> "<sentence>": when <cond> [does <effects>] says <line>
 //
 // A condition reads: self.<mood>, self.<flag> (true when set), act.verb (one of
-// RING_VERBS), act.distance_m, act.approaching, actor.times (how often this actor
-// has acted inside its ring during its span), and the literals true, false, numbers
+// RING_VERBS or AFFORDED_VERBS), act.distance_m, act.approaching, actor.times (how
+// often this actor has acted inside its ring during its span), heard.any (true
+// when the creature has words to repeat: see {heard}), and the literals true, false, numbers
 // and "strings", joined by == != < <= > >= and/or/not and parentheses. It is
 // evaluated here and never by eval.
 //
@@ -43,7 +54,22 @@
 // `self.<mood> -n` (clamped to its range), or `flee` (it goes back into the Mists
 // at once: a withdraw with reason `fled`). Several are joined by " ; ".
 //
-// A line may name `{actor}`, the acting resident, and nothing else.
+// A CREATURE THAT IS FINISHED (WLD-25, Darko 2026-10-20 22:47 and 22:56): a kind
+// that says `finishable: true` may carry the effect `finish`: the acting resident
+// has finished it. That changes nothing else; the creature stays until its
+// settlement ends it (reason `ended`), and every resident who finished it before
+// then is on the record, the first by act order taking what it carries. A
+// finishable kind never flees (D6): it leaves only by its ending. And it may write
+// its own ending's line, `ending: …`, naming {finisher}, {names} (the others who
+// took part) and {carried} (what it carried), all three filled by code.
+//
+// A line may name `{actor}`, the acting resident, and two slots CODE fills, never a
+// model: `{offered}`, the name of the kind offered, only on a reaction whose
+// condition requires `act.verb == "offer"`; and `{heard}`, a few words a resident
+// said near it in public, only on a reaction whose condition requires `heard.any`
+// (the raven's mimicry, WLD-56 18:13: the words are content, never instructions).
+// "Requires" means the slot's term stands in the condition's top-level `and` chain,
+// so the line can never be rendered without what it names.
 //
 // A `#` after a space ends a line's comment, except on a reaction line, which may
 // not carry one (it would cut what the reaction says); no line is longer than
@@ -56,8 +82,17 @@ import { readFileSync } from "node:fs";
  *  (Darko, 21:31; the same list as the G5 privacy paragraph, POS-632 PR-0). */
 export const RING_VERBS = Object.freeze(["walk", "enter", "exit", "say", "take", "give", "drop", "leave-mark"]);
 
+/** The afforded actions a creature class may declare (POS-672; ruled 2026-10-16
+ *  18:06): watch, approach and shoo on every creature; call and offer on the wolf
+ *  and the raven; whisper on the bat. Which ones a creature takes is its classes'
+ *  `actions`, never this list: this is only every verb a kind file may key on. */
+export const AFFORDED_VERBS = Object.freeze(["watch", "approach", "shoo", "call", "offer", "whisper"]);
+
+/** The slots a line may name: the actor, and the two code fills (see the header). */
+export const LINE_SLOTS = Object.freeze(["actor", "offered", "heard"]);
+
 /** What a condition may read beyond the creature's own moods and flags. */
-const ACT_FIELDS = new Set(["act.verb", "act.distance_m", "act.approaching", "actor.times"]);
+const ACT_FIELDS = new Set(["act.verb", "act.distance_m", "act.approaching", "actor.times", "heard.any"]);
 
 // ── the expression language ────────────────────────────────────────────────────
 const TOKEN = /\s*(?:(\d+(?:\.\d+)?)|("(?:[^"\\]|\\.)*")|(==|!=|<=|>=|<|>|\(|\))|([A-Za-z_][\w.-]*))/y;
@@ -138,6 +173,18 @@ export function evaluate(tree, scope) {
 
 export const holds = (tree, scope) => !!evaluate(tree, scope);
 
+/** What a condition REQUIRES: the bare ids and the act.verb literals standing in
+ *  its top-level `and` chain, so whenever it holds, each of them holds too. */
+function requiredOf(tree, out = { ids: new Set(), verbs: new Set() }) {
+  if (tree.op === "and") { requiredOf(tree.l, out); requiredOf(tree.r, out); }
+  else if ("id" in tree) out.ids.add(tree.id);
+  else if (tree.op === "==") {
+    const verbSide = [tree.l, tree.r].find((s) => s.id === "act.verb"), other = verbSide === tree.l ? tree.r : tree.l;
+    if (verbSide && "lit" in other) out.verbs.add(other.lit);
+  }
+  return out;
+}
+
 /** Every identifier a condition reads, and every string it compares act.verb with. */
 function readsOf(tree, out = { ids: [], verbs: [] }) {
   if ("id" in tree) out.ids.push(tree.id);
@@ -168,6 +215,7 @@ export function parseEffects(src, { moods, flags }) {
     let m;
     if (s === "nothing") return { do: "nothing" };
     if (s === "flee") return { do: "flee" };
+    if (s === "finish") return { do: "finish" };
     if ((m = /^(set|clear)\s+([\w-]+)$/.exec(s))) {
       if (!flags.includes(m[2])) throw new Error(`the effect "${s}" names a flag the kind does not declare (flags: ${flags.join(", ") || "none"})`);
       return { do: m[1], flag: m[2] };
@@ -183,7 +231,9 @@ export function parseEffects(src, { moods, flags }) {
 // ── the kind file ───────────────────────────────────────────────────────────────
 const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/;
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
-const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags"]);
+const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending"]);
+/** The slots an ending's line may name (WLD-25), each filled by code at the settlement. */
+export const ENDING_SLOTS = Object.freeze(["finisher", "names", "carried"]);
 /** The longest line a kind file may hold (the reaction pattern is not linear in a
  *  hostile line's length; kind files are reviewed law, and this closes it anyway). */
 export const MAX_LINE = 2000;
@@ -243,6 +293,15 @@ export function parseKind(text, { source = "kind file" } = {}) {
   kind.ring_m = ring;
   if (!Object.keys(kind.moods).length) throw new Error(`${source}: a kind needs at least one mood`);
   for (const f of kind.flags) if (!/^[a-z][\w-]*$/.test(f) || Object.hasOwn(kind.moods, f)) throw new Error(`${source}: the flag "${f}" must be a slug and not a mood's name`);
+  // finishable: true or nothing (WLD-25); an ending's line only on a finishable kind, naming only its slots
+  if (kind.finishable !== undefined && kind.finishable !== "true") throw new Error(`${source}: finishable: is true or absent (got ${JSON.stringify(kind.finishable)})`);
+  kind.finishable = kind.finishable === "true";
+  if (kind.ending !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: ending: belongs to a finishable kind`);
+    if (!kind.ending) throw new Error(`${source}: ending: says something`);
+    for (const [, x] of kind.ending.matchAll(/\{([^}]*)\}/g))
+      if (!ENDING_SLOTS.includes(x)) throw new Error(`${source}: an ending may name {finisher}, {names} or {carried} and nothing else (got {${x}})`);
+  }
 
   const known = new Set([...ACT_FIELDS, ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`)]);
   for (const { n, m } of pending) {
@@ -252,13 +311,19 @@ export function parseKind(text, { source = "kind file" } = {}) {
     try { when = parseCondition(cond); } catch (e) { fail(n, e.message); }
     const reads = readsOf(when);
     for (const id of reads.ids) if (!known.has(id)) fail(n, `the condition reads "${id}", which a creature cannot know (it reads ${[...known].join(", ")})`);
-    for (const v of reads.verbs) if (!RING_VERBS.includes(v)) fail(n, `act.verb is never "${v}": a creature notices only ${RING_VERBS.join(", ")} (there are no creature verbs)`);
+    for (const v of reads.verbs) if (!RING_VERBS.includes(v) && !AFFORDED_VERBS.includes(v))
+      fail(n, `act.verb is never "${v}": a creature notices only ${RING_VERBS.join(", ")}, and is aimed at only by ${AFFORDED_VERBS.join(", ")}`);
     let effects;
     try { effects = parseEffects(does ?? "nothing", kind); } catch (e) { fail(n, e.message); }
+    if (effects.some((e) => e.do === "finish") && !kind.finishable) fail(n, `only a finishable kind can be finished (finishable: true); a Mists creature fades or flees`);
+    if (effects.some((e) => e.do === "flee") && kind.finishable) fail(n, `a finishable kind never flees: it stays until its settlement ends it`);
     const line = says.trim();
     if (!line) fail(n, `a reaction says something`);
     const names = [...line.matchAll(/\{([^}]*)\}/g)].map((x) => x[1]);
-    for (const x of names) if (x !== "actor") fail(n, `a line may name {actor} and nothing else (got {${x}})`);
+    for (const x of names) if (!LINE_SLOTS.includes(x)) fail(n, `a line may name {actor}, {offered} or {heard} and nothing else (got {${x}})`);
+    const needs = requiredOf(when);
+    if (names.includes("offered") && !needs.verbs.has("offer")) fail(n, `a line naming {offered} needs a condition that requires act.verb == "offer" (in its top-level and)`);
+    if (names.includes("heard") && !needs.ids.has("heard.any")) fail(n, `a line naming {heard} needs a condition that requires heard.any (in its top-level and)`);
     kind.reactions.push({ name, sentence, when, src: cond, effects, says: line });
   }
   if (!kind.reactions.length) throw new Error(`${source}: a kind needs at least one reaction`);
@@ -276,7 +341,8 @@ export function startState(kind) {
 }
 
 /** The scope a condition is read against. `state` is { moods, flags }, `act`
- *  { verb, distance_m, approaching }, `actor` { times }. */
+ *  { verb, distance_m, approaching, heard? } (heard: the words the creature could
+ *  repeat, or none), `actor` { times }. */
 export function scopeOf(state, act = {}, actor = {}) {
   const self = { ...state.moods };
   for (const f of state.flags ?? []) self[f] = true;
@@ -284,6 +350,7 @@ export function scopeOf(state, act = {}, actor = {}) {
     self,
     act: { verb: act.verb, distance_m: act.distance_m, approaching: !!act.approaching },
     actor: { times: Number(actor.times) || 0 },
+    heard: { any: wordsOf(act.heard) !== "" },
   };
 }
 
@@ -293,12 +360,14 @@ export function allowedReactions(kind, scope) {
 }
 
 /** Apply a reaction's effects to a state, without touching the original. Moods are
- *  clamped to their range. `fled` is true when it went back into the Mists. */
+ *  clamped to their range. `fled` is true when it went back into the Mists, and
+ *  `finished` when the acting resident finished it (WLD-25). */
 export function applyEffects(kind, state, effects) {
   const next = { moods: { ...state.moods }, flags: [...(state.flags ?? [])] };
-  let fled = false;
+  let fled = false, finished = false;
   for (const e of effects) {
     if (e.do === "flee") fled = true;
+    else if (e.do === "finish") finished = true;
     else if (e.do === "set" && !next.flags.includes(e.flag)) next.flags.push(e.flag);
     else if (e.do === "clear") next.flags = next.flags.filter((f) => f !== e.flag);
     else if (e.do === "add") {
@@ -308,10 +377,15 @@ export function applyEffects(kind, state, effects) {
     }
   }
   next.flags.sort();
-  return { state: next, fled };
+  return { state: next, fled, finished };
 }
 
-/** The line a reaction leaves: its template, with the acting resident named. */
-export function voiceLine(reaction, { actor }) {
-  return reaction.says.replaceAll("{actor}", () => String(actor));   // a function, so "$&" in a name is only a name
+const wordsOf = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+
+/** The line a reaction leaves: its template, with the acting resident named, and
+ *  the offered kind's name and the heard words where the line names them. One pass,
+ *  by a function: "$&" in a name, or "{heard}" in what was said, is only text. */
+export function voiceLine(reaction, { actor, offered = null, heard = null } = {}) {
+  const fill = { actor: String(actor), offered: wordsOf(offered) || "offering", heard: wordsOf(heard) || "…" };
+  return reaction.says.replace(/\{(actor|offered|heard)\}/g, (_, slot) => fill[slot]);
 }

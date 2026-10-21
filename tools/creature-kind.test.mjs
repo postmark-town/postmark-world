@@ -5,7 +5,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  RING_VERBS, parseKind, parseCondition, evaluate, startState, scopeOf, allowedReactions, applyEffects, voiceLine,
+  RING_VERBS, AFFORDED_VERBS, LINE_SLOTS, parseKind, parseCondition, evaluate, startState, scopeOf, allowedReactions, applyEffects, voiceLine,
 } from "./creature-kind.mjs";
 
 const FIXTURE = `# a test fixture, not a creature
@@ -70,18 +70,22 @@ test("effects change only the creature, clamped, and `flee` sends it back into t
   assert.equal(voiceLine(k.reactions[1], { actor: "kogane" }), "It starts at kogane's voice.");
 });
 
-test("the Mists' law is held at parse: no harm, no holds, no spring, no verbs of its own", () => {
+test("the Mists' law is held at parse: no harm, no holds, no spring, no verb outside the ring's and the afforded", () => {
   const withLine = (line) => FIXTURE.replace(/reaction watch .*\n/, `${line}\n`);
   const refused = [
     [`reaction bite "it bites": when true does actor.nerve -2 says It bites {actor}.`, /no nerve, no harm/],
     [`reaction grab "it grabs": when true does take says It grabs it.`, /takes nothing/],
     [`reaction crouch "it crouches": when true does telegraph spring says It crouches.`, /telegraphs no spring/],
-    [`reaction struck "it is struck": when act.verb == "strike" says Ow.`, /act\.verb is never "strike".*no creature verbs/],
-    [`reaction offered "it is fed": when "offer" == act.verb says Yum.`, /act\.verb is never "offer"/],
+    [`reaction struck "it is struck": when act.verb == "strike" says Ow.`, /act\.verb is never "strike".*aimed at only by watch, approach, shoo, call, offer, whisper/],
+    [`reaction fed "it is fed": when "feed" == act.verb says Yum.`, /act\.verb is never "feed"/],
     [`reaction peek "it peeks": when actor.nerve > 2 says It peeks.`, /reads "actor\.nerve", which a creature cannot know/],
     [`reaction calm "it calms": when self.temper < 1 says It calms.`, /reads "self\.temper"/],
     [`reaction tame "it is tamed": when true does set tamed says It is yours.`, /a flag the kind does not declare/],
-    [`reaction sneer "it sneers": when true says It sneers at {item}.`, /\{actor\} and nothing else/],
+    [`reaction sneer "it sneers": when true says It sneers at {item}.`, /\{actor\}, \{offered\} or \{heard\} and nothing else/],
+    [`reaction sniff "it sniffs": when true says It sniffs the {offered}.`, /\{offered\} needs a condition that requires act\.verb == "offer"/],
+    [`reaction sniff "it sniffs": when act.verb == "offer" or true says It sniffs the {offered}.`, /\{offered\} needs a condition that requires act\.verb == "offer"/],
+    [`reaction echo "it echoes": when act.verb == "say" says It says "{heard}".`, /\{heard\} needs a condition that requires heard\.any/],
+    [`reaction echo "it echoes": when not heard.any says It says "{heard}".`, /\{heard\} needs a condition that requires heard\.any/],
     [`reaction lunge "it lunges": when true does self.vigor -1 says It lunges.`, /a mood the kind does not have/],
     [`law fallen "no more blows": act.verb != "strike"`, /no laws/],
     [`rule froth "it froths": self.fear > 2 then set startled`, /no rules/],
@@ -146,4 +150,38 @@ test("the condition language: precedence, parentheses, literals, and nothing eva
 test("the ring's verbs are the resident's ordinary public acts (the G5 list)", () => {
   assert.deepEqual([...RING_VERBS], ["walk", "enter", "exit", "say", "take", "give", "drop", "leave-mark"]);
   assert.ok(Object.isFrozen(RING_VERBS));
+});
+
+test("the afforded actions: the six ruled verbs, frozen, none of them a ring verb", () => {
+  assert.deepEqual([...AFFORDED_VERBS], ["watch", "approach", "shoo", "call", "offer", "whisper"]);
+  assert.ok(Object.isFrozen(AFFORDED_VERBS));
+  assert.deepEqual(AFFORDED_VERBS.filter((v) => RING_VERBS.includes(v)), [], "an aimed act and an ambient act are never the same word");
+  assert.deepEqual([...LINE_SLOTS], ["actor", "offered", "heard"]);
+});
+
+const AIMED = FIXTURE.replace("ring_m: 50\n", "ring_m: 50\ntastes: bright things, and anything sweet\n") + `reaction stare "it stares back": when act.verb == "watch" does self.fear -1 says It stares back at {actor}.
+reaction snatch "it takes it": when act.verb == "offer" and self.fear <= 2 says It takes the {offered} from {actor}.
+reaction echo "it echoes you": when heard.any and (act.verb == "call" or act.verb == "say") says It calls back: "{heard}".
+`;
+
+test("a kind keys reactions on its afforded actions, and the menu reads them as it reads a ring verb", () => {
+  const k = parseKind(AIMED), s = startState(k);
+  assert.equal(k.tastes, "bright things, and anything sweet", "the tastes line is plain prose, read whole");
+  const menu = (act) => allowedReactions(k, scopeOf(s, act)).map((r) => r.name);
+  assert.deepEqual(menu({ verb: "watch", distance_m: 200 }), ["watch", "nearer", "stare"]);
+  assert.deepEqual(menu({ verb: "offer", distance_m: 10 }), ["watch", "nearer", "snatch"]);
+  assert.deepEqual(menu({ verb: "call", distance_m: 100 }), ["watch", "nearer"], "nothing heard: the echo is not on the menu");
+  assert.deepEqual(menu({ verb: "call", distance_m: 100, heard: "the ferry is late" }), ["watch", "nearer", "echo"]);
+  assert.deepEqual(menu({ verb: "call", distance_m: 100, heard: "   " }), ["watch", "nearer"], "blank words are nothing heard");
+  assert.deepEqual(menu({ verb: "walk", distance_m: 10 }), ["watch", "nearer"], "an afforded reaction never answers a ring act");
+});
+
+test("a line's slots are filled by code: the offered kind's name and the heard words, each as plain text", () => {
+  const k = parseKind(AIMED);
+  const r = (name) => k.reactions.find((x) => x.name === name);
+  assert.equal(voiceLine(r("snatch"), { actor: "kogane", offered: "hoard-coins" }), "It takes the hoard-coins from kogane.");
+  assert.equal(voiceLine(r("snatch"), { actor: "kogane" }), "It takes the offering from kogane.", "no name handed in: the plain word");
+  assert.equal(voiceLine(r("echo"), { actor: "kogane", heard: "  meet  me\nat the {actor} $& " }), 'It calls back: "meet me at the {actor} $&".',
+    "what was said is text: no slot inside it is filled, no replacement pattern expands");
+  assert.equal(voiceLine(r("stare"), { actor: "{heard}", heard: "boo" }), "It stares back at {heard}.", "a name is filled once, never re-read");
 });

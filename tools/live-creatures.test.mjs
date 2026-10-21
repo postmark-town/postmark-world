@@ -8,7 +8,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  isCreatureId, liveCreaturesFrom, creatureReactionLines, creatureColumnFacts, creatureGlyphSVG, CREATURE_GLYPH, WALKER_FRAME, walkerFrameSVG,
+  isCreatureId, liveCreaturesFrom, creatureReactionLines, creatureColumnFacts, creatureGlyphSVG, creatureDiamond, CREATURE_GLYPH, WALKER_FRAME,
 } from "../spectator/viewer.mjs";
 import { creatureSilhouette } from "../spectator/mists-render.mjs";
 
@@ -62,22 +62,21 @@ test("a creature's column: its kind, what it is doing, its moods as bars, when i
   assert.deepEqual(creatureColumnFacts(wolf, null).facts.map((f) => f.label), ["kind", "fades"]);
 });
 
-test("on the painting: a TOKEN with the walker's own body, in pastel red, the kind's silhouette inside (play fix 40)", () => {
+test("on the painting: a TOKEN, a pastel red diamond with the kind's silhouette inside (play fix 40; WLD-82)", () => {
   const [wolf] = liveCreaturesFrom(FOUND);
   const svg = creatureGlyphSVG({ creature: wolf, at: { x: 10, y: 20 }, silhouette: creatureSilhouette("wolf") });
   assert.match(svg, /^<g transform="translate\(10 20\)"><g class="ov-s">/, "held at a constant size on screen, as a walker is");
   assert.match(svg, /data-creature="creature:wolf-251-play1"/);
-  // the walker's body: its near frame and its two stubby legs, at the same size
-  assert.equal(CREATURE_GLYPH.size, WALKER_FRAME.near, "the same size as a resident's token");
-  assert.equal(CREATURE_GLYPH.leg, WALKER_FRAME.legNear, "the same legs");
-  assert.match(svg, new RegExp(`<circle cx="0" cy="0" r="${WALKER_FRAME.near / 2}" class="ov-creature-disc"/>`), "a round disc where a portrait sits");
-  assert.equal((svg.match(/class="ov-creature-leg"/g) ?? []).length, 2, "two stubby legs");
-  const walker = walkerFrameSVG({ at: { x: 10, y: 20 }, handle: "visitor", art: { monogram: "V", color: "#888888" } });
-  const legsOf = (s) => [...s.matchAll(/<line x1="([^"]+)" y1="([^"]+)" x2="([^"]+)" y2="([^"]+)"/g)].map((m) => m.slice(1).join(","));
-  assert.deepEqual(legsOf(svg), legsOf(walker), "the legs stand exactly where a resident's do");
-  // the silhouette is inside the circle, clipped to it: no freeform art on the map
+  // a diamond scaled from the walker's near token (the same area as its circle), and no legs
+  assert.equal(CREATURE_GLYPH.size, WALKER_FRAME.near, "scaled from a resident's near token");
+  const { points } = creatureDiamond(WALKER_FRAME.near);
+  assert.equal(points, "0,-13.79 13.79,0 0,13.79 -13.79,0", "half-diagonal 11·√(π/2): the circle's area");
+  assert.match(svg, new RegExp(`<polygon points="${points}" class="ov-creature-disc"/>`), "a diamond where a portrait sits");
+  assert.match(svg, new RegExp(`<polygon points="${points}" class="ov-creature-ring"/>`), "and its rim");
+  assert.doesNotMatch(svg, /ov-creature-leg|<line /, "no legs");
+  // the silhouette is inside the diamond, clipped to it: no freeform art on the map
   assert.ok(svg.includes(creatureSilhouette("wolf").d), "the Mists' own wolf");
-  assert.match(svg, /<clipPath id="wv-ct-creaturewolf-251-play1"><circle cx="0" cy="0" r="11"\/><\/clipPath>/);
+  assert.match(svg, new RegExp(`<clipPath id="wv-ct-creaturewolf-251-play1"><polygon points="${points}"/></clipPath>`));
   assert.doesNotMatch(svg, /ov-creature-pip/, "no pip beside the token; the token says what it is");
   assert.equal(creatureGlyphSVG({ creature: wolf, at: { x: "x", y: 0 } }), "", "no point, no drawing");
   assert.notEqual(creatureSilhouette("bat").d, creatureSilhouette("wolf").d, "each kind its own art");

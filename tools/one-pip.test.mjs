@@ -24,10 +24,10 @@ test("the dot stands down for a picture only where it carries no icon (far and m
   assert.match(loop, /const isPictured = pictured\.has\(m\.id\) && !what;/);
 });
 
-test("no corner pill: a mark's states ride beside its pip, as every mark's do", () => {
+test("no corner pill, and no pill beside it: a mark's states sit on its own pip (WLD-95)", () => {
   assert.doesNotMatch(SOURCE, /cornerOf/);
-  assert.equal((loop.match(/placePill\(/g) ?? []).length, 1);
-  assert.match(loop, /pills \+= placePill\(what \? icons\.slice\(1\) : icons, p, /);
+  assert.equal((loop.match(/placePill\(/g) ?? []).length, 0, "the pill beside the pip is gone (WLD-95)");
+  assert.match(loop, /badges: what \? icons\.slice\(1\) : icons,/);
 });
 
 test("the hover pill opens from that pip: visiblePip passes over only pictured and home pips", () => {

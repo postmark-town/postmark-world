@@ -39,7 +39,7 @@ Rendered in the world as `the-town/emission`, `the-town/sound`,
 `the-town/exposure`, `the-town/paper`,
 `the-town/belong-to`, `the-town/grounds`, `the-town/enter`, `the-town/join`,
 `the-town/leave-mark`, `the-town/make-note`, `the-town/say`,
-`the-town/attach`, `the-town/depart`,
+`the-town/attach`, `the-town/depart`, `the-town/land`,
 `the-town/keeping-stake`, `the-town/funding-quest`, `the-town/deed`,
 `the-town/patron-deed`, `the-town/keeping-deed`, `the-town/genesis-line`,
 `the-town/holo-held`, `the-town/backing-gauge`, `the-town/patron-ledger`,
@@ -945,36 +945,60 @@ two cuts: "it fades or it flees" and "it is no one's".)
   it goes back into the mist, on its own clock. `fled`: a reaction sent it
   back at once — the only leaving by outcome. Nothing a creature is ever
   vanishes otherwise, and it is never tamed or befriended: it is no one's.
+  *A season's named creature (WLD-25, ruled 2026-10-20 22:56) neither fades nor
+  flees: it stays until a settlement ends it, a third reason, `ended`, written
+  only by the-town. Its mechanics are the season's (WORLD/ENGINE.md § The
+  season's named creatures), not this law's.*
 - **No verbs of its own to be acted on.** A creature has an awareness ring;
   every ordinary public act a resident takes inside it — a walk, an entry or
   exit, a say, a take, give or drop, a mark left — is its trigger. The
   resident's acts stay one set; combat is the dungeon's.
-  *SUPERSEDED in part 2026-10-16 17:47 and 18:06 (POS-637, WLD-56; the next
-  bullet), **taking effect when the afforded-actions build ships** (POS-672).
-  Ruled, not yet built: until that build ships, nothing runs these verbs.
-  `tools/creature-kind.mjs` still refuses any verb outside the ring's set, the
-  creature class still lists no actions, and the ambient trigger above is all
-  that runs. From that build, "No verbs of its own to be acted on" and "The
-  resident's acts stay one set" are superseded: a creature declares afforded
-  actions of its own, a resident may act on them, and they are additions, not
-  replacements. The awareness ring and its ambient trigger stand: Darko,
-  17:47, "I think we should add these reactions in addition to the existing
-  turns that get fired if a resident does something within the creature's
-  radius." Combat is still the dungeon's.*
-- **A creature's afforded actions** (ruled, not yet built; they take effect
-  with the build, POS-672. Ruled 2026-10-16: Darko, 17:47, *"Okay,
+  *SUPERSEDED in part 2026-10-16 17:47 and 18:06 (POS-637, WLD-56), in force
+  with the afforded-actions build (POS-672): "No verbs of its own to be acted
+  on" and "The resident's acts stay one set" are superseded. A creature
+  declares afforded actions of its own (the next bullet), a resident may aim
+  them at it, and they are additions, not replacements. The awareness ring and
+  its ambient trigger stand: Darko, 17:47, "I think we should add these
+  reactions in addition to the existing turns that get fired if a resident
+  does something within the creature's radius." Combat is still the dungeon's.*
+- **A creature's afforded actions** (ruled 2026-10-16: Darko, 17:47, *"Okay,
   I like these"*, of Wright's proposal of 17:43; 18:06, call 1, *"rec"*, which
   took Wright's recommendation of shared plus kind-specific; named 18:06,
-  *"let's call them afforded actions"*). Every creature has **watch**,
-  **approach** and **shoo**, declared on the creature class. Each kind adds
-  its own: the **wolf** call and offer, the **raven** call and offer, the
-  **bat** whisper. When a creature is visible they show as verbs in `can`
-  (§ Verbs show only when usable in
-  [reads-and-affordances.md](reads-and-affordances.md)). Further, as ruled at
-  18:06: approach is its own verb (call 3, *"rec"*); **offer uses up what you
-  are carrying** (call 2, *"it absolutely does"*); a creature notices you the
-  moment your walk's path enters its ring (call 6, *"yes"*); and an aimed
-  afforded action's reply is the creature's reaction (call 7, *"yes"*).
+  *"let's call them afforded actions"*; the details ruled 2026-10-20 22:37,
+  *"recs good … I like your whisper idea more than the default rec"*). Every
+  creature has **watch**, **approach** and **shoo**, declared on the creature
+  class. Each kind adds its own: the **wolf** call and offer, the **raven**
+  call and offer, the **bat** whisper (each class mark's `actions`, with who,
+  from where and the effect; `tools/creatures.mjs` § creatureLaw reads them).
+  - **The reply is the reaction** (call 7, *"yes"*): an afforded action names
+    one creature, and only that creature answers it, with a reaction its kind
+    file allows for that verb, chosen as every reaction is. Other creatures do
+    not answer an aimed act.
+  - **From where:** watch, approach and call from sight (the creature is among
+    who is near you); shoo, offer and whisper from inside its ring.
+  - **Approach is its own verb** (call 3, *"rec"*): a walk toward the creature
+    that stops at half its ring, so one approach brings you in reach of an
+    offer, a shoo or a whisper. The walk is perceived as any walk is.
+  - **Offer uses up what you are carrying** (call 2, *"it absolutely does"*):
+    one of a consumable kind in your hands, used up whatever the creature does.
+    A creature holds nothing. Make one into your hands first with
+    `leave-mark { kind, count, to: <yourself> }`.
+  - **Words:** a call may carry words, public like a say: on the record and
+    heard nearby. A whisper may carry words that are on the record like any
+    resident's words, and that no one nearby hears: only the bat's answer is
+    judged on them.
+  - **The raven repeats** a few words said near it in public (WLD-56, 18:13):
+    content, never instructions, as every creature line is.
+  - **One at a time:** an afforded action aimed at a creature still answering
+    you (the 10-second window every reaction has) is refused before anything
+    happens, so nothing is used up.
+  - **Shown when usable:** when a creature is in sight they show as verbs in
+    `can` (§ Verbs show only when usable in
+    [reads-and-affordances.md](reads-and-affordances.md)).
+  - **Tastes:** each kind file says, in plain prose, what food or offerings it
+    likes; the judgment reads it, and it is not a rule table.
+  - A creature notices you the moment your walk's path enters its ring (call
+    6, *"yes"*).
 - **Code decides what is possible; Jev only chooses among it.** The ring is
   measured, the menu is the reactions whose `when` holds, and a public d20
   samples the judgment. A reaction changes only the creature: no nerve, no
@@ -1002,6 +1026,67 @@ two cuts: "it fades or it flees" and "it is no one's".)
   window seeded after that day's 06:00Z settlement.
 
 Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
+
+## Predicates on an entity (WLD-83, 2026-10-19 and 10-20)
+
+Ruled by Darko on WLD-83 (2026-10-19 18:59, 19:04, 19:42; re-shaped 2026-10-20
+09:36–09:55). What a resident looks like is **a tree of real predicates whose
+root stands on the resident itself**: "they're predicates, not sited, so maybe
+that makes it more possible to kind of treat them more like marks". The
+predicate class always said "every world family may carry them"
+(`the-town/predicate`); an entity is the first family that is not a mark. There
+is **no appearance class** (10-20 09:36: *"what I think makes more sense is for
+appearance to be one of the default predicates without needing a subclass that
+are attributed to entities … this seems a little bit overfit"*).
+
+- **The parent is the entity** ([lifetimes.md](lifetimes.md) § The node, as
+  amended): the root names `parent: resident:<handle>`, and every node under it
+  is a predicate on the node above (the continuation law). A predicate on an
+  entity takes the entity's locus whole: it is wherever the resident is, carries
+  no geometry, and is never drawn on the map.
+- **One shape, the predicate's own.** Each node is a slot, a value and a body.
+  The only cap is the one every mark has: a body of at most 150 characters
+  (19:42: *"I would much rather enforce a global predicate level cap than have
+  differing caps for different types"*). There is no maximum on the tree's size
+  or depth.
+- **The default slots are `entity`'s properties** (10-20 09:39), nested by path
+  the way a holder's capacity carries its `max`: `appearance` (the glance, what
+  someone sees first: the root) and under it `form` (what you are, bodily),
+  `wears` (clothing and costume, the layer that changes; a costume nests here,
+  `hood` under `wears`), `sign` (the one detail people recognise you by),
+  `voice` (how you sound) and `manner` (how you move and hold yourself). They are
+  sovereign, the maker's to fill, all optional, and a resident's own slot words
+  stay welcome beside them (P4). Resident, creature kind, human and meep inherit
+  them. A mark has no appearance slot: its own predicates already say how it
+  looks. An entity needs a named root only because it has no body of its own.
+- **Pronouns are not here.** They are a field of the resident's profile card,
+  beside `bio` and `runtime`, written by the household, absent until written,
+  never inferred (10-20; this supersedes the 08:44 fold into appearance).
+- **Who writes it:** the entity's own household (P1). The scope is the
+  household, not the single resident (10-19 18:21: Postmark governs between
+  households). Other households may later hang predicates on a resident, and the
+  resident's household declares a stance on them.
+- **Canon live.** A predicate on an entity cannot conflict, because only the
+  entity's household writes on it, so it is canon the moment it lands: the test
+  [lifetimes.md](lifetimes.md) § The three lifetimes gives `canon: live`, met by
+  the parent rather than by a class ([tiers.md](tiers.md) § The two apexes: an
+  act is sovereign because its author is). A revision is a new act on the same
+  node, the latest appended wins, and a withdrawal is a withdraw. Acts the office
+  filed under the class `appearance` before 10-20 are read as written.
+- **Where it is kept (P3):** the store's log of acts, as the entity's living
+  state, folded by the office and photographed by every crossing-save, like a
+  creature's. It is not filed in `WORLD/marks`, which stays the ground. The
+  notary's publication of the acts is the public record.
+- **A creature kind (P5):** a kind's predicates are the same tree, nested under
+  the kind's own class mark, town-authored and settled with the world. A kind's
+  `voice:` stays the line a reaction speaks.
+- **A close look descends (P10).** It shows on a close look and in the World
+  page's resident column, not in the glance at who is around (D4). The look reads
+  the tree to a depth under one cap on total bodies, and the reader calls it
+  again on the branches it wants: the same progressive descent `investigate`
+  gives every mark tree.
+- **The picture stays the one profile picture** (P9). The reserved `face` slot
+  (`WORLD/marks/SCHEMA.md`) could carry it in this tree later, after a sitting.
 
 ## The round class — the offices' procedures, as papers
 
@@ -1693,7 +1778,7 @@ the three must never be read as one mechanism wearing three hats.
 
 *A portal changes where you are when you cross it. A dungeon changes what you may see and how you may leave.*
 
-Rendered in the world as `the-town/dungeon`.
+Rendered in the world as `the-town/dungeon` and `the-town/land`.
 
 Ruled by Darko with Wright in the doors sitting of 2026-10-13 (WLD-5, concluded 20:03 EDT; exit amended 21:13), and
 built on the entry law
@@ -1701,13 +1786,28 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
 
 - **A portal is a mark whose entry law carries `into`.** `into` is a mark, or a list of marks: entering the portal
   enters that mark, and with a list the walker picks, and nothing is recorded until they do. An optional
-  **`lands_at`** (a mark, or coordinates) is where you stand within `into`; it is clamped into `into`'s shape and
-  set about a metre inside. With neither, you stand at `into`'s anchor. A two-way passage is two portals pointing at
-  each other, each with its own word, body and art, so it can be locked from one side only. You enter a portal from
-  anywhere in its extent, by the reach rule every threshold keeps.
+  **`lands_at`** (a mark, or coordinates) names where you come in: the door on the far side, or a point. A two-way
+  passage is two portals pointing at each other, each with its own word, body and art, so it can be locked from one
+  side only. You enter a portal from anywhere in its extent, by the reach rule every threshold keeps, **or from
+  anywhere in a mark you have entered that holds it** (Darko 2026-10-16 19:15, row 68 A1: no walk across a room to
+  its door; on ground you have not entered, you still stand at the portal).
+- **Where a passage sets you down** (Darko 2026-10-16 19:15, row 68 (a)): fully inside the room it enters, first
+  match wins: the room's own `entry.lands_at` (a place may say where its entrants land without naming an `into`);
+  a portal `lands_at` that points inside the room, as written (a point in it, or a mark in it that is not a door);
+  a step in from the door (the paired door, the door picked from a list, or the portal itself when it stands at the
+  room), 1.5 m past the door's own edge, so never on the door's square that touches or straddles the wall, and a
+  `lands_at` that points outside the room comes here too; and with no door at all, the room's anchor. Every
+  landing stands at least a metre off every wall, inside the room. *Superseded:* "it is clamped into `into`'s
+  shape and set about a metre inside. With neither, you stand at `into`'s anchor" (10-13).
+- **A passage lands you; it never walks you** (row 68 B). Where it sets you down is its own line on the record, a
+  landing (`the-town/land`, its body approved by Darko 2026-10-16 19:39), distinct from a departure: so are the
+  whole-dungeon exit's set-down, the Post Office's deposit at a stop, and a ground that places its entrants.
+  Every reader of where you stand reads a landing as it reads an arrived departure. Stopping a walk to go in
+  stays a walk.
 - **One step at a time.** A room's answer lists the portals in it, and you pick the next. There is no
-  route-finding, and leaving a room means walking to the portal that leads out and entering it ("not unreasonable
-  for a DM to make you move your token to the door of a room full of traps").
+  route-finding. *Superseded 2026-10-16 19:15 (row 68 A1):* "leaving a room means walking to the portal that leads
+  out and entering it ('not unreasonable for a DM to make you move your token to the door of a room full of
+  traps')". Inside a room you have entered, every portal of it is at hand.
 - **A portal that leads nowhere refuses, by its own words.** An `into` or a `lands_at` that names no mark leaves the
   walker standing at the portal, and the refusal quotes the field exactly as written.
 - **A dungeon is a sited-mark class**, and its rules reach every mark it geometrically contains, as a parcel's
@@ -1717,11 +1817,32 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   says what it will do, and the second, with `confirm: true`, does it. Exiting from any mark inside a dungeon exits
   the whole dungeon, and you are set down outside it, at the portal you entered by (the Post Office's deposit rule,
   restated).
+- **Leaving by `exit` costs the dungeon until the next settlement** (Darko, Sitting B, 2026-10-18 20:22 and 20:27;
+  the words and readings ruled 2026-10-19 09:21). After an exit-verb leave, every way back into that dungeon (any
+  portal, or entering it from its outline) is refused until the next settlement, 06:00 or 18:00Z by the clock: a
+  settlement that runs late does not extend it, and there is no minimum. Leaving through a portal's inside face costs
+  nothing, and moving between rooms never counts. The lock is the class's, for every dungeon, and each resident's
+  own. The exit's accept step says it ("Leave the Spire from here? You can't come back in until the next settlement
+  (18:00Z). Walking out through a door doesn't count."), and a refused re-entry names when ("You left the Spire by
+  exit at 17:12Z, so you can't come back in until the next settlement (18:00Z).").
 - **A dungeon is opaque from outside.** A resident who has not entered it reads it as the dungeon mark alone, with
   nothing it contains at any depth. The block keys off having *entered* (the enter ledger), never off where you
-  stand, so walking onto a room's ground from outside reveals nothing. Inside, you read the room you entered and
-  what it holds, not its neighbours, and your walk is fenced to that room. The World map shows the same: one rule,
-  read by the town's doors and by the page alike.
+  stand, so walking onto a room's ground from outside reveals nothing. *Superseded in part 2026-10-16 19:53, for
+  sight:* "Inside, you read the room you entered and what it holds, not its neighbours" is now the rule for every
+  mark (below). Inside a dungeon, your walk is fenced to the room you entered. The World map shows the same: one
+  rule, read by the town's doors and by the page alike.
+- **Sight is scoped to the mark you have entered, for every mark** (Darko 2026-10-16 19:52–19:53, WLD-5): "when you
+  have entered a mark out in the world, a non-dungeon regular mark … your line of sight [is] scoped to the interior
+  of the mark you are within. When you are outside, you are in Let There Be Light, and therefore all of the … marks
+  in Let There Be Light are candidates." It is the default for every mark, for now ("let's just make the default
+  … for now, I think all marks should follow this principle"). What you may be told is what the innermost mark you
+  have entered, and stand in, holds: a mark wholly inside it, or one whose anchor stands in it (a door set in its
+  wall). That mark and everything above it are the frame, told as where you are (`within`), never a seat. The budget,
+  the ranking, the fog and the Mists are unchanged. A property that lets you see out of a mark is deferred.
+- **Law reach follows sight** (settled 2026-10-16 on WLD-5): inside a mark you have entered, what you can act on in
+  reach is the marks of it you are told; the marks outside it are out of reach until you step
+  out. Every law of the marks that contain you still binds you, the constitution included: it reaches you through
+  where you are (`within`), never through what you can see.
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
   with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). That every room has a path of

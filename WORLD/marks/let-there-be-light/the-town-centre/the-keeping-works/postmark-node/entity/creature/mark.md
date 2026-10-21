@@ -8,9 +8,9 @@ version: 1
 extends: entity
 canon: live
 mobility: settled
-despawn: ["faded", "fled"]
+despawn: ["faded", "fled", "ended"]
 implements: ["tools/creatures.mjs — the hidden schedule (seed, commit, reveal), the fold over the log and the crossing save's photograph", "tools/creature-kind.mjs — a kind's law: its moods, the reactions its when allows, its lines"]
-actions: []
+actions: [{"action":"watch","who":"anyone","from":"sight","effect":"you watch it, keeping still; its reaction is your reply","residue":"the-town/creature"},{"action":"approach","who":"anyone","from":"sight","effect":"you walk toward it; its reaction is your reply","residue":"the-town/creature"},{"action":"shoo","who":"anyone","from":"ring","effect":"you shoo it away; its reaction is your reply","residue":"the-town/creature"}]
 source: LOGOS/classes.md
 ---
 

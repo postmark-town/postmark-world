@@ -141,8 +141,8 @@ const rows = roll.map((handle) => {
     // The landing act's assertion, for the states that need one. `null` means
     // the record already places them and a placement would be noise.
     seed: state === "unplaced"
-      ? { to: "quay", mark_id: QUAY_MARK_ID, at: { x: porch.x, y: porch.y },
-          because: "no movement record and no ground at any grain — the ruled default is the town's porch" }
+      ? { to: "origin", mark_id: null, at: { x: porch.x, y: porch.y },
+          because: "no movement record and no ground at any grain — the ruled default is the Origin (2026-09-17, 2026-10-21; the porch until then)" }
       : null,
   };
 });

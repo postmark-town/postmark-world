@@ -40,6 +40,9 @@ export const ENGINE_FILES = [
   "class-properties.mjs",
   // joined with W2: what a record is and how it stands, in either form
   "mark-kind.mjs",
+  // joined 2026-10-19 (WLD-5 A, the exit lock): portals.mjs says a dungeon's name
+  // in its words, and a mark's name is mark-name.mjs's, the one the page reads.
+  "mark-name.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

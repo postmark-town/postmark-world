@@ -128,8 +128,9 @@ test("[pin] the plate wears what the mark is before its name and its states afte
   assert.match(fn, /: `<span class="wv-np-dot \$\{markClasses\(full\)\}" aria-hidden="true"><\/span>`/, "the dot when there is no icon");
 });
 
-test("one resident icon: the walker's token, in sovereign green; a creature is the same body in red; never the stamps' purple (play fix 43)", () => {
-  assert.equal(MARK_ICONS.inside.d, MARK_ICONS.creature.d, "one body for a person and a creature");
+test("one resident icon: the walker's token, in sovereign green; a creature is a red diamond (WLD-82); never the stamps' purple (play fix 43)", () => {
+  assert.notEqual(MARK_ICONS.inside.d, MARK_ICONS.creature.d, "a creature never wears a resident's body (WLD-82)");
+  assert.equal(MARK_ICONS.creature.d, "M 8 1.6 L 14.4 8 L 8 14.4 L 1.6 8 Z", "a diamond: four points, no legs");
   assert.ok(MARK_ICONS.inside.fill && MARK_ICONS.creature.fill, "filled, as the token's frame is on the map");
   assert.match(MARK_ICONS.inside.d, /^M 3\.4 6\.6 a 4\.6 4\.6/, "a round frame…");
   assert.equal((MARK_ICONS.inside.d.match(/ Z/g) ?? []).length, 3, "…and two stubby legs");

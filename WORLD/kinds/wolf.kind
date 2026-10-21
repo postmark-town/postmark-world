@@ -9,6 +9,8 @@ what: >
   equal measure, and it shows its teeth more than it means them. Come too close and it warns you;
   frighten it and it is gone back into the grey.
 ring_m: 80
+# what it likes, read by Jev with judgment (POS-672, ruled 2026-10-16 18:06; the words are a draft for Darko)
+tastes: Meat and bones, and anything that smells of the town's kitchens; it sniffs at sweets and seldom takes them.
 moods:
   fear: 0..3 = 1 | unbothered | wary | uneasy | ready to bolt
   curiosity: 0..3 = 1 | indifferent | watchful | interested | fixed on you
@@ -20,3 +22,13 @@ reaction stalk "it paces along the mist-line with you": when act.verb == "walk" 
 reaction howl "it throws back its head and howls": when self.hunger >= 2 says The wolf throws back its head and howls. Deep in the Mists, something answers.
 reaction slink "it slinks back a step into the fog": when self.fear >= 2 does self.fear -1 says The wolf slinks back a step into the fog, its eyes still on {actor}.
 reaction flee "it turns and is gone": when self.fear >= 3 does flee says The wolf wheels and is gone, a grey shape folding back into the grey.
+
+# Its afforded actions' reactions (POS-672; the lines approved by Darko 2026-10-20 22:35): a
+# resident aims watch, approach, shoo, call or offer at it, and one of these, or one above, is the reply.
+reaction hold "it holds your eye": when act.verb == "watch" says The wolf holds {actor}'s eye, unblinking, until the fog moves between you.
+reaction give "it gives ground, slowly": when act.verb == "approach" does self.fear +1 says The wolf gives ground, slowly, never taking its eyes off {actor}.
+reaction bristle "its hackles rise": when act.verb == "shoo" does self.fear +1 says The wolf's hackles rise; it gives {actor} one step and no more.
+reaction answer "it answers with a long howl": when act.verb == "call" says The wolf lifts its head and answers {actor}'s call with a long howl.
+reaction ears "its ears swivel to you": when act.verb == "call" says The wolf's ears swivel toward {actor}; it does not move.
+reaction accept "it takes it": when act.verb == "offer" and self.fear <= 2 does self.hunger -1 says The wolf waits until {actor} steps back, then takes the {offered} in one snap.
+reaction sniff "it sniffs and turns away": when act.verb == "offer" says The wolf sniffs at the {offered} in {actor}'s hand, then turns its head away.

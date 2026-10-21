@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 
 import { entryLawOf, termsAt, occupancyAt, parseEnterExitLedger } from "./enter-exit.mjs";
 import {
-  clampInto, landingOf, hiddenFrom, scopeWorld, portalFindings, applyPortalExceptions, portalsIn, portalsInto,
+  insetInto, landingOf, hiddenFrom, scopeWorld, portalFindings, applyPortalExceptions, portalsIn, portalsInto,
   dungeonsOf, heldDungeon, standpointSight, walkFence, dungeonLanding, pointInMark, LANDING_REACH_M,
 } from "./portals.mjs";
 import { enter, exit, enterPrompt, exitPrompt, containmentChain, investigate } from "./world-verbs.mjs";
@@ -79,17 +79,18 @@ test("a law without the portal keys reads byte for byte as before", () => {
 
 // ── the landing ──────────────────────────────────────────────────────────────
 
-test("CLAMPING: a landing outside its into moves to the nearest point, a metre inside", () => {
+// the 10-13 clamp (clampInto) is gone with row 68 (a): every landing is held a metre inside by insetInto
+test("INSET: a point outside its room, or within a metre of a wall, is held a metre inside; one already in stays put", () => {
   const room = { at: { x: 0, y: 0 }, extent: { w: 10, h: 10 } };
-  assert.deepEqual(clampInto({ x: 20, y: 2 }, room), { x: 4, y: 2, clamped: true });
-  assert.deepEqual(clampInto({ x: -3, y: -30 }, room), { x: -3, y: -4, clamped: true });
-  assert.deepEqual(clampInto({ x: 1, y: 1 }, room), { x: 1, y: 1, clamped: false }, "a point already inside stays put");
+  assert.deepEqual(insetInto({ x: 20, y: 2 }, room), { x: 4, y: 2, moved: true });
+  assert.deepEqual(insetInto({ x: -3, y: -30 }, room), { x: -3, y: -4, moved: true });
+  assert.deepEqual(insetInto({ x: 1, y: 1 }, room), { x: 1, y: 1, moved: false }, "a point already inside stays put");
 });
 
-test("CLAMPING into a ring lands strictly inside it", () => {
+test("INSET into a ring lands strictly inside it", () => {
   const ring = { at: { x: 5, y: 5 }, extent: { w: 10, h: 10 }, points: [[0, 0], [10, 0], [10, 10], [0, 10]] };
-  const at = clampInto({ x: 15, y: 5 }, ring);
-  assert.equal(at.clamped, true);
+  const at = insetInto({ x: 15, y: 5 }, ring);
+  assert.equal(at.moved, true);
   assert.ok(Math.abs(at.x - 9) < 1e-9 && Math.abs(at.y - 5) < 1e-9, `1 m inside the east edge, got ${at.x},${at.y}`);
 });
 
@@ -104,13 +105,15 @@ test("THE DOOR BUG: a lands_at naming no mark is refused by quoting the field", 
 
 // ── the passage ──────────────────────────────────────────────────────────────
 
-test("into the Spire: one portal enters the dungeon and the vestibule (never the open Grounds above it), and lands at the inside face", () => {
+test("into the Spire: one portal enters the dungeon and the vestibule (never the open Grounds above it), and lands a step in from the inside face", () => {
   const a = enter(AT(845, 1000), "spire/doors-outside", world(), { occupancy: occ([]), handle: "ann", at: 300 });
   assert.equal(a.error, undefined);
   assert.deepEqual(a.entered, [SPIRE, "spire/vestibule"]);
   assert.equal(a.rows.length, 2);
   assert.match(a.rows[0], / · ann · enters spire\/the-spire · ferry 300\.0000 · word neutral$/);
-  assert.deepEqual(a.landing, { x: 860, y: 1000, mark: "spire/doors-inside", clamped: false });
+  // row 68 (a): a step in from the door, never on its square: the 4×2 inside face at x 860 is 5 m in from the
+  // vestibule west wall, so its far edge is 862 and a 1.5 m step past it is 863.5
+  assert.deepEqual(a.landing, { x: 863.5, y: 1000, mark: "spire/doors-inside", clamped: false });
   assert.deepEqual(a.portals.map((p) => p.id), ["spire/doors-inside", "spire/hall-door"]);
   const acts = parseEnterExitLedger(a.rows.join("\n")).acts;
   assert.deepEqual(occupancyAt(acts).get("ann"), [SPIRE, "spire/vestibule"], "the rows derive the stack the answer claims");
@@ -212,7 +215,14 @@ test("EXIT IS OFFERED, WITH A CONFIRMATION: the first call writes nothing and sa
   assert.equal(x.dungeon, SPIRE);
   assert.deepEqual(x.left, [SPIRE, "spire/vestibule"]);
   assert.deepEqual(x.landing, { x: 845, y: 1000, via: "spire/doors-outside", chosen: false });
-  assert.match(x.awaiting.because, /^exiting spire\/vestibule leaves the whole of spire\/the-spire, a dungeon, and sets you down outside, at spire\/doors-outside \(845, 1000\)\. Call again with confirm: true to go; nothing was recorded\.$/);
+  // WLD-5 A (Darko 2026-10-19 09:21): the accept step is his sentence, which the
+  // World page prints; the instruction to confirm moved to `how`, for agents.
+  // Until then `because` read "exiting spire/vestibule leaves the whole of
+  // spire/the-spire, a dungeon, and sets you down outside, at spire/doors-outside
+  // (845, 1000). Call again with confirm: true to go; nothing was recorded."
+  assert.equal(x.awaiting.because, "Leave the Spire from here? You can't come back in until the next settlement."
+    + " Walking out through a door doesn't count. You'll be set down outside, at Doors Outside.");
+  assert.equal(x.awaiting.how, "exiting spire/vestibule leaves the whole of spire/the-spire. Call again with confirm: true to go; nothing was recorded.");
 });
 
 test("CONFIRMED, EXIT LEAVES THE WHOLE DUNGEON from any room in it, and sets you down at the portal you entered by", () => {

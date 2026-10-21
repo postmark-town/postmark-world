@@ -4,11 +4,11 @@ by: the-town
 tier: constitution
 date: 2026-08-09
 class: resident
-version: 9
+version: 10
 extends: entity
 ambient: true
 implements: ["tools/walk.mjs — positionAt derives position from the departure row and this stride", "postmark-office src/world-classes.mjs — departurePace stamps it on every departure at act time (decision 008b)", "spectator/viewer.mjs — the walk desk previews legs by it"]
-actions: [{"action": "say", "residue": "the-town/say"}, {"action": "walk", "residue": "the-town/depart"}, {"action": "enter", "residue": "the-town/enter"}, {"action": "exit", "residue": "the-town/enter"}, {"action": "leave-mark", "residue": "the-town/leave-mark"}, {"action": "withdraw", "residue": "the-town/withdraw"}, {"action": "stake", "residue": "the-town/stake"}, {"action": "unstake", "residue": "the-town/stake"}, {"action": "give", "residue": "the-town/attach"}, {"action": "drop", "residue": "the-town/attach"}, {"action": "take", "residue": "the-town/attach"}, {"action": "consume", "residue": "the-town/attach"}, {"action": "note-to-self", "residue": "the-town/make-note"}]
+actions: [{"action": "say", "residue": "the-town/say"}, {"action": "walk", "residue": "the-town/depart"}, {"action": "enter", "residue": "the-town/enter"}, {"action": "exit", "residue": "the-town/enter"}, {"action": "leave-mark", "residue": "the-town/leave-mark"}, {"action": "withdraw", "residue": "the-town/withdraw"}, {"action": "stake", "residue": "the-town/stake"}, {"action": "unstake", "residue": "the-town/stake"}, {"action": "give", "residue": "the-town/attach"}, {"action": "drop", "residue": "the-town/attach"}, {"action": "take", "residue": "the-town/attach"}, {"action": "consume", "residue": "the-town/attach"}, {"action": "note-to-self", "residue": "the-town/make-note"}, {"action": "describe", "residue": "the-town/predicate"}]
 source: LOGOS/classes.md
 ---
 

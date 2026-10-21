@@ -769,6 +769,20 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
     // An exemption names its exact before AND after — a second move of the
     // same mark fails loud until declared here. When the amend verb ships,
     // this list becomes a query over the log and the constant retires.
+    // THE AUTHOR'S OWN MOVE IS A DECLARING ACT (S120, 2026-10-20). The amend verb
+    // shipped, so the hand list below became the query its own comment promised:
+    // a record whose author rewrote it (its `date:` is newer) AND whose own file
+    // numbers changed was MOVED BY ITS AUTHOR, and that is the ordinary, lawful
+    // event a falsifier must never refuse. S120 sat untagged because little-bird
+    // carried three bowls of broth to the waiting-room door and the quay, and this
+    // test read the 2026-08 positions as law. What it still guards: a mark whose
+    // own record did NOT change must compose to exactly where it stood.
+    const recA = new Map(A.map((m) => [m.id, m])), recB = new Map(B.map((m) => [m.id, m]));
+    const fileAt = (m) => (m?._fileAt ? `${m._fileAt.x},${m._fileAt.y}` : m?.at ? `${m.at.x},${m.at.y}` : null);
+    const movedByItsAuthor = (id) => {
+      const a = recA.get(id), b = recB.get(id);
+      return !!(a && b && String(a.date ?? "") !== String(b.date ?? "") && fileAt(a) !== fileAt(b));
+    };
     const MOVED_BY_DECLARED_ACT = new Map([
       ["the-town/the-ship-at-anchor", { from: "1210,5720", to: "1350,5665" }],
     ]);
@@ -868,7 +882,7 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
       const reshaped = RESHAPED_BY_DECLARED_ACT.get(id);
       if (a.at !== b.at) {
         const d = MOVED_BY_DECLARED_ACT.get(id) ?? reshaped;
-        if (!(d && d.from === a.at && d.to === b.at) && !carriedByAReshapedRegion(id, a.at, b.at))
+        if (!(d && d.from === a.at && d.to === b.at) && !carriedByAReshapedRegion(id, a.at, b.at) && !movedByItsAuthor(id))
           moved.push(`${id}: ${a.at} -> ${b.at}`);
       }
       // a size is not a position; it must not move — except where the claim was
@@ -1010,6 +1024,9 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
       // names the ground it stood on when it was re-filed, which the verb's own
       // falsifier proved unchanged; the answer must still be that ground.
       if (REFILED_GROUND.has(m.id) && REFILED_GROUND.get(m.id) === (after ?? ROOT_ID)) continue;
+      // a mark its author carried somewhere else stands on new ground by its own
+      // declaring act (S120: the author's move, above)
+      if (movedByItsAuthor(m.id)) continue;
       assert.equal(after, before, `placementParent moved for ${m.id}`);
     }
   } finally {

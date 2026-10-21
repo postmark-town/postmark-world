@@ -3,15 +3,24 @@
 // wall. Browser-pure except bakeMistsLayer and the bell, which need a canvas
 // and an AudioContext; everything a test asks about is pure.
 //
-// THE ONE HARD RULE: the paint may cover MORE than the physics, never less.
-// The engine's wall (mistsAt's clear ground and clearings) stays drawn as the
-// viewer's opaque vector path; this layer goes over it. Its own back layer is
-// also opaque at every point the engine puts behind the wall, because its
-// distance field only ever grows: the clear rectangle is rounded INSIDE its
-// corners (a rounded box sits inside the box, so its distance is never less),
-// and the noise only moves the visible face INWARD from the true face (the
-// edge offset is never positive). `mistsRenderAt` is that rule as a function;
-// tools/mists-render.test.mjs holds it at 244, 272 and 282.
+// THE FACE IS CENTRED ON THE WALL (WLD-81, RULED by Darko 2026-10-19 18:53:
+// "it looks spectacular, I don't want to change that"). The render is POS-553's,
+// its banks, tongues, corners and colour unchanged, with one thing taken out:
+// the flat creep-in. The noise used to move the visible face only INWARD (by the
+// banks' reach·(0.3 + 0.7·v) and a tongue of 0..tongueM), so on average the fog
+// stood ~0.65·reach + tongueM/2 onto ground the engine keeps clear: the bat at
+// 259, 94 m clear, was deep in it. Now that mean (mistsCreepM) is added back, so
+// the same noise wanders both ways about the engine's true face: some bumps a
+// little onto the clear side, some back into the Mist. In a pocket that stands
+// back (past the true face, short of the ragged face) the paint is what the
+// noise's own falloff paints there, nothing more; the viewer's opaque vector wall
+// follows the ragged face (mistsOpaqueFromM), and its pointer is still taken from
+// the true face, so nothing past the real wall can be clicked.
+//
+// SUPERSEDED (WLD-81): "the paint may cover MORE than the physics, never less"
+// (POS-553, 10-10), and "the sheet's edge is a face" (the POS-553 review), which
+// painted all the clear ground past the painting solid, a 2 km flat creep at 259.
+// `mistsRenderAt` is the rule as a function; tools/mists-render.test.mjs holds it.
 //
 // THE FRINGE is the engine's own band: haze over `fringe_m` (400 m) on the
 // clear side of the true face, thinning toward the clear land, at the band's
@@ -44,7 +53,6 @@ export const MISTS_PAINT = {
   keepM: MISTS_KEEP.keepM,       // the town's margin (tools/mists-keep.mjs, one definition)
   keepSoftM: 200,        // the margin's soft edge
   keepNoiseM: 420,       // the margin grows by up to this much, by noise, so its edge is ragged (never less than keepM)
-  frameInsetM: 260,      // how far over the painted sheet's own edge the fog reaches before its noise
   townMaxM: MISTS_KEEP.townMaxM, // past this a mark is open country, not the town (tools/mists-keep.mjs)
   faceRampM: 80,         // the least band over which the wall's face rises inside the town's margin
   faceJagM: 700,         // and how far beyond that it may reach, by noise, where the marks leave room
@@ -107,6 +115,17 @@ function paintDistance(m, x, y) {
 }
 const smooth = (e0, e1, v) => { const t = Math.max(0, Math.min(1, (v - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
 
+/** THE CREEP (WLD-81): the mean of the face's inward reach for a layer, the
+ *  banks' reach·(0.3 + 0.7·E[v]) at E[v] = 0.5 and the tongue's tongueM/2, which
+ *  is added back so the face's noise is centred on the true face. */
+export function mistsCreepM(m, layer = 0) {
+  return mistsReachM(m) * MISTS_PAINT.layers[layer].reach * 0.65 + MISTS_PAINT.tongueM / 2;
+}
+/** How far back past the true face a layer's face can stand at most: its noise's
+ *  inward floor (reach·0.3), less the creep. */
+export function mistsBackM(m, layer = 0) {
+  return mistsCreepM(m, layer) - mistsReachM(m) * MISTS_PAINT.layers[layer].reach * 0.3;
+}
 /** The reach of the banks for this crossing's veil (0.10 → 0.50). */
 export function mistsReachM(m) {
   const [a, b] = MISTS_PAINT.reachM, u = Math.max(0, Math.min(1, ((m?.veil ?? 0) - 0.1) / 0.4));
@@ -122,8 +141,8 @@ export function mistsReachM(m) {
 export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const L = MISTS_PAINT.layers[layer], reach = mistsReachM(m) * L.reach;
   const dTrue = mistsTrueDistance(m, x, y);
-  const dPaint = Math.max(paintDistance(m, x, y), dTrue, mistsFrameDistance(m, x, y));
-  // the visible face, pushed inward by the noise and never outward (offset ≤ 0)
+  const dPaint = Math.max(paintDistance(m, x, y), dTrue);
+  // the visible face: POS-553's noise, centred on the true face (WLD-81)
   // (two scales, the long banks and their tongues, stretched apart so the reach is uneven)
   const v = smooth(0.25, 0.75, 0.65 * mistsFbm(x / L.scaleM, y / L.scaleM, L.seed) + 0.35 * mistsFbm(x * 4 / L.scaleM, y * 4 / L.scaleM, L.seed + 3));
   // and short tongues that never saturate: the banks' term goes flat where its
@@ -131,8 +150,8 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   // sheet's edge, the clear ground's side) was a ruled line (Darko 10-11)
   const ts = MISTS_PAINT.tongueScaleM, tn = 0.72 * mistsFbm(x / ts, y / ts, L.seed + 5, 3) + 0.28 * mistsFbm(x * 2.6 / ts, y * 2.6 / ts, L.seed + 6, 2);
   const tongue = MISTS_PAINT.tongueM * Math.max(0, Math.min(1, 0.5 + 1.8 * (tn - 0.5)));
-  const edge = -reach * (0.3 + 0.7 * v) - tongue;
-  const e = dPaint - edge;   // ≥ reach·0.3 > softM wherever dTrue > 0
+  const edge = -reach * (0.3 + 0.7 * v) - tongue + mistsCreepM(m, layer);   // the creep taken back out
+  const e = dPaint - edge;   // ≥ 0 past the ragged face, which wanders both ways about the true face
   let bank = smooth(-MISTS_PAINT.softM, 0, e) * (layer === 0 ? 1 : L.alpha);
   if (layer === 0 && e >= 0) bank = 1;
   // the engine's fringe: haze over fringe_m on the clear side of the true face
@@ -165,7 +184,6 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
     // the fog here is lit from this face, not from the far one the margin hid
     eDepth = e + (Math.min(e, dTrue + Math.max(0, width)) - e) * k;
   }
-  if (layer === 0 && dTrue > 0) alpha = 1;
   // THE CORE CARRIES NO WEATHER: deep behind the wall the front layers are the
   // core's own colour over the core, which adds nothing but a level of rounding
   // where a canvas's premultiplied alpha meets the vector wall, and that level
@@ -187,28 +205,36 @@ export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   return { alpha, depth };
 }
 
-/** The painted sheet's edge as a face (metres, positive past it): past the sheet
- *  the fog may stand, and it reaches in over the edge by frameInsetM so the
- *  sheet's straight sides never show. Never inside a clearing: a clearing is
- *  ground the engine keeps clear, and it is drawn by its own banks alone.
- *  -Infinity with no frame. */
-export function mistsFrameDistance(m, x, y) {
-  if (!m?.frame) return -Infinity;
-  let d = sdBox(x, y, m.frame) + MISTS_PAINT.frameInsetM;
-  for (const k of m.clearings ?? []) d = Math.min(d, Math.hypot(x - k.x, y - k.y) - k.r);
-  return d;
+// THE SHEET'S EDGE IS NOT A FACE (WLD-81): past the painting the ground is open
+// country (the feather, mistsSheetFeatherAt, below), never fog.
+
+/** Where the back layer turns opaque along a ray from a point on the true face
+ *  (`at`, metres) out into the wall (`dir`, a unit vector): the least distance
+ *  past which the paint is opaque, so the viewer's vector wall can follow the
+ *  ragged face. 0 where the face stands on the clear side. Pure. */
+export function mistsOpaqueFromM(m, at, dir, { stepM = 10 } = {}) {
+  const most = mistsBackM(m, 0) + MISTS_PAINT.softM;
+  let last = 0;
+  for (let d = 0; d <= most; d += stepM) {
+    if (mistsRenderAt(m, at.x + dir.x * d, at.y + dir.y * d, 0).alpha < 1) last = d + stepM;
+  }
+  return Math.min(last, most);
 }
 
 /** One baked pixel's paint, exactly as the bake decides it: nothing deep in the
- *  clear ground (judged on the painted distance, the sheet's face included, so
- *  the skip never cuts the paint along a straight line), the core past the
- *  core's depth, and mistsRenderAt between. `far` is mistsBakeFar(m, layer).
+ *  clear ground, the core past the core's depth (which stands back with the
+ *  face's own wander, WLD-81), and mistsRenderAt between. `far` is mistsBakeFar(m, layer).
  *  Pure; the tests run this rule. */
 export function mistsBakeAt(m, layer, x, y, keep = null, far = mistsBakeFar(m, layer)) {
   const dT = mistsTrueDistance(m, x, y);
-  if (Math.max(dT, mistsFrameDistance(m, x, y)) < -far) return { alpha: 0, depth: 0 };
-  if (dT >= MISTS_PAINT.depthM - MISTS_PAINT.depthJagM[0]) return { alpha: layer === 0 ? 1 : 0, depth: 1 };   // the core: the back layer alone (coreFadeM)
+  if (dT < -far) return { alpha: 0, depth: 0 };
+  if (dT >= mistsCoreM(m)) return { alpha: layer === 0 ? 1 : 0, depth: 1 };   // the core: the back layer alone (coreFadeM)
   return mistsRenderAt(m, x, y, layer, keep);
+}
+/** How far behind the true face the paint is the core whatever its noise: the
+ *  darkness's own depth past the furthest any layer's face stands back. */
+export function mistsCoreM(m) {
+  return MISTS_PAINT.depthM - MISTS_PAINT.depthJagM[0] + Math.max(0, ...MISTS_PAINT.layers.map((_, li) => mistsBackM(m, li)));
 }
 /** How far into the clear ground a layer's paint can reach (the bake's skip). */
 export function mistsBakeFar(m, layer) {
@@ -310,24 +336,28 @@ export function mistsCoreHex(m, tint = MISTS_TINT) {
 // ── the bake (browser): one canvas per layer per crossing ───────────────────
 /** The box a layer bakes over, metres: the clear ground plus the depth beyond. */
 export function mistsBakeBox(m, k = null) {
-  const pad = MISTS_PAINT.depthM + MISTS_PAINT.layers.reduce((a, L) => Math.max(a, L.driftM), 0) * 2;
+  // past the core's depth (which stands back with the face's wander) and the widest drift
+  const pad = mistsCoreM(m) + MISTS_PAINT.layers.reduce((a, L) => Math.max(a, L.driftM), 0) * 2;
   if (k) return { minX: k.x - k.r - pad, minY: k.y - k.r - pad, maxX: k.x + k.r + pad, maxY: k.y + k.r + pad };
   return { minX: m.clear.minX - pad, minY: m.clear.minY - pad, maxX: m.clear.maxX + pad, maxY: m.clear.maxY + pad };
 }
 /** What a crossing bakes: the main band in every layer at MISTS_PAINT.pxM,
- *  each clearing in the back layers at a resolution capped by clearingPx. */
+ *  each clearing in the back layers at a resolution capped by clearingPx. A
+ *  clearing's bake leaves to the main one whatever the main box holds (`skip`):
+ *  its box is wide enough now (WLD-81) to reach into the main band, and two bakes
+ *  of one place at two resolutions would seam. */
 export function mistsBakePlan(m) {
   const main = mistsBakeBox(m), plan = MISTS_PAINT.layers.map((_, li) => ({ li, box: main, pxM: MISTS_PAINT.pxM }));
   for (const k of m.clearings ?? []) {
     const box = mistsBakeBox(m, k), pxM = Math.max(MISTS_PAINT.pxM, (box.maxX - box.minX) / MISTS_PAINT.clearingPx);
-    for (let li = 0; li < MISTS_PAINT.clearingLayers; li++) plan.push({ li, box, pxM });
+    for (let li = 0; li < MISTS_PAINT.clearingLayers; li++) plan.push({ li, box, pxM, skip: main });
   }
   return plan;
 }
 /** A bake of one layer over `box`, a band of rows at a time, so a page can
  *  spread it across frames: `next(rows)` paints the next rows and answers true
  *  while rows remain; `canvas` holds the result once done. */
-export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT.pxM, canvas = null, keepRects = null, keepRaster = null } = {}) {
+export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT.pxM, canvas = null, keepRects = null, keepRaster = null, skip = null } = {}) {
   const w = Math.max(1, Math.ceil((box.maxX - box.minX) / pxM)), h = Math.max(1, Math.ceil((box.maxY - box.minY) / pxM));
   const cv = canvas ?? (typeof OffscreenCanvas === "function" ? new OffscreenCanvas(w, h) : Object.assign(document.createElement("canvas"), { width: w, height: h }));
   cv.width = w; cv.height = h;
@@ -342,6 +372,7 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
         const y = box.minY + (j + 0.5) * pxM;
         for (let i = 0; i < w; i++) {
           const x = box.minX + (i + 0.5) * pxM, o = (j * w + i) * 4;
+          if (skip && x >= skip.minX && x <= skip.maxX && y >= skip.minY && y <= skip.maxY) { px[o + 3] = 0; continue; }
           const kv = kr ? kr.at(i, j) : 0;
           const { alpha, depth } = mistsBakeAt(m, layer, x, y, kv > 0 ? Object.assign(() => kv, { dist: () => kr.dist(i, j) }) : null, far);
           if (!(alpha > 0)) { px[o + 3] = 0; continue; }

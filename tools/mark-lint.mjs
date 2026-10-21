@@ -1228,6 +1228,21 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
     findings.push({ sev: "WARN", file: PORTAL_EXC_REL, msg: `the exception for ${e.mark} (${e.rule}) matches no finding — it excuses nothing; remove it` });
 }
 
+// ---- the creature law, read whole as the tick reads it (POS-672) ----
+// creatureLaw (tools/creatures.mjs) reads the creature class and its kinds
+// whole or not at all, their afforded actions included: a malformed `actions`
+// there throws, and a law that throws spawns nothing at that blessing. So the
+// lint runs the same reader, and anything it would throw on is an ERROR here,
+// on the creature class's mark, before a settlement can carry it.
+{
+  const creatureClass = marks.find((m) => m?.kind === "class" && m.by === TOWN && String(m.class) === "creature");
+  if (creatureClass) {
+    const { creatureLaw } = await import("./creatures.mjs");
+    try { creatureLaw(marks); }
+    catch (e) { err(creatureClass, `the creature law cannot be read whole, so the creatures' tick would spawn nothing: ${e.message}`); }
+  }
+}
+
 // ---- report (lint.mjs idiom: sort, print, exit non-zero only on ERROR) ----
 // scoped mode: the whole tree was loaded (edges + cross-author leaf uniqueness
 // still checked), but only findings under the scope are reported/gated.

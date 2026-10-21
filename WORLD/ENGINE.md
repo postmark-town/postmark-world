@@ -311,6 +311,30 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
 - **Render cost capped by a context budget, never world size.** Candidates are
   culled to a sight radius, ranked, and carried to the budget; the rest aggregate.
 
+## The season's named creatures: finished, then ended at the settlement (WLD-25)
+
+Ruled by Darko 2026-10-20 22:47 and 22:56; the engineering settled by Wright the
+same night (W1–W11). A season's mechanics, kept here rather than in LOGOS (the
+10-10 ruling), to be promoted once a week of play has been watched.
+
+- **Declared, once.** A kind class may name creatures of its own (its mark's
+  `named`: a slug, a place, what it carries, the crossing it comes from). Each is
+  spawned ONCE EVER by the-town at its place with `stays: true`: it never fades.
+  Its kind file says `finishable: true`, so it never flees either.
+- **Finished by anyone, by any road.** A reaction carrying the effect `finish`,
+  or a mechanic that checks its own answer in code, writes one `finish` row: the
+  creature, the resident and the resident's act that earned it. Once per resident.
+  Nothing else changes: the creature stays, and others can still take part. An
+  earned finish is taken by code, never left to Jev or the die (W4).
+- **Ended at the settlement.** At the first landed settlement after a finish (the
+  office's tick, after the bless), the town gives what the creature carried to
+  the FIRST finisher, by act order on either road, and withdraws the creature,
+  reason `ended` (only the-town writes it), naming everyone who took part. A
+  finish counts when its act is before that settlement's own instant (06:00/18:00Z).
+  The creature is gone for the whole town: one creature, one ending.
+- **The line** is the kind's own `ending:` ({finisher}, {names}, {carried}) when it
+  writes one, else the town's plain words.
+
 ## Two lessons carried (from the budding-friendship build)
 
 - **Retroactive-replay hazard** — a lean that lives in a code *constant* re-decides

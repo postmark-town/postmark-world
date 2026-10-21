@@ -69,7 +69,7 @@ test("a one-door dungeon is entered directly, from anywhere in its extent, strai
   assert.equal(a.into, "t/vestibule");
   assert.deepEqual(acts(a), [`enters ${SPIRE}`, "enters t/vestibule"]);
   assert.deepEqual(a.within, ["t/grounds", SPIRE, "t/vestibule"]);
-  assert.deepEqual({ x: a.landing.x, y: a.landing.y, mark: a.landing.mark }, { x: -292, y: 0, mark: "t/doors-inside" }, "set down inside the Gilded Doors");
+  assert.deepEqual({ x: a.landing.x, y: a.landing.y, mark: a.landing.mark }, { x: -289.5, y: 0, mark: "t/doors-inside" }, "set down a step in from the Gilded Doors (row 68 (a))");
   assert.equal(a.walk, null, "standing in its extent: no walk to a door first");
   assert.match(a.rows[0], /word neutral/, "the Spire writes no word, so it answers neutral, as any mark does");
 });
@@ -101,12 +101,12 @@ test("a pick lands you at that door, however far it is from where you stand, wit
   assert.equal(a.walk, null);
   assert.deepEqual(acts(a), [`enters ${CHAPEL}`, "enters t/apse"]);
   assert.deepEqual(a.within, ["t/grounds", CHAPEL, "t/apse"]);
-  assert.deepEqual({ x: a.landing.x, y: a.landing.y }, { x: 200, y: -94 }, "at the apse door itself");
+  assert.deepEqual({ x: a.landing.x, y: a.landing.y }, { x: 200, y: -91.5 }, "a 1.5 m step in from the apse door (row 68 (a)), off its square");
   assert.match(a.rows[0], /word welcomed/, "the Chapel's own word rides every row");
   // the west door opens on the nave
   const w = enter(AT(150, 90), CHAPEL, world(), { occupancy: occ(["t/grounds"]), handle: "ann", into: "t/door-w" });
   assert.deepEqual(w.within, ["t/grounds", CHAPEL, "t/nave"]);
-  assert.deepEqual({ x: w.landing.x, y: w.landing.y }, { x: 141, y: 20 });
+  assert.deepEqual({ x: w.landing.x, y: w.landing.y }, { x: 143.5, y: 20 });
 });
 
 test("a door counts as a threshold only inside the place entered; any other way is entered as before", () => {

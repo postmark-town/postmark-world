@@ -220,7 +220,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -293,6 +293,9 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // chat-only human's agent, by id. The viewer builds the text at the press,
     // from its own record, so the column carries no prose of its own here.
     copy: String(copyId ?? "").trim() ? { id: String(copyId).trim() } : null,
+    // A RESIDENT'S PRONOUNS, beside the name (WLD-83, Darko 2026-10-20 08:44): their own
+    // word from their appearance tree, shown only when written, never guessed
+    pronouns: typeof pronouns === "string" && pronouns.trim() ? pronouns.trim() : null,
     // the way back to the mark this column was reached from, named
     back: back && String(back.id ?? "").trim()
       ? { id: String(back.id).trim(), name: String(back.name ?? back.id).trim() } : null,
@@ -494,6 +497,11 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
   const title = el(doc, "h2", "wv-homecol-title");
   title.textContent = model.title;
   titleRow.appendChild(title);
+  if (model.pronouns) {
+    const theirs = el(doc, "span", "wv-homecol-pronouns");
+    theirs.textContent = model.pronouns;   // their own words: text, never markup
+    titleRow.appendChild(theirs);
+  }
   if (enter) titleRow.appendChild(enter);
   scroll.appendChild(titleRow);
 
@@ -696,8 +704,11 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
         face.textContent = tok.monogram || tok.name.charAt(0).toUpperCase();
       }
       b.appendChild(face);
-      b.appendChild(el(doc, "span", "wv-tok-leg l"));
-      b.appendChild(el(doc, "span", "wv-tok-leg r"));
+      // a creature is a diamond with no legs (WLD-82); a resident keeps its two
+      if (tok.kind !== "creature") {
+        b.appendChild(el(doc, "span", "wv-tok-leg l"));
+        b.appendChild(el(doc, "span", "wv-tok-leg r"));
+      }
       const name = el(doc, "span", "wv-tok-name");
       name.textContent = tok.name;
       b.appendChild(name);
@@ -812,6 +823,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       bars: view.bars ?? [],
       tokens: view.tokens ?? [],
       copyId: view.copyId ?? null,
+      pronouns: view.pronouns ?? null,
     }), { imagePath });
   };
 
@@ -880,6 +892,7 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-title { margin:0; color:var(--paper); font-size:1.22rem; line-height:1.25; }
 /* the door beside the name (founder, 2026-09-11) */
 .wv-homecol-titlerow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.wv-homecol-pronouns { color:var(--muted, #9aa3ad); font-size:.82rem; font-style:italic; }
 .wv-homecol-titlerow .wv-enter { flex:none; margin:0; font-size:.82rem; padding:2px 11px; }
 .wv-homecol-meta { margin-top:.25rem; color:var(--dim); font-size:.78rem; font-style:italic; }
 .wv-homecol-lead { margin:.9rem 0 0; }
@@ -956,18 +969,21 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-bar-cell { width:1.6rem; height:.55rem; border-radius:3px; background:rgba(232,224,207,.12); border:1px solid rgba(232,224,207,.18); }
 .wv-homecol-bar-cell.is-on { background:#e6948c; border-color:#e6948c; }
 .wv-homecol-tokens { display:flex; flex-wrap:wrap; gap:.6rem .9rem; }
-/* a token, the walker's body in miniature: a round face, two stubby legs */
+/* a token, the walker's body in miniature: a round face, two stubby legs (a creature's is a diamond, below) */
 .wv-tok { position:relative; display:inline-flex; flex-direction:column; align-items:center; gap:7px; padding:0 0 2px;
   border:0; background:transparent; color:var(--paper); font:inherit; cursor:pointer; }
 .wv-tok-face { position:relative; z-index:1; width:28px; height:28px; border-radius:50%; overflow:hidden; display:grid; place-items:center;
   font-weight:700; font-size:.8rem; color:#101b31; background:#bfe4c6; box-shadow:0 0 0 2px var(--green); }
-.wv-tok.is-creature .wv-tok-face { background:#f4b4ad; box-shadow:0 0 0 2px #d8706a; }
+/* a creature's token is the map's diamond (WLD-82): a turned square behind its art, the same reds, no legs */
+.wv-tok.is-creature .wv-tok-face { overflow:visible; background:none; box-shadow:none; border-radius:0; }
+.wv-tok.is-creature .wv-tok-face::before { content:""; position:absolute; z-index:-1; left:3px; top:3px; width:22px; height:22px;
+  transform:rotate(45deg); background:#f4b4ad; box-shadow:0 0 0 2px #d8706a; border-radius:1px; }
+.wv-tok.is-creature .wv-tok-sil { width:68%; height:68%; }
 .wv-tok-img { width:100%; height:100%; object-fit:cover; display:block; }
 .wv-tok-sil { width:86%; height:86%; background:#4a2326; -webkit-mask:var(--wv-sil) center/contain no-repeat; mask:var(--wv-sil) center/contain no-repeat; }
 .wv-tok-leg { position:absolute; top:25px; width:2px; height:7px; border-radius:1px; background:var(--green); }
 .wv-tok-leg.l { left:calc(50% - 5px); transform:rotate(14deg); }
 .wv-tok-leg.r { left:calc(50% + 3px); transform:rotate(-14deg); }
-.wv-tok.is-creature .wv-tok-leg { background:#d8706a; }
 .wv-tok-name { font-size:.7rem; color:var(--dim); max-width:6rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .wv-tok:hover .wv-tok-name, .wv-tok:focus-visible .wv-tok-name { color:var(--paper); }
 .wv-homecol-rel-more { margin:.1rem 0 0; color:var(--dim); font-size:.76rem; font-style:italic; }

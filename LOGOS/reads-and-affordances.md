@@ -153,6 +153,10 @@ subclass may declare (18:44).
   every mark in view. Both are one function's answer projected two ways, and
   a door that lets them differ is wrong, the same never-diverge rule as a
   page's column and its map.
+- **A creature in sight is an object of the same function** (POS-672, the
+  afforded actions; Wright's settlement W4, 2026-10-20): `investigate` of a
+  creature carries its `can`, the afforded actions you can aim at it now, and
+  the invariant reads "every mark or creature in view".
 
 ## The reading law
 

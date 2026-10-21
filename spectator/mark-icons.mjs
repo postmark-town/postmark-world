@@ -32,10 +32,12 @@ const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").
 // THE TOKEN (play fix 43, Darko 20:16): a resident is drawn on the map as a round
 // frame on two stubby legs, so that body IS the icon for a person — "replace our
 // just like head and shoulders with the circle with two little stubby legs coming
-// out the bottom". The same body stands for a creature, in its own red. Filled,
-// so the mask and the map draw it alike.
+// out the bottom". A creature is a diamond, as its token on the map is (WLD-82,
+// Darko 2026-10-19: "creatures shouldn't have the same shape of icon as
+// residents"), in its own red. Filled, so the mask and the map draw it alike.
 const TOKEN_D = "M 3.4 6.6 a 4.6 4.6 0 1 0 9.2 0 a 4.6 4.6 0 1 0 -9.2 0 Z "
   + "M 5.9 10.4 L 7.0 10.7 L 6.3 14.2 L 5.2 13.9 Z M 10.1 10.4 L 9.0 10.7 L 9.7 14.2 L 10.8 13.9 Z";
+const CREATURE_D = "M 8 1.6 L 14.4 8 L 8 14.4 L 1.6 8 Z";
 const circle = (x, y, r) => `M ${x - r} ${y} a ${r} ${r} 0 1 0 ${2 * r} 0 a ${r} ${r} 0 1 0 ${-2 * r} 0`;
 
 // The vocabulary. `what` icons say what a mark is (one per mark at most);
@@ -60,14 +62,14 @@ export const MARK_ICONS = Object.freeze({
   vehicle: { kind: "what", label: "vehicle", meaning: "A vehicle: it moves, and you can ride it.",
     d: "M 2 9.6 H 14 L 12 13 H 4 Z M 8 9.6 V 2.5 L 12.2 8 H 8" },
   creature: { kind: "what", label: "creature", meaning: "A creature: something alive that answers what you do near it.", fill: true,
-    d: TOKEN_D },
+    d: CREATURE_D },
   yours: { kind: "state", label: "yours", meaning: "Yours: your household's mark.",
     d: "M 4 14 V 2.5 M 4 3 H 12.5 L 10.4 5.6 L 12.5 8.2 H 4" },
   locked: { kind: "state", label: "locked", meaning: "Locked: it refuses entry.",
     d: `M 3.8 7.4 H 12.2 V 13.6 H 3.8 Z M 5.6 7.4 V 5.4 A 2.4 2.4 0 0 1 10.4 5.4 V 7.4 M 8 9.8 V 11.4` },
   consent: { kind: "state", label: "asks consent", meaning: "Asks consent: it has terms you accept at the door before you go in.",
     d: "M 4 2.5 H 9.8 L 12.4 5.1 V 13.5 H 4 Z M 9.8 2.5 V 5.1 H 12.4 M 6 8.6 H 10.4 M 6 11 H 9" },
-  staked: { kind: "state", label: "staked", meaning: "Staked: stamps are staked behind it.", fill: true,
+  staked: { kind: "state", label: "staked", meaning: "Staked: your household has stamps staked on this.", fill: true,
     d: "M 8 1.5 L 9.6 6.4 L 14.5 8 L 9.6 9.6 L 8 14.5 L 6.4 9.6 L 1.5 8 L 6.4 6.4 Z" },
   inside: { kind: "state", label: "people inside", meaning: "People inside: someone is inside it now.", fill: true,
     d: TOKEN_D },
@@ -142,8 +144,14 @@ export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"
 
 /** The mark's state badges, in a fixed order. `soon` is the stairs class's
  *  answer (STAIRS_LINE: "…Coming Soon!") — a refusal that is a promise, so it
- *  is not also called locked. */
-export function markStates(mark, { yours = false, weight = 0, inside = 0 } = {}) {
+ *  is not also called locked.
+ *
+ *  THE MAP'S ✦ IS YOUR HOUSEHOLD'S STAKE (WLD-95, Darko 2026-10-20 22:19). A
+ *  surface that hands in `ownStake` (the map) asks one question of the badge:
+ *  does your household hold stamps in escrow on this mark? A reader signed out,
+ *  or one whose household holds none, sees no ✦ there. A surface that does not
+ *  (the column, the nameplate) keeps the mark's general ✦ figure, `weight`. */
+export function markStates(mark, { yours = false, weight = 0, ownStake = null, inside = 0 } = {}) {
   if (!mark) return [];
   const out = [];
   if (yours) out.push({ key: "yours" });
@@ -151,8 +159,13 @@ export function markStates(mark, { yours = false, weight = 0, inside = 0 } = {})
   const soon = !!law && law.word === "opposed" && law.consequence === STAIRS_LINE;
   if (law?.word === "opposed" && !soon) out.push({ key: "locked" });
   if (law?.edge) out.push({ key: "consent" });
-  const w = Math.max(0, Number(weight) || 0);
-  if (w > 0) out.push({ key: "staked", count: w });
+  if (ownStake != null) {
+    const own = Math.max(0, Number(ownStake) || 0);
+    if (own > 0) out.push({ key: "staked", own });
+  } else {
+    const w = Math.max(0, Number(weight) || 0);
+    if (w > 0) out.push({ key: "staked", count: w });
+  }
   const n = Math.max(0, Number(inside) || 0);
   if (n > 0) out.push({ key: "inside", count: n });
   if (soon) out.push({ key: "soon" });
@@ -166,11 +179,12 @@ export function markIcons(mark, opts = {}) {
     .map((icon) => ({ ...icon, ...describe(icon) }));
 }
 
-function describe({ key, count = null }) {
+function describe({ key, count = null, own = null }) {
   const icon = MARK_ICONS[key];
   if (!icon) return { kind: "state", label: key, meaning: key };
   let meaning = icon.meaning;
   if (key === "staked" && count) meaning = `Staked: ✦ ${Number(count).toLocaleString()} behind it.`;
+  if (key === "staked" && own) meaning = `Staked: your household has ${Number(own).toLocaleString()} stamp${own === 1 ? "" : "s"} staked on this.`;
   if (key === "inside" && count) meaning = `People inside: ${count} ${count === 1 ? "person is" : "people are"} inside it now.`;
   return { kind: icon.kind, label: icon.label, meaning };
 }

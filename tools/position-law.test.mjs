@@ -67,11 +67,12 @@ test("LAW: the parcel's resolution clause stands — own-claimed first, else the
   assert.ok(body.length <= 150, `body is ${body.length} chars; the cap is 150`);
 });
 
-test("LAW: the resident's standing clause stands — the unplaced stand at the quay", () => {
+test("LAW: the resident's standing clause stands — the unplaced stand at the Origin (2026-09-17, trued 2026-10-21)", () => {
   const { fields, body } = markOf(`${WORKS}/postmark-node/entity/resident/the-standing-porch/mark.md`);
   assert.equal(fields.kind, "property"); // a class's clause is a property now (LOGOS v2 part 2)
   assert.equal(fields.name, "standing");
-  assert.match(fields.default, /quay/i);
+  assert.match(fields.default, /^the Origin, when the record places them nowhere else$/);
+  assert.match(body, /set down by the record where it stood/, "a berth that comes ashore is placed by its own record (POS-740)");
   assert.ok(body.length <= 150, `body is ${body.length} chars; the cap is 150`);
 });
 
@@ -128,11 +129,11 @@ test("CODE: the pick follows the resolution clause's own order, and says which i
 
 test("CODE: the unplaced stand where the standing clause says, and the answer says it is a default", () => {
   const clause = markOf(`${WORKS}/postmark-node/entity/resident/the-standing-porch/mark.md`).fields.default;
-  assert.match(clause, /quay/i);
+  assert.match(clause, /Origin/);
   const here_ = whereIs("adam-rhys", { world: garrison, departures: [] });
   assert.equal(here_.placed, true, `the record says "${clause}"`);
-  assert.equal(here_.mark_id, QUAY_MARK_ID);
-  assert.equal(here_.source, "quay", "a default that cannot be told from a choice is the thing NOWHERE forbids");
+  assert.deepEqual([here_.x, here_.y, here_.mark_id], [0, 0, null]);
+  assert.equal(here_.source, "origin", "a default that cannot be told from a choice is the thing NOWHERE forbids");
   assert.equal(homeOf("adam-rhys", garrison).placed, false, "standing there is not holding it");
 });
 
@@ -142,5 +143,6 @@ test("CODE: reading never becomes holding — the claiming law survives the grai
   // implemented as a rights grant instead of a read.
   assert.deepEqual(parcelsFor("outsider", garrison), []);
   assert.equal(homeOf("outsider", garrison).placed, false);
-  assert.equal(porchOf({ marks: [] }).placed, false, "no quay in the record, no porch — the law is read, not held here");
+  assert.equal(porchOf({ marks: [] }).mark_id, null, "the default stands on no mark, so it can hold none");
+  assert.equal(homeOf("adam-rhys", garrison).placed, false, "standing at the default is not holding ground");
 });

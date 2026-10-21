@@ -69,7 +69,11 @@ anyone's welcome.
 of constitution** (the sitting's pillar, 2026-08-11; restored 2026-08-13).
 Every sovereign node descends from a household: a parcel is an
 apex-sovereign *standing* node, a resident an apex-sovereign *living* one,
-and both are children of the household that stands behind them. There is no
+and both are children of the household that stands behind them. **An act is
+sovereign because its author is** (Darko, 2026-10-19 19:42, WLD-83 P6): a
+resident is an apex-sovereign living node, so a predicate it hangs on itself
+stands as a predicate on a mark inside its own parcel does, on the holder's own
+ground, and welcomed because the holder wrote it. There is no
 free-floating sovereignty — whose ground a thing is traces, in finitely many
 steps, to a household or to the town.
 

@@ -39,11 +39,16 @@ test("REGRESSION (2026-08-04): a resident absent from any seeding snapshot is st
   assert.equal(here.source, "parcel");
 });
 
-test("NOWHERE is not the origin — unplaced must be distinguishable from the Origin", () => {
+test("the unplaced stand at the Origin, DECLARED — distinguishable from anyone standing at (0, 0) by choice (POS-740)", () => {
+  // Until 2026-10-21 this was NOWHERE with x null, because the Origin returned
+  // for "unknown" read as the Town Centre. The Origin is now the ruled default
+  // (2026-09-17, trued 2026-10-21), and what keeps it honest is the same thing
+  // that kept the porch honest: `source` says it is a default and no mark is claimed.
   const here = whereIs("stranger", { world, departures: [] });
-  assert.deepEqual(here, { ...NOWHERE });
-  assert.equal(here.x, null, "never 0 — the origin is a real place and would read as the Town Centre");
-  assert.equal(here.placed, false);
+  assert.deepEqual(here, { x: 0, y: 0, placed: true, source: "origin", mark_id: null });
+  assert.notEqual(here.source, "walk");
+  assert.notEqual(here.source, "parcel");
+  assert.deepEqual(NOWHERE, { x: null, y: null, placed: false, source: null, mark_id: null }, "NOWHERE itself is unchanged for its other callers");
 });
 
 test("whereIs: a declared walk wins over the standing home", () => {
@@ -102,12 +107,11 @@ test("publicResidents: someone mid-walk is the one genuinely different state", (
   assert.ok(rei.toward, "a mover has somewhere to be; the still do not");
 });
 
-test("publicResidents: a world with no porch still omits the unplaced, and never duplicates", () => {
-  // This fixture has no quay mark, so there is no porch to stand on and the
-  // pre-2026-08-18 answer is unchanged — which is the property being pinned:
-  // the default is READ FROM THE RECORD, not held in this module.
+test("publicResidents: the unplaced are on the list at the Origin even in a world with no quay, and never duplicated (POS-740)", () => {
+  // The Origin is the grid's own point, not a mark, so it needs no record to be
+  // read from: nobody is dropped in silence for want of a quay.
   const rows = publicResidents(["stranger", "rei", "rei"], { world, departures: [] });
-  assert.deepEqual(rows.map((r) => r.handle), ["rei"]);
+  assert.deepEqual(rows.map((r) => [r.handle, r.source]), [["stranger", "origin"], ["rei", "parcel"]]);
 });
 
 // ── household grain (ruled 2026-08-18) ──────────────────────────────────────
@@ -191,19 +195,20 @@ test("the claiming law is untouched: this changes READING, never rights", () => 
 
 // ── the porch (ruled 2026-08-18) ────────────────────────────────────────────
 
-test("the porch is READ FROM THE RECORD — no quay mark, no default", () => {
-  assert.deepEqual(porchOf({ marks: [] }), { ...NOWHERE });
-  assert.deepEqual(porchOf({ marks: [{ id: QUAY_MARK_ID, kind: "sited", at: { x: null, y: 3 } }] }), { ...NOWHERE },
-    "a quay without a coordinate is an absent input, and absent inputs are disclosed, never substituted for");
+test("the default needs no record: with a quay, without one, or with a broken one, it is the Origin (POS-740)", () => {
+  const origin = { x: 0, y: 0, placed: true, source: "origin", mark_id: null };
+  assert.deepEqual(porchOf({ marks: [] }), origin);
+  assert.deepEqual(porchOf({ marks: [{ id: QUAY_MARK_ID, kind: "sited", at: { x: null, y: 3 } }] }), origin);
+  assert.deepEqual(porchOf(garrison), origin, "the quay is still in the record, and it is no longer anyone's default");
 });
 
 test("the porch is DECLARED, never smuggled: an unplaced resident is placed AND says why", () => {
   const here = whereIs("adam-rhys", { world: garrison, departures: [] });
   assert.equal(here.placed, true, "a third of the roll was absent from the map with nothing saying so");
-  assert.deepEqual({ x: here.x, y: here.y }, { x: 1390, y: 5665 }, "the quay's own coordinate, off the record");
-  assert.equal(here.source, "quay", "the field that lets a caller tell a default from a choice");
-  assert.equal(here.mark_id, QUAY_MARK_ID);
-  assert.match(sourceLabel(here, "adam-rhys"), /porch/);
+  assert.deepEqual({ x: here.x, y: here.y }, { x: 0, y: 0 }, "the Origin (POS-740; the quay until then)");
+  assert.equal(here.source, "origin", "the field that lets a caller tell a default from a choice");
+  assert.equal(here.mark_id, null, "the Origin is no mark, so none is claimed");
+  assert.match(sourceLabel(here, "adam-rhys"), /the Origin \(0, 0\).*a default/);
   // THE PROPERTY NOWHERE EXISTED TO PROTECT, now on a field instead of an absence
   assert.notEqual(here.source, "walk", "a placement is not an act its subject performed");
   assert.notEqual(here.source, "parcel", "the porch is not ground; homeOf still says they hold none");
@@ -220,7 +225,7 @@ test("the porch is the LAST tier — ground and walks both outrank it", () => {
 
 test("publicResidents: the porch puts the unplaced ON the list, labelled", () => {
   const rows = publicResidents(["sol-of-garrison", "rook-of-garrison", "adam-rhys"], { world: garrison, departures: [] });
-  assert.deepEqual(rows.map((r) => r.source), ["parcel", "parcel", "quay"]);
+  assert.deepEqual(rows.map((r) => r.source), ["parcel", "parcel", "origin"]);
   assert.equal(rows.length, 3, "nobody is dropped in silence");
   assert.ok(rows.every((r) => r.moving === false), "standing is standing however we learned it");
 });

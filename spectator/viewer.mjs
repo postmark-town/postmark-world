@@ -23,6 +23,7 @@
 // the office has explaining to do.
 import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
+import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creature's ring stops at its room's walls (WLD-25)
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
@@ -34,13 +35,14 @@ import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mj
 // mark carries a ring too, and the sea is not a region anyone is filed under
 import { REGION_SLUGS } from "../tools/region-outsiders.mjs";
 import { parseEnterExitLedger, occupancyAt, occupantsOf, withinOf, isMark, isEntity, entryLawOf } from "../tools/enter-exit.mjs";
+import { deslugMarkId, resolveMarkName } from "../tools/mark-name.mjs";
 // WHERE A RECORD MAY BE READ FROM — one decision, in one place, with the
 // guardrail it answers to quoted in its header ("tags only, never main tip").
 // There is deliberately no constant here naming the world's main tip: this file
 // is not allowed to hold one, and `tools/record-sources.test.mjs` reads these
 // bytes to prove it.
 import { recordSources, recordAbsenceMessage } from "../tools/record-sources.mjs";
-import { creatureSilhouette, roomInMists, bakeRoomSurround, MISTS_PAINT, bakeSheetFeather, mistsBakePlan, mistsBaker, mistsKeepRasterBuilder, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureHTML, bellFor, ringBell } from "./mists-render.mjs";
+import { creatureSilhouette, roomInMists, bakeRoomSurround, MISTS_PAINT, bakeSheetFeather, mistsBakePlan, mistsBaker, mistsKeepRasterBuilder, mistsCoreHex, mistsKeepRects, mistsKeepAt, mistsCreatures, mistsCreatureHTML, bellFor, ringBell, mistsOpaqueFromM } from "./mists-render.mjs";
 // THE PARCEL'S COLUMN — the atlas's right-hand panel, back (Keemin 2026-09-11).
 // It owns its own markdown reader, its own builder and its own dress, and it
 // takes no viewer internals: the door read, the shelf gate and the handle rule
@@ -199,28 +201,8 @@ export function edgePointToward(viewport, target, inset = 0) {
   return { x: cx + dx * scale, y: cy + dy * scale, bearingDeg: bearingDeg(dx, dy) };
 }
 
-export function deslugMarkId(id) {
-  const slug = String(id ?? "").split("/").filter(Boolean).pop() ?? "";
-  const words = slug.split("-").filter(Boolean);
-  const readable = [];
-  for (const word of words) {
-    if (word.toLowerCase() === "s" && readable.length) {
-      readable[readable.length - 1] += "'s";
-      continue;
-    }
-    readable.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
-  }
-  return readable.join(" ");
-}
-
-export function resolveMarkName(mark, determined = {}) {
-  const key = `${mark?.id ?? ""}::name`;
-  const won = determined instanceof Map ? determined.get(key) : determined?.[key];
-  const name = String(won ?? "").trim();
-  return name
-    ? { name, determined: true }
-    : { name: deslugMarkId(mark?.id), determined: false };
-}
+// A mark's name, read one way by the page and the verbs (tools/mark-name.mjs; WLD-5).
+export { deslugMarkId, resolveMarkName };
 
 /** THE PARCEL CARD IS LABELLED WITH THE PARCEL'S OWN NAME (Keemin, 2026-09-20:
  *  "let's just use the parcel's name, and strip the word 'parcel'").
@@ -2241,7 +2223,7 @@ const isPortalGround = (classes) => /(?:^|\s)c-portal-ground(?:\s|$)/.test(Strin
 // a glyph centred on the dot (mark-icons.mjs § iconSVG), drawn the same way the
 // doorway is — over the circle, never instead of it — and it replaces the
 // doorway, which is the door glyph's older, smaller self.
-export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "" } = {}) {
+export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "", badges = [] } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
   const dx = Number(fan?.dx) || 0, dy = Number(fan?.dy) || 0;
@@ -2252,7 +2234,28 @@ export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, 
     + (inner ? `<g class="ov-ic-in" transform="translate(${dx} ${dy})">${inner}</g>`
       : isPortalGround(classes)
       ? `<path class="ov-pip-door" transform="translate(${dx} ${dy})" d="${PIP_DOOR}" pointer-events="none"/>` : "")
+    + (badges?.length ? `<g transform="translate(${dx} ${dy})">${pipBadgesSVG(badges)}</g>` : "")
     + `</g></g>`;
+}
+
+// THE STATES SIT ON THE PIP (WLD-95, Darko 2026-10-20 22:19). They rode in a
+// pill beside it, and where a few marks stand metres apart (a fair's stalls)
+// the pills, nudged down a row so as not to overlap, read as markers of their
+// own: a field of ✦ discs that belonged to nobody. Now each state is a small
+// dark disc seated on its pip's own rim, the first at its top right and the
+// rest following clockwise, inside the pip's scaled group, so it holds its size
+// on screen as the pip does and goes where the pip goes. The pill still opens on
+// hover (fix 37) and carries them in words, so they step aside while it is up.
+export const PIP_BADGE = Object.freeze({ r: 4.6, glyph: 6.4, start: -Math.PI / 4, step: Math.PI / 4 });
+export function pipBadgesSVG(states = []) {
+  if (!states?.length) return "";
+  const { r, glyph, start, step } = PIP_BADGE;
+  return `<g class="ov-pip-badges">` + states.map((icon, i) => {
+    const a = start + i * step;
+    const x = +(Math.cos(a) * OVERLAY_PIP_R).toFixed(2), y = +(Math.sin(a) * OVERLAY_PIP_R).toFixed(2);
+    return `<g transform="translate(${x} ${y})"><circle r="${r}" class="ov-badge-bg"/>`
+      + iconSVG(icon, { x: -glyph / 2, y: -glyph / 2, size: glyph }) + `</g>`;
+  }).join("") + `</g>`;
 }
 
 /** THE STATE PILL: a mark's icons in a small dark pill, in the overlay's scaled
@@ -3796,6 +3799,53 @@ export function residentFace(handle, meta = null) {
   };
 }
 
+// THE RESIDENT'S COLUMN IS THE WHOLE PROFILE (WLD-83, Darko 2026-10-19 17:50:
+// "This should really be where we have everything"): what they look like, their
+// bio, their colour and what they run on, beside where they are and what they
+// carry. Pure, so it is tested without a browser.
+//
+// `card` is the office's GET /residents/{handle} answer (its `profile` is the
+// resident's PROFILE.md bubble, its `appearance` their own tree, canon live);
+// `look` is their close look (`world { investigate }`), whose `appearance` is
+// the same tree. The close look's is preferred: it is the read the page already
+// holds fresh. Every value is the resident's own text, set as text, never HTML.
+//
+// THE ONE PICTURE (WLD-83 part 1): the URL at the town's media door first, then
+// the face the map already draws; the live card can only make it newer.
+export function residentProfileView(card = null, look = null, face = null) {
+  const profile = card?.profile && typeof card.profile === "object" ? card.profile : {};
+  const tree = (look?.appearance && !look.appearance.unavailable ? look.appearance : null)
+    ?? (card?.appearance && !card.appearance.unavailable ? card.appearance : null);
+  const text = (v) => (typeof v === "string" && v.trim() ? v.trim() : null);
+  const facts = [];
+  if (tree && text(tree.body)) {
+    facts.push({ label: "looks", value: text(tree.body) });
+    for (const p of tree.predicates ?? []) {
+      if (!text(p?.slot)) continue;
+      const value = text(p.value) ?? "";
+      const body = text(p.body);
+      facts.push({ label: p.slot, value: value || body || "", ...(body && body !== value ? { detail: body } : {}) });
+    }
+    const more = Number(tree.more?.predicates ?? 0);
+    if (more > 0) facts.push({ label: "and", value: `${more} more detail${more === 1 ? "" : "s"}, on a closer look` });
+  }
+  // the colour they chose, or none: never the map's default gold (safeHexColor's
+  // fallback), because a colour on this line reads as theirs
+  const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(profile.color ?? "").trim());
+  const color = hex ? `#${hex[1].toLowerCase()}` : null;
+  const colorName = text(profile.color_name);
+  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · ") });
+  if (text(profile.runtime)) facts.push({ label: "runs on", value: text(profile.runtime) });
+  // A shelf picture travels by the page's own /shelf/ route, as a mark's does
+  // (markImagePath): the column's <img> then loads wherever the page is served
+  // (prod, the rig, the sandbox), never by asking the media host from the browser.
+  const shown = (url) => (url && MARK_IMAGE_SHELF.test(url) ? markImagePath({ image: url }) : url) ?? null;
+  const picture = shown(safeAvatarUrl(profile.avatar_url) ?? face?.avatar ?? null);
+  // their pronouns beside the name: the close look's, else the card's; absent when unwritten
+  const pronouns = text(look?.pronouns) ?? text(card?.pronouns);
+  return { facts, bio: text(profile.bio), picture, pronouns };
+}
+
 // The resident page for a handle. Handles are lowercase-hyphenated by the
 // town's own law, but this is a link built from map data, so it is encoded
 // rather than trusted — and a handle that isn't handle-shaped gets no link at
@@ -4175,11 +4225,18 @@ export function mistsVeilSVG(m, { originPx, mPerPx }) {
   return `<rect class="wv-mists-veil" data-src="mists:veil" aria-hidden="true" x="${n(originPx.x - r)}" y="${n(originPx.y - r)}"`
     + ` width="${n(2 * r)}" height="${n(2 * r)}" fill="#060d18" fill-opacity="${(0.6 * m.veil).toFixed(3)}" pointer-events="none"/>`;
 }
-export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = false }) {
+export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = false, ragged = false }) {
   if (!m) return "";
   // PAINTED (POS-553): the wall keeps its exact geometry and its pointer, in the
   // paint's core colour; the fringe and the clearings' rings are the paint's
   // (mists-render.mjs), so the vector strips stand down.
+  //
+  // RAGGED (WLD-81, RULED by Darko 2026-10-19 18:53): once the paint is on the
+  // page its face wanders both ways about the true face, so the opaque wall
+  // follows it: along every side and round every clearing, it starts where the
+  // paint turns opaque (mistsOpaqueFromM), and a pocket the face leaves past the
+  // true face shows what the paint's own falloff paints there. The pointer is
+  // still taken from the true face: the wall's own path stays, unpainted.
   const MISTS_INK = painted ? mistsCoreHex(m) : MISTS_INK_FLAT;
   const px = (p) => ({ x: originPx.x + p.x / mPerPx, y: originPx.y + p.y / mPerPx });
   const n = (v) => v.toFixed(1);
@@ -4193,6 +4250,27 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
     + (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
       return ` M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; }).join("")
     + `"/>`;
+  if (painted && ragged) {
+    const STEP = 60, pt = (q) => { const v = px(q); return `${n(v.x)} ${n(v.y)}`; };
+    const out = (at, dir) => { const d = mistsOpaqueFromM(m, at, dir, { stepM: 15 }); return { x: at.x + dir.x * d, y: at.y + dir.y * d }; };
+    const c = m.clear, ring = [];
+    const side = (x0, y0, x1, y1, dir) => { const len = Math.hypot(x1 - x0, y1 - y0), k = Math.max(1, Math.ceil(len / STEP));
+      for (let i = 0; i < k; i++) ring.push(out({ x: x0 + (x1 - x0) * i / k, y: y0 + (y1 - y0) * i / k }, dir)); };
+    side(c.minX, c.minY, c.maxX, c.minY, { x: 0, y: -1 });
+    side(c.maxX, c.minY, c.maxX, c.maxY, { x: 1, y: 0 });
+    side(c.maxX, c.maxY, c.minX, c.maxY, { x: 0, y: 1 });
+    side(c.minX, c.maxY, c.minX, c.minY, { x: -1, y: 0 });
+    let d = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
+      + ` M ${ring.map(pt).join(" L ")} Z`;
+    for (const k of m.clearings ?? []) {
+      const steps = Math.max(24, Math.ceil(2 * Math.PI * k.r / STEP)), arc = [];
+      for (let i = 0; i < steps; i++) { const a = 2 * Math.PI * i / steps, dir = { x: Math.cos(a), y: Math.sin(a) };
+        arc.push(out({ x: k.x + dir.x * k.r, y: k.y + dir.y * k.r }, dir)); }
+      d += ` M ${arc.map(pt).join(" L ")} Z`;
+    }
+    const back = `<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none" d="${d}"/>`;
+    return `<g class="wv-mists" aria-hidden="true">${back}${wall.replace(` fill="${MISTS_INK}"`, ` fill="${MISTS_INK}" fill-opacity="0"`)}</g>`;
+  }
   // a clearing's fringe: a soft ring on its own clear side, fading inward from the wall
   const ringOp = Math.min(1, m.density || 0).toFixed(3);
   const rings = !(m.density > 0) || !(m.fringeM > 0) ? "" : (m.clearings ?? []).map((k, i) => {
@@ -4397,12 +4475,40 @@ export const chooserIdsFrom = (id) =>
     ? id.slice(CHOOSER_PREFIX.length).split(" ").filter(Boolean)
     : null;
 
+// YOUR HOUSEHOLD'S STAKE ON A MARK (WLD-95): the stamps its open escrow
+// positions hold there, read from the portfolio the page already walks for a
+// signed-in household (`backed`, household grain: every resident's position).
+// Zero for a reader signed out, and for a mark the household has not backed.
+export function householdStakeOn(markId, { signedIn = false, portfolio = null } = {}) {
+  if (!signedIn || !markId) return 0;
+  let n = 0;
+  for (const row of portfolio?.backed ?? [])
+    if ((row?.id ?? row?.mark) === markId) n += Math.max(0, Number(row?.stamps ?? 0) || 0);
+  return n;
+}
+
 export const WALKER_HOVER_PREFIX = "walker:";
 export const walkerHoverId = (handle) => `${WALKER_HOVER_PREFIX}${handle}`;
 export const walkerHandleFromHoverId = (id) =>
   typeof id === "string" && id.startsWith(WALKER_HOVER_PREFIX)
     ? id.slice(WALKER_HOVER_PREFIX.length) || null
     : null;
+
+// THE HIT TARGET STANDS WHERE THE BODY IS DRAWN (WLD-94, Darko 2026-10-20 21:52).
+// Since row 69 a moving body is drawn each frame at its walk record's place
+// (`liveBody`), while the hover snap, the click's chooser and the hover disc
+// still read the poll's row: the face walked on along its dashed path and the
+// disc and the click stayed at the older point. So each body is placed through
+// `bodyOf`, the same function the draw places it with, before it is projected.
+// Every row stays a candidate (a boat too, which has no hit disc to read).
+export function walkerCandidatesAt(rows, { bodyOf = (w) => w, toScreen }) {
+  return (rows ?? []).flatMap((row) => {
+    const w = bodyOf(row);
+    if (!w?.handle || ![w.x, w.y].every(Number.isFinite)) return [];
+    const screen = toScreen(w);
+    return [{ id: walkerHoverId(w.handle), x: screen.x, y: screen.y }];
+  });
+}
 
 // ── THE LIVE CREATURES (play fix 35) ────────────────────────────────────────
 //
@@ -4426,7 +4532,7 @@ export function liveCreaturesFrom(answer) {
     const x = Number(c?.at?.x ?? c?.x), y = Number(c?.at?.y ?? c?.y);
     if (!isCreatureId(c?.id) || ![x, y].every(Number.isFinite)) return [];
     return [{ id: String(c.id), kind: String(c.kind ?? "creature"), name: String(c.name ?? c.kind ?? "a creature"), x, y,
-      fades_in: c.fades_in ? String(c.fades_in) : null }];
+      fades_in: c.fades_in ? String(c.fades_in) : null, ...(Number(c?.ring_m) > 0 ? { ring_m: Number(c.ring_m) } : {}) }];
   });
 }
 
@@ -4487,7 +4593,8 @@ export function creatureColumnFacts(row = null, inv = null, { timeZone = undefin
   return { facts, lately, bars };
 }
 
-/** One live creature on the painting, as a TOKEN (play fix 40, Darko 20:09:
+/** One live creature on the painting, as a TOKEN (its SHAPE is superseded by
+ *  WLD-82 below: a diamond, no legs; the rest stands) (play fix 40, Darko 20:09:
  *  "like D&D, like Roll20 virtual tabletop tokens … they have to be in circles,
  *  just like … the residents"; 20:16: "the same body"). The walker's own body —
  *  `walkerFrameSVG`'s round frame at its near size, its two stubby legs from the
@@ -4501,33 +4608,67 @@ export function creatureColumnFacts(row = null, inv = null, { timeZone = undefin
  *  replaces any resident profile pictures at far zoom"). `plain` is the far
  *  tier's creature, exactly as the far tier's resident is the blank walker: the
  *  walker's far size and legs, filled pastel red, and no kind's silhouette,
- *  which shows only where a resident's picture shows. Pure. */
-export const CREATURE_GLYPH = Object.freeze({ size: WALKER_FRAME.near, leg: WALKER_FRAME.legNear, hit: 17, art: 0.86,
-  plainSize: WALKER_FRAME.far, plainLeg: WALKER_FRAME.legFar, plainHit: 12 });
+ *  which shows only where a resident's picture shows. Pure.
+ *
+ *  A CREATURE IS A DIAMOND (WLD-82, RULED by Darko 2026-10-19 17:07–17:09):
+ *  "creatures shouldn't have the same shape of icon as residents … the exact
+ *  same circle with the two little legs"; "replace the zoomed out silhouette
+ *  with the diamond. And as you zoom in, just keep that same diamond"; "I do
+ *  want the token to remain a token … and just have artwork inside". So the
+ *  disc and its ring are a diamond at every zoom, with no legs, the kind's art
+ *  clipped inside it where the round token carried it, and the colours as they
+ *  were ("the color choice is intentional"). The walker's sizes still set its
+ *  scale: the diamond holds the same area as the walker's circle at each tier
+ *  (half-diagonal r·√(π/2)), so neither body reads as the bigger one. */
+export const CREATURE_GLYPH = Object.freeze({ size: WALKER_FRAME.near, hit: 17, art: 0.86,
+  plainSize: WALKER_FRAME.far, plainHit: 12 });
+/** The creature's diamond at a token size: its half-diagonal and its points, centred on 0 0. Pure. */
+export function creatureDiamond(size) {
+  const h = (size / 2) * Math.sqrt(Math.PI / 2), n = (v) => +v.toFixed(2);
+  return { h: n(h), points: `0,${n(-h)} ${n(h)},0 0,${n(h)} ${n(-h)},0` };
+}
 export function creatureGlyphSVG({ creature, at, silhouette = null, title = null, plain = false, jiggling = false } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (!creature?.id || ![x, y].every(Number.isFinite)) return "";
   const size = plain ? CREATURE_GLYPH.plainSize : CREATURE_GLYPH.size;
-  const leg = plain ? CREATURE_GLYPH.plainLeg : CREATURE_GLYPH.leg;
-  const r = size / 2;
+  const { points } = creatureDiamond(size);
   if (plain) silhouette = null;
-  // the legs start where they meet the rim, exactly as the walker's do
-  const rim = Math.sqrt(r * r - (size * 0.22) ** 2);
   const safe = String(creature.id).toLowerCase().replace(/[^a-z0-9-]/g, "");
   const k = (size * CREATURE_GLYPH.art) / 100;
   const art = silhouette?.d
-    ? `<clipPath id="wv-ct-${safe}"><circle cx="0" cy="0" r="${r}"/></clipPath>`
+    ? `<clipPath id="wv-ct-${safe}"><polygon points="${points}"/></clipPath>`
       + `<g clip-path="url(#wv-ct-${safe})"><g transform="scale(${k.toFixed(4)}) translate(-50 -52)"><path d="${silhouette.d}" class="ov-creature-art"/></g></g>`
     : "";
   return `<g transform="translate(${x} ${y})"><g class="ov-s">`
     + `<g class="ov-creature${plain ? " is-plain" : ""}${jiggling ? " is-jiggling" : ""} ov-creature-${esc(String(creature.kind).toLowerCase().replace(/[^a-z0-9-]/g, ""))}" data-creature="${esc(creature.id)}">`
     + `<circle r="${plain ? CREATURE_GLYPH.plainHit : CREATURE_GLYPH.hit}" class="ov-creature-hit">${title ? `<title>${esc(title)}</title>` : ""}</circle>`
-    + `<circle cx="0" cy="0" r="${r}" class="ov-creature-disc"/>`
+    + `<polygon points="${points}" class="ov-creature-disc"/>`
     + art
-    + `<circle cx="0" cy="0" r="${r}" class="ov-creature-ring"/>`
-    + `<line x1="${-size * 0.22}" y1="${rim}" x2="${-size * 0.3}" y2="${rim + leg}" class="ov-creature-leg"/>`
-    + `<line x1="${size * 0.22}" y1="${rim}" x2="${size * 0.3}" y2="${rim + leg}" class="ov-creature-leg"/>`
+    + `<polygon points="${points}" class="ov-creature-ring"/>`
     + `</g></g></g>`;
+}
+
+/** A creature's AWARENESS RING (WLD-82, RULED by Darko 2026-10-19 17:09: "we can
+ *  use the same red color to denote kind of the awareness radius of the creature
+ *  … a similar like faint dotted line with expired conversations in the way those
+ *  are represented on the map"). A circle at its kind's ring_m, the ground it
+ *  hears in (the office's find row carries it, from the kind's own law), drawn in
+ *  painting pixels so it holds its true size as the map zooms. It wears the
+ *  map's one faint-ring style (.wv-faint-ring, the expired conversation's line)
+ *  in the creature's red. No ring_m, no ring. Pure.
+ *  INDOORS THE RING STOPS AT THE WALLS (WLD-25, 2026-10-21): `room`, the outline
+ *  of the room it hears inside (tools/portals.mjs § ringRoomOf), in painting
+ *  pixels, clips the circle to it under `clipId`. Outdoors there is none. */
+export function creatureRingSVG({ at, ringM, mPerPx, room = null, clipId = null } = {}) {
+  const x = Number(at?.x), y = Number(at?.y), r = Number(ringM) / Number(mPerPx);
+  if (![x, y].every(Number.isFinite) || !(r > 0) || !Number.isFinite(r)) return "";
+  const pts = Array.isArray(room) && room.length >= 3 && clipId
+    && room.every((p) => Number.isFinite(Number(p?.x)) && Number.isFinite(Number(p?.y)))
+    ? room.map((p) => `${+Number(p.x).toFixed(1)},${+Number(p.y).toFixed(1)}`).join(" ") : null;
+  const circle = `<circle cx="${+x.toFixed(1)}" cy="${+y.toFixed(1)}" r="${+r.toFixed(2)}" class="wv-faint-ring ov-creature-aware"`;
+  if (!pts) return `${circle}/>`;
+  const id = String(clipId).replace(/[^\w-]/g, "-");
+  return `<clipPath id="${id}"><polygon points="${pts}"/></clipPath>${circle} clip-path="url(#${id})"/>`;
 }
 
 // ── A MARK IS HIT BY WHAT WAS DRAWN FOR IT (Keemin, 2026-09-11: "make parcels
@@ -4678,6 +4819,9 @@ export function orderInnermostFirst(ids, byId) {
 // every pip in a pile jump the moment one of them appears, disappears, or is
 // filtered out. Hash-derived, a mark's offset is the same on every render, in
 // every clone, forever.
+//
+// ⚑ The map no longer fans (WLD-95, Darko 2026-10-20 22:19: every pin at its
+// anchor). These stay as the pure, tested helpers they are, unused by the draw.
 export const FAN_RADIUS_PX = 5;
 // Only once the map is zoomed in enough that a few pixels means anything. Below
 // this the pips genuinely overlap and separating them would be a lie about how
@@ -6293,6 +6437,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-hl-box.is-hover.t-constitution { fill:rgba(123,167,224,.13); }
 .wv-hl-box.is-hover.is-draft { fill:rgba(160,160,160,.12); }
 .ov-s.is-hovering > .ov-pip, .ov-s.is-hovering > .ov-pip-door, .ov-s.is-hovering > .ov-ic-in { opacity:0; }
+.ov-s.is-hovering > g > .ov-pip-badges { opacity:0; }
 .wv-hl-dot { stroke:#fff; stroke-width:1.5; vector-effect:non-scaling-stroke; }
 .wv-hl-dot.t-constitution { fill:var(--blue); }
 .wv-hl-dot.t-home { fill:var(--green); }
@@ -6509,8 +6654,10 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
    after a day. The aboard variant is the deck drawn as a room rather than the
    length of the water it crossed. A wash carries no text of its own: hovering
    raises the SAME name-box a mark raises, in this same pale voice. */
-.wv-convo { fill:rgba(183,198,212,.06); stroke:#7f93a6; stroke-width:1.5;
-  stroke-dasharray:3 4; vector-effect:non-scaling-stroke; }
+/* THE FAINT RING, one style (WLD-82): the expired conversation's dotted line,
+   worn by a creature's awareness ring too; each says its own colour */
+.wv-faint-ring, .wv-convo { stroke-width:1.5; stroke-dasharray:3 4; vector-effect:non-scaling-stroke; }
+.wv-convo { fill:rgba(183,198,212,.06); stroke:#7f93a6; }
 .wv-convo.is-live { fill:rgba(183,198,212,.12); stroke:#b7c6d4; stroke-width:2;
   stroke-dasharray:none; animation:wv-convo-breathe 3.2s ease-in-out infinite; }
 .wv-convo.is-aboard { stroke-dasharray:6 5; }
@@ -6614,11 +6761,11 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
    feet at street zoom; their answer to an act in a note like the walk's */
 .ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
 .ov-creature-art { fill:#4a2326; pointer-events:none; }
-/* THE CREATURE TOKEN (play fix 40): the walker's body in pastel red — the disc
-   where a portrait sits, the ring and the legs in a deeper red of the same hue */
+/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
+   portrait sits, the rim in a deeper red of the same hue, and no legs */
 .ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
+.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
 .ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
-.ov-creature-leg { stroke:#d8706a; stroke-width:2; stroke-linecap:round; vector-effect:non-scaling-stroke; pointer-events:none; }
 .wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
 .wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */
 .wv-choose-row.is-convo { border-left:3px solid #7f93a6; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
@@ -6912,6 +7059,8 @@ ${MARK_ICON_CSS}
 /* the map's icons (mark-icons.mjs): the pill a state rides in, and the glyph
    cut into a pip, in the page's own dark like the doorway it replaces */
 .ov-icons-bg { fill:rgba(13,20,38,.88); stroke:rgba(232,224,207,.28); stroke-width:.6; }
+.ov-badge-bg { fill:rgba(13,20,38,.92); stroke:rgba(232,224,207,.32); stroke-width:.6; }
+.ov-pip-badges .ov-ic { pointer-events:visiblePainted; }
 .ov-icons .ov-ic, .ov-ic-in .ov-ic { pointer-events:visiblePainted; }
 .ov-ic rect { pointer-events:all; }
 `;
@@ -7485,6 +7634,46 @@ export function withTownBodies(earshot = [], town = []) {
   }
   for (const r of near.values()) if (!seen.has(r.handle)) { seen.add(r.handle); out.push(r); }
   return out;
+}
+
+// ── A LANDING IS DRAWN WITH THE ROOM (WLD-63 row 68 (b), Darko 2026-10-16) ──
+//
+// Passing a door, the office sets you down and says where (`landed`, or an
+// exit's `set_down`). The page used to learn the room from the ledger poll and
+// the body from the walkers poll, 15 and 30 s apart, so for a while you stood
+// outside the room it showed. These three let one render draw both.
+
+/** The reader's body set down at a landing, in the walkers list the map draws. Pure. */
+export function placeLanded(rows = [], handle = null, landed = null) {
+  const x = Number(landed?.x), y = Number(landed?.y);
+  if (!handle || !Number.isFinite(x) || !Number.isFinite(y)) return rows;
+  let found = false;
+  const at = { x, y, moving: false, standing: true, remaining_m: 0 };
+  const out = rows.map((r) => (r?.handle === handle ? ((found = true), { ...r, ...at }) : r));
+  return found ? out : [...out, { handle, ...at }];
+}
+
+/** A landing the walkers read reports for this reader that this page has not drawn yet:
+ *  its instant, or null. Pure. */
+export function freshLanding(bodies = [], handle = null, seenIso = null) {
+  const me = (bodies ?? []).find((b) => b?.handle === handle);
+  const iso = me?.landed?.iso ?? null;
+  return iso && iso !== seenIso ? iso : null;
+}
+
+/** LEAVING A DUNGEON ASKS FIRST (row 72): the office's own words, then go or stay. Null
+ *  for any answer that is not asking. Pure. The head is the dungeon's name, since the
+ *  words below it already ask the question (WLD-5 A, Darko 2026-10-19 09:21: "Leave the
+ *  Spire from here? …"); `nameOf` is the page's own namer. */
+export function exitConfirmSheetHTML(answer = {}, markId = "", { nameOf = (id) => deslugMarkId(id) } = {}) {
+  if (answer?.awaiting?.effect !== "confirm") return null;
+  return `<div class="wv-cross-sheet is-terms wv-exit-confirm-sheet" data-for="${esc(markId)}">`
+    + `<div class="wv-cross-head">${esc(String(answer.dungeon ? nameOf(answer.dungeon) : "leaving"))}</div>`
+    + `<p class="wv-cross-body">${esc(String(answer.awaiting.because ?? ""))}</p>`
+    + `<div class="wv-cross-row">`
+    + `<button type="button" class="ctl wv-exit-confirm" data-exit-confirm="${esc(markId)}">go</button>`
+    + `<button type="button" class="ctl wv-exit-stay">stay</button>`
+    + `</div></div>`;
 }
 
 export function walkersFromPresent(present = {}, { self = null } = {}) {
@@ -8196,7 +8385,9 @@ export function mountViewer(appEl) {
     for (const m of marks ?? []) { const cls = classToken(instanceClassOf(m)); if (cls && !seen.has(cls)) { seen.add(cls); askLineage(cls); } }
     return thingClasses();
   }
-  function iconsOf(m, inside = null) {
+  // `map`: the map's ✦ is your household's stake (WLD-95); the column and the
+  // nameplate keep the mark's general ✦ figure
+  function iconsOf(m, inside = null, { map = false } = {}) {
     const full = byId.get(m?.id) ?? m;
     if (!full) return [];
     const occupants = inside ?? occupantsOf(liveOccupancy());
@@ -8205,6 +8396,7 @@ export function mountViewer(appEl) {
     return markIcons(full, {
       cls, creatureClasses: creatureClasses(), thingClasses: thingClasses(),
       yours: isOwnMark(full), weight: effectiveWeight(full), inside: (occupants.get(full.id) ?? []).length,
+      ...(map ? { ownStake: householdStakeOn(full.id, { signedIn: !!pmKey(), portfolio: state.portfolio }) } : {}),
     });
   }
   // ───────── the telling view ─────────
@@ -8984,6 +9176,9 @@ export function mountViewer(appEl) {
       // CROSSED. The ledger is the answer, so go and read it rather than
       // assuming — and then the interior takes over on its own, off insideOf,
       // because that path already exists and is the one the record drives.
+      // A passage says where it set you down (row 68 (b)): the body goes there
+      // in the same render that mounts the room, never a poll later.
+      if (answer.landed?.recorded) { walkState.walkers = placeLanded(walkState.walkers, state.handle, answer.landed); walkState.selfLive = null; }
       await loadEnterExitLedger();
       renderCurrent();
     } catch (err) {
@@ -9032,14 +9227,27 @@ export function mountViewer(appEl) {
     }
   }
 
-  async function stepOutside(markId, button) {
+  async function stepOutside(markId, button, { confirm = false } = {}) {
     const room = markId && byId.get(markId);
     if (!room) return;
     const label = button?.textContent;
     if (button) { button.disabled = true; button.textContent = "stepping outside…"; }
     try {
-      const response = await apexAct("exit", { mark: markId });
+      const response = await apexAct("exit", { mark: markId, ...(confirm ? { confirm: true } : {}) });
+      const answer = response?.body ?? {};
       if (response?.error) throw new Error(response.defect ?? response.error);
+      if (answer.error === "bounce") throw new Error(answer.defect ?? answer.error);
+      // LEAVING A DUNGEON ASKS FIRST (WLD-5 21:13; row 72): the first answer writes
+      // nothing and says what will happen. It is shown, and "go" sends the word.
+      const ask = exitConfirmSheetHTML(answer, markId, { nameOf: (id) => markName(byId.get(id) ?? { id }).name });
+      if (ask) {
+        const row = button?.closest(".wv-int-exit");
+        row?.querySelector(".wv-exit-confirm-sheet")?.remove();
+        row?.insertAdjacentHTML("beforeend", ask);
+        if (button) { button.disabled = false; button.textContent = label ?? "↤ step outside"; }
+        return;
+      }
+      if (answer.set_down?.recorded) { walkState.walkers = placeLanded(walkState.walkers, state.handle, answer.set_down); walkState.selfLive = null; }
       // the ledger is the answer, so go and read it rather than assuming the act
       // landed the way this page expected
       await loadEnterExitLedger();
@@ -10463,18 +10671,17 @@ export function mountViewer(appEl) {
     });
     const toldHere = () => toldPaintingMarks(lastRadial, allMarks());
     const paintingMarkForEvent = (event) => markAt(event, toldHere());
-    // walkers, in the same screen-space shape the mark snap already eats
+    // walkers, in the same screen-space shape the mark snap already eats, each
+    // where the draw puts it (WLD-94: liveBody, never the poll's row)
     function screenWalkerCandidates() {
       const matrix = svg.getScreenCTM();
       if (!matrix) return [];
-      return (walkState.walkers ?? []).flatMap((w) => {
-        if (!w?.handle || ![w.x, w.y].every(Number.isFinite)) return [];
+      return walkerCandidatesAt(walkState.walkers, { bodyOf: liveBody, toScreen: (w) => {
         const point = svg.createSVGPoint();
         point.x = originPx.x + w.x / mPerPx;
         point.y = originPx.y + w.y / mPerPx;
-        const screen = point.matrixTransform(matrix);
-        return [{ id: walkerHoverId(w.handle), x: screen.x, y: screen.y }];
-      });
+        return point.matrixTransform(matrix);
+      } });
     }
     // the live creatures, in the same shape: a creature is pointed at like a face (play fix 35)
     function screenCreatureCandidates() {
@@ -10990,6 +11197,7 @@ export function mountViewer(appEl) {
     // page draws before the paint stands alone, with no feather and no creatures.
     // The bell still arms once a session, as the roll-in would have armed it.
     if (lite.on) {
+      mapCtx.mistsLayer.innerHTML = mistsWallSVG(m, { ...mapCtx, painted: true });   // no paint, so the wall stands on the true face (WLD-81)
       mapCtx?.svg?.querySelector(".wv-sheet-feather")?.remove(); unmaskSheetWashes();
       if (state.crossing <= liveCrossing() && sessionOnce("pm_world_mists_intro")) mistsBellArm(m);
       mistsBellButton(m);
@@ -11021,6 +11229,8 @@ export function mountViewer(appEl) {
     g.className = "wv-mists-paint";
     g.innerHTML = mistsPaintHTML(baked, { originPx, mPerPx, layers: MISTS_PAINT.layers, creatures });
     mapCtx.mistsCam.replaceChildren(g);
+    // the paint is on: the opaque wall follows its ragged face (WLD-81)
+    mapCtx.mistsLayer.innerHTML = mistsWallSVG(drawn, { ...mapCtx, painted: true, ragged: true });
     // the roll-in and the bell belong to the live crossing: dialling ahead shows
     // the paint (as it shows the wall) but neither spends the session's roll-in
     // nor rings the bell
@@ -11052,7 +11262,7 @@ export function mountViewer(appEl) {
         if (timed((n) => rasterJob.next(n), per, (n) => { per = n; })) { setTimeout(step, 0); return; }
         rasters.set(rk, rasterJob.raster); rasterJob = null;
       }
-      baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, keepRaster: rasters.get(rk), canvas: document.createElement("canvas") });
+      baker = baker ?? mistsBaker(m, p.li, p.box, { pxM: p.pxM, skip: p.skip ?? null, keepRaster: rasters.get(rk), canvas: document.createElement("canvas") });
       // a slice of rows, sized to stay near 8 ms, so a phone keeps its frames
       const t0 = performance.now();
       const more = timed((n) => baker.next(n), rows, (n) => { rows = n; });
@@ -11443,7 +11653,9 @@ export function mountViewer(appEl) {
     // would be the same word, later and uglier.
     const named = tier !== "far" && !state.paintingOnly;
     const nameOf = (m) => (named ? markIdentity(m) : null);
-    const fanned = mapCtx?.zoomK >= FAN_MIN_ZOOM ? coLocatedMarkIds(drawn) : new Set();
+    // NO FAN (WLD-95, Darko 2026-10-20 22:19): every pin is drawn at its own
+    // anchor. Marks a metre apart sit together, as they stand; the chooser
+    // (row 55) is how the reader picks among them.
     // ── THE ICONS, AT STREET ZOOM ONLY (Darko, playground sitting 2026-10-15) ──
     //
     // "a small icon per mark saying WHAT it is, plus tiny STATE badges. No
@@ -11499,7 +11711,7 @@ export function mountViewer(appEl) {
       return pointInRect(Number(mark.at.x), Number(mark.at.y), r);
     });
     const parcelPill = (parcel, at, fan) => {
-      const states = iconsOf(parcel, insideNow).filter((icon) => icon.kind === "state");
+      const states = iconsOf(parcel, insideNow, { map: true }).filter((icon) => icon.kind === "state");
       return placePill(states, at, (Number(fan?.dx) || 0) + 18, (Number(fan?.dy) || 0) - 37, isOwnMark(parcel));
     };
     for (const m of drawn) {
@@ -11516,26 +11728,23 @@ export function mountViewer(appEl) {
       // divided it by k.
       glyphIds.add(m.id);
       if (full.kind === "parcel") {
-        s += homeCard(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null, nameOf(m), tier);
-        if (iconsHere) pills += parcelPill(full, p, fanned.has(m.id) ? fanOffsetPx(m.id) : null);
+        s += homeCard(full, p, null, nameOf(m), tier);
+        if (iconsHere) pills += parcelPill(full, p, null);
         continue;
       }
-      const fan = fanned.has(m.id) ? fanOffsetPx(m.id) : null;
-      const icons = iconsHere && !underCard(full) ? iconsOf(full, insideNow) : [];
+      const icons = iconsHere && !underCard(full) ? iconsOf(full, insideNow, { map: true }) : [];
       const what = icons[0]?.kind === "what" ? icons[0] : null;
       // the dot stands down for a picture only where it carries no icon (fix 48)
       const isPictured = pictured.has(m.id) && !what;
       s += overlayPipSVG({
         at: p, id: m.id, classes: markClasses(m) + (isPictured ? " ov-pip-pictured" : ""),
-        fan,
         // the OS tooltip stands down in painting-only for the same reason the SVG
         // label does: the bubble is already saying this word, sooner and better
         title: nameOf(m),
         inner: what ? iconSVG(what, { x: -PIP_GLYPH / 2, y: -PIP_GLYPH / 2, size: PIP_GLYPH, ink: "var(--night)" }) : "",
+        // its states on its own pip's rim (WLD-95): never a pill beside it
+        badges: what ? icons.slice(1) : icons,
       });
-      // its states beside its pip, as every mark's are: never a corner pill of its own
-      if (icons.length > (what ? 1 : 0))
-        pills += placePill(what ? icons.slice(1) : icons, p, (Number(fan?.dx) || 0) + OVERLAY_PIP_R + 2, (Number(fan?.dy) || 0) - 6.5);
     }
     // THE TOWN'S HOUSES ARE ALWAYS ON THE MAP. The atlas drew every home on its
     // sheet, whoever was looking; the field-of-view rule above is right for the
@@ -11708,7 +11917,9 @@ export function mountViewer(appEl) {
   // the painting, instead of the OS tooltip a <title> used to raise.
   function renderWalkerHighlight(handle) {
     if (!mapCtx) return "";
-    const w = (walkState.walkers ?? []).find((x) => x?.handle === handle);
+    // the disc stands on the body as drawn (WLD-94), and follows it: writeWalkLayer repaints it
+    const row = (walkState.walkers ?? []).find((x) => x?.handle === handle);
+    const w = row ? liveBody(row) : null;
     if (!w || ![w.x, w.y].every(Number.isFinite)) return "";
     const k = markerScale(mapCtx.zoomK);
     const p = { x: mapCtx.originPx.x + w.x / mapCtx.mPerPx, y: mapCtx.originPx.y + w.y / mapCtx.mPerPx };
@@ -11776,6 +11987,8 @@ export function mountViewer(appEl) {
   let walkState = {
     at: null,
     walkers: [],
+    // the instant of the last landing of the reader this page has drawn (row 68 (b))
+    landedIso: null,
     // the reader's own body while it walks, from /world/walkers (null when standing)
     selfLive: null,
     timer: null,
@@ -12517,6 +12730,9 @@ export function mountViewer(appEl) {
       walkDraws.layerSkips += 1;
     }
     walkState.lastDrawn = drawnWalkers;
+    // a lit body's disc moves with it (WLD-94); an unchanged disc is not rewritten (writeHighlight)
+    const lit = markInteraction.getState();
+    if (walkerHandleFromHoverId(lit.selectedId) || walkerHandleFromHoverId(lit.hoveredId)) renderMarkHighlight();
     walkReadout(drawnWalkers);
     syncHouseLights();
     syncActorPosition();
@@ -12926,7 +13142,14 @@ export function mountViewer(appEl) {
               }
               // the town's bodies, earshot's rows winning for their handles; a
               // town door that does not answer leaves the earshot answer alone
-              takeWalkers(withTownBodies(rows, (await town) ?? []));
+              const bodies = (await town) ?? [];
+              // A LANDING THIS PAGE DID NOT MAKE (the arrival tick's passage, another
+              // tab): the room is read at once, so the scene and the body change in
+              // ONE render rather than on two polls 15 s apart (row 68 (b))
+              const landedIso = freshLanding(bodies, state.handle, walkState.landedIso ?? null);
+              if (landedIso) { walkState.landedIso = landedIso; await loadEnterExitLedger(); }
+              takeWalkers(withTownBodies(rows, bodies));
+              if (landedIso) renderCurrent();
             }
           }
         } catch { /* a poll miss is silent — the last good reading stands */ }
@@ -14210,6 +14433,32 @@ export function mountViewer(appEl) {
   /** The close look in hand for a mark, or null while it is being asked. */
   function markCloseLook(id) { return loadCloseLook("mark", id)?.read ?? null; }
   function residentCloseLook(handle) { return loadCloseLook("investigate", handle)?.read ?? null; }
+  // THE RESIDENT'S CARD (WLD-83): GET /residents/{handle}, keyless and public,
+  // asked at most every CLOSE_LOOK_MS while their column is open. Its picture is
+  // the one the office holds now, so a picture changed since the site last built
+  // `residents-meta.json` reaches the map's face the moment the column is opened.
+  const residentCards = new Map();   // handle -> { at, card, pending }
+  function residentCard(handle) {
+    const held = residentCards.get(handle);
+    if (held && (held.pending || Date.now() - held.at < CLOSE_LOOK_MS)) return held.card ?? null;
+    residentCards.set(handle, { ...(held ?? {}), pending: true, at: held?.at ?? 0 });
+    fetch(officeUrl(`/residents/${encodeURIComponent(handle)}`), { headers: { accept: "application/json" }, credentials: "same-origin" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((card) => {
+        residentCards.set(handle, { at: Date.now(), card: card && !card.error ? card : null });
+        const live = safeAvatarUrl(card?.profile?.avatar_url);
+        const meta = residentsMeta.get(handle) ?? null;
+        if (live && meta?.avatar !== live) {
+          residentsMeta.set(handle, { ...(meta ?? {}), avatar: live });
+          // the faces are the walker layer's: redraw it, and the overlay beside it
+          drawWalkers();
+          if (lastRadial && mapCtx) drawOverlay(lastRadial);
+        }
+      })
+      .catch(() => residentCards.set(handle, { at: Date.now(), card: null }))
+      .finally(() => syncMarkInteractionViews());
+    return held?.card ?? null;
+  }
   // what a close look says a kind IS: only a yes is kept (holdings.mjs § thingKindLedger)
   function noteThingKind(mark, focus) { thingKinds.fromLook(classToken(instanceClassOf(mark)), focus); }
   // A KIND THE PAGE HOLDS NO CLASS MARK FOR is asked of the class layer once, at
@@ -14297,20 +14546,25 @@ export function mountViewer(appEl) {
     const moving = w.moving ?? (!w.arrived && !w.standing);
     const things = lines?.things ?? [];
     const region = moving ? walkingLabel(w.remaining_m, w.eta_crossings) : walkerPlace(w);
+    // the whole profile (WLD-83): the office's card, read live like the close look
+    const card = residentCard(handle);
+    const profile = residentProfileView(card, inv, face);
     return {
       // the place line is in the key: it changes when the page learns a kind is a thing (not ground)
-      key: ["resident", handle, worldEpoch, inv ? "read" : "-", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
+      key: ["resident", handle, worldEpoch, inv ? "read" : "-", card ? "card" : "-", JSON.stringify(profile.facts), profile.picture ?? "", profile.pronouns ?? "", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
       handle, residentLink: false,
       residentHref: residentHref(handle),
       kicker: face.household || "a resident",
       title: face.name || handle,
+      pronouns: profile.pronouns,
       region,
-      leadImage: null,
-      door: { description: "" },
+      leadImage: profile.picture,
+      // their bio, in their own words, is the column's body
+      door: { description: profile.bio ?? "" },
       byline: handle === state.handle && onResidentPath() ? "you" : handle,
       // the whole things are the relation below, each a way into its own column
-      facts: lines ? holdingFacts({ ...lines, things: [] }, "carrying")
-        : closeLooks.get(`${asWho()}|investigate|${handle}`)?.at ? [] : [{ label: "carrying", value: "reading their hands…" }],
+      facts: [...profile.facts, ...(lines ? holdingFacts({ ...lines, things: [] }, "carrying")
+        : closeLooks.get(`${asWho()}|investigate|${handle}`)?.at ? [] : [{ label: "carrying", value: "reading their hands…" }])],
       relations: things.length ? [{ label: "whole things", items: things.map((t) => ({ id: t, name: lines.names?.get(t) ?? markIdentity(byId.get(t) ?? { id: t }) })) }] : [],
     };
   }
@@ -14368,16 +14622,20 @@ export function mountViewer(appEl) {
     // doing any kind of no clumping rule … The tokens should stay in their
     // correct geometric positions"). Tokens that share a spot are told apart by
     // the chooser a click on them opens, never by moving them.
-    let out = "";
+    let out = "", rings = "";
     for (const c of liveCreatures.values()) {
       if (sceneRoomId && !(box && pointInRect(c.x, c.y, box))) continue;
       if (m && mistsHere({ x: c.x, y: c.y }, m).inWall) continue;
+      // its awareness ring (WLD-82), under every token; indoors it stops at the room's walls
+      const ringRoom = c.ring_m ? ringRoomOutline(ringRoomOf({ x: c.x, y: c.y }, allMarks())) : null;
+      rings += creatureRingSVG({ at: px({ x: c.x, y: c.y }), ringM: c.ring_m, mPerPx: mapCtx?.mPerPx,
+        room: ringRoom ? ringRoom.map((p) => px(p)) : null, clipId: `wv-ring-${c.id}` });
       // far: the plain token, as a resident is the blank walker there (fix 49)
       const plain = tier === "far";
       out += creatureGlyphSVG({ creature: c, at: px({ x: c.x, y: c.y }), silhouette: plain ? null : creatureSilhouette(c.kind),
         title: state.paintingOnly ? null : c.name, plain, jiggling: (creatureJiggleUntil.get(c.id) ?? 0) > Date.now() });
     }
-    return out;
+    return rings + out;
   }
   function creatureNameplateHTML(id) {
     const c = liveCreatures.get(id);
@@ -14567,7 +14825,7 @@ export function mountViewer(appEl) {
     const full = byId.get(id);
     if (!full) return "";
     const identity = markName(full);
-    const icons = iconsOf(full);
+    const icons = iconsOf(full, null, { map: true });   // the pip opened: its ✦ is the pip's (WLD-95)
     const what = icons[0]?.kind === "what" ? icons[0] : null;
     const states = what ? icons.slice(1) : icons;
     // the cap is the pip: its icon only where the pip itself wears one
@@ -15906,6 +16164,10 @@ export function mountViewer(appEl) {
     if (cancelBtn) { e.stopPropagation(); cancelBtn.closest(".wv-cross-sheet")?.remove(); return; }
     const exitBtn = e.target.closest(".wv-int-exit-btn");
     if (exitBtn) { stepOutside(exitBtn.dataset.mark, exitBtn); return; }
+    const exitGo = e.target.closest("[data-exit-confirm]");
+    if (exitGo) { e.stopPropagation(); stepOutside(exitGo.dataset.exitConfirm, exitGo, { confirm: true }); return; }
+    const exitStay = e.target.closest(".wv-exit-stay");
+    if (exitStay) { e.stopPropagation(); exitStay.closest(".wv-exit-confirm-sheet")?.remove(); return; }
     if (e.target.closest(".wv-dev-toggle")) { const dev = $(root, ".wv-dev"); dev.hidden = !dev.hidden; if (!dev.dataset.built) { buildDevPane(); dev.dataset.built = "1"; } syncDevReadouts(); return; }
     if (e.target.closest(".wv-dev-reset")) {
       state.dials = { ...DIALS };

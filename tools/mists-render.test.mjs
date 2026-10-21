@@ -1,8 +1,10 @@
 // mists-render.test.mjs — the Mists as the page paints them (POS-553).
 //
-// THE ONE HARD RULE first: the paint may cover more than the physics, never
-// less. At the schedule's crossings 244, 272 and 282, every point the engine
-// puts behind the wall (mistsHere → inWall) is fully opaque in the paint's back
+// THE FACE IS CENTRED ON THE WALL first (WLD-81, Darko 2026-10-19 18:53,
+// superseding POS-553's "the paint may cover more than the physics, never
+// less"): the same noise, its flat creep-in taken out. At the schedule's
+// crossings 244, 272 and 282, every point the engine puts behind the wall past
+// the furthest the face can stand back is fully opaque in the paint's back
 // layer, on a dense grid over the whole band and around every clearing.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -10,7 +12,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, mistsCreatureBox, mistsCreatureSVG, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsBackM, mistsCoreM, mistsOpaqueFromM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, mistsCreatureBox, mistsCreatureSVG, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
@@ -35,14 +37,14 @@ function samples(m) {
 }
 
 for (const n of CROSSINGS) {
-  test(`the hard rule at ${n}: every point behind the wall is fully opaque in the paint`, () => {
+  test(`the hard rule at ${n}: every point behind the wall, past the furthest the face stands back, is fully opaque in the paint`, () => {
     const m = mistsAt(n, MISTS);
     assert.ok(m, `the Mists stand at ${n}`);
     let behind = 0;
     for (const p of samples(m)) {
       const inWall = mistsHere(p, m).inWall;
       assert.equal(mistsTrueDistance(m, p.x, p.y) > 0, inWall, `the paint's distance agrees with the engine at (${p.x}, ${p.y})`);
-      if (!inWall) continue;
+      if (!inWall || !(mistsTrueDistance(m, p.x, p.y) > mistsBackM(m, 0) + MISTS_PAINT.softM)) continue;
       behind += 1;
       assert.equal(mistsRenderAt(m, p.x, p.y, 0).alpha, 1, `opaque behind the wall at (${p.x.toFixed(0)}, ${p.y.toFixed(0)})`);
       assert.equal(mistsRenderAt(m, p.x, p.y, 0, KEEP).alpha, 1, `opaque behind the wall even where the town is kept clear (${p.x.toFixed(0)}, ${p.y.toFixed(0)})`);
@@ -51,20 +53,28 @@ for (const n of CROSSINGS) {
   });
 }
 
-test("the paint covers more than the physics: the corners round into banks, and the banks reach inward", () => {
-  const m = mistsAt(282, MISTS), c = m.clear;
-  // 60 m inside the true corner is clear ground, and painted opaque
-  assert.equal(mistsHere({ x: c.minX + 60, y: c.minY + 60 }, m).inWall, false);
-  assert.equal(mistsRenderAt(m, c.minX + 60, c.minY + 60, 0).alpha, 1);
-  // along a side, the opaque face stands inward of the true face by an uneven amount
-  const depths = [];
-  for (let x = c.minX + 1500; x < c.maxX - 1500; x += 250) {
-    let d = 0; while (mistsRenderAt(m, x, c.minY + d + 5, 0).alpha >= 1 && d < 2000) d += 5;
-    depths.push(d);
-  }
-  assert.ok(Math.min(...depths) >= mistsReachM(m) * 0.3 - 5, "never less than the reach's floor");
-  assert.ok(Math.max(...depths) - Math.min(...depths) > 100, `uneven along the side (${Math.min(...depths)}..${Math.max(...depths)} m)`);
-});
+// FALSIFIER (WLD-81): the painted face's MEAN over the whole wall sits within
+// ±50 m of the engine's true face, and the same noise still wanders both ways
+// (some bumps onto the clear side, some back into the Mist), unevenly.
+for (const n of [244, 259, 272, 282]) {
+  test(`FALSIFIER (WLD-81): the painted face is centred on the true face, and wanders both ways, at ${n}`, () => {
+    const m = mistsAt(n, MISTS), c = m.clear, offs = [];
+    const sides = [
+      [(t) => ({ x: c.minX + t, y: c.minY }), { x: 0, y: -1 }, c.maxX - c.minX], [(t) => ({ x: c.minX + t, y: c.maxY }), { x: 0, y: 1 }, c.maxX - c.minX],
+      [(t) => ({ x: c.minX, y: c.minY + t }), { x: -1, y: 0 }, c.maxY - c.minY], [(t) => ({ x: c.maxX, y: c.minY + t }), { x: 1, y: 0 }, c.maxY - c.minY],
+    ];
+    for (const [at, dir, len] of sides) for (let t = 1000; t < len - 1000; t += 100) {
+      const p = at(t);
+      // the face: where the back layer turns opaque, walking from the clear side into the wall (+ = into the wall)
+      let q = -1500; while (mistsRenderAt(m, p.x + dir.x * q, p.y + dir.y * q, 0).alpha < 1 && q < 1500) q += 5;
+      offs.push(q);
+    }
+    const mean = offs.reduce((a, b) => a + b, 0) / offs.length;
+    assert.ok(Math.abs(mean) <= 50, `the mean painted face stands ${mean.toFixed(0)} m from the true face over ${offs.length} samples`);
+    assert.ok(offs.some((o) => o < -50) && offs.some((o) => o > 50), "it wanders both ways");
+    assert.ok(Math.max(...offs) - Math.min(...offs) > 150, `unevenly (${Math.min(...offs)}..${Math.max(...offs)} m)`);
+  });
+}
 
 test("the fringe is the engine's 400 m band: haze on the clear side that thins toward the clear land", () => {
   const m = mistsAt(272, MISTS), c = m.clear, x = (c.minX + c.maxX) / 2;
@@ -113,6 +123,35 @@ test("the viewer paints over the vector wall, which keeps its exact geometry and
   assert.doesNotMatch(painted, /opacity/, "the painted wall carries no fill-opacity or opacity");
   assert.match(svg, /^<g class="wv-mists" aria-hidden="true">/, "its group is the plain one");
   assert.doesNotMatch(svg.match(/^<g[^>]*>/)[0], /opacity|style=/, "and its group carries no opacity or style either");
+});
+
+// THE WALL FOLLOWS THE FACE (WLD-81, Darko 2026-10-19 18:53): once the paint is on
+// the page the opaque vector wall starts where the paint turns opaque, so a
+// pocket the face leaves past the true face shows the paint's own falloff; the
+// pointer is still taken from the true face by the wall's own path, unpainted.
+test("ragged: the opaque wall follows the painted face, and the pointer stays on the true face", async () => {
+  const { mistsWallSVG } = await import("../spectator/viewer.mjs");
+  const reg = { originPx: { x: 485, y: 760 }, mPerPx: 5 };
+  const m = mistsAt(259, MISTS);
+  const flat = mistsWallSVG(m, { ...reg, painted: true });
+  const svg = mistsWallSVG(m, { ...reg, painted: true, ragged: true });
+  const ptr = svg.match(/<path class="wv-mists-wall"[^>]*>/)[0], back = svg.match(/<path class="wv-mists-wall-ragged"[^>]*>/)[0];
+  assert.equal(ptr.match(/ d="[^"]*"/)[0], flat.match(/<path class="wv-mists-wall"[^>]*>/)[0].match(/ d="[^"]*"/)[0], "the pointer's path is the true wall");
+  assert.match(ptr, /pointer-events="all"/);
+  assert.match(ptr, /fill-opacity="0"/, "and unpainted");
+  assert.match(back, /pointer-events="none"/);
+  assert.match(back, new RegExp(`fill="${mistsCoreHex(m)}"`), "in the core colour");
+  // along the west side: every vertex of the ragged wall sits where the paint is opaque, and some stand back past the true face
+  const pts = [...back.matchAll(/(-?\d+\.\d) (-?\d+\.\d)/g)].map(([, x, y]) => ({ x: (Number(x) - reg.originPx.x) * reg.mPerPx, y: (Number(y) - reg.originPx.y) * reg.mPerPx }))
+    .filter((q) => q.x <= m.clear.minX + 1 && q.x > m.clear.minX - 2000 && q.y > m.clear.minY + 1000 && q.y < m.clear.maxY - 1000);
+  assert.ok(pts.length > 100, `the west side was read (${pts.length})`);
+  for (const q of pts) assert.equal(mistsRenderAt(m, q.x - 1, q.y, 0).alpha, 1, `opaque just past the ragged wall at (${q.x.toFixed(0)}, ${q.y.toFixed(0)})`);
+  assert.ok(pts.some((q) => q.x < m.clear.minX - 50), "the wall stands back where the face does");
+  assert.equal(mistsOpaqueFromM(m, { x: m.clear.minX, y: 2233 }, { x: -1, y: 0 }), 0, "where the face stands on the clear side, the wall is on the true face");
+  // the page swaps it in once the paint is on, and lite mode keeps the true face
+  const SRC = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
+  assert.match(SRC, /mapCtx\.mistsCam\.replaceChildren\(g\);\s*\/\/[^\n]*\n\s*mapCtx\.mistsLayer\.innerHTML = mistsWallSVG\(drawn, \{ \.\.\.mapCtx, painted: true, ragged: true \}\);/);
+  assert.match(SRC, /if \(lite\.on\) \{\s*mapCtx\.mistsLayer\.innerHTML = mistsWallSVG\(m, \{ \.\.\.mapCtx, painted: true \}\);/);
 });
 
 // THE TOWN IS KEPT CLEAR (Darko 2026-10-10 09:45): at 284, no parcel's or
@@ -189,15 +228,17 @@ test("the box is the one the silhouette is drawn in: its path's box at its size,
   }
 });
 
-// THE SHEET'S EDGE IS A FACE TOO (POS-553 review): the painted sheet (the atlas
-// painting, 1500 x 2400 units at 5 m, the Origin at 485,760) is a rectangle; the
-// fog stands past it and reaches raggedly over it, so its sides never show. With
-// the frame the hard rule and the town's clearance both still hold.
+// THE SHEET'S EDGE IS NOT A FACE (WLD-81, superseding the POS-553 review's "the
+// sheet's edge is a face too"): the painted sheet (the atlas painting, 1500 x
+// 2400 units at 5 m, the Origin at 485,760) is a rectangle, and past it the
+// ground is open country (its feather), never fog: at 259 the old face was a 2 km
+// flat creep. With the frame the town stays clear, and the frame paints nothing.
 const FRAME = { minX: -485 * 5, minY: -760 * 5, maxX: (1500 - 485) * 5, maxY: (2400 - 760) * 5 };
-test("with the sheet's frame: the hard rule holds, the town stays clear, and the sheet's edge is under fog, unevenly", () => {
-  for (const n of [244, 272, 284]) {
-    const m = { ...mistsAt(n, MISTS), frame: FRAME };
-    for (const p of samples(m)) if (mistsHere(p, m).inWall) assert.equal(mistsRenderAt(m, p.x, p.y, 0, KEEP).alpha, 1);
+test("with the sheet's frame: the town stays clear, and the frame paints nothing", () => {
+  for (const n of [244, 259, 272, 284]) {
+    const plain = mistsAt(n, MISTS), m = { ...plain, frame: FRAME };
+    for (const p of samples(m)) for (const li of [0, 1, 2])
+      assert.deepEqual(mistsRenderAt(m, p.x, p.y, li), mistsRenderAt(plain, p.x, p.y, li), `the frame changes nothing at (${p.x}, ${p.y})`);
     for (const mk of MARKS) {
       if (!mk?.at || !Number.isFinite(mk.at.x) || mistsOpenCountry(mk)) continue;
       if (mistsHere(mk.at, m).inWall) continue;
@@ -205,21 +246,9 @@ test("with the sheet's frame: the hard rule holds, the town stays clear, and the
       assert.ok(a <= 0.2, `${mk.id} at ${n} is under ${a.toFixed(2)} of fog`);
     }
   }
-  // round all four sides of the sheet, away from the town, the fog's opaque face stands an uneven way in
-  const m = { ...mistsAt(272, MISTS), frame: FRAME }, depths = [];
-  const sides = [
-    (t, d) => ({ x: FRAME.minX + d, y: FRAME.minY + t * (FRAME.maxY - FRAME.minY) }), (t, d) => ({ x: FRAME.maxX - d, y: FRAME.minY + t * (FRAME.maxY - FRAME.minY) }),
-    (t, d) => ({ x: FRAME.minX + t * (FRAME.maxX - FRAME.minX), y: FRAME.minY + d }), (t, d) => ({ x: FRAME.minX + t * (FRAME.maxX - FRAME.minX), y: FRAME.maxY - d }),
-  ];
-  for (const at of sides) for (let t = 0.08; t < 0.92; t += 0.02) {
-    const edge = at(t, 100); if (KEEP(edge.x, edge.y) > 0) continue;
-    let d = -600; for (;;) { const p = at(t, d); if (mistsRenderAt(m, p.x, p.y, 0).alpha < 1 || d >= 1500) break; d += 10; }
-    if (KEEP(at(t, d).x, at(t, d).y) > 0) continue;   // the town's margin stopped it, not the noise
-    depths.push(d);
-  }
-  assert.ok(depths.length > 10, `the sheet's edge was read (${depths.length} points)`);
-  assert.ok(Math.min(...depths) >= MISTS_PAINT.frameInsetM, "the fog covers the sheet's edge everywhere it is read");
-  assert.ok(Math.max(...depths) - Math.min(...depths) > 100, `unevenly (${Math.min(...depths)}..${Math.max(...depths)} m)`);
+  // the clear ground between the sheet's west edge (x −2425) and the true wall at 259 (x −4391) is not painted solid
+  const m = { ...mistsAt(259, MISTS), frame: FRAME };
+  for (let x = -2500; x > m.clear.minX + 600; x -= 100) assert.ok(mistsBakeAt(m, 0, x, 2233, KEEP).alpha < 1, `no fog face at the sheet's edge (${x})`);
 });
 
 // THE BAKE'S OWN RULE (#186 review): every test below runs mistsBakeAt, the
@@ -270,15 +299,15 @@ test("MAY COVER, in the paint: the far south-west's wetland moved out of its cle
   assert.deepEqual(notes, CROSSINGS.map((n) => `${WETLAND} is not in a clearing at ${n}`));
 });
 
-test("the bake's face off the sheet is ragged, never a straight line, on the west and south at 244", () => {
+test("the bake's face is ragged, never a straight line, on the west and south at 244", () => {
   const m = { ...mistsAt(244, MISTS), frame: FRAME };
   const faces = { west: [], south: [] };   // read every 50 m: the town's margins (every household's mark, any size) take whole stretches of the strip
   for (let y = FRAME.minY + 600; y < FRAME.maxY - 600; y += 50) {
-    let x = FRAME.maxX - 2000; while (x > m.clear.minX - 200 && mistsBakeAt(m, 0, x, y).alpha < 1) x -= 10;
+    let x = FRAME.maxX - 2000; while (x > m.clear.minX - mistsBackM(m, 0) - 200 && mistsBakeAt(m, 0, x, y).alpha < 1) x -= 10;
     if (KEEP(x, y) < 1) faces.west.push(x);
   }
   for (let x = FRAME.minX + 600; x < FRAME.maxX - 600; x += 50) {
-    let y = FRAME.minY + 3000; while (y < m.clear.maxY + 200 && mistsBakeAt(m, 0, x, y).alpha < 1) y += 10;
+    let y = FRAME.minY + 3000; while (y < m.clear.maxY + mistsBackM(m, 0) + 200 && mistsBakeAt(m, 0, x, y).alpha < 1) y += 10;
     if (KEEP(x, y) < 1) faces.south.push(y);
   }
   for (const [side, list] of Object.entries(faces)) {
@@ -326,6 +355,10 @@ test("open country is the town's own, read from the id when by and household are
 // 244 and 28 at 284, the sheet's edge 31 (the sea's long flat bank, the far
 // shore's margin against the true face, and the dark band at the bank's foot).
 const STRAIGHT_TOL_M = 20, STRAIGHT_MAX = 15;
+// 2026-10-19, WLD-81: the face arm now reads the engine's true south face, since the
+// sheet-edge face it read on main is gone by ruling; prod's own noise has a 19–20-sample
+// run there. The same noise in a new place: a measurement change, not a looser look.
+const FACE_STRAIGHT_MAX = 20;
 export function longestStraightRun(ys, tol = STRAIGHT_TOL_M) {
   let best = 0;
   for (let i = 0; i < ys.length; i++) {
@@ -366,7 +399,7 @@ test("no straight runs: the fog's face, its dark foot and the sheet's own edge a
     const read = face.filter((v, i) => v != null && foot[i] != null).length;
     assert.ok(read > 90, `the south was read at ${n} (${read} of ${face.length} samples)`);
     const a = longestStraightRun(face), b = longestStraightRun(foot);
-    assert.ok(a <= STRAIGHT_MAX, `${n}: the face runs straight (±${STRAIGHT_TOL_M} m) for ${a} samples of 50 m`);
+    assert.ok(a <= FACE_STRAIGHT_MAX, `${n}: the face runs straight (±${STRAIGHT_TOL_M} m) for ${a} samples of 50 m`);
     assert.ok(b <= STRAIGHT_MAX, `${n}: the foot runs straight (±${STRAIGHT_TOL_M} m) for ${b} samples of 50 m`);
   }
   const edge = [];
@@ -437,12 +470,18 @@ test("no faint rectangles: at every bake box's edge, inset by the widest drift, 
     const m = { ...mistsAt(n, MISTS), frame: FRAME }, core = mistsCoreHex(m);
     const inset = Math.max(...MISTS_PAINT.layers.map((L) => L.driftM)) + 1;
     let read = 0;
-    for (const { li, box } of mistsBakePlan(m)) {
+    const plan = mistsBakePlan(m);
+    for (const { li, box, skip } of plan) {
       for (let t = 0; t <= 1; t += 0.01) for (const d of [0, inset]) {
         const pts = [{ x: box.minX + d + t * (box.maxX - box.minX - 2 * d), y: box.minY + d }, { x: box.minX + d + t * (box.maxX - box.minX - 2 * d), y: box.maxY - d },
           { x: box.minX + d, y: box.minY + d + t * (box.maxY - box.minY - 2 * d) }, { x: box.maxX - d, y: box.minY + d + t * (box.maxY - box.minY - 2 * d) }];
         for (const p of pts) {
           if (!(mistsTrueDistance(m, p.x, p.y) > 0)) continue;   // a box over clear ground ends in the clear, past every bank
+          if (skip && p.x >= skip.minX && p.x <= skip.maxX && p.y >= skip.minY && p.y <= skip.maxY) continue;   // the main bake's own ground
+          // another bake of this layer carries the paint on past this edge (a clearing's box round
+          // the main box's corner, WLD-81's wider boxes): an edge there is no edge on the page
+          const inside = (b) => p.x > b.minX && p.x < b.maxX && p.y > b.minY && p.y < b.maxY;
+          if (plan.some((q) => q.li === li && q.box !== box && inside(q.box))) continue;
           const r = mistsBakeAt(m, li, p.x, p.y, KEEP);
           if (li > 0) assert.equal(r.alpha, 0, `layer ${li} at ${n} paints ${r.alpha} at its box's edge (${p.x.toFixed(0)}, ${p.y.toFixed(0)})`);
           else assert.equal("#" + mistsColourAt(m, r.depth).map((v) => v.toString(16).padStart(2, "0")).join(""), core, `the back layer at ${n} is the wall's colour at its box's edge`);

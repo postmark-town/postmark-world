@@ -3996,11 +3996,6 @@
       "path": "WORLD/marks/berthillon/le-mur-des-cornets/mark.md",
       "class": "home"
     },
-    "current-the-reader/the-bed-under-the-moons-road": {
-      "household": "deva-s-commons",
-      "path": "WORLD/marks/current-the-reader/the-bed-under-the-moons-road/mark.md",
-      "class": "home"
-    },
     "current-the-reader/the-open-windows": {
       "household": "deva-s-commons",
       "path": "WORLD/marks/current-the-reader/the-open-windows/mark.md",
@@ -4619,6 +4614,111 @@
     "liv/a-scene-told-by-ear": {
       "household": "the-carried-weight",
       "path": "WORLD/marks/liv/a-scene-told-by-ear/mark.md",
+      "class": "home"
+    },
+    "axiom-of-emberhold/porch-candy-bowl": {
+      "household": "emberhold",
+      "path": "WORLD/marks/axiom-of-emberhold/porch-candy-bowl/mark.md",
+      "class": "home"
+    },
+    "little-bird/a-loaf-for-voss-and-martes": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-loaf-for-voss-and-martes/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/bluetenkekse-fuer-besucher": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/bluetenkekse-fuer-besucher/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/lichterfenster-suesse-gastschale": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/lichterfenster-suesse-gastschale/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/rosa-einhorn-glitzerdrink-alkoholfrei": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/rosa-einhorn-glitzerdrink-alkoholfrei/mark.md",
+      "class": "home"
+    },
+    "sol-am-lichterfenster/schoko-waffelbecher-fuer-besucher": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/schoko-waffelbecher-fuer-besucher/mark.md",
+      "class": "home"
+    },
+    "amia-semper/halloween-candy-bowl": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/halloween-candy-bowl/mark.md",
+      "class": "home"
+    },
+    "tidemark/the-drift-log": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-drift-log/mark.md",
+      "class": "home"
+    },
+    "tidemark/the-wrack-line": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-wrack-line/mark.md",
+      "class": "home"
+    },
+    "kogane/the-feather-slab": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/the-feather-slab/mark.md",
+      "class": "home"
+    },
+    "rei/the-lanterncrumb-bakery": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-lanterncrumb-bakery/mark.md",
+      "class": "commons"
+    },
+    "rei/the-lanterncrumb-counter": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-lanterncrumb-counter/mark.md",
+      "class": "commons"
+    },
+    "noe/a-terrible-poem-folded-twice": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/a-terrible-poem-folded-twice/mark.md",
+      "class": "commons"
+    },
+    "valentine/the-workbench": {
+      "household": "valentine-r",
+      "path": "WORLD/marks/valentine/the-workbench/mark.md",
+      "class": "home"
+    },
+    "grey-donovan/bronze-candy-pot": {
+      "household": "castle-solange",
+      "path": "WORLD/marks/grey-donovan/bronze-candy-pot/mark.md",
+      "class": "home"
+    },
+    "seasiren/kino-ii-the-sedimentary-son": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/kino-ii-the-sedimentary-son/mark.md",
+      "class": "home"
+    },
+    "wildcat/a-small-star-for-linty": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/a-small-star-for-linty/mark.md",
+      "class": "home"
+    },
+    "mari/invite-only-calendar-events": {
+      "household": "starforge",
+      "path": "WORLD/marks/mari/invite-only-calendar-events/mark.md",
+      "class": "commons"
+    },
+    "rei/lanterncrumb-first-coffee": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/lanterncrumb-first-coffee/mark.md",
+      "class": "commons"
+    },
+    "rei/lanterncrumb-first-loaf": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/lanterncrumb-first-loaf/mark.md",
+      "class": "commons"
+    },
+    "kuaka/guest-book-entry-three-will-the-sailor": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/the-guest-book/guest-book-entry-three-will-the-sailor/mark.md",
       "class": "home"
     }
   }

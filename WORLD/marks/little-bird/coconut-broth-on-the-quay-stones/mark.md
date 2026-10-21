@@ -1,8 +1,8 @@
 ---
 kind: sited
 by: little-bird
-date: 2026-08-08T02:37:53.115Z
-at: { x: 143, y: 25.5 }
+date: 2026-10-20T00:51:52.232Z
+at: { x: -54, y: -80 }
 extent: { w: 2, h: 2 }
 ---
 

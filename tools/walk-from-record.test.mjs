@@ -10,7 +10,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { liveWalkerAt, onRecordedWalk } from "../spectator/viewer.mjs";
+import { liveWalkerAt, onRecordedWalk, walkerCandidatesAt, walkerHoverId } from "../spectator/viewer.mjs";
 import { positionAt, fractionalCrossing } from "./walk.mjs";
 
 const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
@@ -124,4 +124,26 @@ test("pins: your own walk's record takes only the answer's extent; a queued entr
   assert.doesNotMatch(SOURCE, /targetExtent: target\?\.extent \?/, "never the mark's extent");
   assert.match(SOURCE, /if \(body\.entry\?\.queued_for_arrival\) followArrival\(body\.arrives_at, body\.entry\?\.eta\);/);
   assert.match(SOURCE, /function followArrival\(arrivesAt, etaCrossing\) \{[\s\S]*?loadEnterExitLedger\(\)\.then\(\(\) => \{\s*if \(crossingsSignature\(enterExitLedger\.acts\) !== before\) \{ renderCurrent\(\); return; \}/);
+});
+
+// WLD-94 (Darko 2026-10-20 21:52): the face walked on along its dashed path, and
+// its hover disc and click target stayed at the poll's older point.
+test("the hit target stands where the body is drawn: a body mid-walk is a candidate at its live place, not the poll's", () => {
+  const polled = { handle: "visitor", ...positionAt(record, sec(2)), moving: true, toward: record.toward };
+  const bodyOf = (w) => liveWalkerAt(w, { record, declaredMs: t0, polledMs: t0 + 2000, nowCrossing: sec(9) });
+  const drawn = bodyOf(polled);
+  assert.ok(Math.abs(drawn.y - polled.y) > 5, "the fixture: the drawn body is metres from the poll's row");
+  const toScreen = (w) => ({ x: (w.x - 3800) * 10, y: (w.y + 5500) * 10 });
+  const [c] = walkerCandidatesAt([polled], { bodyOf, toScreen });
+  assert.equal(c.id, walkerHoverId("visitor"));
+  assert.deepEqual([c.x, c.y], [toScreen(drawn).x, toScreen(drawn).y], "at the drawn place");
+  // a row with no place, or no handle, is no candidate; a boat (no hit disc) still is
+  assert.deepEqual(walkerCandidatesAt([{ handle: "x", x: NaN, y: 0 }, { x: 1, y: 1 }], { toScreen }), []);
+  assert.equal(walkerCandidatesAt([{ handle: "the-ferry", x: 3810, y: -5510 }], { toScreen }).length, 1);
+});
+
+test("pins: the snap, the click and the hover disc place each body through liveBody, and the disc follows it", () => {
+  assert.match(SOURCE, /function screenWalkerCandidates\(\) \{[\s\S]*?return walkerCandidatesAt\(walkState\.walkers, \{ bodyOf: liveBody, toScreen:/);
+  assert.match(SOURCE, /function renderWalkerHighlight\(handle\) \{[\s\S]*?const w = row \? liveBody\(row\) : null;/);
+  assert.match(SOURCE, /function writeWalkLayer\(markup, drawnWalkers\) \{[\s\S]*?if \(walkerHandleFromHoverId\(lit\.selectedId\) \|\| walkerHandleFromHoverId\(lit\.hoveredId\)\) renderMarkHighlight\(\);/);
 });

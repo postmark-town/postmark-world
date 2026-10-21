@@ -411,3 +411,18 @@ test("POS-619 · a [ value that isn't JSON reds with marks-fold's sentence; JSON
   const green = runLint(lossyTree(['implements: ["candy", "chest"]', "labels: []", "title: [draft] my house"]));
   assert.doesNotMatch(green, /not strict JSON/, `JSON lists lose nothing, got:\n${green}`);
 });
+
+test("POS-672 · a creature class whose afforded actions the creature law cannot read is a lint ERROR, before a blessing can stop every spawn", () => {
+  const { dir, root } = fixtureTree();
+  const REL = join("the-town-centre", "the-keeping-works", "postmark-node", "entity", "creature");
+  cpSync(join(REAL, REL), join(root, REL), { recursive: true });
+  const SAYS = /the creature law cannot be read whole, so the creatures' tick would spawn nothing/;
+  assert.doesNotMatch(runLint(dir), SAYS, "the law as it stands reads whole");
+  const file = join(root, REL, "mark.md");
+  const text = readFileSync(file, "utf8");
+  writeFileSync(file, text.replace(/"action":"watch"/, '"action":"strike"'));
+  const out = runLint(dir);
+  assert.match(out, /\[ERROR\][^\n]*creature[^\n]*the creature law cannot be read whole[^\n]*"strike" is not one of watch, approach, shoo, call, offer, whisper/);
+  writeFileSync(file, text.replace(/"from":"sight"/, '"from":"anywhere"'));
+  assert.match(runLint(dir), /\[ERROR\][^\n]*taken from "anywhere", not sight or ring/);
+});
