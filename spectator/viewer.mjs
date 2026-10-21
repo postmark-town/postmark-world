@@ -4460,6 +4460,22 @@ export const walkerHandleFromHoverId = (id) =>
     ? id.slice(WALKER_HOVER_PREFIX.length) || null
     : null;
 
+// THE HIT TARGET STANDS WHERE THE BODY IS DRAWN (WLD-94, Darko 2026-10-20 21:52).
+// Since row 69 a moving body is drawn each frame at its walk record's place
+// (`liveBody`), while the hover snap, the click's chooser and the hover disc
+// still read the poll's row: the face walked on along its dashed path and the
+// disc and the click stayed at the older point. So each body is placed through
+// `bodyOf`, the same function the draw places it with, before it is projected.
+// Every row stays a candidate (a boat too, which has no hit disc to read).
+export function walkerCandidatesAt(rows, { bodyOf = (w) => w, toScreen }) {
+  return (rows ?? []).flatMap((row) => {
+    const w = bodyOf(row);
+    if (!w?.handle || ![w.x, w.y].every(Number.isFinite)) return [];
+    const screen = toScreen(w);
+    return [{ id: walkerHoverId(w.handle), x: screen.x, y: screen.y }];
+  });
+}
+
 // ── THE LIVE CREATURES (play fix 35) ────────────────────────────────────────
 //
 // Ruled in Sitting E (WLD-56 D5, Darko 2026-10-15 12:09): the painted creatures
@@ -10604,18 +10620,17 @@ export function mountViewer(appEl) {
     });
     const toldHere = () => toldPaintingMarks(lastRadial, allMarks());
     const paintingMarkForEvent = (event) => markAt(event, toldHere());
-    // walkers, in the same screen-space shape the mark snap already eats
+    // walkers, in the same screen-space shape the mark snap already eats, each
+    // where the draw puts it (WLD-94: liveBody, never the poll's row)
     function screenWalkerCandidates() {
       const matrix = svg.getScreenCTM();
       if (!matrix) return [];
-      return (walkState.walkers ?? []).flatMap((w) => {
-        if (!w?.handle || ![w.x, w.y].every(Number.isFinite)) return [];
+      return walkerCandidatesAt(walkState.walkers, { bodyOf: liveBody, toScreen: (w) => {
         const point = svg.createSVGPoint();
         point.x = originPx.x + w.x / mPerPx;
         point.y = originPx.y + w.y / mPerPx;
-        const screen = point.matrixTransform(matrix);
-        return [{ id: walkerHoverId(w.handle), x: screen.x, y: screen.y }];
-      });
+        return point.matrixTransform(matrix);
+      } });
     }
     // the live creatures, in the same shape: a creature is pointed at like a face (play fix 35)
     function screenCreatureCandidates() {
@@ -11860,7 +11875,9 @@ export function mountViewer(appEl) {
   // the painting, instead of the OS tooltip a <title> used to raise.
   function renderWalkerHighlight(handle) {
     if (!mapCtx) return "";
-    const w = (walkState.walkers ?? []).find((x) => x?.handle === handle);
+    // the disc stands on the body as drawn (WLD-94), and follows it: writeWalkLayer repaints it
+    const row = (walkState.walkers ?? []).find((x) => x?.handle === handle);
+    const w = row ? liveBody(row) : null;
     if (!w || ![w.x, w.y].every(Number.isFinite)) return "";
     const k = markerScale(mapCtx.zoomK);
     const p = { x: mapCtx.originPx.x + w.x / mapCtx.mPerPx, y: mapCtx.originPx.y + w.y / mapCtx.mPerPx };
@@ -12671,6 +12688,9 @@ export function mountViewer(appEl) {
       walkDraws.layerSkips += 1;
     }
     walkState.lastDrawn = drawnWalkers;
+    // a lit body's disc moves with it (WLD-94); an unchanged disc is not rewritten (writeHighlight)
+    const lit = markInteraction.getState();
+    if (walkerHandleFromHoverId(lit.selectedId) || walkerHandleFromHoverId(lit.hoveredId)) renderMarkHighlight();
     walkReadout(drawnWalkers);
     syncHouseLights();
     syncActorPosition();
