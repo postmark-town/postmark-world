@@ -73,9 +73,9 @@ test("a bad declaration throws, so the law is read whole or not at all", () => {
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, carries: "a-thing" }])), /not a mark's id/);
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, from_crossing: "soon" }])), /not a whole crossing/);
   // after (a creature that tempts): the named creatures that must all have ended first
-  assert.deepEqual(creatureLaw(withNamed("wolf", [{ ...ok, after: ["creature:bat-roost", "creature:wolf-den2"] }])).named[0].after, ["creature:bat-roost", "creature:wolf-den2"]);
+  assert.deepEqual(creatureLaw(withNamed("wolf", [{ ...ok, after: ["creature:wolf-first", "creature:wolf-second"] }])).named[0].after, ["creature:wolf-first", "creature:wolf-second"]);
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, after: [] }])), /not a list of named creatures' ids/);
-  assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, after: ["the-bat"] }])), /not a list of named creatures' ids/);
+  assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, after: ["not-a-creature"] }])), /not a list of named creatures' ids/);
   assert.throws(() => creatureLaw(withNamed("wolf", [ok, ok])), /declared twice/);
   assert.throws(() => creatureLaw(withNamed("wolf", { slug: "den" })), /are not a list/);
 });

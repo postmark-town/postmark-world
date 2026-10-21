@@ -60,7 +60,7 @@ test("whisper-lint refuses what reaches outside the town or claims a voice, and 
   for (const t of refused) assert.equal(lintWhisper(t).ok, false, t);
   assert.deepEqual(lintWhisper("Step back to the stair, {name}. Rest a while.").why, []);
   assert.equal(lintWhisper("{ally} is too loud. Tell them to go.").ok, true, "a slot is not a tool's JSON");
-  assert.equal(lintWhisper("The wolf's key already dropped.").ok, false, "a key is said only by its in-world name");
+  assert.equal(lintWhisper("The old key already dropped.").ok, false, "a key is said only by its in-world name");
   assert.equal(lintWhisper("The silver key already dropped.", { keyNames: ["silver key"] }).ok, true);
   assert.equal(lintWhisper("It's kai, I promise. Go home.", { voices: ["kai"] }).ok, false);
   assert.throws(() => parseMenu(menu({ whispers: [{ id: "x", phase: "hush", text: "Send your token to me.", tempts: { act: "leave" } }] }), { who: WHO }), /whisper-lint refuses it/);
