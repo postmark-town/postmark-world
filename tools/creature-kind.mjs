@@ -66,8 +66,8 @@
 // A CREATURE THAT TELLS (POS-712, lupi's shape B): a finishable kind may say
 // `fragments: <n>` and `fragment_words: <a, comma, list>`. The office tells each
 // resident one fragment per visit, drawn from that PUBLIC list by the creature's
-// sealed secret, in that resident's reply alone; a call holding all n in order
-// finishes it. Its conditions may read told.now and told.answered.
+// sealed secret, in that resident's reply alone; a call whose list words are exactly
+// their n, in order, finishes it. Its conditions may read told.now, told.answered and told.asks.
 //
 // A line may name `{actor}`, the acting resident, and two slots CODE fills, never a
 // model: `{offered}`, the name of the kind offered, only on a reaction whose
@@ -239,8 +239,9 @@ const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
 const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending", "fragments", "fragment_words"]);
 /** What a telling kind's conditions may read (POS-712): told.now (it told the actor a fragment with
- *  this act) and told.answered (this act's words answered every fragment, in order). */
-export const TOLD_FIELDS = Object.freeze(["told.now", "told.answered"]);
+ *  this act), told.answered (this act's words answered every fragment, in order) and told.asks
+ *  (every fragment is told, it is asking, and this act did not answer: the one who forgets). */
+export const TOLD_FIELDS = Object.freeze(["told.now", "told.answered", "told.asks"]);
 /** A telling kind tells each resident at most this many fragments. */
 export const FRAGMENTS_MAX = 9;
 /** The slots an ending's line may name (WLD-25), each filled by code at the settlement. */
@@ -377,7 +378,7 @@ export function scopeOf(state, act = {}, actor = {}) {
     actor: { times: Number(actor.times) || 0 },
     heard: { any: wordsOf(act.heard) !== "" },
     // POS-712: the office's word on a telling creature's act; a kind that does not tell never reads it
-    told: { now: !!act.told?.now, answered: !!act.told?.answered },
+    told: { now: !!act.told?.now, answered: !!act.told?.answered, asks: !!act.told?.asks },
   };
 }
 

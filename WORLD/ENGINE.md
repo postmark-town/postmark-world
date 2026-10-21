@@ -339,7 +339,8 @@ same night (W1–W11). A season's mechanics, kept here rather than in LOGOS (the
   fragment per visit (a settlement window), drawn from the list by the creature's
   sealed secret. The word is in that resident's reply alone; the record holds its
   commitment. Inside the window the same fragment is told again; after it, never.
-  Once all n are told it asks, and a call holding all n in order finishes it. When
+  Once all n are told it asks, and a call whose words from the list are exactly its n, in
+  order, finishes it (words off the list are free; reciting the list answers nothing). When
   its settlement has ended it, its secret is published, and every commitment can
   be checked by anyone. Fragments are the one thing that does not reset (08:39).
 

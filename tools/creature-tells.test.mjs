@@ -21,17 +21,21 @@ moods:
 reaction stare "it stares": when true says It stares at {actor}.
 reaction tell "it leans close": when told.now says It leans close to {actor}.
 reaction bow "it bows its head": when told.answered says It bows its head to {actor}.
+reaction peck "it pecks the one who forgets": when act.verb == "call" and told.asks says It pecks at {actor}.
 `;
 
 test("a telling kind: its count and its public list, one word each, and its lines keyed on told.now and told.answered", () => {
   const k = parseKind(KIND);
   assert.equal(k.fragments, 3);
   assert.deepEqual(k.fragment_words, ["amber", "brass", "cinder", "dusk"]);
-  assert.deepEqual([...TOLD_FIELDS], ["told.now", "told.answered"]);
+  assert.deepEqual([...TOLD_FIELDS], ["told.now", "told.answered", "told.asks"]);
   const menu = (told) => allowedReactions(k, scopeOf(startState(k), { verb: "walk", distance_m: 5, ...(told ? { told } : {}) })).map((r) => r.name);
   assert.deepEqual(menu(null), ["stare"]);
   assert.deepEqual(menu({ now: true }), ["stare", "tell"]);
   assert.deepEqual(menu({ answered: true }), ["stare", "bow"]);
+  const call = (told) => allowedReactions(k, scopeOf(startState(k), { verb: "call", distance_m: 5, told })).map((r) => r.name);
+  assert.deepEqual(call({ asks: true }), ["stare", "peck"], "the one who forgets");
+  assert.deepEqual(call({ answered: true }), ["stare", "bow"]);
 });
 
 test("refused: told.* in a kind that does not tell, fragments on a Mists kind, one without the other, a bad word or count", () => {
