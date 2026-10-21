@@ -55,7 +55,7 @@ test("the seed: a secret per crossing, and a commitment that binds it and the wo
 });
 
 test("the law: the class marks carry the ruled numbers (the ramp, Darko 2026-10-19 20:05), and the launch is crossing 259", () => {
-  assert.deepEqual(LAW.dials.counts, RAMP, "the ramp: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
+  assert.deepEqual(countsFor(264, LAW.dials, LAW.fromCrossing), RAMP, "the ramp: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05), up to the Halloween ramp (WLD-96)");
   assert.equal("rotation" in LAW.dials, false, "the ramp: rotation null, every kind every window");
   assert.deepEqual([LAW.dials.band_from_m, LAW.dials.band_to_m], [0, 400], "D1: the 400 m fringe on the clear side");
   assert.equal(LAW.dials.span_h, 12, "a creature lasts 12 h from its own spawn");
@@ -154,7 +154,7 @@ test("the dial and the season: no schedule when the dial is off, before it, or b
 
 test("the ramp (Darko 2026-10-19 20:05, WLD-84): every kind every window from 259, 2 bats, 3 ravens and 1 wolf", () => {
   assert.deepEqual(scheduleFor(258, secretFor(MASTER, 258), STANDING), { crossing: 258, spawns: [], unplaced: [] }, "nothing before the launch window");
-  for (let N = 259; N <= 265; N += 1) {
+  for (let N = 259; N <= 264; N += 1) { // 265 on is the Halloween ramp (WLD-96, creature-ramp.test.mjs)
     assert.deepEqual(countsFor(N, LAW.dials, LAW.fromCrossing), RAMP, `crossing ${N}: every kind at its count`);
     for (let k = 0; k < 20; k += 1) {
       const sched = scheduleFor(N, secretFor(`ramp ${k}`, N), STANDING);
@@ -199,7 +199,9 @@ test("the ramp holds the same ground rules (Darko 2026-10-19 20:05): on land, of
       }
     }
   }
-  assert.equal(checked, 32 * 10 * RAMP_N, "the ramp's six a window, every window placed (1920)");
+  // WLD-96: from 265 the Halloween ramp (to 20 a window by 283), so the windows count what the law says each brings
+  const owed = Array.from({ length: 32 }, (_, i) => Object.values(countsFor(259 + i, LAW.dials, LAW.fromCrossing)).reduce((a, b) => a + b, 0)).reduce((a, b) => a + b, 0);
+  assert.equal(checked, 10 * owed, `every window placed, at the ramp's count (${10 * owed})`);
   const N = 259, secret = secretFor(MASTER, N), sched = scheduleFor(N, secret, STANDING), { endMs } = windowOf(N);
   const acts = [
     { actor: TOWN, action: "seed", object: `window-${N}`, at: t(windowOf(N).startMs), payload: { crossing: N, world_sha: SHA, commitment: commitmentOf(secret, SHA) } },

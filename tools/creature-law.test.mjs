@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord } from "./marks-fold.mjs";
 import { readKind, AFFORDED_VERBS } from "./creature-kind.mjs";
-import { DESPAWN_REASONS, CREATURE_LAW_DIR, AFFORDED_FROM, creatureLaw } from "./creatures.mjs";
+import { DESPAWN_REASONS, CREATURE_LAW_DIR, AFFORDED_FROM, countAt, creatureLaw } from "./creatures.mjs";
 import { propertyOf } from "./class-properties.mjs";
 
 // a class's dials are its property nodes now (LOGOS v2 part 2)
@@ -32,8 +32,8 @@ test("the creature class: a living node, live canon, its ways to leave (ended on
   assert.equal(dial("creature", "from_crossing"), 259, "the launch: the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58)");
   // THE RAMP (Darko 2026-10-19 20:05, WLD-84): rotation null, every kind every window at its own count
   assert.equal(dial("creature", "rotation"), null, "the ramp: no rotation, every kind every window (Darko 2026-10-19 20:05)");
-  assert.deepEqual(Object.fromEntries(KINDS.map((k) => [k, dial(k, "count_per_window")])), { wolf: 1, raven: 3, bat: 2 },
-    "the ramp's counts: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
+  assert.deepEqual(Object.fromEntries(KINDS.map((k) => [k, countAt(dial(k, "count_per_window"), 264)])), { wolf: 1, raven: 3, bat: 2 },
+    "the ramp's counts: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05), until the Halloween ramp (WLD-96)");
   assert.equal(dial("creature", "span_h"), 12, "a creature lasts 12 h (ruled), the span's one home");
 });
 
@@ -42,7 +42,7 @@ test("the three kinds: each a class extending creature, whose kind file is its l
     const m = byClass(k);
     assert.ok(m, `the-town/${k} stands in the works`);
     assert.equal(m.extends, "creature");
-    assert.ok(Number.isInteger(dial(k, "count_per_window")) && dial(k, "count_per_window") > 0, `${k} has a count per window`);
+    assert.ok(countAt(dial(k, "count_per_window"), 264) > 0, `${k} has a count per window`);
     assert.equal(m.kind_file, `WORLD/kinds/${k}.kind`);
     assert.ok(existsSync(join(ROOT, m.kind_file)), `${m.kind_file} is there`);
     const kind = readKind(join(ROOT, m.kind_file));

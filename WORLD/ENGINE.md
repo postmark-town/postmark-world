@@ -311,6 +311,23 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
 - **Render cost capped by a context budget, never world size.** Candidates are
   culled to a sight radius, ranked, and carried to the budget; the rest aggregate.
 
+## The Mists' ramp toward Halloween (WLD-96)
+
+Darko 2026-10-21 09:21: "slowly ramped up the number of creatures spawning per
+settlement as we approach halloween, maybe to 20 total creatures max." Each kind's
+`count_per_window` is a schedule by crossing, so window N reads its count at N and
+a window passed never re-decides. Six a window (2 bats, 3 ravens, 1 wolf; WLD-84)
+until 10-22; then, from each EDT day's first window (12:00Z): 8, 9, 11, 12, 14,
+15, 17, 18, 19 and 20 on 10-31, held at 20. Ravens the most, then bats, then
+wolves (at most 4); never more than 20 in a window. `apart_m` (150 m) still places
+all 20 in the 400 m band (measured over crossings 265–330, 20 seeds each: none
+unplaced).
+
+| window from | 265 (10-22) | 267 | 269 | 271 | 273 | 275 | 277 | 279 | 281 | 283 (10-31) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| ravens · bats · wolves | 4·3·1 | 4·3·2 | 5·4·2 | 5·4·3 | 6·5·3 | 7·5·3 | 7·6·4 | 8·6·4 | 8·7·4 | 9·7·4 |
+| in all | 8 | 9 | 11 | 12 | 14 | 15 | 17 | 18 | 19 | 20 |
+
 ## The season's named creatures: finished, then ended at the settlement (WLD-25)
 
 Ruled by Darko 2026-10-20 22:47 and 22:56; the engineering settled by Wright the

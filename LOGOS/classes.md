@@ -1020,7 +1020,10 @@ two cuts: "it fades or it flees" and "it is no one's".)
   `rotation` dial names the kinds in turn, `bat raven wolf`: window
   N brings only the kind whose turn it is, counted from the launch dial
   (`tools/creatures.mjs § countsFor`). A null `rotation` brings every kind at
-  its own count.
+  its own count. *A kind's `count_per_window` may be a schedule by crossing,
+  `[{ from_crossing, count }, …]` (WLD-96, Darko 2026-10-21 09:21): window N
+  reads its count at N, so a window passed never re-decides. The season's own
+  numbers are the dials' and WORLD/ENGINE.md's, not this law's.*
 - **Off until the town says so.** A null `from_crossing` dial spawns nothing.
   It stands at 259, the window that opens 2026-10-19 at 12:00Z, the first
   window seeded after that day's 06:00Z settlement.

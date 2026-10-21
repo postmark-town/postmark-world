@@ -56,6 +56,13 @@
 // length]`, at that kind's `count_per_window`. Written null, every kind comes at
 // its own count; an absent rotation mark is refused, like any missing dial.
 //
+// THE RAMP TOWARD HALLOWEEN (WLD-96; Darko 2026-10-21 09:21, "slowly ramped up …
+// maybe to 20 total creatures max"). A kind's `count_per_window` may be a SCHEDULE
+// keyed by crossing, `[{ from_crossing, count }, …]`, read as "this count from this
+// crossing on" (before its first entry, none). A plain whole number still works.
+// Keyed by crossing, a window already passed never re-decides when the law changes
+// (ENGINE.md § the retroactive-replay hazard): window N reads its count at N.
+//
 // ── THE FOLD (W4, W5) ──────────────────────────────────────────────────────────
 // A creature is a fold of the log's rows: `spawn` (the-town, object = its id),
 // its reactions (action `react`, actor = its id; payload `moods_after` and
@@ -105,7 +112,7 @@ export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "k
 /**
  * The creature law as the class marks write it: { fromCrossing, dials, kinds }.
  *   fromCrossing  the class's launch dial (null is off, W6)
- *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m, span_h }
+ *   dials         { counts: { <kind>: count_per_window (a number, or a schedule by crossing: WLD-96) }, band_from_m, band_to_m, keep_m, apart_m, span_h }
  *   kinds         [{ kind, kind_file }], by name
  *   afforded      { <kind>: [{ action, who, from, effect, residue, from_class }] }: the
  *                 afforded actions a resident may aim at a creature of that kind
@@ -134,8 +141,7 @@ export function creatureLaw(records) {
   }
   const kinds = [];
   for (const m of classes.filter((x) => x.extends === "creature").sort((a, b) => (String(a.class) < String(b.class) ? -1 : 1))) {
-    const kind = String(m.class), n = dial(kind, "count_per_window");
-    if (!Number.isInteger(n) || n < 0) throw new Error(`creatureLaw: ${kind}'s count_per_window is ${JSON.stringify(n)}, not a whole number`);
+    const kind = String(m.class), n = countOf(dial(kind, "count_per_window"), kind);
     if (typeof m.kind_file !== "string" || !m.kind_file) throw new Error(`creatureLaw: ${kind} names no kind_file`);
     dials.counts[kind] = n;
     kinds.push({ kind, kind_file: m.kind_file });
@@ -239,10 +245,40 @@ function rotationOf(v, counts) {
   return list;
 }
 
-/** The kinds crossing N brings and how many of each: every kind at its count, or,
+/**
+ * A kind's count_per_window, read whole (WLD-96): a whole number ≥ 0, or a
+ * schedule `[{ from_crossing, count }, …]` (a list, or its JSON text) whose
+ * crossings are whole, ≥ 0 and strictly rising and whose counts are whole and
+ * ≥ 0. Answers the number, or the schedule as a frozen list. Anything else throws.
+ */
+function countOf(v, kind) {
+  if (Number.isInteger(v) && v >= 0) return v;
+  const list = typeof v === "string" && v.trim().startsWith("[") ? JSON.parse(v) : v;
+  const where = `creatureLaw: ${kind}'s count_per_window is ${JSON.stringify(v)}`;
+  if (!Array.isArray(list) || !list.length) throw new Error(`${where}, not a whole number or a schedule`);
+  let last = -1;
+  return Object.freeze(list.map((e) => {
+    if (!Number.isInteger(e?.from_crossing) || e.from_crossing < 0 || !Number.isInteger(e?.count) || e.count < 0)
+      throw new Error(`${where}: every step is { from_crossing, count }, both whole numbers ≥ 0`);
+    if (e.from_crossing <= last) throw new Error(`${where}: its crossings rise, each step after the one before`);
+    last = e.from_crossing;
+    return Object.freeze({ from_crossing: e.from_crossing, count: e.count });
+  }));
+}
+
+/** A count at crossing N: the number itself, or the schedule's step in force at N (none before its first). */
+export function countAt(v, crossing) {
+  if (!Array.isArray(v)) return v;
+  const N = crossing | 0;
+  let n = 0;
+  for (const e of v) if (e.from_crossing <= N) n = e.count;
+  return n;
+}
+
+/** The kinds crossing N brings and how many of each: every kind at its count at N, or,
  *  under a rotation, only the kind whose turn N is (counted from the launch dial). */
 export function countsFor(crossing, dials, fromCrossing) {
-  const counts = dials?.counts ?? {};
+  const counts = Object.fromEntries(Object.entries(dials?.counts ?? {}).map(([k, v]) => [k, countAt(v, crossing)]));
   const rotation = dials?.rotation ?? null;
   if (!rotation) return counts;
   const from = Number(fromCrossing), len = rotation.length;
