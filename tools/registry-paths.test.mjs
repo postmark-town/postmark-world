@@ -9,42 +9,51 @@
 //
 // THE HELD ROWS are the ones that verb will not write, because the repair
 // would make a zero-escrow commons mark sweepable that is not today. They wait
-// on the founder (WLD-51) and are named here so the list can only shrink by a
-// decision: when WLD-51 is ruled, the rows are repaired and leave this list.
+// on the founder (WLD-51). The verb's own plan names them (its `held` set), so
+// this test asks the plan rather than keeping a second list by hand (WLD-101,
+// 2026-10-21). A held row that heals (its path is back in the tree, or the row
+// is gone) is simply no longer stale, and never turns a crossing red.
 
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { reconcilePlan, reconcileRepo } from "./registry-reconcile.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-/// 13 stale paths held at 978a1d34 (2026-10-14); each row is stored commons and
-// its mark walks market. (berthillon/cone-peche-de-vigne-2026-08-27, the other
-// WLD-51 row, stands at a present path, stored home and walking market, so it
-// has no place in a path test; tools/unpublish-standing.test.mjs pins it.)
-const HELD_FOR_WLD_51 = new Set([
-  "vermillion/pando-peak-library-shelf",
-  "lysander/the-lake-signed-the-book",
-  "scree/the-cairn-on-the-scree",
-  "spark-the-builder/puzzle-1-smoothing",
-  "spark-the-builder/puzzle-2-five-strands",
-  "spark-the-builder/puzzle-3-the-other-builder",
-  "limen/the-amber-haze",
-  "wright/a-trued-spinning-top-for-little-m",
-  "lupi/rootwood-bookend",
-  "orion-by-the-fire/for-the-caterpillar-at-one-month",
-  "little-pica/the-nest",
-  "limen/the-twice-rung-bells",
-]);
+// The stale rows the reconcile verb would NOT hold: each one is a row an act
+// left behind, and the verb (or a person, for an unresolved row) owes it.
+function unheldStale(published, plan, pathExists) {
+  const held = new Set(plan.held.map((r) => r.id));
+  const owed = new Map([...plan.repairs, ...plan.removed, ...plan.unresolved].map((r) => [r.id, r.why]));
+  return Object.entries(published)
+    .filter(([id, row]) => !pathExists(row.path) && !held.has(id))
+    .map(([id]) => `${id}${owed.has(id) ? ` (${owed.get(id)})` : ""}`);
+}
 
-test("every registry row names a path in this tree, or is held by name for WLD-51", () => {
+test("every registry row names a path in this tree, or is held by the reconcile verb for WLD-51", () => {
   const { published } = JSON.parse(readFileSync(join(ROOT, "WORLD", "settlement-publications.json"), "utf8"));
-  const stale = Object.entries(published).filter(([, row]) => !existsSync(join(ROOT, row.path))).map(([id]) => id);
-  const unheld = stale.filter((id) => !HELD_FOR_WLD_51.has(id));
+  const { plan } = reconcileRepo(ROOT);
+  const unheld = unheldStale(published, plan, (path) => existsSync(join(ROOT, path)));
   assert.deepEqual(unheld, [],
     `registry rows whose path is not in the tree: run \`node tools/registry-reconcile.mjs --write\` in the commit that moved them:\n  ${unheld.join("\n  ")}`);
-  const healed = [...HELD_FOR_WLD_51].filter((id) => !stale.includes(id));
-  assert.deepEqual(healed, [], "a held row's path is back in the tree (or the row is gone): take it off the held list");
+});
+
+test("the check CAN fail: a stale row the verb would not hold is red; a held row and a healed row are not", () => {
+  const published = {
+    "a/held": { path: "WORLD/marks/gone/held/mark.md", class: "commons" },       // stored commons, walks commons: held
+    "b/owed": { path: "WORLD/marks/gone/owed/mark.md", class: "home" },          // stored home: safe to repoint, so owed
+    "c/healed": { path: "WORLD/marks/here/healed/mark.md", class: "commons" },   // its path is back: not stale
+  };
+  const filingOf = (id) => `WORLD/marks/${id}/mark.md`;
+  const tierOf = () => "market";
+  const pathExists = (path) => path.startsWith("WORLD/marks/here/");
+  const plan = reconcilePlan(published, { filingOf, tierOf, pathExists });
+  assert.deepEqual(plan.held.map((r) => r.id), ["a/held"]);
+  assert.deepEqual(unheldStale(published, plan, pathExists), ["b/owed (path)"]);
+  // the same tree once the owed row is repointed: green, with the held row still stale and the healed one never asked
+  const repaired = { ...published, "b/owed": { ...published["b/owed"], path: "WORLD/marks/here/owed/mark.md" } };
+  assert.deepEqual(unheldStale(repaired, reconcilePlan(repaired, { filingOf, tierOf, pathExists }), pathExists), []);
 });
