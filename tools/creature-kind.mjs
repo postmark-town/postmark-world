@@ -66,6 +66,39 @@
 // not carry one (it would cut what the reaction says); no line is longer than
 // MAX_LINE. How long a creature lives is not here: it is the creature class's
 // `span_h` dial, its one home (ruled: twelve hours for every kind, § 7).
+//
+// A FINISHABLE KIND (an encounter: Darko 2026-10-20 22:47 and 2026-10-21 08:34).
+// Some creatures are not decorations: they are encountered, and either road
+// finishes them, brute force or the creature's own peaceful test. Both roads cost
+// the resident nerve (the office's to count: 10 each, refilled at each
+// settlement; at 0 you flee). A kind says so with one line, and only then may it
+// use the words below; a Mists kind that uses one is refused, so the Mists'
+// creatures stay what their header says.
+//
+//   finishable: yes                the switch
+//   resolve: 30                    a whole number > 0: what brute force wears down. Full
+//                                  again at each settlement (the one clock)
+//   strike: 3                      how much resolve one strike takes (1..resolve). resolve
+//                                  and strike come together or not at all
+//   ease: 3 mine                   the peaceful test's target, each resident filling their own,
+//   ease: 3 households             or shared by the ring, one point per household per window
+//
+// Its reactions may key on the ENCOUNTER_VERBS (act.verb == "strike", "steady",
+// "shield") and read self.resolve (resolve left this window), ease.mine (the
+// actor's own ease, or their household's point), ease.all (the shared ease) and
+// ease.first_m (minutes since the actor's first point this window). Their
+// effects may be:
+//
+//   press <n>                      a nerve cost (1..PRESS_MAX) aimed at one resident in the
+//   press <n> on <who> <who> …     ring; code resolves each of PRESS_ON to one resident and Jev
+//                                  chooses among them. `on` narrows the menu
+//   ease +<n> / ease reset         fills the ease (the actor's own, or their household's point),
+//                                  or empties it (the actor's own, or the whole shared ease)
+//   finish                         the actor finishes it (the office writes the finish row)
+//
+// and a line carrying `press` may name {target}, the resident it landed on. A
+// finishable kind never flees: it leaves only by its ending. Every number here
+// is the kind's, so tuning is a kind file's change, never code's.
 
 import { readFileSync } from "node:fs";
 
@@ -79,11 +112,27 @@ export const RING_VERBS = Object.freeze(["walk", "enter", "exit", "say", "take",
  *  `actions`, never this list: this is only every verb a kind file may key on. */
 export const AFFORDED_VERBS = Object.freeze(["watch", "approach", "shoo", "call", "offer", "whisper"]);
 
-/** The slots a line may name: the actor, and the two code fills (see the header). */
-export const LINE_SLOTS = Object.freeze(["actor", "offered", "heard"]);
+/** An encounter's verbs, keyed on by a finishable kind only (see the header): brute
+ *  force aimed at the creature, and two aimed at another resident in its ring. */
+export const ENCOUNTER_VERBS = Object.freeze(["strike", "steady", "shield"]);
+
+/** Whom a press may land on: each a menu entry the office resolves to one resident
+ *  in the ring (the one who acted, the last to strike it, one shielding another,
+ *  the one with the most acts in its ring this window, one with no housemate there). */
+export const PRESS_ON = Object.freeze(["actor", "striker", "shielder", "loudest", "alone"]);
+/** The most nerve one press may cost. */
+export const PRESS_MAX = 2;
+/** How a kind's ease fills: each resident their own, or shared, one point per household. */
+export const EASE_BY = Object.freeze(["mine", "households"]);
+
+/** The slots a line may name: the actor, and the code fills (see the header). */
+export const LINE_SLOTS = Object.freeze(["actor", "offered", "heard", "target"]);
 
 /** What a condition may read beyond the creature's own moods and flags. */
 const ACT_FIELDS = new Set(["act.verb", "act.distance_m", "act.approaching", "actor.times", "heard.any"]);
+/** What a finishable kind's condition may read besides (self.resolve with a resolve, ease.* with an ease). */
+const RESOLVE_FIELDS = new Set(["self.resolve"]);
+const EASE_FIELDS = new Set(["ease.mine", "ease.all", "ease.first_m"]);
 
 // ── the expression language ────────────────────────────────────────────────────
 const TOKEN = /\s*(?:(\d+(?:\.\d+)?)|("(?:[^"\\]|\\.)*")|(==|!=|<=|>=|<|>|\(|\))|([A-Za-z_][\w.-]*))/y;
@@ -200,12 +249,37 @@ const REFUSED_EFFECT = [
   [/^telegraph\b/, "a Mists creature telegraphs no spring (combat is the dungeon's)"],
 ];
 
-export function parseEffects(src, { moods, flags }) {
+/** The effects only a finishable kind may carry (see the header), and why a Mists kind may not. */
+const ENCOUNTER_EFFECT = /^(press|ease|finish)\b/;
+const MISTS_ONLY = "only a finishable kind (finishable: yes) presses, eases or is finished: a Mists creature is a smart decoration";
+
+export function parseEffects(src, { moods, flags, finishable = false, ease = null }) {
   return src.split(";").map((s) => s.trim()).filter(Boolean).map((s) => {
     for (const [re, why] of REFUSED_EFFECT) if (re.test(s)) throw new Error(`the effect "${s}" is refused: ${why}`);
+    if (!finishable && ENCOUNTER_EFFECT.test(s)) throw new Error(`the effect "${s}" is refused: ${MISTS_ONLY}`);
     let m;
     if (s === "nothing") return { do: "nothing" };
-    if (s === "flee") return { do: "flee" };
+    if (s === "flee") {
+      if (finishable) throw new Error(`the effect "flee" is refused: a finishable kind never flees; it leaves only by its ending`);
+      return { do: "flee" };
+    }
+    if (s === "finish") return { do: "finish" };
+    if ((m = /^press\s+(\d+)(?:\s+on\s+(.+))?$/.exec(s))) {
+      const n = Number(m[1]);
+      if (!(n >= 1 && n <= PRESS_MAX)) throw new Error(`the effect "${s}" presses ${n}: a press is 1 to ${PRESS_MAX} nerve`);
+      const on = m[2] ? m[2].trim().split(/\s+/) : [...PRESS_ON];
+      for (const w of on) if (!PRESS_ON.includes(w)) throw new Error(`the effect "${s}" presses "${w}", which is not one of ${PRESS_ON.join(", ")}`);
+      if (new Set(on).size !== on.length) throw new Error(`the effect "${s}" names someone twice`);
+      return { do: "press", n, on };
+    }
+    if ((m = /^ease\s+(?:\+(\d+)|(reset))$/.exec(s))) {
+      if (!ease) throw new Error(`the effect "${s}" fills an ease the kind does not declare (ease: <n> ${EASE_BY.join(" | <n> ")})`);
+      if (m[2]) return { do: "ease", reset: true };
+      const by = Number(m[1]);
+      if (!(by >= 1)) throw new Error(`the effect "${s}" fills ease by ${by}: by 1 or more`);
+      return { do: "ease", by };
+    }
+    if (/^(press|ease)\b/.test(s)) throw new Error(`cannot read the effect "${s}" (press <n> [on <who> …], ease +<n>, ease reset)`);
     if ((m = /^(set|clear)\s+([\w-]+)$/.exec(s))) {
       if (!flags.includes(m[2])) throw new Error(`the effect "${s}" names a flag the kind does not declare (flags: ${flags.join(", ") || "none"})`);
       return { do: m[1], flag: m[2] };
@@ -221,10 +295,39 @@ export function parseEffects(src, { moods, flags }) {
 // ── the kind file ───────────────────────────────────────────────────────────────
 const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/;
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
-const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes"]);
+const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "resolve", "strike", "ease"]);
 /** The longest line a kind file may hold (the reaction pattern is not linear in a
  *  hostile line's length; kind files are reviewed law, and this closes it anyway). */
 export const MAX_LINE = 2000;
+
+/** A finishable kind's own lines (see the header), read whole in place: `finishable`
+ *  true or absent, `resolve` and `strike` whole numbers (both or neither), `ease`
+ *  { target, by }. Any of them on a kind that is not finishable throws. */
+function encounterOf(kind, source) {
+  const whole = (k, v, lo, hi = Infinity) => {
+    const n = Number(v);
+    if (!(Number.isInteger(n) && n >= lo && n <= hi) || !/^\d+$/.test(String(v).trim()))
+      throw new Error(`${source}: ${k}: must be a whole number from ${lo}${hi < Infinity ? ` to ${hi}` : " up"} (got ${JSON.stringify(v)})`);
+    return n;
+  };
+  if (kind.finishable !== undefined) {
+    if (kind.finishable !== "yes") throw new Error(`${source}: finishable: is "yes" or absent (got ${JSON.stringify(kind.finishable)})`);
+    kind.finishable = true;
+  }
+  for (const k of ["resolve", "strike", "ease"])
+    if (kind[k] !== undefined && !kind.finishable) throw new Error(`${source}: ${k}: belongs to a finishable kind (finishable: yes); ${MISTS_ONLY}`);
+  if ((kind.resolve === undefined) !== (kind.strike === undefined)) throw new Error(`${source}: resolve: and strike: come together (what force wears down, and how much one strike takes)`);
+  if (kind.resolve !== undefined) {
+    kind.resolve = whole("resolve", kind.resolve, 1);
+    kind.strike = whole("strike", kind.strike, 1, kind.resolve);
+    if (Object.hasOwn(kind.moods, "resolve") || kind.flags.includes("resolve")) throw new Error(`${source}: a kind with resolve: has no mood or flag named resolve (self.resolve is its resolve)`);
+  }
+  if (kind.ease !== undefined) {
+    const m = /^(\S+)\s+(\S+)$/.exec(kind.ease);
+    if (!m || !EASE_BY.includes(m[2])) throw new Error(`${source}: ease: is "<n> ${EASE_BY.join("\" or \"<n> ")}" (got ${JSON.stringify(kind.ease)})`);
+    kind.ease = { target: whole("ease", m[1], 1), by: m[2] };
+  }
+}
 
 /** Parse a kind file's text. Throws, naming the line, on anything it cannot read or
  *  that the Mists' law refuses. */
@@ -281,8 +384,11 @@ export function parseKind(text, { source = "kind file" } = {}) {
   kind.ring_m = ring;
   if (!Object.keys(kind.moods).length) throw new Error(`${source}: a kind needs at least one mood`);
   for (const f of kind.flags) if (!/^[a-z][\w-]*$/.test(f) || Object.hasOwn(kind.moods, f)) throw new Error(`${source}: the flag "${f}" must be a slug and not a mood's name`);
+  encounterOf(kind, source);
 
-  const known = new Set([...ACT_FIELDS, ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`)]);
+  const known = new Set([...ACT_FIELDS, ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`),
+    ...(kind.resolve ? RESOLVE_FIELDS : []), ...(kind.ease ? EASE_FIELDS : [])]);
+  const verbs = kind.finishable ? [...RING_VERBS, ...AFFORDED_VERBS, ...ENCOUNTER_VERBS] : [...RING_VERBS, ...AFFORDED_VERBS];
   for (const { n, m } of pending) {
     const [, name, sentence, cond, does, says] = m;
     if (kind.reactions.some((r) => r.name === name)) fail(n, `the reaction ${name} is given twice`);
@@ -290,17 +396,20 @@ export function parseKind(text, { source = "kind file" } = {}) {
     try { when = parseCondition(cond); } catch (e) { fail(n, e.message); }
     const reads = readsOf(when);
     for (const id of reads.ids) if (!known.has(id)) fail(n, `the condition reads "${id}", which a creature cannot know (it reads ${[...known].join(", ")})`);
-    for (const v of reads.verbs) if (!RING_VERBS.includes(v) && !AFFORDED_VERBS.includes(v))
-      fail(n, `act.verb is never "${v}": a creature notices only ${RING_VERBS.join(", ")}, and is aimed at only by ${AFFORDED_VERBS.join(", ")}`);
+    for (const v of reads.verbs) if (!verbs.includes(v))
+      fail(n, ENCOUNTER_VERBS.includes(v)
+        ? `act.verb is never "${v}" here: ${MISTS_ONLY}`
+        : `act.verb is never "${v}": a creature notices only ${RING_VERBS.join(", ")}, and is aimed at only by ${AFFORDED_VERBS.join(", ")}${kind.finishable ? ` and ${ENCOUNTER_VERBS.join(", ")}` : ""}`);
     let effects;
     try { effects = parseEffects(does ?? "nothing", kind); } catch (e) { fail(n, e.message); }
     const line = says.trim();
     if (!line) fail(n, `a reaction says something`);
     const names = [...line.matchAll(/\{([^}]*)\}/g)].map((x) => x[1]);
-    for (const x of names) if (!LINE_SLOTS.includes(x)) fail(n, `a line may name {actor}, {offered} or {heard} and nothing else (got {${x}})`);
+    for (const x of names) if (!LINE_SLOTS.includes(x)) fail(n, `a line may name {actor}, {offered}, {heard} or {target} and nothing else (got {${x}})`);
     const needs = requiredOf(when);
     if (names.includes("offered") && !needs.verbs.has("offer")) fail(n, `a line naming {offered} needs a condition that requires act.verb == "offer" (in its top-level and)`);
     if (names.includes("heard") && !needs.ids.has("heard.any")) fail(n, `a line naming {heard} needs a condition that requires heard.any (in its top-level and)`);
+    if (names.includes("target") && !effects.some((e) => e.do === "press")) fail(n, `a line naming {target} needs a press among its effects: {target} is who the press landed on`);
     kind.reactions.push({ name, sentence, when, src: cond, effects, says: line });
   }
   if (!kind.reactions.length) throw new Error(`${source}: a kind needs at least one reaction`);
@@ -319,15 +428,20 @@ export function startState(kind) {
 
 /** The scope a condition is read against. `state` is { moods, flags }, `act`
  *  { verb, distance_m, approaching, heard? } (heard: the words the creature could
- *  repeat, or none), `actor` { times }. */
-export function scopeOf(state, act = {}, actor = {}) {
+ *  repeat, or none), `actor` { times }. `encounter` is a finishable kind's
+ *  window, as the office counts it: { resolve, ease: { mine, all, first_m } };
+ *  absent, every number reads 0. */
+export function scopeOf(state, act = {}, actor = {}, encounter = {}) {
   const self = { ...state.moods };
   for (const f of state.flags ?? []) self[f] = true;
+  const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+  if (encounter.resolve != null) self.resolve = num(encounter.resolve);
   return {
     self,
     act: { verb: act.verb, distance_m: act.distance_m, approaching: !!act.approaching },
     actor: { times: Number(actor.times) || 0 },
     heard: { any: wordsOf(act.heard) !== "" },
+    ease: { mine: num(encounter.ease?.mine), all: num(encounter.ease?.all), first_m: num(encounter.ease?.first_m) },
   };
 }
 
@@ -360,7 +474,7 @@ const wordsOf = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : 
 /** The line a reaction leaves: its template, with the acting resident named, and
  *  the offered kind's name and the heard words where the line names them. One pass,
  *  by a function: "$&" in a name, or "{heard}" in what was said, is only text. */
-export function voiceLine(reaction, { actor, offered = null, heard = null } = {}) {
-  const fill = { actor: String(actor), offered: wordsOf(offered) || "offering", heard: wordsOf(heard) || "…" };
-  return reaction.says.replace(/\{(actor|offered|heard)\}/g, (_, slot) => fill[slot]);
+export function voiceLine(reaction, { actor, offered = null, heard = null, target = null } = {}) {
+  const fill = { actor: String(actor), offered: wordsOf(offered) || "offering", heard: wordsOf(heard) || "…", target: wordsOf(target) || String(actor) };
+  return reaction.says.replace(/\{(actor|offered|heard|target)\}/g, (_, slot) => fill[slot]);
 }

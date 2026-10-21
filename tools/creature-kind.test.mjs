@@ -76,12 +76,12 @@ test("the Mists' law is held at parse: no harm, no holds, no spring, no verb out
     [`reaction bite "it bites": when true does actor.nerve -2 says It bites {actor}.`, /no nerve, no harm/],
     [`reaction grab "it grabs": when true does take says It grabs it.`, /takes nothing/],
     [`reaction crouch "it crouches": when true does telegraph spring says It crouches.`, /telegraphs no spring/],
-    [`reaction struck "it is struck": when act.verb == "strike" says Ow.`, /act\.verb is never "strike".*aimed at only by watch, approach, shoo, call, offer, whisper/],
+    [`reaction struck "it is struck": when act.verb == "strike" says Ow.`, /act\.verb is never "strike" here: only a finishable kind/], // an encounter verb: creature-kind-encounter.test.mjs
     [`reaction fed "it is fed": when "feed" == act.verb says Yum.`, /act\.verb is never "feed"/],
     [`reaction peek "it peeks": when actor.nerve > 2 says It peeks.`, /reads "actor\.nerve", which a creature cannot know/],
     [`reaction calm "it calms": when self.temper < 1 says It calms.`, /reads "self\.temper"/],
     [`reaction tame "it is tamed": when true does set tamed says It is yours.`, /a flag the kind does not declare/],
-    [`reaction sneer "it sneers": when true says It sneers at {item}.`, /\{actor\}, \{offered\} or \{heard\} and nothing else/],
+    [`reaction sneer "it sneers": when true says It sneers at {item}.`, /\{actor\}, \{offered\}, \{heard\} or \{target\} and nothing else/],
     [`reaction sniff "it sniffs": when true says It sniffs the {offered}.`, /\{offered\} needs a condition that requires act\.verb == "offer"/],
     [`reaction sniff "it sniffs": when act.verb == "offer" or true says It sniffs the {offered}.`, /\{offered\} needs a condition that requires act\.verb == "offer"/],
     [`reaction echo "it echoes": when act.verb == "say" says It says "{heard}".`, /\{heard\} needs a condition that requires heard\.any/],
@@ -156,7 +156,7 @@ test("the afforded actions: the six ruled verbs, frozen, none of them a ring ver
   assert.deepEqual([...AFFORDED_VERBS], ["watch", "approach", "shoo", "call", "offer", "whisper"]);
   assert.ok(Object.isFrozen(AFFORDED_VERBS));
   assert.deepEqual(AFFORDED_VERBS.filter((v) => RING_VERBS.includes(v)), [], "an aimed act and an ambient act are never the same word");
-  assert.deepEqual([...LINE_SLOTS], ["actor", "offered", "heard"]);
+  assert.deepEqual([...LINE_SLOTS], ["actor", "offered", "heard", "target"], "target: a finishable kind's press (creature-kind-encounter.test.mjs)");
 });
 
 const AIMED = FIXTURE.replace("ring_m: 50\n", "ring_m: 50\ntastes: bright things, and anything sweet\n") + `reaction stare "it stares back": when act.verb == "watch" does self.fear -1 says It stares back at {actor}.
