@@ -73,7 +73,7 @@ test("a temptation's slots are filled by code, as plain text", () => {
 });
 
 test("a kind that tempts: tempts:, who: and fight_size: together, finishable, and never with a resolve or an ease", () => {
-  const HEAD = `kind: tempter\nname: a test tempter\nring_m: 30\nwhat: >\n  A fixture.\nmoods:\n  sweet: 0..3 = 1 | a | b | c | d\nreaction r "r": when true says It hums.\n`;
+  const HEAD = `kind: tempter\nname: a test tempter\nring_m: 30\nwhat: >\n  A fixture.\nmoods:\n  mood: 0..3 = 1 | a | b | c | d\nreaction r "r": when true says It hums.\n`;
   const k = parseKind(`${HEAD}finishable: true\ntempts: tempter.menu.json\nwho: a-tempter\nfight_size: 30\n`);
   assert.deepEqual([k.tempts, k.who, k.fight_size], ["tempter.menu.json", "a-tempter", 30]);
   assert.throws(() => parseKind(`${HEAD}finishable: true\ntempts: tempter.menu.json\n`), /come together/);
@@ -83,7 +83,7 @@ test("a kind that tempts: tempts:, who: and fight_size: together, finishable, an
 });
 
 test("a tempting kind's line may name {ally}, the resident its temptation named, filled by code; no other kind's may", () => {
-  const HEAD = `kind: tempter\nname: a test tempter\nring_m: 30\nwhat: >\n  A fixture.\nmoods:\n  sweet: 0..3 = 1 | a | b | c | d\n`;
+  const HEAD = `kind: tempter\nname: a test tempter\nring_m: 30\nwhat: >\n  A fixture.\nmoods:\n  mood: 0..3 = 1 | a | b | c | d\n`;
   const k = parseKind(`${HEAD}finishable: true\ntempts: t.json\nwho: a-tempter\nfight_size: 30\nreaction r "r": when act.verb == "shield" says {actor} stood in front of {ally}.\n`);
   assert.equal(voiceLine(k.reactions[0], { actor: "kai", ally: "ren" }), "kai stood in front of ren.");
   assert.equal(voiceLine(k.reactions[0], { actor: "kai" }), "kai stood in front of someone.");
