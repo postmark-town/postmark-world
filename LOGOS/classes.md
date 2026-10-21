@@ -1854,7 +1854,7 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   until the holder (`in`, or the portal itself, a thing with `holder: true`) holds every mark `holds` names; then it
   passes for everyone. Things go in by an ordinary give. The refusal says `says`, the door's own line, with
   `{held}` and `{asks}` read as the counts, so the door shows how far it has come. An exit never carries one (locked
-  from the outside, never from the inside), and the lint holds every id it names to a mark.
+  from the outside, never from the inside), and the lint holds every id it names to a mark. `entry` itself is a property of every mark (`the-town/mark-entry`), so a thing that is a door carries it like any other mark.
 
 **Later** (named in the sitting, not law yet): other `requires:` conditions on a portal, secret portals (a hidden
 entry in the list), and exit routing for marks that are not dungeons.
