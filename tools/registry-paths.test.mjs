@@ -35,7 +35,6 @@ const HELD_FOR_WLD_51 = new Set([
   "wright/a-trued-spinning-top-for-little-m",
   "lupi/rootwood-bookend",
   "orion-by-the-fire/for-the-caterpillar-at-one-month",
-  "lucien/little-moon-for-little-m",
   "little-pica/the-nest",
   "limen/the-twice-rung-bells",
 ]);

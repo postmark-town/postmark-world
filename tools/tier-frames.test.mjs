@@ -761,6 +761,7 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
       points: JSON.stringify(m.points ?? null),
     }]));
     const pa = posOf(A), pb = posOf(B);
+    const heldOnB = new Set(B.filter((m) => m.held_by).map((m) => m.id));
     assert.ok(pa.size > 300, `enough positioned records to be worth checking (${pa.size})`);
     // NOTHING MOVES WITHOUT A DECLARING ACT (the loss check's doctrine,
     // extended to geometry 2026-08-17; first lawful customer the same day):
@@ -878,6 +879,13 @@ test("THE FALSIFIER: every mark in the real world composes to EXACTLY the positi
       // side answers to it. Checked AFTER the de-sited branch so that branch's
       // "and the B side must not still position it" still runs for its own ids.
       if (WITHDRAWN_BY_DECLARED_ACT.has(id)) continue;
+      // a take is a declaring act: a mark the B side holds (held_by) rides its holder
+      // and carries no position of its own (LOGOS: a held thing rides its holder; S123,
+      // 2026-10-21, POS-688). Like the de-sited branch, hold only that it lost the position.
+      if (heldOnB.has(id)) {
+        assert.ok(!pb.has(id), `${id} is held on the B side, but the B side still positions it at ${pb.get(id)?.at}`);
+        continue;
+      }
       const b = pb.get(id);
       const reshaped = RESHAPED_BY_DECLARED_ACT.get(id);
       if (a.at !== b.at) {
