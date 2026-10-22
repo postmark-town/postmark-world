@@ -1284,7 +1284,8 @@ answer, exactly as exposure's body has always listed them. Elevation and
 sightline come from the heightfield, which is terrain, not a class —
 noted here so their absence from the drawing reads as fact, not gap.
 The town alone shapes that ground for now: a sited mark by the-town may carry
-`ground_m` (a height, or a `[lo, hi]` range inside its region's band), laid as a
+`ground_m` (a height, or a `[lo, hi]` range inside its region's band; a landform
+linked to a water body may sink to that water's surface), laid as a
 control point that reaches no further than its own extent (WLD-97, ruled by Darko
 2026-10-22; `WORLD/marks/SCHEMA.md § ground_m`).
 Sound deliberately does not feed exposure (hearing is earshot's law, a

@@ -132,7 +132,8 @@ test("THE LINT, end to end: in band on a town mark stands; out of band, and on a
   catch (e) { out = String(e.stdout ?? "") + String(e.stderr ?? ""); }
   const errors = out.split(/\r?\n/).filter((l) => l.startsWith("[ERROR]"));
   assert.equal(errors.filter((l) => /ground_m/.test(l)).length, 2, errors.join("\n"));
-  assert.ok(errors.some((l) => /the-garrison-lake/.test(l) && /outside the-protected-grove's band \[30, 50\]/.test(l)), errors.join("\n"));
+  // the lake mark is linked to its water, so water carves: [7, 50], and 60 is still above the top
+  assert.ok(errors.some((l) => /the-garrison-lake/.test(l) && /outside \[7, 50\] \(the-garrison-lake's surface to the-protected-grove's top\)/.test(l)), errors.join("\n"));
   assert.ok(errors.some((l) => /the-protected-grove:/.test(l) && /only a mark by the-town/.test(l)), errors.join("\n"));
   assert.equal(errors.some((l) => /the-lochan/.test(l)), false, "the lochan's 25 stands");
 
@@ -140,4 +141,17 @@ test("THE LINT, end to end: in band on a town mark stands; out of band, and on a
   const fold = JSON.parse(execFileSync("node", [join(HERE, "marks-fold.mjs"), "--marks-dir", join(repo, "WORLD", "marks"), "--no-write", "--json", "--allow-stampless"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 << 20 }));
   const lochan = (fold.marks ?? []).find((m) => m.id === "the-town/the-lochan");
   assert.equal(lochan?.ground_m, 25);
+});
+
+test("WATER CARVES: a landform linked to a water body is held between that water's surface and its region's top", () => {
+  // Garrison Lake sits in the-protected-grove, band [30, 50]; its water stands at 7.
+  const valley = { id: "the-town/a-test-valley", kind: "sited", by: "the-town", at: { x: -1400, y: -2775 }, extent: { w: 920, h: 800 }, feature: "the-garrison-lake", ground_m: 8 };
+  assert.deepEqual(groundStands(valley, ANCHORS, SKELETON), { ground: { lo: 8, hi: 8 }, region: "the-protected-grove", band: [7, 50], carvedBy: "the-garrison-lake" });
+  assert.match(groundStands({ ...valley, ground_m: 6 }, ANCHORS, SKELETON).refused, /outside \[7, 50\] \(the-garrison-lake's surface to the-protected-grove's top\)/);
+  assert.match(groundStands({ ...valley, ground_m: 51 }, ANCHORS, SKELETON).refused, /outside \[7, 50\]/);
+  // without the link, the upland's own band holds it
+  const { feature, ...unlinked } = valley;
+  assert.match(groundStands(unlinked, ANCHORS, SKELETON).refused, /outside the-protected-grove's band \[30, 50\]/);
+  // a link to a feature with no surface carves nothing
+  assert.match(groundStands({ ...valley, feature: "the-main-channel" }, ANCHORS, SKELETON).refused, /outside the-protected-grove's band \[30, 50\]/);
 });

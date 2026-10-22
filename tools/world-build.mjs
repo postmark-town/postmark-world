@@ -117,7 +117,8 @@ export function nearestAnchor(at, anchors) {
 // now"). A sited mark may carry `ground_m: <m>` or `ground_m: [lo, hi]`: the
 // height of the ground under it, or the range that ground is held to. Only a
 // mark `by: the-town` may carry it, and the value must sit inside the band of the
-// mark's region. In the heightfield it is a control point whose reach is the
+// mark's region (or, for a landform linked by `feature:` to a water body with a
+// surface, between that surface and the region's top: water carves). In the heightfield it is a control point whose reach is the
 // mark's own extent (the ellipse inside its w × h): it holds the ground at its
 // centre and fades to nothing at the extent's edge, so it never moves an inch of
 // ground outside the mark. Where its reach covers a lake that carries
@@ -147,10 +148,16 @@ export function groundStands(mark, anchors, skeleton) {
   if (!isSited(mark) || !mark.extent || !(mark.extent.w > 0) || !(mark.extent.h > 0)) return { refused: `ground_m: shapes the ground under a sited mark's own extent, and this mark stands on no ground of its own` };
   const region = nearestAnchor(mark.at, anchors);
   const row = (skeleton?.elevation?.regions ?? []).find((r) => r.id === region?.id);
-  const band = row?.band_m;
-  if (!band) return { refused: `ground_m: the mark's region has no band to hold it to` };
-  if (ground.lo < band[0] || ground.hi > band[1]) return { refused: `ground_m: ${JSON.stringify(mark.ground_m)} is outside ${region.id}'s band [${band[0]}, ${band[1]}]` };
-  return { ground, region: region.id, band };
+  if (!row?.band_m) return { refused: `ground_m: the mark's region has no band to hold it to` };
+  // WATER CARVES (G3, ruled by Darko 2026-10-22 18:54): a landform linked by
+  // `feature:` to a water body with a surface is bounded below by that surface,
+  // not by the upland's floor, so a valley can sink to its river. The top of the
+  // band is still the region's.
+  const water = mark.feature ? (skeleton?.features ?? []).find((f) => f.id === mark.feature && Number.isFinite(f.surface_m)) : null;
+  const band = water ? [water.surface_m, row.band_m[1]] : row.band_m;
+  const said = water ? `[${band[0]}, ${band[1]}] (${water.id}'s surface to ${region.id}'s top)` : `${region.id}'s band [${band[0]}, ${band[1]}]`;
+  if (ground.lo < band[0] || ground.hi > band[1]) return { refused: `ground_m: ${JSON.stringify(mark.ground_m)} is outside ${said}` };
+  return { ground, region: region.id, band, ...(water ? { carvedBy: water.id } : {}) };
 }
 
 // The lakes whose surface is a dial, as ellipses.
