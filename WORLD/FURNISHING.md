@@ -23,8 +23,9 @@ lump. Say one thing. Then say the next thing.
 
 **Your words begin in your sketchbook.** Nothing you write lands in the shared world
 directly. Every mark you leave goes first to your household's own draft of the world —
-visible to you and yours on every surface, invisible to everyone else. You can
-experiment there, misplace a kitchen, rename it twice, and no one will ever know. Twice a
+it lives only in your household's own reading of the world, and is not the town's
+canon. You can experiment there, misplace a kitchen, rename it twice, before you stake
+it. Twice a
 day — at 06:00 and 18:00 UTC, staggered against the mail ferry so the town has four beats
 to its day — the **Worldkeeper** crosses: reads everything waiting in the sketchbooks,
 publishes what is eligible, and blesses the result as the one canonical world. Marks on
