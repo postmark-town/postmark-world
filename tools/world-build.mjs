@@ -94,14 +94,106 @@ export function deriveHomeControlPoints(marks, anchors) {
   const pts = [];
   for (const m of marks) {
     if (!isSited(m)) continue;
-    let best = null, bd = Infinity;
-    for (const r of anchors) {
-      const d = (m.at.x - r.at.x) ** 2 + (m.at.y - r.at.y) ** 2;
-      if (d < bd) { bd = d; best = r; }
-    }
+    const best = nearestAnchor(m.at, anchors);
     if (best) pts.push({ x: m.at.x, y: m.at.y, h: best.h, id: best.id });
   }
   return pts;
+}
+
+// A point's region is its nearest region anchor: the one rule the home
+// densification above has always used, and the one the ground_m band check reads.
+// Ties keep the earlier anchor.
+export function nearestAnchor(at, anchors) {
+  let best = null, bd = Infinity;
+  for (const r of anchors) {
+    const d = (at.x - r.at.x) ** 2 + (at.y - r.at.y) ** 2;
+    if (d < bd) { bd = d; best = r; }
+  }
+  return best;
+}
+
+// ───────────────────────── the ground the town shapes ───────────────────────
+// WLD-97 part 2 (Darko, 2026-10-22: "the town should own the terraform for
+// now"). A sited mark may carry `ground_m: <m>` or `ground_m: [lo, hi]`: the
+// height of the ground under it, or the range that ground is held to. Only a
+// mark `by: the-town` may carry it, and the value must sit inside the band of the
+// mark's region. In the heightfield it is a control point whose reach is the
+// mark's own extent (the ellipse inside its w × h): it holds the ground at its
+// centre and fades to nothing at the extent's edge, so it never moves an inch of
+// ground outside the mark. Where its reach covers a lake that carries
+// `surface_m`, the water's surface wins.
+export const GROUND_SHAPER = "the-town";
+
+/** `ground_m` read as `{ lo, hi }`; null when absent; `{ malformed }` when unreadable. */
+export function groundOf(mark) {
+  const g = mark?.ground_m;
+  if (g === undefined || g === null) return null;
+  if (typeof g === "number" && Number.isFinite(g)) return { lo: g, hi: g };
+  if (Array.isArray(g) && g.length === 2 && g.every((v) => typeof v === "number" && Number.isFinite(v)) && g[0] <= g[1]) return { lo: g[0], hi: g[1] };
+  return { malformed: true };
+}
+
+/**
+ * Whether a mark's `ground_m` stands: `{ ground, region, band }` when it does,
+ * `{ refused }` (a sentence) when it does not, null when the mark carries none.
+ * The one rule: the lint refuses by it and the heightfield honors only what it
+ * accepts.
+ */
+export function groundStands(mark, anchors, skeleton) {
+  const ground = groundOf(mark);
+  if (!ground) return null;
+  if (ground.malformed) return { refused: `ground_m: is a height in metres or a [lo, hi] pair with lo ≤ hi; got ${JSON.stringify(mark.ground_m)}` };
+  if (mark.by !== GROUND_SHAPER) return { refused: `ground_m: only a mark by ${GROUND_SHAPER} may shape the ground (the town owns terraforming for now, ruled 2026-10-22); this mark is by ${mark.by}` };
+  if (!isSited(mark) || !mark.extent || !(mark.extent.w > 0) || !(mark.extent.h > 0)) return { refused: `ground_m: shapes the ground under a sited mark's own extent, and this mark stands on no ground of its own` };
+  const region = nearestAnchor(mark.at, anchors);
+  const row = (skeleton?.elevation?.regions ?? []).find((r) => r.id === region?.id);
+  const band = row?.band_m;
+  if (!band) return { refused: `ground_m: the mark's region has no band to hold it to` };
+  if (ground.lo < band[0] || ground.hi > band[1]) return { refused: `ground_m: ${JSON.stringify(mark.ground_m)} is outside ${region.id}'s band [${band[0]}, ${band[1]}]` };
+  return { ground, region: region.id, band };
+}
+
+// The lakes whose surface is a dial, as ellipses.
+function surfacedWaters(skeleton) {
+  return (skeleton?.features ?? [])
+    .filter((f) => f.kind === "lake" && Number.isFinite(f.surface_m) && f.center_m && f.rx_m > 0 && f.ry_m > 0)
+    .map((f) => ({ id: f.id, cx: f.center_m.x, cy: f.center_m.y, rx: f.rx_m, ry: f.ry_m, surface: f.surface_m }));
+}
+
+/**
+ * The heightfield with the town's landforms laid on it. With none, the very
+ * heightfield handed in (the field the town had before ground_m existed).
+ */
+export function shapeGround(heightfield, marks, anchors, skeleton) {
+  const forms = [];
+  for (const m of marks) {
+    const s = groundStands(m, anchors, skeleton);
+    if (!s || s.refused) continue;
+    forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, waters: [] });
+  }
+  if (!forms.length) return heightfield;
+  const waters = surfacedWaters(skeleton);
+  for (const f of forms) {
+    f.waters = waters.filter((w) => Math.abs(w.cx - f.cx) < w.rx + f.rx && Math.abs(w.cy - f.cy) < w.ry + f.ry);
+  }
+  const base = heightfield.elevationAt;
+  function elevationAt(x, y) {
+    let h = base(x, y);
+    for (const f of forms) {
+      const dx = (x - f.cx) / f.rx, dy = (y - f.cy) / f.ry;
+      const r2 = dx * dx + dy * dy;
+      if (!(r2 < 1)) continue;
+      for (const w of f.waters) {
+        const wx = (x - w.cx) / w.rx, wy = (y - w.cy) / w.ry;
+        if (wx * wx + wy * wy < 1) return w.surface;
+      }
+      const weight = 0.5 * (1 + Math.cos(Math.PI * Math.sqrt(r2)));
+      const held = h < f.lo ? f.lo : h > f.hi ? f.hi : h;
+      h += weight * (held - h);
+    }
+    return h;
+  }
+  return { ...heightfield, elevationAt, landforms: forms.map(({ waters, ...f }) => ({ ...f, waters: waters.map((w) => w.id) })) };
 }
 
 // ───────────────────────── the assembly ─────────────────────────────────────
@@ -130,7 +222,7 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
     ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
     ...waterControlPoints(skeleton),
   ];
-  const heightfield = buildHeightfield({ controlPoints });
+  const heightfield = shapeGround(buildHeightfield({ controlPoints }), marks, anchors, skeleton);
   return {
     marks,
     // THE PARCEL IS THE HOME (ruling 7). Home is a household's parcel, so the

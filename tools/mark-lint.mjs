@@ -39,6 +39,7 @@ import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs"
 import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
+import { regionAnchors, groundStands } from "./world-build.mjs"; // WLD-97: the ground_m rule the heightfield honors
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -680,6 +681,21 @@ for (const rec of marks) {
   if (rec._error || rec.fill === undefined || rec.kind === "class" || rec.kind === "property") continue;
   if (typeof propertyValue(rec.fill) !== "boolean")
     err(rec, `fill: is true or false — whether the World page tints this thing's ground when it has no picture (false: its outline alone); got ${JSON.stringify(rec.fill)}`);
+}
+
+// 5e. THE GROUND THE TOWN SHAPES (WLD-97 part 2, ruled 2026-10-22): `ground_m`
+// is the town's alone for now, and sits inside the band of the mark's region.
+// The rule is world-build.mjs § groundStands, the same one the heightfield
+// honors, so a refused ground_m is one the heightfield would never lay.
+{
+  let anchors = null;
+  try { anchors = regionAnchors(terrain); } catch { /* reported below, once */ }
+  for (const rec of marks) {
+    if (rec._error || rec.ground_m === undefined) continue;
+    if (!anchors) { err(rec, `ground_m: the skeleton's region anchors cannot be read (${TERRAIN_PATH}), so no band can hold this ground`); continue; }
+    const s = groundStands(rec, anchors, terrain);
+    if (s?.refused) err(rec, s.refused);
+  }
 }
 
 // THE FRAME LAW, written out here rather than imported from the loader.

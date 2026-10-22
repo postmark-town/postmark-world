@@ -69,6 +69,9 @@ ceiling +22 m, walk speed 60 km/crossing (**15 as ruled by 008, amended to 60 by
 pole at Caelina, **provisional on caelum's word**). Every height in the heightfield
 is read from here (WLD-97, 2026-10-22): an anchor stands at its band's midpoint,
 typed once, so terraforming is an edit to this file, never a code PR.
+A local landform (a basin, a knoll, a terrace) is a mark instead: a the-town
+sited mark's `ground_m`, laid within its own extent (`WORLD/marks/SCHEMA.md
+§ ground_m`).
 
 **Placement dials** — `tools/world-poc.mjs`:
 - Household anchors are **extracted from the marks** — every sited mark at its

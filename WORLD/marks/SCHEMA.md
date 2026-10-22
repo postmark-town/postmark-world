@@ -151,6 +151,7 @@ still written `kind: sited` + `class: thing` that `class:` folds into `kind:`.
 | `points` (reserved²) | opt | opt | — | — |
 | `far` (horizon object) | opt (the-town) | — | — | — |
 | `feature: <skeleton-id>` | opt (the-town, or the household a terrain mark has passed to) | — | — | — |
+| `ground_m: <m>` or `[lo, hi]` | opt (the-town only, for now) | — | — | — |
 | `mechanic: <registry-id>`³ | opt | opt | opt | opt |
 | `timetable`⁵ | opt | opt | opt | opt |
 | `consent: { <mark id>: <word> }`⁶ | opt | opt | — | — |
@@ -240,6 +241,21 @@ class dials.
 (the precise geometry in `skeleton.json`) are joined by a field, not a
 convention. The engine can follow it to the precise geometry later; nothing
 consumes it tonight.
+
+**`ground_m:` — the ground the town shapes (WLD-97, ruled by Darko
+2026-10-22: "the town should own the terraform for now").** A sited mark
+`by: the-town` may carry `ground_m: <m>` (the height of the ground under it)
+or `ground_m: [lo, hi]` (the range that ground is held to). The lint refuses it
+on any other mark, and refuses a value outside the band of the mark's region
+(its nearest region anchor, `skeleton.json § elevation.regions`). In the
+heightfield it is a control point whose reach is the mark's own extent: it holds
+the ground at the mark's centre and fades to nothing at the edge of the ellipse
+inside its w × h, so no ground outside the mark moves. Where that reach covers a
+lake carrying `surface_m`, the water's surface wins inside the water. It links
+the survey the same way every terrain claim does, by `feature:`. Whether a
+resident may shape their own ground waits for the terraforming sitting. The
+rule is `tools/world-build.mjs § groundStands`, read by both the lint and the
+heightfield.
 
 **A terrain mark may pass to a household, and the link goes with it
 (founder-ruled 2026-09-10: *"the inlet is terrain; everything else is just a
