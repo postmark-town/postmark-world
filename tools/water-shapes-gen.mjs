@@ -31,6 +31,8 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { waterFeatures, waterAt, halfWidthAtIndex, seaFeature } from "./water.mjs";
 import { pointInPolygon } from "./geometry.mjs";
+import { parseRecord } from "./marks-fold.mjs";
+import { claimsFeature } from "./world-build.mjs"; // WLD-97: a landform links a feature without claiming it
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const WRITE = process.argv.includes("--write");
@@ -195,9 +197,14 @@ function markFiles(dir, out = []) {
 let _files = null;
 function recordPathFor(featureId) {
   _files ??= markFiles(join(ROOT, "WORLD/marks"));
+  // read from the FRONTMATTER (a body line saying `feature: x` claims nothing;
+  // world-root-gen § indexFeatureClaims was hardened the same way), and only the
+  // feature's CLAIM: a landform carrying ground_m beside it links the survey but
+  // is not the record the water's shape is written onto (WLD-97 part 3)
   const hits = _files.filter((f) => {
-    const m = /^feature:\s*(.+?)\s*$/m.exec(readFileSync(f, "utf8"));
-    return m && m[1] === featureId;
+    let rec = null;
+    try { rec = parseRecord(readFileSync(f, "utf8"), f); } catch { return false; }
+    return claimsFeature(rec) && String(rec.feature) === featureId;
   });
   if (hits.length !== 1) return { error: `expected exactly one record for feature ${featureId}, found ${hits.length}` };
   return { path: hits[0], rel: hits[0].slice(ROOT.length + 1).replace(/\\/g, "/") };
@@ -233,7 +240,7 @@ for (const f of features) {
   const found = recordPathFor(f.id);
 
   const oldMark = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"))
-    .marks.find((m) => m.feature === f.id);
+    .marks.find((m) => claimsFeature(m) && m.feature === f.id);
   const before = oldMark ? `${oldMark.extent.w}×${oldMark.extent.h} at ${oldMark.at.x},${oldMark.at.y}` : "(no mark)";
 
   console.log(`  ${f.id} (${f.kind})`);
