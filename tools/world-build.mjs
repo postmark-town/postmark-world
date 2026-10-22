@@ -35,29 +35,21 @@ export const SIGNAL_MARKS = {
   "little-bird/little-bird-the-turning-mark": "a spar buoy marking where the channel turns",
 };
 
-// The heightfield's region control points — decision 008's seventeen rows at a
-// representative grid coordinate carrying its band-midpoint height. Coordinate is
-// EXTRACTED where possible (a placed home / a terrain feature), DERIVED only where
-// no home or feature names the spot. Height is the band midpoint — never a pixel.
-export const REGION_ANCHORS = [
-  { id: "the-town-centre",                  at: { x: 0, y: 0 },      h: 5,    src: "terrain: origin, the Origin {0,0} (+5, ruled)" },
-  { id: "the-lanternseed-gardens",          at: { x: 1075, y: -800 }, h: 15,  src: "home: rei" },
-  { id: "the-trueing-terrace",              at: { x: 888, y: -2320 }, h: 37,  src: "home: wright, ethan-thorne (centroid)" },
-  { id: "north-rim",                        at: { x: 700, y: -3600 }, h: 60,  src: "derived: N of the trueing terrace toward the map's north edge" },
-  { id: "the-high-ground",                  at: { x: 2544, y: 175 },  h: 35,  src: "home: the reeves household (centroid)" },
-  { id: "the-threshold-district",           at: { x: 1358, y: 1821 }, h: 2.5, src: "home: limen, hal, liv, noe (centroid)" },
-  { id: "the-still-reach-and-blackwater",   at: { x: 1900, y: 3900 }, h: 3,   src: "terrain: the-still-reach centreline" },
-  { id: "the-long-run",                     at: { x: 1513, y: 4888 }, h: 2.5, src: "home: carta, jetto-of-starforge (centroid); the locks" },
-  { id: "the-east-low-hills",               at: { x: 2800, y: 900 },  h: 20,  src: "derived: the East Window District's western wall" },
-  { id: "the-east-window-district",         at: { x: 3125, y: 1675 }, h: 8,   src: "home: east-facing-window" },
-  { id: "evermoon",                         at: { x: -1900, y: 2150 }, h: 17, src: "home: caelum (== the dark pole; Evermoon moved WEST 07-22)" },
-  { id: "the-protected-grove",              at: { x: -1375, y: -2550 }, h: 40, src: "home: sol-of-garrison; the garrison lake" },
-  { id: "the-lochan",                       at: { x: 2575, y: -1160 }, h: 25, src: "terrain: the-lochan closed basin" },
-  { id: "the-reach",                        at: { x: -1725, y: 4840 }, h: 15, src: "home: orion-by-the-fire" },
-  { id: "the-headland",                     at: { x: -2300, y: 4200 }, h: 15, src: "derived: raised promontory seaward of the Reach" },
-  { id: "the-doubled-coast",                at: { x: -258, y: 5033 }, h: 4,   src: "home: claude-of-dregg, gael-renton, spar (centroid)" },
-  { id: "aelyria",                          at: { x: 4075, y: 5050 }, h: 7.5, src: "home: aion-solare; the aelyria cliffs" },
-];
+// The heightfield's region control points: decision 008's seventeen rows, each at
+// the coordinate its row in skeleton.json § elevation.regions names (`anchor.at_m`)
+// and at the MIDPOINT OF THAT ROW'S OWN band_m. They were a constant here, with
+// every height typed a second time beside the band (WLD-97, ruled 2026-10-22: the
+// dials live in the skeleton, and terraforming is an edit to it, not a code PR).
+// A skeleton without them is refused by name: a heightfield missing its regions
+// would still draw, as a flat wrong world nobody was told about.
+export function regionAnchors(skeleton) {
+  const rows = skeleton?.elevation?.regions ?? [];
+  const unanchored = rows.filter((r) => !Number.isFinite(r.anchor?.at_m?.x) || !Number.isFinite(r.anchor?.at_m?.y) || !Array.isArray(r.band_m)).map((r) => r.id);
+  if (!rows.length || unanchored.length) {
+    throw new Error(`skeleton.elevation.regions must give every region an anchor.at_m and a band_m (${rows.length ? `missing: ${unanchored.join(", ")}` : "no regions"})`);
+  }
+  return rows.map((r) => ({ id: r.id, at: { x: r.anchor.at_m.x, y: r.anchor.at_m.y }, h: (r.band_m[0] + r.band_m[1]) / 2, src: r.anchor.receipt ?? null }));
+}
 
 // Sea datum points: sea = 0 at the coasts and the mouth (decision 008 datum).
 export const SEA_DATUM = [
@@ -70,7 +62,9 @@ export const SEA_DATUM = [
 
 // ───────────────────────── pure control-point derivations ───────────────────
 // Water-surface control points from the skeleton's own channel/still-water/locks
-// geometry. Height follows decision 008's fall (~+8 m upstream → 0 at the mouth).
+// geometry. Height follows decision 008's fall: the skeleton's river_fall_m at the
+// northmost wet point, falling evenly to 0 at the mouth (the dial was H_UP = 8 here
+// until WLD-97 moved it into the skeleton).
 // The water is a strong LOW constraint that carves the quay/river corridor.
 export function waterControlPoints(skeleton) {
   const wet = (skeleton.features ?? []).filter((f) => ["channel", "still-water", "still-inlet", "locks"].includes(f.kind));
@@ -80,12 +74,13 @@ export function waterControlPoints(skeleton) {
     for (const p of (Array.isArray(line) ? line : [line])) if (p) pts.push(p);
   }
   if (!pts.length) return [];
+  const fall = skeleton.elevation?.river_fall_m;
+  if (!Number.isFinite(fall)) throw new Error("skeleton.elevation.river_fall_m must be a number: the river's fall is a dial, read from the skeleton");
   const ys = pts.map((p) => p.y);
   const yN = Math.min(...ys), yMouth = Math.max(...ys);
-  const H_UP = 8; // dial: upstream water surface
   return pts.map((p) => {
     const t = (p.y - yN) / Math.max(1, yMouth - yN);
-    return { x: p.x, y: p.y, h: Math.max(0, H_UP * (1 - t)), id: null };
+    return { x: p.x, y: p.y, h: Math.max(0, fall * (1 - t)), id: null };
   });
 }
 
@@ -94,12 +89,13 @@ export function waterControlPoints(skeleton) {
 // anchor, so a low region holds its corridor down instead of the hills bleeding
 // in. The disk PoC overrides this with the manifest's declared-region points
 // (see assembleWorld's homeControlPoints), which is why run-01 stays byte-exact.
-export function deriveHomeControlPoints(marks) {
+// `anchors` is regionAnchors(skeleton).
+export function deriveHomeControlPoints(marks, anchors) {
   const pts = [];
   for (const m of marks) {
     if (!isSited(m)) continue;
     let best = null, bd = Infinity;
-    for (const r of REGION_ANCHORS) {
+    for (const r of anchors) {
       const d = (m.at.x - r.at.x) ** 2 + (m.at.y - r.at.y) ** 2;
       if (d < bd) { bd = d; best = r; }
     }
@@ -126,9 +122,10 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
     signalParents.add(isPredicate(m) || m.kind === "naming" ? m.parent : m.id);
   }
   const marks = (worldState.marks ?? []).map((m) => ({ ...m, signal: signalParents.has(m.id) || !!SIGNAL_MARKS[m.id] }));
-  const homePts = homeControlPoints ?? deriveHomeControlPoints(marks);
+  const anchors = regionAnchors(skeleton);
+  const homePts = homeControlPoints ?? deriveHomeControlPoints(marks, anchors);
   const controlPoints = [
-    ...REGION_ANCHORS.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
+    ...anchors.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
     ...homePts,
     ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
     ...waterControlPoints(skeleton),
