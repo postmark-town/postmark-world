@@ -418,6 +418,20 @@ export function entityChild(handle, markId) {
   return { id: handle, kind: ENTITY_KIND, handle, within: markId, at: null, extent: null, weight: 0, stamps: 0 };
 }
 
+// ── the terms' sentence, in plain English (WLD-109) ─────────────────────────
+//
+// An edge is a mark's own word ("aboard", "latch", "knock"), so its article is
+// read off it: "an aboard edge", "a latch edge". And a consequence is the
+// mark's own sentence, so when it already ends in a stop the sentence adds
+// none ("It opens." is never "It opens.."). The World page says the same two
+// things the same way (spectator/viewer.mjs § the terms sheet).
+
+/** "a" or "an" for an edge word, by its first letter. */
+export const edgeArticle = (word) => (/^[aeiou]/i.test(String(word ?? "").trim()) ? "an" : "a");
+
+/** Whether a line already ends in a stop of its own: . ! or ?, before any closing quotes or brackets. */
+export const endsInStop = (text) => /[.!?]["'”’)\]]*$/.test(String(text ?? "").trim());
+
 // ── adjudication: the walker's side meeting the mark's ──────────────────────
 //
 // One link of a chain. `accepted` is the walker's explicit word, demanded only
@@ -438,6 +452,7 @@ export function adjudicate(mark, { accepted = false } = {}) {
                : `${mark.id} opposes entry — an entity child opposed is a refusal at the threshold, and you are left standing at the door.` };
   if (law?.edge && !accepted)
     return { mark: mark.id, word, effect: "terms", terms: termsAt(mark),
-             because: `${mark.id} forms an ${law.edge} edge back at you on entry${law.consequence ? ` — ${law.consequence}` : ""}. Entering means accepting it; say so, or stay outside.` };
+             because: `${mark.id} forms ${edgeArticle(law.edge)} ${law.edge} edge back at you on entry${law.consequence ? ` — ${law.consequence}` : ""}`
+               + `${endsInStop(law.consequence || "on entry") ? "" : "."} Entering means accepting it; say so, or stay outside.` };
   return { mark: mark.id, word, effect: "entered", terms: termsAt(mark), because: null };
 }

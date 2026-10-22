@@ -34,7 +34,7 @@ import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mj
 // the town's own roster of regions, stated once in the record's own view: a water
 // mark carries a ring too, and the sea is not a region anyone is filed under
 import { REGION_SLUGS } from "../tools/region-outsiders.mjs";
-import { parseEnterExitLedger, occupancyAt, occupantsOf, withinOf, isMark, isEntity, entryLawOf } from "../tools/enter-exit.mjs";
+import { parseEnterExitLedger, occupancyAt, occupantsOf, withinOf, isMark, isEntity, entryLawOf, edgeArticle, endsInStop } from "../tools/enter-exit.mjs";
 import { deslugMarkId, resolveMarkName } from "../tools/mark-name.mjs";
 // WHERE A RECORD MAY BE READ FROM — one decision, in one place, with the
 // guardrail it answers to quoted in its header ("tags only, never main tip").
@@ -5249,8 +5249,8 @@ export function enterSheetHTML(answer = {}, markId = "", { nameOf, into = null }
     return `<div class="wv-cross-sheet is-terms" data-for="${esc(markId)}">`
       + `<div class="wv-cross-head">this door has terms</div>`
       + (body ? `<p class="wv-cross-body">${esc(body)}</p>` : "")
-      + (edge ? `<p class="wv-cross-edge">Crossing forms an <b>${esc(edge)}</b> edge back at you`
-          + `${consequence ? ` — ${esc(consequence)}` : ""}.</p>` : "")
+      + (edge ? `<p class="wv-cross-edge">Crossing forms ${edgeArticle(edge)} <b>${esc(edge)}</b> edge back at you`
+          + `${consequence ? ` — ${esc(consequence)}` : ""}${consequence && endsInStop(consequence) ? "" : "."}</p>` : "")
       + reading
       + `<div class="wv-cross-row">`
       + `<button type="button" class="ctl wv-cross-accept" data-enter-accept="${esc(markId)}"${into ? ` data-into="${esc(into)}"` : ""}>accept and cross</button>`
