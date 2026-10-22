@@ -911,6 +911,11 @@ commit. Nothing in this file is law; § 7 is a proposal.*
   ADDITION (public, openly weightless, on main). Nothing migrates
   automatically; privacy is never traded for a tier. Ruling recorded in
   LOGOS/tiers.md.
+  *SUPERSEDED in part 2026-10-21 (POS-752): the sketchbook was never private.
+  Its drafts are written to a public repository. Darko: "say the accurate thing
+  that matters: they are not the town's canon and live only in your own reading
+  of the world." `the-town/the-sketchbook` now says so. Q3's other half stands:
+  sketchbook and gray remain different instruments.*
 - **Q4 · the root's light — daylight is not an emission.** Ambient physics: no
   TTL, no source, present in every snapshot's idea of the world. The
   mechanic:→class: migration maps the root's light to its own ambient class

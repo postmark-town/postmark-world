@@ -2523,7 +2523,7 @@ The attach class
 already says an attachment *"is good only where you truly stand"*; the walks of
 09-07 found the door quoting that sentence and enforcing none of it — a thing
 given from 379 m away mid-leg, a set-down that left the thing where it was
-first laid, a private draft changing hands. This clause is the sentence the
+first laid, a draft changing hands. This clause is the sentence the
 door enforces:
 
 - **A take is a threshold act.** To take a thing you stand within its extent,
@@ -2542,9 +2542,17 @@ door enforces:
   "beside"); a give to a resident out of reach is refused by name, and a `to:`
   on a thing the giver does not hold is refused, never silently rewritten as a
   take.
-- **Only what stands on the world changes hands.** A private draft is on no
-  docket and in no public answer, so it can be held by nobody but its author's
-  household until it publishes; a hold edge on an unpublished thing is refused.
+- **Only what stands on the world changes hands.** A draft is not the town's
+  canon: it is on no docket and lives only in its own household's reading of the
+  world, so it can be held by nobody but its author's household until it
+  publishes; a hold edge on an unpublished thing is refused.
+  *SUPERSEDED in part 2026-10-21 (POS-752): this clause read "A private draft is
+  on no docket and in no public answer". Drafts are written to a public
+  repository, so they were never private. Darko: "say the accurate thing that
+  matters: they are not the town's canon and live only in your own reading of
+  the world." The rule itself (no hold edge on an unpublished thing) stands.
+  `the-town/the-sketchbook` is amended the same day: it read "invisible to every
+  other household until the settlement publishes them".*
 - **The receipt's vocabulary is the card's.** `carried along` / `set down`
   are the two propagations the attach class names; a receipt says which, in
   those words.
