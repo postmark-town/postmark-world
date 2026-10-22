@@ -64,8 +64,11 @@ node --test tools/world-engine.test.mjs     # the tests
 1.7 m, default mark top 4 m, fog curve, signal fog-reach ×6, dark-dim floor 0.15).
 
 **Terrain dials** — `WORLD/skeleton.json` (decision 008): quay +5 m, fog
-ceiling +22 m, walk speed 60 km/crossing (**15 as ruled by 008, amended to 60 by 008b; the skeleton's own number trued to 60 on 2026-10-01, POS-223; the live law is `the-town/resident`'s dial**), the seventeen region bands, the light
-poles (dawn NE → dark pole at Caelina, **provisional on caelum's word**).
+ceiling +22 m, walk speed 60 km/crossing (**15 as ruled by 008, amended to 60 by 008b; the skeleton's own number trued to 60 on 2026-10-01, POS-223; the live law is `the-town/resident`'s dial**), the seventeen region bands with their anchors, the river's fall
+(`river_fall_m`, 8 m) and each lake's `surface_m`, the light poles (dawn NE → dark
+pole at Caelina, **provisional on caelum's word**). Every height in the heightfield
+is read from here (WLD-97, 2026-10-22): an anchor stands at its band's midpoint,
+typed once, so terraforming is an edit to this file, never a code PR.
 
 **Placement dials** — `tools/world-poc.mjs`:
 - Household anchors are **extracted from the marks** — every sited mark at its
@@ -75,11 +78,13 @@ poles (dawn NE → dark pole at Caelina, **provisional on caelum's word**).
   the atlas `HOME_XY`), so the terrain it reported and the terrain the viewer drew
   were two different terrains. The manifest is retired (postmark#3025) and the
   override with it; the two agree now.
-- The heightfield's region control points are the seventeen bands at coordinates
-  **extracted** from placed homes + terrain features; only `north-rim`,
-  `the-east-low-hills`, `the-headland` are `derived` leans (flagged, no home/feature
-  names the spot). Water-surface points come from the skeleton's channel geometry
-  at the datum fall; sea points are the datum (0 m at coasts/mouth).
+- The heightfield's region control points are the seventeen bands, each at its
+  row's `anchor.at_m` in `skeleton.json § elevation.regions` and at its band's
+  midpoint (`regionAnchors`, world-build.mjs). The coordinates are **extracted**
+  from placed homes + terrain features; only `north-rim`, `the-east-low-hills`,
+  `the-headland` are `derived` leans (each anchor's receipt says which).
+  Water-surface points come from the skeleton's channel geometry at
+  `river_fall_m`; sea points are the datum (0 m at coasts/mouth).
 - `SIGNAL_MARKS` — **superseded 2026-07-23: signal is mechanic-backed now.** A
   mark (or a predicated mark describing it) carrying `mechanic: signal` on the
   record IS the signal — `assembleWorld` derives it from the fold output
