@@ -120,6 +120,8 @@ test("the anchors are the old ones: same order, same coordinates, and heights fr
     if (a.h !== old.h) moved[a.id] = a.h - old.h;
   });
   assert.deepEqual(moved, { "the-trueing-terrace": 0.5, "the-east-window-district": 0.5, "evermoon": 0.5 });
+  // the still reach's anchor carries its region's own id now (the constant said "the-still-reach-and-blackwater")
+  assert.equal(now[6].id, "the-still-reach-and-blackwater-bend");
 });
 
 test("the river's fall is read from the skeleton: the dial moves the water, and the same dial reproduces the old code", () => {
@@ -131,7 +133,7 @@ test("the river's fall is read from the skeleton: the dial moves the water, and 
   assert.equal(head.h, 12, "the head of the water stands at the dial");
 });
 
-test("a skeleton that leaves out a dial is refused by name, never drawn flat", () => {
+test("by default a skeleton that leaves out a dial is refused by name: the office never tells the world over ground it cannot read", () => {
   const noAnchor = fresh();
   delete noAnchor.elevation.regions[11].anchor;
   assert.throws(() => assembleWorld({ worldState: WORLD_STATE, skeleton: noAnchor }), /missing: the-protected-grove/);
@@ -144,4 +146,21 @@ test("the lakes carry their surface as data", () => {
   const lakes = SKELETON.features.filter((f) => f.kind === "lake");
   assert.deepEqual(Object.fromEntries(lakes.map((l) => [l.id, l.surface_m])), { "the-lochan": 25, "the-garrison-lake": 7 });
   for (const l of lakes) assert.ok(l.surface_receipt, `${l.id} says why`);
+});
+
+test("THE WORLD PAGE NEVER GOES BLANK: a skeleton without its height dials draws flat on the page, and says why", () => {
+  const old = fresh();
+  for (const r of old.elevation.regions) delete r.anchor;   // a clone one settlement behind the anchors
+  delete old.elevation.river_fall_m;
+  const w = assembleWorld({ worldState: WORLD_STATE, skeleton: old, whenHeightsUnread: "flat" });
+  assert.equal(w.marks.length, WORLD_STATE.marks.length, "every mark is still drawn");
+  for (const [x, y] of [[0, 0], [-1400, -2775], [2575, -1160]]) assert.equal(w.heightfield.elevationAt(x, y), 0);
+  assert.match(w.heightsUnread, /drawn flat, without terrain heights: .*anchor/);
+  // a readable skeleton says nothing
+  assert.equal("heightsUnread" in assembleWorld({ worldState: WORLD_STATE, skeleton: SKELETON, whenHeightsUnread: "flat" }), false);
+  // and the page is the one that asks for it, and logs the reason
+  const viewer = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
+  const call = viewer.match(/world = sightOf\(assembleWorld\(\{[^}]*\}\)\);\s*\n\s*if \(world\.heightsUnread\) console\.warn\(/);
+  assert.ok(call, "the World page assembles with a fallback and warns (sight keeps the reason: scopeWorld spreads the world)");
+  assert.match(call[0], /whenHeightsUnread: "flat"/);
 });

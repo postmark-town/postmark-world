@@ -111,7 +111,13 @@ export function deriveHomeControlPoints(marks, anchors) {
 //   passes the manifest's declared-region points; the browser passes null and the
 //   points are derived from the marks). Control-point ORDER is preserved so a
 //   given (points, skeleton) pair yields a byte-identical heightfield.
-export function assembleWorld({ worldState, skeleton, homeControlPoints = null } = {}) {
+// whenHeightsUnread: what to do when the skeleton's height dials cannot be read
+//   (no region anchors, no river_fall_m). "refuse" (the default) throws: the
+//   office tells the world, and a telling over ground it cannot read is no
+//   answer. "flat" is the World page's: it draws the town at 0 m and says why in
+//   `heightsUnread`, so a page that read a skeleton from a clone one settlement
+//   behind (an office whose clone predates the anchors) still draws (WLD-97 W1).
+export function assembleWorld({ worldState, skeleton, homeControlPoints = null, whenHeightsUnread = "refuse" } = {}) {
   // Signal is mechanic-backed now (07-23): a sited mark is a signal when it — or
   // any predicated mark describing it — carries `mechanic: signal` on the record.
   // The durable form SIGNAL_MARKS stood in for; the allowlist stays only for the
@@ -122,16 +128,24 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
     signalParents.add(isPredicate(m) || m.kind === "naming" ? m.parent : m.id);
   }
   const marks = (worldState.marks ?? []).map((m) => ({ ...m, signal: signalParents.has(m.id) || !!SIGNAL_MARKS[m.id] }));
-  const anchors = regionAnchors(skeleton);
-  const homePts = homeControlPoints ?? deriveHomeControlPoints(marks, anchors);
-  const controlPoints = [
-    ...anchors.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
-    ...homePts,
-    ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
-    ...waterControlPoints(skeleton),
-  ];
-  const heightfield = buildHeightfield({ controlPoints });
+  let heightfield, heightsUnread = null;
+  try {
+    const anchors = regionAnchors(skeleton);
+    const homePts = homeControlPoints ?? deriveHomeControlPoints(marks, anchors);
+    const controlPoints = [
+      ...anchors.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
+      ...homePts,
+      ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
+      ...waterControlPoints(skeleton),
+    ];
+    heightfield = buildHeightfield({ controlPoints });
+  } catch (e) {
+    if (whenHeightsUnread !== "flat") throw e;
+    heightsUnread = `the town is drawn flat, without terrain heights: ${e.message}`;
+    heightfield = { elevationAt: () => 0, controlPoints: [] };
+  }
   return {
+    ...(heightsUnread ? { heightsUnread } : {}),
     marks,
     // THE PARCEL IS THE HOME (ruling 7). Home is a household's parcel, so the
     // parcel is a first-class world object and the fold must publish it — every
