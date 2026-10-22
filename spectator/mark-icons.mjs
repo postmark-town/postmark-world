@@ -207,9 +207,10 @@ export function iconSVG(icon, { x = 0, y = 0, size = 10, ink = null } = {}) {
 }
 
 /** The icon row as HTML (the nameplate's): an empty span per icon, drawn by its
- *  CSS mask, a count beside ✦ and people, the meaning as its `title`. */
+ *  CSS mask, a count beside ✦ and people, the meaning as its `title`. An icon a
+ *  caller could not resolve (undefined) is left out, never a throw (WLD-108). */
 export function iconsHTML(icons = []) {
-  return (icons ?? []).map((icon) => `<span class="wv-icw" title="${esc(icon.meaning)}">`
+  return (icons ?? []).filter(Boolean).map((icon) => `<span class="wv-icw" title="${esc(icon.meaning)}">`
     + `<span class="wv-ic ic-${esc(icon.key)}" aria-label="${esc(icon.label)}"></span>`
     + (icon.count ? `<span class="wv-icn">${esc(Number(icon.count).toLocaleString())}</span>` : "")
     + `</span>`).join("");

@@ -4524,6 +4524,12 @@ export function walkerCandidatesAt(rows, { bodyOf = (w) => w, toScreen }) {
 // walker's is, and it joins the nameplate and the column the way a mark does.
 export const CREATURE_PREFIX = "creature:";
 export const isCreatureId = (id) => typeof id === "string" && id.startsWith(CREATURE_PREFIX) && id.length > CREATURE_PREFIX.length;
+/** The icon a live creature wears (fix 13's, the one the record's creature classes wear), for its
+ *  nameplate and its column. The stand-in carries an `at`: since LOGOS v2 W2, isSited needs one,
+ *  and without it markIcons answered nothing and the creature nameplate threw on hover (WLD-108). */
+export function creatureIcon() {
+  return markIcons({ kind: "sited", id: CREATURE_PREFIX, at: { x: 0, y: 0 } }, { cls: "creature" })[0];
+}
 
 /** The living creatures in an apex find answer: [{ id, kind, name, x, y, fades_in }]. Pure. */
 export function liveCreaturesFrom(answer) {
@@ -14607,8 +14613,6 @@ export function mountViewer(appEl) {
   // a kind's silhouette (the Mists' own art) as a CSS mask, for its token in the column
   const silhouetteURL = (kind) => "url(\"data:image/svg+xml," + encodeURIComponent(
     "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='" + creatureSilhouette(kind).d + "'/></svg>") + "\")";
-  // fix 13's creature icon, the one the record's creature classes wear
-  const creatureIcon = () => markIcons({ kind: "sited", id: "creature:" }, { cls: "creature" })[0];
   function liveCreatureGlyphs(px, tier) {
     if (Date.now() - liveCreaturesAt > CREATURES_REFRESH_MS) loadLiveCreatures();
     if (!liveCreatures.size) return "";

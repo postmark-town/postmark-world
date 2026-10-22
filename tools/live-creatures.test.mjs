@@ -97,3 +97,26 @@ test("[pin] the page reads the office's own keyless doors, draws over the paint,
   assert.match(SOURCE, /if \(isCreatureId\(id\)\) \{\s*if \(markInteraction\.getState\(\)\.selectedId === id\) \{ markInteraction\.select\(null\); return false; \}/, "selected like a face");
   assert.match(SOURCE, /regionColumnView\(selected\) \?\? creatureColumnView\(selected\) \?\? (residentColumnView\(selected\) \?\? )?markColumnView\(selected\)/, "and opens the column");
 });
+
+// WLD-108 (2026-10-22): hovering a live creature on the World page threw
+// "Cannot read properties of undefined (reading 'meaning')" (reproduced on prod,
+// painting-only, on the raven). creatureIcon's stand-in carried no `at`, so since
+// LOGOS v2 W2's isSited it answered nothing, and iconsHTML([undefined]) threw
+// inside the interaction store's listener loop.
+test("WLD-108: a creature's nameplate wears the creature icon, and an unresolved icon is never a throw", async () => {
+  const { creatureIcon } = await import("../spectator/viewer.mjs");
+  const { iconsHTML } = await import("../spectator/mark-icons.mjs");
+  const icon = creatureIcon();
+  assert.equal(icon?.key, "creature", "the stand-in is sited, so it gets its icon");
+  assert.equal(icon.kind, "what");
+  // the plate's own composition (creatureNameplateHTML), rendered
+  const fn = SOURCE.match(/function creatureNameplateHTML\(id\) \{[\s\S]*?\n  \}\n/)[0];
+  assert.match(fn, /iconsHTML\(\[creatureIcon\(\)\]\)/, "the plate draws creatureIcon through iconsHTML");
+  const plate = iconsHTML([creatureIcon()]);
+  assert.match(plate, /class="wv-ic ic-creature"/);
+  assert.match(plate, /title="A creature/);
+  // and whatever a future reader fails to resolve is left out, not thrown on
+  assert.doesNotThrow(() => iconsHTML([undefined, null]));
+  assert.equal(iconsHTML([undefined]), "");
+  assert.equal(iconsHTML([undefined, icon]), plate);
+});
