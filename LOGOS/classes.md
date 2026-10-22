@@ -614,7 +614,7 @@ sovereign root therefore never makes instances "fully sovereign" — the named
 constitutional set is the exceptions ledger made structural, and instance
 freedom is everything it does not say. **Registration is itself a
 constitutional predicate** — the one that separates a class standing in the
-Keeping Works from a private taxonomy in someone's sketchbook.
+Keeping Works from a taxonomy in someone's drafts.
 
 **Locked predicates never demote at any rung** (*locked properties, read from
 2026-10-16*) — and the anti-sybil floor
@@ -2547,8 +2547,10 @@ door enforces:
   world, so it can be held by nobody but its author's household until it
   publishes; a hold edge on an unpublished thing is refused.
   *SUPERSEDED in part 2026-10-21 (POS-752): this clause read "A private draft is
-  on no docket and in no public answer". Drafts are written to a public
-  repository, so they were never private. Darko: "say the accurate thing that
+  on no docket and in no public answer". Until the 2026-09-11 cutover drafts
+  were written to public `draft/<household>` branches of this repository, which
+  still stand; since then they live in the office's store. Either way, private
+  was not the accurate word. Darko: "say the accurate thing that
   matters: they are not the town's canon and live only in your own reading of
   the world." The rule itself (no hold edge on an unpublished thing) stands.
   `the-town/the-sketchbook` is amended the same day: it read "invisible to every
