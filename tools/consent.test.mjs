@@ -290,6 +290,88 @@ test("an UNSTAKED senior's veto moves nothing — with nobody backing either sid
   assert.equal(state.returned.length, 0);
 });
 
+// ── WLD-102: two grounds the market never reaches ───────────────────────────
+// LOGOS conflict-matrix § Roles from seniority, RULED 2026-10-21 (Darko): (a)
+// the town's own marks never answer a resident's market opposition, on a
+// commons edge as on a parcel; (b) once a parcel stands, what is laid inside it
+// answers only to its holder, never to a senior's density. The estate below is
+// backed and laid before everything else, so without these rules its word
+// would return each mark it opposes (plumb-wld101's probe shapes).
+
+const ESTATE_DATE = "2026-07-25";                 // before the parcel (08-01) and every mark after it (08-10)
+const backedEstate = (consent) => sited("estate", "a", 0, 0, 1000, 1000, { date: ESTATE_DATE, consent });
+const BACKED = [stake("s", "a/estate", 100)];
+
+test("WLD-102/a · THE TOWN IS EXEMPT: a backed senior estate opposing a later town mark inside it no longer returns it", () => {
+  const quay = sited("quay", "the-town", 0, 0, 40, 40, { tier: "constitution", date: "2026-08-20" });
+  onTheRuledPath(backedEstate(), quay);
+  const state = fold({ marks: [backedEstate({ "the-town/quay": "opposed" }), quay], terrain, tick: 1, stakes: BACKED });
+  assert.equal(standing(state, "the-town/quay"), true, "the town's own mark stands under a senior's opposition");
+  assert.deepEqual(state.returned, [], "and nothing is returned");
+});
+
+test("WLD-102/a · the town is exempt on EVERY edge: a town mark straddling the estate's edge, not inside it, stands too", () => {
+  const pier = sited("pier", "the-town", 500, 0, 100, 40, { date: "2026-08-20" });
+  onTheRuledPath(backedEstate(), pier);
+  const state = fold({ marks: [backedEstate({ "the-town/pier": "opposed" }), pier], terrain, tick: 1, stakes: BACKED });
+  assert.equal(standing(state, "the-town/pier"), true, "a partial overlap is a commons edge, and the town is exempt there too");
+  assert.deepEqual(state.returned, []);
+});
+
+test("WLD-102/b · THE PARCEL'S INTERIOR IS THE HOLDER'S: the estate opposing a later household mark on its own parcel inside the estate no longer returns it", () => {
+  const house = sited("house", "b", 0, 0, 10, 10);
+  onTheRuledPath(backedEstate(), house);
+  const state = fold({ marks: [backedEstate({ "b/house": "opposed" }), parcel("lot", "b", 0, 0), house], terrain, tick: 1, stakes: BACKED });
+  assert.equal(state.marks.find((m) => m.id === "b/house")?.placementParent, "b/lot", "the house stands inside the parcel");
+  assert.equal(standing(state, "b/house"), true, "the estate's density does not reach inside a standing parcel");
+  assert.deepEqual(state.returned, []);
+});
+
+test("WLD-102/b · a THIRD household's later mark inside the parcel answers only to the holder: the estate's word is ignored, the holder's returns it", () => {
+  const stall = sited("stall", "c", 0, 0, 10, 10);
+  const estateOnly = fold({ marks: [backedEstate({ "c/stall": "opposed" }), parcel("lot", "b", 0, 0), stall], terrain, tick: 1, stakes: BACKED });
+  assert.equal(standing(estateOnly, "c/stall"), true, "the estate's word does not reach the parcel's interior");
+  const holder = fold({
+    marks: [backedEstate({ "c/stall": "opposed" }), parcel("lot", "b", 0, 0, { consent: { "c/stall": "opposed" } }), stall],
+    terrain, tick: 1, stakes: BACKED,
+  });
+  assert.equal(standing(holder, "c/stall"), false, "the holder's word does");
+  assert.equal(holder.returned.length, 1);
+  assert.equal(holder.returned[0].authority, "parcel (absolute)", "and the return names the parcel, not the estate");
+  assert.equal(holder.returned[0].returned_from, "b/lot");
+});
+
+test("WLD-102/b · the holder's opposition to a later mark inside their parcel still works, unstaked, with no estate around it", () => {
+  const stall = sited("stall", "c", 0, 0, 10, 10);
+  const state = fold({ marks: [parcel("lot", "b", 0, 0, { consent: { "c/stall": "opposed" } }), stall], terrain, tick: 1, stakes: [] });
+  assert.equal(standing(state, "c/stall"), false, "the parcel veto is absolute");
+  assert.equal(state.returned[0].authority, "parcel (absolute)");
+});
+
+test("WLD-102/b · the ORDINARY case is unchanged: a newcomer on open commons ground under the estate is still opposed by density", () => {
+  const shed = sited("shed", "c", 300, 300, 10, 10);       // inside the estate, nowhere near the parcel
+  onTheRuledPath(backedEstate(), shed);
+  const state = fold({ marks: [backedEstate({ "c/shed": "opposed" }), parcel("lot", "b", 0, 0), shed], terrain, tick: 1, stakes: BACKED });
+  assert.equal(standing(state, "c/shed"), false, "the backed senior turns the newcomer away");
+  assert.equal(state.returned[0].authority, "commons edge (earned)");
+});
+
+test("WLD-102/b · a mark STRADDLING the parcel's fence is not its interior: the estate's word still reaches it", () => {
+  const barn = sited("barn", "b", 12, 0, 10, 10);          // half on the lot (x -12.5..12.5), half on the commons
+  onTheRuledPath(backedEstate(), barn);
+  const state = fold({ marks: [backedEstate({ "b/barn": "opposed" }), parcel("lot", "b", 0, 0), barn], terrain, tick: 1, stakes: BACKED });
+  assert.notEqual(state.marks.find((m) => m.id === "b/barn")?.placementParent, "b/lot", "the barn is not inside the parcel");
+  assert.equal(standing(state, "b/barn"), false, "so it is a commons newcomer, and the backed senior returns it");
+});
+
+test("WLD-102/b · what stood inside BEFORE the parcel keeps its senior: the estate's word still reaches a mark older than the parcel around it", () => {
+  const hut = sited("hut", "c", 0, 0, 10, 10, { date: "2026-07-28" }); // after the estate, before the parcel (08-01)
+  onTheRuledPath(backedEstate(), hut);
+  const state = fold({ marks: [backedEstate({ "c/hut": "opposed" }), parcel("lot", "b", 0, 0), hut], terrain, tick: 1, stakes: BACKED });
+  assert.equal(standing(state, "c/hut"), false, "a parcel laid around an older mark does not shield it from that mark's own senior");
+  assert.equal(state.returned[0].authority, "commons edge (earned)");
+});
+
 // ── POS-369: the senior at contact holds the word, never the container ──────
 // LOGOS conflict-matrix § Roles from seniority, RULED 2026-10-04: contact is
 // geometric, seniority is temporal, the senior at contact holds the `m`; the

@@ -367,6 +367,25 @@ test("POS-369 · a market opposition: the senior at contact may oppose a straddl
   assert.doesNotMatch(out, /"pondhh\/the-old-pond"[^\n]*(ignored|not inside)/, "held for POS-572: a welcome on what stands inside your mark is read as before");
 });
 
+test("WLD-102 · a market opposition on the town's own mark, or inside a standing parcel laid after it, is named and ignored; the commons newcomer and the elder inside the parcel are not", () => {
+  const { dir, root } = fixtureTree();
+  const put = (slug, fm, body) => {
+    mkdirSync(join(root, slug), { recursive: true });
+    writeFileSync(join(root, slug, "mark.md"), `---\n${fm}\n---\n\n${body}\n`);
+  };
+  put("the-old-estate", 'kind: sited\nby: estatehh\ndate: 2026-07-25\nat: { x: 800, y: 800 }\nextent: { w: 400, h: 400 }\nconsent: {"the-town/the-new-well": "opposed", "lothh/the-new-house": "opposed", "shedhh/the-new-shed": "opposed", "huthh/the-old-hut": "opposed"}', "An estate that was here first.");
+  put("the-new-well", "kind: sited\nby: the-town\ndate: 2026-08-20\nat: { x: 900, y: 900 }\nextent: { w: 20, h: 20 }", "The town's well.");
+  put("the-lot", "kind: parcel\nby: lothh\ndate: 2026-08-01\nat: { x: 700, y: 700 }\nextent: { w: 25, h: 25 }", "A parcel inside the estate.");
+  put("the-new-house", "kind: sited\nby: lothh\ndate: 2026-08-20\nat: { x: 700, y: 700 }\nextent: { w: 10, h: 10 }", "A house on its own parcel.");
+  put("the-old-hut", "kind: sited\nby: huthh\ndate: 2026-07-28\nat: { x: 705, y: 705 }\nextent: { w: 6, h: 6 }", "A hut that stood before the parcel.");
+  put("the-new-shed", "kind: sited\nby: shedhh\ndate: 2026-08-20\nat: { x: 850, y: 700 }\nextent: { w: 10, h: 10 }", "A shed on the open commons.");
+  const out = runLint(dir);
+  assert.match(out, /"the-town\/the-new-well" is the town's own mark — ignored/, "the town is exempt");
+  assert.match(out, /"lothh\/the-new-house" stands inside the parcel lothh\/the-lot, laid after it — ignored/, "the parcel's interior is the holder's");
+  assert.doesNotMatch(out, /"shedhh\/the-new-shed"[^\n]*(ignored|does not touch)/, "the commons newcomer is still the senior's to speak on");
+  assert.doesNotMatch(out, /"huthh\/the-old-hut"[^\n]*(ignored|does not touch)/, "a mark older than the parcel keeps its senior");
+});
+
 // ── WLD-41 · a value the parser silently empties (Darko, 2026-10-13 16:47) ───
 //
 // parseRecord reads a `{…}` value as strict JSON first, and anything else through

@@ -1231,6 +1231,8 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // the law; this is only where it is asked.
   const consent = resolveConsent({
     byId, credOf: credHh, parcels, ownStamps: weightByMark, parentOf, rectOf: rect,
+    // the placement chain, which holds parcels: a parcel's interior answers only to its holder (WLD-102/b)
+    placementOf: containedBy,
     // the town's standing word per mark (POS-361), fed by the settlement; absent = silence
     townWords,
     // the town's oppositions that cite a limit (R11), fed by the settlement: they take their subtree
@@ -1562,9 +1564,12 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // is not a contest (tools/carve-principles.test.mjs; consent.test.mjs, "a
   // household never consents to itself" and the unstaked veto that moves
   // nothing). The fourth, that a sovereign mark and a constitution mark never
-  // enter, holds today against a parcel holder's word (consent.test.mjs, "THE
-  // TOWN'S OWN REGION"); whether a backed senior's market opposition reaches
-  // them is not ruled, so no test claims it.
+  // enter, holds against a parcel holder's word (consent.test.mjs, "THE TOWN'S
+  // OWN REGION") and, since WLD-102 (Darko, 2026-10-21), against a backed
+  // senior's market opposition: the town's own marks are exempt, and a parcel's
+  // interior answers only to its holder (carve-principles.test.mjs). One edge
+  // is left by the ruling itself: a household's mark that stood on the ground
+  // before its own parcel was laid keeps the seniors it had.
   //
   // The disabled call, kept where it stood:
   // const carved = carve(

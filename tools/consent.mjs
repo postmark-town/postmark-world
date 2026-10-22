@@ -88,6 +88,17 @@
 //              (a predicate, a name) touches only its declared parent, so that
 //              edge is its contact.
 //
+//              TWO GROUNDS THE MARKET NEVER REACHES (Darko, 2026-10-21,
+//              WLD-102; conflict-matrix § Roles from seniority):
+//                · the town's own marks (a, 21:06, "Yes: the town is exempt"),
+//                  on a commons edge as on a parcel: the town alone is
+//                  sovereign over them;
+//                · a standing parcel's interior (b, 21:11, "Parcel interior is
+//                  the holder's"): a mark whose containment chain reaches a
+//                  standing parcel, and which was first laid after it, answers
+//                  only to that parcel's holder, never to a senior's density.
+//                  What stood there before the parcel keeps its seniors.
+//
 //              HELD FOR POS-572 (Darko, 2026-10-10: the rest of the role
 //              law goes to a proper sitting), each keeping what the fold did
 //              before POS-369:
@@ -224,6 +235,24 @@ export function inContact(grantor, target) {
   if (!grantor?.at || !target) return false;                        // no extent, no ground to speak from
   return target.at ? marksOverlapArea(grantor, target) > 0 : target.parent === grantor.id;
 }
+// A PARCEL'S INTERIOR IS THE HOLDER'S (conflict-matrix § Roles from seniority,
+// RULED 2026-10-21, WLD-102/b): the standing parcel `target` stands inside and
+// was laid after, or null. Inside is the placement chain (`placementOf`, the
+// edge published as `placementParent`, marks-fold.mjs § containmentParents),
+// climbed to the first standing parcel on it. It is not `parentOf`, the edge a
+// return walks: that one is sited-in-sited and never holds a parcel. A mark
+// that stood there before the parcel was laid is not its interior. `parcelIds`
+// is the standing parcels. Shared with the lint so both answer the same.
+export function parcelInteriorOf(target, { byId, placementOf, parcelIds }) {
+  if (!target?.id || !placementOf) return null;
+  const seen = new Set([target.id]);
+  for (let id = placementOf.get(target.id); id != null && !seen.has(id); id = placementOf.get(id)) {
+    seen.add(id);
+    if (!parcelIds.has(id)) continue;
+    return byId.has(id) && cameAfter(target, byId.get(id)) ? id : null;
+  }
+  return null;
+}
 /** Do the two first-laid instants both parse, and differ? Only then does seniority decide. */
 export function firstLaidOrdered(a, b) {
   const ta = Date.parse(String(claimInstant(a) ?? ""));
@@ -239,7 +268,7 @@ const overlapsRect = (a, b) => {
 };
 
 /**
- * resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rectOf })
+ * resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, placementOf, rectOf })
  *
  *   byId      Map(id -> mark record)
  *   credOf    (handle) -> credential household key
@@ -248,6 +277,10 @@ const overlapsRect = (a, b) => {
  *   parentOf  Map(childId -> parentId)  — the computed containment edges: the
  *             subtree a return walks and the fan-up tree. Who holds a word is
  *             NOT read off it (§ seniorAtContact)
+ *   placementOf Map(id -> containerId) — the placement chain, which holds
+ *             parcels (marks-fold.mjs § containmentParents); what stands inside
+ *             a standing parcel is read off it (§ parcelInteriorOf). Absent, no
+ *             mark is any parcel's interior
  *   rectOf    (mark) -> {x,y,w,h}
  *   townWords Map(id -> "neutral" | "opposed") or a plain object; optional —
  *             the town's standing word per mark (see § THE TOWN'S WORD)
@@ -259,7 +292,7 @@ const overlapsRect = (a, b) => {
  *   `alone`: the marks returned without their positioned children, whose
  *   children the fold reparents (ruling B)
  */
-export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rectOf, townWords = null, townLaws = null }) {
+export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, placementOf = null, rectOf, townWords = null, townLaws = null }) {
   const errors = [];
   const kept = new Set();
   const words = new Map();      // `${grantorId}\0${targetId}` -> word
@@ -309,8 +342,11 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
   // asked, except where the first-laid order proves nothing (held for
   // POS-572). A later mark drawn over an earlier one cannot oppose it; the
   // earlier one's word counts on the later one whichever contains which.
-  // Parcels answer their own law above.
+  // Parcels answer their own law above, and so do the two grounds the market
+  // never reaches (§ IN THE MARKET, WLD-102): the town's own marks, and what was
+  // laid inside a standing parcel after it.
   const edgeVeto = new Map();       // childId -> { parent, grantor, child_own, parent_density, child_eff }
+  const parcelIds = new Set(parcels.map((p) => p.id));
   const opposals = [...words]
     .filter(([, word]) => word === "opposed")
     .map(([key]) => key.split("\0"))
@@ -319,6 +355,8 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, rec
     const c = byId.get(child), p = byId.get(parent);
     if (!c || !p) continue;                                 // the lint warns; the fold does not invent a mark
     if (credOfMark(c) === credOfMark(p)) continue;          // structural +1 already; a word here is ignored (the lint warns)
+    if (townOwnedMark(c)) continue;                         // the town is exempt (WLD-102/a)
+    if (parcelInteriorOf(c, { byId, placementOf, parcelIds })) continue; // the parcel's interior is its holder's (WLD-102/b)
     if (!seniorAtContact(p, c, { container: parentOf.get(child) ?? null })) continue; // no contact, or a newcomer's word on what stood there first
 
     // §9.2's arithmetic, in densities, which is the unit §9.2 argues in

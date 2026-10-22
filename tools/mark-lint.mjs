@@ -34,7 +34,7 @@ import {
   containmentParents, lossyValues, lossyMessage,
 } from "./marks-fold.mjs";
 import { markStanding } from "./mark-standing.mjs";
-import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact } from "./consent.mjs";
+import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact, parcelInteriorOf } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
@@ -1001,6 +1001,9 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
   const households = existsSync(HOUSEHOLDS_PATH)
     ? (JSON.parse(readFileSync(HOUSEHOLDS_PATH, "utf8")).households ?? {}) : {};
   const credOf = (handle) => households[handle] ?? `solo:${handle}`;
+  // every parcel on file: the lint does not run the fold's admission, so a word
+  // that only an inadmissible parcel would shield is still told as shielded
+  const parcelIds = new Set(marks.filter((m) => !m._error && m.kind === "parcel").map((m) => m.id));
 
   for (const rec of marks) {
     if (rec._error) continue;
@@ -1057,6 +1060,17 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
       }
       if (!isParcel && t.kind === "parcel") {
         warn(rec, parcelIgnored);
+        continue;
+      }
+      // the two grounds the market never reaches (consent.mjs § IN THE MARKET,
+      // WLD-102): the town's own marks, and a standing parcel's interior
+      if (!isParcel && opposes && townOwnedMark(t)) {
+        warn(rec, `${CONSENT_FIELD}: "${target}" is the town's own mark — ignored. The market never reaches the town's own marks; the town alone is sovereign over them`);
+        continue;
+      }
+      const interior = !isParcel && opposes ? parcelInteriorOf(t, { byId, placementOf: containedBy, parcelIds }) : null;
+      if (interior) {
+        warn(rec, `${CONSENT_FIELD}: "${target}" stands inside the parcel ${interior}, laid after it — ignored. Once a parcel stands, what is laid inside it answers only to its holder`);
         continue;
       }
       if (!isParcel && opposes && !seniorAtContact(rec, t, { container })) {
