@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  fold, admitDelta, admissionBase, parcelRoomOf, parcelCapRefusal, nextParcelPrice,
+  fold, admitDelta, admissionBase, parcelRoomOf, parcelCapRefusal, nextRoomPrice,
   PARCEL_CLAIM_CAP, PARCEL_SETTLED_BY, PARCEL_SETTLED_BY_DAY, PARCEL_PRICE_STAMPS, NEW_HOUSEHOLD_PARCELS,
   CLAIM_CAP_LAW, ONE_PER_RESIDENT_LAW,
 } from "./marks-fold.mjs";
@@ -35,7 +35,7 @@ test("the law's numbers: declared on or before 10-31 in town time, one parcel, 5
   assert.equal(day, PARCEL_SETTLED_BY_DAY, "the last day that keeps three is the US-Eastern day the cutoff ends");
   assert.equal(NEW_HOUSEHOLD_PARCELS, 1);
   assert.equal(PARCEL_PRICE_STAMPS, 50);
-  assert.deepEqual([nextParcelPrice(1), nextParcelPrice(2)], [50, 100], "the second costs 50, the third 100");
+  assert.deepEqual([nextRoomPrice(1), nextRoomPrice(2)], [50, 100], "room 1→2 costs 50, 2→3 costs 100 (POS-762/f, Room bought)");
 });
 
 test("parcelRoomOf: three by the cutoff or with no facts; after it, one plus what was bought, never past three", () => {
@@ -102,9 +102,10 @@ test("the sentence: it starts the way the settlement cites the cap, and names th
   assert.ok(s.includes(CLAIM_CAP_LAW));
   assert.match(s, /holds 1 parcel and has room for 1/);
   assert.ok(s.includes(PARCEL_SETTLED_BY) && s.includes("whose declaration is dated after 2026-10-31 (town time"), "the cutoff, plainly: the declaration day, never the day ashore");
-  assert.match(s, /costs 50 stamps for every parcel it already holds \(its next: 50 stamps\)/, "the price, plainly");
+  assert.match(s, /buys room ahead for each further parcel, at 50 stamps × the room it already has \(its next room: 50 stamps\)/, "the price, plainly");
+  assert.match(parcelCapRefusal(2, 1), /its next room: 50 stamps/, "priced by the room, whatever is held");
   assert.match(s, /paid to the town and never returned, up to 3, one per resident/);
-  assert.match(parcelCapRefusal(2, 2), /holds 2 parcels and has room for 2.*its next: 100 stamps/);
+  assert.match(parcelCapRefusal(2, 2), /holds 2 parcels and has room for 2.*its next room: 100 stamps/);
   // at the cap, the 07-30 sentence is unchanged
   assert.equal(parcelCapRefusal(3, 3),
     "parcel claim capped — this credential household already holds 3 (cap 3 per household, ruled 2026-07-30; prior estate stands, new claims wait on the founder's word)");

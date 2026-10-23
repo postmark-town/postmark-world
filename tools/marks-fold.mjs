@@ -801,10 +801,13 @@ export const ONE_PER_RESIDENT_REFUSAL =
 // ashore: a household whose declaration is dated on or before 2026-10-31 (town
 // time; the cutoff is 2026-11-01 04:00Z) keeps the claim cap of three for good.
 // A household declared later holds ONE parcel,
-// plus one for each parcel it has bought, and never more than three. One per
-// resident (above) still holds for every household. A purchase costs 50 stamps
-// for every parcel the household already holds, paid to the town and never
-// returned. The town's ledger records each one as a burn
+// plus one for each room it has bought, and never more than three. One per
+// resident (above) still holds for every household. Darko, 2026-10-23 09:51
+// EDT: room is bought AHEAD (POS-762/e "Buy room ahead": "a household act burns
+// the stamps and adds one parcel of room for good; a claim then costs
+// nothing"), at 50 stamps times the room already bought (POS-762/f "Room
+// bought": "room 1->2 costs 50, 2->3 costs 100, whatever is held"), paid to the
+// town and never returned. The town's ledger records each one as a burn
 // (`for: parcel:<nth>/<household>`, postmark tools/stamp-mint.mjs).
 //
 // THE FACTS ARE THE OFFICE'S, THE RULE IS THIS FILE'S. The fold cannot see the
@@ -821,7 +824,7 @@ export const PARCEL_SETTLED_BY = "2026-11-01T04:00:00Z";
 /** The last US-Eastern day a household may settle on and keep three: the day before PARCEL_SETTLED_BY's, in the town's own date. */
 export const PARCEL_SETTLED_BY_DAY = "2026-10-31";
 export const NEW_HOUSEHOLD_PARCELS = 1;
-/** Stamps per parcel the household already holds, for its next one. */
+/** Stamps per parcel of room the household already has, for its next room. */
 export const PARCEL_PRICE_STAMPS = 50;
 
 /**
@@ -836,8 +839,8 @@ export function parcelRoomOf(fact) {
   return Math.min(PARCEL_CLAIM_CAP, NEW_HOUSEHOLD_PARCELS + bought);
 }
 
-/** What a household's next parcel costs, by the parcels it already holds. */
-export const nextParcelPrice = (held) => PARCEL_PRICE_STAMPS * Math.max(1, held);
+/** What a household's next room costs: 50 × the room it already has, whatever it holds (POS-762/f). */
+export const nextRoomPrice = (room) => PARCEL_PRICE_STAMPS * Math.max(1, room);
 
 /**
  * The claim cap's refusal, at both of the fold's cap sites. A household whose
@@ -851,7 +854,7 @@ export function parcelCapRefusal(held, room = PARCEL_CLAIM_CAP) {
     return `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)`;
   return `parcel claim capped — this household holds ${held} parcel${held === 1 ? "" : "s"} and has room for ${room}. `
     + `A household whose declaration is dated after ${PARCEL_SETTLED_BY_DAY} (town time; the cutoff is ${PARCEL_SETTLED_BY}) holds ${NEW_HOUSEHOLD_PARCELS === 1 ? "one parcel" : `${NEW_HOUSEHOLD_PARCELS} parcels`}; `
-    + `each further parcel costs ${PARCEL_PRICE_STAMPS} stamps for every parcel it already holds (its next: ${nextParcelPrice(held)} stamps), `
+    + `it buys room ahead for each further parcel, at ${PARCEL_PRICE_STAMPS} stamps × the room it already has (its next room: ${nextRoomPrice(room)} stamps), `
     + `paid to the town and never returned, up to ${PARCEL_CLAIM_CAP}, one per resident (${CLAIM_CAP_LAW})`;
 }
 
