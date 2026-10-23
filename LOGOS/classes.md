@@ -1227,6 +1227,20 @@ belongs to exactly one resident, and a resident holds at most one. The 08-18
 sentence "Claiming is untouched — still one parcel to a handle" is amended to
 say both.
 
+**Parcels from 11-01** (Darko, 2026-10-22: "any household that joins before
+the end of the month, so before Halloween, gets to register up to 3 parcels.
+And then after that, it will just be 1 parcel per household with extra parcels
+purchasable with stamps"; "let's price parcels at 50 stamps per parcel you
+already have"). A household settled by 2026-11-01 04:00Z (the end of 10-31,
+US Eastern) keeps the cap of three for good. A household settled after that
+holds one parcel. Each further parcel costs 50 stamps for every parcel the
+household already holds (the second 50, the third 100), paid to the town and
+never returned, up to the same cap of three. One parcel per resident still
+holds, so a household needs a resident for each parcel. A claim past a
+household's room is opposed at the crossing like any claim past the cap,
+citing `the-town/claim-cap`. Its sentence names the room, the cutoff and the
+price.
+
 Rendered in the world as `the-town/claim-cap`, `the-town/one-per-resident`,
 `the-town/homes-per-resident` and `the-town/declared-home` (children of
 `the-town/parcel`, beside the amended `the-town/household-scope`).
