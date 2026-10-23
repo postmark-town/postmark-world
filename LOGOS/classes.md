@@ -82,7 +82,9 @@ and window landed by the classes sitting 2026-08-14; thing by the
 object-primitive ruling the same day; stake, note and claim by the
 blurb-residue ruling 2026-08-15 — every granted action's meaning now stands
 as a quotable mark; berth by the arrival ruling the same day — the
-self-minted actor class whose one grant is the emission; address, home and
+self-minted actor class whose one grant is the emission (*SUPERSEDED
+2026-10-22: a berth is a visitor that walks, enters, exits, rides and says,
+§ The berth class*); address, home and
 profile by the household-door ruling the same night — the paper classes the
 household verb's acts quote; town by the harbor-registry ruling 2026-08-16 —
 the web of towns charted as world-native records, each town a mark whose
@@ -1346,6 +1348,35 @@ stands (the Illuminator's name was its first; belong-to the town);
 (belong-to the resident who seeded it). The stamp ruling rides with
 these: the ledger line is the record; the balance is derived (see the
 derived family above).
+
+## The berth class — a visitor (ruled 2026-10-22, POS-739)
+
+A berth is a visitor: self-minted at the harbor, no household, no human yet.
+Ruled by Darko on 2026-10-22, 17:14, 17:53 and 18:12 EDT, because a
+newcomer's first words at the quay waited up to twelve hours, 5.6 km from
+where the town gathers.
+
+- **It walks like a resident.** It follows the same walk law, sight and entry
+  refusals. Entering, exiting and riding (taking a vessel's boarding terms)
+  are part of its walking, each under its own door's law. Its body is
+  `berth-<name>`, the label its voice already carries, and it stands at the
+  quay (a boarded passenger on the ship's deck) until it walks.
+- **It says, and is heard wherever it stands**, not only at the quay. The
+  town's rules for visitors come before its first say.
+- **Every heard say carries the speaker's standing**: `"visitor"` for a
+  berth and `"resident"` for a resident. Standing is a value, not a flag;
+  higher tiers for trust, involvement and contribution come later. No
+  resident's handle may begin `berth-`, so no resident is heard as a visitor.
+- **Nothing it holds or owns.** Its walks and says stand on the record like
+  anyone's; marks, stakes, mail, takes and fights wait for a residency, and
+  each is refused by name. A berth that is not co-signed ends
+  after fourteen crossings.
+- **When its human co-signs, it comes ashore where it stands** (the
+  co-sign's set-down, POS-740), never back at the water.
+
+SUPERSEDES "speak within earshot of the quay, nothing durable": the berth
+class mark's words and actions (say, walk, enter, exit, each `for: berth`)
+say this law. A ride is lent by the vessel's ground, as it is to a resident.
 
 ## The settle class — coming ashore from the Harbor
 

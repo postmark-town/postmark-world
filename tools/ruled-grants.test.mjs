@@ -39,6 +39,15 @@ test("the berth's say grant is for: berth (ruled 679e097f; regressed by sweep 91
     "an absent for: reads as RESIDENT under LOGOS — this widening is exactly what the sweep must refuse");
 });
 
+test("a visitor walks, enters and exits, each grant for: berth, and nothing durable (POS-739, Darko 2026-10-22)", () => {
+  const actions = markActions(
+    "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/berth/mark.md");
+  assert.deepEqual(actions.map((a) => a.action).sort(), ["enter", "exit", "say", "walk"],
+    "a berth's grants are say and its moves; marks, stakes, mail, takes and fights wait for a residency");
+  for (const a of actions)
+    assert.equal(a.for, "berth", `${a.action} lost its for: berth, which reads as RESIDENT under LOGOS and widens it to every resident`);
+});
+
 test("the resident's pace dial is 60 (decision 008b; regressed by sweep 652fdb44, caught by Keemin's memory 08-18)", () => {
   // departure renamed depart at the graduation merge; the dial moved AGAIN
   // 2026-08-22 (Keemin: the stride sits under RESIDENT — the mover owns its
