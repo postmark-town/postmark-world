@@ -17,6 +17,7 @@ walk derives the answer). A node's tier is **the response it stands under**:
 |---|---|---|
 | blue | constitutional | the town's own — composed under the town's authorship, or (never yet) welcomed into law |
 | green | sovereign | conferred down a household — the holder's own ground and what it welcomes |
+| — | biome | a local law boundary's own word, between a household's and the town's (below); no color yet |
 | yellow | market | neutral-admitted — standing in canon, uncoupled, contested by weight |
 | gray | draft | sovereign space not yet admitted — a branch state, not a standing |
 
@@ -33,6 +34,25 @@ stands under, derived by the one walk. Where entry-law and exit-law compose
 scope and custody, the mapping onto these two tiers is OPEN, for part 2's
 sitting (agreed 18:44; [classes.md](classes.md) § The two
 constitutionalities).
+
+## The biome tier (ruled 2026-10-23, WLD-116)
+
+**The ladder of whose word it is runs market < sovereign (a household) <
+biome < constitution (the town).** A biome is a local law boundary inside
+Postmark's one plane (Darko, 2026-10-22): it sits on the same map and uses the
+same readers, and its own law is a foundry's. A biome's own classes extend the
+constitution-tier classes of the Keeping Works and never contradict them, and
+they carry `tier: biome`.
+
+- **A law node's `tier` names the governance that wrote it** ([classes.md](classes.md)
+  § The law node). `constitution` is the town's; `biome` is that biome's. That
+  one field is the shared language for global versus local.
+- **Extends, never contradicts.** A biome may add classes and narrow what it
+  governs; it may not say otherwise than the constitution tier says. (No code
+  checks this yet: the first biome is WLD-115.)
+- **This is about law nodes.** A mark's standing is still never stored: it is
+  the response it stands under, derived by the one walk (above). Whether a
+  biome also gives a rung to the standing of the marks inside it is not ruled.
 
 ## Conferral has exactly two channels
 
