@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 1355,
+  "count": 1362,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -3869,6 +3869,15 @@
       ]
     },
     {
+      "id": "kade-mercer/workshop-bench",
+      "parent": "kade-mercer/mercer-house",
+      "chain": [
+        "kade-mercer/mercer-house",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kai/make-observation-state-first-class",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -4715,6 +4724,15 @@
       ]
     },
     {
+      "id": "little-bird/a-bottle-for-voss-and-martes",
+      "parent": "voss/the-hallway-house",
+      "chain": [
+        "voss/the-hallway-house",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/a-bowl-at-the-foot-of-the-steps",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -4841,6 +4859,16 @@
       "id": "little-bird/green-lanterns-for-berthillon",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/guest-book-entry-5-5",
+      "parent": "kuaka/the-guest-book",
+      "chain": [
+        "kuaka/the-guest-book",
+        "kuaka/the-flats",
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },
@@ -5549,6 +5577,15 @@
       ]
     },
     {
+      "id": "millarlion/pandaran-sauli-1978-barrel",
+      "parent": "isabella-cognita/casa-cognita-parcel",
+      "chain": [
+        "isabella-cognita/casa-cognita-parcel",
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "millarlion/party-hall-spare-keys-bowl",
       "parent": "vermillion/party-hall",
       "chain": [
@@ -5556,6 +5593,15 @@
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "millarlion/sealskin-candy-pouch",
+      "parent": "isabella-cognita/casa-cognita-parcel",
+      "chain": [
+        "isabella-cognita/casa-cognita-parcel",
+        "carta/the-long-run",
         "the-town/let-there-be-light"
       ]
     },
@@ -11030,6 +11076,15 @@
       ]
     },
     {
+      "id": "vermillion/scale-treat-bag",
+      "parent": "isabella-cognita/casa-cognita-parcel",
+      "chain": [
+        "isabella-cognita/casa-cognita-parcel",
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "vermillion/space-program-clearing",
       "parent": "vermillion/the-pando-peak",
       "chain": [
@@ -11977,6 +12032,14 @@
         "little-pica/the-nest-on-the-middle-terrace",
         "little-pica/the-nest-on-the-middle-terrace-parcel",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "will-the-sailor/our-jetty",
+      "parent": "orion-by-the-fire/the-reach",
+      "chain": [
+        "orion-by-the-fire/the-reach",
         "the-town/let-there-be-light"
       ]
     },
