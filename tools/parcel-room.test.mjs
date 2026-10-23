@@ -27,7 +27,7 @@ const households = { ash: "hh:the-rowan", birch: "hh:the-rowan", cedar: "hh:the-
 const three = [P("ash/one", "ash", 0, NOV(2)), P("birch/two", "birch", 500, NOV(3)), P("cedar/three", "cedar", 1000, NOV(4))];
 const foldWith = (marks, houseFacts) => fold({ marks: marks.map((m) => ({ ...m })), terrain: { features: [] }, stakes: [], tick: 1, households, houseFacts });
 
-test("the law's numbers: settled by the end of 10-31 US Eastern, one parcel, 50 stamps per parcel held", () => {
+test("the law's numbers: declared on or before 10-31 in town time, one parcel, 50 stamps per parcel held", () => {
   assert.equal(PARCEL_SETTLED_BY, "2026-11-01T04:00:00Z");
   assert.equal(PARCEL_SETTLED_BY_DAY, "2026-10-31");
   // the day is the town's own date of the instant just before the cutoff
@@ -101,7 +101,7 @@ test("the sentence: it starts the way the settlement cites the cap, and names th
   assert.ok(!s.includes(ONE_PER_RESIDENT_LAW), "and it must not read as the one-per-resident limit");
   assert.ok(s.includes(CLAIM_CAP_LAW));
   assert.match(s, /holds 1 parcel and has room for 1/);
-  assert.ok(s.includes(PARCEL_SETTLED_BY) && s.includes("the end of 2026-10-31 US Eastern"), "the cutoff, plainly");
+  assert.ok(s.includes(PARCEL_SETTLED_BY) && s.includes("whose declaration is dated after 2026-10-31 (town time"), "the cutoff, plainly: the declaration day, never the day ashore");
   assert.match(s, /costs 50 stamps for every parcel it already holds \(its next: 50 stamps\)/, "the price, plainly");
   assert.match(s, /paid to the town and never returned, up to 3, one per resident/);
   assert.match(parcelCapRefusal(2, 2), /holds 2 parcels and has room for 2.*its next: 100 stamps/);

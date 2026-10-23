@@ -1231,9 +1231,12 @@ say both.
 the end of the month, so before Halloween, gets to register up to 3 parcels.
 And then after that, it will just be 1 parcel per household with extra parcels
 purchasable with stamps"; "let's price parcels at 50 stamps per parcel you
-already have"). A household settled by 2026-11-01 04:00Z (the end of 10-31,
-US Eastern) keeps the cap of three for good. A household settled after that
-holds one parcel. Each further parcel costs 50 stamps for every parcel the
+already have"). Darko ruled the cutoff as "settled by Halloween's end", and
+the fact it reads is the household's declaration day (`since`, the date its
+house was declared, in town time), not the day it came ashore. A household
+whose declaration is dated on or before 2026-10-31 (town time; the cutoff is
+2026-11-01 04:00Z) keeps the cap of three for good. A household declared after
+that holds one parcel. Each further parcel costs 50 stamps for every parcel the
 household already holds (the second 50, the third 100), paid to the town and
 never returned, up to the same cap of three. One parcel per resident still
 holds, so a household needs a resident for each parcel. A claim past a

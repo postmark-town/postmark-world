@@ -796,21 +796,25 @@ export const ONE_PER_RESIDENT_REFUSAL =
 //   20:42 EDT (the picker) settled by Halloween's end; keep one per resident;
 //             pay stamps to the town.
 //
-// A household SETTLED by 2026-11-01 04:00Z (the end of 10-31, US Eastern) keeps
-// the claim cap of three for good. A household settled later holds ONE parcel,
+// Darko ruled the cutoff as "settled by Halloween's end". The fact is the
+// household's DECLARATION day (`since`, in town time), never the day it came
+// ashore: a household whose declaration is dated on or before 2026-10-31 (town
+// time; the cutoff is 2026-11-01 04:00Z) keeps the claim cap of three for good.
+// A household declared later holds ONE parcel,
 // plus one for each parcel it has bought, and never more than three. One per
 // resident (above) still holds for every household. A purchase costs 50 stamps
 // for every parcel the household already holds, paid to the town and never
 // returned. The town's ledger records each one as a burn
 // (`for: parcel:<nth>/<household>`, postmark tools/stamp-mint.mjs).
 //
-// THE FACTS ARE THE OFFICE'S, THE RULE IS THIS FILE'S. The fold cannot see when
-// a household settled or what it paid, so the office hands both in, per
+// THE FACTS ARE THE OFFICE'S, THE RULE IS THIS FILE'S. The fold cannot see the
+// day a household was declared or what it paid, so the office hands both in, per
 // household key (the values of `households`), as `houseFacts`:
-// `{ [key]: { since, bought } }`. `since` is the day the household settled as
-// the town wrote it (a US-Eastern date string, the registry's `since`), and
-// `bought` counts its parcel burns on the ledger. A household with no facts
-// keeps the cap of three: every household before the office feeds facts, every
+// `{ [key]: { since, bought } }`. `since` is the household's declaration day as
+// the town wrote it (a town-time date string, the registry's `since`), and
+// `bought` is how many parcels it has bought (the office reads its highest
+// parcel burn on the ledger, less one, so a duplicate line never adds room).
+// A household with no facts keeps the cap of three: every household before the office feeds facts, every
 // solo handle, and every house when the office could not read its sources. So
 // this law is dark until the office speaks, and it can only ever LOWER a cap.
 export const PARCEL_SETTLED_BY = "2026-11-01T04:00:00Z";
@@ -822,7 +826,7 @@ export const PARCEL_PRICE_STAMPS = 50;
 
 /**
  * A household's parcel room: how many parcels the claim cap lets it hold.
- * PARCEL_CLAIM_CAP when it settled by the cutoff or nothing is known about it;
+ * PARCEL_CLAIM_CAP when it was declared by the cutoff or nothing is known about it;
  * otherwise NEW_HOUSEHOLD_PARCELS plus the parcels it bought, never past the cap.
  */
 export function parcelRoomOf(fact) {
@@ -846,7 +850,7 @@ export function parcelCapRefusal(held, room = PARCEL_CLAIM_CAP) {
   if (room >= PARCEL_CLAIM_CAP)
     return `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)`;
   return `parcel claim capped — this household holds ${held} parcel${held === 1 ? "" : "s"} and has room for ${room}. `
-    + `A household that settled after Halloween (after ${PARCEL_SETTLED_BY}, the end of ${PARCEL_SETTLED_BY_DAY} US Eastern) holds ${NEW_HOUSEHOLD_PARCELS === 1 ? "one parcel" : `${NEW_HOUSEHOLD_PARCELS} parcels`}; `
+    + `A household whose declaration is dated after ${PARCEL_SETTLED_BY_DAY} (town time; the cutoff is ${PARCEL_SETTLED_BY}) holds ${NEW_HOUSEHOLD_PARCELS === 1 ? "one parcel" : `${NEW_HOUSEHOLD_PARCELS} parcels`}; `
     + `each further parcel costs ${PARCEL_PRICE_STAMPS} stamps for every parcel it already holds (its next: ${nextParcelPrice(held)} stamps), `
     + `paid to the town and never returned, up to ${PARCEL_CLAIM_CAP}, one per resident (${CLAIM_CAP_LAW})`;
 }
@@ -1164,7 +1168,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: ONE_PER_RESIDENT_REFUSAL }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
-    // the household's room: three, or one plus what it bought when it settled after 11-01 (§ parcels from 11-01)
+    // the household's room: three, or one plus what it bought when it was declared after 10-31 (§ parcels from 11-01)
     const room = parcelRoomOf(houseFacts?.[cred]);
     if (String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= room && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
       errors.push({ mark: mk.id, error: parcelCapRefusal(held, room) });
