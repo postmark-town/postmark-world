@@ -246,3 +246,80 @@ test("A LANDFORM IS ITS OWN CLASS: mark's child beside sited, never sited, never
   const { deriveHomeControlPoints } = await import("./world-build.mjs");
   assert.deepEqual(deriveHomeControlPoints([KNOLL], ANCHORS), []);
 });
+
+// ── the #296 review (2026-10-22): the old spelling, a class under landform, entering ──
+
+test("THE OLD SPELLING IS A LANDFORM: kind: sited + class: landform is never sited, by either reader", async () => {
+  const kind = await import("./mark-kind.mjs");
+  const { loadMarks } = await import("./marks-fold.mjs");
+  const idx = kind.kindIndexOf(loadMarks(join(ROOT, "WORLD/marks")));
+  const old = { ...KNOLL, kind: "sited", class: "landform" };
+  assert.equal(kind.standingOf(old, idx), "landform", "the class answers before the standing word");
+  assert.equal(kind.standingOf(old, null), "landform");
+  assert.equal(kind.isSitedIn(old, idx), false);
+  assert.equal(kind.isGroundIn(old, idx), false);
+  assert.equal(kind.isSited(old), false);
+});
+
+test("A CLASS UNDER LANDFORM IS A LANDFORM: it shapes ground, and it is never sited", async () => {
+  const kind = await import("./mark-kind.mjs");
+  const { classIndex } = await import("./class-properties.mjs");
+  const classes = [
+    { id: "the-town/postmark-node", kind: "class", by: "the-town", class: "postmark-node" },
+    { id: "the-town/mark", kind: "class", by: "the-town", class: "mark", extends: "postmark-node" },
+    { id: "the-town/landform", kind: "class", by: "the-town", class: "landform", extends: "mark" },
+    { id: "the-town/basin", kind: "class", by: "the-town", class: "basin", extends: "landform" },
+  ];
+  const idx = classIndex(classes);
+  const basin = { ...KNOLL, kind: "basin" };
+  assert.equal(kind.isLandform(basin, idx), true, "the chain names landform");
+  assert.equal(kind.isLandform(basin), false, "with no class tree in hand, only the name can answer");
+  assert.equal(kind.standingOf(basin, idx), "landform");
+  assert.equal(kind.isGroundIn(basin, idx), false);
+  assert.deepEqual(groundStands(basin, ANCHORS, SKELETON, idx), { ground: { lo: 31, hi: 31 }, region: "the-high-ground", band: [30, 40] });
+  // the heightfield finds the class in the marks it is handed
+  const now = assembleWorld({ worldState: { ...WORLD_STATE, marks: [...WORLD_STATE.marks, ...classes, basin] }, skeleton: SKELETON }).heightfield.elevationAt;
+  assert.equal(now(2544, 175), 31);
+});
+
+test("A LANDFORM IS NO PLACE TO GO IN: enter refuses it, and naming one shelters nothing and frames no sight", async () => {
+  const verbs = await import("./world-verbs.mjs");
+  const world = assembleWorld({ worldState: withMarks(KNOLL), skeleton: SKELETON });
+  const plan = verbs.enterExitPlan({ x: 2544, y: 175 }, KNOLL.id, world);
+  assert.equal(plan.error, `'${KNOLL.id}' is a landform: a landform is ground, not a place to go in`);
+  const went = verbs.enter({ x: 2544, y: 175 }, KNOLL.id, world);
+  assert.match(went.error, /a landform is ground, not a place to go in/);
+  assert.equal(verbs.shelterOf(world, [KNOLL.id], { x: 2544, y: 175 }), null, "no shelter from the Mists");
+  assert.equal(verbs.sightFrameOf(world, [KNOLL.id], { x: 2544, y: 175 }), null, "no frame narrowing sight");
+});
+
+test("THE WORLD PAGE DRAWS NO LANDFORM: the footprint layer passes one by (until a look is ruled)", () => {
+  const viewer = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
+  const bake = viewer.slice(viewer.indexOf("function buildFpLayer() {"), viewer.indexOf("fpLayer.innerHTML = s;"));
+  assert.match(bake, /const kidx = kindIndexOf\(drawn\);/);
+  assert.match(bake, /if \(isLandform\(m, kidx\)\) continue;/);
+});
+
+test("THE REVIEW'S REPRO: an old-spelling town basin over the lochan nests nothing, and the lint holds it to a landform's law", () => {
+  const repo = realTree();
+  const dir = join(repo, "WORLD", "marks", "the-town", "an-old-basin");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "mark.md"), ["---", "kind: sited", "class: landform", "by: the-town", "tier: constitution", "date: 2026-10-22",
+    "at: { x: 2575, y: -1160 }", "extent: { w: 900, h: 700 }", "ground_m: 25", "---", "", "An old-spelling basin.", ""].join("\n"));
+  // and one in the old spelling that forgot its ground_m: the lint reads it as a landform too
+  const dir2 = join(repo, "WORLD", "marks", "the-town", "an-old-knoll");
+  mkdirSync(dir2, { recursive: true });
+  writeFileSync(join(dir2, "mark.md"), ["---", "kind: sited", "class: landform", "by: the-town", "tier: constitution", "date: 2026-10-22",
+    "at: { x: 2544, y: 175 }", "extent: { w: 200, h: 100 }", "---", "", "An old-spelling knoll with no height.", ""].join("\n"));
+  const map = JSON.parse(execFileSync("node", ["-e", `import("${pathToFileURL(join(HERE, "marks-fold.mjs")).href}").then(({ loadMarks, containmentMap }) => process.stdout.write(JSON.stringify(containmentMap(loadMarks(process.argv[1])))))`, join(repo, "WORLD", "marks")], { encoding: "utf8", maxBuffer: 64 << 20 }));
+  assert.deepEqual(map.marks.filter((r) => r.chain.includes("the-town/an-old-basin")).map((r) => r.id), [], "lochan-house and its neighbours stay where they stood");
+  assert.deepEqual(map.marks.find((r) => r.id === "the-town/an-old-basin")?.chain, ["the-town/let-there-be-light"]);
+  let out;
+  try { out = execFileSync("node", [join(HERE, "mark-lint.mjs"), "--repo", repo], { encoding: "utf8" }); }
+  catch (e) { out = String(e.stdout ?? "") + String(e.stderr ?? ""); }
+  const mine = out.split(/\r?\n/).filter((l) => l.includes("an-old-basin:"));
+  assert.ok(mine.some((l) => l.startsWith("[WARN]") && /class: landform folds into kind/.test(l)), "told to write the new spelling: " + mine.join("\n"));
+  assert.deepEqual(mine.filter((l) => l.startsWith("[ERROR]")), [], "the basin itself is lawful as a landform");
+  const knoll = out.split(/\r?\n/).filter((l) => l.includes("an-old-knoll:") && l.startsWith("[ERROR]"));
+  assert.ok(knoll.some((l) => /a landform carries ground_m/.test(l)), "the lint holds the old spelling to a landform's own law: " + knoll.join("\n"));
+});

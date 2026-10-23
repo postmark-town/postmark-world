@@ -164,6 +164,10 @@ const CLASS_IDX = classIndex(marks.filter((m) => !m._error));
 const chainOf = (name) => classChain(CLASS_IDX, String(name)).map((c) => String(c.class));
 const isPostClass = (name) => name !== undefined && chainOf(name).includes("post");
 const standingOfRecord = (rec) => {
+  // a landform answers by its class before the standing words, so the old spelling
+  // (kind: sited + class: landform), or a class under landform, is a landform (#296 review)
+  const lk = instanceClassOf(rec);
+  if (lk != null && (lk === "landform" || (CLASS_ROSTER.has(lk) && chainOf(lk).includes("landform")))) return "landform";
   if (KINDS.has(rec.kind)) return rec.kind === "predicate" ? "predicated" : rec.kind; // one standing, two spellings
   if (rec.kind == null || !CLASS_ROSTER.has(String(rec.kind)) || isPostClass(rec.kind)) return null;
   const chain = chainOf(rec.kind);
@@ -708,7 +712,7 @@ for (const rec of marks) {
   for (const rec of marks) {
     if (rec._error || rec.ground_m === undefined) continue;
     if (!anchors) { err(rec, `ground_m: the skeleton's region anchors cannot be read (${TERRAIN_PATH}), so no band can hold this ground`); continue; }
-    const s = groundStands(rec, anchors, terrain);
+    const s = groundStands(rec, anchors, terrain, CLASS_IDX);
     if (s?.refused) err(rec, s.refused);
   }
 }
