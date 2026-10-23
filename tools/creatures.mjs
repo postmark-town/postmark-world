@@ -84,6 +84,7 @@ import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
 import { pointInPolygon, polygonOf } from "./geometry.mjs";
 import { classIndex, propertyOf } from "./class-properties.mjs";
+import { isClass } from "./law.mjs"; // WLD-116: THE ONE TEST of what is a class
 import { AFFORDED_VERBS } from "./creature-kind.mjs";
 import { entryLawOf, REQUIRES_AT_SETTLEMENT } from "./enter-exit.mjs";
 import { unmetRequires } from "./portals.mjs";
@@ -97,9 +98,11 @@ export const ID_PREFIX = "creature:";
 export const REACT_ACTION = "react";
 
 /** Where the creature class and its kinds stand in the world: the one directory a
- *  reader at a ref (the office's tick) lists and parses to read the law. A mark's
- *  directory never moves (the frozen filing), so this is a durable address. */
-export const CREATURE_LAW_DIR = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/creature";
+ *  reader at a ref (the office's tick) lists and parses to read the law. It is in
+ *  the law tree since WLD-116 (classes are law nodes, never marks): the Keeping
+ *  Works' foundry, and a `node.md` in each directory. A law node's directory is
+ *  its address; it does not move. */
+export const CREATURE_LAW_DIR = "WORLD/law/the-keeping-works/postmark-node/entity/creature";
 
 /** The dials the schedule reads, each from the creature class (or a kind's mark). */
 export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "keep_m", "apart_m", "span_h"]);
@@ -123,7 +126,7 @@ export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "k
  */
 export function creatureLaw(records) {
   const marks = nestedByPath(records ?? []);
-  const classes = marks.filter((m) => m?.kind === "class" && m.by === TOWN);
+  const classes = marks.filter((m) => isClass(m));
   const c = classes.find((m) => String(m.class) === "creature");
   if (!c) return null;
   const idx = classIndex(marks);
@@ -261,7 +264,7 @@ function affordedOf(mark) {
 // it stands under. Loader records already carry both and pass through unchanged.
 function nestedByPath(records) {
   if (records.every((m) => m?.id != null)) return records;
-  const dirOf = (file) => String(file ?? "").replace(/\\/g, "/").replace(/(^|\/)mark\.md$/, "");
+  const dirOf = (file) => String(file ?? "").replace(/\\/g, "/").replace(/(^|\/)(mark|node)\.md$/, "");
   const up = (dir) => (dir.includes("/") ? dir.slice(0, dir.lastIndexOf("/")) : "");
   return records.map((m) => {
     if (!m || m.id != null || m._file == null) return m;

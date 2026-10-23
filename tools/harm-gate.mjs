@@ -36,12 +36,13 @@
 //   node tools/harm-gate.mjs --snapshot-before <export> --snapshot-after <export> --sweep <the window's acts> [--stakes <file>] [--json]
 //                                  the same five checks over a snapshot pair (POS-363; harmGateOnSnapshots)
 
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { loadMarks, loadSnapshot, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
+import { loadMarks, loadSnapshot, loadSnapshotLaw, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: a class that moved from the marks to the law is not lost
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -56,10 +57,39 @@ function marksAt(repo, ref) {
     const archive = join(dir, "world.tar");
     execFileSync("git", ["-C", repo, "archive", "--format=tar", `--output=${archive}`, ref, "--", "WORLD"], { stdio: ["ignore", "pipe", "pipe"] });
     execFileSync("tar", ["-xf", "world.tar"], { cwd: dir, stdio: ["ignore", "pipe", "pipe"] });
-    return byId(loadMarks(join(dir, "WORLD", "marks")));
+    return byId(standing(join(dir, "WORLD", "marks")));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+}
+/**
+ * What stands in a tree: its marks, and its law nodes beside them (WLD-116). A class
+ * that moved from WORLD/marks to WORLD/law keeps its id, so it is not "lost" from the
+ * world by moving: the "lost" check asks what STANDS, and a law node stands.
+ */
+function standing(marksDir) {
+  return [...loadMarks(marksDir), ...loadLaw(lawDirFor(marksDir)).nodes];
+}
+/**
+ * What the tree has RETIRED by a declaring act (WLD-116): the ids named in
+ * WORLD/_archived/<date>/RETIRED.json, each moved whole into that folder and never
+ * deleted. A retirement is an act the gate can read, so a mark it names has not
+ * been "lost with no act naming it"; it has been retired, and it must be gone
+ * from the standing tree (the act's word is held to the tree, as the sweep's is).
+ */
+export function retiredIn(repo) {
+  const out = new Set();
+  const dir = join(repo, "WORLD", "_archived");
+  if (!existsSync(dir)) return out;
+  for (const d of readdirSync(dir).sort()) {
+    const file = join(dir, d, "RETIRED.json");
+    if (!existsSync(file)) continue;
+    let act;
+    try { act = JSON.parse(readFileSync(file, "utf8")); }
+    catch (e) { throw new Error(`could not gate: WORLD/_archived/${d}/RETIRED.json is not JSON (${e.message})`); }
+    for (const id of Object.keys(act?.rows ?? {})) out.add(id);
+  }
+  return out;
 }
 function byId(marks) {
   const out = new Map();
@@ -79,12 +109,12 @@ const ids = (rows) => new Set((Array.isArray(rows) ? rows : []).map((r) => r?.id
 export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = true } = {}) {
   const baseRef = base ?? defaultBase(repo);
   const before = marksAt(repo, baseRef);
-  const after = byId(loadMarks(join(repo, "WORLD", "marks")));
+  const after = byId(standing(join(repo, "WORLD", "marks")));
   const statePath = join(repo, "WORLD", "world-state.json");
   if (!existsSync(statePath)) throw new Error("could not gate: no WORLD/world-state.json — the fold did not run, so escrow cannot be read");
   const state = JSON.parse(readFileSync(statePath, "utf8"));
   const lintRun = lint ? lintVerdict(repo) : null;
-  return { ...judge({ before, after, sweep, state, stakes: stakes ? stakesFrom(stakes) : null, lint: lintRun }), base: baseRef };
+  return { ...judge({ before, after, sweep, state, stakes: stakes ? stakesFrom(stakes) : null, lint: lintRun, retired: retiredIn(repo) }), base: baseRef };
 }
 
 // ── THE GATE ON A SNAPSHOT PAIR (POS-363; R1, R2) ───────────────────────────
@@ -98,12 +128,13 @@ export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = 
 // world-state.json; lint runs over the new snapshot through the loader's seam
 // (WORLD_SNAPSHOT), so mark-lint reads exactly the marks the gate judges.
 export function harmGateOnSnapshots({ repo = join(HERE, ".."), before, after, acts = {}, stakes = null, lint = true } = {}) {
-  const read = (x) => (typeof x === "string" ? loadSnapshot(x) : structuredClone(x ?? []));
+  // an export's marks AND its law nodes: a class that moved out of the marks is not lost from the world (WLD-116)
+  const read = (x) => (typeof x === "string" ? [...loadSnapshot(x), ...loadSnapshotLaw(x)] : structuredClone(x ?? []));
   const was = byId(read(before)), now = read(after);
   const stakeRows = stakes ? (typeof stakes === "string" ? stakesFrom(stakes) : stakes) : [];
   const state = fold({ marks: structuredClone(now), terrain: null, stakes: stakeRows });
   const lintRun = lint && typeof after === "string" ? lintVerdict(repo, { [SNAPSHOT_ENV]: after, [SNAPSHOT_ROOT_ENV]: repo }) : null;
-  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: exportRef(before) ?? "snapshot" };
+  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, retired: retiredIn(repo), lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: exportRef(before) ?? "snapshot" };
 }
 
 /** The commit a before-export was read at (`snapshot-export.mjs` writes `ref`), so the run names its base. */
@@ -130,7 +161,7 @@ function lintVerdict(repo, env = {}) {
  * and (optionally) the stakes and a lint verdict. PURE. The tree's gate and the
  * snapshot pair's gate are this one judgement.
  */
-export function judge({ before, after, sweep = {}, state = {}, stakes = null, lint = null }) {
+export function judge({ before, after, sweep = {}, state = {}, stakes = null, lint = null, retired = new Set() }) {
   const published = ids(sweep.published), unpublished = ids(sweep.unpublished), withdrawn = ids(sweep.withdrawn);
   const checks = [];
   const check = (name, rows, note = null) => { checks.push({ name, ok: rows.length === 0, count: rows.length, rows: rows.slice(0, 40), ...(note ? { note } : {}) }); };
@@ -163,10 +194,13 @@ export function judge({ before, after, sweep = {}, state = {}, stakes = null, li
   // 3 · lost, and the sweep's word held to the tree both ways
   {
     const rows = [];
-    for (const id of before.keys()) if (!after.has(id) && !unpublished.has(id) && !withdrawn.has(id)) rows.push(`${id}: gone, and no act names it`);
+    // a declaring act names what it retired (WLD-116: WORLD/_archived/<date>/RETIRED.json), and the act's word is held to the tree
+    for (const id of before.keys()) if (!after.has(id) && !unpublished.has(id) && !withdrawn.has(id) && !retired.has(id)) rows.push(`${id}: gone, and no act names it`);
+    for (const id of retired) if (before.has(id) && after.has(id)) rows.push(`${id}: a declaring act says it retired, and it still stands`);
     for (const id of published) if (!after.has(id)) rows.push(`${id}: the sweep says it published this mark, and it does not stand`);
     for (const id of [...unpublished, ...withdrawn]) if (after.has(id)) rows.push(`${id}: the sweep says it removed this mark, and it still stands`);
-    check("lost", rows);
+    const named = [...retired].filter((id) => before.has(id) && !after.has(id)).length;
+    check("lost", rows, named ? `${named} retired by a declaring act` : null);
   }
 
   // 4 · escrow — the fold's own errors, and the stampless fold

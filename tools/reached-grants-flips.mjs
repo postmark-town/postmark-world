@@ -21,16 +21,16 @@ import { dirname, join } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
+const WORKS = "WORLD/law/the-keeping-works";
 const at = (rel) => join(root, rel);
 
-const HUMAN = `${WORKS}/postmark-node/entity/human/mark.md`;
-const RESIDENT = `${WORKS}/postmark-node/entity/resident/mark.md`;
-const PARCEL = `${WORKS}/postmark-node/mark/parcel/mark.md`;
-const PORTAL = `${WORKS}/postmark-node/mark/portal-ground/mark.md`;
-const HELD = `${WORKS}/postmark-node/mark/thing/held-grant-slot/mark.md`;
-const VERB = (v) => `${WORKS}/postmark-edge/${v}/mark.md`;
-const ARENA = `${WORKS}/postmark-node/mark/portal-ground/arena/mark.md`;
+const HUMAN = `${WORKS}/postmark-node/entity/human/node.md`;
+const RESIDENT = `${WORKS}/postmark-node/entity/resident/node.md`;
+const PARCEL = `${WORKS}/postmark-node/mark/parcel/node.md`;
+const PORTAL = `${WORKS}/postmark-node/mark/portal-ground/node.md`;
+const HELD = `${WORKS}/postmark-node/mark/thing/held-grant-slot/node.md`;
+const VERB = (v) => `${WORKS}/postmark-edge/${v}/node.md`;
+const ARENA = `${WORKS}/postmark-node/mark/portal-ground/arena/node.md`;
 
 /** Each flip: the file it breaks, the edit, and the test title that must catch it. */
 const FLIPS = [
@@ -189,7 +189,7 @@ const FLIPS = [
     edit: (t) => t.replace(/^class: thing$/m, 'class: thing\ndials: {"hp": 1}') },
 
   { name: "the adversary CLASS seals a value every instance must wear",
-    file: `${WORKS}/postmark-node/mark/adversary/mark.md`,
+    file: `${WORKS}/postmark-node/mark/adversary/node.md`,
     catches: "the adversary's numbers are on its own mark",
     edit: (t) => t.replace('"hp": "unsealed"', '"hp": 60') },
 ];

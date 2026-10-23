@@ -41,6 +41,8 @@ import {
 // a frame's record leaving canon or returning — never moves what stands on it.
 import { snapshotWorld, keepWorldAcross, ReframeRefusal } from "./reparent-keep-world.mjs";
 import { CONSENT_FIELD, consentMap } from "./consent.mjs";
+import { mergeLaw, splitLaw } from "./law.mjs";
+import { loadLaw } from "./law-tree.mjs"; // WLD-116: classes are law nodes, read from WORLD/law/ beside the marks
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -320,6 +322,9 @@ function firstStakeRowIn(message) {
 export const foldMeter = { whole: 0, wholeMs: 0, delta: 0, deltaMs: 0, marks: 0, gitCalls: 0 };
 export function resetFoldMeter() { foldMeter.whole = 0; foldMeter.wholeMs = 0; foldMeter.delta = 0; foldMeter.deltaMs = 0; foldMeter.marks = 0; foldMeter.gitCalls = 0; }
 
+// The law a ref holds: the law tree's nodes, and any a ref older than the tree still files among its marks.
+function mergeLawOf(law, marks) { return mergeLaw(law, splitLaw(marks).law); }
+
 export function foldRef(repo, ref, stakes) {
   const t0 = performance.now();
   try { return foldRefInner(repo, ref, stakes); }
@@ -330,6 +335,9 @@ function foldRefInner(repo, ref, stakes) {
   const dir = archiveRef(repo, ref);
   try {
     const marks = loadMarks(join(dir, "WORLD", "marks"));
+    // the law at this ref (WLD-116); a ref older than the law tree has none, and its classes are still
+    // among its marks, which the fold reads as law all the same
+    const law = loadLaw(join(dir, "WORLD", "law")).nodes;
     const markIds = new Set(marks.map((mark) => mark.id));
     const terrain = JSON.parse(readFileSync(join(dir, "WORLD", "skeleton.json"), "utf8"));
     const prevPath = join(dir, "WORLD", "world-state.json");
@@ -343,6 +351,7 @@ function foldRefInner(repo, ref, stakes) {
     foldMeter.marks = Math.max(foldMeter.marks, marks.length);
     const state = fold({
       marks,
+      law,
       terrain,
       stakes: stakes.filter((stake) => markIds.has(stake.mark)),
       prev,
@@ -357,6 +366,8 @@ function foldRefInner(repo, ref, stakes) {
     Object.defineProperty(state, "consentOf", {
       value: new Map(marks.filter((mark) => consentMap(mark)).map((mark) => [mark.id, consentMap(mark)])),
     });
+    // the law this ref folded under, for the admission that follows (the class lineage is the law's, not the marks')
+    Object.defineProperty(state, "law", { value: mergeLawOf(law, marks) });
     return state;
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -1219,7 +1230,7 @@ export function settlementSweep({
   // retires all three, because validating k records needs no branch tree at
   // all, only k reads at the ref.
   const mainState = foldRef(repo, mainBranch, stakes);
-  const admitBase = admissionBase(mainState, { households: wallRegistry.households, stakes });
+  const admitBase = admissionBase(mainState, { households: wallRegistry.households, stakes, law: mainState.law });
   // THE CONSENT WORD RIDES THE VIEW (WLD-51). The fold's published shape drops
   // a ground's `consent`, and `classifyMark` reads it (mark-standing.mjs §
   // groundVerdict: a mark welcomed on another household's parcel stands home).
@@ -1331,7 +1342,7 @@ export function settlementSweep({
     // was read against every parcel admitted beside it, the held one included).
     const held = candidates.filter((c) => suiteQuarantine.has(c.id)).map((c) => c.id);
     for (const [id, view] of admitted.views) if (!held.includes(id)) folded.set(id, view);
-    if (held.length) sovereignInResult(new Map([...admitted.views].filter(([id]) => !held.includes(id))), folded);
+    if (held.length) sovereignInResult(new Map([...admitted.views].filter(([id]) => !held.includes(id))), folded, { kindIndex: admitBase.kindIndex });
 
     for (const delta of deltas) {
       // SUPERSESSION. The sketchbook has not touched this path since it was cut,
@@ -1559,7 +1570,7 @@ export function settlementSweep({
     }
     try {
       const baseMarks = [...mainFolded.values()].filter((mark) => !gone.has(mark.id));
-      const base = admissionBase({ marks: baseMarks }, { households: wallRegistry.households, stakes });
+      const base = admissionBase({ marks: baseMarks }, { households: wallRegistry.households, stakes, law: mainState.law });
       // A main mark asked again is handed over as an amendment of itself, with
       // the edge `loadMarks` would have given it (`_parentMarkId`): a predicate
       // or a naming mark is contained by that edge, not by geometry.
@@ -1572,7 +1583,7 @@ export function settlementSweep({
         const { views } = resultAdmitter([...asked.values()], base);
         const byId = new Map(baseMarks.map((mark) => [mark.id, mark]));
         for (const [id, view] of views) byId.set(id, view);
-        sovereignInResult(views, byId);
+        sovereignInResult(views, byId, { kindIndex: base.kindIndex });
         let grew = false;
         for (const id of targets) {
           if (!views.has(id)) continue;
@@ -1980,6 +1991,9 @@ export function settlementSweep({
     // and the next crossing refuses at checkout for a mess the sweep made.
     touched.push("WORLD/world-state.json", "WORLD/INDEX.md",
       "WORLD/region-outsiders.json", "WORLD/region-outsiders.md",
+      // the law artifact, fold-derived (WLD-116): the classes are not in world-state.json, so the
+      // readers that cannot read the law tree read this
+      "WORLD/law-state.json",
       // the containment map, fold-derived since the freeze: "the fold emits the
       // containment map beside world-state.json every settlement."
       "WORLD/containment.json");
@@ -2001,6 +2015,7 @@ export function settlementSweep({
     "WORLD/region-outsiders.json",
     "WORLD/region-outsiders.md",
     "WORLD/containment.json",
+    "WORLD/law-state.json",
   // EVERY CHANNEL, INCLUDING THE EMPTY ONES (founder-mandated 2026-08-27,
   // defect 2 — "receipts lie by omission"). This line used to name published and
   // unpublished, and mentioned withdrawn only when it was non-zero. So a

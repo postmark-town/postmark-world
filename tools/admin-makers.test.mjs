@@ -11,13 +11,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadMarks } from "./marks-fold.mjs";
+import { loadLiveLaw } from "./law-tree.mjs";
 import { propertyOf, classChain } from "./class-properties.mjs";
 import { ADMIN_CLASSES, isAdminClass, adminsOf, householdOf, mayMake, makersRefusal } from "./admin-makers.mjs";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const WORKS = join(HERE, "..", "WORLD", "marks", "let-there-be-light", "the-town-centre", "the-keeping-works");
-const law = loadMarks(WORKS);
+const law = loadLiveLaw(); // the classes are law nodes (WLD-116): the live law tree
 
 const registry = {
   households: { wright: "hh:starforge", rei: "hh:starforge", ana: "hh:ana-solace" },

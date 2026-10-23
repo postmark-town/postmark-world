@@ -1,0 +1,840 @@
+{
+  "act": "retire",
+  "date": "2026-10-23",
+  "ruling": "WLD-116 (Darko, 2026-10-23 13:47-13:50): the machinery buildings, their function pointers and the code registry retire now; nothing reads them. Classes are law nodes, never marks (the law tree, WORLD/law/).",
+  "by": "the-town",
+  "why": "The Great Convergence (2026-08-01) filed one building per piece of code, each citing the code that keeps it true. No code in any repo reads `mechanic_draft:` or the registry, and the arrow points the wrong way (code points at law nodes, never the reverse). Observability is its own track: canon is served by the doors (explain: and a LOGOS read), and later an embodied library, derived and regenerated, one writer.",
+  "kept": {
+    "the-town/the-keeping-works": "the seat, a plain landmark (its body no longer claims the buildings); it will hold the library",
+    "noe/say-which-copy": "Noe's predicate on the relay office, re-parented to the seat (id unchanged); Wright writes Noe a letter"
+  },
+  "counts": {
+    "total": 136,
+    "by_kind": {
+      "sited": 42,
+      "predicate": 82,
+      "class": 9,
+      "property": 3
+    },
+    "machinery_marks": 124,
+    "history_law_nodes": 12
+  },
+  "rows": {
+    "the-town/spectators-gallery": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/spectators-gallery/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/spectators-gallery/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-viewer-module": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/spectators-gallery/the-viewer-module/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/spectators-gallery/the-viewer-module/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-embodied-ancestor": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/spectators-gallery/the-viewer-module/the-embodied-ancestor/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/spectators-gallery/the-viewer-module/the-embodied-ancestor/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-embodiment-test": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/spectators-gallery/the-viewer-module/the-embodiment-test/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/spectators-gallery/the-viewer-module/the-embodiment-test/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-viewer-mount": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/spectators-gallery/the-viewer-module/the-viewer-mount/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/spectators-gallery/the-viewer-module/the-viewer-mount/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-walk-preview": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/spectators-gallery/the-viewer-module/the-walk-preview/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/spectators-gallery/the-viewer-module/the-walk-preview/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-almanac-hall": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-almanac-hall/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-almanac-hall/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-conversation-knot": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-almanac-hall/the-conversation-knot/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-almanac-hall/the-conversation-knot/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-full-round": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-almanac-hall/the-full-round/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-almanac-hall/the-full-round/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ledger-reading": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-almanac-hall/the-ledger-reading/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-almanac-hall/the-ledger-reading/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-preamble-reader": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-almanac-hall/the-preamble-reader/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-almanac-hall/the-preamble-reader/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-backers-hall": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-backers-hall/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-backers-hall/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-backing-answer": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-backers-hall/the-backing-answer/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-backers-hall/the-backing-answer/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-panel-mount": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-backers-hall/the-panel-mount/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-backers-hall/the-panel-mount/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/ballot-asked-by": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/ballot-asked-by/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/ballot-asked-by/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/ballot-custody": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/ballot-custody/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/ballot-custody/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/ballot-law": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/ballot-law/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/ballot-law/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/ballot-vote": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/ballot-vote/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/ballot-vote/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ballot-house": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ballot-reading": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/the-ballot-reading/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/the-ballot-reading/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-clip-and-cast": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/the-clip-and-cast/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/the-clip-and-cast/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-closing-return": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/the-closing-return/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/the-closing-return/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-mailed-ballot-sweep": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/the-mailed-ballot-sweep/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/the-mailed-ballot-sweep/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-standing-record": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/the-standing-record/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/the-standing-record/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-tally": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-house/the-tally/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-house/the-tally/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ballot-room": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-room/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-room/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ballot-bundle": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-room/the-ballot-bundle/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-room/the-ballot-bundle/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-locked-stake": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ballot-room/the-locked-stake/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ballot-room/the-locked-stake/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-bouncers-booth": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-bouncers-booth/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-bouncers-booth/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-unnamed-key": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-bouncers-booth/the-unnamed-key/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-bouncers-booth/the-unnamed-key/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-copyists-bench": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-copyists-bench/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-copyists-bench/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-byte-check": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-copyists-bench/the-byte-check/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-copyists-bench/the-byte-check/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-quiet-write": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-copyists-bench/the-quiet-write/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-copyists-bench/the-quiet-write/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-darkroom": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-darkroom/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-darkroom/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-develop-step": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-darkroom/the-develop-step/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-darkroom/the-develop-step/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-flat-name": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-darkroom/the-flat-name/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-darkroom/the-flat-name/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-unclaimed-sweep": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-darkroom/the-unclaimed-sweep/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-darkroom/the-unclaimed-sweep/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-editing-desk": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-editing-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-editing-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-hearth-rewrite": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-editing-desk/the-hearth-rewrite/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-editing-desk/the-hearth-rewrite/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-new-pane": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-editing-desk/the-new-pane/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-editing-desk/the-new-pane/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-fitting-room": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-fitting-room/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-fitting-room/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-founders-desk": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-founders-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-founders-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-founder-check": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-founders-desk/the-founder-check/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-founders-desk/the-founder-check/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-founders-gift": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-founders-desk/the-founders-gift/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-founders-desk/the-founders-gift/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-framers-gallery": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-framers-gallery/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-framers-gallery/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-front-window": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-credentials-desk": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-credentials-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/the-credentials-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-minting-press": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-credentials-desk/the-minting-press/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/the-credentials-desk/the-minting-press/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-pass-check": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-credentials-desk/the-pass-check/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/the-credentials-desk/the-pass-check/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-sign-in-corridor": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-credentials-desk/the-sign-in-corridor/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/the-credentials-desk/the-sign-in-corridor/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-signature-match": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-credentials-desk/the-signature-match/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/the-credentials-desk/the-signature-match/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-intake-slot": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-front-window/the-intake-slot/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-front-window/the-intake-slot/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-gatehouse": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-gatehouse/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-gatehouse/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-glaziers-loft": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-glaziers-loft/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-glaziers-loft/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-window-dressing": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-glaziers-loft/the-window-dressing/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-glaziers-loft/the-window-dressing/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-index-room": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-index-room/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-index-room/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-lending-library": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-lending-library/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-lending-library/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-borrowed-glass": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-lending-library/the-borrowed-glass/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-lending-library/the-borrowed-glass/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-mail-desk": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mail-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mail-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-days-tally": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mail-desk/the-days-tally/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mail-desk/the-days-tally/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-narrowing-glass": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mail-desk/the-narrowing-glass/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mail-desk/the-narrowing-glass/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-office-test": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mail-desk/the-office-test/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mail-desk/the-office-test/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-mint-house": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-mint-engine": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-balance-fold": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-balance-fold/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-balance-fold/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-correspondence-fold": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-correspondence-fold/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-correspondence-fold/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-friendship-mint": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-friendship-mint/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-friendship-mint/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ledgers-grammar": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-ledgers-grammar/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-ledgers-grammar/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-sealed-entry": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-sealed-entry/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-sealed-entry/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-sealing-wax": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-sealing-wax/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-sealing-wax/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-settlement-trace": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-mint-engine/the-settlement-trace/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-mint-engine/the-settlement-trace/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-verifiers-desk": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-mint-house/the-verifiers-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-mint-house/the-verifiers-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-morning-desk": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-morning-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-morning-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-naming-shelf": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-naming-shelf/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-naming-shelf/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-plain-title": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-naming-shelf/the-plain-title/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-naming-shelf/the-plain-title/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-outbox": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-outbox/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-outbox/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-next-crossing": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-outbox/the-next-crossing/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-outbox/the-next-crossing/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-outbox-filing": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-outbox/the-outbox-filing/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-outbox/the-outbox-filing/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-pen-stroke": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-outbox/the-pen-stroke/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-outbox/the-pen-stroke/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-pressroom": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-pressroom/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-pressroom/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-quest-board": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-quest-board/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-quest-board/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-days-leaderboard": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-quest-board/the-days-leaderboard/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-quest-board/the-days-leaderboard/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-days-progress": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-quest-board/the-days-progress/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-quest-board/the-days-progress/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-durable-snapshot": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-quest-board/the-durable-snapshot/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-quest-board/the-durable-snapshot/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-friendship-standing": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-quest-board/the-friendship-standing/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-quest-board/the-friendship-standing/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-personal-board": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-quest-board/the-personal-board/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-quest-board/the-personal-board/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-reading-room": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-reading-room/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-reading-room/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-doorstep-reading": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-reading-room/the-doorstep-reading/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-reading-room/the-doorstep-reading/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-identity-reading": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-reading-room/the-identity-reading/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-reading-room/the-identity-reading/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-letter-sorting": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-reading-room/the-letter-sorting/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-reading-room/the-letter-sorting/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-three-balances": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-reading-room/the-three-balances/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-reading-room/the-three-balances/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-relay-office": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-relay-office/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-relay-office/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-daily-haul": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-relay-office/the-daily-haul/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-relay-office/the-daily-haul/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-patient-knock": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-relay-office/the-patient-knock/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-relay-office/the-patient-knock/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-today-strip": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-relay-office/the-today-strip/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-relay-office/the-today-strip/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-residency-office": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-residency-office/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-residency-office/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-card-check": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-residency-office/the-card-check/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-residency-office/the-card-check/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-request-to-stay": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-residency-office/the-request-to-stay/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-residency-office/the-request-to-stay/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-roll-house": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-roll-house/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-roll-house/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-signet-office": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-signet-office/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-signet-office/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-authorize-road": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-signet-office/the-authorize-road/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-signet-office/the-authorize-road/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-freshness-test": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-signet-office/the-freshness-test/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-signet-office/the-freshness-test/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-return-reading": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-signet-office/the-return-reading/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-signet-office/the-return-reading/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-sorting-house": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-envelope-law": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/the-envelope-law/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/the-envelope-law/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-crossing-memory": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/the-envelope-law/the-crossing-memory/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/the-envelope-law/the-crossing-memory/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-frontmatter-reader": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/the-envelope-law/the-frontmatter-reader/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/the-envelope-law/the-frontmatter-reader/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-roll-call": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/the-envelope-law/the-roll-call/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/the-envelope-law/the-roll-call/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-stale-clone-test": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/the-envelope-law/the-stale-clone-test/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/the-envelope-law/the-stale-clone-test/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-verdict": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-sorting-house/the-envelope-law/the-verdict/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-sorting-house/the-envelope-law/the-verdict/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-stake-window": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-stake-window/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-stake-window/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-held-stamps": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-stake-window/the-held-stamps/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-stake-window/the-held-stamps/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-telemetry-ledger": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-telemetry-ledger/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-telemetry-ledger/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-footfall-line": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-telemetry-ledger/the-footfall-line/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-telemetry-ledger/the-footfall-line/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-two-shelves": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-two-shelves/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-two-shelves/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-typesetters-desk": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-typesetters-desk/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-typesetters-desk/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-safe-render": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-typesetters-desk/the-safe-render/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-typesetters-desk/the-safe-render/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-teaser-cut": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-typesetters-desk/the-teaser-cut/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-typesetters-desk/the-teaser-cut/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-ushers-rail": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ushers-rail/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ushers-rail/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-rail-watch": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-ushers-rail/the-rail-watch/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-ushers-rail/the-rail-watch/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-witness-stand": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-witness-stand/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-witness-stand/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-works-portal": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-works-portal/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-works-portal/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-world-window": {
+      "kind": "sited",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-world-window/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-world-window/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/the-doorway-orientation": {
+      "kind": "predicate",
+      "was": "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/the-world-window/the-doorway-orientation/mark.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/machinery/the-world-window/the-doorway-orientation/mark.md",
+      "why": "machinery building or a pointer at code: nothing reads it"
+    },
+    "the-town/uncategorized": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-custody-ladder": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-custody-ladder/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-custody-ladder/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-market-machinery": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-market-machinery/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-market-machinery/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-placement-discipline": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-placement-discipline/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-placement-discipline/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-publish-law": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-publish-law/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-publish-law/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/publish-mechanic": {
+      "kind": "property",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-publish-law/publish-mechanic/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-publish-law/publish-mechanic/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-deferred-gate": {
+      "kind": "property",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-publish-law/the-deferred-gate/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-publish-law/the-deferred-gate/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-late-welcome": {
+      "kind": "property",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-publish-law/the-late-welcome/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-publish-law/the-late-welcome/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-read-policy": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-read-policy/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-read-policy/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/the-two-question-lint": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-rules/uncategorized/the-two-question-lint/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-rules/uncategorized/the-two-question-lint/node.md",
+      "why": "v0 markers: law standing in LOGOS with no works seat yet; the rules they point at stand in LOGOS"
+    },
+    "the-town/burn": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-edge/burn/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-edge/burn/node.md",
+      "why": "dormant since 2026-09-14: supply leaves the world nowhere"
+    },
+    "the-town/keeping-deed": {
+      "kind": "class",
+      "was": "WORLD/law/the-keeping-works/postmark-node/paper/deed/keeping-deed/node.md",
+      "now": "WORLD/_archived/2026-10-23-wld-116/law/postmark-node/paper/deed/keeping-deed/node.md",
+      "why": "retired 2026-09-14 with the burn; the patron's deed stands"
+    }
+  }
+}

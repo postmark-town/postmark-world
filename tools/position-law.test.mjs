@@ -27,7 +27,7 @@ import { dirname, join } from "node:path";
 import { whereIs, homeOf, parcelsFor, porchOf, QUAY_MARK_ID } from "./where-is.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
+const WORKS = "WORLD/law/the-keeping-works";
 
 /** A mark's frontmatter, as fields — the record is the source, not a fixture. */
 function markOf(rel) {
@@ -47,7 +47,7 @@ function markOf(rel) {
 // ── 1. the law is planted ────────────────────────────────────────────────────
 
 test("LAW: the parcel's scope clause stands — a parcel is the HOUSEHOLD's ground", () => {
-  const { fields, body } = markOf(`${WORKS}/postmark-node/mark/parcel/household-scope/mark.md`);
+  const { fields, body } = markOf(`${WORKS}/postmark-node/mark/parcel/household-scope/node.md`);
   assert.equal(fields.kind, "property"); // a class's clause is a property now (LOGOS v2 part 2)
   assert.equal(fields.by, "the-town");
   assert.equal(fields.tier, "constitution", "who may read a household's ground is the town's word, not a holder's");
@@ -59,7 +59,7 @@ test("LAW: the parcel's scope clause stands — a parcel is the HOUSEHOLD's grou
 });
 
 test("LAW: the parcel's resolution clause stands — own-claimed first, else the household's first-made", () => {
-  const { fields, body } = markOf(`${WORKS}/postmark-node/mark/parcel/ground-resolution/mark.md`);
+  const { fields, body } = markOf(`${WORKS}/postmark-node/mark/parcel/ground-resolution/node.md`);
   assert.equal(fields.kind, "property"); // a class's clause is a property now (LOGOS v2 part 2)
   assert.equal(fields.name, "resolution");
   assert.match(fields.default, /own/i, "the handle's own claim leads");
@@ -68,7 +68,7 @@ test("LAW: the parcel's resolution clause stands — own-claimed first, else the
 });
 
 test("LAW: the resident's standing clause stands — the unplaced stand at the Origin (2026-09-17, trued 2026-10-21)", () => {
-  const { fields, body } = markOf(`${WORKS}/postmark-node/entity/resident/the-standing-porch/mark.md`);
+  const { fields, body } = markOf(`${WORKS}/postmark-node/entity/resident/the-standing-porch/node.md`);
   assert.equal(fields.kind, "property"); // a class's clause is a property now (LOGOS v2 part 2)
   assert.equal(fields.name, "standing");
   assert.match(fields.default, /^the Origin, when the record places them nowhere else$/);
@@ -81,7 +81,7 @@ test("LAW: the CLAIMING law is untouched by any of it — one parcel per handle"
   // rather than trusted: reading at household grain must never become holding.
   // Asserted across the WHOLE clause, not just `default:` — the headline field
   // states the scope and the body carries the carve-out, and the law is both.
-  const { fields, body } = markOf(`${WORKS}/postmark-node/mark/parcel/household-scope/mark.md`);
+  const { fields, body } = markOf(`${WORKS}/postmark-node/mark/parcel/household-scope/node.md`);
   assert.match(`${fields.default} ${body}`, /claim/i,
     "the scope clause has to say what it does NOT change, or it reads as a rights grant");
 });
@@ -98,7 +98,7 @@ const garrison = {
 };
 
 test("CODE: ground resolves at the grain the scope clause names", () => {
-  const clause = markOf(`${WORKS}/postmark-node/mark/parcel/household-scope/mark.md`).fields.default;
+  const clause = markOf(`${WORKS}/postmark-node/mark/parcel/household-scope/node.md`).fields.default;
   // The law says the ground is the household's. Read it, then demand it.
   assert.match(clause, /household/i);
   const rook = homeOf("rook-of-garrison", garrison);
@@ -108,7 +108,7 @@ test("CODE: ground resolves at the grain the scope clause names", () => {
 });
 
 test("CODE: the pick follows the resolution clause's own order, and says which it took", () => {
-  const clause = markOf(`${WORKS}/postmark-node/mark/parcel/ground-resolution/mark.md`).fields.default;
+  const clause = markOf(`${WORKS}/postmark-node/mark/parcel/ground-resolution/node.md`).fields.default;
   assert.match(clause, /own/i);
   const both = {
     ...garrison,
@@ -128,7 +128,7 @@ test("CODE: the pick follows the resolution clause's own order, and says which i
 });
 
 test("CODE: the unplaced stand where the standing clause says, and the answer says it is a default", () => {
-  const clause = markOf(`${WORKS}/postmark-node/entity/resident/the-standing-porch/mark.md`).fields.default;
+  const clause = markOf(`${WORKS}/postmark-node/entity/resident/the-standing-porch/node.md`).fields.default;
   assert.match(clause, /Origin/);
   const here_ = whereIs("adam-rhys", { world: garrison, departures: [] });
   assert.equal(here_.placed, true, `the record says "${clause}"`);

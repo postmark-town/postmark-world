@@ -292,7 +292,7 @@ const overlapsRect = (a, b) => {
  *   `alone`: the marks returned without their positioned children, whose
  *   children the fold reparents (ruling B)
  */
-export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, placementOf = null, rectOf, townWords = null, townLaws = null }) {
+export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, placementOf = null, rectOf, townWords = null, townLaws = null, kindIndex = null }) {
   const errors = [];
   const kept = new Set();
   const words = new Map();      // `${grantorId}\0${targetId}` -> word
@@ -430,7 +430,8 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, pla
   for (const [c, p] of parentOf) { if (!children.has(p)) children.set(p, []); children.get(p).push(c); }
   // on the fold's own path, so ground by the class chain (G12), one index over
   // the marks this resolution holds
-  const kidx = kindIndexOf(byId);
+  // (the lineage is the law's, WLD-116: the fold hands its index in; a caller with classes among its marks need not)
+  const kidx = kindIndex ?? kindIndexOf(byId);
   const positioned = (mk) => isGroundIn(mk, kidx);
   // A SUBTREE IS THE OPPOSED HOUSEHOLD'S OWN (POS-477). `parentOf` holds the
   // geometric containment edge (the smallest sited mark around a mark, the edge

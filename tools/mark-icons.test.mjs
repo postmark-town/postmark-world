@@ -77,8 +77,10 @@ test("the state badges, in their fixed order, and the stairs' promise is not a l
 
 test("the real record: the Spire, its doors and stairs, and the Post Office", () => {
   const state = JSON.parse(readFileSync(new URL("../WORLD/world-state.json", import.meta.url), "utf8"));
+  // the classes are law nodes (WLD-116), beside the fold's marks in the law artifact the page reads
+  const lawNodes = JSON.parse(readFileSync(new URL("../WORLD/law-state.json", import.meta.url), "utf8")).nodes;
   const byId = new Map(state.marks.map((m) => [m.id, m]));
-  const creatures = creatureClassesOf(state.marks, tok);
+  const creatures = creatureClassesOf([...state.marks, ...lawNodes], tok);
   assert.ok(creatures.has("wolf") && creatures.has("raven") && creatures.has("bat"), "the record's creature classes");
   const keys = (id) => markIcons(byId.get(id), { cls: tok(instanceClassOf(byId.get(id))), creatureClasses: creatures }).map((i) => i.key);
   for (const [id, want] of [

@@ -41,7 +41,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
+const WORKS = "WORLD/law/the-keeping-works";
 const STANCE = `${WORKS}/postmark-edge/declare-stance-on`;
 
 const at = (rel) => join(here, "..", rel);
@@ -70,7 +70,7 @@ const DIALS = {
 
 test("the stance verb declares both of its standing numbers as predicate children", () => {
   for (const [slot, { dir, value, constant }] of Object.entries(DIALS)) {
-    const rel = `${STANCE}/${dir}/mark.md`;
+    const rel = `${STANCE}/${dir}/node.md`;
     assert.ok(existsSync(at(rel)),
       `${slot} has no node — src/world-stance.mjs runs on ${constant} and "an orphan number is a rule nobody declared"`);
     // a predicate child until LOGOS v2 part 2, a property node now (slot → name, value → default)
@@ -88,7 +88,7 @@ test("each dial carries its claim — a dial nobody can read is a constant with 
   // dials-on-the-record.test.mjs's standard for the say and doorstep dials,
   // applied to these: a readable sentence, and inside the one-claim cap.
   for (const { dir } of Object.values(DIALS)) {
-    const b = body(`${STANCE}/${dir}/mark.md`);
+    const b = body(`${STANCE}/${dir}/node.md`);
     assert.ok(b.length > 20, `${dir} states no claim`);
     assert.ok([...b].length <= 150, `${dir} breaks the one-claim cap (the-town/the-one-claim)`);
   }
@@ -98,7 +98,7 @@ test("the numbers have ONE home: the class frontmatter does not restate them", (
   // The failure mode F5 found on the walk pace — three declarations, one read.
   // Having just planted these, the cheapest way to acquire that bug is to also
   // write them into `dials:` on the class node.
-  const cls = read(`${STANCE}/mark.md`);
+  const cls = read(`${STANCE}/node.md`);
   // since LOGOS v2 part 2 a class node carries no `dials:` line at all; if one
   // ever returns, it must not restate these
   const line = cls.split("\n").find((l) => l.startsWith("dials:"));

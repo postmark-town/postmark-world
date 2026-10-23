@@ -79,7 +79,7 @@ test("the lint: fill is true or false; anything else is refused by name", () => 
 });
 
 test("the thing class declares fill: sovereign, default true", () => {
-  const node = readFileSync(join(ROOT, "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/mark/thing/thing-fill/mark.md"), "utf8");
+  const node = readFileSync(join(ROOT, "WORLD/law/the-keeping-works/postmark-node/mark/thing/thing-fill/node.md"), "utf8");
   assert.match(node, /^kind: property$/m);
   assert.match(node, /^tier: sovereign$/m);
   assert.match(node, /^name: fill$/m);

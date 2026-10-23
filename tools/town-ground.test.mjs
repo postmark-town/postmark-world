@@ -436,14 +436,15 @@ test("[pin] THE CALL SITE PASSES A SET THAT EXISTS — a CHEAP SECOND GUARD, not
   // the READER now; a fold in hand is not consulted on that path. This guard
   // pins the QUESTION, not the whole expression, for the same reason the
   // open-country one does.
-  assert.match(VIEWER, /const allMarks = \(\) =>[^;]*onResidentPath\(\)[^;]*byId\.values\(\)/,
+  // (WLD-116: the fold's law nodes ride with its marks, so `allMarks` is a block now, not one expression)
+  assert.match(VIEWER, /const allMarks = \(\) => \{\s*if \(onResidentPath\(\)\) return \[\.\.\.byId\.values\(\)\];/,
     "`allMarks` must ask who is reading before it reaches for a fold");
-  assert.match(VIEWER, /const allMarks = \(\) =>[^;]*world\?\.marks/,
+  assert.match(VIEWER, /const allMarks = \(\) => \{[^}]*world\?\.marks/,
     "and it still reads the fold where there is a reader who wants one");
   // ⚑ THE CALL SITE MOVED AGAIN ON 2026-10-13 (WLD-5): the assembled world is
   // read through `sightOf` (the world tools' standpointSight, so a dungeon draws
   // as its own mark alone). Same fold, same skeleton, scoped before anything draws.
-  assert.match(VIEWER, /world = sightOf\(assembleWorld\(\{ worldState: data\.worldState, skeleton: data\.skeleton \}\)\)/);
+  assert.match(VIEWER, /world = sightOf\(assembleWorld\(\{ worldState: data\.worldState, skeleton: data\.skeleton, law: data\.law \?\? \[\] \}\)\)/); // (the law rides beside the fold, WLD-116)
   assert.doesNotMatch(VIEWER, /townGround\(data\.marks/, "`data.marks` is undefined and always was");
   // THE ORIGINAL BUG, still watched: a set that does not exist. `world.marks`
   // is now the one that can be absent — the resident path never assembles a

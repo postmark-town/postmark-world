@@ -299,3 +299,30 @@ test("REHEARSAL PAIR: the before-export is read at its commit, and the gate prin
   assert.equal(clean.ok, true, JSON.stringify(clean.checks.filter((c) => !c.ok)));
   assert.match(clean.base, /^the working tree at [0-9a-f]{40}$/);
 });
+
+// ── a RETIREMENT is an act the gate can read (WLD-116) ────────────────────────
+// WORLD/_archived/<date>/RETIRED.json names what it moved whole into the archive. A mark it names
+// is not "gone, and no act names it"; and the act's word is held to the tree, as the sweep's is.
+import { judge, retiredIn } from "./harm-gate.mjs";
+
+test("a mark a declaring act retired is not lost; one the act names that still stands is HARM", () => {
+  const mk = (id) => [id, { id, kind: "sited", by: "the-town" }];
+  const before = new Map([mk("the-town/a-building"), mk("the-town/kept"), mk("the-town/not-yet")]);
+  const after = new Map([mk("the-town/kept"), mk("the-town/not-yet")]);
+  const lost = (retired) => judge({ before, after, retired }).checks.find((c) => c.name === "lost");
+  assert.equal(lost(new Set()).ok, false, "without the act, the building is gone and no act names it");
+  assert.match(lost(new Set()).rows[0], /the-town\/a-building: gone, and no act names it/);
+  const named = lost(new Set(["the-town/a-building"]));
+  assert.equal(named.ok, true);
+  assert.match(named.note, /1 retired by a declaring act/);
+  const lying = lost(new Set(["the-town/a-building", "the-town/not-yet"]));
+  assert.equal(lying.ok, false, "the act says it retired a mark that still stands");
+  assert.match(lying.rows[0], /the-town\/not-yet: a declaring act says it retired, and it still stands/);
+});
+
+test("retiredIn reads every RETIRED.json under WORLD/_archived, and the live repo's names the machinery", () => {
+  const ids = retiredIn(ROOT);
+  assert.ok(ids.size >= 136);
+  assert.ok(ids.has("the-town/the-works-portal") && ids.has("the-town/burn"));
+  assert.equal(retiredIn(join(tmpdir(), "no-such-repo-for-retired")).size, 0);
+});

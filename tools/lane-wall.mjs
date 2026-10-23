@@ -42,6 +42,7 @@ import { join, dirname, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord, placementParent } from "./marks-fold.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: the classes are law nodes
 import { mayMake, makersRefusal } from "./admin-makers.mjs"; // who may make a class: makers, then admin (WLD-21)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -181,6 +182,9 @@ for (const { status, path } of changes) {
 const placeable = changes.filter((c) => c.status !== "D" && MARK_RE.test(c.path));
 let composed = null;
 const composedMarks = () => (composed ??= loadMarks(MARKS_DIR));
+// the classes are law nodes, not marks (WLD-116): the makers law reads them from the law tree beside the marks
+let composedLawNodes = null;
+const composedLaw = () => (composedLawNodes ??= loadLaw(lawDirFor(MARKS_DIR)).nodes);
 const yoursSoFar = violations.length === 0; // paths and pens hold; placement and makers both read the composed tree
 if (placeable.length && yoursSoFar) {
   const marks = composedMarks();
@@ -223,7 +227,7 @@ if (placeable.length && yoursSoFar) {
     try { record = parseRecord(showAt(HEAD, path), path); } catch { continue; } // the handles law already named it
     const klass = instanceClassOf(record);
     if (klass === undefined) continue;
-    if (!mayMake({ klass, by: record.by, marks: composedMarks(), registry: registryFile }).may)
+    if (!mayMake({ klass, by: record.by, marks: composedLaw(), registry: registryFile }).may)
       refuse(path, makersRefusal(klass), "a resident makes what the class's makers allows; world { explain: \"" + klass + "\" } says who makes what");
   }
 }

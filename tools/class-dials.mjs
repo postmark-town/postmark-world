@@ -18,8 +18,9 @@ export function propertyFilesUnder(markFile) {
   const out = [];
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     if (!e.isDirectory()) continue;
-    const f = join(dir, e.name, "mark.md");
-    if (!existsSync(f)) continue;
+    // a property is a law node (WLD-116): node.md in the law tree; mark.md is the old filing
+    const f = [join(dir, e.name, "node.md"), join(dir, e.name, "mark.md")].find((p) => existsSync(p));
+    if (!f) continue;
     const rec = parseRecord(readFileSync(f, "utf8"), f);
     if (rec.kind === "property") out.push({ ...rec, slug: e.name, file: f });
   }

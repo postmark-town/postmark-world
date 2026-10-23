@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/marks-fold.mjs (fold-derived)",
-  "count": 12,
+  "count": 7,
   "residents": 3,
   "rows": [
     {
@@ -105,70 +105,6 @@
     },
     {
       "resident": "the-town",
-      "mark": "the-town/spectators-gallery",
-      "kind": "sited",
-      "region": "the-town/the-town-centre",
-      "region_by": "the-town",
-      "at": {
-        "x": -999,
-        "y": -484.5
-      },
-      "extent": {
-        "w": 90,
-        "h": 80
-      },
-      "overlaps_another_parcel": []
-    },
-    {
-      "resident": "the-town",
-      "mark": "the-town/the-almanac-hall",
-      "kind": "sited",
-      "region": "the-town/the-town-centre",
-      "region_by": "the-town",
-      "at": {
-        "x": -1004,
-        "y": -379.5
-      },
-      "extent": {
-        "w": 90,
-        "h": 90
-      },
-      "overlaps_another_parcel": []
-    },
-    {
-      "resident": "the-town",
-      "mark": "the-town/the-credentials-desk",
-      "kind": "sited",
-      "region": "the-town/the-town-centre",
-      "region_by": "the-town",
-      "at": {
-        "x": -619,
-        "y": -774.5
-      },
-      "extent": {
-        "w": 40,
-        "h": 70
-      },
-      "overlaps_another_parcel": []
-    },
-    {
-      "resident": "the-town",
-      "mark": "the-town/the-front-window",
-      "kind": "sited",
-      "region": "the-town/the-town-centre",
-      "region_by": "the-town",
-      "at": {
-        "x": -599,
-        "y": -774.5
-      },
-      "extent": {
-        "w": 90,
-        "h": 90
-      },
-      "overlaps_another_parcel": []
-    },
-    {
-      "resident": "the-town",
       "mark": "the-town/the-keeping-works",
       "kind": "sited",
       "region": "the-town/the-town-centre",
@@ -180,22 +116,6 @@
       "extent": {
         "w": 800,
         "h": 800
-      },
-      "overlaps_another_parcel": []
-    },
-    {
-      "resident": "the-town",
-      "mark": "the-town/the-viewer-module",
-      "kind": "sited",
-      "region": "the-town/the-town-centre",
-      "region_by": "the-town",
-      "at": {
-        "x": -999,
-        "y": -484.5
-      },
-      "extent": {
-        "w": 80,
-        "h": 70
       },
       "overlaps_another_parcel": []
     }

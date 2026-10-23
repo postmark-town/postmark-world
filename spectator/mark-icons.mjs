@@ -26,7 +26,8 @@
 // reader's, its ✦ figure and who is inside it. Pure.
 import { entryLawOf, isStairs, STAIRS_LINE } from "../tools/enter-exit.mjs";
 import { isDungeon } from "../tools/portals.mjs";
-import { isSited, isHeld } from "../tools/mark-kind.mjs"; // LOGOS v2 W2: a thing is kind: thing, still sited
+import { isSited, isHeld } from "../tools/mark-kind.mjs";
+import { isClass } from "../tools/law.mjs"; // WLD-116: THE ONE TEST of what is a class (a law node in a foundry) // LOGOS v2 W2: a thing is kind: thing, still sited
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 // THE TOKEN (play fix 43, Darko 20:16): a resident is drawn on the map as a round
@@ -93,7 +94,7 @@ export const inkOf = (key) => INK[key] ?? WHAT_INK;
  *  the nesting and drops `extends`). Never a hard-coded list of animals. */
 export function creatureClassesOf(marks = [], token = (c) => String(c ?? "").trim().toLowerCase()) {
   const out = new Set(["creature"]);
-  const classes = (marks ?? []).filter((m) => m?.kind === "class");
+  const classes = (marks ?? []).filter(isClass);
   const creatureIds = new Set(classes.filter((m) => token(m.class) === "creature").map((m) => m.id));
   for (const m of classes) {
     if (!token(m.class)) continue;
@@ -108,7 +109,7 @@ export function creatureClassesOf(marks = [], token = (c) => String(c ?? "").tri
  *  fold, so both are followed, to a fixed point. */
 export function thingClassesOf(marks = [], token = (c) => String(c ?? "").trim().toLowerCase()) {
   const out = new Set(["thing"]);
-  const classes = (marks ?? []).filter((m) => m?.kind === "class" && token(m.class));
+  const classes = (marks ?? []).filter((m) => isClass(m) && token(m.class));
   const ids = new Set(classes.filter((m) => token(m.class) === "thing").map((m) => m.id));
   for (let grew = true; grew;) {
     grew = false;

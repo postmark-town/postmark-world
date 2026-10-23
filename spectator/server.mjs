@@ -132,6 +132,8 @@ createServer(async (req, res) => {
     // record off this clone's disk, byte for byte as before.
     if (p === "/WORLD/world-state.json") return serveWorld(res, "world-state.json");
     if (p === "/WORLD/skeleton.json") return serveWorld(res, "skeleton.json");
+    // the classes are law nodes, not marks (WLD-116): the fold's derived law artifact, off this clone's disk
+    if (p === "/WORLD/law-state.json") return serveWorld(res, "law-state.json");
     // the crossings, as a FILE rather than as a door. Occupancy is derived from
     // the acts client-side (the same shape as position from the walk ledger), so
     // what the page needs is the record, not this server's opinion of it — and

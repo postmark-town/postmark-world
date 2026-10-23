@@ -8,6 +8,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 import { readKind, AFFORDED_VERBS } from "./creature-kind.mjs";
 import { DESPAWN_REASONS, CREATURE_LAW_DIR, AFFORDED_FROM, creatureLaw } from "./creatures.mjs";
 import { propertyOf } from "./class-properties.mjs";
@@ -16,7 +17,7 @@ import { propertyOf } from "./class-properties.mjs";
 const dial = (c, name) => propertyOf(marks, c, name)?.value;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const marks = loadMarks(join(ROOT, "WORLD", "marks"));
+const marks = loadRecords(join(ROOT, "WORLD", "marks"));
 const byClass = (c) => marks.find((m) => m.kind === "class" && m.by === "the-town" && String(m.class) === c);
 const KINDS = ["wolf", "raven", "bat"];
 
@@ -54,7 +55,7 @@ test("the three kinds: each a class extending creature, whose kind file is its l
 
 test("the law's directory: the class and its kinds all stand under CREATURE_LAW_DIR, so a reader at a ref lists one place", () => {
   // as the office's tick reads it at a ref: every mark.md under the directory, each through parseRecord
-  const files = readdirSync(join(ROOT, CREATURE_LAW_DIR), { recursive: true }).map(String).filter((p) => /(^|[\\/])mark\.md$/.test(p));
+  const files = readdirSync(join(ROOT, CREATURE_LAW_DIR), { recursive: true }).map(String).filter((p) => /(^|[\\/])node.md$/.test(p));
   const under = files.map((p) => parseRecord(readFileSync(join(ROOT, CREATURE_LAW_DIR, p), "utf8"), p));
   assert.deepEqual(creatureLaw(under), creatureLaw(marks), "the directory alone reads the same law as the whole world");
   assert.deepEqual(under.filter((m) => m.kind === "class").map((m) => String(m.class)).sort(), ["bat", "creature", "raven", "wolf"]);

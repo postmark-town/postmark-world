@@ -20,11 +20,12 @@ import { readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 import { walk } from "./world-verbs.mjs";
 import { propertyOf } from "./class-properties.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const marks = loadMarks(join(ROOT, "WORLD/marks"));
+const marks = loadRecords(join(ROOT, "WORLD/marks"));
 const skeleton = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
 const byId = new Map(marks.map((m) => [m.id, m]));
 

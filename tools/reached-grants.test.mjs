@@ -30,7 +30,7 @@ import { dialsOf } from "./class-dials.mjs";
 import { instanceClassOf } from "./mark-kind.mjs"; // what a record IS, in either form (W2)
 
 const here = dirname(fileURLToPath(import.meta.url));
-const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
+const WORKS = "WORLD/law/the-keeping-works";
 
 const read = (rel) => readFileSync(join(here, "..", rel), "utf8");
 const field = (rel, name) => {
@@ -46,12 +46,12 @@ const scalar = (rel, name) => {
   return line ? line.slice(name.length + 1).trim() : null;
 };
 
-const HUMAN = `${WORKS}/postmark-node/entity/human/mark.md`;
-const PARCEL = `${WORKS}/postmark-node/mark/parcel/mark.md`;
-const PORTAL = `${WORKS}/postmark-node/mark/portal-ground/mark.md`;
-const HELD_SLOT = `${WORKS}/postmark-node/mark/thing/held-grant-slot/mark.md`;
-const VERB = (v) => `${WORKS}/postmark-edge/${v}/mark.md`;
-const ARENA = `${WORKS}/postmark-node/mark/portal-ground/arena/mark.md`;
+const HUMAN = `${WORKS}/postmark-node/entity/human/node.md`;
+const PARCEL = `${WORKS}/postmark-node/mark/parcel/node.md`;
+const PORTAL = `${WORKS}/postmark-node/mark/portal-ground/node.md`;
+const HELD_SLOT = `${WORKS}/postmark-node/mark/thing/held-grant-slot/node.md`;
+const VERB = (v) => `${WORKS}/postmark-edge/${v}/node.md`;
+const ARENA = `${WORKS}/postmark-node/mark/portal-ground/arena/node.md`;
 
 // ── channel 1 · ambient, unchanged ──────────────────────────────────────────
 
@@ -88,7 +88,7 @@ test("the human's stride POINTS at the resident's — one number, one home", () 
   // one was ever read (`departurePace` asks the-town/resident by name, office
   // src/world-classes.mjs:143-146). The assertion now is that the second copy
   // does not exist.
-  const resident = dialsAt(`${WORKS}/postmark-node/entity/resident/mark.md`);
+  const resident = dialsAt(`${WORKS}/postmark-node/entity/resident/node.md`);
   const human = dialsAt(HUMAN);
 
   assert.equal(human.pace_km_per_crossing, "the-town/resident",
@@ -99,7 +99,7 @@ test("the human's stride POINTS at the resident's — one number, one home", () 
 
   // the pointer resolves: whatever the resident is ruled to, the human is that,
   // because there is nothing else for it to be.
-  const slot = `${WORKS}/postmark-edge/depart/pace-slot/mark.md`;
+  const slot = `${WORKS}/postmark-edge/depart/pace-slot/node.md`;
   assert.equal(scalar(slot, "default"), "the-town/resident",
     "the third declaration points too — depart's own body already said 'The stride is the mover's, never this verb's'");
 });
@@ -468,7 +468,7 @@ test("the adversary's numbers are on its own mark, not in any office", () => {
   // words allow ("a clause with no instance is a clause nobody has had to
   // mean"). The class-grammar half is still live law and still checked. When
   // the next adversary stands, the instance assertions return with its name.
-  const cls = dialsAt(`${WORKS}/postmark-node/mark/adversary/mark.md`);
+  const cls = dialsAt(`${WORKS}/postmark-node/mark/adversary/node.md`);
   assert.equal(cls.hp, "unsealed", "the class speaks the grammar and never the value");
   assert.equal(cls.hits_for, "unsealed");
   const monument = frontmatter("WORLD/marks/wright/the-unlit-cake/mark.md");
@@ -521,7 +521,7 @@ function markFiles(dir = join(here, "..", WORKS), out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (statSync(p).isDirectory()) markFiles(p, out);
-    else if (name === "mark.md") out.push(p);
+    else if (name === "node.md") out.push(p);
   }
   return out;
 }

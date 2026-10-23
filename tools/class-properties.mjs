@@ -16,10 +16,12 @@
 //
 // Browser-pure on purpose: the viewer reads the stride through this, from the
 // store, and the store carries `name`, `default`, `parent` and `extends` for
-// exactly that reason. `marks` is either loader records (`loadMarks`) or the
-// store's rows (world-state.json); both carry the four fields this reads.
+// exactly that reason. `marks` is the LAW (WLD-116: classes are law nodes, never
+// marks; tools/law.mjs is the one test of what is a class): the loader's law
+// nodes (tools/law-tree.mjs), or the law artifact's rows (WORLD/law-state.json).
+// A list that also holds marks is fine: only the law nodes in it are read.
 
-const TOWN = "the-town";
+import { isClass, isProperty } from "./law.mjs"; // WLD-116: THE ONE TEST of what is a class (a law node in a foundry)
 
 // The record grammar keeps every value as text except numbers and JSON, so a
 // default of `true`, `false` or `null` arrives as the word. A property's value
@@ -35,15 +37,13 @@ export function propertyValue(raw) {
 // `property_tier`; a loader record carries the property's own as `tier`.
 const tierOf = (node) => node.property_tier ?? node.tier;
 
-const isClassNode = (m) => m?.kind === "class" && (m.by ?? m.household) === TOWN;
-const isProperty = (m) => m?.kind === "property";
 
 /** One reusable index over the marks: classes by name, properties by parent. */
 export function classIndex(marks) {
   const byName = new Map();
   const propsUnder = new Map();
   for (const m of marks ?? []) {
-    if (isClassNode(m) && m.class != null && !byName.has(String(m.class))) byName.set(String(m.class), m);
+    if (isClass(m) && m.class != null && !byName.has(String(m.class))) byName.set(String(m.class), m);
     // a child property names its parent property in `of:` and files flat in its
     // class's directory (the layout, 2026-10-17); a property without `of:`
     // belongs to the node it is filed under

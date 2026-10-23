@@ -28,6 +28,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs"; // the ONE loader
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: the classes are law nodes
 import { assembleWorld } from "./world-build.mjs"; // the ONE assembly (shared with the browser)
 import { orient, openYourEyes } from "./world-verbs.mjs";
 
@@ -66,14 +67,15 @@ const DEFAULT_CROSSING = Number(arg("--crossing", 19)); // fog is the crossing's
 export function buildWorld({ crossing = DEFAULT_CROSSING, marksDir = null, stakesPath = null, fanup = "legacy" } = {}) {
   const terrain = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
   const placed = loadMarks(marksDir ?? join(ROOT, "WORLD/marks")); // SHARED nested loader; real coords
+  const law = loadLaw(lawDirFor(marksDir ?? join(ROOT, "WORLD/marks"))).nodes; // the classes are law nodes, not marks (WLD-116)
   const stakes = stakesPath ? JSON.parse(readFileSync(stakesPath, "utf8")) : [];
 
   // fold at this crossing (stakes take effect the crossing after they land)
-  const state = fold({ marks: placed, terrain, stakes, tick: crossing + 1, fanup });
+  const state = fold({ marks: placed, law, terrain, stakes, tick: crossing + 1, fanup });
 
   // one assembly, disk data source, no override: the home densification is
   // derived from the marks, exactly as the browser derives it (see above)
-  const world = assembleWorld({ worldState: state, skeleton: terrain });
+  const world = assembleWorld({ worldState: state, skeleton: terrain, law });
   world.foldErrors = state.errors;
   // sandbox receipts ride to the caller (assembleWorld picks fields, so these
   // must be re-attached; absent under fanup:"legacy" by construction)

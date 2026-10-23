@@ -47,7 +47,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
+const WORKS = "WORLD/law/the-keeping-works";
 const SETTLE = `${WORKS}/postmark-edge/settle`;
 
 const read = (rel) => readFileSync(join(here, "..", rel), "utf8");
@@ -63,8 +63,8 @@ const body = (rel) => {
   return t.slice(t.indexOf("\n", end + 1) + 1).trim();
 };
 
-const TRIGGER = `${SETTLE}/come-ashore-trigger/mark.md`;
-const GUARD = `${SETTLE}/co-sign-guard/mark.md`;
+const TRIGGER = `${SETTLE}/come-ashore-trigger/node.md`;
+const GUARD = `${SETTLE}/co-sign-guard/node.md`;
 
 test("the trigger is the CROSSING, not the berth's own hand", () => {
   // src/declare.mjs:389, verbatim: "This door never settles anyone — the

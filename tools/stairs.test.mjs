@@ -10,6 +10,7 @@ import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, cpSync, rmSync } from "node:fs";
+import { copyLiveLaw } from "./law-fixture.mjs";
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -147,9 +148,10 @@ test("the lint: a stair is a box inside a room, not a door in a wall, so it stil
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LINT = join(HERE, "mark-lint.mjs");
 const REAL = join(HERE, "..", "WORLD", "marks", "let-there-be-light");
-const WORKS = ["the-town-centre", "the-town-centre/the-keeping-works", "the-town-centre/the-keeping-works/postmark-node",
-  "the-town-centre/the-keeping-works/postmark-node/mark", "the-town-centre/the-keeping-works/postmark-node/mark/dungeon"];
-const STAIRS_NODE = "the-town-centre/the-keeping-works/postmark-node/mark/stairs";
+const WORKS = ["the-town-centre", "the-town-centre/the-keeping-works"]; // the quarter's marks
+// the classes are law nodes (WLD-116): the chain to dungeon, and the stairs class the works declare
+const LAW_CHAIN = ["postmark-node", "postmark-node/mark", "postmark-node/mark/sited", "postmark-node/mark/dungeon"];
+const STAIRS_NODE = "postmark-node/mark/stairs";
 const SCRATCH = [];
 after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true }); });
 
@@ -159,10 +161,11 @@ function gateTree({ declared }) {
   mkdirSync(root, { recursive: true });
   copyFileSync(join(REAL, "mark.md"), join(root, "mark.md"));
   cpSync(join(REAL, "logos"), join(root, "logos"), { recursive: true });
-  for (const rel of [...WORKS, ...(declared ? [STAIRS_NODE] : [])]) {
+  for (const rel of WORKS) {
     mkdirSync(join(root, rel), { recursive: true });
     copyFileSync(join(REAL, rel, "mark.md"), join(root, rel, "mark.md"));
   }
+  copyLiveLaw(dir, [...LAW_CHAIN, ...(declared ? [STAIRS_NODE] : [])]);
   const rid = (s) => s.replace(/^home\//, "testerhh/");
   for (const m of world().marks) {
     const d = join(root, m.id.split("/")[1]);

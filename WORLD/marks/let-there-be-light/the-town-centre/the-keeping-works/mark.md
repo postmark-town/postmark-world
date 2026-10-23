@@ -9,4 +9,4 @@ pre: true
 derived_from: package.json — "The told world of Postmark — the semantic-world engine (heightfield, field-of-view, LOD, radial serializer) and its spine verbs (orient / open-your-eyes / investigate / walk)."
 ---
 
-The quarter where the town's own machinery stands as buildings, each one citing the code that keeps it true.
+The quarter where the town keeps its book: Postmark's own law is kept here, and the town's library will stand here.
