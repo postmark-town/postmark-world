@@ -244,3 +244,26 @@ test("TWO CLAIMS: one survey entry claimed twice is refused, not resolved by dir
     assert.doesNotMatch(r.stdout, /record\(s\) written/, "nothing was written before it stopped");
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+// 6. A LANDFORM IS NOT A CLAIM (WLD-97 part 3, G4 ruled 2026-10-22). A town
+// landform carrying ground_m links the survey by `feature:` beside the feature's
+// own mark (the Garrison valley beside the lake). It shapes the ground around the
+// feature; it does not claim it, so it is no twin, the run is not refused, and
+// the feature's own mark is still the town's and still generated.
+const valleyMark = (feature, at) => markText([
+  "kind: landform", "by: the-town", "tier: constitution", "date: 2026-10-22",
+  `at: { x: ${at.x}, y: ${at.y} }`, "extent: { w: 300, h: 300 }", `feature: ${feature}`, "ground_m: 8",
+], `the valley ${feature} lies in.`);
+
+test("A LANDFORM IS NOT A CLAIM: a ground_m mark linked to a feature beside its own mark is no twin, and speaks for nothing", () => {
+  const dir = scratch(townMark("fixture-footbridge", { x: 100, y: 100 }),
+    [["a-grove-valley", valleyMark("fixture-grove", { x: 520, y: 510 })]]);
+  try {
+    const before = read(at(dir, "a-grove-valley"));
+    const r = runExpectingRefusal(dir);
+    assert.equal(r.status, 0, `the run is not refused: ${r.stderr}`);
+    assert.doesNotMatch(r.stdout, /SPOKEN FOR/, "the town's own grove is not spoken for by its valley");
+    assert.match(read(at(dir, "fixture-grove")), /^feature: fixture-grove$/m, "the grove's own mark is still generated");
+    assert.equal(read(at(dir, "a-grove-valley")), before, "and the valley is left as it was written");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

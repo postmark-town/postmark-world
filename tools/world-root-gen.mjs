@@ -30,6 +30,7 @@ import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COORDS_FIELD, COORDS_RELATIVE, parseRecord } from "./marks-fold.mjs";
+import { claimsFeature } from "./world-build.mjs"; // WLD-97: a landform links a feature without claiming it
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -158,7 +159,9 @@ function indexFeatureClaims() {
         let rec = null;
         try { rec = parseRecord(readFileSync(mp, "utf8"), mp); } catch { /* malformed: §1's error, not this gate's */ }
         const feat = rec?.feature;
-        if (feat != null && rec.by != null) {
+        // a landform (ground_m) beside the feature's own mark links the survey
+        // without claiming it: it is not a twin, and it speaks for nothing
+        if (claimsFeature(rec) && rec.by != null) {
           const key = String(feat);
           if (!claims.has(key)) claims.set(key, []);
           claims.get(key).push({ by: String(rec.by), slug: e, rel: p.replace(/\\/g, "/").slice(ROOT.length + 1) });

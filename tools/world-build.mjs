@@ -136,6 +136,18 @@ export function nearestAnchor(at, anchors) {
 export const GROUND_SHAPER = "the-town";
 const instanceKindOf = (m) => String(m?.class ?? m?.kind ?? "mark");
 
+/**
+ * Whether a record CLAIMS the survey feature it names: is that feature's own
+ * ground, the one record the generators write the feature's shape onto
+ * (water-shapes-gen § recordPathFor, world-root-gen § indexFeatureClaims). A
+ * landform links its survey by `feature:` too (WLD-97 part 3:
+ * the Garrison valley beside the lake's own mark) without claiming it, so one
+ * feature may carry one claim and any number of landforms (G4, ruled 2026-10-22).
+ */
+export function claimsFeature(rec) {
+  return rec?.feature != null && !isLandform(rec);
+}
+
 /** `ground_m` read as `{ lo, hi }`; null when absent; `{ malformed }` when unreadable. */
 export function groundOf(mark) {
   const g = mark?.ground_m;
