@@ -18,7 +18,7 @@
 // Browser-purity: this imports ONLY world-engine.mjs (pure). No node:*, no
 // marks-fold. All numeric leans are dials, movable by ruling.
 
-import { isSited, isPredicate, isLandform, LANDFORM } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isPredicate, isLandform, LANDFORM, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { buildHeightfield } from "./world-engine.mjs";
 
 // ───────────────────────── dials (moved from world-poc, verbatim) ───────────
@@ -99,8 +99,9 @@ export function waterControlPoints(skeleton) {
 // `anchors` is regionAnchors(skeleton).
 export function deriveHomeControlPoints(marks, anchors) {
   const pts = [];
+  const idx = kindIndexOf(marks);
   for (const m of marks) {
-    if (!isSited(m)) continue;
+    if (!isSited(m) || isLandform(m, idx)) continue;   // a landform (any class under it) lays no home point
     const best = nearestAnchor(m.at, anchors);
     if (best) pts.push({ x: m.at.x, y: m.at.y, h: best.h, id: best.id });
   }
@@ -162,12 +163,12 @@ export function groundOf(mark) {
  * The one rule: the lint refuses by it and the heightfield honors only what it
  * accepts.
  */
-export function groundStands(mark, anchors, skeleton) {
+export function groundStands(mark, anchors, skeleton, idx = null) {
   const ground = groundOf(mark);
   if (!ground) return null;
   // ONLY A LANDFORM SHAPES GROUND (ruled by Darko 2026-10-22 21:03): ground_m is
   // the landform class's own property, never a field any sited mark may carry.
-  if (!isLandform(mark)) return { refused: `ground_m: is a landform's own property (the-town/${LANDFORM}); this mark is kind: ${instanceKindOf(mark)}, and only a landform shapes the ground` };
+  if (!isLandform(mark, idx)) return { refused: `ground_m: is a landform's own property (the-town/${LANDFORM}); this mark is kind: ${instanceKindOf(mark)}, and only a landform shapes the ground` };
   if (ground.malformed) return { refused: `ground_m: is a height in metres or a [lo, hi] pair with lo ≤ hi; got ${JSON.stringify(mark.ground_m)}` };
   // STAYS WITH THE TOWN (/k, ruled by Darko 2026-10-22 20:44): a mark carrying
   // ground_m is the town's and can never pass to a household. A pass is a commit
@@ -212,8 +213,9 @@ function surfacedWaters(skeleton) {
  */
 export function shapeGround(heightfield, marks, anchors, skeleton) {
   const forms = [];
+  const idx = kindIndexOf(marks);   // a class under landform is a landform too
   for (const m of marks) {
-    const s = groundStands(m, anchors, skeleton);
+    const s = groundStands(m, anchors, skeleton, idx);
     if (!s || s.refused) continue;
     forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, carvedBy: s.carvedBy ?? null, waters: [], shore: null });
   }

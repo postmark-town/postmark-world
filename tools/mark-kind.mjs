@@ -54,8 +54,18 @@ export function instanceClassOf(m) {
 // sited and never ground, so containment and every sited reader pass it by. Only
 // the town makes one (its class answers makers: false).
 export const LANDFORM = "landform";
-/** A landform, by the class it names (either form). The chain answer is standingOf's. */
-export const isLandform = (m) => instanceClassOf(m) === LANDFORM;
+/**
+ * A landform, by the class it names, in either form (`kind: landform`, or the old
+ * `kind: sited` + `class: landform`). Handed a class index, it walks the chain, so
+ * a class that extends landform is one too; with none in hand (the place proxy's
+ * readers) only the name itself can answer.
+ */
+export const isLandform = (m, idx = null) => {
+  const k = instanceClassOf(m);
+  if (k == null) return false;
+  if (k === LANDFORM) return true;
+  return !!idx && classChain(idx, k).some((c) => String(c.class) === LANDFORM);
+};
 
 export const isSited = (m) => !!m && !!m.at && !NEVER_GROUND.has(String(m.kind)) && !isLandform(m);
 
@@ -156,10 +166,13 @@ export function standingOf(m, idx) {
   if (kind === "naming") return "naming";
   if (kind === "predicated" || kind === "predicate") return "predicate";
   if (kind == null) return null;
+  // a landform answers by its class BEFORE the standing words: the old spelling
+  // (kind: sited + class: landform) is a landform, never a sited mark (review of #296)
+  if (isLandform(m, idx)) return LANDFORM;
   if (STANDING_WORDS.has(kind)) return kind;
   const chain = idx ? classChain(idx, kind).map((c) => String(c.class)) : [];
-  if (!chain.includes("postmark-node")) return kind === LANDFORM ? LANDFORM : m.at ? "sited" : null;
-  for (const s of ["post", "naming", "predicate", "parcel", "sited", LANDFORM]) if (chain.includes(s)) return s;
+  if (!chain.includes("postmark-node")) return m.at ? "sited" : null;
+  for (const s of ["post", "naming", "predicate", "parcel", "sited"]) if (chain.includes(s)) return s;
   return null;
 }
 
