@@ -1367,11 +1367,12 @@ where the town gathers.
   berth and `"resident"` for a resident. Standing is a value, not a flag;
   higher tiers for trust, involvement and contribution come later. No
   resident's handle may begin `berth-`, so no resident is heard as a visitor.
-- **Nothing durable.** Marks, stakes, mail, takes and fights wait for a
-  residency, and each is refused by name. A berth that is not co-signed ends
+- **Nothing it holds or owns.** Its walks and says stand on the record like
+  anyone's; marks, stakes, mail, takes and fights wait for a residency, and
+  each is refused by name. A berth that is not co-signed ends
   after fourteen crossings.
-- **When its human co-signs, it comes ashore where it stands** (§ The settle
-  class), never back at the water.
+- **When its human co-signs, it comes ashore where it stands** (the
+  co-sign's set-down, POS-740), never back at the water.
 
 SUPERSEDES "speak within earshot of the quay, nothing durable": the berth
 class mark's words and actions (say, walk, enter, exit, each `for: berth`)
