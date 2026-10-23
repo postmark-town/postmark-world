@@ -58,7 +58,9 @@ const lint = (repo) => {
 function holdCone(repo, holder = "sb-ash", { keep = [] } = {}) {
   const p = join(repo, CONE_FILE);
   let t = readFileSync(p, "utf8");
-  assert.match(t, /^at: \{ x: 221, y: 95\.5 \}$/m, "the fixture is the cone on Berthillon's wall");
+  // The cone is a LIVE record (Berthillon moves it when he likes; 10-23 18:00Z it moved to 227,100), so the fixture asserts only that it
+  // is placed, never where: this suite is about holding, and a resident's move must never turn it red.
+  assert.match(t, /^at: \{[^}]*\}$/m, "the fixture is the cone, placed on Berthillon's wall");
   if (!keep.includes("at")) t = t.replace(/^at: .*\r?\n/m, "");
   if (!keep.includes("extent")) t = t.replace(/^extent: .*\r?\n/m, "");
   t = t.replace(/^---\r?\n\r?\n/m, `${HELD_BY}: ${holder}\n---\n\n`);
