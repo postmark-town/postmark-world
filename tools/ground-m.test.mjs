@@ -300,7 +300,7 @@ test("THE WORLD PAGE DRAWS NO LANDFORM: the footprint layer passes one by (until
   assert.match(bake, /if \(isLandform\(m, kidx\)\) continue;/);
 });
 
-test("THE REVIEW'S REPRO: an old-spelling town basin over the lochan nests nothing, and the lint holds it to a landform's law", () => {
+test("THE REVIEW'S REPRO: an old-spelling town basin over the lochan nests nothing, and the lint refuses the old spelling outright", () => {
   const repo = realTree();
   const dir = join(repo, "WORLD", "marks", "the-town", "an-old-basin");
   mkdirSync(dir, { recursive: true });
@@ -318,8 +318,12 @@ test("THE REVIEW'S REPRO: an old-spelling town basin over the lochan nests nothi
   try { out = execFileSync("node", [join(HERE, "mark-lint.mjs"), "--repo", repo], { encoding: "utf8" }); }
   catch (e) { out = String(e.stdout ?? "") + String(e.stderr ?? ""); }
   const mine = out.split(/\r?\n/).filter((l) => l.includes("an-old-basin:"));
-  assert.ok(mine.some((l) => l.startsWith("[WARN]") && /class: landform folds into kind/.test(l)), "told to write the new spelling: " + mine.join("\n"));
-  assert.deepEqual(mine.filter((l) => l.startsWith("[ERROR]")), [], "the basin itself is lawful as a landform");
+  // THE OLD SPELLING CAN NEVER LAND (the review's ruled fix): the office's store record
+  // drops `class:`, so a warning would let a record through that the office reads as sited
+  assert.ok(mine.some((l) => l.startsWith("[ERROR]") && l.includes("class: landform is a landform, and a landform is written kind: landform, never with a class: line: write kind: landform")),
+    "refused, not folded: " + mine.join("\n"));
+  assert.equal(mine.some((l) => l.startsWith("[WARN]") && /folds into kind/.test(l)), false, "a refusal, never the fold's warning");
+  assert.ok(/[1-9]\d* error\(s\)/.test(out), "the lint fails the tree");
   const knoll = out.split(/\r?\n/).filter((l) => l.includes("an-old-knoll:") && l.startsWith("[ERROR]"));
   assert.ok(knoll.some((l) => /a landform carries ground_m/.test(l)), "the lint holds the old spelling to a landform's own law: " + knoll.join("\n"));
 });
