@@ -17,6 +17,7 @@ test("the fold publishes the valley, and the rule stands it: water carves, so 8 
   const v = world.marks.find((m) => m.id === "the-town/the-garrison-valley");
   assert.ok(v, "the valley is in the folded world");
   assert.equal(v.ground_m, 8);
+  assert.equal(v.kind, "landform", "a landform, its own class (ruled 2026-10-22 21:03–21:04)");
   assert.equal(v.feature, "the-garrison-lake");
   assert.deepEqual(v.extent, { w: 920, h: 800 });
   assert.deepEqual(groundStands(v, regionAnchors(world.terrain), world.terrain),
@@ -46,4 +47,17 @@ test("THE WATERFALL IS GONE: the river's own points through the valley and the l
   assert.ok(pts.length >= 3, `${pts.length} river points in the valley`);
   const zs = pts.map((p) => h(p.x, p.y));
   assert.ok(Math.max(...zs) - Math.min(...zs) <= 1.5, `the river through the valley spans ${Math.min(...zs).toFixed(2)}..${Math.max(...zs).toFixed(2)} m`);
+});
+
+test("SHAPES GROUND ONLY: the valley nests in nothing but the root, and no mark nests in it", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { join, dirname } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const map = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "..", "WORLD/containment.json"), "utf8"));
+  const row = map.marks.find((r) => r.id === "the-town/the-garrison-valley");
+  assert.deepEqual(row?.chain, ["the-town/let-there-be-light"]);
+  assert.deepEqual(map.marks.filter((r) => r.chain.includes("the-town/the-garrison-valley")).map((r) => r.id), []);
+  // the grove still holds what it held: the Heart House parcel's chain reaches the grove, not the valley
+  const hh = map.marks.find((r) => r.id === "sol-of-garrison/the-heart-house-parcel");
+  assert.ok(hh?.chain.includes("sol-of-garrison/the-protected-grove"), JSON.stringify(hh?.chain));
 });

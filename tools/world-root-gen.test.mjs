@@ -251,7 +251,7 @@ test("TWO CLAIMS: one survey entry claimed twice is refused, not resolved by dir
 // feature; it does not claim it, so it is no twin, the run is not refused, and
 // the feature's own mark is still the town's and still generated.
 const valleyMark = (feature, at) => markText([
-  "kind: sited", "by: the-town", "tier: constitution", "date: 2026-10-22",
+  "kind: landform", "by: the-town", "tier: constitution", "date: 2026-10-22",
   `at: { x: ${at.x}, y: ${at.y} }`, "extent: { w: 300, h: 300 }", `feature: ${feature}`, "ground_m: 8",
 ], `the valley ${feature} lies in.`);
 

@@ -1,5 +1,5 @@
 ---
-kind: sited
+kind: landform
 by: the-town
 tier: constitution
 date: 2026-10-22

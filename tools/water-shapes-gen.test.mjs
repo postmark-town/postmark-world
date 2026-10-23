@@ -22,17 +22,18 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
 const VALLEY = join(ROOT, "WORLD/marks/the-town/the-garrison-valley/mark.md");
 
-test("claimsFeature: a feature link claims, unless the record shapes ground beside it", () => {
-  assert.equal(claimsFeature({ feature: "a-lake" }), true);
-  assert.equal(claimsFeature({ feature: "a-lake", ground_m: 8 }), false);
-  assert.equal(claimsFeature({ feature: "a-lake", ground_m: [6, 10] }), false);
-  assert.equal(claimsFeature({}), false);
+test("claimsFeature: a feature link claims, unless the record is a landform (it shapes ground beside the feature)", () => {
+  assert.equal(claimsFeature({ kind: "sited", feature: "a-lake" }), true);
+  assert.equal(claimsFeature({ kind: "landform", feature: "a-lake", ground_m: 8 }), false);
+  assert.equal(claimsFeature({ kind: "sited", class: "landform", feature: "a-lake" }), false, "the old form names the class too");
+  assert.equal(claimsFeature({ kind: "sited" }), false);
 });
 
 test("TWO RECORDS, ONE FEATURE: with the valley beside it, Garrison Lake's ring still goes to the lake's own mark", () => {
   const valley = parseRecord(readFileSync(VALLEY, "utf8"), VALLEY);
   assert.equal(valley.feature, "the-garrison-lake", "fixture: the valley links the lake's survey");
   assert.equal(valley.ground_m, 8);
+  assert.equal(valley.kind, "landform");
   const out = execFileSync(process.execPath, [join(HERE, "water-shapes-gen.mjs")], { encoding: "utf8", cwd: ROOT });
   const block = out.split(/\r?\n\r?\n/).find((b) => /the-garrison-lake \(lake\)/.test(b));
   assert.ok(block, "the generator reports the lake");
