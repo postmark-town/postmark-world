@@ -171,8 +171,8 @@ export function standingOf(m, idx) {
   if (isLandform(m, idx)) return LANDFORM;
   if (STANDING_WORDS.has(kind)) return kind;
   const chain = idx ? classChain(idx, kind).map((c) => String(c.class)) : [];
-  if (!chain.includes("postmark-node")) return kind === LANDFORM ? LANDFORM : m.at ? "sited" : null;
-  for (const s of ["post", "naming", "predicate", "parcel", "sited", LANDFORM]) if (chain.includes(s)) return s;
+  if (!chain.includes("postmark-node")) return m.at ? "sited" : null;
+  for (const s of ["post", "naming", "predicate", "parcel", "sited"]) if (chain.includes(s)) return s;
   return null;
 }
 

@@ -174,7 +174,6 @@ const standingOfRecord = (rec) => {
   if (chain.includes("naming")) return "naming";
   if (chain.includes("predicate")) return "predicated";
   if (chain.includes("parcel")) return "parcel";
-  if (chain.includes("landform")) return "landform";   // WLD-97: mark's third child, never sited
   if (chain.includes("sited") || !chain.includes("postmark-node")) return "sited";
   return null;
 };
