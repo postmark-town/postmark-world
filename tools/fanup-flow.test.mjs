@@ -25,35 +25,39 @@ const sited = (id, by, x, y, w, h, extra = {}) => ({
 const stake = (holder, mark, n) => ({ holder, mark, n, weight: n, tick: 0 });
 const w = (state, id) => state.marks.find((m) => m.id === id)?.weight;
 
-// A miniature town: the root, the works quarter with one class declaration,
-// a stranger's district, and a resident's staked instance standing on the
-// stranger's ground.
+// A miniature town: the root, the works quarter, a stranger's district, and a
+// resident's staked instance standing on the stranger's ground. The class the
+// instance names is LAW (WLD-116), a node in the Keeping Works' foundry beside
+// the marks, never a mark among them.
+const LAW = () => [
+  { id: "the-town/bicycle", kind: "class", class: "bicycle", by: "the-town", tier: "constitution", foundry: "the-keeping-works", date: "2026-08-10", body: "bicycle" },
+];
 const WORLD = () => [
   sited("let-there-be-light", "the-town", 0, 0, 100000, 100000),
   sited("the-town-centre", "the-town", -500, -500, 2000, 2000),
   sited("the-keeping-works", "the-town", -600, -350, 800, 800),
-  sited("bicycle", "the-town", -600, -350, 50, 40, { class: "bicycle" }),   // the declaration, in the works
   sited("the-district", "stranger", 5000, 5000, 3000, 3000),               // a stranger's ground
   sited("my-bicycle", "rider", 5000, 5000, 2, 1, { class: "bicycle" }),    // the staked instance, on it
 ];
 
 test("legacy stays the default and the stranger still harvests nothing", () => {
-  const state = fold({ marks: WORLD(), terrain, tick: 1, stakes: [stake("s", "rider/my-bicycle", 8)] });
+  const state = fold({ marks: WORLD(), law: LAW(), terrain, tick: 1, stakes: [stake("s", "rider/my-bicycle", 8)] });
   assert.equal(state.fanup, undefined, "no flow receipts under the default");
   assert.equal(w(state, "stranger/the-district"), 0);
-  assert.equal(w(state, "the-town/bicycle"), 0, "legacy has no instance channel");
+  assert.equal(w(state, "the-town/bicycle"), undefined, "a class is law: no mark of it stands in the fold to carry a weight");
 });
 
-test("R9 unit conductance: two present channels split the unit; conservation holds to the sink", () => {
-  const state = fold({ marks: WORLD(), terrain, tick: 1, stakes: [stake("s", "rider/my-bicycle", 8)], fanup: "flow" });
-  // the instance has TWO channels: contains (skipping the stranger, R11) and
-  // instance-of → each carries exactly half the unit
-  assert.equal(w(state, "the-town/bicycle"), 4, "the class receives the instance-of half");
+test("R9 unit conductance: the one present channel (containment) conducts the full unit; conservation holds to the sink", () => {
+  const state = fold({ marks: WORLD(), law: LAW(), terrain, tick: 1, stakes: [stake("s", "rider/my-bicycle", 8)], fanup: "flow" });
+  // WLD-116: a class is a law node and stands in no mark set, so the instance-of
+  // channel (an instance up to its class declaration) is gone with the class marks;
+  // the instance has ONE channel, contains, and it carries the whole unit
+  assert.equal(w(state, "the-town/bicycle"), undefined, "the class is law: it receives nothing, for it is no mark");
+  assert.equal(state.fanup.instance_edges, 0, "no instance-of edge is drawn");
   assert.equal(w(state, "stranger/the-district"), 0, "the non-consenting rung is skipped, never enriched");
-  // the containment half lands on the first town-owned ancestor (the root —
-  // the district was skipped and nothing else contains the bicycle); the class
-  // half then flows on up the works' own chain, so the root re-unites the unit
-  assert.equal(w(state, "the-town/let-there-be-light"), 8, "the apex receives exactly 1× the stake, both paths summed");
+  // the containment unit lands on the first town-owned ancestor (the root —
+  // the district was skipped and nothing else contains the bicycle)
+  assert.equal(w(state, "the-town/let-there-be-light"), 8, "the apex receives exactly 1× the stake");
 });
 
 test("R9 present-channels-only: a lone-channel mark conducts its full unit", () => {
@@ -69,19 +73,20 @@ test("R11: same-household and welcomed rungs still take the carry; only the word
   const marks = WORLD().concat([
     sited("riders-yard", "rider", 5000, 5000, 40, 40),  // the rider's own ground around the bicycle, inside the stranger's district
   ]);
-  const state = fold({ marks, terrain, tick: 1, stakes: [stake("s", "rider/my-bicycle", 8)], fanup: "flow" });
-  assert.equal(w(state, "rider/riders-yard"), 4, "the household's own rung takes the containment half");
+  const state = fold({ marks, law: LAW(), terrain, tick: 1, stakes: [stake("s", "rider/my-bicycle", 8)], fanup: "flow" });
+  assert.equal(w(state, "rider/riders-yard"), 8, "the household's own rung takes the carry");
   assert.equal(w(state, "stranger/the-district"), 0, "and the stranger above it is still skipped");
   assert.equal(w(state, "the-town/let-there-be-light"), 8, "conservation survives the extra rung");
 });
 
 test("conservation over the whole fixture: Σ stakes === the apex, with receipts naming every flow", () => {
-  const stakes = [stake("a", "rider/my-bicycle", 8), stake("b", "the-town/bicycle", 3)];
-  const state = fold({ marks: WORLD(), terrain, tick: 1, stakes, fanup: "flow" });
+  const stakes = [stake("a", "rider/my-bicycle", 8), stake("b", "the-town/the-keeping-works", 3)];
+  const state = fold({ marks: WORLD(), law: LAW(), terrain, tick: 1, stakes, fanup: "flow" });
   assert.equal(w(state, "the-town/let-there-be-light"), 11, "every staked stamp reaches the apex exactly once");
   assert.ok(Array.isArray(state.fanup.flows) && state.fanup.flows.length > 0, "the flows are receipted");
-  const instanceFlow = state.fanup.flows.find((f) => f.channel === "instance-of");
-  assert.ok(instanceFlow && instanceFlow.from === "rider/my-bicycle" && instanceFlow.to === "the-town/bicycle");
+  assert.equal(state.fanup.flows.find((f) => f.channel === "instance-of"), undefined, "no flow runs to a class: it is law, not a mark (WLD-116)");
+  const instanceFlow = state.fanup.flows.find((f) => f.from === "rider/my-bicycle");
+  assert.ok(instanceFlow && instanceFlow.channel === "contains" && instanceFlow.to === "the-town/let-there-be-light");
   assert.ok(state.fanup.skips.some((s) => s.skipped.includes("stranger/the-district")), "the skip is receipted by name");
 });
 
@@ -150,5 +155,5 @@ test("entity children never reach a consumer that means area", () => {
   // and the derived edges are not a channel the fold has ever heard of
   const state = fold({ marks: peopled.marks, terrain, tick: 1, stakes: [stake("a", "rider/my-bicycle", 8)], fanup: "flow" });
   const channels = new Set(state.fanup.flows.map((f) => f.channel));
-  assert.deepEqual([...channels].sort(), ["contains", "instance-of"], "no `within` channel appeared in the receipts");
+  assert.deepEqual([...channels].sort(), ["contains"], "no `within` channel appeared in the receipts");
 });

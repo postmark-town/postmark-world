@@ -46,6 +46,8 @@ function realTree() {
   copyFileSync(join(REPO_SRC, "WRITES.md"), join(repo, "WRITES.md"));
   for (const f of ["skeleton.json", "filing-freeze.json", "households.json"]) copyFileSync(join(REPO_SRC, "WORLD", f), join(repo, "WORLD", f));
   cpSync(join(REPO_SRC, "WORLD", "marks"), join(repo, "WORLD", "marks"), { recursive: true });
+  cpSync(join(REPO_SRC, "WORLD", "law"), join(repo, "WORLD", "law"), { recursive: true }); // the classes are law nodes (WLD-116)
+  cpSync(join(REPO_SRC, "WORLD", "_archived"), join(repo, "WORLD", "_archived"), { recursive: true }); // the declaring act of what retired (the lint knows a retired id)
   return repo;
 }
 const lint = (repo) => {

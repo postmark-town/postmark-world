@@ -31,6 +31,8 @@ const scratch = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); SCR
 after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true }); });
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116)
+import { putClass } from "./law-fixture.mjs";
 import { propertyOf } from "./class-properties.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";
 import { mayMake, makersRefusal } from "./admin-makers.mjs";
@@ -147,7 +149,7 @@ test("a world with no notices serializes without a single new key", () => {
 const residentMay = (live, klass) => propertyOf(live, klass, "makers")?.value === true;
 
 test("LIVE TREE: class law -- town marks define; residents instantiate only what makers allows", () => {
-  const live = loadMarks(MARKS_DIR);
+  const live = loadRecords(MARKS_DIR); // the marks and the law, together: a class is a law node now
   const classed = live.filter((m) => classOf(m) !== undefined);
 
   // ⚠ NARROWED 2026-08-26, and the narrowing is the LAW'S OWN LINE, not a
@@ -167,7 +169,9 @@ test("LIVE TREE: class law -- town marks define; residents instantiate only what
   // weaker: it now pins the definition/instance boundary itself, and a
   // definition that wandered out of the works, or an instance that crept into
   // it, fails here where before either could pass.
-  const inTheWorks = (m) => String(m._dir ?? "").split("\\").join("/").includes("/the-keeping-works/");
+  // WLD-116: a class is a LAW NODE in a foundry, and an instance is a mark. The boundary the
+  // path used to carry is the record's own: a declaration is law; anything else is an instance.
+  const inTheWorks = (m) => m._law === true && m.foundry === "the-keeping-works";
   const defs = classed.filter((m) => m.by === "the-town" && inTheWorks(m));
   const townInstances = classed.filter((m) => m.by === "the-town" && !inTheWorks(m));
   assert.ok(defs.length >= 11, `expected the Keeping Works roster, found ${defs.length}`);
@@ -265,15 +269,11 @@ function fixtureTree() {
   mkdirSync(works, { recursive: true });
   writeFileSync(join(works, "mark.md"),
     "---\nkind: sited\nby: the-town\ntier: constitution\ndate: 2026-08-11\nat: { x: 400, y: 400 }\nextent: { w: 40, h: 40 }\n---\n\nThe Keeping Works: the class definitions stand here.\n");
-  const type = join(works, "bounty");
-  mkdirSync(type, { recursive: true });
-  writeFileSync(join(type, "mark.md"),
-    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-08-11\nclass: bounty\nextends: post\n---\n\nA bounty is one ask, a reward in stamps, a status: open or done.\n");
+  // the class TYPE nodes are LAW (WLD-116): filed in the Keeping Works' foundry beside the marks, never stood among them
+  putClass(dir, "bounty", "bounty", { extends: "post", body: "A bounty is one ask, a reward in stamps, a status: open or done.\n" });
   // the post class bounty and idea extend (15:12): their instances keep the old
   // form until the post lane (W2; settled 2026-10-17, WLD-73 G7)
-  mkdirSync(join(works, "post"), { recursive: true });
-  writeFileSync(join(works, "post", "mark.md"),
-    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-10-17\nclass: post\n---\n\nA post is an ask the town reads, not a claim on the world.\n");
+  putClass(dir, "post", "post", { date: "2026-10-17", body: "A post is an ask the town reads, not a claim on the world.\n" });
   return { dir, root, board };
 }
 
@@ -377,13 +377,10 @@ test("the '#' truncation: the lint catches the face it CAN see (review O-1)", ()
 // the mark it stands under. Both anchors, one class. Drop either half of the
 // gate and the cases below go red by name.
 test("IDEA: sited OR predicated — \"Ideas can be predicates.\" (2026-09-01); a thoughtless one errs on the one-claim law either way; any other kind is refused quoting the four words; an idea may stand ANYWHERE; the whitelist carries the ruling", () => {
-  assert.ok(residentMay(loadMarks(MARKS_DIR), "idea"),
+  assert.ok(residentMay(loadRecords(MARKS_DIR), "idea"),
     "the 2026-08-30 ruling: residents publish ideas with their own hand — stage 1 needs no git and no founder");
   const { dir, root } = fixtureTree();
-  const works = join(root, "the-keeping-works");
-  mkdirSync(join(works, "idea"), { recursive: true });
-  writeFileSync(join(works, "idea", "mark.md"),
-    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-08-30\nclass: idea\nextends: post\n---\n\nOne thought by a resident, of the town: the body IS the claim. Sited anywhere or predicated under any mark; the Think Tank reads them all. BETA.\n");
+  putClass(dir, "idea", "idea", { date: "2026-08-30", extends: "post", body: "One thought by a resident, of the town: the body IS the claim. Sited anywhere or predicated under any mark; the Think Tank reads them all. BETA.\n" });
   const tank = join(root, "the-think-tank");
   mkdirSync(tank, { recursive: true });
   writeFileSync(join(tank, "mark.md"),
@@ -483,10 +480,7 @@ test("THE KIND NAMES THE CLASS: a notice keeps its old form; a thing's old form 
   assert.match(lintWithNotice({ kind: "quest", class: undefined }), /a-notice: kind must be one of [^\n]*or name a class the works declare \(got "quest"\)/);
 
   const { dir, root, board } = fixtureTree();
-  const works = join(root, "the-keeping-works");
-  mkdirSync(join(works, "thing"), { recursive: true });
-  writeFileSync(join(works, "thing", "mark.md"),
-    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-08-14\nclass: thing\n---\n\nA thing is made, held or set down.\n");
+  putClass(dir, "thing", "thing", { date: "2026-08-14", body: "A thing is made, held or set down.\n" });
   const lantern = (kindLines) => `---\n${kindLines}by: testerhh\ndate: 2026-10-17\nat: { x: 0, y: 0 }\nextent: { w: 1, h: 1 }\n---\n\nA pocket lantern.\n`;
   mkdirSync(join(board, "a-lantern"), { recursive: true });
   writeFileSync(join(board, "a-lantern", "mark.md"), lantern("kind: sited\nclass: thing\n"));

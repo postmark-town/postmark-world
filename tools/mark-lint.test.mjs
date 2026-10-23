@@ -157,6 +157,8 @@ function fidelityRepo() {
   copyFileSync(join(REPO_SRC, "WRITES.md"), join(repo, "WRITES.md"));
   copyFileSync(join(REPO_SRC, "WORLD", "skeleton.json"), join(repo, "WORLD", "skeleton.json"));
   cpSync(join(REPO_SRC, "WORLD", "marks"), join(repo, "WORLD", "marks"), { recursive: true });
+  cpSync(join(REPO_SRC, "WORLD", "law"), join(repo, "WORLD", "law"), { recursive: true }); // the classes are law nodes (WLD-116)
+  cpSync(join(REPO_SRC, "WORLD", "_archived"), join(repo, "WORLD", "_archived"), { recursive: true }); // the declaring act of what retired (the lint knows a retired id)
   // The fossil's boundary travels with the tree it bounds (the freeze,
   // 2026-08-25). A whole-tree copy without it is a tree the freeze gates cannot
   // read, and the lint says so — which is the warning working, not a fixture
@@ -226,14 +228,12 @@ test('"Rendered in the world: not yet" is an honest declaration — tolerated, u
   const clean = fidelityRepo();
   assert.match(runRepoLint(clean), /CLEAN/, "the live tree passes untouched");
   // the premise is now synthetic (fixture law): reads-and-affordances gained a
-  // real rendering at the uncategorized planting, so the not-yet doc is built,
-  // not borrowed — the scenario must not lean on live state that can move.
+  // real rendering at the uncategorized planting (retired 2026-10-23, WLD-116: the
+  // marker was machinery history), so the not-yet doc is built, not borrowed — the scenario must not lean on live state that can move.
   const repo = fidelityRepo();
   editFile(repo, "LOGOS/reads-and-affordances.md",
     "Rendered in the world as `the-town/the-read-policy` — a v0 backlog marker awaiting its true seat (the uncategorized section, 2026-08-19). Beyond that marker the affordances themselves ride the class marks, and classes.md names them.",
     "Rendered in the world: not yet.");
-  editFile(repo, "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-rules/uncategorized/the-read-policy/mark.md",
-    "source: LOGOS/reads-and-affordances.md", "source: LOGOS/conflict-matrix.md");
   editFile(repo, "WORLD/marks/let-there-be-light/logos/the-gate/the-fidelity/mark.md",
     "source: LOGOS/three-layers.md", "source: LOGOS/reads-and-affordances.md");
   assert.match(runRepoLint(repo), /\[ERROR\].*says "Rendered in the world: not yet" — either this clause is early or that line is stale/,
@@ -433,11 +433,16 @@ test("POS-619 · a [ value that isn't JSON reds with marks-fold's sentence; JSON
 
 test("POS-672 · a creature class whose afforded actions the creature law cannot read is a lint ERROR, before a blessing can stop every spawn", () => {
   const { dir, root } = fixtureTree();
-  const REL = join("the-town-centre", "the-keeping-works", "postmark-node", "entity", "creature");
-  cpSync(join(REAL, REL), join(root, REL), { recursive: true });
+  // the creature class is a LAW NODE (WLD-116): copied from the live law tree into the fixture's own
+  const LIVE_FOUNDRY = join(HERE, "..", "WORLD", "law", "the-keeping-works");
+  const REL = join("postmark-node", "entity", "creature");
+  const FOUNDRY = join(dir, "_law", "the-keeping-works");
+  mkdirSync(FOUNDRY, { recursive: true });
+  copyFileSync(join(LIVE_FOUNDRY, "foundry.json"), join(FOUNDRY, "foundry.json"));
+  cpSync(join(LIVE_FOUNDRY, REL), join(FOUNDRY, REL), { recursive: true });
   const SAYS = /the creature law cannot be read whole, so the creatures' tick would spawn nothing/;
   assert.doesNotMatch(runLint(dir), SAYS, "the law as it stands reads whole");
-  const file = join(root, REL, "mark.md");
+  const file = join(FOUNDRY, REL, "node.md");
   const text = readFileSync(file, "utf8");
   writeFileSync(file, text.replace(/"action":"watch"/, '"action":"strike"'));
   const out = runLint(dir);

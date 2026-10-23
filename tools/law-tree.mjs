@@ -25,8 +25,15 @@ import { fileURLToPath } from "node:url";
 import { walkMarks, loadMarks } from "./marks-fold.mjs";
 import { FOUNDRY_FILE, NODE_FILE, foundryTable, foundryChain, lawProblems, inReadingOrder } from "./law.mjs";
 
-/** The law tree that stands beside a marks tree: WORLD/marks -> WORLD/law. */
-export const lawDirFor = (marksDir) => join(dirname(resolve(String(marksDir))), "law");
+/** A marks directory that is not WORLD/marks (a test's fixture world, a snapshot unpacked) carries its law inside itself, here. Nothing in the live tree is named this. */
+export const FIXTURE_LAW_DIR = "_law";
+
+/** The law tree that stands beside a marks tree: WORLD/marks -> WORLD/law; or inside it, at _law/, for a fixture world. */
+export const lawDirFor = (marksDir) => {
+  const root = resolve(String(marksDir));
+  const inside = join(root, FIXTURE_LAW_DIR);
+  return isDir(inside) ? inside : join(dirname(root), "law");
+};
 
 const isDir = (p) => { try { return statSync(p).isDirectory(); } catch { return false; } };
 

@@ -41,7 +41,7 @@ import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, proper
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
 // WLD-116: classes are law nodes, never marks. THE ONE TEST of what is a class is law.mjs's;
 // the tree it reads is WORLD/law/<foundry>/ (law-tree.mjs). The lint holds both trees.
-import { isClass, isLawKind, classRoster, FOUNDRY_TIERS, KEEPING_WORKS, NODE_FILE, LAW_ROOT } from "./law.mjs";
+import { isClass, isLawKind, classRoster, foundryOf, FOUNDRY_TIERS, KEEPING_WORKS, NODE_FILE, LAW_ROOT } from "./law.mjs";
 import { loadLaw, lawDirFor } from "./law-tree.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -658,6 +658,12 @@ for (const rec of marks) {
       const up = inheritedAt(c, path);
       if (up && up.tier === "constitution" && c.by !== TOWN)
         err(p, `${c.id} redeclares ${up.from}'s ${path.join(" → ")}, a constitution property — a constitution value is the town's word, and only the town's own subclass may set it`);
+      // A BIOME EXTENDS THE BOOK AND NEVER CONTRADICTS IT (WLD-116, CORE-3/k). The same
+      // line between foundries: a class in a nearer foundry that shadows a constitution
+      // property of a class in the foundry it extends has set the town's word to its own,
+      // whoever wrote it. A sovereign property is the maker's to set, in any foundry.
+      else if (up && up.tier === "constitution" && up.node && foundryOf(up.node) != null && foundryOf(p) != null && foundryOf(p) !== foundryOf(up.node))
+        err(p, `${c.id} (foundry ${foundryOf(p)}) redeclares ${up.from}'s ${path.join(" → ")}, a constitution property of foundry ${foundryOf(up.node)} — a foundry extends the book it stands on and never contradicts it (CORE-3/k)`);
     }
   }
 }
@@ -975,7 +981,8 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
   const walk = (dir, depth) => {
     for (const name of readdirSync(dir)) {
       const p = join(dir, name);
-      if (statSync(p).isDirectory()) walk(p, depth + 1);
+      // (a fixture world carries its law inside the marks directory, law-tree.mjs: its node.md is not a stray)
+      if (statSync(p).isDirectory()) { if (resolve(p) !== resolve(LAW_DIR)) walk(p, depth + 1); }
       else if (/\.md$/i.test(name) && name !== "mark.md" && !(depth === 0 && TOP_LEVEL_MD.has(name)))
         findings.push({ sev: "ERROR", file: p.replace(/\\/g, "/").replace(/^.*\/WORLD\//, "WORLD/"), msg: `stray .md — the only .md in a mark directory is mark.md; everything else must be its own mark (the one-file law)${cite("the-town/the-one-file")}` });
     }

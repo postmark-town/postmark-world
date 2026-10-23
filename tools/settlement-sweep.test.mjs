@@ -1836,13 +1836,19 @@ test("THE SAFETY HALF (postmark#3757, Darko 2026-10-14): a commons row whose mar
     "its row is not rewritten: the walk decides at every crossing, the stored class decides nothing for it");
 });
 
+// the class a held thing needs is a LAW NODE in the Keeping Works' foundry (WLD-116), filed beside the marks
+function putThingClass(c) {
+  c.put("WORLD/law/the-keeping-works/foundry.json", JSON.stringify({ foundry: "the-keeping-works", tier: "constitution", extends: null, seat: null, authors: ["the-town"] }) + "\n");
+  c.put("WORLD/law/the-keeping-works/thing/node.md",
+    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-07-28\nclass: thing\n---\n\nA thing: what can be carried.\n");
+}
+
 test("POS-688: a hand-off prints whatever stands behind the thing — held_by in, at/extent out, and a drop's fresh at back", (t) => {
   const c = crossing(t, "hold-printout");
   // the one class the record needs: a held thing is a thing (mark-lint § 4a)
   c.put("WORLD/marks/let-there-be-light/the-keeping-works/mark.md", record({
     by: "the-town", tier: "constitution", at: { x: -500, y: -500 }, extent: { w: 20, h: 20 }, body: "the works" }));
-  c.put("WORLD/marks/let-there-be-light/the-keeping-works/thing/mark.md",
-    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-07-28\nclass: thing\n---\n\nA thing: what can be carried.\n");
+  putThingClass(c);
   const cone = "WORLD/marks/berthillon/a-cone/mark.md";
   const placed = "---\nkind: sited\nby: berthillon\ndate: 2026-08-26\nat: { x: 800, y: 800 }\nextent: { w: 1, h: 1 }\nclass: thing\n---\n\nA paper cone.\n";
   c.put(cone, placed);
@@ -1889,8 +1895,7 @@ function heldThingCrossing(t, name, { registryClass = "commons", parcel = false 
   const c = crossing(t, name);
   c.put("WORLD/marks/let-there-be-light/the-keeping-works/mark.md", record({
     by: "the-town", tier: "constitution", at: { x: -500, y: -500 }, extent: { w: 20, h: 20 }, body: "the works" }));
-  c.put("WORLD/marks/let-there-be-light/the-keeping-works/thing/mark.md",
-    "---\nkind: class\nby: the-town\ntier: constitution\ndate: 2026-07-28\nclass: thing\n---\n\nA thing: what can be carried.\n");
+  putThingClass(c);
   if (parcel) c.put("WORLD/marks/berthillon/berthillon-parcel/mark.md",
     record({ kind: "parcel", by: "berthillon", at: { x: 800, y: 800 }, extent: { w: 25, h: 25 }, body: "berthillon's ground" }));
   const cone = "WORLD/marks/berthillon/a-cone/mark.md";

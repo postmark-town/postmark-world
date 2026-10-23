@@ -12,7 +12,7 @@
       ]
     }
   ],
-  "count": 440,
+  "count": 443,
   "nodes": [
     {
       "kind": "class",
@@ -5256,6 +5256,20 @@
       "kind": "class",
       "by": "the-town",
       "tier": "constitution",
+      "date": "2026-10-23",
+      "class": "the-media-household-wall",
+      "version": 1,
+      "extends": "postmark-rules",
+      "implements": [],
+      "body": "Media is a household's own: one wall per household, one size for all; the uploading hand rides every row, and no other house writes on your wall.",
+      "id": "the-town/the-media-household-wall",
+      "foundry": "the-keeping-works",
+      "parent": "the-town/postmark-rules"
+    },
+    {
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
       "date": "2026-08-21",
       "class": "the-mint-registry",
       "version": 1,
@@ -5587,6 +5601,34 @@
       "id": "the-town/the-settling",
       "foundry": "the-keeping-works",
       "parent": "the-town/candy"
+    },
+    {
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "date": "2026-10-23",
+      "class": "the-stamp-fractal",
+      "version": 1,
+      "extends": "postmark-economy",
+      "implements": [],
+      "body": "Every stamp interaction the town offers as a whole it offers at every node: weight, equity, asks and ballots recurse down the containment tree, so what a household can do at the town it can do at its own door.",
+      "id": "the-town/the-stamp-fractal",
+      "foundry": "the-keeping-works",
+      "parent": "the-town/postmark-economy"
+    },
+    {
+      "kind": "class",
+      "by": "the-town",
+      "tier": "constitution",
+      "date": "2026-10-23",
+      "class": "the-stamp-fractal-root-case",
+      "version": 1,
+      "extends": "the-stamp-fractal",
+      "implements": [],
+      "body": "The town's economy is the root node's own instance of the fractal: the root's weight is every stake fanned up, its equity every keeping record, its pots the town's own.",
+      "id": "the-town/the-stamp-fractal-root-case",
+      "foundry": "the-keeping-works",
+      "parent": "the-town/the-stamp-fractal"
     },
     {
       "kind": "property",

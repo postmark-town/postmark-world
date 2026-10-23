@@ -21,7 +21,9 @@ import { dirname, join } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const state = JSON.parse(readFileSync(join(ROOT, "WORLD", "world-state.json"), "utf8"));
-const marks = Array.isArray(state.marks) ? state.marks : Object.values(state.marks ?? {});
+// the classes and their properties are law nodes, not marks (WLD-116): WORLD/law-state.json is the fold-derived printout of the law
+const law = JSON.parse(readFileSync(join(ROOT, "WORLD", "law-state.json"), "utf8"));
+const marks = [...(Array.isArray(state.marks) ? state.marks : Object.values(state.marks ?? {})), ...law.nodes];
 const byId = new Map(marks.map((m) => [m.id, m]));
 
 // ── RULING B, verbatim (Keemin, 2026-08-22) ─────────────────────────────────

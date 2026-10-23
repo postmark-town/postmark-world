@@ -177,19 +177,20 @@ test("lane-wall: a change is judged as the record stood — rewriting another ho
 const node = (lines, body) => `${["---", ...lines, "---"].join("\n")}\n\n${body}\n`;
 const classNode = (name, ext) => node(["kind: class", "by: the-town", "tier: constitution", "date: 2026-10-18", `class: ${name}`, ...(ext ? [`extends: ${ext}`] : [])], `The ${name} class.`);
 const makersNode = (v) => node(["kind: property", "by: the-town", "tier: constitution", "date: 2026-10-18", "name: makers", `default: ${v}`], "Who makes one.");
-const WORKS = "WORLD/marks/let-there-be-light/the-keeping-works";
+const WORKS = "WORLD/law/the-keeping-works"; // the classes are law nodes (WLD-116), filed in a foundry beside the marks
 function withLaw({ put, commit, git }, admins) {
   git("switch", "-q", "main");
-  put(`${WORKS}/postmark-node/mark.md`, classNode("postmark-node"));
-  put(`${WORKS}/postmark-node/postmark-node-makers/mark.md`, makersNode(false));
-  put(`${WORKS}/postmark-node/sited/mark.md`, classNode("sited", "postmark-node"));
-  put(`${WORKS}/postmark-node/sited/sited-makers/mark.md`, makersNode(true));
-  put(`${WORKS}/postmark-node/sited/thing/mark.md`, classNode("thing", "sited"));
+  put(`${WORKS}/foundry.json`, JSON.stringify({ foundry: "the-keeping-works", tier: "constitution", extends: null, seat: null, authors: ["the-town"] }) + "\n");
+  put(`${WORKS}/postmark-node/node.md`, classNode("postmark-node"));
+  put(`${WORKS}/postmark-node/postmark-node-makers/node.md`, makersNode(false));
+  put(`${WORKS}/postmark-node/sited/node.md`, classNode("sited", "postmark-node"));
+  put(`${WORKS}/postmark-node/sited/sited-makers/node.md`, makersNode(true));
+  put(`${WORKS}/postmark-node/sited/thing/node.md`, classNode("thing", "sited"));
   for (const k of ["dungeon", "stairs", "portal-ground"]) {
-    put(`${WORKS}/postmark-node/sited/${k}/mark.md`, classNode(k, "sited"));
-    put(`${WORKS}/postmark-node/sited/${k}/${k}-makers/mark.md`, makersNode(false));
+    put(`${WORKS}/postmark-node/sited/${k}/node.md`, classNode(k, "sited"));
+    put(`${WORKS}/postmark-node/sited/${k}/${k}-makers/node.md`, makersNode(false));
   }
-  put(`${WORKS}/postmark-node/sited/portal-ground/vehicle/mark.md`, classNode("vehicle", "portal-ground"));
+  put(`${WORKS}/postmark-node/sited/portal-ground/vehicle/node.md`, classNode("vehicle", "portal-ground"));
   put("WORLD/households.json", JSON.stringify({
     households: { alice: "gh:1", mallory: "gh:3" },
     logins: { "house-a": "gh:1", "house-m": "gh:3" },

@@ -26,6 +26,8 @@ import { departPaceKm, STRIDE_CLASS_ID, previewWalkLeg, walkLegParts } from "../
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const STORE = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
+// the classes are law nodes, not marks (WLD-116): the page reads them from the fold-derived law artifact beside the store
+STORE.marks = [...STORE.marks, ...JSON.parse(readFileSync(join(ROOT, "WORLD/law-state.json"), "utf8")).nodes];
 
 test("THE LIVE STORE CARRIES THE STRIDE: the resident class is in world-state.json, by that name, with its dial", () => {
   const mover = STORE.marks.find((m) => m.id === STRIDE_CLASS_ID);

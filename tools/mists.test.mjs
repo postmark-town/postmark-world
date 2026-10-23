@@ -240,7 +240,8 @@ function clearingsHold({ skeleton, worldState }) {
 function townClear({ skeleton, worldState }) {
   const ks = keyframesOf(skeleton);
   const town = worldState.marks.filter((m) => m.at && theTowns(m) && !isFrame(m) && !RUNS_INTO_THE_MIST.has(m.id));
-  assert.ok(town.length > 50, `the town's own marks are all here (${town.length})`);
+  // (90 until 2026-10-23, when WLD-116 retired the 42 machinery buildings, which stood in the town's quarter and were sited marks)
+  assert.ok(town.length > 40, `the town's own marks are all here (${town.length})`);
   const covered = {};
   for (const c of [...ks, ks.at(-1) + 10]) {
     const m = mistsAt(c, skeleton.mists);

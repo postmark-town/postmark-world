@@ -2,7 +2,8 @@
 // (LOGOS v2 part 2, W1; LOGOS/classes.md § The meta-class: "admissible param bounds …,
 // slot naming grammar, collision rules, and the locks").
 //
-// Each case builds a throwaway tree (the world root and a small Keeping Works),
+// Each case builds a throwaway tree (the world root and a small Keeping Works, whose
+// classes and properties are LAW NODES in a foundry beside the marks, WLD-116),
 // runs tools/mark-lint.mjs on it as a real subprocess, and reads the finding by
 // name. The live tree's own answer is the suite's other half: the lint's CLEAN
 // over WORLD/marks.
@@ -14,6 +15,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, copyFileSync, cpSync, rmSync } f
 import { join, dirname } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { putFoundry } from "./law-fixture.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LINT = join(HERE, "mark-lint.mjs");
@@ -23,13 +25,20 @@ after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true 
 
 const fm = (fields, body) =>
   `---\n${Object.entries(fields).filter(([, v]) => v !== undefined).map(([k, v]) => `${k}: ${v}`).join("\n")}\n---\n\n${body}\n`;
+// a record under a fixture's _law/ is a law node (node.md); anywhere else, a mark (mark.md)
 const node = (dir, fields, body = "A clause of the fixture's class space, long enough to read.") => {
   mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "mark.md"), fm(fields, body));
+  writeFileSync(join(dir, /[\\/]_law[\\/]/.test(dir) ? "node.md" : "mark.md"), fm(fields, body));
   return dir;
 };
+// a class carries its FOUNDRY's tier: constitution in the Keeping Works, biome in a biome's
 const cls = (dir, name, ext, by = "the-town") =>
-  node(join(dir, name), { kind: "class", by, tier: by === "the-town" ? "constitution" : undefined, date: "2026-10-17", class: name, extends: ext });
+  node(join(dir, name), { kind: "class", by, tier: by === "the-town" ? "constitution" : "biome", date: "2026-10-17", class: name, extends: ext });
+/** A biome foundry that a household writes in (its config is the permission), extending the Keeping Works. */
+const householdFoundry = (dir, name, author) => {
+  const root = putFoundry(dir, name, { tier: "biome", extends: "the-keeping-works", authors: ["the-town", author] });
+  return root;
+};
 const prop = (dir, slug, { name, tier, dflt, of }) =>
   node(join(dir, slug), { kind: "property", by: "the-town", tier, date: "2026-10-17", name, of, default: dflt });
 
@@ -40,9 +49,7 @@ function tree() {
   mkdirSync(root, { recursive: true });
   copyFileSync(join(REAL, "mark.md"), join(root, "mark.md"));
   cpSync(join(REAL, "logos"), join(root, "logos"), { recursive: true });
-  const works = node(join(root, "the-keeping-works"),
-    { kind: "sited", by: "the-town", tier: "constitution", date: "2026-08-11", "at": "{ x: 400, y: 400 }", "extent": "{ w: 40, h: 40 }" },
-    "The Keeping Works: the class definitions stand here.");
+  const works = putFoundry(dir); // the Keeping Works' foundry: WORLD/law/the-keeping-works, here <dir>/_law/the-keeping-works
   const thing = cls(works, "thing", undefined);
   prop(thing, "thing-holder", { name: "holder", tier: "sovereign", dflt: "false" });
   prop(thing, "thing-capacity", { name: "capacity", tier: "sovereign", dflt: 30, of: "the-town/thing-holder" });
@@ -91,7 +98,7 @@ test("BY PATH (WLD-73 S2): a subclass's default stands within the bounds it inhe
 
 test("BY PATH (WLD-73 S1): the lock reaches a child — a household's holder → capacity → max is refused", () => {
   const t = tree();
-  const box = cls(t.root, "alices-box", "thing", "alice");
+  const box = cls(householdFoundry(t.dir, "alices-foundry", "alice"), "alices-box", "thing", "alice");
   prop(box, "alices-box-holder", { name: "holder", tier: "sovereign", dflt: "true" });
   prop(box, "alices-box-capacity", { name: "capacity", tier: "sovereign", dflt: 40, of: "the-town/alices-box-holder" });
   prop(box, "alices-box-capacity-max", { name: "max", tier: "constitution", dflt: 400, of: "the-town/alices-box-capacity" });
@@ -145,7 +152,7 @@ test("THE LOCKS (settled 2026-10-17, WLD-73 G6): a town subclass may set a const
   assert.doesNotMatch(r.out, /redeclares/, "the town's subclass shadows a constitution value: constitution is the town's word");
   // a household's subclass may shadow only a sovereign property
   const u = tree();
-  const box = cls(u.root, "alices-box", "thing", "alice");
+  const box = cls(householdFoundry(u.dir, "alices-foundry", "alice"), "alices-box", "thing", "alice");
   prop(box, "alices-box-take-requires-welcome", { name: "take_requires_welcome", tier: "constitution", dflt: "true" });
   prop(box, "alices-box-portable", { name: "portable", tier: "sovereign", dflt: "false" });
   const out = lint(u.dir).out;

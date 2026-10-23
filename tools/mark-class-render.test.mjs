@@ -32,6 +32,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(join(ROOT, p), "utf8");
 const SOURCE = read("spectator/viewer.mjs");
 const MARKS = JSON.parse(read("WORLD/world-state.json")).marks;
+// the classes are law nodes, not marks (WLD-116): the fold-derived printout of the law names every class the record declares
+const LAW = JSON.parse(read("WORLD/law-state.json")).nodes;
 
 const DOOR = MARKS.find((m) => m.id === "wright/the-cellar-door");
 const BASKET = MARKS.find((m) => m.id === "rei/the-mending-basket");
@@ -80,7 +82,7 @@ test("EVERY class in the committed world survives the mint as a usable token", (
   // the sanitiser must not quietly eat the record: whatever the town has
   // actually written has to come out the other side as something a stylesheet
   // can name
-  const classes = [...new Set(MARKS.map((m) => m.class).filter(Boolean))];
+  const classes = [...new Set([...MARKS.map((m) => m.class), ...LAW.filter((n) => n.kind === "class").map((n) => n.class)].filter(Boolean))];
   assert.ok(classes.length > 100, `the record carries ${classes.length} distinct classes`);
   const eaten = classes.filter((c) => !markStateClasses({ mark: { class: c } }).includes("c-"));
   assert.deepEqual(eaten, [], "no class the town has written is lost at the mint");
