@@ -1283,11 +1283,7 @@ derives-from fog and light** — the two emissions feed the standpoint
 answer, exactly as exposure's body has always listed them. Elevation and
 sightline come from the heightfield, which is terrain, not a class —
 noted here so their absence from the drawing reads as fact, not gap.
-The town alone shapes that ground for now: a sited mark by the-town may carry
-`ground_m` (a height, or a `[lo, hi]` range inside its region's band; a landform
-linked to a water body may sink to that water's surface), laid as a
-control point that reaches no further than its own extent (WLD-97, ruled by Darko
-2026-10-22; `WORLD/marks/SCHEMA.md § ground_m`).
+Only a landform shapes that ground (§ The landform, below).
 Sound deliberately does not feed exposure (hearing is earshot's law, a
 different corridor).
 
@@ -1926,6 +1922,33 @@ entry in the list), and exit routing for marks that are not dungeons.
 **Terminology.** "Portal" now names this mechanism, a third sense beside ① the read-root slot and ② the verb-lending
 ground. The read-root slot is to be renamed (proposed: lens), and live identifiers are renamed only after the
 freeze.
+
+## The landform — ground the town shapes
+
+*A landform holds the land at a height: a basin, a knoll, a terrace. It is never sited, and nothing stands in it.*
+
+Rendered in the world as `the-town/landform`.
+
+Ruled by Darko 2026-10-22 (WLD-97; 17:59–18:16, 18:54, 19:19, 19:55, 20:44, 21:02–21:04):
+
+- **A class of its own.** `landform` extends `mark` directly, a sibling of `sited`. Its own properties are its place
+  (`at`), its outline (`extent`, or a `points` ring), the survey feature it shapes around (`feature`) and
+  **`ground_m`**: the height it holds its ground at, or the `[lo, hi]` range it holds it to. No other mark carries
+  `ground_m`.
+- **Shapes ground only.** It is not sited and not ground, so it takes no part in containment: nothing nests in it and
+  it nests in nothing. Every reader of sited marks passes it by; the heightfield reads it.
+- **Only the town makes one** (`makers: false`), and **it never passes to a household**: a commit that moves its
+  `by:` is refused.
+- **It stays in its region**: its whole outline lies in the one region its band is read from (the region is the
+  nearest region anchor's).
+- **Its value sits inside that region's band.** **Water carves**: a landform linked by `feature:` to a water body with
+  a `surface_m` is held between that surface and the region's top.
+- **In the heightfield** it is a control point whose reach is its own extent: held at its centre and faded to nothing at
+  the edge. A landform linked to its water is **held to the shore**, at full weight out to that water's edge, and fades
+  only from the shore. Inside a surfaced lake under its reach, the water wins.
+
+The rule is `tools/world-build.mjs § groundStands`, which both the lint and the heightfield read.
+`WORLD/marks/SCHEMA.md § landform` gives the record's form.
 
 ## The stairs — a way between floors, before the floor exists
 
