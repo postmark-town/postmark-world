@@ -47,7 +47,7 @@ test("the rule refuses a band violation, a mark not by the-town, and a mark with
   assert.deepEqual(groundStands(KNOLL, ANCHORS, SKELETON), { ground: { lo: 31, hi: 31 }, region: "the-high-ground", band: [30, 40] });
   assert.match(groundStands({ ...KNOLL, ground_m: 29 }, ANCHORS, SKELETON).refused, /outside the-high-ground's band \[30, 40\]/);
   assert.match(groundStands({ ...KNOLL, ground_m: [35, 41] }, ANCHORS, SKELETON).refused, /outside the-high-ground's band/);
-  assert.match(groundStands({ ...KNOLL, by: "sage-reeves" }, ANCHORS, SKELETON).refused, /only a mark by the-town may shape the ground/);
+  assert.match(groundStands({ ...KNOLL, by: "sage-reeves" }, ANCHORS, SKELETON).refused, /stays with the town and never passes to a household/);
   assert.match(groundStands({ ...KNOLL, kind: "predicate", at: undefined, extent: undefined }, ANCHORS, SKELETON).refused, /stands on no ground of its own/);
   assert.equal(groundStands({ ...KNOLL, ground_m: undefined }, ANCHORS, SKELETON), null);
 });
@@ -134,7 +134,7 @@ test("THE LINT, end to end: in band on a town mark stands; out of band, and on a
   assert.equal(errors.filter((l) => /ground_m/.test(l)).length, 2, errors.join("\n"));
   // the lake mark is linked to its water, so water carves: [7, 50], and 60 is still above the top
   assert.ok(errors.some((l) => /the-garrison-lake/.test(l) && /outside \[7, 50\] \(the-garrison-lake's surface to the-protected-grove's top\)/.test(l)), errors.join("\n"));
-  assert.ok(errors.some((l) => /the-protected-grove:/.test(l) && /only a mark by the-town/.test(l)), errors.join("\n"));
+  assert.ok(errors.some((l) => /the-protected-grove:/.test(l) && /stays with the town and never passes to a household/.test(l)), errors.join("\n"));
   assert.equal(errors.some((l) => /the-lochan/.test(l)), false, "the lochan's 25 stands");
 
   // and the fold publishes it, so the heightfield the town reads can lay it
@@ -175,4 +175,30 @@ test("HELD TO THE SHORE: a landform linked to its water meets it at the valley f
   // a landform with no water still fades from its centre
   const r = 0.5, half = heightsOf([KNOLL])(2544 + 200 * r, 175), was = BEFORE(2544 + 200 * r, 175);
   assert.ok(Math.abs(half - (was + 0.5 * (31 - was))) < 1e-9, "half way out, a dry landform is half held");
+});
+
+test("STAYS IN ITS REGION (/j, ruled 2026-10-22 20:44): a landform whose outline leaves its region is refused, naming where it leaves to", () => {
+  // the knoll at the high ground's anchor, stretched south until two corners stand nearer the east low hills
+  const tall = { ...KNOLL, extent: { w: 400, h: 1000 } };
+  const r = groundStands(tall, ANCHORS, SKELETON);
+  assert.match(r.refused, /a landform stays in its region/);
+  assert.match(r.refused, /leaves the-high-ground at 2744,675 \(into the-east-low-hills\)/);
+  // a points ring is the outline when there is one: the same claim drawn inside the region stands
+  const ring = { ...tall, points: [[2400, -300], [2700, -300], [2700, 300], [2400, 300]] };
+  assert.equal(groundStands(ring, ANCHORS, SKELETON).refused, undefined);
+  // and the heightfield lays none of a refused one
+  assert.equal(heightsOf([tall])(2544, 175), heightsOf([bare(tall)])(2544, 175));
+});
+
+test("STAYS WITH THE TOWN (/k, ruled 2026-10-22 20:44): a landform passed to a household is refused, the pass named", async () => {
+  // the pass as DEC-16 makes it: the same record, `by:` moved to the household, the tier line dropped
+  const { readFileSync: read } = await import("node:fs");
+  const { parseRecord } = await import("./marks-fold.mjs");
+  const file = join(ROOT, "WORLD/marks/let-there-be-light/the-lochan/mark.md");
+  const town = { ...parseRecord(read(file, "utf8"), file), id: "the-town/the-lochan", ground_m: 25 };
+  assert.equal(town.by, "the-town");
+  assert.equal(groundStands(town, ANCHORS, SKELETON).refused, undefined, "the town's own landform stands");
+  const { tier, ...passed } = { ...town, by: "lysander" };
+  assert.match(groundStands(passed, ANCHORS, SKELETON).refused,
+    /a mark that shapes the ground stays with the town and never passes to a household .* this mark is by lysander/);
 });

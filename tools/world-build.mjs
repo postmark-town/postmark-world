@@ -163,7 +163,11 @@ export function groundStands(mark, anchors, skeleton) {
   const ground = groundOf(mark);
   if (!ground) return null;
   if (ground.malformed) return { refused: `ground_m: is a height in metres or a [lo, hi] pair with lo ≤ hi; got ${JSON.stringify(mark.ground_m)}` };
-  if (mark.by !== GROUND_SHAPER) return { refused: `ground_m: only a mark by ${GROUND_SHAPER} may shape the ground (the town owns terraforming for now, ruled 2026-10-22); this mark is by ${mark.by}` };
+  // STAYS WITH THE TOWN (/k, ruled by Darko 2026-10-22 20:44): a mark carrying
+  // ground_m is the town's and can never pass to a household. A pass is a commit
+  // that moves a mark's `by:` (DEC-16 re-identification), so the gate that refuses
+  // the commit refuses the pass, before it ever reaches a settlement.
+  if (mark.by !== GROUND_SHAPER) return { refused: `ground_m: a mark that shapes the ground stays with the town and never passes to a household (ruled 2026-10-22: only ${GROUND_SHAPER} may shape the ground); this mark is by ${mark.by}` };
   if (!isSited(mark) || !mark.extent || !(mark.extent.w > 0) || !(mark.extent.h > 0)) return { refused: `ground_m: shapes the ground under a sited mark's own extent, and this mark stands on no ground of its own` };
   const region = nearestAnchor(mark.at, anchors);
   const row = (skeleton?.elevation?.regions ?? []).find((r) => r.id === region?.id);
@@ -172,6 +176,16 @@ export function groundStands(mark, anchors, skeleton) {
   // `feature:` to a water body with a surface is bounded below by that surface,
   // not by the upland's floor, so a valley can sink to its river. The top of the
   // band is still the region's.
+  // STAYS IN ITS REGION (/j, ruled by Darko 2026-10-22 20:44): the landform's
+  // whole outline (its points ring, or else its extent's corners) lies in the one
+  // region its band is read from. A region is the set of points nearest its anchor,
+  // which is convex, so the outline's vertices standing in it put the whole
+  // outline in it.
+  const outline = Array.isArray(mark.points) && mark.points.length >= 3
+    ? mark.points.map((p) => (Array.isArray(p) ? { x: p[0], y: p[1] } : p))
+    : [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => ({ x: mark.at.x + sx * mark.extent.w / 2, y: mark.at.y + sy * mark.extent.h / 2 }));
+  const strays = outline.filter((p) => nearestAnchor(p, anchors)?.id !== region.id);
+  if (strays.length) return { refused: `ground_m: a landform stays in its region (ruled 2026-10-22), and this one's outline leaves ${region.id} at ${strays[0].x},${strays[0].y} (into ${nearestAnchor(strays[0], anchors).id})` };
   const water = mark.feature ? (skeleton?.features ?? []).find((f) => f.id === mark.feature && Number.isFinite(f.surface_m)) : null;
   const band = water ? [water.surface_m, row.band_m[1]] : row.band_m;
   const said = water ? `[${band[0]}, ${band[1]}] (${water.id}'s surface to ${region.id}'s top)` : `${region.id}'s band [${band[0]}, ${band[1]}]`;
