@@ -68,7 +68,9 @@ ceiling +22 m, walk speed 60 km/crossing (**15 as ruled by 008, amended to 60 by
 (`river_fall_m`, 8 m) and each lake's `surface_m`, the light poles (dawn NE → dark
 pole at Caelina, **provisional on caelum's word**). Every height in the heightfield
 is read from here (WLD-97, 2026-10-22): an anchor stands at its band's midpoint,
-typed once, so terraforming is an edit to this file, never a code PR.
+typed once, so changing a dial (a band, an anchor, the fall, a lake's surface) is an
+edit to this file alone: `tools/world-terrain-gen.mjs` carries these dials across a
+regenerate rather than typing its own.
 
 **Placement dials** — `tools/world-poc.mjs`:
 - Household anchors are **extracted from the marks** — every sited mark at its

@@ -164,3 +164,44 @@ test("THE WORLD PAGE NEVER GOES BLANK: a skeleton without its height dials draws
   assert.ok(call, "the World page assembles with a fallback and warns (sight keeps the reason: scopeWorld spreads the world)");
   assert.match(call[0], /whenHeightsUnread: "flat"/);
 });
+
+// THE DIALS HAVE ONE HOME. tools/world-terrain-gen.mjs carries the elevation block
+// and the lakes' surfaces across from the committed skeleton instead of typing them,
+// so a terraform is an edit to WORLD/skeleton.json alone and a regenerate keeps it.
+test("the generator types no height dial of its own", () => {
+  const gen = readFileSync(join(ROOT, "tools/world-terrain-gen.mjs"), "utf8");
+  assert.doesNotMatch(gen, /band_m:\s*\[/, "no band typed in the generator");
+  assert.doesNotMatch(gen, /river_fall_m:\s*\d/, "no fall typed in the generator");
+  assert.doesNotMatch(gen, /surface_m:\s*\d/, "no lake surface typed in the generator");
+  assert.match(gen, /elevation: committed\.elevation,/);
+});
+
+test("A TERRAFORM IS AN EDIT TO THE SKELETON ALONE: a regenerate keeps a changed band, fall and surface (needs POSTMARK_ATLAS)", { skip: !process.env.POSTMARK_ATLAS && "POSTMARK_ATLAS is not set: the atlas the generator extracts from lives in the town's repo" }, async () => {
+  const { execFileSync } = await import("node:child_process");
+  const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const dir = mkdtempSync(join(tmpdir(), "terraform-"));
+  try {
+    const edited = fresh();
+    edited.elevation.regions[11].band_m = [28, 52];
+    edited.elevation.river_fall_m = 9;
+    edited.features.find((f) => f.id === "the-garrison-lake").surface_m = 6.5;
+    writeFileSync(join(dir, "in.json"), JSON.stringify(edited, null, 2));
+    execFileSync(process.execPath, [join(ROOT, "tools/world-terrain-gen.mjs"), "--atlas", process.env.POSTMARK_ATLAS],
+      { env: { ...process.env, SKELETON_IN: join(dir, "in.json"), SKELETON_OUT: join(dir, "out.json") }, stdio: "pipe" });
+    assert.deepEqual(JSON.parse(readFileSync(join(dir, "out.json"), "utf8")), edited);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("a band is two numbers, low first; and the flat page survives only the two named refusals", async () => {
+  const { HEIGHTS_UNREAD } = await import("./world-build.mjs");
+  for (const bad of [[30], [50, 30], ["30", 50], 40]) {
+    const sk = fresh();
+    sk.elevation.regions[11].band_m = bad;
+    assert.throws(() => regionAnchors(sk), (e) => e.code === HEIGHTS_UNREAD && /missing: the-protected-grove/.test(e.message), JSON.stringify(bad));
+  }
+  // any other failure is not a lagging clone: the page refuses it as loudly as the office does
+  const broken = fresh();
+  broken.features = "not a list";
+  assert.throws(() => assembleWorld({ worldState: WORLD_STATE, skeleton: broken, whenHeightsUnread: "flat" }), TypeError);
+});

@@ -17,7 +17,7 @@
 //   --atlas defaults to this repo's own PROJECTS/build-the-town/atlas copy;
 //   point it at the live clone's atlas dir for a fresh derive. The source
 //   used is printed loudly either way.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -62,12 +62,19 @@ const candA = JSON.parse(readFileSync(join(ATLAS, "terrain-candidate-A.json"), "
 const m = (px, py) => ({ x: Math.round((px - ORIGIN.x) * K), y: Math.round((py - ORIGIN.y) * K) });
 const mPt = (p) => ({ ...m(p.x, p.y), ...(p.w !== undefined ? { w_m: Math.round(p.w * K) } : {}) });
 
-// THE WATER'S SURFACE (WLD-97): a lake's `surface_m` is its water's height,
-// a dial per water body. Nothing in the heightfield reads it yet.
-const LAKE_SURFACE = {
-  "the-lochan": { surface_m: 25, surface_receipt: "a closed basin in the-lochan's band [22, 28]; the region's anchor stands at the lake's centre at the band midpoint, 25" },
-  "the-garrison-lake": { surface_m: 7, surface_receipt: "the river runs through it (the-main-channel enters from the north), so the water stands at the river's own level there: 7.1 m under river_fall_m 8" },
-};
+// THE HEIGHT DIALS HAVE ONE HOME: WORLD/skeleton.json (WLD-97, review of part 1).
+// The elevation block (datum, quay, fog ceiling, pace, the river's fall, every
+// region's band and anchor) and each lake's surface are ruled dials, not
+// extractions from the atlas, so a terraform edits the skeleton alone and a
+// regenerate carries them across from the committed record unchanged. They were
+// typed here too, a second copy a terraform would have had to find.
+const RECORD = process.env.SKELETON_IN ?? join(ROOT, "WORLD/skeleton.json"); // SKELETON_IN: the suite's terraform-then-regenerate
+const committed = existsSync(RECORD) ? JSON.parse(readFileSync(RECORD, "utf8")) : null;
+if (!committed?.elevation?.regions?.length)
+  throw new Error(`${RECORD} carries no elevation dials: they are ruled data that lives only there (restore the file from git, then regenerate)`);
+const LAKE_SURFACE = Object.fromEntries((committed.features ?? [])
+  .filter((f) => f.kind === "lake" && f.surface_m !== undefined)
+  .map((f) => [f.id, { surface_m: f.surface_m, ...(f.surface_receipt ? { surface_receipt: f.surface_receipt } : {}) }]));
 
 const skeleton = {
   _law: "WORLD/skeleton.json is the world's survey + physics instrument — the derived measurement beneath the marks tree, NOT a tier. Terrain claims live as constitution marks (by: the-town) in the tree, each linking here via feature:<id>; this file is how the world COMPUTES (precise geometry, hydrology, elevation, light). The test (Keemin, 2026-07-23): if a resident could dispute or enrich it, it's a mark; if it's how the world computes, it's skeleton. Elevation derives from residents' words + survey decisions, NEVER from drawn pixels (decision 008).",
@@ -89,44 +96,8 @@ const skeleton = {
     signal: { honored: true, receipt: "Orion's announce-yourself law made mechanics (decision 008); a light declared on the record cuts fog for the whole town" },
     timetable: { honored: true, receipt: "the Post Office as a scheduled service (Keemin, 2026-08-07): a mark carrying a timetable — stops by mark id, departure times, its own pace — becomes a body that moves on a clock. Boarding is presence, not a verb (ENGINE.md § the timetable mechanic)" },
   },
-  elevation: {
-    _ruling: "survey decision 008 (Keemin, 2026-07-22) — all values are dials, movable by ruling, never silently",
-    datum: "sea = 0 m at the coasts and the mouth",
-    quay_m: 5,
-    fog_ceiling_m: 22,
-    north_trend: "~1.45% climb, quay to the north rim (~+60 m at the map's edge)",
-    open_ground_principle: "unclaimed ground stays gentle and unremarkable until a resident gives it words — height is canon too",
-    walk_speed_m_per_crossing: 60000,
-    // THE RIVER'S FALL (WLD-97): the water's surface at the head of the wet
-    // features, falling evenly with distance south to 0 at the mouth. It was
-    // `H_UP = 8` in world-build.mjs; it is a dial, so it lives with the dials.
-    river_fall_m: 8,
-    river_fall_receipt: "decision 008's fall: ~+8 m upstream to 0 at the mouth. The heightfield sets every channel, still-water, still-inlet and locks point at river_fall_m × (1 − t), where t runs from 0 at the northmost wet point to 1 at the southmost",
-    // THE REGION ANCHORS (WLD-97, ruled 2026-10-22): each row's `anchor` is where
-    // its band stands in the heightfield, and its HEIGHT IS THE MIDPOINT OF ITS OWN
-    // band_m, typed once, in the band. They were the REGION_ANCHORS constant in
-    // world-build.mjs, with the height typed a second time beside the band.
-    anchors: "each region's anchor.at_m is a heightfield control point at the midpoint of that region's band_m; the coordinate is EXTRACTED from a placed home or a terrain feature, and DERIVED only where neither names the spot (the receipt says which)",
-    regions: [
-      { id: "the-town-centre", band_m: [4, 6], note: "flat quayside, both banks low", anchor: { at_m: { x: 0, y: 0 }, receipt: "terrain: origin, the Origin {0,0} (+5, ruled)" } },
-      { id: "the-lanternseed-gardens", band_m: [10, 20], note: "lower slope", anchor: { at_m: { x: 1075, y: -800 }, receipt: "home: rei" } },
-      { id: "the-trueing-terrace", band_m: [30, 45], note: "stepped terraces, above fog", anchor: { at_m: { x: 888, y: -2320 }, receipt: "home: wright, ethan-thorne (centroid)" } },
-      { id: "north-rim", band_m: [55, 65], note: "the map's north edge; the mountain itself is off-map (see far_features)", anchor: { at_m: { x: 700, y: -3600 }, receipt: "derived: N of the trueing terrace toward the map's north edge" } },
-      { id: "the-high-ground", band_m: [30, 40], note: "the second rise, east — distinct from the north hill, a saddle between", anchor: { at_m: { x: 2544, y: 175 }, receipt: "home: the reeves household (centroid)" } },
-      { id: "the-threshold-district", band_m: [0, 5], note: "four ~3 m steps descending from the Centre to river level; the lower two under the fog ceiling", anchor: { at_m: { x: 1358, y: 1821 }, receipt: "home: limen, hal, liv, noe (centroid)" } },
-      { id: "the-still-reach-and-blackwater-bend", band_m: [2, 4], note: "floodplain, flat — merrick's inlet sits here", anchor: { at_m: { x: 1900, y: 3900 }, receipt: "terrain: the-still-reach centreline" } },
-      { id: "the-long-run", band_m: [0, 5], note: "banks stepping to 0 through the two locks (~2-3 m each)", anchor: { at_m: { x: 1513, y: 4888 }, receipt: "home: carta, jetto-of-starforge (centroid); the locks" } },
-      { id: "the-east-low-hills", band_m: [15, 25], note: "knolls — the East Window District's western wall", anchor: { at_m: { x: 2800, y: 900 }, receipt: "derived: the East Window District's western wall" } },
-      { id: "the-east-window-district", band_m: [5, 12], note: "open field, rolling east", anchor: { at_m: { x: 3125, y: 1675 }, receipt: "home: east-facing-window" } },
-      { id: "evermoon", band_m: [10, 25], note: "gentle dark upland on the WEST band (post-move, provisional on caelum's word); shallow twin-mooned lake basin — the night native to the pole", anchor: { at_m: { x: -1900, y: 2150 }, receipt: "home: caelum (== the dark pole; Evermoon moved WEST 07-22)" } },
-      { id: "the-protected-grove", band_m: [30, 50], note: "NW forested upland rising to the corner; Memory Lake basin; the watchtower knoll the local summit", anchor: { at_m: { x: -1375, y: -2550 }, receipt: "home: sol-of-garrison; the garrison lake" } },
-      { id: "the-lochan", band_m: [22, 28], note: "NE upland hollow — a CLOSED basin, no inlet, no outlet: 'a lake that belongs to no river' is literally hydrology", anchor: { at_m: { x: 2575, y: -1160 }, receipt: "terrain: the-lochan closed basin" } },
-      { id: "the-reach", band_m: [0, 30], note: "west-coast basalt cliffs +15-30, shingle at 0", anchor: { at_m: { x: -1725, y: 4840 }, receipt: "home: orion-by-the-fire" } },
-      { id: "the-headland", band_m: [10, 20], note: "raised promontory, sea on three sides", anchor: { at_m: { x: -2300, y: 4200 }, receipt: "derived: raised promontory seaward of the Reach" } },
-      { id: "the-doubled-coast", band_m: [0, 8], note: "low shore", anchor: { at_m: { x: -258, y: 5033 }, receipt: "home: claude-of-dregg, gael-renton, spar (centroid)" } },
-      { id: "aelyria", band_m: [5, 10], note: "LOW cliffs, gentle inland — plus a modest inland scarp so the upward falls has a drop to fall up", anchor: { at_m: { x: 4075, y: 5050 }, receipt: "home: aion-solare; the aelyria cliffs" } },
-    ],
-  },
+  // the committed record's own dials (see THE HEIGHT DIALS HAVE ONE HOME above)
+  elevation: committed.elevation,
   light: {
     _ruling: "day-axis canon (atlas 2026-07-21) + 07-22 recalibration — PROVISIONAL on caelum's word (the Evermoon move reverts wholly at his word)",
     dawn_pole_m: m(1500, 850),

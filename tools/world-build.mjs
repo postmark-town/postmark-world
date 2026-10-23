@@ -39,14 +39,21 @@ export const SIGNAL_MARKS = {
 // the coordinate its row in skeleton.json § elevation.regions names (`anchor.at_m`)
 // and at the MIDPOINT OF THAT ROW'S OWN band_m. They were a constant here, with
 // every height typed a second time beside the band (WLD-97, ruled 2026-10-22: the
-// dials live in the skeleton, and terraforming is an edit to it, not a code PR).
+// dials live in the skeleton, so a dial is changed by editing it, not the code).
 // A skeleton without them is refused by name: a heightfield missing its regions
 // would still draw, as a flat wrong world nobody was told about.
+//
+// The refusal carries code HEIGHTS_UNREAD, and so does the river's fall's (below):
+// those two, and only those, are what a reader may choose to survive (the World
+// page draws flat; the office's world doors answer 503).
+export const HEIGHTS_UNREAD = "HEIGHTS_UNREAD";
+function heightsUnread(message) { return Object.assign(new Error(message), { code: HEIGHTS_UNREAD }); }
+const isBand = (b) => Array.isArray(b) && b.length === 2 && Number.isFinite(b[0]) && Number.isFinite(b[1]) && b[0] <= b[1];
 export function regionAnchors(skeleton) {
   const rows = skeleton?.elevation?.regions ?? [];
-  const unanchored = rows.filter((r) => !Number.isFinite(r.anchor?.at_m?.x) || !Number.isFinite(r.anchor?.at_m?.y) || !Array.isArray(r.band_m)).map((r) => r.id);
+  const unanchored = rows.filter((r) => !Number.isFinite(r.anchor?.at_m?.x) || !Number.isFinite(r.anchor?.at_m?.y) || !isBand(r.band_m)).map((r) => r.id);
   if (!rows.length || unanchored.length) {
-    throw new Error(`skeleton.elevation.regions must give every region an anchor.at_m and a band_m (${rows.length ? `missing: ${unanchored.join(", ")}` : "no regions"})`);
+    throw heightsUnread(`skeleton.elevation.regions must give every region an anchor.at_m and a band_m of two numbers, low first (${rows.length ? `missing: ${unanchored.join(", ")}` : "no regions"})`);
   }
   return rows.map((r) => ({ id: r.id, at: { x: r.anchor.at_m.x, y: r.anchor.at_m.y }, h: (r.band_m[0] + r.band_m[1]) / 2, src: r.anchor.receipt ?? null }));
 }
@@ -75,7 +82,7 @@ export function waterControlPoints(skeleton) {
   }
   if (!pts.length) return [];
   const fall = skeleton.elevation?.river_fall_m;
-  if (!Number.isFinite(fall)) throw new Error("skeleton.elevation.river_fall_m must be a number: the river's fall is a dial, read from the skeleton");
+  if (!Number.isFinite(fall)) throw heightsUnread("skeleton.elevation.river_fall_m must be a number: the river's fall is a dial, read from the skeleton");
   const ys = pts.map((p) => p.y);
   const yN = Math.min(...ys), yMouth = Math.max(...ys);
   return pts.map((p) => {
@@ -140,7 +147,7 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null, 
     ];
     heightfield = buildHeightfield({ controlPoints });
   } catch (e) {
-    if (whenHeightsUnread !== "flat") throw e;
+    if (whenHeightsUnread !== "flat" || e?.code !== HEIGHTS_UNREAD) throw e;
     heightsUnread = `the town is drawn flat, without terrain heights: ${e.message}`;
     heightfield = { elevationAt: () => 0, controlPoints: [] };
   }
