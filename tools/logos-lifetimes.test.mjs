@@ -1,8 +1,8 @@
 // logos-lifetimes.test.mjs — WLD-39: standing / living / fleeting are LIFETIMES,
 // not kinds (Darko, Sitting A, 2026-10-12; scope ruled by Wright
 // 2026-10-13T08:57:47.829Z). The doctrine lives at LOGOS/lifetimes.md; the old
-// path LOGOS/kinds.md stays for a season as a pointer, so historical mentions
-// resolve. A mark's `kind` still means only how it stands.
+// path LOGOS/kinds.md stays as a pointer in LOGOS/_archived/ (WLD-116), so
+// historical mentions resolve. A mark's `kind` still means only how it stands.
 //
 // Reads only the LOGOS documents, WORLD/marks/SCHEMA.md and tools/mark-lint.mjs —
 // never a mark record, a daily or a receipt. The records that cite the old path
@@ -22,13 +22,13 @@ const read = (rel) => readFileSync(join(ROOT, rel), "utf8");
 // by ruling: they may keep the old name, and the redirect resolves it.
 const LIVE = [
   "LOGOS/INDEX.md", "LOGOS/STATUS.md",
-  "LOGOS/conflict-matrix.md", "LOGOS/graph/metamodel.json", "WRITE-REGISTRY.md", "tools/mark-lint.mjs",
+  "LOGOS/conflict-matrix.md", "WRITE-REGISTRY.md", "tools/mark-lint.mjs",
 ];
 // HISTORICAL, kept whole (STATUS: "historical"; Wright, AUTHORITY
 // 2026-10-13T13:18:53.839Z): the 2026-08-09 working record and reconciliation
 // are not live doctrine, so they keep the old path as written — their quoted
 // `source:` history must agree with marks that still name kinds.md.
-const HISTORICAL = ["LOGOS/DRAFT-REPORT.md", "LOGOS/RECONCILIATION.md"];
+const HISTORICAL = ["LOGOS/_archived/DRAFT-REPORT.md", "LOGOS/_archived/RECONCILIATION.md"];
 const OLD = /(?<![\w/.-])(?:LOGOS\/)?kinds\.md/g;
 const RENDERED_IDS = ["the-town/the-standing-question", "the-town/the-fading", "the-town/the-human-lane"];
 const renderedLine = (text) => {
@@ -50,9 +50,9 @@ test("the doctrine is at LOGOS/lifetimes.md, titled for lifetimes — no canonic
 });
 
 test("the old path is a pointer, not a second doctrine: it resolves to lifetimes.md and keeps only the rendering its records still cite", () => {
-  const stub = read("LOGOS/kinds.md");
+  const stub = read("LOGOS/_archived/kinds.md");
   const links = [...stub.matchAll(/\]\(([^)]+)\)/g)].map((m) => m[1]);
-  assert.ok(links.length && links.every((l) => l === "lifetimes.md"), `links: ${links}`);
+  assert.ok(links.length && links.every((l) => l === "../lifetimes.md" || l === "INDEX.md"), `links: ${links}`);
   assert.ok(existsSync(join(ROOT, "LOGOS", "lifetimes.md")));
   assert.ok(stub.split("\n").length < 20, "a short pointer");
   assert.doesNotMatch(stub, /^## /m, "no doctrine sections");
@@ -62,13 +62,13 @@ test("the old path is a pointer, not a second doctrine: it resolves to lifetimes
   assert.ok(here, "the Rendered line stays with the path its marks cite");
   assert.deepEqual([...here.matchAll(/`([^`]+)`/g)].map((m) => m[1]), RENDERED_IDS);
   assert.equal(renderedLine(read("LOGOS/lifetimes.md")), null,
-    "lifetimes.md declares no rendering of its own: the marks cite kinds.md, and the lint would hold a second declaration to marks that do not cite it back");
+    "lifetimes.md declares no rendering of its own: the marks cite the archived kinds.md, and the lint would hold a second declaration to marks that do not cite it back");
 });
 
 test("no LIVE document or code links the old path; every reference names lifetimes.md", () => {
   // STATUS's one row ABOUT the seasonal pointer names it by its file name; that
   // row, and only that row, is set aside — every other line is held to the rule
-  const POINTER_ROW = /^\| `kinds\.md` \| \*\*seasonal pointer\*\* \|.*$/m;
+  const POINTER_ROW = /^\| `_archived\/kinds\.md` \| \*\*archived pointer\*\* \|.*$/m;
   for (const rel of LIVE) {
     const text = rel === "LOGOS/STATUS.md" ? read(rel).replace(POINTER_ROW, "") : read(rel);
     const hits = text.match(OLD) ?? [];
@@ -78,7 +78,7 @@ test("no LIVE document or code links the old path; every reference names lifetim
 });
 
 test("the metamodel parses, and every prose pointer names a file that exists", () => {
-  const graph = JSON.parse(read("LOGOS/graph/metamodel.json"));
+  const graph = JSON.parse(read("LOGOS/_archived/graph/metamodel.json"));
   const prose = [];
   (function walk(v) { if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) { if (k === "prose" && typeof x === "string") prose.push(x); else walk(x); } })(graph);
   assert.ok(prose.includes("LOGOS/lifetimes.md"));
@@ -86,7 +86,7 @@ test("the metamodel parses, and every prose pointer names a file that exists", (
 });
 
 test("the relative links into and out of the new document resolve", () => {
-  for (const rel of ["LOGOS/lifetimes.md", "LOGOS/kinds.md", "LOGOS/INDEX.md", "LOGOS/conflict-matrix.md", "WORLD/marks/SCHEMA.md"]) {
+  for (const rel of ["LOGOS/lifetimes.md", "LOGOS/_archived/kinds.md", "LOGOS/INDEX.md", "LOGOS/conflict-matrix.md", "WORLD/marks/SCHEMA.md"]) {
     for (const [, target] of read(rel).matchAll(/\]\(([^)#:]+\.md)(?:#[^)]*)?\)/g))
       assert.ok(existsSync(join(ROOT, dirname(rel), target)), `${rel} → ${target}`);
   }
@@ -124,7 +124,7 @@ test("THE TWO HISTORIES ARE KEPT WHOLE: STATUS labels them historical, the live 
     assert.ok(!LIVE.includes(rel), `${rel} is not a live file`);
     assert.ok((read(rel).match(OLD) ?? []).length > 0, `${rel} keeps its own words, the old path among them`);
   }
-  assert.match(status, /^\| `kinds\.md` \| \*\*seasonal pointer\*\* \|/m, "the pointer is named as a pointer, not doctrine and not history");
+  assert.match(status, /^\| `_archived\/kinds\.md` \| \*\*archived pointer\*\* \|/m, "the pointer is named as a pointer, not doctrine and not history");
 });
 
 test("INDEX'S BARE CITATIONS name real LOGOS documents, never the seasonal pointer: `*(kinds)*` was a citation a filename search could not see", () => {
