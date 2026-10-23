@@ -183,14 +183,35 @@ export function shapeGround(heightfield, marks, anchors, skeleton) {
   for (const m of marks) {
     const s = groundStands(m, anchors, skeleton);
     if (!s || s.refused) continue;
-    forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, waters: [] });
+    forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, carvedBy: s.carvedBy ?? null, waters: [], shore: null });
   }
   if (!forms.length) return heightfield;
   const waters = surfacedWaters(skeleton);
   for (const f of forms) {
     f.waters = waters.filter((w) => Math.abs(w.cx - f.cx) < w.rx + f.rx && Math.abs(w.cy - f.cy) < w.ry + f.ry);
+    f.shore = f.carvedBy ? waters.find((w) => w.id === f.carvedBy) ?? null : null;
+  }
+  // HELD TO THE SHORE (G6, ruled by Darko 2026-10-22 19:55). A landform linked to
+  // its water holds ground_m at full weight from its centre out to that water's
+  // shore, and fades only from the shore to its own edge: the ground meets the
+  // water at the valley floor rather than half way up its side. The shore is
+  // found along the ray from the landform's centre through the point: the
+  // fraction of that ray still inside the water's ellipse (the larger root of the
+  // ray-ellipse quadratic). A landform with no water fades from its centre.
+  function shoreFraction(f, x, y) {
+    const w = f.shore;
+    if (!w) return 0;
+    const ux = x - f.cx, uy = y - f.cy, ox = f.cx - w.cx, oy = f.cy - w.cy;
+    const a = (ux / w.rx) ** 2 + (uy / w.ry) ** 2;
+    if (!(a > 0)) return 0;
+    const b = 2 * (ox * ux / w.rx ** 2 + oy * uy / w.ry ** 2), c = (ox / w.rx) ** 2 + (oy / w.ry) ** 2 - 1;
+    const disc = b * b - 4 * a * c;
+    return disc < 0 ? 0 : Math.max(0, (-b + Math.sqrt(disc)) / (2 * a));
   }
   const base = heightfield.elevationAt;
+  // OVERLAPS: landforms apply in the order the marks are given (the fold's
+  // order), each blending from the height the ones before it left; the first
+  // surfaced water a reach covers answers outright.
   function elevationAt(x, y) {
     let h = base(x, y);
     for (const f of forms) {
@@ -201,13 +222,15 @@ export function shapeGround(heightfield, marks, anchors, skeleton) {
         const wx = (x - w.cx) / w.rx, wy = (y - w.cy) / w.ry;
         if (wx * wx + wy * wy < 1) return w.surface;
       }
-      const weight = 0.5 * (1 + Math.cos(Math.PI * Math.sqrt(r2)));
+      const r = Math.sqrt(r2);
+      const rs = Math.min(r * shoreFraction(f, x, y), 0.999);   // the shore, in this landform's own radius
+      const weight = r <= rs ? 1 : 0.5 * (1 + Math.cos(Math.PI * (r - rs) / (1 - rs)));
       const held = h < f.lo ? f.lo : h > f.hi ? f.hi : h;
       h += weight * (held - h);
     }
     return h;
   }
-  return { ...heightfield, elevationAt, landforms: forms.map(({ waters, ...f }) => ({ ...f, waters: waters.map((w) => w.id) })) };
+  return { ...heightfield, elevationAt, landforms: forms.map(({ waters, shore, ...f }) => ({ ...f, waters: waters.map((w) => w.id) })) };
 }
 
 // ───────────────────────── the assembly ─────────────────────────────────────

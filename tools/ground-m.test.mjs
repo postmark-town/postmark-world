@@ -155,3 +155,24 @@ test("WATER CARVES: a landform linked to a water body is held between that water
   // a link to a feature with no surface carves nothing
   assert.match(groundStands({ ...valley, feature: "the-main-channel" }, ANCHORS, SKELETON).refused, /outside the-protected-grove's band \[30, 50\]/);
 });
+
+test("HELD TO THE SHORE: a landform linked to its water meets it at the valley floor, and fades only from the shore to its edge", () => {
+  // Garrison Lake: centre -1400,-2775, radii 230 × 200, surface 7. A valley twice
+  // its size, linked to it, ground_m 8 (the shape part 3 lays).
+  const valley = { id: "the-town/a-test-valley", kind: "sited", by: "the-town", at: { x: -1400, y: -2775 }, extent: { w: 920, h: 800 }, feature: "the-garrison-lake", ground_m: 8 };
+  const now = heightsOf([valley]);
+  const unshaped = heightsOf([bare(valley)]);
+  assert.equal(now(-1400, -2775), 7, "the water is flat at its surface");
+  // 25 m past the north and south shores: the valley floor, not half way up its side
+  // (faded from the centre instead, these read 27.12 m: a 20 m step at the water)
+  for (const y of [-2550, -3000]) {
+    const h = now(-1400, y);
+    assert.ok(h >= 8 && h < 10, `25 m past the shore at y ${y}: ${h}`);
+  }
+  assert.ok(now(-1400, -2574) - 8 < 0.01, "a metre past the shore the ground stands at ground_m");
+  // and it still fades to nothing at the valley's own edge
+  for (const [x, y] of [[-1400, -3176], [-1400, -2374], [-1861, -2775], [-939, -2775]]) assert.equal(Object.is(now(x, y), unshaped(x, y)), true, `${x},${y} is outside the valley`);
+  // a landform with no water still fades from its centre
+  const r = 0.5, half = heightsOf([KNOLL])(2544 + 200 * r, 175), was = BEFORE(2544 + 200 * r, 175);
+  assert.ok(Math.abs(half - (was + 0.5 * (31 - was))) < 1e-9, "half way out, a dry landform is half held");
+});
