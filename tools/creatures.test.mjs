@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
 import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { loadMarks } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 import { pointInPolygon } from "./geometry.mjs";
 import {
   creatureLaw, countsFor, CREATURE_DIAL_NAMES, TOWN, TOWN_WATERS, townWaterRings, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
@@ -27,7 +28,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
 const MARKS = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")).marks;
 const SHA = "e5bb5aa561d9b134523ce057fdf5e961876963f6";   // the world sha these inputs stand for
-const LAW = creatureLaw(loadMarks(join(ROOT, "WORLD", "marks")));
+const LAW = creatureLaw(loadRecords(join(ROOT, "WORLD", "marks")));
 // D2's numbers (Darko 2026-10-15 12:09) with no rotation: the schedule at full strength.
 const { rotation: _rotation, ...FULL } = { ...LAW.dials, counts: { bat: 3, raven: 4, wolf: 2 } };
 const INPUTS = { mists: MISTS, marks: MARKS, dials: FULL, fromCrossing: 244, world_sha: SHA };
@@ -226,7 +227,7 @@ test("the rotation dial is read whole: text naming the class's own kinds in turn
   assert.deepEqual(law("  wolf   bat ", "bat", "wolf").dials.rotation, ["wolf", "bat"], "spaces are only separators");
   assert.equal("rotation" in law(null, "bat").dials, false, "written null: no rotation");
   // an absent rotation mark is refused, never three creatures a window (review-239 N1)
-  const records = loadMarks(join(ROOT, "WORLD", "marks"));
+  const records = loadRecords(join(ROOT, "WORLD", "marks"));
   const without = records.filter((m) => !(m.kind === "property" && m.name === "rotation"));
   assert.equal(records.length - without.length, 1, "the world has one rotation mark, creature-rotation");
   assert.throws(() => creatureLaw(without), /no rotation dial/, "the real law with creature-rotation filtered out is refused");

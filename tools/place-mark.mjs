@@ -34,6 +34,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, placementParent, PARCEL_EXTENT_M } from "./marks-fold.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: the lineage is the law's
 import { isGroundIn, kindIndexOf } from "./mark-kind.mjs"; // ground by the class chain, in either form (G12)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -85,7 +86,7 @@ if (kind === "sited" || kind === "parcel") {
   if (!parent) die(`no mark "${parentId ?? "(none given)"}" to describe`, "predicated/naming marks nest under the mark they describe — pass --parent <by>/<slug>");
   // ground by its class chain (G12): `kind: sited` + `class: thing` and the
   // W2 form `kind: thing` alike, and a parcel
-  if (!isGroundIn(parent, kindIndexOf(marks)))
+  if (!isGroundIn(parent, kindIndexOf(loadLaw(lawDirFor(MARKS_DIR)).nodes)))
     die(`"${parentId}" cannot hold a description`, "only ground (a sited mark, an instance of a class under sited, or a parcel) carries predicate/naming children");
   parentDir = parent._dir;
 }

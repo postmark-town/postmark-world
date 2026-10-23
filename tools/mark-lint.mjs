@@ -31,7 +31,7 @@ import { fileURLToPath } from "node:url";
 import {
   loadMarks, polygonOf, ringMatchesClaim, isValidMarkDate, rect, overlapArea,
   standingRank, fileToWorld, declaredCoords, COORDS_RELATIVE, WORLD_ROOT_SLUG,
-  containmentParents, lossyValues, lossyMessage,
+  containmentParents, lossyValues, lossyMessage, snapshotFor,
 } from "./marks-fold.mjs";
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact, parcelInteriorOf } from "./consent.mjs";
@@ -39,6 +39,10 @@ import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs"
 import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
+// WLD-116: classes are law nodes, never marks. THE ONE TEST of what is a class is law.mjs's;
+// the tree it reads is WORLD/law/<foundry>/ (law-tree.mjs). The lint holds both trees.
+import { isClass, isLawKind, classRoster, FOUNDRY_TIERS, KEEPING_WORKS, NODE_FILE, LAW_ROOT } from "./law.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -50,6 +54,8 @@ const opt = (name, def) => { const i = args.indexOf(name); return i >= 0 ? args[
 const REPO = resolve(opt("--repo", ROOT));
 const MARKS_DIR = opt("--marks-dir", join(REPO, "WORLD/marks"));
 const TERRAIN_PATH = opt("--terrain", join(REPO, "WORLD/skeleton.json"));
+// --law-dir <dir>: the law tree (WLD-116), WORLD/law beside the marks tree by default.
+const LAW_DIR = opt("--law-dir", lawDirFor(MARKS_DIR));
 // --scope <subtree>: the fleet writes sibling dirs concurrently, so a full-tree
 // lint mid-fleet would trip on another agent's half-written dir. Scoped mode
 // still LOADS the whole tree (ancestor edges resolve; the-town leaf collisions
@@ -118,7 +124,31 @@ const REGISTRY = terrain.physics_registry ?? {};
 const num = (v) => typeof v === "number" && Number.isFinite(v);
 const hasGeom = (rec) => rec.at && num(rec.at.x) && num(rec.at.y) && rec.extent && num(rec.extent.w) && num(rec.extent.h);
 
-const marks = loadMarks(MARKS_DIR);
+// THE TWO TREES (WLD-116). The marks stand on the ground; the law (the classes and
+// their properties, filed in a foundry) has no where. The lint holds both to the
+// record grammar below, so the law nodes ride the same list the marks do, flagged
+// `_law`, and the rules that are only about ground (geometry, the freeze) skip them.
+const lawTree = loadLaw(LAW_DIR);
+let markRecords = loadMarks(MARKS_DIR);
+// A snapshot read through the loader's seam (the store's marks, WORLD_SNAPSHOT) is
+// older than the law tree until the store moves its classes out. The law is this
+// repo's tree (WORLD/law), so a class the snapshot carries among its marks is
+// dropped when the tree holds it, and read as law (not refused) when only the
+// snapshot does; either way it is said once. A TREE has no such excuse: §1 refuses
+// a class filed as a mark.
+const FROM_SNAPSHOT = snapshotFor(MARKS_DIR) != null;
+let snapshotLaw = 0;
+if (FROM_SNAPSHOT) {
+  const treeIds = new Set(lawTree.nodes.map((n) => n.id));
+  markRecords = markRecords.filter((m) => {
+    if (m._error || !isLawKind(m)) return true;
+    snapshotLaw++;
+    if (treeIds.has(m.id)) return false;
+    m._law = true; m.foundry ??= KEEPING_WORKS;
+    return true;
+  });
+}
+const marks = [...markRecords, ...lawTree.nodes];
 
 // The class roster: a class NAME is lawful exactly when the town's own
 // constitution-tier TYPE mark declares it FROM THE KEEPING WORKS. The position
@@ -133,18 +163,13 @@ const marks = loadMarks(MARKS_DIR);
 // works. This still reads the class VALUE, never the slug. A record naming a
 // class outside the roster is a lie about the world's vocabulary, same shape
 // as a mechanic outside the registry.
-const _byIdForWorks = new Map(marks.map((m) => [m.id, m]));
-const standsInTheWorks = (rec) => {
-  let cur = rec, hops = 0;
-  while (cur && hops++ < 64) {
-    if (cur.id === "the-town/the-keeping-works") return true;
-    cur = cur._parentMarkId ? _byIdForWorks.get(cur._parentMarkId) : null;
-  }
-  return false;
-};
-const isClassDeclaration = (m) =>
-  m.by === "the-town" && m.tier === "constitution" && m.class !== undefined && standsInTheWorks(m);
-const CLASS_ROSTER = new Set(marks.filter(isClassDeclaration).map((m) => String(m.class)));
+//
+// WLD-116: the declaration is a LAW NODE now, in a foundry (law.mjs), where it
+// was a mark standing in the Works. The position clause moved with it: what tells a
+// DECLARATION from a town-authored INSTANCE is that a declaration is filed in a
+// foundry, and an instance is a mark. The roster is every foundry's classes.
+const isClassDeclaration = (m) => m._law === true && isClass(m) && m.class !== undefined;
+const CLASS_ROSTER = classRoster(marks.filter((m) => m._law === true));
 
 // THE KIND NAMES THE CLASS (LOGOS v2 part 2, W2; ruled 2026-10-16 16:02: "The
 // `class:` field folds into `kind`"). A record's kind is either one of the
@@ -159,7 +184,7 @@ const CLASS_ROSTER = new Set(marks.filter(isClassDeclaration).map((m) => String(
 // class's instances keep the old form: posts live in the office's post machine,
 // and a later lane moves them there (settled 2026-10-17, WLD-73 G7), so a
 // `kind:` naming a post class is refused.
-const CLASS_IDX = classIndex(marks.filter((m) => !m._error));
+const CLASS_IDX = classIndex(marks.filter((m) => !m._error && m._law === true));
 const chainOf = (name) => classChain(CLASS_IDX, String(name)).map((c) => String(c.class));
 const isPostClass = (name) => name !== undefined && chainOf(name).includes("post");
 const standingOfRecord = (rec) => {
@@ -202,7 +227,18 @@ const standingOf = (m) => markStanding(m, standingIndex);
 // derived fold"), so a directory answer here would be historical filing standing
 // in for geography, and both clauses would go quietly wrong for the first mark
 // filed at its id. Same function the fold and WORLD/containment.json use.
-const { parent: containedBy } = containmentParents(marks);
+const { parent: containedBy } = containmentParents(marks.filter((m) => !m._law));
+
+// THE FOUNDRIES, held to the foundry rules (law.mjs): a tier that is not the foundry's,
+// an author the foundry does not name, a name declared in two unrelated foundries, a
+// class that extends a foundry that extends it. A config's own faults ride here too.
+for (const p of lawTree.problems) {
+  const rec = p.id ? standingIndex.get(p.id) : null;
+  if (rec) err(rec, p.msg);
+  else findings.push({ sev: "ERROR", file: p.foundry ? `${LAW_ROOT}/${p.foundry}` : LAW_ROOT, msg: p.msg });
+}
+if (snapshotLaw)
+  findings.push({ sev: "WARN", file: "(snapshot)", msg: `${snapshotLaw} law node(s) ride in this snapshot's marks: the store they come from predates the law tree. They are read as law here; a tree that files a class as a mark is refused (WLD-116)` });
 
 const slugsByHousehold = new Map();
 const childCount = new Map();
@@ -218,6 +254,11 @@ for (const rec of marks) {
   // the kind names the class (W2), or is a standing word the field carried until then
   const standing = standingOfRecord(rec);
   const klass = instanceClassOf(rec);
+  // CLASSES ARE LAW NODES, NEVER MARKS (WLD-116). A class or a property filed in the
+  // marks tree is the old shape: it would fold as a mark (a row, a containment
+  // edge, a place in fan-up) and no reader of the law would find it.
+  if (!rec._law && isLawKind(rec))
+    err(rec, `kind: ${rec.kind} is law, and law is not a mark: file it as a ${NODE_FILE} in a foundry under ${LAW_ROOT}/<foundry>/, ids unchanged (classes are law nodes, never marks; WLD-116)`);
   if (standing == null && isPostClass(rec.kind))
     err(rec, `kind: ${rec.kind} names a post class, and a post-class record keeps its old form (kind: sited or predicated, with class: ${rec.kind}) until the post lane moves it to the office's post machine (settled 2026-10-17, WLD-73 G7)`);
   else if (standing == null && CLASS_ROSTER.has(String(rec.kind)))
@@ -231,7 +272,9 @@ for (const rec of marks) {
   if (!SLUG_RE.test(rec.slug)) err(rec, `slug "${rec.slug}" must be lowercase-hyphenated (it is the directory name and the leaf of the id)`);
   if (rec._dir) {
     // repo-relative, as a clone lays it out: WORLD/marks/<path from the marks root>
-    const rel = `WORLD/marks/${resolve(rec._dir).replace(/\\/g, "/").slice(resolve(MARKS_DIR).replace(/\\/g, "/").length + 1)}/mark.md`;
+    const rel = rec._law
+      ? `${LAW_ROOT}/${resolve(rec._dir).replace(/\\/g, "/").slice(resolve(LAW_DIR).replace(/\\/g, "/").length + 1)}/${NODE_FILE}`
+      : `WORLD/marks/${resolve(rec._dir).replace(/\\/g, "/").slice(resolve(MARKS_DIR).replace(/\\/g, "/").length + 1)}/mark.md`;
     if (rel.length > MARK_PATH_MAX)
       err(rec, `the mark path ${rel} is ${rel.length} characters; the most is ${MARK_PATH_MAX}, or a Windows checkout cannot create it — file it shallower (a child property files beside its parent and names it in of:)`);
   }
@@ -242,7 +285,11 @@ for (const rec of marks) {
   const isProperty = rec.kind === "property";
   if (isProperty) {
     if (!PROPERTY_TIERS.has(rec.tier)) err(rec, `a property's tier is whose word decides its value: ${[...PROPERTY_TIERS].join(" | ")} (got ${JSON.stringify(rec.tier)})`);
-  } else if (!TIERS.has(rec.tier)) err(rec, `tier must be one of ${[...TIERS].join(" | ")} (got ${JSON.stringify(rec.tier)})`);
+  } else if (rec._law) {
+    // a class node carries its FOUNDRY's tier (law.mjs rule 2): constitution in the Keeping
+    // Works, biome in a biome's. The foundry check below says which, and refuses a mismatch.
+    if (!FOUNDRY_TIERS.includes(rec.tier)) err(rec, `a class node's tier is its foundry's: ${FOUNDRY_TIERS.join(" | ")} (got ${JSON.stringify(rec.tier)})`);
+  } else if (!TIERS.has(rec.tier)) err(rec, `tier must be one of ${[...TIERS].join(" | ")} (got ${JSON.stringify(rec.tier)}) — biome is a law tier and is refused on marks for now`);
   if (rec.tier === "constitution" && rec.by !== TOWN) err(rec, `tier: constitution is the town's — only by: ${TOWN} may claim it (a market mark cannot bind without stamps)${cite("the-town/the-tiers")}`);
   // B's rule, made structural (residue stripped 2026-08-13): standing is the
   // one walk's verdict, so an AUTHORED tier: is residue the moment it lands —
@@ -252,9 +299,9 @@ for (const rec of marks) {
   // field standingRank still reads).
   if (rec._dir) {
     let raw = null;
-    try { raw = readFileSync(join(rec._dir, "mark.md"), "utf8"); } catch { /* unreadable file already erred above */ }
+    try { raw = readFileSync(join(rec._dir, rec._law ? NODE_FILE : "mark.md"), "utf8"); } catch { /* unreadable file already erred above */ }
     const rawTier = raw == null ? null : ((raw.match(/^---\r?\n[\s\S]*?\r?\n---/) || [""])[0].match(/^tier:\s*(\S+)/m) || [])[1] ?? null;
-    if (rawTier && rawTier !== "draft" && !(rec.by === TOWN && rawTier === "constitution") && !(rec.by === TOWN && isProperty))
+    if (rawTier && rawTier !== "draft" && !rec._law && !(rec.by === TOWN && rawTier === "constitution") && !(rec.by === TOWN && isProperty))
       err(rec, `tier: is not a field — standing is derived by the one walk, never asserted (drop the line; the ground decides)${cite("the-town/the-tiers")}`);
     // 1.5 a value the parser would silently lose (WLD-41): the record above was
     // read already diminished, so this reads the file. A snapshot's records
@@ -462,6 +509,8 @@ for (const rec of marks) {
     if (rec.at !== undefined || rec.extent !== undefined) err(rec, `class marks carry no at/extent — a rule's extent is its jurisdiction, not geometry`);
     if (rec.slot !== undefined || rec.value !== undefined) err(rec, `class marks carry no slot/value (those are for predicated/naming)`);
     if (rec.class === undefined) err(rec, `a class mark declares its class: — kind: class with no class: names nothing`);
+    if (rec.extends != null && rec.extends !== "" && !CLASS_ROSTER.has(String(rec.extends)))
+      err(rec, `extends: ${JSON.stringify(rec.extends)} names no class in any foundry — a class extends a class`);
     if (rec._explicitParent) err(rec, `class marks never declare a parent — their registry standing is the enclosing directory`);
   } else if (rec.kind === "property") {
     // A PROPERTY IS THE CLASS SIDE (LOGOS/classes.md § Property and predicate,
@@ -770,6 +819,9 @@ const parentOf = (rec) => (rec._parentMarkId ? byId.get(rec._parentMarkId) : nul
       });
   } else for (const rec of marks) {
     if (rec._error || !rec._dir) continue;
+    // a law node is not a mark and is not filed under the freeze: its fossil row (if any) records where
+    // it WAS a mark, and the move to the law tree is the one place a class's file left that row (WLD-116)
+    if (rec._law) continue;
     if (rec.by == null) continue;           // an id of the shape "?/slug" is §1's error, not this gate's
     const here = filedAt(rec);
     const was = frozen[rec.id];
@@ -1110,6 +1162,21 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
   }
 }
 
+// THE RETIRED (WLD-116): a record that left the world by a declaring act is named in WORLD/_archived/<date>/RETIRED.json.
+// Only this repository's own tree has such a record.
+const RETIRED = new Map();
+if (OWN_TREE) {
+  const archDir = join(REPO, "WORLD", "_archived");
+  if (existsSync(archDir)) for (const d of readdirSync(archDir).sort()) {
+    const f = join(archDir, d, "RETIRED.json");
+    if (!existsSync(f)) continue;
+    try {
+      const act = JSON.parse(readFileSync(f, "utf8"));
+      for (const id of Object.keys(act.rows ?? {})) RETIRED.set(id, act.date ?? d);
+    } catch (e) { findings.push({ sev: "ERROR", file: `WORLD/_archived/${d}/RETIRED.json`, msg: `the declaring act could not be read as JSON (${String(e?.message ?? e).slice(0, 100)})` }); }
+  }
+}
+
 // 9. the two-way channel: a rendering and the word it renders name each other.
 //
 // A charter article carries `source:` — "this clause renders that document."
@@ -1204,7 +1271,11 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
       for (const id of doc.ids) {
         const mark = byId.get(id);
         const docErr = (msg) => findings.push({ sev: "ERROR", file: rel, msg });
-        if (!mark)
+        if (!mark && RETIRED.has(id))
+          // a retired record is known to be gone (the declaring act is WORLD/_archived/<date>/RETIRED.json): the document is owed
+          // a line dropped, which is a fix for whoever owns the document, and no reason to refuse the tree that retired the record
+          findings.push({ sev: "WARN", file: rel, msg: `Rendered line names "${id}", which was RETIRED ${RETIRED.get(id)} — drop the line (the record rests under WORLD/_archived/)` });
+        else if (!mark)
           docErr(`Rendered line names "${id}", which is no mark in the tree — either the clause never landed, or it landed under another id; a document may not claim a rendering that is not there${cite(FIDELITY)}`);
         else if (String(mark.source ?? "").trim().replace(/\\/g, "/") !== rel)
           docErr(`Rendered line names "${id}", but that mark's source: is ${mark.source === undefined ? "absent" : JSON.stringify(mark.source)} — the channel runs both ways or it is not a channel${cite(FIDELITY)}`);
@@ -1270,7 +1341,7 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
 // lint runs the same reader, and anything it would throw on is an ERROR here,
 // on the creature class's mark, before a settlement can carry it.
 {
-  const creatureClass = marks.find((m) => m?.kind === "class" && m.by === TOWN && String(m.class) === "creature");
+  const creatureClass = marks.find((m) => isClassDeclaration(m) && String(m.class) === "creature");
   if (creatureClass) {
     const { creatureLaw } = await import("./creatures.mjs");
     let law = null;
@@ -1318,7 +1389,7 @@ if (JSON_OUT) {
   process.exit(code);
 }
 
-console.log(`Linted ${scopedMarks} mark(s)${scopeRel ? ` under ${scopeRel}` : ` under ${MARKS_DIR.replace(/\\/g, "/").replace(/^.*\/(WORLD\/marks)$/, "$1")}`}.\n`);
+console.log(`Linted ${scopedMarks} record(s) (${lawTree.nodes.length} law node(s) in ${lawTree.foundries.length} foundr${lawTree.foundries.length === 1 ? "y" : "ies"})${scopeRel ? ` under ${scopeRel}` : ` under ${MARKS_DIR.replace(/\\/g, "/").replace(/^.*\/(WORLD\/marks)$/, "$1")}`}.\n`);
 // THE VERDICT WORD FOLLOWS THE EXIT CODE, NOT THE FINDINGS LIST (founder-directed
 // 2026-09-01, the S53 morning). The header above says "WARNs are advisory and
 // never fail it", and the exit code agrees — but this line used to print CLEAN

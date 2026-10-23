@@ -16,6 +16,7 @@ import assert from "node:assert/strict";
 import { ENDING_SLOTS, applyEffects, parseKind, startState } from "./creature-kind.mjs";
 import { DESPAWN_REASONS, ENDED, TOWN, creatureLaw, creaturesAt, creaturesSnapshot, dueFades } from "./creatures.mjs";
 import { loadMarks } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -56,7 +57,7 @@ test("a Mists kind cannot be finished, a finishable kind never flees, and an end
 // ── the declaration ─────────────────────────────────────────────────────────
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const marks = loadMarks(join(ROOT, "WORLD", "marks"));
+const marks = loadRecords(join(ROOT, "WORLD", "marks"));
 const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by === TOWN && String(m.class) === cls ? { ...m, named } : m));
 
 test("a kind class's named creatures are read whole: one id each, a place, what it carries and its crossing", () => {

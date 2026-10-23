@@ -125,6 +125,7 @@ import { join, dirname, relative, basename } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { loadMarks, fold, rect, contains } from "./marks-fold.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: the classes are law nodes
 import { REGION_SLUGS } from "./region-outsiders.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -276,6 +277,7 @@ if (!STAKES && !ALLOW_STAMPLESS) {
 
 // ── re-measure: fold the tree as it stands right now ────────────────────────
 const loaded = loadMarks(MARKS_DIR);
+const law = loadLaw(lawDirFor(MARKS_DIR)).nodes; // the classes are law nodes, not marks (WLD-116)
 const dirOf = new Map();
 // The AUTHORED tier, kept from the record before the fold projects over it —
 // see `exemptionFor` for why the published `tier` is the wrong field to read.
@@ -298,7 +300,7 @@ const households = existsSync(HOUSEHOLDS) ? JSON.parse(readFileSync(HOUSEHOLDS, 
 // carry weight with no stamps of their own — the breadth bonus — and
 // `rook-of-garrison/vanguards-watchtower` folds sovereign). One vocabulary,
 // read the way the fold reads it.
-const state = fold({ marks: loaded, terrain, stakes, households: households.households ?? null });
+const state = fold({ marks: loaded, law, terrain, stakes, households: households.households ?? null });
 
 const all = state.marks ?? [];
 const byId = new Map(all.map((m) => [m.id, m]));
@@ -505,6 +507,7 @@ let cascade = [];
 if (movedIds.size) {
   const after = fold({
     marks: loaded.filter((r) => !movedIds.has(r.id)),
+    law,
     terrain, stakes, households: households.households ?? null,
   });
   // A HELD parcel is deliberately left in the set-but-not-moved, so it is not a
@@ -675,7 +678,7 @@ if (APPLY) {
     let reLoaded = [], rounds = 0;
     for (; rounds < 24; rounds++) {
       reLoaded = loadMarks(MARKS_DIR);
-      const reState = fold({ marks: reLoaded, terrain, stakes, households: households.households ?? null });
+      const reState = fold({ marks: reLoaded, law, terrain, stakes, households: households.households ?? null });
       const nowById = new Map((reState.marks ?? []).map((m) => [m.id, m]));
       let fixedThisRound = 0;
       for (const rec of reLoaded) {
@@ -793,7 +796,7 @@ if (APPLY) {
   // `walkMarks` has already assigned parents, so it cannot see re-framing at all.
   try {
     const afterLoad = loadMarks(MARKS_DIR);
-    const afterState = fold({ marks: afterLoad, terrain, stakes, households: households.households ?? null });
+    const afterState = fold({ marks: afterLoad, law, terrain, stakes, households: households.households ?? null });
     const beforeById = new Map(all.map((m) => [m.id, m]));
     const displaced = [];
     for (const a of afterState.marks ?? []) {

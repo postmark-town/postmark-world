@@ -12,11 +12,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TOWN, creatureLaw, afterDoorOpen, afterDoorRefusal } from "./creatures.mjs";
 import { loadMarks } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const marks = loadMarks(join(ROOT, "WORLD", "marks"));
+const marks = loadRecords(join(ROOT, "WORLD", "marks"));
 const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by === TOWN && String(m.class) === cls ? { ...m, named } : m));
 
 const DOOR = "tower/inner-door";

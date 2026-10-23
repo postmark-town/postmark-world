@@ -28,6 +28,8 @@ import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSy
 import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
+import { loadLaw, lawDirFor, lawStateOf } from "./law-tree.mjs"; // (a cycle by design: that file reads this one's walk, and each uses the other only inside a function)
+import { splitLaw, mergeLaw } from "./law.mjs"; // WLD-116: classes are law, never marks (the ONE test lives there)
 import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn, HELD_BY, OWNED_BY, ownedBy } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -451,7 +453,17 @@ export function loadSnapshot(path) {
 
 /** A snapshot export built from a tree: the records the tree's loader returns, as the export carries them. */
 export function snapshotFromTree(dir, meta = {}) {
-  return { format: SNAPSHOT_FORMAT, ...meta, marks: JSON.parse(JSON.stringify(loadTreeMarks(dir))) };
+  // the law rides beside the marks (WLD-116): classes are law nodes, never marks, so the export keeps them apart
+  const law = existsSync(lawDirFor(dir)) ? loadLaw(lawDirFor(dir)).nodes : [];
+  return { format: SNAPSHOT_FORMAT, ...meta, marks: JSON.parse(JSON.stringify(loadTreeMarks(dir))), law: JSON.parse(JSON.stringify(law)) };
+}
+
+/** A snapshot export's law nodes (WLD-116): the export's own `law`, or none (a store older than the law tree files its classes among its marks, and the fold reads them as law). */
+export function loadSnapshotLaw(path) {
+  let doc;
+  try { doc = JSON.parse(readFileSync(path, "utf8")); }
+  catch (e) { throw new Error(`${SNAPSHOT_ENV}: ${path} could not be read as a snapshot export (${e.message})`); }
+  return Array.isArray(doc?.law) ? structuredClone(doc.law) : [];
 }
 
 /** The tree's marks, read from disk (the loader before the seam, unchanged). */
@@ -467,14 +479,19 @@ export function loadTreeMarks(dir) {
   return frameMarks(out);
 }
 
-function walkMarks(nodeDir, parentMarkId, out) {
+// `file` is the record's file name: `mark.md` in the marks tree, `node.md` in a
+// foundry's law tree (tools/law-tree.mjs reads that tree through this same walk,
+// so a law node is parsed, identified and nested exactly as a class mark was).
+// `extra` is stamped on every record read (the foundry); a directory that begins
+// with `_` is an archive and holds no live record.
+export function walkMarks(nodeDir, parentMarkId, out, { file = "mark.md", extra = null } = {}) {
   const entries = readdirSync(nodeDir);
   let thisId = parentMarkId;
-  if (entries.includes("mark.md")) {
+  if (entries.includes(file)) {
     const slug = basename(nodeDir);
     let rec;
     try {
-      rec = parseRecord(readFileSync(join(nodeDir, "mark.md"), "utf8"), `${slug}/mark.md`);
+      rec = parseRecord(readFileSync(join(nodeDir, file), "utf8"), `${slug}/${file}`);
     } catch (e) {
       rec = { _error: e.message, body: "" };
     }
@@ -486,6 +503,7 @@ function walkMarks(nodeDir, parentMarkId, out) {
     rec.slug = slug;
     rec.id = by != null ? `${by}/${slug}` : `?/${slug}`;   // id = by + leaf; a missing `by` is a lint error
     rec._dir = nodeDir;
+    if (extra) Object.assign(rec, extra);
     rec._parentMarkId = parentMarkId; // the enclosing mark, if any
     rec._stray = stray;
     rec._explicitParent = rec.parent; // as-authored (expected only for terrain refs at top level)
@@ -504,10 +522,11 @@ function walkMarks(nodeDir, parentMarkId, out) {
     out.push(rec);
   }
   for (const e of entries) {
-    if (e === "mark.md") continue;
+    if (e === file) continue;
+    if (file !== "mark.md" && e.startsWith("_")) continue;
     const p = join(nodeDir, e);
     let s; try { s = statSync(p); } catch { continue; }
-    if (s.isDirectory()) walkMarks(p, thisId, out);
+    if (s.isDirectory()) walkMarks(p, thisId, out, { file, extra });
   }
 }
 
@@ -567,12 +586,13 @@ import { resolveConsent, consentMap, CONSENT_FIELD } from "./consent.mjs";
 // area still ranks candidates (strictly larger; smallest containing wins).
 // Returns the container id, or null when only the world-root contains it
 // (null → root). `claim` is any { at, extent, points? }.
-export function placementParent(claim, marks, { worldScaleM = 50000 } = {}) {
+export function placementParent(claim, marks, { worldScaleM = 50000, kindIndex = null } = {}) {
   const claimArea = rect(claim).w * rect(claim).h;
   let best = null, bestArea = Infinity;
   // ground by the class chain (G12): the fold is the record, so it asks the
   // lineage of the marks it holds, never the place as a proxy for it
-  const kidx = kindIndexOf(marks);
+  // (the lineage is the law's: a caller holding the law hands its index in, once)
+  const kidx = kindIndex ?? kindIndexOf(marks);
   for (const m of marks) {
     if (!isGroundIn(m, kidx)) continue;
     const mr = rect(m), area = mr.w * mr.h;
@@ -633,32 +653,35 @@ export const worldRootOf = (marks) => marks.find((m) => leafSlugOf(m) === WORLD_
 // `null` means the world root itself. A mark that nothing tighter holds returns
 // the root's id, never null — a chain that stops short of the frame is a chain
 // with a hole in it.
-export function containmentParentOf(mark, marks, root = worldRootOf(marks)) {
+export function containmentParentOf(mark, marks, root = worldRootOf(marks), kindIndex = null) {
   const rootId = root?.id ?? null;
   if (rootId != null && mark.id === rootId) return null;
-  const geometric = isGroundIn(mark, kindIndexOf(marks));
+  const kidx = kindIndex ?? kindIndexOf(marks);
+  const geometric = isGroundIn(mark, kidx);
   // No self-exclusion needed and none paid for: `placementParent` requires a
   // parent to be STRICTLY larger than the claim, so a mark can never be its own
   // container, and neither can a twin sharing its rect. Filtering the array per
   // mark would be 960 copies of 960 elements for an answer that does not change.
-  const up = geometric ? placementParent(mark, marks) : (mark._parentMarkId ?? null);
+  const up = geometric ? placementParent(mark, marks, { kindIndex: kidx }) : (mark._parentMarkId ?? null);
   return up ?? rootId;
 }
 
 /** Every mark's containment parent, in one pass. `{ parent: Map, rootId }`. */
-export function containmentParents(marks) {
+export function containmentParents(marks, { law = null } = {}) {
   const root = worldRootOf(marks);
   const rootId = root?.id ?? null;
   const parent = new Map();
+  // the class lineage comes from the law (WLD-116: classes are not marks), asked once
+  const kidx = law ? kindIndexOf(law) : kindIndexOf(marks);
   for (const m of marks) {
     if (m._error || m.id == null || parent.has(m.id)) continue; // a duplicate id is the lint's error; first wins, as in the loader
-    parent.set(m.id, containmentParentOf(m, marks, root));
+    parent.set(m.id, containmentParentOf(m, marks, root, kidx));
   }
   return { parent, rootId };
 }
 
-export function containmentMap(marks) {
-  const { parent, rootId } = containmentParents(marks);
+export function containmentMap(marks, { law = null } = {}) {
+  const { parent, rootId } = containmentParents(marks, { law });
   // The chain, walked with a guard: geometry cannot make a cycle (a container is
   // strictly larger than what it holds) but a predication edge is authored, and
   // an authored edge can say anything. A chain that closes on itself is reported
@@ -1039,7 +1062,13 @@ export function householdKeyGrain(households) {
   return "mixed";
 }
 
-export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy", townWords = null, townLaws = null }) {
+export function fold({ marks: given, law = [], terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy", townWords = null, townLaws = null }) {
+  // THE LAW IS NOT IN THE MARK SET (WLD-116). A fold takes its marks and, beside
+  // them, the law (tools/law-tree.mjs). A law node found among the marks (a store's
+  // snapshot older than the move, a fixture) is law all the same: it comes out of
+  // the marks, joins the law, and no class or property row reaches the state.
+  const { marks, law: inMarks } = splitLaw(given);
+  const lawNodes = mergeLaw(law, inMarks);
   const errors = [];
   const terrainIds = new Set((terrain?.features ?? []).map(f => "terrain:" + f.id));
   const byId = new Map();
@@ -1051,7 +1080,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // how each record stands is its class chain's answer (G12, settled
   // 2026-10-17): one index over the marks this fold holds, asked by every
   // geometric question below, never the place as a proxy for the lineage
-  const KIDX = kindIndexOf(marks);
+  const KIDX = kindIndexOf(lawNodes);
   const isSited = (m) => isSitedIn(m, KIDX), isGround = (m) => isGroundIn(m, KIDX);
 
   // ---------- the household grain (Keemin's rulings, 2026-08-07 + 2026-08-10) ----------
@@ -1185,7 +1214,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // to read a directory. Same function the emitted WORLD/containment.json uses,
   // so the store and the artifact can never disagree about what holds what —
   // "containment lives only in the derived fold" (the freeze, 2026-08-25).
-  const { parent: containedBy } = containmentParents([...byId.values()]);
+  const { parent: containedBy } = containmentParents([...byId.values()], { law: lawNodes });
   // Stamped on the record so the standing walk reads it too. `markStanding` used
   // to climb `_parentMarkId` — the directory — which is how a WELCOMED guest at
   // an id-filed path lost the holder's word and folded as market. The walk needs
@@ -1237,6 +1266,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     townWords,
     // the town's oppositions that cite a limit (R11), fed by the settlement: they take their subtree
     townLaws,
+    kindIndex: KIDX,
   });
   errors.push(...consent.errors);
   const returned = consent.returned;
@@ -1275,7 +1305,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
         if (up) parentOf.set(mk.id, up); else parentOf.delete(mk.id);
       }
       if (isGround(mk) && consent.alone.has(containedBy.get(mk.id))) {
-        const up = containmentParentOf(mk, standing, root);
+        const up = containmentParentOf(mk, standing, root, KIDX);
         containedBy.set(mk.id, up);
         mk._containedBy = up ?? null;
       }
@@ -1314,19 +1344,13 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // the entire A/B delta is the instance-of resolution upgrade.
   let fanupReceipts = null;
   if (fanup === "flow") {
-    const THE_WORKS = "the-town/the-keeping-works";
-    const inWorks = (id) => {
-      let cur = id, hops = 0;
-      while (cur !== undefined && hops++ < 64) { if (cur === THE_WORKS) return true; cur = parentOf.get(cur); }
-      return false;
-    };
-    // the declaration gate, fold-local for the sandbox (classes.md: declared
-    // "standing in the Keeping Works"); promoted to mark-lint/world-store on
-    // greenlight of the real Stratum A machinery
+    // WLD-116: a class is law, not a mark, so it stands in no mark set and carries
+    // no weight: there is no declaration for an instance to flow to. The
+    // instance-of channel this sandbox once ran (an instance up to its class
+    // declaration "standing in the Keeping Works") is gone with the class marks,
+    // and the flow is containment alone. `declByClass` stays as the receipt's
+    // (empty) declarations so the report keeps its shape.
     const declByClass = new Map();
-    for (const mk of byId.values())
-      if (mk.class !== undefined && inWorks(mk.id) && !declByClass.has(String(mk.class)))
-        declByClass.set(String(mk.class), mk.id);
     // THE SKIP RULE (Keemin's spot-fix, 2026-08-17 night, round 2): an
     // absent-word cross-household containment edge does not STOP flow — it
     // skips the non-consenting rung. The effective fan-up parent is the first
@@ -1791,7 +1815,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
 }
 
 // ---------- INDEX render (the v0 table IS the world) ----------
-function renderIndex(state) {
+export function renderIndex(state) {
   // ⚔ = this mark is in a live contest, of either shape: named in a slot rivalry,
   // or holding ground another household also claims.
   const inContest = (id) => state.rivalries.some(r =>
@@ -1849,6 +1873,9 @@ function standingStamps(path) {
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1].replace(/\\/g, "/").replace(/^([a-z]):/i, (s) => s.toUpperCase());
 if (isMain || basename(process.argv[1] ?? "") === "marks-fold.mjs") {
   const marks = loadMarks(MARKS_DIR);
+  // THE LAW, beside the marks (WLD-116): WORLD/law/<foundry>/, read by tools/law-tree.mjs
+  const lawTree = loadLaw(opt("--law-dir", lawDirFor(MARKS_DIR)));
+  const law = lawTree.nodes;
   const terrain = existsSync(TERRAIN_PATH) ? JSON.parse(readFileSync(TERRAIN_PATH, "utf8")) : null;
   const stakes = loadStakes();
   const prev = PREV_PATH ? JSON.parse(readFileSync(PREV_PATH, "utf8")) : null;
@@ -1888,14 +1915,14 @@ if (isMain || basename(process.argv[1] ?? "") === "marks-fold.mjs") {
   // The flip to flow-as-default is the founder's word after the shadow diffs
   // read clean in the settlement journal.
   const FANUP = opt("--fanup", "legacy");
-  const state = fold({ marks, terrain, stakes, prev, tick: TICK, households, fanup: FANUP });
+  const state = fold({ marks, law, terrain, stakes, prev, tick: TICK, households, fanup: FANUP });
   // THE SHADOW: while legacy publishes, the flow fold runs beside it and says
   // its redistribution OUT LOUD — the settlement journal is the reader. Loud,
   // bounded, zero canon writes. (R9 conservation + R11 skip; gold plan
   // postmark-world-view-system.)
   if (FANUP === "legacy") {
     try {
-      const shadow = fold({ marks, terrain, stakes, prev, tick: TICK, households, fanup: "flow" });
+      const shadow = fold({ marks, law, terrain, stakes, prev, tick: TICK, households, fanup: "flow" });
       const wL = new Map(state.marks.map((m) => [m.id, m.weight ?? 0]));
       const movers = shadow.marks
         .map((m) => ({ id: m.id, legacy: wL.get(m.id) ?? 0, flow: +(m.weight ?? 0).toFixed(2) }))
@@ -1955,7 +1982,12 @@ To read the fold without writing it at all: --no-write --json`);
     // settlement. The browsable truth is generated; the source files rest."
     // Sorted by id so a settlement's diff shows what the GROUND did and never
     // what the walk order happened to be.
-    writeFileSync(join(ROOT, "WORLD/containment.json"), JSON.stringify(containmentMap(marks), null, 2) + "\n");
+    writeFileSync(join(ROOT, "WORLD/containment.json"), JSON.stringify(containmentMap(marks, { law }), null, 2) + "\n");
+    // ── the law artifact (WLD-116) ──────────────────────────────────────────
+    // Classes are law nodes, so the fold's state carries none of them. The readers
+    // that cannot read the tree (the viewer, a store, a browser) read them here:
+    // derived at every fold from WORLD/law/, one writer, never hand-kept.
+    writeFileSync(join(ROOT, "WORLD/law-state.json"), JSON.stringify(lawStateOf(lawTree), null, 2) + "\n");
     const ground = state.rivalries.filter(r => r.kind === "region");
     console.log(`fold: ${state.marks.length} marks · ${state.parcels.length} parcels · ${Object.keys(state.determined).length} determined · ${state.vague.length} vague · ${state.rivalries.length - ground.length} slot rivalries · ${ground.length} ground contests · ${state.returned.length} returned · ${state.errors.length} errors`);
   }
@@ -2025,8 +2057,10 @@ To read the fold without writing it at all: --no-write --json`);
  * (the PUBLIC shape) rather than from fold's internals, so `fold`'s signature is
  * untouched and this cannot drift with a change to its locals.
  */
-export function admissionBase(state, { households = null, stakes = [] } = {}) {
+export function admissionBase(state, { households = null, stakes = [], law = null } = {}) {
   const marks = state?.marks ?? [];
+  // the class lineage is the law's (WLD-116), asked once for every candidate
+  const kindIndex = law ? kindIndexOf(law) : null;
   const byId = new Map(marks.map((mk) => [mk.id, mk]));
   const credOf = (handle) => households?.[handle] ?? `solo:${handle}`;
   const parcelRectsByCred = new Map();
@@ -2050,7 +2084,7 @@ export function admissionBase(state, { households = null, stakes = [] } = {}) {
   const netByMark = new Map();
   for (const row of stakes ?? []) netByMark.set(row.mark, (netByMark.get(row.mark) ?? 0) + Number(row.n ?? 0));
 
-  return { byId, credOf, parcelRectsByCred, parcelByHh, parcelsByCred, netByMark };
+  return { byId, credOf, parcelRectsByCred, parcelByHh, parcelsByCred, netByMark, kindIndex };
 }
 
 const sameRect = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
@@ -2060,8 +2094,8 @@ const sameRect = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y && a.w === b
  * `classifyMark` is handed everywhere else, and a view in a private shape would
  * be a second vocabulary for one fact.
  */
-function deltaView(mk, cred, rectsByCred, world = null) {
-  const kidx = kindIndexOf(world ?? [mk]);
+function deltaView(mk, cred, rectsByCred, world = null, kindIndex = null) {
+  const kidx = kindIndex ?? kindIndexOf(world ?? [mk]);
   const isSited = (m) => isSitedIn(m, kidx);
   const held = isSited(mk) ? (rectsByCred.get(cred) ?? []) : [];
   // The containment answer, asked of the WHOLE folded world plus this delta's
@@ -2070,7 +2104,7 @@ function deltaView(mk, cred, rectsByCred, world = null) {
   // stopped meaning "the directory" on 2026-08-25 (see § the containment answer
   // in fold); a view that still said the directory would be the one shape where
   // the freeze had not landed, and `classifyMark` reads this field.
-  const contained = world ? containmentParentOf(mk, world) : (mk._parentMarkId ?? null);
+  const contained = world ? containmentParentOf(mk, world, undefined, kidx) : (mk._parentMarkId ?? null);
   return {
     id: mk.id, kind: mk.kind, by: mk.by ?? mk.household, household: mk.household ?? mk.by,
     declared_household: cred, date: mk.date,
@@ -2115,7 +2149,7 @@ function deltaView(mk, cred, rectsByCred, world = null) {
  * Sets `sovereign` on every sited view in `views`, in place. `world` is the
  * result by id, its parcels included (main's and the admitted ones).
  */
-export function sovereignInResult(views, world, { dials = DIALS } = {}) {
+export function sovereignInResult(views, world, { dials = DIALS, kindIndex = null } = {}) {
   const rectsByCred = new Map();
   for (const mk of world.values()) {
     if (mk.kind !== "parcel") continue;
@@ -2126,7 +2160,7 @@ export function sovereignInResult(views, world, { dials = DIALS } = {}) {
     if (!rectsByCred.has(cred)) rectsByCred.set(cred, []);
     rectsByCred.get(cred).push(r);
   }
-  const kidx = kindIndexOf(world);
+  const kidx = kindIndex ?? kindIndexOf(world);
   for (const view of views.values()) {
     if (!isSitedIn(view, kidx)) continue;
     view.sovereign = (rectsByCred.get(view.declared_household ?? view.household) ?? []).some((pr) => contains(pr, rect(view)));
@@ -2228,7 +2262,7 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
     }
 
     // a thing owned apart from its maker stands in its OWNER's household (POS-688 D-O2), as the fold reads it
-    views.set(mk.id, deltaView(mk, ownedBy(mk) ? base.credOf(ownedBy(mk)) : cred, rectsByCred, deltaWorld));
+    views.set(mk.id, deltaView(mk, ownedBy(mk) ? base.credOf(ownedBy(mk)) : cred, rectsByCred, deltaWorld, base.kindIndex));
   }
   return { views, errors };
 }

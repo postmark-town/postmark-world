@@ -41,7 +41,8 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { loadMarks, loadSnapshot, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
+import { loadMarks, loadSnapshot, loadSnapshotLaw, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: a class that moved from the marks to the law is not lost
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -56,10 +57,18 @@ function marksAt(repo, ref) {
     const archive = join(dir, "world.tar");
     execFileSync("git", ["-C", repo, "archive", "--format=tar", `--output=${archive}`, ref, "--", "WORLD"], { stdio: ["ignore", "pipe", "pipe"] });
     execFileSync("tar", ["-xf", "world.tar"], { cwd: dir, stdio: ["ignore", "pipe", "pipe"] });
-    return byId(loadMarks(join(dir, "WORLD", "marks")));
+    return byId(standing(join(dir, "WORLD", "marks")));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+}
+/**
+ * What stands in a tree: its marks, and its law nodes beside them (WLD-116). A class
+ * that moved from WORLD/marks to WORLD/law keeps its id, so it is not "lost" from the
+ * world by moving: the "lost" check asks what STANDS, and a law node stands.
+ */
+function standing(marksDir) {
+  return [...loadMarks(marksDir), ...loadLaw(lawDirFor(marksDir)).nodes];
 }
 function byId(marks) {
   const out = new Map();
@@ -79,7 +88,7 @@ const ids = (rows) => new Set((Array.isArray(rows) ? rows : []).map((r) => r?.id
 export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = true } = {}) {
   const baseRef = base ?? defaultBase(repo);
   const before = marksAt(repo, baseRef);
-  const after = byId(loadMarks(join(repo, "WORLD", "marks")));
+  const after = byId(standing(join(repo, "WORLD", "marks")));
   const statePath = join(repo, "WORLD", "world-state.json");
   if (!existsSync(statePath)) throw new Error("could not gate: no WORLD/world-state.json — the fold did not run, so escrow cannot be read");
   const state = JSON.parse(readFileSync(statePath, "utf8"));
@@ -98,7 +107,8 @@ export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = 
 // world-state.json; lint runs over the new snapshot through the loader's seam
 // (WORLD_SNAPSHOT), so mark-lint reads exactly the marks the gate judges.
 export function harmGateOnSnapshots({ repo = join(HERE, ".."), before, after, acts = {}, stakes = null, lint = true } = {}) {
-  const read = (x) => (typeof x === "string" ? loadSnapshot(x) : structuredClone(x ?? []));
+  // an export's marks AND its law nodes: a class that moved out of the marks is not lost from the world (WLD-116)
+  const read = (x) => (typeof x === "string" ? [...loadSnapshot(x), ...loadSnapshotLaw(x)] : structuredClone(x ?? []));
   const was = byId(read(before)), now = read(after);
   const stakeRows = stakes ? (typeof stakes === "string" ? stakesFrom(stakes) : stakes) : [];
   const state = fold({ marks: structuredClone(now), terrain: null, stakes: stakeRows });

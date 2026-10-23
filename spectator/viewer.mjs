@@ -27,6 +27,7 @@ import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creatur
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
+import { isClass } from "../tools/law.mjs"; // WLD-116: THE ONE TEST of what is a class (a law node in a foundry)
 import { propertyOf, propertyValue } from "../tools/class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2); a property's value as the record writes it
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
 import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
@@ -4943,7 +4944,7 @@ export function containmentIndex(marks = [], { insideRoomId = null, thingClasses
   // filter also gathers the class marks, so the thing classes cost no second read.
   const classMarks = [];
   const candidates = (marks ?? []).filter((mark) => {
-    if (mark?.kind === "class") classMarks.push(mark);
+    if (isClass(mark)) classMarks.push(mark);
     return !encloses(mark) && isEmbodiedMark(mark) && !isAmbientMark(mark, byMarkId);
   });
   // A KIND OF THING IS A THING (W2 final): a halloween-candy-bowl is no more ground
@@ -8257,7 +8258,7 @@ export function mountViewer(appEl) {
       return;
     }
     data.worldState = foldForSight(data, state.outsider);   // the lens draws the town's fold, not your drafts (WLD-26)
-    world = sightOf(assembleWorld({ worldState: data.worldState, skeleton: data.skeleton }));
+    world = sightOf(assembleWorld({ worldState: data.worldState, skeleton: data.skeleton, law: data.law ?? [] }));
     byId = new Map(allMarks().map((m) => [m.id, m]));
     homeSet = buildHomeSet(world.marks);
     pinnedBuiltId = null; // the record moved: an open bubble is now stale prose
@@ -8281,7 +8282,16 @@ export function mountViewer(appEl) {
   // stay assembled for a later Spectator switch — it is expensive to fetch and
   // there is no reason to throw it away — it just does not get to feed the
   // resident's painting.
-  const allMarks = () => (onResidentPath() ? [...byId.values()] : (world?.marks ?? [...byId.values()]));
+  // The fold's law nodes ride with its marks (WLD-116): the page asks the same set the fold answered
+  // before the classes left the mark set, and the join is made once per record, not per call.
+  let allMarksJoin = { marks: null, law: null, out: null };
+  const allMarks = () => {
+    if (onResidentPath()) return [...byId.values()];
+    if (!world?.marks) return [...byId.values()];
+    if (!world.law?.length) return world.marks;
+    if (allMarksJoin.marks !== world.marks || allMarksJoin.law !== world.law) allMarksJoin = { marks: world.marks, law: world.law, out: [...world.marks, ...world.law] };
+    return allMarksJoin.out;
+  };
   const isOfficeLive = (url) => url === officeUrl("/world/state");
   // ── TWO LOADS, BECAUSE THEY ARE TWO DIFFERENT SIZES (2026-09-10) ──────────
   //
@@ -8308,6 +8318,23 @@ export function mountViewer(appEl) {
     const ws = await fetchWorldState(worldStatePaths(), { credentials: "same-origin" });
     state.dataSource = ws.url; state.asOf = ws.asOf;
     data.trueWorld = ws.json;
+    data.law = await loadLawNodes();
+  }
+
+  // THE LAW, BESIDE THE FOLD (WLD-116). A class is a law node, never a mark, so the
+  // fold's marks carry none and the page reads them from the law artifact the fold
+  // writes beside world-state.json. A page that cannot read it still draws the town:
+  // the kinds it cannot place fall back to what they were before (a place), and the
+  // one thing said is that the law was not read. A store older than the move still
+  // carries its classes among its marks, and those answer as they always did.
+  async function loadLawNodes() {
+    try {
+      const j = await fetchJson(recordSources("/WORLD/law-state.json").map((source) => source.url));
+      return Array.isArray(j?.nodes) ? j.nodes : [];
+    } catch (e) {
+      console.warn(`[world] the law (WORLD/law-state.json) could not be read (${String(e?.message ?? e).slice(0, 120)}) — classes known only from the record's own marks`);
+      return [];
+    }
   }
 
   // Kept for the hosts that call it (the published `reload` handle, the replay
@@ -14502,7 +14529,7 @@ export function mountViewer(appEl) {
   // until its column was opened.
   function recordClasses() {   // the class marks the page holds, once per record
     if (recordClassMemo.epoch !== worldEpoch || !recordClassMemo.set)
-      recordClassMemo = { epoch: worldEpoch, set: new Set(allMarks().filter((m) => m?.kind === "class").map((m) => classToken(m.class)).filter(Boolean)) };
+      recordClassMemo = { epoch: worldEpoch, set: new Set(allMarks().filter(isClass).map((m) => classToken(m.class)).filter(Boolean)) };
     return recordClassMemo.set;
   }
   function askLineage(cls) {

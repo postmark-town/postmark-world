@@ -19,9 +19,10 @@ import {
   PARCEL_CLAIM_CAP, CLAIM_CAP_LAW, ONE_PER_RESIDENT_LAW, ONE_PER_RESIDENT_REFUSAL,
   ONE_PER_RESIDENT_PRIOR_ESTATE, ONE_PARCEL_PER_HANDLE_EXCEPTIONS,
 } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const MARKS = loadMarks(join(ROOT, "WORLD/marks")).filter((m) => !m._error);
+const MARKS = loadRecords(join(ROOT, "WORLD/marks")).filter((m) => !m._error);
 const byId = new Map(MARKS.map((m) => [m.id, m]));
 const law = (id) => {
   const m = byId.get(id);

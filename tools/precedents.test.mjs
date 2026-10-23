@@ -11,9 +11,10 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks } from "./marks-fold.mjs";
+import { loadRecords } from "./law-tree.mjs"; // the classes are law nodes (WLD-116): the marks and the law, together
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const MARKS = loadMarks(join(ROOT, "WORLD/marks")).filter((m) => !m._error);
+const MARKS = loadRecords(join(ROOT, "WORLD/marks")).filter((m) => !m._error);
 
 test("the-town/precedents stands as constitution law under postmark-rules, citable by its id", () => {
   const m = MARKS.find((x) => x.id === "the-town/precedents");

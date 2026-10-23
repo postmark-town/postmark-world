@@ -115,7 +115,7 @@ export function deriveHomeControlPoints(marks) {
 //   passes the manifest's declared-region points; the browser passes null and the
 //   points are derived from the marks). Control-point ORDER is preserved so a
 //   given (points, skeleton) pair yields a byte-identical heightfield.
-export function assembleWorld({ worldState, skeleton, homeControlPoints = null } = {}) {
+export function assembleWorld({ worldState, skeleton, homeControlPoints = null, law = null } = {}) {
   // Signal is mechanic-backed now (07-23): a sited mark is a signal when it — or
   // any predicated mark describing it — carries `mechanic: signal` on the record.
   // The durable form SIGNAL_MARKS stood in for; the allowlist stays only for the
@@ -136,6 +136,9 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
   const heightfield = buildHeightfield({ controlPoints });
   return {
     marks,
+    // THE LAW (WLD-116): the classes are law nodes, never marks, so the fold's marks carry none.
+    // The world holds them beside its marks, for what asks a class (the stride, the kinds).
+    law: law ?? worldState.law ?? [],
     // THE PARCEL IS THE HOME (ruling 7). Home is a household's parcel, so the
     // parcel is a first-class world object and the fold must publish it — every
     // reader that needs to answer "where does this resident stand?" reads the

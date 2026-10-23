@@ -40,6 +40,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { loadMarks, fold } from "./marks-fold.mjs";
+import { loadLaw, lawDirFor } from "./law-tree.mjs"; // WLD-116: the classes are law nodes
 import { pointInRect } from "./geometry.mjs";
 import {
   positionAt as walkPositionAt, fractionalCrossing,
@@ -151,6 +152,7 @@ function whyCarried(before) {
 function main() {
   const state = fold({
     marks: loadMarks(join(ROOT, "WORLD/marks")),
+    law: loadLaw(join(ROOT, "WORLD/law")).nodes, // the classes are law nodes, not marks (WLD-116)
     terrain: JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")),
     stakes: [],
   });

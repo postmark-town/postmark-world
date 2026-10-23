@@ -350,8 +350,10 @@ export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } 
   // The dial is a property of resident now (LOGOS v2 part 2). A store folded
   // before that change still carries it as the class row's dial, so a world
   // read from the last crossing's store answers either way, the property first.
-  const residentPaceKm = Number(propertyOf(world.marks ?? [], "resident", "pace_km_per_crossing")?.value
-    ?? (world.marks ?? []).find((m) => m.id === "the-town/resident")?.dials?.pace_km_per_crossing);
+  // (the class is a law node, WLD-116: the world's law first, then any a store older than the move still files among its marks)
+  const classes = [...(world.law ?? []), ...(world.marks ?? [])];
+  const residentPaceKm = Number(propertyOf(classes, "resident", "pace_km_per_crossing")?.value
+    ?? classes.find((m) => m.id === "the-town/resident")?.dials?.pace_km_per_crossing);
   const walkSpeed = world.terrain?.elevation?.walk_speed_m_per_crossing
     ?? (Number.isFinite(residentPaceKm) && residentPaceKm > 0 ? residentPaceKm * 1000 : 15000);
   const unit = DIR_UNIT[dir?.toUpperCase?.()] ?? unitFromDeg(Number(dir));

@@ -36,6 +36,7 @@
 // Browser-pure: the viewer and the store readers ask through it too.
 
 import { classIndex, classChain } from "./class-properties.mjs";
+import { isLawKind } from "./law.mjs"; // WLD-116: a class or a property is law, never an instance
 
 /** The standing words `kind:` wrote before it named the class, and the node kinds. */
 export const STANDING_WORDS = Object.freeze(new Set(["sited", "predicated", "predicate", "naming", "parcel", "class", "property", "post"]));
@@ -43,7 +44,7 @@ export const STANDING_WORDS = Object.freeze(new Set(["sited", "predicated", "pre
 const NEVER_GROUND = new Set(["predicated", "predicate", "naming", "class", "property", "parcel"]);
 
 export function instanceClassOf(m) {
-  if (!m || m.kind === "class" || m.kind === "property") return undefined;
+  if (!m || isLawKind(m)) return undefined;
   if (m.class !== undefined) return String(m.class);
   return m.kind != null && !STANDING_WORDS.has(String(m.kind)) ? String(m.kind) : undefined;
 }
@@ -143,7 +144,7 @@ export function kindIndexOf(marks) {
 export function standingOf(m, idx) {
   if (!m) return null;
   const kind = m.kind == null ? null : String(m.kind);
-  if (kind === "class" || kind === "property") return kind;
+  if (isLawKind(m)) return kind;
   if (kind === "naming") return "naming";
   if (kind === "predicated" || kind === "predicate") return "predicate";
   if (kind == null) return null;
