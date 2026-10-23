@@ -1,110 +1,76 @@
 # The Keeping Works — current map
 
-*A current navigation guide, not a constitutional source.*
+*A navigation guide, not a constitutional source.*
 
-The canonical record is the mark tree at
-`WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/`. This guide
-exists because the Works grew far beyond its 2026-08-01 seed and its two kinds
-of structure are easy to mistake for one another.
+The Keeping Works is **Postmark's book**: the ten roots, the eight invariants and every
+Postmark class, at the constitution tier. LOGOS is the universal core above it (what any
+AI town would share); every biome's foundry extends the Keeping Works and never
+contradicts it. Classes are **law nodes, never marks** (WLD-116, Darko 2026-10-23).
 
-## Two systems at one address
+## Where it lives
 
-### The ground view: machinery as buildings
+```
+WORLD/law/
+  the-keeping-works/            a FOUNDRY: a directory under WORLD/law/
+    foundry.json                its configuration: tier, extends, seat, authors
+    postmark-node/ postmark-edge/ postmark-rules/ postmark-invariant/
+    postmark-derived/ postmark-economy/ postmark-class/
+      <class>/node.md           a law node; a class nests its properties and subclasses by directory
+WORLD/law-state.json            DERIVED at every fold from the tree; for what cannot read the tree
+```
 
-The sited portion is a district: Postmark's machinery expressed as buildings,
-rooms, desks, and function-grain predicates. There are currently **37 direct
-sited buildings** and **43 sited marks in total**, including nested modules.
+A node's id is `by/<leaf directory>`, exactly as it was when the class was filed as a mark:
+a stake, an `extends`, an `implements` and a fossil row still mean what they meant. There
+is no `at`, no `extent`, no containment and no fan-up for a law node ("law has no where").
+The 150-character body cap does not apply to one.
 
-Representative paths:
+## One test of what is a class
 
-- `the-sorting-house/the-envelope-law/` — the town's mail crossing
-- `the-mint-house/the-mint-engine/` — stamp derivation and verification
-- `the-front-window/the-credentials-desk/` — office protocol and identity
-- `spectators-gallery/the-viewer-module/` — the read-only World viewer
+`tools/law.mjs` (pure, browser-safe) answers it for the lint, `classIndex`, the fold, the
+icons and the creatures: **a class is a law node of `kind: class` in a foundry**. It knows
+the foundry rules and nothing else does:
 
-The original four-block symmetry no longer describes the record. Later
-constitutional work moved most World machinery and the former claim-house
-functions into the LOGOS rendering. That history should not be reversed merely
-to make the old plat look balanced.
+- a foundry has one **tier**: `constitution` (the Keeping Works) or `biome`; its classes carry it.
+  `biome` is refused in the Keeping Works and on marks (for now);
+- a foundry **extends** one other foundry or none; a biome extends the Keeping Works, never the
+  reverse, and a class extends its own foundry's classes or an ancestor's, never a foundry that
+  extends it (the town never depends on a biome);
+- a class **name** is one class: the same name in two foundries is refused unless one extends
+  the other, and then only as a refinement at the same rung of the ladder;
+- a biome **never contradicts** the book: shadowing a constitution property of a class in the
+  foundry it extends is refused (a sovereign property is the maker's to set);
+- only a foundry's **authors** declare in it (the town, in v0).
 
-### The class-space view: placeless law
+`tools/law-tree.mjs` reads the tree (`loadLaw`, `loadWorld`, `lawStateOf`). `tools/law.test.mjs`
+holds every rule, with a test-only second foundry.
 
-The same directory is also the declaration registry. These seven direct class
-roots and one portal are not physical buildings:
+## Standing up a foundry (Pando Peak is the next)
 
-| root | current marks | role |
-|---|---:|---|
-| `postmark-node` | 98 | the node families and their classes |
-| `postmark-edge` | 58 | declarable relations and action residues |
-| `postmark-rules` | 48 | stipulations and their implementation questions |
-| `postmark-invariant` | 25 | standing questions asked of the town |
-| `postmark-derived` | 17 | answers computed at read/save time |
-| `postmark-economy` | 6 | economic classes and seams |
-| `postmark-class` | 1 | the class-of-classes root |
-| `the-works-portal` | 1 | the read transition from ground to class-space |
+A new directory and a `foundry.json`; no line of code changes:
 
-Class nodes have no geometry. Their directory nesting renders type ancestry,
-not containment in the district. Do not flatten these branches to make the
-filesystem shallower; the hierarchy carries meaning.
+```json
+{ "foundry": "pando-peak", "tier": "biome", "extends": "the-keeping-works",
+  "seat": "the-town/pando-peak", "authors": ["the-town"], "about": "…" }
+```
 
-## Current census
+Its classes are `node.md` files carrying `tier: biome`.
 
-As read on 2026-10-06 from main at `73fc717a` (first read 2026-09-03 at `441580e38`: 362 files, 153 class, 166 predicated):
+## What the Works is not any more
 
-- **378** `mark.md` files
-- **43** sited marks
-- **155** class marks
-- **180** predicated marks
-- **45** direct child branches: 37 sited, 7 class, 1 portal predicate
+The district of machinery buildings (42 sited marks), their 82 function-grain predicates
+(77 `fn:` pointers, the four civic plaques, the works portal) and `CODE_REGISTRY.draft.json`
+retired on 2026-10-23: nothing read them, and the arrow pointed the wrong way (code points at
+law nodes, never the reverse). So did three class records that were already history
+(`uncategorized` and its children, `burn`, `keeping-deed`). All of it rests under
+`WORLD/_archived/2026-10-23-wld-116/`; `RETIRED.json` there is the declaring act. The seat,
+`the-town/the-keeping-works`, stays as a plain landmark and will hold the embodied library
+(generated, one writer). Observability of canon is the doors' job (`explain:` and a LOGOS read).
 
-This is a receipt, not a dial. The tree governs when the numbers change.
-
-## How similarly named things differ
-
-The Works describes several layers of one town. Similar names are often
-relations, not duplicates:
-
-- **institution:** `the-ballot-house`
-- **office service:** `the-ballot-room`
-- **paper class:** `postmark-node/paper/ballot`
-- **governance route:** `postmark-rules/the-asks/vote-lane`
-- **escrow edge:** `postmark-edge/stake/stake-ballot`
-
-Likewise, the code-derived `the-quest-board`, the bulletin class
-`postmark-node/paper/town-bulletin/quests`, and the public
-`WORLD/marks/the-town/the-quest-guild` answer different questions. A future
-generated index should expose these layer links directly.
-
-## Draft mechanic registry
-
-`CODE_REGISTRY.draft.json` is still inert draft provenance:
-
-- **101** entries, all `unverified-draft`
-- **101** matching `mechanic_draft:` references across the complete World tree
-- **77** references remain inside the physical/class Works subtree
-- **24** World/town mechanics moved with their witnesses into the LOGOS
-  rendering; they are globally referenced, not orphaned
-
-The registry is complete by identifier but not yet durable cross-repository
-provenance. Town, site, and office entries carry relative source paths without
-a repository URL, revision, or content hash. Do not rename
-`mechanic_draft:` to `mechanic:` wholesale. Either rule and verify a real
-cross-repository registry contract or remove the inert layer in a separately
-reviewed change.
+The earlier map and the seeding receipt rest in `docs/_archived/2026-10-23-wld-116/`.
 
 ## Maintenance boundary
 
-- Keep physical containment, class ancestry, and cross-layer relationships
-  visibly distinct.
-- Do not restore removed buildings for aesthetic symmetry.
-- Review `version: 0`, source-less, and empty-implementation nodes one ruling
-  at a time; several are deliberately held proposals, not accidental debris.
-- Regenerate derived views such as `WORLD/INDEX.md` only after mark changes.
-- Treat the old seeding report as history, not current authority.
-
-## Historical seed receipt
-
-[`the-keeping-works-seeding-README-2026-08-01.md`](the-keeping-works-seeding-README-2026-08-01.md)
-records the original Great Convergence pass. Its `DRAFT` status, 159-mark
-census, four-block inventory, and absolute-coordinate discussion describe that
-moment only. They do not describe the current Works.
+- Regenerate derived views (`WORLD/INDEX.md`, `world-state.json`, `containment.json`,
+  `law-state.json`) only through the fold; the tree is the source.
+- A proposed class or amendment is a post; its ruling writes or updates the law node.
+- Review `version: 0`, source-less and empty-implementation nodes one ruling at a time.

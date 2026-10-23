@@ -1,3 +1,5 @@
+> **Archived 2026-10-23 (WLD-116).** The Keeping Works is no longer a district of machinery buildings: the buildings, their function pointers and the draft registry retired, and the classes became law nodes under WORLD/law/ (docs/the-keeping-works.md is the current map; WORLD/_archived/2026-10-23-wld-116/RETIRED.json names what retired). Kept whole below as history.
+
 # the-keeping-works — historical seeding receipt (2026-08-01)
 
 > **HISTORICAL RECORD.** This file preserves the Great Convergence seed as it
