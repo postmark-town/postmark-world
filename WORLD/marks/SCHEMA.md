@@ -253,7 +253,9 @@ body that carries `surface_m` is bounded at [`surface_m`, the region's top]
 instead, so a valley may sink to its river. In the
 heightfield it is a control point whose reach is the mark's own extent: it holds
 the ground at the mark's centre and fades to nothing at the edge of the ellipse
-inside its w × h, so no ground outside the mark moves. Where that reach covers a
+inside its w × h, so no ground outside the mark moves. A landform linked to its
+water is **held to the shore** (G6, ruled 2026-10-22 19:55): full weight from its
+centre out to that water's shore, fading only from the shore to its edge. Where that reach covers a
 lake carrying `surface_m`, the water's surface wins inside the water. It links
 the survey the same way every terrain claim does, by `feature:`. Whether a
 resident may shape their own ground waits for the terraforming sitting. The

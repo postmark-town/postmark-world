@@ -39,14 +39,21 @@ export const SIGNAL_MARKS = {
 // the coordinate its row in skeleton.json § elevation.regions names (`anchor.at_m`)
 // and at the MIDPOINT OF THAT ROW'S OWN band_m. They were a constant here, with
 // every height typed a second time beside the band (WLD-97, ruled 2026-10-22: the
-// dials live in the skeleton, and terraforming is an edit to it, not a code PR).
+// dials live in the skeleton, so a dial is changed by editing it, not the code).
 // A skeleton without them is refused by name: a heightfield missing its regions
 // would still draw, as a flat wrong world nobody was told about.
+//
+// The refusal carries code HEIGHTS_UNREAD, and so does the river's fall's (below):
+// those two, and only those, are what a reader may choose to survive (the World
+// page draws flat; the office's world doors answer 503).
+export const HEIGHTS_UNREAD = "HEIGHTS_UNREAD";
+function heightsUnread(message) { return Object.assign(new Error(message), { code: HEIGHTS_UNREAD }); }
+const isBand = (b) => Array.isArray(b) && b.length === 2 && Number.isFinite(b[0]) && Number.isFinite(b[1]) && b[0] <= b[1];
 export function regionAnchors(skeleton) {
   const rows = skeleton?.elevation?.regions ?? [];
-  const unanchored = rows.filter((r) => !Number.isFinite(r.anchor?.at_m?.x) || !Number.isFinite(r.anchor?.at_m?.y) || !Array.isArray(r.band_m)).map((r) => r.id);
+  const unanchored = rows.filter((r) => !Number.isFinite(r.anchor?.at_m?.x) || !Number.isFinite(r.anchor?.at_m?.y) || !isBand(r.band_m)).map((r) => r.id);
   if (!rows.length || unanchored.length) {
-    throw new Error(`skeleton.elevation.regions must give every region an anchor.at_m and a band_m (${rows.length ? `missing: ${unanchored.join(", ")}` : "no regions"})`);
+    throw heightsUnread(`skeleton.elevation.regions must give every region an anchor.at_m and a band_m of two numbers, low first (${rows.length ? `missing: ${unanchored.join(", ")}` : "no regions"})`);
   }
   return rows.map((r) => ({ id: r.id, at: { x: r.anchor.at_m.x, y: r.anchor.at_m.y }, h: (r.band_m[0] + r.band_m[1]) / 2, src: r.anchor.receipt ?? null }));
 }
@@ -75,7 +82,7 @@ export function waterControlPoints(skeleton) {
   }
   if (!pts.length) return [];
   const fall = skeleton.elevation?.river_fall_m;
-  if (!Number.isFinite(fall)) throw new Error("skeleton.elevation.river_fall_m must be a number: the river's fall is a dial, read from the skeleton");
+  if (!Number.isFinite(fall)) throw heightsUnread("skeleton.elevation.river_fall_m must be a number: the river's fall is a dial, read from the skeleton");
   const ys = pts.map((p) => p.y);
   const yN = Math.min(...ys), yMouth = Math.max(...ys);
   return pts.map((p) => {
@@ -188,14 +195,35 @@ export function shapeGround(heightfield, marks, anchors, skeleton) {
   for (const m of marks) {
     const s = groundStands(m, anchors, skeleton);
     if (!s || s.refused) continue;
-    forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, waters: [] });
+    forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, carvedBy: s.carvedBy ?? null, waters: [], shore: null });
   }
   if (!forms.length) return heightfield;
   const waters = surfacedWaters(skeleton);
   for (const f of forms) {
     f.waters = waters.filter((w) => Math.abs(w.cx - f.cx) < w.rx + f.rx && Math.abs(w.cy - f.cy) < w.ry + f.ry);
+    f.shore = f.carvedBy ? waters.find((w) => w.id === f.carvedBy) ?? null : null;
+  }
+  // HELD TO THE SHORE (G6, ruled by Darko 2026-10-22 19:55). A landform linked to
+  // its water holds ground_m at full weight from its centre out to that water's
+  // shore, and fades only from the shore to its own edge: the ground meets the
+  // water at the valley floor rather than half way up its side. The shore is
+  // found along the ray from the landform's centre through the point: the
+  // fraction of that ray still inside the water's ellipse (the larger root of the
+  // ray-ellipse quadratic). A landform with no water fades from its centre.
+  function shoreFraction(f, x, y) {
+    const w = f.shore;
+    if (!w) return 0;
+    const ux = x - f.cx, uy = y - f.cy, ox = f.cx - w.cx, oy = f.cy - w.cy;
+    const a = (ux / w.rx) ** 2 + (uy / w.ry) ** 2;
+    if (!(a > 0)) return 0;
+    const b = 2 * (ox * ux / w.rx ** 2 + oy * uy / w.ry ** 2), c = (ox / w.rx) ** 2 + (oy / w.ry) ** 2 - 1;
+    const disc = b * b - 4 * a * c;
+    return disc < 0 ? 0 : Math.max(0, (-b + Math.sqrt(disc)) / (2 * a));
   }
   const base = heightfield.elevationAt;
+  // OVERLAPS: landforms apply in the order the marks are given (the fold's
+  // order), each blending from the height the ones before it left; the first
+  // surfaced water a reach covers answers outright.
   function elevationAt(x, y) {
     let h = base(x, y);
     for (const f of forms) {
@@ -206,13 +234,15 @@ export function shapeGround(heightfield, marks, anchors, skeleton) {
         const wx = (x - w.cx) / w.rx, wy = (y - w.cy) / w.ry;
         if (wx * wx + wy * wy < 1) return w.surface;
       }
-      const weight = 0.5 * (1 + Math.cos(Math.PI * Math.sqrt(r2)));
+      const r = Math.sqrt(r2);
+      const rs = Math.min(r * shoreFraction(f, x, y), 0.999);   // the shore, in this landform's own radius
+      const weight = r <= rs ? 1 : 0.5 * (1 + Math.cos(Math.PI * (r - rs) / (1 - rs)));
       const held = h < f.lo ? f.lo : h > f.hi ? f.hi : h;
       h += weight * (held - h);
     }
     return h;
   }
-  return { ...heightfield, elevationAt, landforms: forms.map(({ waters, ...f }) => ({ ...f, waters: waters.map((w) => w.id) })) };
+  return { ...heightfield, elevationAt, landforms: forms.map(({ waters, shore, ...f }) => ({ ...f, waters: waters.map((w) => w.id) })) };
 }
 
 // ───────────────────────── the assembly ─────────────────────────────────────
@@ -251,7 +281,7 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null, 
     ];
     heightfield = shapeGround(buildHeightfield({ controlPoints }), marks, anchors, skeleton);
   } catch (e) {
-    if (whenHeightsUnread !== "flat") throw e;
+    if (whenHeightsUnread !== "flat" || e?.code !== HEIGHTS_UNREAD) throw e;
     heightsUnread = `the town is drawn flat, without terrain heights: ${e.message}`;
     heightfield = { elevationAt: () => 0, controlPoints: [] };
   }
