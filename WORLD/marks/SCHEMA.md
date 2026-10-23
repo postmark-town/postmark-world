@@ -247,7 +247,11 @@ consumes it tonight.
 `by: the-town` may carry `ground_m: <m>` (the height of the ground under it)
 or `ground_m: [lo, hi]` (the range that ground is held to). The lint refuses it
 on any other mark, and refuses a value outside the band of the mark's region
-(its nearest region anchor, `skeleton.json § elevation.regions`). **Water
+(its nearest region anchor, `skeleton.json § elevation.regions`). **It stays in its
+region** (ruled 2026-10-22 20:44): the whole outline (its `points` ring, or else its
+extent) lies in that one region, or the lint refuses it. **It stays with the town**
+(the same sitting): a mark carrying `ground_m` never passes to a household, and a
+commit that moves its `by:` is refused at the gate. **Water
 carves** (ruled 2026-10-22 18:54): a landform linked by `feature:` to a water
 body that carries `surface_m` is bounded at [`surface_m`, the region's top]
 instead, so a valley may sink to its river. In the
