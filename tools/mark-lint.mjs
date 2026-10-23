@@ -170,6 +170,7 @@ const standingOfRecord = (rec) => {
   if (chain.includes("naming")) return "naming";
   if (chain.includes("predicate")) return "predicated";
   if (chain.includes("parcel")) return "parcel";
+  if (chain.includes("landform")) return "landform";   // WLD-97: mark's third child, never sited
   if (chain.includes("sited") || !chain.includes("postmark-node")) return "sited";
   return null;
 };
@@ -439,6 +440,17 @@ for (const rec of marks) {
       if (!polygonOf(rec)) err(rec, `points: must be a ring of ≥3 vertices ([[x,y],…] or "x1,y1 x2,y2 …")`);
       else if (!ringMatchesClaim(rec)) err(rec, `the points: ring's bounding box must equal the mark's at/extent claim — the claim IS the ring's bbox (SCHEMA v2)`);
     }
+  } else if (standing === "landform") {
+    // A LANDFORM (WLD-97, ruled 2026-10-22 21:03–21:04) carries its own place and
+    // outline like a sited mark, and its ground_m (5e holds the rest of its law).
+    if (!hasGeom(rec)) err(rec, `a landform needs at {x,y} and extent {w,h} in grid meters: the ground it shapes`);
+    if (rec.ground_m === undefined) err(rec, `a landform carries ground_m: the height it holds its ground at, or a [lo, hi] range`);
+    if (rec.slot !== undefined || rec.value !== undefined) err(rec, `a landform carries no slot/value`);
+    if (rec._explicitParent) err(rec, `a landform never declares a parent: it nests in nothing`);
+    if (rec.points !== undefined) {
+      if (!polygonOf(rec)) err(rec, `points: must be a ring of ≥3 vertices ([[x,y],…] or "x1,y1 x2,y2 …")`);
+      else if (!ringMatchesClaim(rec)) err(rec, `the points: ring's bounding box must equal the landform's at/extent claim`);
+    }
   } else if (standing === "predicated" || standing === "naming") {
     if (rec.at !== undefined || rec.extent !== undefined) err(rec, `${rec.kind} marks carry no at/extent — they take their locus from their parent${cite("the-town/the-continuation")}`);
     if (standing === "predicated" && (rec.slot === undefined || rec.value === undefined)) err(rec, `predicated marks need slot and value${cite("the-town/the-kinds")}`);
@@ -617,7 +629,8 @@ for (const rec of marks) {
 // 5b'. A PLACE IS SITED'S, OR A POST'S (G13, settled 2026-10-17, WLD-73). `at`
 // and `extent` are properties of sited (16:02 item 8), so an instance that
 // stands at a place is an instance of a class under sited, or of a class under
-// post (an idea may stand anywhere, founder-ruled 2026-09-01). A place on any
+// post (an idea may stand anywhere, founder-ruled 2026-09-01), or a landform (its
+// own at and extent, WLD-97, 2026-10-22). A place on any
 // other class's instance is refused: the lint never reads a record as sited
 // from its place alone. Asked only of a class whose chain reaches the root, so
 // a fixture's partial tree, which cannot answer, is left alone.
@@ -628,8 +641,10 @@ for (const rec of marks) {
     const klass = String(instanceClassOf(rec) ?? rec.kind);
     const chain = classChain(CLASS_IDX, klass).map((c) => String(c.class));
     if (!chain.includes("postmark-node")) continue;
-    if (!chain.includes("sited") && !chain.includes("post"))
-      err(rec, `a ${klass} stands at a place, but ${klass} is not under sited (its chain: ${chain.join(" → ")}) — at and extent are sited's properties; a place is lawful only on an instance of a class under sited or under post (G13, settled 2026-10-17)`);
+    // a landform carries its own place and outline as its own properties (WLD-97,
+    // ruled 2026-10-22 21:04): placed, and never sited
+    if (!chain.includes("sited") && !chain.includes("post") && !chain.includes("landform"))
+      err(rec, `a ${klass} stands at a place, but ${klass} is not under sited (its chain: ${chain.join(" → ")}) — at and extent are sited's properties; a place is lawful only on an instance of a class under sited, under post, or a landform (G13, settled 2026-10-17; WLD-97)`);
   }
 }
 

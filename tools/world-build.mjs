@@ -18,7 +18,7 @@
 // Browser-purity: this imports ONLY world-engine.mjs (pure). No node:*, no
 // marks-fold. All numeric leans are dials, movable by ruling.
 
-import { isSited, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isPredicate, isLandform, LANDFORM } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { buildHeightfield } from "./world-engine.mjs";
 
 // ───────────────────────── dials (moved from world-poc, verbatim) ───────────
@@ -121,16 +121,19 @@ export function nearestAnchor(at, anchors) {
 
 // ───────────────────────── the ground the town shapes ───────────────────────
 // WLD-97 part 2 (Darko, 2026-10-22: "the town should own the terraform for
-// now"). A sited mark may carry `ground_m: <m>` or `ground_m: [lo, hi]`: the
-// height of the ground under it, or the range that ground is held to. Only a
-// mark `by: the-town` may carry it, and the value must sit inside the band of the
-// mark's region (or, for a landform linked by `feature:` to a water body with a
+// now"; 21:03–21:04: landforms are their own class). A LANDFORM (kind: landform,
+// a class that extends `mark`, a sibling of sited) carries `ground_m: <m>` or
+// `ground_m: [lo, hi]`: the height of the ground under it, or the range that
+// ground is held to. No other mark may carry it. Only the town makes a landform
+// (the class answers makers: false; the rule refuses any other `by`), and the
+// value must sit inside the band of the mark's region (or, for a landform linked by `feature:` to a water body with a
 // surface, between that surface and the region's top: water carves). In the heightfield it is a control point whose reach is the
 // mark's own extent (the ellipse inside its w × h): it holds the ground at its
 // centre and fades to nothing at the extent's edge, so it never moves an inch of
 // ground outside the mark. Where its reach covers a lake that carries
 // `surface_m`, the water's surface wins.
 export const GROUND_SHAPER = "the-town";
+const instanceKindOf = (m) => String(m?.class ?? m?.kind ?? "mark");
 
 /**
  * Whether a record CLAIMS the survey feature it names: is that feature's own
@@ -162,13 +165,16 @@ export function groundOf(mark) {
 export function groundStands(mark, anchors, skeleton) {
   const ground = groundOf(mark);
   if (!ground) return null;
+  // ONLY A LANDFORM SHAPES GROUND (ruled by Darko 2026-10-22 21:03): ground_m is
+  // the landform class's own property, never a field any sited mark may carry.
+  if (!isLandform(mark)) return { refused: `ground_m: is a landform's own property (the-town/${LANDFORM}); this mark is kind: ${instanceKindOf(mark)}, and only a landform shapes the ground` };
   if (ground.malformed) return { refused: `ground_m: is a height in metres or a [lo, hi] pair with lo ≤ hi; got ${JSON.stringify(mark.ground_m)}` };
   // STAYS WITH THE TOWN (/k, ruled by Darko 2026-10-22 20:44): a mark carrying
   // ground_m is the town's and can never pass to a household. A pass is a commit
   // that moves a mark's `by:` (DEC-16 re-identification), so the gate that refuses
   // the commit refuses the pass, before it ever reaches a settlement.
   if (mark.by !== GROUND_SHAPER) return { refused: `ground_m: a mark that shapes the ground stays with the town and never passes to a household (ruled 2026-10-22: only ${GROUND_SHAPER} may shape the ground); this mark is by ${mark.by}` };
-  if (!isSited(mark) || !mark.extent || !(mark.extent.w > 0) || !(mark.extent.h > 0)) return { refused: `ground_m: shapes the ground under a sited mark's own extent, and this mark stands on no ground of its own` };
+  if (!mark.at || !Number.isFinite(mark.at.x) || !Number.isFinite(mark.at.y) || !mark.extent || !(mark.extent.w > 0) || !(mark.extent.h > 0)) return { refused: `ground_m: a landform shapes the ground inside its own place and extent, and this one gives none` };
   const region = nearestAnchor(mark.at, anchors);
   const row = (skeleton?.elevation?.regions ?? []).find((r) => r.id === region?.id);
   if (!row?.band_m) return { refused: `ground_m: the mark's region has no band to hold it to` };
