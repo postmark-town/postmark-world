@@ -8257,7 +8257,10 @@ export function mountViewer(appEl) {
       return;
     }
     data.worldState = foldForSight(data, state.outsider);   // the lens draws the town's fold, not your drafts (WLD-26)
-    world = sightOf(assembleWorld({ worldState: data.worldState, skeleton: data.skeleton }));
+    // a skeleton whose height dials cannot be read draws flat and says so, never
+    // a blank page (WLD-97 W1: an office clone one settlement behind the page)
+    world = sightOf(assembleWorld({ worldState: data.worldState, skeleton: data.skeleton, whenHeightsUnread: "flat" }));
+    if (world.heightsUnread) console.warn(`[world] ${world.heightsUnread}`);
     byId = new Map(allMarks().map((m) => [m.id, m]));
     homeSet = buildHomeSet(world.marks);
     pinnedBuiltId = null; // the record moved: an open bubble is now stale prose

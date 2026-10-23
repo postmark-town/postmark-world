@@ -49,7 +49,7 @@ const DEFAULT_CROSSING = Number(arg("--crossing", 19)); // fog is the crossing's
 //
 // Nothing replaces it, because `assembleWorld` already has the replacement and
 // has been using it all along: with no override it calls
-// `deriveHomeControlPoints(marks)`, which is what the BROWSER passes through —
+// `deriveHomeControlPoints(marks, regionAnchors(skeleton))`, which is what the BROWSER passes through —
 // every sited mark at its nearest region anchor's height. So the terrain this
 // CLI reports and the terrain the viewer draws were two different terrains,
 // and the CLI's was the painting's. Measured on the fold at 5f042bb: 64

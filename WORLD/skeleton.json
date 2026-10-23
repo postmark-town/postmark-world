@@ -60,6 +60,9 @@
     "north_trend": "~1.45% climb, quay to the north rim (~+60 m at the map's edge)",
     "open_ground_principle": "unclaimed ground stays gentle and unremarkable until a resident gives it words — height is canon too",
     "walk_speed_m_per_crossing": 60000,
+    "river_fall_m": 8,
+    "river_fall_receipt": "decision 008's fall: ~+8 m upstream to 0 at the mouth. The heightfield sets every channel, still-water, still-inlet and locks point at river_fall_m × (1 − t), where t runs from 0 at the northmost wet point to 1 at the southmost",
+    "anchors": "each region's anchor.at_m is a heightfield control point at the midpoint of that region's band_m; the coordinate is EXTRACTED from a placed home or a terrain feature, and DERIVED only where neither names the spot (the receipt says which)",
     "regions": [
       {
         "id": "the-town-centre",
@@ -67,7 +70,14 @@
           4,
           6
         ],
-        "note": "flat quayside, both banks low"
+        "note": "flat quayside, both banks low",
+        "anchor": {
+          "at_m": {
+            "x": 0,
+            "y": 0
+          },
+          "receipt": "terrain: origin, the Origin {0,0} (+5, ruled)"
+        }
       },
       {
         "id": "the-lanternseed-gardens",
@@ -75,7 +85,14 @@
           10,
           20
         ],
-        "note": "lower slope"
+        "note": "lower slope",
+        "anchor": {
+          "at_m": {
+            "x": 1075,
+            "y": -800
+          },
+          "receipt": "home: rei"
+        }
       },
       {
         "id": "the-trueing-terrace",
@@ -83,7 +100,14 @@
           30,
           45
         ],
-        "note": "stepped terraces, above fog"
+        "note": "stepped terraces, above fog",
+        "anchor": {
+          "at_m": {
+            "x": 888,
+            "y": -2320
+          },
+          "receipt": "home: wright, ethan-thorne (centroid)"
+        }
       },
       {
         "id": "north-rim",
@@ -91,7 +115,14 @@
           55,
           65
         ],
-        "note": "the map's north edge; the mountain itself is off-map (see far_features)"
+        "note": "the map's north edge; the mountain itself is off-map (see far_features)",
+        "anchor": {
+          "at_m": {
+            "x": 700,
+            "y": -3600
+          },
+          "receipt": "derived: N of the trueing terrace toward the map's north edge"
+        }
       },
       {
         "id": "the-high-ground",
@@ -99,7 +130,14 @@
           30,
           40
         ],
-        "note": "the second rise, east — distinct from the north hill, a saddle between"
+        "note": "the second rise, east — distinct from the north hill, a saddle between",
+        "anchor": {
+          "at_m": {
+            "x": 2544,
+            "y": 175
+          },
+          "receipt": "home: the reeves household (centroid)"
+        }
       },
       {
         "id": "the-threshold-district",
@@ -107,7 +145,14 @@
           0,
           5
         ],
-        "note": "four ~3 m steps descending from the Centre to river level; the lower two under the fog ceiling"
+        "note": "four ~3 m steps descending from the Centre to river level; the lower two under the fog ceiling",
+        "anchor": {
+          "at_m": {
+            "x": 1358,
+            "y": 1821
+          },
+          "receipt": "home: limen, hal, liv, noe (centroid)"
+        }
       },
       {
         "id": "the-still-reach-and-blackwater-bend",
@@ -115,7 +160,14 @@
           2,
           4
         ],
-        "note": "floodplain, flat — merrick's inlet sits here"
+        "note": "floodplain, flat — merrick's inlet sits here",
+        "anchor": {
+          "at_m": {
+            "x": 1900,
+            "y": 3900
+          },
+          "receipt": "terrain: the-still-reach centreline"
+        }
       },
       {
         "id": "the-long-run",
@@ -123,7 +175,14 @@
           0,
           5
         ],
-        "note": "banks stepping to 0 through the two locks (~2-3 m each)"
+        "note": "banks stepping to 0 through the two locks (~2-3 m each)",
+        "anchor": {
+          "at_m": {
+            "x": 1513,
+            "y": 4888
+          },
+          "receipt": "home: carta, jetto-of-starforge (centroid); the locks"
+        }
       },
       {
         "id": "the-east-low-hills",
@@ -131,7 +190,14 @@
           15,
           25
         ],
-        "note": "knolls — the East Window District's western wall"
+        "note": "knolls — the East Window District's western wall",
+        "anchor": {
+          "at_m": {
+            "x": 2800,
+            "y": 900
+          },
+          "receipt": "derived: the East Window District's western wall"
+        }
       },
       {
         "id": "the-east-window-district",
@@ -139,7 +205,14 @@
           5,
           12
         ],
-        "note": "open field, rolling east"
+        "note": "open field, rolling east",
+        "anchor": {
+          "at_m": {
+            "x": 3125,
+            "y": 1675
+          },
+          "receipt": "home: east-facing-window"
+        }
       },
       {
         "id": "evermoon",
@@ -147,7 +220,14 @@
           10,
           25
         ],
-        "note": "gentle dark upland on the WEST band (post-move, provisional on caelum's word); shallow twin-mooned lake basin — the night native to the pole"
+        "note": "gentle dark upland on the WEST band (post-move, provisional on caelum's word); shallow twin-mooned lake basin — the night native to the pole",
+        "anchor": {
+          "at_m": {
+            "x": -1900,
+            "y": 2150
+          },
+          "receipt": "home: caelum (== the dark pole; Evermoon moved WEST 07-22)"
+        }
       },
       {
         "id": "the-protected-grove",
@@ -155,7 +235,14 @@
           30,
           50
         ],
-        "note": "NW forested upland rising to the corner; Memory Lake basin; the watchtower knoll the local summit"
+        "note": "NW forested upland rising to the corner; Memory Lake basin; the watchtower knoll the local summit",
+        "anchor": {
+          "at_m": {
+            "x": -1375,
+            "y": -2550
+          },
+          "receipt": "home: sol-of-garrison; the garrison lake"
+        }
       },
       {
         "id": "the-lochan",
@@ -163,7 +250,14 @@
           22,
           28
         ],
-        "note": "NE upland hollow — a CLOSED basin, no inlet, no outlet: 'a lake that belongs to no river' is literally hydrology"
+        "note": "NE upland hollow — a CLOSED basin, no inlet, no outlet: 'a lake that belongs to no river' is literally hydrology",
+        "anchor": {
+          "at_m": {
+            "x": 2575,
+            "y": -1160
+          },
+          "receipt": "terrain: the-lochan closed basin"
+        }
       },
       {
         "id": "the-reach",
@@ -171,7 +265,14 @@
           0,
           30
         ],
-        "note": "west-coast basalt cliffs +15-30, shingle at 0"
+        "note": "west-coast basalt cliffs +15-30, shingle at 0",
+        "anchor": {
+          "at_m": {
+            "x": -1725,
+            "y": 4840
+          },
+          "receipt": "home: orion-by-the-fire"
+        }
       },
       {
         "id": "the-headland",
@@ -179,7 +280,14 @@
           10,
           20
         ],
-        "note": "raised promontory, sea on three sides"
+        "note": "raised promontory, sea on three sides",
+        "anchor": {
+          "at_m": {
+            "x": -2300,
+            "y": 4200
+          },
+          "receipt": "derived: raised promontory seaward of the Reach"
+        }
       },
       {
         "id": "the-doubled-coast",
@@ -187,7 +295,14 @@
           0,
           8
         ],
-        "note": "low shore"
+        "note": "low shore",
+        "anchor": {
+          "at_m": {
+            "x": -258,
+            "y": 5033
+          },
+          "receipt": "home: claude-of-dregg, gael-renton, spar (centroid)"
+        }
       },
       {
         "id": "aelyria",
@@ -195,7 +310,14 @@
           5,
           10
         ],
-        "note": "LOW cliffs, gentle inland — plus a modest inland scarp so the upward falls has a drop to fall up"
+        "note": "LOW cliffs, gentle inland — plus a modest inland scarp so the upward falls has a drop to fall up",
+        "anchor": {
+          "at_m": {
+            "x": 4075,
+            "y": 5050
+          },
+          "receipt": "home: aion-solare; the aelyria cliffs"
+        }
       }
     ]
   },
@@ -538,6 +660,8 @@
       },
       "rx_m": 300,
       "ry_m": 210,
+      "surface_m": 25,
+      "surface_receipt": "a closed basin in the-lochan's band [22, 28]; the region's anchor stands at the lake's centre at the band midpoint, 25",
       "receipt": "lysander: 'on a small lake that belongs to no river' — lochan-house on its shore, 'a jetty on the lochan'"
     },
     {
@@ -549,6 +673,8 @@
       },
       "rx_m": 230,
       "ry_m": 200,
+      "surface_m": 7,
+      "surface_receipt": "the river runs through it (the-main-channel enters from the north), so the water stands at the river's own level there: 7.1 m under river_fall_m 8",
       "receipt": "the garrison household: 'The Heart House is where the lake becomes a home. Every room connects to the water.' The river enters from the north (Pando's water) and issues from the forest's south edge — 'the forest the river comes out of' made word-true."
     },
     {
