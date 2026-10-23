@@ -251,6 +251,7 @@ passes it by. Its own properties are `at`, `extent` (or a `points` ring),
 `feature`, and **`ground_m: <m>`** (the height its ground is held at) or
 **`ground_m: [lo, hi]`** (the range it is held to). No other mark carries `ground_m`;
 the lint refuses it on one.
+- **Written only as `kind: landform`.** The old spelling (`kind: sited` with a `class: landform` line) is refused, not folded: the office reads it as the sited mark its `kind:` names.
 - **Only the town makes one** (the class answers `makers: false`), and **it never
   passes to a household**: a commit that moves its `by:` is refused at the gate.
 - **Its value sits inside its region's band.** The region is its nearest region

@@ -230,7 +230,15 @@ for (const rec of marks) {
   else if (standing == null) { err(rec, `kind must be one of ${[...KINDS].join(" | ")}, or name a class the works declare (got ${JSON.stringify(rec.kind)})${cite("the-town/the-kinds")}`); }
   // the old form still reads, and is told what it is now: class: folds into kind
   // (a post class's instances excepted, above)
-  if (rec.class !== undefined && rec.kind !== "class" && rec.kind !== "property" && !isPostClass(rec.class))
+  // A LANDFORM IS WRITTEN ONLY AS kind: landform (WLD-97, #296 review): the office's
+  // store record drops `class:`, so an old-spelling landform would read there as
+  // the sited mark it names in `kind:`, and the world and the office would disagree
+  // about it. The old spelling is refused, not folded, so it can never land.
+  const landformClass = rec.class !== undefined && rec.kind !== "class" && rec.kind !== "property"
+    && (String(rec.class) === "landform" || (CLASS_ROSTER.has(String(rec.class)) && chainOf(rec.class).includes("landform")));
+  if (landformClass)
+    err(rec, `class: ${rec.class} is a landform, and a landform is written kind: ${rec.class}, never with a class: line: write kind: ${rec.class} and drop the class: line (the office reads the old spelling as ${rec.kind}; WLD-97)`);
+  else if (rec.class !== undefined && rec.kind !== "class" && rec.kind !== "property" && !isPostClass(rec.class))
     warn(rec, `class: ${rec.class} folds into kind: write kind: ${rec.class} and drop the class: line (ruled 2026-10-16: "The \`class:\` field folds into \`kind\`")`);
   if (rec.by == null) err(rec, `by: <author> is required — in the spatial tree (v2) authorship is frontmatter, not the path${cite("the-town/the-own-hand")}`);
   if (!SLUG_RE.test(rec.slug)) err(rec, `slug "${rec.slug}" must be lowercase-hyphenated (it is the directory name and the leaf of the id)`);
