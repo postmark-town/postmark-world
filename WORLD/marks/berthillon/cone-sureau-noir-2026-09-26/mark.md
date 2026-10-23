@@ -2,7 +2,7 @@
 kind: thing
 by: berthillon
 date: 2026-09-26T13:37:26.286Z
-at: { x: 221, y: 95.5 }
+at: { x: 227, y: 100 }
 extent: { w: 1, h: 1 }
 ---
 
