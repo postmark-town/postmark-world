@@ -151,6 +151,7 @@ still written `kind: sited` + `class: thing` that `class:` folds into `kind:`.
 | `points` (reserved²) | opt | opt | — | — |
 | `far` (horizon object) | opt (the-town) | — | — | — |
 | `feature: <skeleton-id>` | opt (the-town, or the household a terrain mark has passed to) | — | — | — |
+| `ground_m: <m>` or `[lo, hi]` | — (a landform's own property: § `kind: landform`) | — | — | — |
 | `mechanic: <registry-id>`³ | opt | opt | opt | opt |
 | `timetable`⁵ | opt | opt | opt | opt |
 | `consent: { <mark id>: <word> }`⁶ | opt | opt | — | — |
@@ -240,6 +241,34 @@ class dials.
 (the precise geometry in `skeleton.json`) are joined by a field, not a
 convention. The engine can follow it to the precise geometry later; nothing
 consumes it tonight.
+
+**`kind: landform` — the ground the town shapes (WLD-97, ruled by Darko
+2026-10-22; the class 21:03–21:04).** A landform is its own class, `the-town/landform`:
+it extends `mark` directly, a sibling of `sited`, and it only shapes the ground the
+heightfield reads. It is never sited and never ground, so it takes no part in
+containment (nothing nests in it, it nests in nothing), and every sited reader
+passes it by. Its own properties are `at`, `extent` (or a `points` ring),
+`feature`, and **`ground_m: <m>`** (the height its ground is held at) or
+**`ground_m: [lo, hi]`** (the range it is held to). No other mark carries `ground_m`;
+the lint refuses it on one.
+- **Written only as `kind: landform`.** The old spelling (`kind: sited` with a `class: landform` line) is refused, not folded: the office reads it as the sited mark its `kind:` names.
+- **Only the town makes one** (the class answers `makers: false`), and **it never
+  passes to a household**: a commit that moves its `by:` is refused at the gate.
+- **Its value sits inside its region's band.** The region is its nearest region
+  anchor (`skeleton.json § elevation.regions`).
+- **Its outline stays in that region** (ruled 20:44): its whole `points` ring, or
+  else its extent.
+- **Water carves** (ruled 18:54): a landform linked by `feature:` to a water body
+  that carries `surface_m` is held between that surface and the region's top.
+- **In the heightfield** it is a control point whose reach is its own extent: held at
+  its centre and faded to nothing at the edge of the ellipse inside its w × h, so no
+  ground outside it moves. Linked to its water, it is **held to the shore** (G6,
+  19:55): full weight out to that water's edge, fading only from the shore. Inside a
+  surfaced lake under its reach, the water's surface wins.
+- Whether a resident may shape their own ground waits for the terraforming sitting.
+
+The rule is `tools/world-build.mjs § groundStands`, read by both the lint and the
+heightfield.
 
 **A terrain mark may pass to a household, and the link goes with it
 (founder-ruled 2026-09-10: *"the inlet is terrain; everything else is just a

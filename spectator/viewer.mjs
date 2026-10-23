@@ -21,7 +21,7 @@
 // One engine, imported the clone's way (relative into the package): the browser
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
-import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy, isLandform, kindIndexOf } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
 import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creature's ring stops at its room's walls (WLD-25)
 import { assembleWorld } from "../tools/world-build.mjs";
@@ -10931,8 +10931,13 @@ export function mountViewer(appEl) {
     let fpEpoch = -1;
     function buildFpLayer() {
       let s = "";
-      for (const m of allMarks()) {
+      const drawn = allMarks();
+      const kidx = kindIndexOf(drawn);
+      for (const m of drawn) {
         if (!m.at || !m.extent || isAmbientMark(m, byId)) continue;
+        // a landform only shapes the ground (WLD-97): the page draws nothing for one
+        // until Darko rules a look, and its outline is not a mark to click
+        if (isLandform(m, kidx)) continue;
         const cls = markClasses(m) + (m.kind === "parcel" ? " fp-parcel" : "") + (m.mechanic ? " mech" : "");
         s += markShapeSVG(m, fpPx, `wv-fp ${cls}`, {
           attrs: ` data-id="${esc(m.id)}"`, inner: `<title>${esc(m.id)}</title>`,

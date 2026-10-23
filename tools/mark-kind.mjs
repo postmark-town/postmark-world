@@ -48,7 +48,26 @@ export function instanceClassOf(m) {
   return m.kind != null && !STANDING_WORDS.has(String(m.kind)) ? String(m.kind) : undefined;
 }
 
-export const isSited = (m) => !!m && !!m.at && !NEVER_GROUND.has(String(m.kind));
+// A LANDFORM (WLD-97, ruled by Darko 2026-10-22 21:03–21:04): a class that extends
+// `mark` directly, a sibling of sited. It carries a place, an outline and its
+// `ground_m`, and it only shapes the ground the heightfield reads: it is never
+// sited and never ground, so containment and every sited reader pass it by. Only
+// the town makes one (its class answers makers: false).
+export const LANDFORM = "landform";
+/**
+ * A landform, by the class it names, in either form (`kind: landform`, or the old
+ * `kind: sited` + `class: landform`). Handed a class index, it walks the chain, so
+ * a class that extends landform is one too; with none in hand (the place proxy's
+ * readers) only the name itself can answer.
+ */
+export const isLandform = (m, idx = null) => {
+  const k = instanceClassOf(m);
+  if (k == null) return false;
+  if (k === LANDFORM) return true;
+  return !!idx && classChain(idx, k).some((c) => String(c.class) === LANDFORM);
+};
+
+export const isSited = (m) => !!m && !!m.at && !NEVER_GROUND.has(String(m.kind)) && !isLandform(m);
 
 export const isGround = (m) => !!m && !!m.at && (m.kind === "parcel" || isSited(m));
 
@@ -132,7 +151,7 @@ export function kindIndexOf(marks) {
 
 /**
  * How a record stands: "sited", "parcel", "predicate", "naming", "post",
- * "class", "property", or null (an instance of a class under none of them).
+ * "landform", "class", "property", or null (an instance of a class under none of them).
  *   - A standing word still answers for itself (`kind: sited`, `kind: parcel`,
  *     and a post class's instances, which keep their old form until the post
  *     lane: WLD-73 G7).
@@ -147,6 +166,9 @@ export function standingOf(m, idx) {
   if (kind === "naming") return "naming";
   if (kind === "predicated" || kind === "predicate") return "predicate";
   if (kind == null) return null;
+  // a landform answers by its class BEFORE the standing words: the old spelling
+  // (kind: sited + class: landform) is a landform, never a sited mark (review of #296)
+  if (isLandform(m, idx)) return LANDFORM;
   if (STANDING_WORDS.has(kind)) return kind;
   const chain = idx ? classChain(idx, kind).map((c) => String(c.class)) : [];
   if (!chain.includes("postmark-node")) return m.at ? "sited" : null;

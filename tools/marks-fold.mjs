@@ -1633,6 +1633,10 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // mark carries — stops by mark id, departures, pace. tools/vessel.mjs derives
       // the vessel's position from THIS fold, never from a file.
       mechanic: mk.mechanic, top_m: mk.top_m, feature: mk.feature, points: mk.points,
+      // ground_m (WLD-97 part 2): the height a town mark holds the ground at
+      // (world-build.mjs § the ground the town shapes); undefined on every mark
+      // without one, so the published world is unchanged until one is written.
+      ground_m: mk.ground_m,
       timetable: mk.timetable,
       // entry (DEMO SLICE, step 5 — jetto/enter-exit-demo): the mark's standing
       // ENTRY LAW, the three-key clause the crossing reads at the threshold
