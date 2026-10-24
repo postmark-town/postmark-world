@@ -6670,6 +6670,13 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-convo.is-live { fill:rgba(183,198,212,.12); stroke:#b7c6d4; stroke-width:2;
   stroke-dasharray:none; animation:wv-convo-breathe 3.2s ease-in-out infinite; }
 .wv-convo.is-aboard { stroke-dasharray:6 5; }
+/* the badge (POS-779): a pale gray-white disc carrying the conversation icon; the ring is the
+   shared dotted line when the thread is from an earlier settlement, solid and breathing when live */
+.wv-convo-disc { fill:#cfd6dd; }
+.wv-convo-badge .wv-convo { fill:none; stroke:#7f93a6; }
+.wv-convo-badge .wv-convo.is-live { stroke:#ffffff; }
+.wv-convo-badge.is-cooling { opacity:.55; }
+.wv-convo-badge .ov-ic { pointer-events:none; }
 .wv-hl-label.wv-hl-convo { color:#b7c6d4; }
 .pannable.over-convo { cursor:pointer; }
 @keyframes wv-convo-breathe { 0%,100% { stroke-opacity:.9; } 50% { stroke-opacity:.45; } }
@@ -7236,7 +7243,7 @@ const MARKUP = `
                the rail no longer offers them. -->
           <button type="button" class="ctl wv-outsider-toggle" aria-pressed="false" hidden aria-label="view as an outsider"
             title="view as an outsider: the world as a stranger sees it, as if your household owned nothing (read-only)">👁</button>
-          <button class="ctl wv-map-convo" aria-label="conversations" title="where the town is talking — live threads and the last day's, drawn as the ground they covered; labels link to the record">💬</button>
+          <button class="ctl wv-map-convo on" aria-label="conversations" title="where the town is talking — one badge per conversation, kept for the settlement; hover for the words, click to read it">💬</button>
           <button type="button" class="ctl wv-tour-open" aria-label="Take the tour"
             title="a short tour of the world">?</button>
           </div>
@@ -10093,7 +10100,9 @@ export function mountViewer(appEl) {
     const convoLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     convoLayer.setAttribute("id", "wv-convo-layer");
     convoLayer.style.pointerEvents = "none";
-    convoLayer.style.display = "none"; // OFF until asked for (Keemin: the bubbles were blocking the painting)
+    // ON by default since POS-779 (Darko 2026-10-24): a conversation is one thread per place per
+    // settlement now, so one badge each, and "there will be less bubbles now". The 💬 button still hides it.
+    convoLayer.style.display = convoVisible ? "" : "none";
     svg.appendChild(convoLayer);
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "g");
     overlay.setAttribute("id", "wv-overlay");
@@ -10141,7 +10150,7 @@ export function mountViewer(appEl) {
     const convoHoverLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     convoHoverLayer.setAttribute("id", "wv-convo-hover-layer");
     convoHoverLayer.style.pointerEvents = "none";
-    convoHoverLayer.style.display = "none"; // rides the same toggle as its washes
+    convoHoverLayer.style.display = convoVisible ? "" : "none"; // rides the same toggle as its badges
     stageTop.appendChild(convoHoverLayer);
     // THE LIVE CREATURES (play fix 35) ride the stage's top, over the Mists'
     // paint: they stand in the fringe, which the paint's banks haze over, and a
@@ -10165,7 +10174,8 @@ export function mountViewer(appEl) {
       // box at 1.6× — ~19px type instead of the 12px the marks' box uses
       // (Keemin: at the marks' size these words were not legible)
       const unit = (bounds.width > 0 ? view.w / bounds.width : 1) * 1.6;
-      const at = { x: originPx.x + hit.cx / mPerPx, y: originPx.y + (hit.cy - hit.ryM) / mPerPx };
+      // above the badge: its radius and a gap, in painting units (the badge is counter-scaled, so 1/k)
+      const at = { x: originPx.x + hit.cx / mPerPx, y: originPx.y + hit.cy / mPerPx - (CONVO_BADGE_R + 6) / markerScale(mapCtx?.zoomK ?? 1) };
       convoHoverLayer.innerHTML = hoverLabelSVG({ text: hit.words, at, unit, view, className: "wv-hl-label wv-hl-convo" });
     }
     boxEl.innerHTML = "";
@@ -10981,6 +10991,8 @@ export function mountViewer(appEl) {
     // first toggle is not also the first correction
     mapCtx.refit();
     if (lastRadial) drawOverlay(lastRadial);
+    // the conversations layer is on by default (POS-779), so it loads with the map, not on a first click
+    if (convoVisible) Promise.resolve().then(() => loadConversations()).then(drawConversations).catch(() => {});
   }
   // What the painting draws: the field of view, plus all of yours whether it holds
   // them or not. The filter chips are the Telling's business and this asks them
@@ -11050,6 +11062,7 @@ export function mountViewer(appEl) {
     mapCtx._scaleKey = key; mapCtx._scaleOverlay = mapCtx.overlay;
     mapCtx.overlay.style.setProperty("--wv-mk", overlayScale(k));
     mapCtx.creatureLayer?.style.setProperty("--wv-mk", overlayScale(k));   // the live creatures (play fix 35)
+    mapCtx.convoLayer?.style.setProperty("--wv-mk", overlayScale(k));      // the conversation badges (POS-779)
     // THE WALK LAYER IS SIZED THE SAME WAY (#2912 (3)): the bodies through
     // `.ov-s`, the vessel through her own floor (see vesselGlyphSVG). Two
     // properties on one element per frame; no walker markup is touched.
@@ -12118,7 +12131,7 @@ export function mountViewer(appEl) {
   // earshot_m, fade_minutes (the DISPLAY fade) and hearable_since (the ear's window: the settlement)
   let convoMeta = null;
   const convoMetaOf = (body) => Object.fromEntries(["earshot_m", "fade_minutes", "hearable_since"].filter((k) => Object.hasOwn(body ?? {}, k)).map((k) => [k, body[k]]));
-  let convoVisible = false; // the layer is opt-in (upper-right 💬); hidden draws nothing, hits nothing, fetches nothing
+  let convoVisible = true;  // on by default since POS-779 (upper-right 💬 hides it); hidden draws nothing, hits nothing, fetches nothing
   async function loadConversations() {
     try {
       const r = await fetch(officeUrl("/world/conversations"), { credentials: "same-origin" });
@@ -12443,28 +12456,44 @@ export function mountViewer(appEl) {
     return new Set(hung.map((m) => m.id));
   }
 
-  // ── conversations on the ground ────────────────────────────────────────────
-  // Each thread draws as the ground it covered: the office ships an extent — a
-  // bbox over EVERY statement in the thread, not just the shown tail — and the
-  // wash is that box grown by half an earshot, because a voice fills a room,
-  // not a point. Live threads carry their label (place · statements · speakers);
-  // a finished conversation fades to bare geometry and leaves the map after a
-  // day — the conversations page is the archive, this layer answers "where is
-  // the town talking right now". Same-named places holding several distinct
-  // circles (three "Volvigradus Garden" threads on party night) is exactly what
-  // this layer exists to disambiguate: the words collide, the ground does not.
-  const CONVO_PAD_M = 30;                        // half an earshot: the room around the words
-  const CONVO_CLOSED_KEEP_MS = 24 * 3600 * 1000; // a cooling mark, then the page remembers
-  // The drawn ellipses in WORLD metres, smallest-first — the click and the
-  // hover pick the most specific room when circles nest (a garden thread sat
-  // inside the party's wash on the night this shipped).
+  // ── conversations on the map: ONE BADGE PER THREAD ───────────────────────────
+  // Darko 2026-10-24 (POS-779/b): "one badge per thread … change the default to
+  // toggle on for the bubbles (and have a distinct icon for each conversation,
+  // like we do for sited marks, dungeons, creatures, etc) given there will be
+  // less bubbles now. I think sticking with the gray-white is fine."
+  //
+  // A thread is one place per settlement now (the office groups by earshot and
+  // splits only at a settlement), so the wash that drew the ground it covered —
+  // a box that grows all settlement long — is replaced by a badge at the place
+  // the conversation IS now (the thread's own point, the latest voice): the
+  // conversation icon of the mark-icons family (a speech bubble, as a dungeon
+  // has its keep and a creature its diamond) on a pale gray-white disc, held at
+  // a constant size on screen like a creature (`.ov-s`). Live threads are solid
+  // and breathe; a thread from the previous settlement stays a day as a faint,
+  // dotted cooling badge, then leaves (the conversations page is the archive).
+  const CONVO_CLOSED_KEEP_MS = 24 * 3600 * 1000; // a cooling badge, then the page remembers
+  const CONVO_BADGE_R = 9;                       // painting units at ov-s scale 1: the disc's radius
+  const CONVO_HIT_MIN_PX = 13;                   // a badge is a small target; reach a little past it
+  // The drawn badges in WORLD metres — the click and the hover pick the nearest.
   let convoHits = [];
   const convoAt = (wx, wy) => convosAt(wx, wy)[0] ?? null;
-  // every wash holding the point, most specific first (row 63's rule counts them all)
-  const convosAt = (wx, wy) => (!convoVisible ? [] : convoHits.filter((h) => {
-    const nx = (wx - h.cx) / h.rxM, ny = (wy - h.cy) / h.ryM;
-    return nx * nx + ny * ny <= 1;
-  }));
+  // The reach of a badge in metres at the current zoom: its disc counter-scales
+  // (1/k painting units), so its metres are fixed by the marker scale, with a
+  // floor in screen pixels so it stays easy to hit.
+  const convoHitM = () => {
+    const m = mapCtx;
+    if (!m?.mPerPx) return 0;
+    const k = markerScale(m.zoomK ?? 1);
+    const mpp = m.paneW > 0 && m.view?.w ? (m.view.w / m.paneW) * m.mPerPx : 0;
+    return Math.max((CONVO_BADGE_R * m.mPerPx) / k, CONVO_HIT_MIN_PX * mpp);
+  };
+  // every badge holding the point, nearest first (row 63's rule counts them all)
+  const convosAt = (wx, wy) => {
+    if (!convoVisible) return [];
+    const r = convoHitM();
+    return convoHits.map((h) => ({ h, d: Math.hypot(wx - h.cx, wy - h.cy) })).filter((o) => o.d <= r)
+      .sort((a, b) => a.d - b.d).map((o) => o.h);
+  };
   // the island serves /conversations/ same-origin; on the local spectator the
   // link 404s, which is the dev-server's honest shape (it has no site around it)
   const convoHref = (id) => `/conversations/#${encodeURIComponent(id)}`;
@@ -12474,34 +12503,30 @@ export function mountViewer(appEl) {
     let s = "";
     const hits = [];
     const paint = (t, live) => {
-      if (!t?.at) return;
-      // A deck thread's box is the length of the water it crossed — true of the
-      // crossing, wrong as a room. The vessel is the room: it draws at the
-      // thread's own point instead (voices.mjs threadOf ships the flag).
-      const e = t.aboard || !t.extent ? { x0: t.at.x, y0: t.at.y, x1: t.at.x, y1: t.at.y } : t.extent;
-      const cxM = (e.x0 + e.x1) / 2, cyM = (e.y0 + e.y1) / 2;
-      const rxM = (e.x1 - e.x0) / 2 + CONVO_PAD_M, ryM = (e.y1 - e.y0) / 2 + CONVO_PAD_M;
-      // a wash says nothing until pointed at; the words it says then ride the
-      // hit, spoken by the SAME name-box a mark raises (renderConvoHover).
-      // The box truncates at 58 chars, so the PLACE carries the cut and the
-      // numbers always survive — a long place name was eating '· 1 speaker'
-      // off the tail (the same class the old labels were fixed for once).
+      if (!t?.at || !Number.isFinite(t.at.x) || !Number.isFinite(t.at.y)) return;
+      // The words it says when pointed at ride the hit, spoken by the SAME
+      // name-box a mark raises (renderConvoHover). The box truncates at 58
+      // chars, so the PLACE carries the cut and the numbers always survive.
       const n = Number(t.voice_count) || 0, p = (t.participants ?? []).length;
-      const tail = `${n} statement${n === 1 ? "" : "s"} · ${p} speaker${p === 1 ? "" : "s"}${live ? "" : " · gone quiet"}`;
+      const tail = `${n} statement${n === 1 ? "" : "s"} · ${p} speaker${p === 1 ? "" : "s"}${live ? "" : " · earlier settlement"}`;
       let where = String(t.place ?? "somewhere");
       const room = 58 - tail.length - 3;
       if (where.length > room) where = `${where.slice(0, Math.max(8, room - 1))}…`;
       const words = `${where} — ${tail}`;
-      if (t.id) hits.push({ id: t.id, cx: cxM, cy: cyM, rxM, ryM, live, words });
-      const c = px(cxM, cyM);
-      const rx = rxM / mapCtx.mPerPx, ry = ryM / mapCtx.mPerPx;
-      s += `<ellipse cx="${c.x}" cy="${c.y}" rx="${rx}" ry="${ry}" class="wv-convo${live ? " is-live" : ""}${t.aboard ? " is-aboard" : ""}"/>`;
+      if (t.id) hits.push({ id: t.id, cx: t.at.x, cy: t.at.y, live, words });
+      const c = px(t.at.x, t.at.y);
+      // the glyph is the family's own (mark-icons.mjs), cut into the disc in the page's dark
+      s += `<g transform="translate(${c.x} ${c.y})"><g class="ov-s"><g class="wv-convo-badge${live ? " is-live" : " is-cooling"}${t.aboard ? " is-aboard" : ""}" data-convo="${esc(String(t.id ?? ""))}">`
+        + `<circle r="${CONVO_BADGE_R}" class="wv-convo-disc"/>`
+        + iconSVG({ key: "conversation" }, { x: -6, y: -6, size: 12, ink: "#2b323a" })
+        + `<circle r="${CONVO_BADGE_R}" class="wv-convo${live ? " is-live" : ""}"/>`
+        + `</g></g></g>`;
     };
     const t0 = Date.now();
     for (const t of convoState.closed)
       if (t0 - Date.parse(t.latest) <= CONVO_CLOSED_KEEP_MS) paint(t, false);
     for (const t of convoState.live) paint(t, true); // live paints over cooled
-    convoHits = hits.sort((a, b) => a.rxM * a.ryM - b.rxM * b.ryM); // most specific room first
+    convoHits = hits;
     mapCtx.convoLayer.innerHTML = s;
   }
 
