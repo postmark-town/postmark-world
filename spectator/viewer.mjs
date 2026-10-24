@@ -10103,7 +10103,7 @@ export function mountViewer(appEl) {
     // ON by default since POS-779 (Darko 2026-10-24): a conversation is one thread per place per
     // settlement now, so one badge each, and "there will be less bubbles now". The 💬 button still hides it.
     convoLayer.style.display = convoVisible ? "" : "none";
-    svg.appendChild(convoLayer);
+    // (appended below, after the walkers: a badge floats over the speakers it names, POS-779)
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "g");
     overlay.setAttribute("id", "wv-overlay");
     svg.appendChild(overlay);
@@ -10125,6 +10125,7 @@ export function mountViewer(appEl) {
     const walkLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     walkLayer.setAttribute("id", "wv-walk-layer");
     svg.appendChild(walkLayer);
+    svg.appendChild(convoLayer); // ABOVE the walkers (POS-779): a conversation badge hangs over the faces that are talking, never under them
     // THE MISTS' WALL (POS-466): above everything the record draws, walkers
     // included, because nothing behind the wall may be seen or clicked
     const mistsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -10175,7 +10176,7 @@ export function mountViewer(appEl) {
       // (Keemin: at the marks' size these words were not legible)
       const unit = (bounds.width > 0 ? view.w / bounds.width : 1) * 1.6;
       // above the badge: its radius and a gap, in painting units (the badge is counter-scaled, so 1/k)
-      const at = { x: originPx.x + hit.cx / mPerPx, y: originPx.y + hit.cy / mPerPx - (CONVO_BADGE_R + 6) / markerScale(mapCtx?.zoomK ?? 1) };
+      const at = { x: originPx.x + hit.cx / mPerPx, y: originPx.y + hit.cy / mPerPx - (CONVO_LIFT + CONVO_BADGE_R + 6) / markerScale(mapCtx?.zoomK ?? 1) };
       convoHoverLayer.innerHTML = hoverLabelSVG({ text: hit.words, at, unit, view, className: "wv-hl-label wv-hl-convo" });
     }
     boxEl.innerHTML = "";
@@ -12473,6 +12474,7 @@ export function mountViewer(appEl) {
   // dotted cooling badge, then leaves (the conversations page is the archive).
   const CONVO_CLOSED_KEEP_MS = 24 * 3600 * 1000; // a cooling badge, then the page remembers
   const CONVO_BADGE_R = 9;                       // painting units at ov-s scale 1: the disc's radius
+  const CONVO_LIFT = 16;                         // painting units at ov-s scale 1: the badge hangs this far above its point, like a speech bubble
   const CONVO_HIT_MIN_PX = 13;                   // a badge is a small target; reach a little past it
   // The drawn badges in WORLD metres — the click and the hover pick the nearest.
   let convoHits = [];
@@ -12491,7 +12493,8 @@ export function mountViewer(appEl) {
   const convosAt = (wx, wy) => {
     if (!convoVisible) return [];
     const r = convoHitM();
-    return convoHits.map((h) => ({ h, d: Math.hypot(wx - h.cx, wy - h.cy) })).filter((o) => o.d <= r)
+    const lift = (CONVO_LIFT * mapCtx.mPerPx) / markerScale(mapCtx.zoomK ?? 1); // the badge hangs above its point
+    return convoHits.map((h) => ({ h, d: Math.hypot(wx - h.cx, wy - (h.cy - lift)) })).filter((o) => o.d <= r)
       .sort((a, b) => a.d - b.d).map((o) => o.h);
   };
   // the island serves /conversations/ same-origin; on the local spectator the
@@ -12517,9 +12520,9 @@ export function mountViewer(appEl) {
       const c = px(t.at.x, t.at.y);
       // the glyph is the family's own (mark-icons.mjs), cut into the disc in the page's dark
       s += `<g transform="translate(${c.x} ${c.y})"><g class="ov-s"><g class="wv-convo-badge${live ? " is-live" : " is-cooling"}${t.aboard ? " is-aboard" : ""}" data-convo="${esc(String(t.id ?? ""))}">`
-        + `<circle r="${CONVO_BADGE_R}" class="wv-convo-disc"/>`
+        + `<g transform="translate(0 ${-CONVO_LIFT})"><circle r="${CONVO_BADGE_R}" class="wv-convo-disc"/>`
         + iconSVG({ key: "conversation" }, { x: -6, y: -6, size: 12, ink: "#2b323a" })
-        + `<circle r="${CONVO_BADGE_R}" class="wv-convo${live ? " is-live" : ""}"/>`
+        + `<circle r="${CONVO_BADGE_R}" class="wv-convo${live ? " is-live" : ""}"/></g>`
         + `</g></g></g>`;
     };
     const t0 = Date.now();
