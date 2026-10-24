@@ -786,6 +786,78 @@ export const ONE_PER_RESIDENT_REFUSAL =
   "this resident already holds a parcel; a household may hold up to three, one per resident "
   + `(${ONE_PER_RESIDENT_LAW}; relocation = replace, not add)`;
 
+// ── PARCELS FROM 11-01 (Darko, 2026-10-22; Linear POS-762) ──────────────────
+//
+//   20:33 EDT "any household that joins before the end of the month, so before
+//             Halloween, gets to register up to 3 parcels. And then after that,
+//             it will just be 1 parcel per household with extra parcels
+//             purchasable with stamps."
+//   20:35 EDT "let's price parcels at 50 stamps per parcel you already have."
+//   20:42 EDT (the picker) settled by Halloween's end; keep one per resident;
+//             pay stamps to the town.
+//
+// Darko ruled the cutoff as "settled by Halloween's end". The fact is the
+// household's DECLARATION day (`since`, in town time), never the day it came
+// ashore: a household whose declaration is dated on or before 2026-10-31 (town
+// time; the cutoff is 2026-11-01 04:00Z) keeps the claim cap of three for good.
+// A household declared later holds ONE parcel,
+// plus one for each room it has bought, and never more than three. One per
+// resident (above) still holds for every household. Darko, 2026-10-23 09:51
+// EDT: room is bought AHEAD (POS-762/e "Buy room ahead": "a household act burns
+// the stamps and adds one parcel of room for good; a claim then costs
+// nothing"), at 50 stamps times the room already bought (POS-762/f "Room
+// bought": "room 1->2 costs 50, 2->3 costs 100, whatever is held"), paid to the
+// town and never returned. The town's ledger records each one as a burn
+// (`for: parcel:<nth>/<household>`, postmark tools/stamp-mint.mjs).
+//
+// THE FACTS ARE THE OFFICE'S, THE RULE IS THIS FILE'S. The fold cannot see the
+// day a household was declared or what it paid, so the office hands both in, per
+// household key (the values of `households`), as `houseFacts`:
+// `{ [key]: { since, bought } }`. `since` is the household's declaration day as
+// the town wrote it (a town-time date string, the registry's `since`), and
+// `bought` is how many parcels it has bought (the office reads its highest
+// parcel burn on the ledger, less one, so a duplicate line never adds room).
+// A household with no facts keeps the cap of three: every household before the office feeds facts, every
+// solo handle, and every house when the office could not read its sources. So
+// this law is dark until the office speaks, and it can only ever LOWER a cap.
+export const PARCEL_SETTLED_BY = "2026-11-01T04:00:00Z";
+/** The last US-Eastern day a household may settle on and keep three: the day before PARCEL_SETTLED_BY's, in the town's own date. */
+export const PARCEL_SETTLED_BY_DAY = "2026-10-31";
+export const NEW_HOUSEHOLD_PARCELS = 1;
+/** Stamps per parcel of room the household already has, for its next room. */
+export const PARCEL_PRICE_STAMPS = 50;
+
+/**
+ * A household's parcel room: how many parcels the claim cap lets it hold.
+ * PARCEL_CLAIM_CAP when it was declared by the cutoff or nothing is known about it;
+ * otherwise NEW_HOUSEHOLD_PARCELS plus the parcels it bought, never past the cap.
+ */
+export function parcelRoomOf(fact) {
+  const since = typeof fact?.since === "string" ? fact.since.slice(0, 10) : "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(since) || since <= PARCEL_SETTLED_BY_DAY) return PARCEL_CLAIM_CAP;
+  const bought = Number.isInteger(fact.bought) && fact.bought > 0 ? fact.bought : 0;
+  return Math.min(PARCEL_CLAIM_CAP, NEW_HOUSEHOLD_PARCELS + bought);
+}
+
+/** What a household's next room costs: 50 × the room it already has, whatever it holds (POS-762/f). */
+export const nextRoomPrice = (room) => PARCEL_PRICE_STAMPS * Math.max(1, room);
+
+/**
+ * The claim cap's refusal, at both of the fold's cap sites. A household whose
+ * room is below the cap hears the November law: its room, the cutoff and the
+ * price. At the cap it hears the 07-30 sentence, unchanged. Both begin
+ * "parcel claim capped", the words the settlement cites the-town/claim-cap by
+ * (postmark-office src/world-settlement.mjs § LIMITS).
+ */
+export function parcelCapRefusal(held, room = PARCEL_CLAIM_CAP) {
+  if (room >= PARCEL_CLAIM_CAP)
+    return `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)`;
+  return `parcel claim capped — this household holds ${held} parcel${held === 1 ? "" : "s"} and has room for ${room}. `
+    + `A household whose declaration is dated after ${PARCEL_SETTLED_BY_DAY} (town time; the cutoff is ${PARCEL_SETTLED_BY}) holds ${NEW_HOUSEHOLD_PARCELS === 1 ? "one parcel" : `${NEW_HOUSEHOLD_PARCELS} parcels`}; `
+    + `it buys room ahead for each further parcel, at ${PARCEL_PRICE_STAMPS} stamps × the room it already has (its next room: ${nextRoomPrice(room)} stamps), `
+    + `paid to the town and never returned, up to ${PARCEL_CLAIM_CAP}, one per resident (${CLAIM_CAP_LAW})`;
+}
+
 // PRIOR ESTATE UNDER ONE PER RESIDENT — a second parcel a resident holds by the
 // founder's word, per parcel (the claim cap's map above answers a different
 // rule). It stands; the household's claim cap still counts it; and it is NEVER
@@ -1039,7 +1111,7 @@ export function householdKeyGrain(households) {
   return "mixed";
 }
 
-export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, fanup = "legacy", townWords = null, townLaws = null }) {
+export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DIALS, households = null, houseFacts = null, fanup = "legacy", townWords = null, townLaws = null }) {
   const errors = [];
   const terrainIds = new Set((terrain?.features ?? []).map(f => "terrain:" + f.id));
   const byId = new Map();
@@ -1099,8 +1171,10 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
     if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: ONE_PER_RESIDENT_REFUSAL }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
-    if (String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
-      errors.push({ mark: mk.id, error: `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)` });
+    // the household's room: three, or one plus what it bought when it was declared after 10-31 (§ parcels from 11-01)
+    const room = parcelRoomOf(houseFacts?.[cred]);
+    if (String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= room && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
+      errors.push({ mark: mk.id, error: parcelCapRefusal(held, room) });
       continue;
     }
     const clash = parcels.find(p => overlapArea(p._r, r) > 0);
@@ -2025,7 +2099,7 @@ To read the fold without writing it at all: --no-write --json`);
  * (the PUBLIC shape) rather than from fold's internals, so `fold`'s signature is
  * untouched and this cannot drift with a change to its locals.
  */
-export function admissionBase(state, { households = null, stakes = [] } = {}) {
+export function admissionBase(state, { households = null, houseFacts = null, stakes = [] } = {}) {
   const marks = state?.marks ?? [];
   const byId = new Map(marks.map((mk) => [mk.id, mk]));
   const credOf = (handle) => households?.[handle] ?? `solo:${handle}`;
@@ -2050,7 +2124,9 @@ export function admissionBase(state, { households = null, stakes = [] } = {}) {
   const netByMark = new Map();
   for (const row of stakes ?? []) netByMark.set(row.mark, (netByMark.get(row.mark) ?? 0) + Number(row.n ?? 0));
 
-  return { byId, credOf, parcelRectsByCred, parcelByHh, parcelsByCred, netByMark };
+  // the household's parcel room, from the same facts the whole fold reads (§ parcels from 11-01)
+  const roomOf = (cred) => parcelRoomOf(houseFacts?.[cred]);
+  return { byId, credOf, roomOf, parcelRectsByCred, parcelByHh, parcelsByCred, netByMark };
 }
 
 const sameRect = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
@@ -2188,8 +2264,10 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
         continue;
       }
       const held = countByCred.get(cred) ?? 0;
-      if (!mk._replacing && String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= PARCEL_CLAIM_CAP && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
-        errors.push({ mark: mk.id, error: `parcel claim capped — this credential household already holds ${held} (cap ${PARCEL_CLAIM_CAP} per household, ruled ${PARCEL_CAP_LAW_DATE}; prior estate stands, new claims wait on the founder's word)` });
+      // a base built before the room existed has no roomOf, and every household keeps three
+      const room = typeof base.roomOf === "function" ? base.roomOf(cred) : PARCEL_CLAIM_CAP;
+      if (!mk._replacing && String(claimInstant(mk) ?? "") > PARCEL_CAP_LAW_DATE && held >= room && !PARCEL_CAP_EXCEPTIONS.has(mk.id)) {
+        errors.push({ mark: mk.id, error: parcelCapRefusal(held, room) });
         continue;
       }
       const prior = mk._replacing ? rect(base.byId.get(mk.id) ?? {}) : null;

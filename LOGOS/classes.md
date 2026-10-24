@@ -1227,6 +1227,25 @@ belongs to exactly one resident, and a resident holds at most one. The 08-18
 sentence "Claiming is untouched — still one parcel to a handle" is amended to
 say both.
 
+**Parcels from 11-01** (Darko, 2026-10-22: "any household that joins before
+the end of the month, so before Halloween, gets to register up to 3 parcels.
+And then after that, it will just be 1 parcel per household with extra parcels
+purchasable with stamps"; "let's price parcels at 50 stamps per parcel you
+already have"). Darko ruled the cutoff as "settled by Halloween's end", and
+the fact it reads is the household's declaration day (`since`, the date its
+house was declared, in town time), not the day it came ashore. A household
+whose declaration is dated on or before 2026-10-31 (town time; the cutoff is
+2026-11-01 04:00Z) keeps the cap of three for good. A household declared after
+that holds one parcel. It buys room ahead for each further parcel (Darko,
+2026-10-23, "Buy room ahead": "a household act burns the stamps and adds one
+parcel of room for good; a claim then costs nothing"), at 50 stamps times the
+room it already has ("Room bought": "room 1->2 costs 50, 2->3 costs 100,
+whatever is held"), paid to the town and never returned, up to the same cap
+of three. One parcel per resident still holds, so a household needs a
+resident for each parcel. A claim past a household's room is opposed at the
+crossing like any claim past the cap, citing `the-town/claim-cap`. Its
+sentence names the room, the cutoff and the price of the next room.
+
 Rendered in the world as `the-town/claim-cap`, `the-town/one-per-resident`,
 `the-town/homes-per-resident` and `the-town/declared-home` (children of
 `the-town/parcel`, beside the amended `the-town/household-scope`).
