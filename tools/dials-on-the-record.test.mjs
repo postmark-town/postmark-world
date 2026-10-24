@@ -102,15 +102,15 @@ test("the dials carry their claim: every one is a readable sentence, none is a b
 test("the record has no lull clock: conversation_lull_min is retired (POS-779, Darko 2026-10-24)", () => {
   // A conversation never expires inside a settlement and splits only at one, so
   // the say edge carries no second grouping dial. The folded world-state.json is
-  // regenerated at the settlement, so this reads the mark FILES: the node must be
-  // gone from the tree and its clause must say so.
+  // regenerated at the settlement, so this reads the mark FILES: the node stands
+  // on main (the harm gate refuses a standing mark that is merely deleted) but
+  // its own sentence says it is retired, and its clause says so.
   const dir = join(ROOT, "WORLD", "marks", "let-there-be-light", "the-town-centre", "the-keeping-works", "postmark-edge", "say");
-  assert.equal(existsSync(join(dir, "conversation-lull-min")), false, "the retired dial's node is withdrawn");
+  const node = readFileSync(join(dir, "conversation-lull-min", "mark.md"), "utf8");
+  assert.ok(node.includes("RETIRED, SUPERSEDED 2026-10-24 (Darko, POS-779)"), "the node says it is retired, in its own sentence");
   const clause = readFileSync(join(dir, "the-hearing-and-the-record", "mark.md"), "utf8");
   assert.match(clause, /SUPERSEDED 2026-10-24/, "the clause that named the lull carries the supersession");
   assert.match(clause, /conversation_lull_min/, "and names what it retired");
-  const contain = JSON.parse(readFileSync(join(ROOT, "WORLD", "containment.json"), "utf8"));
-  assert.equal(contain.marks.some((m) => m.id === "the-town/conversation-lull-min"), false, "containment does not stand it either");
   assert.equal(Object.hasOwn(SAY_DIALS, "conversation_lull_min"), false, "and the ruling's own list no longer asks for it");
   // the clause itself stands as a node, under its own name
   assert.ok(byId.has("the-town/the-hearing-and-the-record"),

@@ -7243,7 +7243,7 @@ const MARKUP = `
                the rail no longer offers them. -->
           <button type="button" class="ctl wv-outsider-toggle" aria-pressed="false" hidden aria-label="view as an outsider"
             title="view as an outsider: the world as a stranger sees it, as if your household owned nothing (read-only)">👁</button>
-          <button class="ctl wv-map-convo on" aria-label="conversations" title="where the town is talking — one badge per conversation, kept for the settlement; hover for the words, click to read it">💬</button>
+          <button class="ctl wv-map-convo" aria-label="conversations" title="where the town is talking — one badge per conversation, kept for the settlement; hover for the words, click to read it">💬</button>
           <button type="button" class="ctl wv-tour-open" aria-label="Take the tour"
             title="a short tour of the world">?</button>
           </div>
@@ -10760,7 +10760,7 @@ export function mountViewer(appEl) {
         // click won't do.
         const clear = !snappedMarkAtPoint({ x: e.clientX, y: e.clientY }, screenWalkerCandidates());
         const wp = clear ? worldPointForEvent(e) : null;
-        const hit = wp ? convoAt(wp.x, wp.y) : null;
+        const hit = wp ? convoClickAt(wp.x, wp.y) : null;
         hoverMark(hit ? null : hoverTargetForEvent(e));
         boxEl.classList.toggle("over-convo", Boolean(hit));
         renderConvoHover(hit);
@@ -10828,16 +10828,17 @@ export function mountViewer(appEl) {
         return;
       }
       if (washes.length && (here.all.length || washes.length > 1)) { openChooser([...here.all, ...washes]); return; }
-      // THE TALK LENS WINS WHILE IT IS UP (Keemin, launch night: with washes
+      // THE TALK LENS WINS ON ITS OWN BADGE (Keemin, launch night: with washes
       // sharing ground with pips and parcels, "sometimes the click reached
-      // the thread" read as broken). The layer is opt-in — switching 💬 on IS
-      // the statement of intent — so while it shows, a click on a wash goes
-      // to the thread for everyone, losing only to a face: a small, precise
-      // target you aimed at. Toggled off (the default), the washes are gone
-      // and every click means exactly what it meant before the layer existed.
+      // the thread" read as broken). The layer is ON by default now (POS-779,
+      // Darko 2026-10-24), so it must not eat the walk: a reader who can act
+      // opens the thread only by clicking the badge's own disc, and a click on
+      // the ground beside it walks as ever; a spectator keeps the easy reach.
+      // Hidden (the 💬 button), the badges are gone and every click means what
+      // it meant before the layer existed.
       {
         const wp = worldPointForEvent(e);
-        const hit = convoAt(wp.x, wp.y); // visibility-gated: always null while hidden
+        const hit = convoClickAt(wp.x, wp.y); // visibility-gated: always null while hidden
         // a NEW tab (Keemin): the reader is mid-world with a lens up and a
         // camera aimed — the thread opens beside the map, never over it
         if (hit) { window.open(convoHref(hit.id), "_blank", "noopener"); return; }
@@ -10982,6 +10983,7 @@ export function mountViewer(appEl) {
       convoLayer.style.display = on ? "" : "none";
       convoHoverLayer.style.display = on ? "" : "none";
       convoVisible = on;
+      convoStore(on);
       if (on) loadConversations().then(drawConversations);
       else { renderConvoHover(null); boxEl.classList.remove("over-convo"); }
       return on;
@@ -10993,6 +10995,7 @@ export function mountViewer(appEl) {
     mapCtx.refit();
     if (lastRadial) drawOverlay(lastRadial);
     // the conversations layer is on by default (POS-779), so it loads with the map, not on a first click
+    $(root, ".wv-map-convo")?.classList.toggle("on", convoVisible); // the lit button follows the layer, remembered or default
     if (convoVisible) Promise.resolve().then(() => loadConversations()).then(drawConversations).catch(() => {});
   }
   // What the painting draws: the field of view, plus all of yours whether it holds
@@ -12132,7 +12135,12 @@ export function mountViewer(appEl) {
   // earshot_m, fade_minutes (the DISPLAY fade) and hearable_since (the ear's window: the settlement)
   let convoMeta = null;
   const convoMetaOf = (body) => Object.fromEntries(["earshot_m", "fade_minutes", "hearable_since"].filter((k) => Object.hasOwn(body ?? {}, k)).map((k) => [k, body[k]]));
-  let convoVisible = true;  // on by default since POS-779 (upper-right 💬 hides it); hidden draws nothing, hits nothing, fetches nothing
+  // THE READER'S OWN CHOICE persists per browser (POS-779, review): the default is on, a reader who
+  // switched it off stays off. Storage can be absent or throw (private windows, blocked data); then the default stands.
+  const CONVO_KEY = "pm.world.conversations";
+  const convoStored = () => { try { const v = globalThis.localStorage?.getItem(CONVO_KEY); return v === "off" ? false : v === "on" ? true : null; } catch { return null; } };
+  const convoStore = (on) => { try { globalThis.localStorage?.setItem(CONVO_KEY, on ? "on" : "off"); } catch { /* the choice just does not persist */ } };
+  let convoVisible = convoStored() ?? true;  // on by default since POS-779 (upper-right 💬 hides it); hidden draws nothing, hits nothing, fetches nothing
   async function loadConversations() {
     try {
       const r = await fetch(officeUrl("/world/conversations"), { credentials: "same-origin" });
@@ -12490,9 +12498,10 @@ export function mountViewer(appEl) {
     return Math.max((CONVO_BADGE_R * m.mPerPx) / k, CONVO_HIT_MIN_PX * mpp);
   };
   // every badge holding the point, nearest first (row 63's rule counts them all)
-  const convosAt = (wx, wy) => {
+  const convosAt = (wx, wy, { disc = false } = {}) => {
     if (!convoVisible) return [];
-    const r = convoHitM();
+    // `disc`: only the badge's own disc, no easy-target reach past it
+    const r = disc ? (CONVO_BADGE_R * mapCtx.mPerPx) / markerScale(mapCtx.zoomK ?? 1) : convoHitM();
     const lift = (CONVO_LIFT * mapCtx.mPerPx) / markerScale(mapCtx.zoomK ?? 1); // the badge hangs above its point
     return convoHits.map((h) => ({ h, d: Math.hypot(wx - h.cx, wy - (h.cy - lift)) })).filter((o) => o.d <= r)
       .sort((a, b) => a.d - b.d).map((o) => o.h);
@@ -12500,6 +12509,11 @@ export function mountViewer(appEl) {
   // the island serves /conversations/ same-origin; on the local spectator the
   // link 404s, which is the dev-server's honest shape (it has no site around it)
   const convoHref = (id) => `/conversations/#${encodeURIComponent(id)}`;
+  // What a plain click or hover on the map means for a thread (POS-779, review): a
+  // reader who CAN ACT is walking the map, so only the badge's own disc is the
+  // thread's; ground merely near it is still ground. A spectator has nothing to
+  // walk, so the reach stays easy.
+  const convoClickAt = (wx, wy) => (canAct() ? convosAt(wx, wy, { disc: true })[0] ?? null : convoAt(wx, wy));
   function drawConversations() {
     if (!mapCtx?.convoLayer || !convoVisible) return;
     const px = (x, y) => ({ x: mapCtx.originPx.x + x / mapCtx.mPerPx, y: mapCtx.originPx.y + y / mapCtx.mPerPx });

@@ -13,10 +13,10 @@ const ruleOf = (sel) => { const at = SOURCE.indexOf(`
 ${sel} {`); return at < 0 ? "" : SOURCE.slice(at, SOURCE.indexOf("}", at)); };
 
 test("the bubbles layer defaults ON, and its button says so", () => {
-  assert.match(SOURCE, /let convoVisible = true;/);
+  assert.ok(SOURCE.includes("let convoVisible = convoStored() ?? true;"), "on unless the reader chose off");
   assert.match(SOURCE, /convoLayer\.style\.display = convoVisible \? "" : "none";/);
   assert.match(SOURCE, /convoHoverLayer\.style\.display = convoVisible \? "" : "none";/);
-  assert.match(SOURCE, /<button class="ctl wv-map-convo on"/, "the lit button matches the lit layer");
+  assert.ok(SOURCE.includes("classList.toggle(\"on\", convoVisible)"), "the lit button matches the layer");
   assert.match(SOURCE, /if \(convoVisible\) Promise\.resolve\(\)\.then\(\(\) => loadConversations\(\)\)\.then\(drawConversations\)/, "it loads with the map, not on a first click");
 });
 
@@ -38,4 +38,19 @@ test("the glyph is in the family, and gray-white", () => {
 test("the hit reach is a badge's, in metres, at the current zoom — nearest first", () => {
   assert.match(SOURCE, /const convoHitM = \(\) => \{/);
   assert.match(SOURCE, /\.sort\(\(a, b\) => a\.d - b\.d\)\.map\(\(o\) => o\.h\)/);
+});
+
+test("review: a reader who can act opens a thread only from its own disc; the ground beside it still walks (POS-779)", () => {
+  assert.match(SOURCE, /const convoClickAt = \(wx, wy\) => \(canAct\(\) \? convosAt\(wx, wy, \{ disc: true \}\)\[0\] \?\? null : convoAt\(wx, wy\)\);/);
+  assert.match(SOURCE, /const hit = convoClickAt\(wp\.x, wp\.y\); \/\/ visibility-gated/);
+  assert.match(SOURCE, /const hit = wp \? convoClickAt\(wp\.x, wp\.y\) : null;/, "the hand cursor promises what the click does");
+  assert.doesNotMatch(SOURCE, /Toggled off \(the default\)/, "the stale comment is gone");
+});
+
+test("review: the reader's own choice persists per viewer, in try/catch, and the lit button follows the layer", () => {
+  assert.match(SOURCE, /let convoVisible = convoStored\(\) \?\? true;/);
+  assert.match(SOURCE, /const convoStored = \(\) => \{ try \{ const v = globalThis\.localStorage\?\.getItem\(CONVO_KEY\)/);
+  assert.match(SOURCE, /try \{ globalThis\.localStorage\?\.setItem\(CONVO_KEY, on \? "on" : "off"\); \} catch/);
+  assert.match(SOURCE, /convoStore\(on\);/);
+  assert.match(SOURCE, /classList\.toggle\("on", convoVisible\)/);
 });

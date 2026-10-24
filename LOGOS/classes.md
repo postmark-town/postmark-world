@@ -1352,10 +1352,12 @@ deck); the **time** split is gone. Every voice at one location in one
 settlement is ONE thread, and a thread splits only at the settlement, the same
 edge hearing has. The say edge keeps six dials: `earshot_m`, `fade_min` (the
 display fade), `speak_every_s`, `text_max`, `hear_max`, `presence_min`. The node
-`the-town/conversation-lull-min` is withdrawn (SUPERSEDED 2026-10-24: its
-sentence, *"Minutes of silence that end one conversation in the RECORD"*, no
-longer states a law), and the clause `the-hearing-and-the-record` carries the
-supersession. The World page draws one badge per thread, not a wash per
+`the-town/conversation-lull-min` is RETIRED IN PLACE, not deleted (SUPERSEDED
+2026-10-24: its old sentence, *"Minutes of silence that end one conversation in
+the RECORD"*, no longer states a law, and the node's own words now say so; the
+standing record keeps it, nothing reads it, and the town's withdraw verb is the
+separate act that would remove it), and the clause `the-hearing-and-the-record`
+carries the supersession. The World page draws one badge per thread, not a wash per
 statement-cluster (the viewer, same ruling). `thread_close_min` on the **sound**
 class is a different dial for a different class and is not touched.
 
