@@ -20,7 +20,7 @@ import {
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
 import { unpublishVerdict, rowClassOf } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
-import { isHeld, heldBy, holdOnlyChange } from "./mark-kind.mjs"; // POS-688: published but unplaced
+import { isHeld, heldBy, holdOnlyChange, handOffOnly } from "./mark-kind.mjs"; // POS-688: published but unplaced
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -1407,7 +1407,15 @@ export function settlementSweep({
       // berth's grant reach main: `the-town` is bound to no household by
       // construction, so it passed as an unverifiable stranger. Nothing signed
       // by the town publishes from a sketchbook, whatever the registry knows.
-      if (townOwned(record)) {
+      //
+      // ONE THING PASSES IT: a hand-off. Holding a thing is not authoring it, and
+      // a hand-off prints the town's own record of where a thing is (held_by,
+      // owned_by, and the place leaving or returning), so it lands on a thing
+      // the town signed as on any other. `handOffOnly` is the whole of what
+      // passes: every other field of the mark must read as it does on main, and
+      // a place that moves while the thing stays on the ground is still the
+      // author's move, which the wall still refuses.
+      if (townOwned(record) && !handOffOnly(mainRecordAt(repo, mainBranch, delta.path), record)) {
         leftDrafted.push({ household, id: record.id, path: delta.path,
           reason: `the town wall: "${record.by}" writes the town's own record, which a founder's pen rules onto main and no sketchbook admits` });
         continue;
