@@ -1,17 +1,4 @@
 {
   "about": "Named exceptions to the portal lint (tools/portals.mjs § the lint; tools/mark-lint.mjs § 10). The rules carry no exceptions of their own (Darko, 2026-10-13, WLD-5): a portal that strands whoever takes it refuses the crossing. An entry here lets ONE finding through, by name: { mark, rule, by, why }, appended by whoever answers for it, and mark-lint prints it as a warning on every run, so the record shows the door was let through and by whom. An entry that excuses nothing is warned about too. Rules: into-names-a-mark, lands-at-names-a-mark, lands-at-reaches-into, exit-never-opposed, path-to-an-exit, rooms-do-not-overlap, landing-inside, requires-names-marks, requires-in-a-holder, exit-carries-no-requires.",
-  "exceptions": [
-    {
-      "mark": "wright/spire-gilded-doors",
-      "rule": "lands-at-names-a-mark",
-      "by": "jetto-of-starforge",
-      "why": "the heist (WLD-18): the Gilded Doors jammed behind him; the Bug Catcher's fix reverts this line and its twin"
-    },
-    {
-      "mark": "wright/the-starforge-spire",
-      "rule": "lands-at-names-a-mark",
-      "by": "jetto-of-starforge",
-      "why": "the heist (WLD-18): the Spire's own entry jammed with its doors, so no way in walks past them; reverted with its twin"
-    }
-  ]
+  "exceptions": []
 }
