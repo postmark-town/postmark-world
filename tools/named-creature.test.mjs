@@ -67,7 +67,9 @@ test("a kind class's named creatures are read whole: one id each, a place, what 
     ["creature:candied-jetto-the-star-chapel", undefined, 272],
     ["creature:candied-raven-mirror-room", "the-town/the-mirror-room-key", 272],
     ["creature:candied-wolf-hall-of-keepers", "the-town/the-hall-of-keepers-key", 272],
-  ], "the law declares the season's three, each with its key, none before the heist");
+    ["creature:candied-wolf-hall-of-keepers-again", "the-town/the-hall-of-keepers-key", 274],
+  ], "the law declares the season's three, each with its key, none before the heist, and the wolf once more from crossing 274");
+  assert.deepEqual(creatureLaw(marks).named.find((d) => d.id === "creature:candied-wolf-hall-of-keepers-again").after, ["creature:candied-wolf-hall-of-keepers"], "the second wolf waits for the first to have ended");
   assert.deepEqual(creatureLaw(withNamed("wolf", JSON.stringify([{ slug: "den", at: { x: 1, y: 2 } }]))).named.filter((d) => d.kind === "wolf").map((d) => d.id), ["creature:wolf-den"], "a JSON string is read as its list");
 });
 
