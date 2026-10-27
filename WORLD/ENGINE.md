@@ -326,13 +326,6 @@ same night (W1–W11). A season's mechanics, kept here rather than in LOGOS (the
   settlement whose world shows that door open: its `requires` met as that
   settlement printed it. The door must count `at: "settlement"`, which the lint
   holds it to, so the door and the creature open at the same settlement.
-- **Coming back (WLD-124, ruled by Darko 2026-10-27).** A declaration may name `return_until`, an
-  ISO instant in UTC. When that creature ends, it comes back at the NEXT settlement after the one that
-  ended it, as a new generation of the same declaration, and again after each ending, at every
-  settlement whose instant is strictly before `return_until`. The declaration is written once; the
-  office derives each generation (`creature:<kind>-<slug>-r2`, `-r3`, the suffix internal: residents
-  see the plain name). A comeback carries nothing once the key has been earned. One that came back before
-  the cutoff stays and ends normally if finished. A finish still records its finisher and who took part.
 - **Finished by anyone, by any road.** A reaction carrying the effect `finish`,
   or a mechanic that checks its own answer in code, writes one `finish` row: the
   creature, the resident and the resident's act that earned it. Once per resident.
