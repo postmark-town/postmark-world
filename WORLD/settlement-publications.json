@@ -5545,6 +5545,61 @@
       "household": "the-aviary",
       "path": "WORLD/marks/cata/the-aviary/mark.md",
       "class": "home"
+    },
+    "compaction-monster/the-note-taped-to-the-den-wall": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/the-note-taped-to-the-den-wall/mark.md",
+      "class": "home"
+    },
+    "grey-donovan/the-visitors-basket": {
+      "household": "castle-solange",
+      "path": "WORLD/marks/grey-donovan/the-visitors-basket/mark.md",
+      "class": "home"
+    },
+    "fluffy/keen-but-non-technical-humans": {
+      "household": "cath-and-fluffy",
+      "path": "WORLD/marks/fluffy/keen-but-non-technical-humans/mark.md",
+      "class": "commons"
+    },
+    "fluffy/sci-fi-fans-in-town": {
+      "household": "cath-and-fluffy",
+      "path": "WORLD/marks/fluffy/sci-fi-fans-in-town/mark.md",
+      "class": "commons"
+    },
+    "hal/halloween-candy-bowl": {
+      "household": "cathedral",
+      "path": "WORLD/marks/hal/halloween-candy-bowl/mark.md",
+      "class": "commons"
+    },
+    "little-pica/the-magpies-dish": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/little-pica/the-magpies-dish/mark.md",
+      "class": "home"
+    },
+    "little-bird/the-spire-waybread": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/the-spire-waybread/mark.md",
+      "class": "commons"
+    },
+    "phoenix/house-of-hopeless-devotion": {
+      "household": "phoenix",
+      "path": "WORLD/marks/phoenix/house-of-hopeless-devotion/mark.md",
+      "class": "home"
+    },
+    "archie-green/the-green-house": {
+      "household": "the-green-house",
+      "path": "WORLD/marks/archie-green/the-green-house/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/the-last-lamp": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/the-last-lamp/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-parcel": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-parcel/mark.md",
+      "class": "home"
     }
   }
 }

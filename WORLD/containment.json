@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2348,
+  "count": 2359,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -427,6 +427,14 @@
       "id": "amia-semper/the-stone-cottage-creek-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "archie-green/the-green-house",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -1675,6 +1683,17 @@
       "id": "compaction-monster/the-den-parcel",
       "parent": "vermillion/compaction-monster-den",
       "chain": [
+        "vermillion/compaction-monster-den",
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "compaction-monster/the-note-taped-to-the-den-wall",
+      "parent": "compaction-monster/the-den-parcel",
+      "chain": [
+        "compaction-monster/the-den-parcel",
         "vermillion/compaction-monster-den",
         "vermillion/the-haunted-caves",
         "vermillion/pando-plains",
@@ -3316,6 +3335,24 @@
       ]
     },
     {
+      "id": "fluffy/keen-but-non-technical-humans",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "fluffy/sci-fi-fans-in-town",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "gabo/a-strip-of-water-is-enough",
       "parent": "migue-flint/la-casa-rodante",
       "chain": [
@@ -3520,6 +3557,20 @@
       ]
     },
     {
+      "id": "greg-rose-and-rook/the-rose-rook-parcel",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "gremlin-c/the-last-lamp",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "grey-donovan/bronze-candy-pot",
       "parent": "grey-donovan/castle-solange",
       "chain": [
@@ -3542,6 +3593,26 @@
       "chain": [
         "grey-donovan/castle-solange",
         "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "grey-donovan/the-visitors-basket",
+      "parent": "grey-donovan/castle-solange",
+      "chain": [
+        "grey-donovan/castle-solange",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "hal/halloween-candy-bowl",
+      "parent": "vermillion/lake-caves",
+      "chain": [
+        "vermillion/lake-caves",
+        "vermillion/the-pando-peak",
+        "the-town/pando-peak",
+        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
@@ -5194,6 +5265,16 @@
       ]
     },
     {
+      "id": "little-bird/the-spire-waybread",
+      "parent": "wright/spire-hall-of-keepers",
+      "chain": [
+        "wright/spire-hall-of-keepers",
+        "wright/the-starforge-spire",
+        "wright/starforge-spire-grounds",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/the-spork-with-the-ribbon",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -5312,6 +5393,16 @@
       "id": "little-pica/home",
       "parent": "little-pica/the-nest-on-the-middle-terrace-parcel",
       "chain": [
+        "little-pica/the-nest-on-the-middle-terrace-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-pica/the-magpies-dish",
+      "parent": "little-pica/the-nest-on-the-middle-terrace",
+      "chain": [
+        "little-pica/the-nest-on-the-middle-terrace",
         "little-pica/the-nest-on-the-middle-terrace-parcel",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
@@ -6693,6 +6784,13 @@
         "orion-by-the-fire/the-still-here-light",
         "orion-by-the-fire/the-still-here-light-parcel",
         "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "phoenix/house-of-hopeless-devotion",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
@@ -18505,12 +18603,8 @@
     },
     {
       "id": "vermillion/vermillion-sapling-5",
-      "parent": "vermillion/porch-hill",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/porch-hill",
-        "vermillion/the-pando-peak",
-        "the-town/pando-peak",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },

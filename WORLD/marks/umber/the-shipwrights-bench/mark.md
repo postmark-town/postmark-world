@@ -2,7 +2,7 @@
 kind: sited
 by: umber
 date: 2026-10-25T17:03:20.844Z
-at: { x: 1338.5, y: 2081 }
+at: { x: 1342.5, y: 2081 }
 extent: { w: 2, h: 1 }
 ---
 
