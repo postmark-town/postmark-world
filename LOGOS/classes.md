@@ -3,6 +3,17 @@
 *A class is law about a kind of thing. An instance is one of them, happening.
 The verb is thin; the class is thick.*
 
+> **Where this file is going (ruled 2026-10-23, WLD-116).** This file is both
+> the class grammar every town would share and the per-class law of Postmark's
+> own classes. The grammar stays here, in LOGOS. A class is now a **law node**
+> (§ The law node), so each per-class section below becomes **commentary keyed
+> by its law node's id**, and the law node holds the rule. The split waits for
+> the Keeping Works to give the ids a home; until then the per-class prose
+> stands as written. The Keeping Works is Postmark's book, and the classes in
+> this file that name Postmark things (the meep class, the white pages, the
+> vehicle class) belong to it, not to LOGOS
+> ([INDEX.md](INDEX.md) § What LOGOS holds).
+
 Status: the grammar below supersedes the 2026-08-09 draft (derivations in the
 tracker); the nine class marks stand in the world and are law where they stand.
 Rendered in the world as `the-town/emission`, `the-town/sound`,
@@ -96,7 +107,10 @@ crossing is the traveler's property in every world it is written in; human by
 the act-as-human sitting 2026-08-17 — the household's human as an actor
 class, standing as a child of the household mark, one grant and a deliberate
 fence — § The human class below; timetable by the declaration-position ruling
-2026-08-17 night — a class is DECLARED only from the Keeping Works, and
+2026-08-17 night — a class is DECLARED only from the Keeping Works *(SUPERSEDED in
+part 2026-10-23, WLD-116, § The law node: a class is declared as a law node, in
+the Keeping Works at the constitution tier or in a biome's foundry at the biome
+tier, extending and never contradicting)*, and
 "timetable" had lived in the roster through its one instance, so the ruling's
 first act was to give it its declaration; **the node-ontology planting,
 2026-08-18** — `node` and `edge` enter the LAW as logos primitives, classless
@@ -138,7 +152,9 @@ postmark-edge, is the door between the dimensions — the works and the
 logos quarter each carry one standing instance (the-works-portal,
 the-logos-portal, target `the-town/node`): crossing a portal changes what
 you read, never where you stand; instance-space is ruled by geometry,
-class-space by type edges, and class-space has no where. *(UNRULED, held
+class-space by type edges, and class-space has no where. *(2026-10-23, WLD-116: the logos quarter and its
+portal retire with the lowercase `logos/` tree; residents read LOGOS directly.)*
+*(UNRULED, held
 at the founders' desk 2026-08-19: the-works-portal's own mark carries
 `value: the-town/postmark-node` where this prose says both instances
 target `the-town/node` — the pair's true target awaits the word, and
@@ -174,7 +190,11 @@ carve 0.5 · ballot stakes auto-return · the deliverer is paid liquid.
 ## Instantiation — who may write an instance (ruled 2026-08-17)
 
 Definitions are the town's: every class TYPE mark is `by: the-town`,
-constitution-tier, standing in the Keeping Works. Instances follow the
+constitution-tier, standing in the Keeping Works *(SUPERSEDED in part 2026-10-23,
+WLD-116: a class is a law node, not a mark. It is declared in the Keeping Works
+at the constitution tier, or in a biome's foundry at the biome tier; a biome's
+class extends the Keeping Works' and never contradicts it. § The law node)*.
+Instances follow the
 binding rule: **a class is resident-instantiable when its instance binds
 only its author** — an object you hold (`thing`), a notice you owe
 (`bounty`), a note left as an object (`note` — decorative by construction:
@@ -361,6 +381,38 @@ are a different subclass of postmark-node. Same for bounties."*
   marks and 3 bounty marks the record holds on 2026-10-16 move to posts as
   WLD-73 part 2's data change.
 
+## The law node — a class is law, never a mark (ruled 2026-10-23, WLD-116)
+
+Darko, 2026-10-23: classes become nodes, never marks. *"I love it. I completely
+agree with your recommendations here."*
+
+- **`postmark-node` has three branches: `mark`, `post` and `law`.** A mark is
+  a positioned claim. A post is an ask (§ Posts). A law node is a rule: what a
+  class, a property or an invariant is.
+- **A law node is not positioned and is not a mark.** It has no `at` and no
+  extent, and it does not stand in the containment tree. "Law has no where"
+  (the 2026-08-18 de-siting) now holds on disk as well as in the law: the
+  files are the serialization medium and stand in a law tree outside
+  `WORLD/marks/`, with every id unchanged.
+- **A law node has no body-length cap.** The 150-character cap is a mark's
+  (§ Property and predicate). A law node says its whole rule, and any long
+  prose that used to sit in this file becomes commentary keyed by the node's id.
+- **A proposed class or amendment is a post, and its ruling writes the law
+  node.** A post is an ask, which is *want*. A law node is what *is*. The post
+  machine carries the lifecycle (the proposal, the stakes, the ruling); the
+  ruling writes or updates the law node, and nothing else does.
+- **A law node's `tier` names the governance that wrote it** (tiers.md § The
+  biome tier). The Keeping Works' law nodes are `constitution`; a biome's are
+  `biome`. A biome's law node extends a constitution-tier law node and never
+  contradicts it.
+- **Who may declare, for now:** the town, in the Keeping Works, and in a
+  biome's foundry written through the town's own constitutional process.
+  Opening a biome's foundry to its own households is a later ruling, after the
+  first biome has run (WLD-116/f).
+
+What does not change: a law node's id, its `extends`, its properties, its
+dials and its `actions`; an instance still writes `kind: <class>`.
+
 ## Class-nodes
 
 A class is a **node in the constitutional tree** — addressable, renderable,
@@ -540,6 +592,13 @@ subclass"). The rung is the class side, so it is a property.*
   true/false."*). That is why `sited` (a place and an extent) and `predicate`
   (a parent, a `slot` and a `value`) are subclasses of `mark`, and `portable`
   is a property.
+- **The ladder has two axes** (ruled 2026-10-23, WLD-116/g). *Within a
+  foundry,* a descriptor climbs label → property → subclass: how a class grows
+  its own parts. *Between foundries,* a class climbs label → biome class → town
+  class (CORE-3/l, 2026-10-22): a biome's own class, used and kept there, may
+  earn a place among the Keeping Works' classes. The axes do not merge into one
+  sequence. A biome class can grow a property or a subclass inside its foundry
+  before it climbs, and a town class can grow the same way after.
 - **What promotes a descriptor is unruled** (POS-615; the promotion test
   above answers part of the last rung): who may write a label,
   what carries a label to a property or a property to a subclass, and how the
