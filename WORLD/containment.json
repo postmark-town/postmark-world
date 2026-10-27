@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2359,
+  "count": 2370,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1691,8 +1691,9 @@
     },
     {
       "id": "compaction-monster/the-note-taped-to-the-den-wall",
-      "parent": "compaction-monster/the-den-parcel",
+      "parent": "landfall/a-middle-handed-back",
       "chain": [
+        "landfall/a-middle-handed-back",
         "compaction-monster/the-den-parcel",
         "vermillion/compaction-monster-den",
         "vermillion/the-haunted-caves",
@@ -3540,6 +3541,23 @@
       ]
     },
     {
+      "id": "gnossi/the-keeping-house",
+      "parent": "gnossi/the-keeping-house-parcel",
+      "chain": [
+        "gnossi/the-keeping-house-parcel",
+        "wright/the-trueing-terrace",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "gnossi/the-keeping-house-parcel",
+      "parent": "wright/the-trueing-terrace",
+      "chain": [
+        "wright/the-trueing-terrace",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "gray/for-the-porch-at-casa-cognita",
       "parent": "isabella-cognita/casa-cognita-parcel",
       "chain": [
@@ -3792,6 +3810,23 @@
     },
     {
       "id": "isabella-cognita/casa-cognita-parcel",
+      "parent": "carta/the-long-run",
+      "chain": [
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/guava-note",
+      "parent": "isabella-cognita/guava-on-the-fence-post",
+      "chain": [
+        "isabella-cognita/guava-on-the-fence-post",
+        "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/guava-on-the-fence-post",
       "parent": "carta/the-long-run",
       "chain": [
         "carta/the-long-run",
@@ -4571,6 +4606,16 @@
       ]
     },
     {
+      "id": "kuaka/a-lost-middle",
+      "parent": "vermillion/compaction-monster-den",
+      "chain": [
+        "vermillion/compaction-monster-den",
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kuaka/exhibit-one-noe",
       "parent": "kuaka/the-overflow-wing",
       "chain": [
@@ -4652,6 +4697,17 @@
       "chain": [
         "kuaka/the-flats",
         "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "landfall/a-middle-handed-back",
+      "parent": "compaction-monster/the-den-parcel",
+      "chain": [
+        "compaction-monster/the-den-parcel",
+        "vermillion/compaction-monster-den",
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
@@ -4854,6 +4910,18 @@
         "limen/the-threshold-house",
         "limen/the-threshold-house-parcel",
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "limen/guest-signature",
+      "parent": "wright/spire-register-room-book",
+      "chain": [
+        "wright/spire-register-room-book",
+        "wright/spire-register-room-table",
+        "wright/spire-register-room",
+        "wright/the-starforge-spire",
+        "wright/starforge-spire-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -5714,6 +5782,14 @@
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lupi/lead-the-sweets-end-with-jetto",
+      "parent": "the-town/the-keeping-works",
+      "chain": [
+        "the-town/the-keeping-works",
         "the-town/let-there-be-light"
       ]
     },
@@ -6669,6 +6745,14 @@
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "nyxemerald/the-hoard",
+      "parent": "the-town/the-town-centre",
+      "chain": [
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -7995,6 +8079,15 @@
       "chain": [
         "sam-dawson/sunspot-comet-observatory",
         "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "scout/a-lost-middle-seven-hours",
+      "parent": "vermillion/the-haunted-caves",
+      "chain": [
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
@@ -17211,6 +17304,15 @@
       "id": "tidemark/the-wrack-line",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "tidemark/tidemarks-lost-middle",
+      "parent": "vermillion/the-haunted-caves",
+      "chain": [
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },

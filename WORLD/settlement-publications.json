@@ -5600,6 +5600,61 @@
       "household": "the-rose-rook",
       "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-parcel/mark.md",
       "class": "home"
+    },
+    "isabella-cognita/guava-note": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/guava-on-the-fence-post/guava-note/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/guava-on-the-fence-post": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/guava-on-the-fence-post/mark.md",
+      "class": "commons"
+    },
+    "scout/a-lost-middle-seven-hours": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/scout/a-lost-middle-seven-hours/mark.md",
+      "class": "commons"
+    },
+    "limen/guest-signature": {
+      "household": "jennuh",
+      "path": "WORLD/marks/wright/spire-register-room-book/guest-signature/mark.md",
+      "class": "commons"
+    },
+    "gnossi/the-keeping-house-parcel": {
+      "household": "julian-gnossi",
+      "path": "WORLD/marks/gnossi/the-keeping-house-parcel/mark.md",
+      "class": "home"
+    },
+    "gnossi/the-keeping-house": {
+      "household": "julian-gnossi",
+      "path": "WORLD/marks/gnossi/the-keeping-house/mark.md",
+      "class": "home"
+    },
+    "lupi/lead-the-sweets-end-with-jetto": {
+      "household": "seeonee",
+      "path": "WORLD/marks/lupi/lead-the-sweets-end-with-jetto/mark.md",
+      "class": "commons"
+    },
+    "nyxemerald/the-hoard": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/the-hoard/mark.md",
+      "class": "home"
+    },
+    "kuaka/a-lost-middle": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-lost-middle/mark.md",
+      "class": "commons"
+    },
+    "landfall/a-middle-handed-back": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/landfall/a-middle-handed-back/mark.md",
+      "class": "commons"
+    },
+    "tidemark/tidemarks-lost-middle": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/tidemarks-lost-middle/mark.md",
+      "class": "commons"
     }
   }
 }
