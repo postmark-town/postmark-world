@@ -59,6 +59,20 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD", "marks"));
 const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by === TOWN && String(m.class) === cls ? { ...m, named } : m));
 
+test("a named creature that returns (WLD-124): return_until is an ISO instant in UTC, carried as written; the season marks three entries", () => {
+  const ok = { slug: "den", at: { x: 1, y: 2 } };
+  const U = "2026-11-01T06:00:00Z";
+  assert.equal(creatureLaw(withNamed("wolf", [{ ...ok, return_until: U }])).named.find((d) => d.kind === "wolf").return_until, U);
+  assert.equal("return_until" in creatureLaw(withNamed("wolf", [ok])).named.find((d) => d.kind === "wolf"), false, "absent when not written");
+  for (const bad of ["2026-11-01", "2026-11-01T02:00:00-04:00", "tomorrow", 7, "2026-13-45T06:00:00Z"])
+    assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, return_until: bad }])), /return_until is .*not an ISO instant in UTC/, String(bad));
+  assert.deepEqual(creatureLaw(marks).named.filter((d) => d.return_until).map((d) => [d.id, d.return_until]), [
+    ["creature:candied-bat-lumber-room", U],
+    ["creature:candied-raven-mirror-room", U],
+    ["creature:candied-wolf-hall-of-keepers-again", U],
+  ], "three entries return, until the settlement at 06:00Z on 11-01 (none after it); the first wolf entry and the boss do not");
+});
+
 test("a kind class's named creatures are read whole: one id each, a place, what it carries and its crossing", () => {
   const law = creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 10, y: -20 }, carries: "the-town/a-thing", from_crossing: 300 }]));
   assert.deepEqual(law.named.filter((d) => d.kind === "wolf"), [{ id: "creature:wolf-den", kind: "wolf", x: 10, y: -20, carries: "the-town/a-thing", from_crossing: 300, declared: "the-town/wolf#den" }]);

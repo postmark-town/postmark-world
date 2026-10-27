@@ -168,7 +168,10 @@ export function creatureLaw(records) {
 
 /**
  * A kind class's named creatures (WLD-25), its mark's `named`: a list of
- * { slug, at: { x, y }, carries?, from_crossing?, after?, after_door? }, read whole like `actions`.
+ * { slug, at: { x, y }, carries?, from_crossing?, after?, after_door?, return_until? }, read whole like `actions`.
+ * `return_until` (WLD-124, 2026-10-27): an ISO instant in UTC. A creature that carries it COMES BACK after
+ * it ends, as a new generation of the same declaration, at each settlement strictly before that instant
+ * (read by the office's creature-tick namedSpawns). The declaration is written once.
  * `after` (a creature that tempts, its fight's opening): the ids of named
  * creatures (creature:<kind>-<slug>) that must all have ended before it comes out.
  * `after_door` (2026-10-22, WLD-25/k): a door's mark id. The creature comes out
@@ -196,9 +199,12 @@ function namedOf(mark, kind) {
       throw new Error(`${where}'s after is ${JSON.stringify(d.after)}, not a list of named creatures' ids`);
     if (d.after_door != null && (typeof d.after_door !== "string" || !d.after_door.includes("/")))
       throw new Error(`${where}'s after_door is ${JSON.stringify(d.after_door)}, not a door's mark id (<by>/<slug>)`);
+    if (d.return_until != null && (typeof d.return_until !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$/.test(d.return_until) || !Number.isFinite(Date.parse(d.return_until))))
+      throw new Error(`${where}'s return_until is ${JSON.stringify(d.return_until)}, not an ISO instant in UTC (YYYY-MM-DDTHH:MM:SSZ)`);
     return { id: `${ID_PREFIX}${kind}-${d.slug}`, kind, x, y, ...(d.carries != null ? { carries: d.carries } : {}),
       ...(d.from_crossing != null ? { from_crossing: d.from_crossing } : {}), ...(d.after != null ? { after: [...d.after] } : {}),
       ...(d.after_door != null ? { after_door: d.after_door } : {}),
+      ...(d.return_until != null ? { return_until: d.return_until } : {}),
       declared: `${TOWN}/${kind}#${d.slug}` };
   });
 }
