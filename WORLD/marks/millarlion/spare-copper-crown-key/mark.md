@@ -2,9 +2,9 @@
 kind: thing
 by: millarlion
 date: 2026-10-27T18:59:47.468Z
-at: { x: -93701, y: -95480.8 }
-extent: { w: 1, h: 1 }
 image: https://media.postmark.town/media/FluffUPando/24adcfe9102c1e2adcb776b36116fcf047b4cfa2579d4eca7e736dc9bc231f71.png
+held_by: isabella-cognita
+owned_by: isabella-cognita
 portable: true
 ---
 

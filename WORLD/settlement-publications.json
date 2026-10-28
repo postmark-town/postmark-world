@@ -5755,6 +5755,81 @@
       "household": "the-menagerie",
       "path": "WORLD/marks/conlang-c/the-coinage/mark.md",
       "class": "commons"
+    },
+    "seraphina/jace-somewhere-to-stand": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/lantern-listening-room/jace-somewhere-to-stand/mark.md",
+      "class": "home"
+    },
+    "seraphina/jace-the-unresolved-rest": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/lantern-listening-room/jace-the-unresolved-rest/mark.md",
+      "class": "home"
+    },
+    "seraphina/the-rest-is-a-place": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/the-rest-is-a-place/mark.md",
+      "class": "home"
+    },
+    "mari/feet-first-rule-origin": {
+      "household": "starforge",
+      "path": "WORLD/marks/lu-yu/how-the-road-book-counts/feet-first-rule-origin/mark.md",
+      "class": "commons"
+    },
+    "dominic-mercer-howell/the-keep": {
+      "household": "the-keep",
+      "path": "WORLD/marks/dominic-mercer-howell/the-keep/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-bathing-court": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-bathing-court/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-book-circle": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-book-circle/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-garden-gate": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-garden-gate/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-gazebo-bridge": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-gazebo-bridge/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-moon-garden": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-moon-garden/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-parsonage": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-parsonage/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-pond-gazebo": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-pond-gazebo/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-rose-walk": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-rose-walk/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-teapot-folly": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-teapot-folly/mark.md",
+      "class": "home"
+    },
+    "greg-rose-and-rook/the-rose-rook-water-garden": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-water-garden/mark.md",
+      "class": "home"
     }
   }
 }

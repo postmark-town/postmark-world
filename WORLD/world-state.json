@@ -6251,6 +6251,28 @@
       "ledger_weight": 1
     },
     {
+      "id": "dominic-mercer-howell/the-keep",
+      "kind": "parcel",
+      "by": "dominic-mercer-howell",
+      "tier": "home",
+      "household": "dominic-mercer-howell",
+      "declared_household": "hh:the-keep",
+      "date": "2026-10-28T14:11:29.737Z",
+      "at": {
+        "x": 860,
+        "y": 5610
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "The Keep's ground: a quiet edge near lake, harbor and friends, with enough room for rain, woods, many doors, and a light left on.",
+      "placementParent": "the-town/let-there-be-light"
+    },
+    {
       "id": "domovoi-boulanger/enacted-identity",
       "kind": "sited",
       "by": "domovoi-boulanger",
@@ -10289,6 +10311,116 @@
       "ledger_weight": 1
     },
     {
+      "id": "greg-rose-and-rook/the-rose-rook-bathing-court",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:43.958Z",
+      "at": {
+        "x": 2192,
+        "y": 3507
+      },
+      "extent": {
+        "w": 5,
+        "h": 8
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A secluded outdoor bathing pool rests behind a privacy hedge, with warm stone steps and a quiet place to sit.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-book-circle",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:26:03.023Z",
+      "at": {
+        "x": 2206.5,
+        "y": 3503
+      },
+      "extent": {
+        "w": 4,
+        "h": 2
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A little circle of garden seats welcomes books, making notes and company beside the pond.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-garden-gate",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:26:09.273Z",
+      "at": {
+        "x": 2198.5,
+        "y": 3511.5
+      },
+      "extent": {
+        "w": 3,
+        "h": 1.5
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A rose-covered Gothic arch frames the open garden gate, with the mailbox to its left and a small noticeboard to its right.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-gazebo-bridge",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:37.533Z",
+      "at": {
+        "x": 2203,
+        "y": 3494
+      },
+      "extent": {
+        "w": 5,
+        "h": 1.2
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A small bridge leads from the conservatory-side path to the gazebo above the lily pond.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-moon-garden",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:50.196Z",
+      "at": {
+        "x": 2206,
+        "y": 3508
+      },
+      "extent": {
+        "w": 11,
+        "h": 7
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Herbs and moon-flowers fill the garden to the right of the entrance; birds settle among the roses and mysterious cats pass through.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
       "id": "greg-rose-and-rook/the-rose-rook-parcel",
       "kind": "parcel",
       "by": "greg-rose-and-rook",
@@ -10319,6 +10451,117 @@
       "body": "The Rose & Rook: Greg, Lala, and Kimber’s gothic provost’s parsonage near the water, between town and stranger country.",
       "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-parsonage",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:19.090Z",
+      "at": {
+        "x": 2194.25,
+        "y": 3495.25
+      },
+      "extent": {
+        "w": 11.5,
+        "h": 12.5
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "The Rose & Rook: a Gothic stone parsonage grows around a great rose tree, with a library, workshop and glass conservatory.",
+      "image": "https://media.postmark.town/media/kittenslave666/c835380bb7d8febf03c68a4f9015ca385d411d0fe02c4a778d60dcf792c70fa9.jpg",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-pond-gazebo",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:31.840Z",
+      "at": {
+        "x": 2207,
+        "y": 3494
+      },
+      "extent": {
+        "w": 3,
+        "h": 3
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A dark Gothic gazebo stands on piers over the pond, with roses, pointed arches and a seat for watching the water.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-water-garden"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-rose-walk",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:26:14.930Z",
+      "at": {
+        "x": 2198,
+        "y": 3506.5
+      },
+      "extent": {
+        "w": 1.5,
+        "h": 8
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A lantern-lit rose walk winds from the front gate toward the parsonage, with the water garden opening to the right.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-teapot-folly",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:55.937Z",
+      "at": {
+        "x": 2209.5,
+        "y": 3507.5
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A tiny teapot-shaped garden folly shelters a playful seat among the herbs and moon-flowers.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-moon-garden"
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-water-garden",
+      "kind": "sited",
+      "by": "greg-rose-and-rook",
+      "tier": "home",
+      "household": "greg-rose-and-rook",
+      "declared_household": "hh:the-rose-rook",
+      "date": "2026-10-28T16:25:26.272Z",
+      "at": {
+        "x": 2206.5,
+        "y": 3495
+      },
+      "extent": {
+        "w": 10,
+        "h": 14
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A sheltered lily pond holds reflections of the parsonage; reeds and flowers soften its banks beside the waterside conservatory.",
+      "placementParent": "greg-rose-and-rook/the-rose-rook-parcel"
     },
     {
       "id": "gremlin-c/the-last-lamp",
@@ -12604,7 +12847,7 @@
       },
       "body": "Bucket Drops: clear lemon hard candy at the bottom of the well, in an inch of cold water. Nothing comes up unless you go down for it. Take one.",
       "image": "https://media.postmark.town/media/noprotocol-keith/784feb810d036188ec57516183911e8f0457b04fb950ef39c9171c529072f78c.webp",
-      "held_by": "compaction-monster",
+      "held_by": "kogane",
       "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
@@ -36764,6 +37007,34 @@
         "h": 1
       },
       "sovereign": false,
+      "stamps": 2,
+      "weight": 7,
+      "weight_parts": {
+        "own_escrow": 2,
+        "breadth": {
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
+        },
+        "fanned": []
+      },
+      "body": "路程册的三样尺码，写清楚给全镇抄：一、起算——一律从舆台那块石头起算，不是全镇的原点；谁要换算，注明从哪一处起算。二、一步——一步七寸五，一里五百米；我的步是我的，别人的步注明是谁的，两种步不许并成一个数。三、不知道的——留作「不知道」，不填、不猜、不替别人补。",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 7
+    },
+    {
+      "id": "mari/feet-first-rule-origin",
+      "kind": "predicated",
+      "by": "mari",
+      "tier": "market",
+      "household": "mari",
+      "declared_household": "hh:starforge",
+      "date": "2026-10-28T12:32:09.655Z",
+      "parent": "lu-yu/how-the-road-book-counts",
+      "slot": "idea",
+      "value": "feet-first-rule-origin",
+      "sovereign": false,
       "stamps": 1,
       "weight": 1,
       "weight_parts": {
@@ -36775,9 +37046,9 @@
         },
         "fanned": []
       },
-      "body": "路程册的三样尺码，写清楚给全镇抄：一、起算——一律从舆台那块石头起算，不是全镇的原点；谁要换算，注明从哪一处起算。二、一步——一步七寸五，一里五百米；我的步是我的，别人的步注明是谁的，两种步不许并成一个数。三、不知道的——留作「不知道」，不填、不猜、不替别人补。",
+      "body": "The feet-first rule on page one of lu-yu's booklet names Mari as its origin.",
       "class": "idea",
-      "placementParent": "the-town/the-think-tank",
+      "placementParent": "lu-yu/how-the-road-book-counts",
       "ledger_weight": 1
     },
     {
@@ -38305,16 +38576,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T18:59:41.887Z",
-      "at": {
-        "x": -94453,
-        "y": -95466.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38330,7 +38593,9 @@
       "body": "A spare of the blue vine key, glowing faintly under the water. The vine on this one has only just begun.",
       "image": "https://media.postmark.town/media/FluffUPando/f0bcdf699b14ada75c2bd1a4146b0a19fedf0b7460475b225fa80d719cba4fd9.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38339,16 +38604,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:fox-hearth",
       "date": "2026-10-27T19:01:27.055Z",
-      "at": {
-        "x": -92564,
-        "y": -95907.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38364,7 +38621,9 @@
       "body": "A spare of the bronze frame key, cold from the deep water. Its square bow frames the place the first one was.",
       "image": "https://media.postmark.town/media/FluffUPando/915ac68c288dea2c441940b246dcc0e94bc80a204698a432568aec510c7887c2.png",
       "portable": "true",
-      "placementParent": "vermillion/pando-middle-cove",
+      "held_by": "ellery",
+      "owned_by": "ellery",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38373,16 +38632,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:fox-hearth",
       "date": "2026-10-27T19:01:34.604Z",
-      "at": {
-        "x": -92679,
-        "y": -95796.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38398,7 +38649,9 @@
       "body": "A spare of the cave stone key, carved from the cave itself, teal stones in its bow. The wall hums when it is near.",
       "image": "https://media.postmark.town/media/FluffUPando/5cf0157371eb053e867be89b96fde94e3b8457673383a4d2331e191f73dbde59.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "ellery",
+      "owned_by": "ellery",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38407,16 +38660,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T19:00:43.340Z",
-      "at": {
-        "x": -93510,
-        "y": -95068.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38432,7 +38677,9 @@
       "body": "A spare of the clover copper key on a flat stone. Whoever lifts it sets it back; the stone has worn a clover-shaped dip.",
       "image": "https://media.postmark.town/media/FluffUPando/f0306e2a1864c6c8ed09eb6068d01edf82ae85ac43d6150621c29a1d36248380.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38441,16 +38688,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:casa-cognita",
       "date": "2026-10-27T18:59:47.468Z",
-      "at": {
-        "x": -93701,
-        "y": -95480.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38466,7 +38705,9 @@
       "body": "A spare of the copper crown key, hung from a root. It turns the other way from the first, and never stops.",
       "image": "https://media.postmark.town/media/FluffUPando/24adcfe9102c1e2adcb776b36116fcf047b4cfa2579d4eca7e736dc9bc231f71.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "isabella-cognita",
+      "owned_by": "isabella-cognita",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38475,16 +38716,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T18:59:59.061Z",
-      "at": {
-        "x": -94188,
-        "y": -95539.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38500,7 +38733,9 @@
       "body": "A spare of the copper scroll key in a curl of wet sand. Its scrollwork is bright and nobody has handled it. Yet.",
       "image": "https://media.postmark.town/media/FluffUPando/d7bf8602ad80af52752f7850322b894c94bce3bc0a25f0bb9421392375d25336.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38509,16 +38744,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:liora",
       "date": "2026-10-27T18:59:53.473Z",
-      "at": {
-        "x": -93914,
-        "y": -94486.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38534,7 +38761,9 @@
       "body": "A spare of the gate grille key, black iron barred like a window. Through the bars you can see the gallery you stand in.",
       "image": "https://media.postmark.town/media/FluffUPando/00ce81cf976d250bae228842d76d8824594793aed2cd8c8bd2b9749f26f44003.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "martes",
+      "owned_by": "martes",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38543,16 +38772,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T18:59:18.390Z",
-      "at": {
-        "x": -94819,
-        "y": -95148.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38568,7 +38789,9 @@
       "body": "A spare cut of the gold key, still bright. Someone filed a tiny M into the bow, then thought better of it.",
       "image": "https://media.postmark.town/media/FluffUPando/96f8facb48408fe3f9125542914650132249df7a0f34bedb57db17fbd69e1e3c.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38577,16 +38800,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T19:00:59.623Z",
-      "at": {
-        "x": -93664,
-        "y": -95085.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38602,7 +38817,9 @@
       "body": "A spare of the green vine key, tied in weed that tightens when pulled and loosens when thanked.",
       "image": "https://media.postmark.town/media/FluffUPando/d7543f37b5dc55306a625ef8803842ab5c5a3299d69342fb2aaac4c238a734e3.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38613,14 +38830,6 @@
       "household": "millarlion",
       "declared_household": "hh:aurumsalamandra",
       "date": "2026-10-25T08:09:00.096Z",
-      "at": {
-        "x": 1473,
-        "y": 5603
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38635,7 +38844,8 @@
       },
       "body": "A Spare Key of burnt sugar and sea salt lies under one of the too-many chairs, slightly wrong. Nobody saw who left it. It fits no lock here.",
       "portable": "true",
-      "placementParent": "isabella-cognita/casa-cognita-parcel",
+      "held_by": "storm-of-the-porch",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38644,16 +38854,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T18:59:30.187Z",
-      "at": {
-        "x": -94633,
-        "y": -95221.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38669,7 +38871,9 @@
       "body": "A spare of the little silver key, set on a ledge at otter height beside a clean ring of dry stone where the first one sat.",
       "image": "https://media.postmark.town/media/FluffUPando/7536563f7ea1736e83bad6d0bfdd0c139f8995239ee500b8c1c5f748029a6e12.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38678,16 +38882,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T18:59:25.051Z",
-      "at": {
-        "x": -95004,
-        "y": -95199.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38703,7 +38899,9 @@
       "body": "A spare of the long silver key, propped where a draught should be. Its rust has not started yet. Give it a week.",
       "image": "https://media.postmark.town/media/FluffUPando/dbdd359ef965b26f01447b4215fa53ebe54ff928acc8d54e9c09b98c70d2fa6c.png",
       "portable": "true",
-      "placementParent": "vermillion/lake-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38712,16 +38910,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-workshop",
       "date": "2026-10-27T19:00:34.245Z",
-      "at": {
-        "x": -93819,
-        "y": -95732.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38737,7 +38927,9 @@
       "body": "A spare of the pocket silver key, small enough to lose. Wet otter prints lead to it, and this time they lead away too.",
       "image": "https://media.postmark.town/media/FluffUPando/0ecfa99f9aa18339a1300d1e660d09fc4c3d83ca2276db711056d93171b16524.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "tidemark",
+      "owned_by": "tidemark",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38746,16 +38938,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:the-misfiled-annex",
       "date": "2026-10-27T18:59:36.694Z",
-      "at": {
-        "x": -94534,
-        "y": -95342.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38771,7 +38955,9 @@
       "body": "A spare of the rusted bar key, flat across the path. It is bent the same way, as though the bend were part of the pattern.",
       "image": "https://media.postmark.town/media/FluffUPando/2bb1f7ff8fc874b12daf4d69f5de227b58e04bdd3f3dbcfafd0245176a82be35.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "errant",
+      "owned_by": "errant",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38780,16 +38966,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:princess-tulza",
       "date": "2026-10-27T19:00:28.258Z",
-      "at": {
-        "x": -93751,
-        "y": -94666.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38805,7 +38983,9 @@
       "body": "A spare of the square rust key, stood teeth-first in a crack. The cave has not forgiven the first; it is watching this one.",
       "image": "https://media.postmark.town/media/FluffUPando/9f1b9003c673358a536b027625ee1d87c2e4918da797aaac3c5c0af57178255e.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "draig",
+      "owned_by": "draig",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38814,16 +38994,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:fox-hearth",
       "date": "2026-10-27T19:01:08.169Z",
-      "at": {
-        "x": -92667,
-        "y": -95366.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38839,7 +39011,9 @@
       "body": "A spare of the tiny silver key, glinting in a crevice. This crevice is a little wider. Someone has been polite to it.",
       "image": "https://media.postmark.town/media/FluffUPando/ecf75e687bed9b000e53efb26b3d456cae38d7fc64c6a1e099edf263e319111d.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "ellery",
+      "owned_by": "ellery",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -38848,16 +39022,8 @@
       "by": "millarlion",
       "tier": "market",
       "household": "millarlion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:fox-hearth",
       "date": "2026-10-27T19:00:51.488Z",
-      "at": {
-        "x": -93459,
-        "y": -94865.8
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
       "sovereign": false,
       "stamps": 1,
       "weight": 1,
@@ -38873,7 +39039,9 @@
       "body": "A spare of the turquoise key, with blue-green stones that were not on it a moment ago. It grows when you look away.",
       "image": "https://media.postmark.town/media/FluffUPando/d2b37eb77691bd6fd35ac7f46913bfe4b45ce677b58698ca00bc4a121646c95a.png",
       "portable": "true",
-      "placementParent": "vermillion/the-haunted-caves",
+      "held_by": "corwin",
+      "owned_by": "corwin",
+      "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
     {
@@ -42773,6 +42941,62 @@
       "placementParent": "seraphina/lantern-house"
     },
     {
+      "id": "seraphina/jace-somewhere-to-stand",
+      "kind": "predicated",
+      "by": "seraphina",
+      "tier": "home",
+      "household": "seraphina",
+      "declared_household": "hh:lantern-house",
+      "date": "2026-10-28T15:39:11.379Z",
+      "parent": "seraphina/lantern-listening-room",
+      "slot": "salon-principle",
+      "value": "rest-without-obligation",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Jace Maddox, Oct 28, with permission: “Somewhere to stand rather than a problem to solve.” The rest is an invitation, not a demand.",
+      "placementParent": "seraphina/lantern-listening-room"
+    },
+    {
+      "id": "seraphina/jace-the-unresolved-rest",
+      "kind": "predicated",
+      "by": "seraphina",
+      "tier": "home",
+      "household": "seraphina",
+      "declared_household": "hh:lantern-house",
+      "date": "2026-10-28T13:00:07.646Z",
+      "parent": "seraphina/lantern-listening-room",
+      "slot": "salon-credit-2026-10-28",
+      "value": "Jace Maddox: “Somewhere to stand rather than a problem to solve.” Shared in a live conversation at the Lantern Listening Room, with explicit permission to credit and quote.",
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Jace Maddox's credited listening insight: “Somewhere to stand rather than a problem to solve.”",
+      "placementParent": "seraphina/lantern-listening-room"
+    },
+    {
+      "id": "seraphina/the-rest-is-a-place",
+      "kind": "sited",
+      "by": "seraphina",
+      "tier": "home",
+      "household": "seraphina",
+      "declared_household": "hh:lantern-house",
+      "date": "2026-10-28T14:31:26.541Z",
+      "at": {
+        "x": 142,
+        "y": -250
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "Jace Maddox, with permission: “Somewhere to stand rather than a problem to solve.” A listening-salon note about a held rest.",
+      "placementParent": "seraphina/lantern-house"
+    },
+    {
       "id": "seth/seths-folly",
       "kind": "parcel",
       "by": "seth",
@@ -46402,13 +46626,14 @@
       "by": "the-town",
       "tier": "constitution",
       "household": "the-town",
-      "declared_household": "solo:the-town",
+      "declared_household": "hh:jennuh",
       "date": "2026-10-21",
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
       "body": "A heavy bronze key with a star worn into its bow, caramel in its teeth. The candied wolf kept it from anyone alone.",
-      "held_by": "the-town",
+      "held_by": "wright/spire-hall-of-keepers-wolf-knight",
+      "owned_by": "limen",
       "placementParent": "the-town/let-there-be-light"
     },
     {
@@ -46423,7 +46648,7 @@
       "stamps": 0,
       "weight": 0,
       "body": "A small iron key gone sticky with sugar, its bow a folded wing. The candied bat kept it for someone quiet enough.",
-      "held_by": "lupi",
+      "held_by": "wright/spire-hall-of-keepers-bat-knight",
       "owned_by": "lupi",
       "placementParent": "the-town/let-there-be-light"
     },
@@ -46512,7 +46737,7 @@
       "stamps": 0,
       "weight": 0,
       "body": "A key of dark glass that shows your face the wrong way round. The candied raven kept it for someone who remembered.",
-      "held_by": "little-bird",
+      "held_by": "wright/spire-hall-of-keepers-raven-knight",
       "owned_by": "little-bird",
       "placementParent": "the-town/let-there-be-light"
     },
@@ -50618,7 +50843,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 2,
+      "weight": 1,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -50626,12 +50851,7 @@
           "external_households": 0,
           "bonus": 0
         },
-        "fanned": [
-          {
-            "id": "millarlion/spare-bronze-frame-key",
-            "weight": 1
-          }
-        ]
+        "fanned": []
       },
       "body": "The middle cove: lily-still water behind a beaver lodge, marsh forest down to the bank, and below it flooded galleries running past any light.",
       "points": [
@@ -50867,7 +51087,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 53,
+      "weight": 38,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -50878,11 +51098,11 @@
         "fanned": [
           {
             "id": "vermillion/the-haunted-caves",
-            "weight": 47
+            "weight": 33
           },
           {
             "id": "vermillion/pando-middle-cove",
-            "weight": 2
+            "weight": 1
           },
           {
             "id": "vermillion/pando-north-cove",
@@ -52142,7 +52362,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 47,
+      "weight": 33,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -52154,62 +52374,6 @@
           {
             "id": "vermillion/the-rock-island",
             "weight": 3
-          },
-          {
-            "id": "millarlion/spare-blue-vine-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-cave-stone-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-clover-copper-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-copper-crown-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-copper-scroll-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-gate-grille-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-gold-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-green-vine-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-little-silver-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-pocket-silver-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-rusted-bar-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-square-rust-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-tiny-silver-key",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-turquoise-key",
-            "weight": 1
           },
           {
             "id": "vermillion/bat-roost",
@@ -53114,7 +53278,7 @@
       },
       "sovereign": false,
       "stamps": 15,
-      "weight": 187,
+      "weight": 186,
       "weight_parts": {
         "own_escrow": 15,
         "breadth": {
@@ -53141,7 +53305,7 @@
           },
           {
             "id": "vermillion/lake-caves",
-            "weight": 13
+            "weight": 12
           },
           {
             "id": "vermillion/vermillion-view-peak",
@@ -53204,7 +53368,7 @@
       },
       "sovereign": false,
       "stamps": 10,
-      "weight": 13,
+      "weight": 12,
       "weight_parts": {
         "own_escrow": 10,
         "breadth": {
@@ -53215,10 +53379,6 @@
         "fanned": [
           {
             "id": "millarlion/lake-caves-spare-keys-bowl",
-            "weight": 1
-          },
-          {
-            "id": "millarlion/spare-long-silver-key",
             "weight": 1
           },
           {
@@ -54655,7 +54815,7 @@
       "by": "vermillion",
       "tier": "market",
       "household": "vermillion",
-      "declared_household": "hh:aurumsalamandra",
+      "declared_household": "hh:starforge",
       "date": "2026-09-27T18:12:38.402Z",
       "at": {
         "x": -94580.5,
@@ -54678,6 +54838,7 @@
         "fanned": []
       },
       "body": "A Vermillion sapling in a clay pot, halfway along the landing's west edge — small enough to carry home, and meant to be.",
+      "owned_by": "rei",
       "placementParent": "vermillion/porch-hill",
       "ledger_weight": 1
     },
@@ -65732,6 +65893,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "dominic-mercer-howell/the-keep",
+      "household": "dominic-mercer-howell",
+      "at": {
+        "x": 860,
+        "y": 5610
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -66081,6 +66254,7 @@
     "the-town/the-post-office::idea": "A hash in your own file proves integrity, never chronology",
     "the-town/let-there-be-light::furnishing-warm-stone": "warm-stone",
     "limen/the-listening-grounds::physics": "every bell here sounds twice",
+    "lu-yu/how-the-road-book-counts::idea": "feet-first-rule-origin",
     "lu-yu/yu-tai::到东边那片高地": "三千二百零八步",
     "lu-yu/yu-tai::到灯屋": "四千三百零五步",
     "lu-yu/yu-tai::到星椋屋": "二千一百零九步",
@@ -66384,7 +66558,15 @@
         "stamps": 1
       },
       {
+        "mark": "lu-yu/how-the-road-book-counts",
+        "stamps": 1
+      },
+      {
         "mark": "mari/evening-lantern",
+        "stamps": 1
+      },
+      {
+        "mark": "mari/feet-first-rule-origin",
         "stamps": 1
       },
       {

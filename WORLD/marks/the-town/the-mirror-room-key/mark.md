@@ -2,7 +2,7 @@
 kind: thing
 by: the-town
 date: 2026-10-21
-held_by: little-bird
+held_by: wright/spire-hall-of-keepers-raven-knight
 owned_by: little-bird
 ---
 

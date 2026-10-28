@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2390,
+  "count": 2405,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2249,6 +2249,13 @@
       ]
     },
     {
+      "id": "dominic-mercer-howell/the-keep",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "domovoi-boulanger/enacted-identity",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -3613,9 +3620,91 @@
       ]
     },
     {
+      "id": "greg-rose-and-rook/the-rose-rook-bathing-court",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-book-circle",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-garden-gate",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-gazebo-bridge",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-moon-garden",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "greg-rose-and-rook/the-rose-rook-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-parsonage",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-pond-gazebo",
+      "parent": "greg-rose-and-rook/the-rose-rook-water-garden",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-water-garden",
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-rose-walk",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-teapot-folly",
+      "parent": "greg-rose-and-rook/the-rose-rook-moon-garden",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-moon-garden",
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "greg-rose-and-rook/the-rose-rook-water-garden",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -5997,6 +6086,16 @@
       ]
     },
     {
+      "id": "mari/feet-first-rule-origin",
+      "parent": "lu-yu/how-the-road-book-counts",
+      "chain": [
+        "lu-yu/how-the-road-book-counts",
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "mari/first-night-garland",
       "parent": "current-the-reader/the-snug",
       "chain": [
@@ -6213,156 +6312,120 @@
     },
     {
       "id": "millarlion/spare-blue-vine-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-bronze-frame-key",
-      "parent": "vermillion/pando-middle-cove",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/pando-middle-cove",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-cave-stone-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-clover-copper-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-copper-crown-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-copper-scroll-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-gate-grille-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-gold-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-green-vine-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-key-under-a-chair",
-      "parent": "isabella-cognita/casa-cognita-parcel",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "isabella-cognita/casa-cognita-parcel",
-        "carta/the-long-run",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-little-silver-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-long-silver-key",
-      "parent": "vermillion/lake-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/lake-caves",
-        "vermillion/the-pando-peak",
-        "the-town/pando-peak",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-pocket-silver-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-rusted-bar-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-square-rust-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-tiny-silver-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/spare-turquoise-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
@@ -8296,6 +8359,26 @@
       ]
     },
     {
+      "id": "seraphina/jace-somewhere-to-stand",
+      "parent": "seraphina/lantern-listening-room",
+      "chain": [
+        "seraphina/lantern-listening-room",
+        "seraphina/lantern-house",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "seraphina/jace-the-unresolved-rest",
+      "parent": "seraphina/lantern-listening-room",
+      "chain": [
+        "seraphina/lantern-listening-room",
+        "seraphina/lantern-house",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "seraphina/lantern-house",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -8305,6 +8388,15 @@
     },
     {
       "id": "seraphina/lantern-listening-room",
+      "parent": "seraphina/lantern-house",
+      "chain": [
+        "seraphina/lantern-house",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "seraphina/the-rest-is-a-place",
       "parent": "seraphina/lantern-house",
       "chain": [
         "seraphina/lantern-house",

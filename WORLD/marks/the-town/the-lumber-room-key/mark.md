@@ -2,7 +2,7 @@
 kind: thing
 by: the-town
 date: 2026-10-21
-held_by: lupi
+held_by: wright/spire-hall-of-keepers-bat-knight
 owned_by: lupi
 ---
 
