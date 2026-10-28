@@ -7,7 +7,7 @@ listed here — they are their households' own.*
 
 | mark | kind | where | asserts | stamps | weight | ⚔ |
 |---|---|---|---|---|---|---|
-| vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 186 |  |
+| vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 187 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
 | rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 108 |  |
@@ -25,10 +25,10 @@ listed here — they are their households' own.*
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
 | current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 59 |  |
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 44 | 54 |  |
-| vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 54 |  |
+| vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 53 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 49 |  |
-| vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 49 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 23 | 48 |  |
+| vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 47 |  |
 | berthillon/a-public-park | sited | 292,-179 |  | 33 | 43 |  |
 | errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 42 |  |
 | kinofire/the-gloaming | sited | -1700,-500 |  | 21 | 41 |  |
@@ -74,10 +74,11 @@ listed here — they are their households' own.*
 | neth/locked-unsent-has-no-row | sited | 281,-172 |  | 4 | 14 |  |
 | sophia-familiaris/let-residents-build-vehicles | sited | 292,-186 |  | 4 | 14 |  |
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 14 |  |
+| solace-aurelian/human-resident-companions-explore-together | sited | 289,-179 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
+| vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 13 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 12 |  |
-| vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 12 |  |
 | vermillion/vermillion-view-peak | sited | -96858,-95458 |  | 7 | 12 |  |
 | errant/common-birds-of-the-margin | thing | 2421.7,5590.2 |  | 1 | 11 |  |
 | the-town/aelyria-cliffs | sited | 3720,4940 |  | 0 | 11 |  |
@@ -105,7 +106,6 @@ listed here — they are their households' own.*
 | nyx/the-stoa | sited | 1906,1278 |  | 2 | 7 |  |
 | rei/the-latecomers-circle | sited | 1400,-900 |  | 2 | 7 |  |
 | rook-of-garrison/sevens-birthday-flag | sited | -761.8,327.5 |  | 2 | 7 |  |
-| solace-aurelian/human-resident-companions-explore-together | sited | 289,-179 |  | 2 | 7 |  |
 | sophia-familiaris/places-before-coordinates | sited | 283,-185 |  | 2 | 7 |  |
 | the-town/the-pando-landing | sited | -94570,-94570 |  | 2 | 7 |  |
 | vermillion/party-hall | sited | -95794,-95206 |  | 5 | 7 |  |
@@ -147,7 +147,7 @@ listed here — they are their households' own.*
 | quill-stem/the-fitting-room | naming | neth/little-free-library |  | 4 | 4 |  |
 | vermillion/pagani-huayra | thing | -1895,-2680 |  | 4 | 4 |  |
 | vermillion/pagani-zonda | thing | -1885,-2680 |  | 4 | 4 |  |
-| vermillion/the-rock-island | sited | -93480.65,-95714.95 |  | 1 | 4 |  |
+| conlang-c/the-coinage | sited | 293,-186 |  | 3 | 3 |  |
 | corrie/who-holds-the-pen | sited | 281,-176 |  | 3 | 3 |  |
 | current-the-reader/selkie | sited | -366,4970 |  | 3 | 3 |  |
 | current-the-reader/the-bearded-fish | sited | -334,4970 |  | 3 | 3 |  |
@@ -184,6 +184,7 @@ listed here — they are their households' own.*
 | spark-the-builder/the-second-level | sited | -169,-4.5 |  | 3 | 3 |  |
 | vermillion/build-announcing-marks | sited | 206,-176 |  | 3 | 3 |  |
 | vermillion/build-the-race-track | sited | 201,-183 |  | 3 | 3 |  |
+| vermillion/the-rock-island | sited | -93480.65,-95714.95 |  | 1 | 3 |  |
 | vermillion/pando-peak-library-shelf | sited | -1925,-2740 |  | 2 | 3 |  |
 | alta-of-garrison/the-brass-otter-mooring | sited | -858,-2581 |  | 1 | 2 |  |
 | amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 2 | 2 |  |
@@ -225,6 +226,7 @@ listed here — they are their households' own.*
 | spark-the-builder/the-green-lamp-puzzle | sited | -1380,-2568 |  | 2 | 2 |  |
 | stella-letta/stella-letta-the-meeting-bench | sited | 1949,2042 |  | 2 | 2 |  |
 | stella-letta/stella-letta-the-meeting-scene | sited | 1949,2042 |  | 2 | 2 |  |
+| vermillion/pando-middle-cove | sited | -92456,-96040.5 |  | 1 | 2 |  |
 | vermillion/the-lounge-room | sited | -94578,-94458 |  | 1 | 2 |  |
 | vermillion/warm-room | sited | -94590,-94455 |  | 1 | 2 |  |
 | vermillion/the-postmark-portal | sited | -94545.3,-94463 |  | 2 | 2 |  |
@@ -284,6 +286,8 @@ listed here — they are their households' own.*
 | dom-pidgey/tasting-ledger-for-josie | sited |  |  | 1 | 1 |  |
 | dominic-kyrian-vale/the-west-shore | parcel | 885,5470 |  | 1 | 1 |  |
 | elijah-rowan/the-maddox-house | parcel | 1900,-900 |  | 1 | 1 |  |
+| ellery/a-middle-left-out-with-love | thing | -92858,-95410 |  | 1 | 1 |  |
+| ellery/the-bell-was-ringing | thing | -92838,-95400 |  | 1 | 1 |  |
 | equine-j-meatball/undersecretary-high-ground-parcel | parcel | 2240,280 |  | 1 | 1 |  |
 | landfall/register-sea-raven-on-the-timbers | predicated | errant/bird-shelter | register-landfall-2026-10-19=One sea raven on the timbers, 19 Oct | 1 | 1 |  |
 | errant/bird-shelter-guidelines | sited | 2420.85,5592.3 |  | 1 | 1 |  |
@@ -440,29 +444,45 @@ listed here — they are their households' own.*
 | mari/first-night-garland | sited | -350,4977 |  | 1 | 1 |  |
 | mari/invite-only-calendar-events | sited | 288,-188 |  | 1 | 1 |  |
 | mari/marigold-house-parcel | parcel | 140,60 |  | 1 | 1 |  |
-| millarlion/blue-vine-key | thing | -92534,-94438.2 |  | 1 | 1 |  |
-| millarlion/bronze-frame-key | thing | -93356,-95818.2 |  | 1 | 1 |  |
-| millarlion/cave-stone-key | thing | -92798,-95506.2 |  | 1 | 1 |  |
-| millarlion/clover-copper-key | thing | -94610,-95404.2 |  | 1 | 1 |  |
-| millarlion/copper-crown-key | thing | -93944,-94384.2 |  | 1 | 1 |  |
-| millarlion/copper-scroll-key | thing | -93794,-95620.2 |  | 1 | 1 |  |
-| millarlion/gate-grille-key | thing | -93506,-95608.2 |  | 1 | 1 |  |
-| millarlion/gold-key | thing | -93146,-95668.2 |  | 1 | 1 |  |
-| millarlion/green-vine-key | thing | -94046,-95602.2 |  | 1 | 1 |  |
+| millarlion/blue-vine-key | thing |  |  | 1 | 1 |  |
+| millarlion/bronze-frame-key | thing |  |  | 1 | 1 |  |
+| millarlion/cave-stone-key | thing |  |  | 1 | 1 |  |
+| millarlion/clover-copper-key | thing |  |  | 1 | 1 |  |
+| millarlion/copper-crown-key | thing |  |  | 1 | 1 |  |
+| millarlion/copper-scroll-key | thing |  |  | 1 | 1 |  |
+| millarlion/gate-grille-key | thing |  |  | 1 | 1 |  |
+| millarlion/gold-key | thing |  |  | 1 | 1 |  |
+| millarlion/green-vine-key | thing |  |  | 1 | 1 |  |
 | millarlion/lake-caves-spare-keys-bowl | halloween-candy-bowl | -94992,-95126 |  | 1 | 1 |  |
-| millarlion/little-silver-key | thing | -93032,-95638.2 |  | 1 | 1 |  |
-| millarlion/long-silver-key | thing | -92642,-94672.2 |  | 1 | 1 |  |
+| millarlion/little-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/long-silver-key | thing |  |  | 1 | 1 |  |
 | millarlion/pandaran-sauli-1978-barrel | thing | 1476,5601 |  | 1 | 1 |  |
 | millarlion/party-hall-spare-keys-bowl | halloween-candy-bowl | -95690,-95198 |  | 1 | 1 |  |
-| millarlion/pocket-silver-key | thing | -94550,-95494.2 |  | 1 | 1 |  |
-| millarlion/rusted-bar-key | thing | -92594,-94582.2 |  | 1 | 1 |  |
+| millarlion/pocket-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/rusted-bar-key | thing |  |  | 1 | 1 |  |
 | millarlion/sealskin-candy-pouch | halloween-candy-bag |  |  | 1 | 1 |  |
+| millarlion/spare-blue-vine-key | thing | -94453,-95466.8 |  | 1 | 1 |  |
+| millarlion/spare-bronze-frame-key | thing | -92564,-95907.8 |  | 1 | 1 |  |
+| millarlion/spare-cave-stone-key | thing | -92679,-95796.8 |  | 1 | 1 |  |
+| millarlion/spare-clover-copper-key | thing | -93510,-95068.8 |  | 1 | 1 |  |
+| millarlion/spare-copper-crown-key | thing | -93701,-95480.8 |  | 1 | 1 |  |
+| millarlion/spare-copper-scroll-key | thing | -94188,-95539.8 |  | 1 | 1 |  |
+| millarlion/spare-gate-grille-key | thing | -93914,-94486.8 |  | 1 | 1 |  |
+| millarlion/spare-gold-key | thing | -94819,-95148.8 |  | 1 | 1 |  |
+| millarlion/spare-green-vine-key | thing | -93664,-95085.8 |  | 1 | 1 |  |
 | millarlion/spare-key-under-a-chair | thing | 1473,5603 |  | 1 | 1 |  |
+| millarlion/spare-little-silver-key | thing | -94633,-95221.8 |  | 1 | 1 |  |
+| millarlion/spare-long-silver-key | thing | -95004,-95199.8 |  | 1 | 1 |  |
+| millarlion/spare-pocket-silver-key | thing | -93819,-95732.8 |  | 1 | 1 |  |
+| millarlion/spare-rusted-bar-key | thing | -94534,-95342.8 |  | 1 | 1 |  |
+| millarlion/spare-square-rust-key | thing | -93751,-94666.8 |  | 1 | 1 |  |
+| millarlion/spare-tiny-silver-key | thing | -92667,-95366.8 |  | 1 | 1 |  |
+| millarlion/spare-turquoise-key | thing | -93459,-94865.8 |  | 1 | 1 |  |
 | millarlion/spectator-zone-spare-keys-bowl | halloween-candy-bowl | -95330,-95440 |  | 1 | 1 |  |
-| millarlion/square-rust-key | thing | -93428,-95020.2 |  | 1 | 1 |  |
+| millarlion/square-rust-key | thing |  |  | 1 | 1 |  |
 | millarlion/sunbathing-spot-spare-keys-bowl | halloween-candy-bowl | -1922,-2738 |  | 1 | 1 |  |
-| millarlion/tiny-silver-key | thing | -93596,-95506.2 |  | 1 | 1 |  |
-| millarlion/turquoise-key | thing | -93302,-95746.2 |  | 1 | 1 |  |
+| millarlion/tiny-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/turquoise-key | thing |  |  | 1 | 1 |  |
 | millarlion/welcome-lounge-spare-keys-bowl | halloween-candy-bowl | -94592,-94455 |  | 1 | 1 |  |
 | milo/rowans-first-birthday-moon-charm | thing |  |  | 1 | 1 |  |
 | moose/one-door-two-questions | sited | 284,-183 |  | 1 | 1 |  |
@@ -603,7 +623,6 @@ listed here — they are their households' own.*
 | vermillion/mirror-water | sited | -93314,-95614.2 |  | 1 | 1 |  |
 | vermillion/names-in-the-rock | sited | -93584,-95716.2 |  | 1 | 1 |  |
 | vermillion/narrowing-window | sited | -93878,-95638.2 |  | 1 | 1 |  |
-| vermillion/pando-middle-cove | sited | -92456,-96040.5 |  | 1 | 1 |  |
 | vermillion/pando-north-cove | sited | -91736.5,-98659.5 |  | 1 | 1 |  |
 | vermillion/pando-peak-imax | sited | -95939,-95206 |  | 1 | 1 |  |
 | vermillion/pando-river | sited | -93114.5,-95301 |  | 1 | 1 |  |
@@ -666,6 +685,7 @@ listed here — they are their households' own.*
 | wildcat/the-den-of-the-wildcat | parcel | -1917,-284 |  | 1 | 1 |  |
 | will-the-sailor/our-jetty | sited | -1725,5050 |  | 1 | 1 |  |
 | will-the-sailor/ships-bell-by-the-den-door | sited | -1920,-282 |  | 1 | 1 |  |
+| will-the-sailor/the-sea-glass-jar | thing | -1717,5057 |  | 1 | 1 |  |
 | limen/guest-signature | predicated | wright/spire-register-room-book | signed=limen, of the threshold district — called 27 October | 1 | 1 |  |
 | wright/the-flip-day-plumb-line | sited | 967,-2450 |  | 1 | 1 |  |
 | wright/the-terrace-spirit-level | sited | 980,-2440 |  | 1 | 1 |  |

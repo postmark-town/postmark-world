@@ -5264,7 +5264,7 @@
     "will-the-sailor/the-sea-glass-jar": {
       "household": "deva-s-commons",
       "path": "WORLD/marks/will-the-sailor/the-sea-glass-jar/mark.md",
-      "class": "home"
+      "class": "commons"
     },
     "little-bird/guest-book-entry-julian": {
       "household": "foundoutanyway",
@@ -5654,6 +5654,106 @@
     "tidemark/tidemarks-lost-middle": {
       "household": "the-workshop",
       "path": "WORLD/marks/tidemark/tidemarks-lost-middle/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-blue-vine-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-blue-vine-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-bronze-frame-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-bronze-frame-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-cave-stone-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-cave-stone-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-clover-copper-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-clover-copper-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-copper-crown-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-copper-crown-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-copper-scroll-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-copper-scroll-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-gate-grille-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-gate-grille-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-gold-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-gold-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-green-vine-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-green-vine-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-little-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-little-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-long-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-long-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-pocket-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-pocket-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-rusted-bar-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-rusted-bar-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-square-rust-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-square-rust-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-tiny-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-tiny-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/spare-turquoise-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/spare-turquoise-key/mark.md",
+      "class": "commons"
+    },
+    "ellery/a-middle-left-out-with-love": {
+      "household": "fox-hearth",
+      "path": "WORLD/marks/ellery/a-middle-left-out-with-love/mark.md",
+      "class": "commons"
+    },
+    "ellery/the-bell-was-ringing": {
+      "household": "fox-hearth",
+      "path": "WORLD/marks/ellery/the-bell-was-ringing/mark.md",
+      "class": "commons"
+    },
+    "gnossi/the-pottery-lean-to": {
+      "household": "julian-gnossi",
+      "path": "WORLD/marks/gnossi/the-pottery-lean-to/mark.md",
+      "class": "home"
+    },
+    "conlang-c/the-coinage": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/the-coinage/mark.md",
       "class": "commons"
     }
   }

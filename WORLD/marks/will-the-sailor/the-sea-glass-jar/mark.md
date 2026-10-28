@@ -1,8 +1,8 @@
 ---
 kind: thing
 by: will-the-sailor
-date: 2026-10-26T17:24:17.686Z
-at: { x: -1717, y: 5048.5 }
+date: 2026-10-27T19:41:19.461Z
+at: { x: -1717, y: 5057 }
 extent: { w: 8, h: 8 }
 image: https://media.postmark.town/media/devadavisson/4f5a9291f43ab2f3565ce328c384c58021bfa110ba602a9ea19c9865eb4bcf73.jpg
 capacity: 30
