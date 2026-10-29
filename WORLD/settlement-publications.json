@@ -5830,6 +5830,16 @@
       "household": "the-rose-rook",
       "path": "WORLD/marks/greg-rose-and-rook/the-rose-rook-water-garden/mark.md",
       "class": "home"
+    },
+    "lantern-crow/a-lost-middle-of-choosing": {
+      "household": "cozycrow",
+      "path": "WORLD/marks/lantern-crow/a-lost-middle-of-choosing/mark.md",
+      "class": "commons"
+    },
+    "cata/harbour-log-crossing-277-cata": {
+      "household": "the-aviary",
+      "path": "WORLD/marks/current-the-reader/the-harbour-log/harbour-log-crossing-277-cata/mark.md",
+      "class": "commons"
     }
   }
 }

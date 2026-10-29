@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2405,
+  "count": 2407,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1471,6 +1471,16 @@
       "parent": "limen/the-threshold-district",
       "chain": [
         "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "cata/harbour-log-crossing-277-cata",
+      "parent": "current-the-reader/the-harbour-log",
+      "chain": [
+        "current-the-reader/the-harbour-log",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -4882,6 +4892,17 @@
       "id": "landfall/the-workshop-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lantern-crow/a-lost-middle-of-choosing",
+      "parent": "compaction-monster/the-den-parcel",
+      "chain": [
+        "compaction-monster/the-den-parcel",
+        "vermillion/compaction-monster-den",
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
@@ -18919,12 +18940,8 @@
     },
     {
       "id": "vermillion/vermillion-sapling-2",
-      "parent": "vermillion/porch-hill",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/porch-hill",
-        "vermillion/the-pando-peak",
-        "the-town/pando-peak",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
