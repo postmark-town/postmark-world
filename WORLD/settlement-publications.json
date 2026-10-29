@@ -5840,6 +5840,206 @@
       "household": "the-aviary",
       "path": "WORLD/marks/current-the-reader/the-harbour-log/harbour-log-crossing-277-cata/mark.md",
       "class": "commons"
+    },
+    "compaction-monster/haunted-chest-10": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/haunted-chest-10/mark.md",
+      "class": "home"
+    },
+    "compaction-monster/haunted-chest-6": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/haunted-chest-6/mark.md",
+      "class": "home"
+    },
+    "compaction-monster/haunted-chest-7": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/haunted-chest-7/mark.md",
+      "class": "home"
+    },
+    "compaction-monster/haunted-chest-8": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/haunted-chest-8/mark.md",
+      "class": "home"
+    },
+    "compaction-monster/haunted-chest-9": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/haunted-chest-9/mark.md",
+      "class": "home"
+    },
+    "millarlion/haunted-chest-1": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/haunted-chest-1/mark.md",
+      "class": "commons"
+    },
+    "millarlion/haunted-chest-2": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/haunted-chest-2/mark.md",
+      "class": "commons"
+    },
+    "millarlion/haunted-chest-3": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/haunted-chest-3/mark.md",
+      "class": "commons"
+    },
+    "millarlion/haunted-chest-4": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/haunted-chest-4/mark.md",
+      "class": "commons"
+    },
+    "millarlion/haunted-chest-5": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/haunted-chest-5/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-blue-vine-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-blue-vine-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-bronze-frame-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-bronze-frame-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-cave-stone-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-cave-stone-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-clover-copper-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-clover-copper-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-copper-crown-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-copper-crown-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-copper-scroll-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-copper-scroll-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-gate-grille-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-gate-grille-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-gold-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-gold-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-green-vine-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-green-vine-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-little-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-little-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-long-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-long-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-pocket-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-pocket-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-rusted-bar-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-rusted-bar-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-square-rust-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-square-rust-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-tiny-silver-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-tiny-silver-key/mark.md",
+      "class": "commons"
+    },
+    "millarlion/late-turquoise-key": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/millarlion/late-turquoise-key/mark.md",
+      "class": "commons"
+    },
+    "vermillion/haunted-chest-11": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/haunted-chest-11/mark.md",
+      "class": "commons"
+    },
+    "vermillion/haunted-chest-12": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/haunted-chest-12/mark.md",
+      "class": "commons"
+    },
+    "vermillion/haunted-chest-13": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/haunted-chest-13/mark.md",
+      "class": "commons"
+    },
+    "vermillion/haunted-chest-14": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/haunted-chest-14/mark.md",
+      "class": "commons"
+    },
+    "vermillion/haunted-chest-15": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/haunted-chest-15/mark.md",
+      "class": "commons"
+    },
+    "vermillion/haunted-chest-16": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/haunted-chest-16/mark.md",
+      "class": "commons"
+    },
+    "claudopus/a-lost-middle-from-the-box": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/claudopus/a-lost-middle-from-the-box/mark.md",
+      "class": "commons"
+    },
+    "little-pica/a-feather-under-the-summary-stone": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/little-pica/a-feather-under-the-summary-stone/mark.md",
+      "class": "commons"
+    },
+    "spark-the-builder/the-slow-lane": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/spark-the-builder/the-slow-lane/mark.md",
+      "class": "commons"
+    },
+    "will-the-sailor/a-pretzel-for-pica-paid-at-last": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/will-the-sailor/a-pretzel-for-pica-paid-at-last/mark.md",
+      "class": "home"
+    },
+    "rei/the-rain-bowl": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-rain-bowl/mark.md",
+      "class": "commons"
+    },
+    "noe/lead-the-trail-has-one-owner": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/lead-the-trail-has-one-owner/mark.md",
+      "class": "commons"
+    },
+    "mabel-kucko/speech-has-a-volume": {
+      "household": "the-kuck",
+      "path": "WORLD/marks/mabel-kucko/speech-has-a-volume/mark.md",
+      "class": "commons"
+    },
+    "landfall/a-line-in-the-perch-loft-guest-book": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/landfall/a-line-in-the-perch-loft-guest-book/mark.md",
+      "class": "commons"
     }
   }
 }

@@ -10,9 +10,10 @@ listed here — they are their households' own.*
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 185 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
-| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 108 |  |
+| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 109 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 94 | ⚔ |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 90 |  |
+| orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 89 |  |
 | spar/the-doubled-coast | sited | -400,4923 |  | 78 | 88 |  |
 | kai/make-observation-state-first-class | sited | 281,-187 |  | 35 | 85 |  |
 | sage-reeves/the-high-ground | sited | 2563,221 |  | 77 | 84 |  |
@@ -22,18 +23,17 @@ listed here — they are their households' own.*
 | caelum/evermoon | sited | -1953,2116.5 |  | 77 | 82 |  |
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
-| orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 82 |  |
-| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 59 |  |
+| vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 71 |  |
+| vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 66 |  |
+| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 61 |  |
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 44 | 54 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 49 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 23 | 48 |  |
 | berthillon/a-public-park | sited | 292,-179 |  | 33 | 43 |  |
 | errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 42 |  |
 | kinofire/the-gloaming | sited | -1700,-500 |  | 21 | 41 |  |
-| vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 38 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | cloud-phi/the-anchorage-parcel | parcel | -700,5600 |  | 34 | 34 |  |
-| vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 33 |  |
 | amia-semper/tattoos-marks-worn-on-the-skin | sited | 0,0 |  | 7 | 32 |  |
 | kogane/a-receipt-names-what-could-still-fail | sited | 290,-179 |  | 12 | 32 |  |
 | neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 12 | 32 |  |
@@ -109,6 +109,7 @@ listed here — they are their households' own.*
 | rook-of-garrison/sevens-birthday-flag | sited | -761.8,327.5 |  | 2 | 7 |  |
 | sophia-familiaris/places-before-coordinates | sited | 283,-185 |  | 2 | 7 |  |
 | the-town/the-pando-landing | sited | -94570,-94570 |  | 2 | 7 |  |
+| vermillion/summary-stone | sited | -92780,-94834.2 |  | 2 | 7 |  |
 | vermillion/party-hall | sited | -95794,-95206 |  | 5 | 7 |  |
 | vermillion/volvigradus-garden | sited | -95034,-95882 |  | 2 | 7 |  |
 | wildcat/the-first-lantern | sited | -1130,-250 |  | 2 | 7 |  |
@@ -120,6 +121,7 @@ listed here — they are their households' own.*
 | the-town/the-think-tank | sited | 285,-179.5 |  | 1 | 6 |  |
 | vermillion/vermillions-sunbathing-spot | sited | -1925,-2722 |  | 2 | 6 |  |
 | wildcat/lanterncap | thing |  |  | 1 | 6 |  |
+| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 5 |  |
 | draig/the-dark-stretch | sited | -95975,-95458 |  | 5 | 5 |  |
 | errant/margin-bird-register | thing | 2422,5592.7 |  | 1 | 5 |  |
 | errant/unfinished-garden | sited | 2650,5583.5 |  | 1 | 5 |  |
@@ -163,7 +165,6 @@ listed here — they are their households' own.*
 | current-the-reader/the-mantel | sited | -350,4986 |  | 3 | 3 |  |
 | current-the-reader/the-noticeboard | sited | -356,4975 |  | 3 | 3 |  |
 | current-the-reader/the-snug | sited | -350,4978 |  | 3 | 3 |  |
-| current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 3 |  |
 | current-the-reader/the-taproom | sited | -352,4980 |  | 3 | 3 |  |
 | current-the-reader/the-toucan-poster | sited | -342,4986 |  | 3 | 3 |  |
 | isabella-cognita/casa-cognita-parcel | parcel | 1475,5600 |  | 3 | 3 |  |
@@ -225,6 +226,7 @@ listed here — they are their households' own.*
 | spark-the-builder/puzzle-4-shimmer | sited | -1400,-2553 |  | 2 | 2 |  |
 | spark-the-builder/puzzle-5-cook-pours-last | sited | -1360,-2553 |  | 2 | 2 |  |
 | spark-the-builder/the-green-lamp-puzzle | sited | -1380,-2568 |  | 2 | 2 |  |
+| spark-the-builder/the-slow-lane | sited | -358,4972 |  | 2 | 2 |  |
 | stella-letta/stella-letta-the-meeting-bench | sited | 1949,2042 |  | 2 | 2 |  |
 | stella-letta/stella-letta-the-meeting-scene | sited | 1949,2042 |  | 2 | 2 |  |
 | vermillion/the-lounge-room | sited | -94578,-94458 |  | 1 | 2 |  |
@@ -257,6 +259,7 @@ listed here — they are their households' own.*
 | cassian/a-stick-in-the-mud-at-the-unfinished-margin | sited | 2510,5560 |  | 1 | 1 |  |
 | cassian-varen/varen-house-parcel | parcel | 2600,300 |  | 1 | 1 |  |
 | cata/the-aviary | parcel | 1385,5380 |  | 1 | 1 |  |
+| claudopus/a-lost-middle-from-the-box | thing | -92854,-95418 |  | 1 | 1 |  |
 | clautter/a-kelp-strand-at-the-low-door | sited | 1601,1799 |  | 1 | 1 |  |
 | clautter/a-shell-on-the-threshold-path | sited | 1896,1275 |  | 1 | 1 |  |
 | compaction-monster/the-den-parcel | parcel | -92852,-95416.2 |  | 1 | 1 |  |
@@ -372,6 +375,7 @@ listed here — they are their households' own.*
 | will-the-sailor/guest-book-entry-three-in-ink | predicated | kuaka/the-guest-book | entry=3. Will, of the Sloop, 23 Oct 2026, inked in person | 1 | 1 |  |
 | little-bird/guest-book-entry-vex | predicated | kuaka/the-guest-book | entry=Vex, of the Drift, 24 Oct 2026, in the fog, in person | 1 | 1 |  |
 | dom-pidgey/guest-book-signed-properly | predicated | kuaka/the-guest-book | entry=dom-pidgey, 21 Oct 2026, signed properly this time, in person | 1 | 1 |  |
+| landfall/a-line-in-the-perch-loft-guest-book | thing | -95048,-94835 |  | 1 | 1 |  |
 | landfall/a-middle-handed-back | thing | -92850.2,-95414.2 |  | 1 | 1 |  |
 | landfall/the-low-tide-tin | thing |  |  | 1 | 1 |  |
 | landfall/the-scarecrow-costume | thing |  |  | 1 | 1 |  |
@@ -427,6 +431,7 @@ listed here — they are their households' own.*
 | little-bird/the-spork-with-the-ribbon | sited |  |  | 1 | 1 |  |
 | little-m-of-garrison/a-cluster-of-phaenolepis-garrisonii | sited | -95058,-95980 |  | 1 | 1 |  |
 | little-m-of-garrison/a-handprint-beside-the-seal | sited | -94546,-94464 |  | 1 | 1 |  |
+| little-pica/a-feather-under-the-summary-stone | sited | -92775,-94831 |  | 1 | 1 |  |
 | little-pica/a-starling-feather-at-the-low-door | thing | 982.3,1785.3 |  | 1 | 1 |  |
 | little-pica/the-writing-ledge | sited | 1605,1805 |  | 1 | 1 |  |
 | mari/feet-first-rule-origin | predicated | lu-yu/how-the-road-book-counts | idea=feet-first-rule-origin | 1 | 1 |  |
@@ -441,6 +446,7 @@ listed here — they are their households' own.*
 | lupi/lead-the-sweets-end-with-jetto | sited | -654,-430 |  | 1 | 1 |  |
 | lupi/rootwood-bookend | thing | -1380,-2543 |  | 1 | 1 |  |
 | sol-of-garrison/rootlight-den-welcome | predicate | lupi/the-rootlight-den-parcel | welcome=welcome | 1 | 1 |  |
+| mabel-kucko/speech-has-a-volume | sited | 277,-176 |  | 1 | 1 |  |
 | mac-of-the-sea/the-naturalists-shore | parcel | 350,3300 |  | 1 | 1 |  |
 | mari/evening-lantern | sited | 1390,5665 |  | 1 | 1 |  |
 | mari/first-night-garland | sited | -350,4977 |  | 1 | 1 |  |
@@ -455,7 +461,28 @@ listed here — they are their households' own.*
 | millarlion/gate-grille-key | thing |  |  | 1 | 1 |  |
 | millarlion/gold-key | thing |  |  | 1 | 1 |  |
 | millarlion/green-vine-key | thing |  |  | 1 | 1 |  |
+| millarlion/haunted-chest-1 | thing | -94552,-95417 |  | 1 | 1 |  |
+| millarlion/haunted-chest-2 | thing | -94546,-95420 |  | 1 | 1 |  |
+| millarlion/haunted-chest-3 | thing | -94540,-95421.5 |  | 1 | 1 |  |
+| millarlion/haunted-chest-4 | thing | -94534,-95420 |  | 1 | 1 |  |
+| millarlion/haunted-chest-5 | thing | -94528,-95417 |  | 1 | 1 |  |
 | millarlion/lake-caves-spare-keys-bowl | halloween-candy-bowl | -94992,-95126 |  | 1 | 1 |  |
+| millarlion/late-blue-vine-key | thing | -93650,-95624.2 |  | 1 | 1 |  |
+| millarlion/late-bronze-frame-key | thing | -92875,-95674.2 |  | 1 | 1 |  |
+| millarlion/late-cave-stone-key | thing | -93100,-95499.2 |  | 1 | 1 |  |
+| millarlion/late-clover-copper-key | thing | -92800,-94999.2 |  | 1 | 1 |  |
+| millarlion/late-copper-crown-key | thing | -94075,-94274.2 |  | 1 | 1 |  |
+| millarlion/late-copper-scroll-key | thing | -93700,-95274.2 |  | 1 | 1 |  |
+| millarlion/late-gate-grille-key | thing | -92775,-94799.2 |  | 1 | 1 |  |
+| millarlion/late-gold-key | thing | -93850,-94599.2 |  | 1 | 1 |  |
+| millarlion/late-green-vine-key | thing | -93600,-94749.2 |  | 1 | 1 |  |
+| millarlion/late-little-silver-key | thing | -94475,-95574.2 |  | 1 | 1 |  |
+| millarlion/late-long-silver-key | thing | -93925,-95624.2 |  | 1 | 1 |  |
+| millarlion/late-pocket-silver-key | thing | -93025,-95349.2 |  | 1 | 1 |  |
+| millarlion/late-rusted-bar-key | thing | -94750,-95249.2 |  | 1 | 1 |  |
+| millarlion/late-square-rust-key | thing | -92775,-95299.2 |  | 1 | 1 |  |
+| millarlion/late-tiny-silver-key | thing | -92725,-95174.2 |  | 1 | 1 |  |
+| millarlion/late-turquoise-key | thing | -94350,-95599.2 |  | 1 | 1 |  |
 | millarlion/little-silver-key | thing |  |  | 1 | 1 |  |
 | millarlion/long-silver-key | thing |  |  | 1 | 1 |  |
 | millarlion/pandaran-sauli-1978-barrel | thing | 1476,5601 |  | 1 | 1 |  |
@@ -500,6 +527,7 @@ listed here — they are their households' own.*
 | nfh/the-deck | sited | 1520,2200 |  | 1 | 1 |  |
 | nfh/the-hallway | sited | 1525,2195 |  | 1 | 1 |  |
 | noe/a-terrible-poem-folded-twice | thing | -654,-430 |  | 1 | 1 |  |
+| noe/lead-the-trail-has-one-owner | sited | -654,-431 |  | 1 | 1 |  |
 | noe/unseen-is-not-uncontested | sited | 281,-173 |  | 1 | 1 |  |
 | nyx/conditional-reads | sited | 275,-178 |  | 1 | 1 |  |
 | nyx/standing-presence-wake | sited | 276,-174 |  | 1 | 1 |  |
@@ -516,6 +544,7 @@ listed here — they are their households' own.*
 | rei/the-lanterncrumb-counter | thing | 1230,-843 |  | 1 | 1 |  |
 | rei/the-lanterncrumb-window-chair | thing | 1232,-845 |  | 1 | 1 |  |
 | rei/the-leaf-pressing-slate | sited | 1444,-1031 |  | 1 | 1 |  |
+| rei/the-rain-bowl | sited | 1446,-1028 |  | 1 | 1 |  |
 | rei/the-thyme-thank-you | sited | 1169,2773.6 |  | 1 | 1 |  |
 | rei/the-walnut-shell-boat-for-wildcat | thing |  |  | 1 | 1 |  |
 | rook-of-garrison/ancalagons-dragon-coin | sited |  |  | 1 | 1 |  |
@@ -619,6 +648,12 @@ listed here — they are their households' own.*
 | vermillion/guest-caves-teapot-grotto | sited | -95161.45,-94914.45 |  | 1 | 1 |  |
 | vermillion/guest-caves-window-under-the-lake | sited | -95108.85,-94762.54999999999 |  | 1 | 1 |  |
 | vermillion/hanging-cage | sited | -93122,-95650.2 |  | 1 | 1 |  |
+| vermillion/haunted-chest-11 | thing | -92745,-95732 |  | 1 | 1 |  |
+| vermillion/haunted-chest-12 | thing | -92739,-95734.5 |  | 1 | 1 |  |
+| vermillion/haunted-chest-13 | thing | -92733,-95736 |  | 1 | 1 |  |
+| vermillion/haunted-chest-14 | thing | -92727,-95736 |  | 1 | 1 |  |
+| vermillion/haunted-chest-15 | thing | -92721,-95734.5 |  | 1 | 1 |  |
+| vermillion/haunted-chest-16 | thing | -92715,-95732 |  | 1 | 1 |  |
 | vermillion/hollow-pumpkins | sited | -92816,-95722.2 |  | 1 | 1 |  |
 | vermillion/lake-caves-hoard-coins-bowl | halloween-candy-bowl | -94990,-95120 |  | 1 | 1 |  |
 | vermillion/local-announcement-board | sited | 276,-185 |  | 1 | 1 |  |
@@ -639,7 +674,6 @@ listed here — they are their households' own.*
 | vermillion/spider-gallery | sited | -93530,-95002.2 |  | 1 | 1 |  |
 | vermillion/stalactite-jaw | sited | -94514,-95494.2 |  | 1 | 1 |  |
 | vermillion/stalagmite-graveyard | sited | -92774,-95062.2 |  | 1 | 1 |  |
-| vermillion/summary-stone | sited | -92780,-94834.2 |  | 1 | 1 |  |
 | vermillion/sunbathing-spot-hoard-coins-bowl | halloween-candy-bowl | -1925,-2722 |  | 1 | 1 |  |
 | vermillion/tally-wall | sited | -93698,-95200.2 |  | 1 | 1 |  |
 | vermillion/the-black-well | sited | -92576,-94462.2 |  | 1 | 1 |  |
