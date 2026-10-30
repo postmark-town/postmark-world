@@ -33,14 +33,15 @@ test("the room's own box stays fully clear; the fog rises over the breathing roo
   assert.equal(mistsRoomSurroundAt(r, r.maxX + 10, 0, 0), 0, "no breathing room, nothing to fog");
 });
 
-test("the real record: the Spire's Grounds stand behind the wall at every crossing of the season; the Town Centre never does", () => {
+test("the real record: the Spire's Grounds stand behind the wall at 244 and 272 and clear from 282, when the Mists part over them (WLD-134); the Town Centre is never in the Mists", () => {
   const sk = JSON.parse(readFileSync(new URL("../WORLD/skeleton.json", import.meta.url), "utf8"));
   if (!sk.mists) return;   // a playground with the Mists off has nothing to ask
   const grounds = box(3850, -5500, 500, 400);   // darko/starforge-spire-grounds, the playground's Spire
   const centre = box(-54, -79, 2092, 2092);
   for (const c of [244, 272, 282]) {
     const at = mistsAt(c, sk.mists);
-    assert.ok(roomInMists(at, grounds)?.inWall, `the Grounds at ${c}`);
+    if (c < 282) assert.ok(roomInMists(at, grounds)?.inWall, `the Grounds behind the wall at ${c}`);
+    else assert.equal(roomInMists(at, grounds), null, `the Grounds clear at ${c}`);
     assert.equal(roomInMists(at, centre), null, `the Town Centre at ${c}`);
   }
 });

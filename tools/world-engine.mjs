@@ -281,11 +281,14 @@ export function fogModel(crossing, dials = DIALS) {
 //              pinned as dated config. It is never derived from what the record
 //              happens to draw today, because a border that moved with the
 //              record would re-tell past crossings.
-//   clearings_m  [{ id, x, y, r_m }]  clear ground the wall never takes: a
-//              household's land standing far past the border keeps a circle of
-//              open air round it (ruled 2026-10-09). Elsewhere the wall may
-//              cover a household's marks as it creeps (WLD-38, 2026-10-12).
-//              Clearings do not creep.
+//   clearings_m  [{ id, x, y, r_m, from_crossing? }]  clear ground the wall
+//              never takes: a household's land standing far past the border
+//              keeps a circle of open air round it (ruled 2026-10-09). Elsewhere
+//              the wall may cover a household's marks as it creeps (WLD-38,
+//              2026-10-12). Clearings do not creep. A clearing with a
+//              from_crossing stands from that crossing on; before it the wall
+//              is as it was, so adding one never re-tells a past crossing
+//              (WLD-134, Darko 2026-10-30).
 //   fringe_m   the translucent haze on the clear side of the wall
 //   wall_sight_m  how far a body standing INSIDE the wall can see
 //   schedule   [{ crossing, front_m, veil }, …] in crossing order. front_m is
@@ -341,6 +344,7 @@ export function mistsAt(crossing, mists) {
   const density = clamp01(lerpN(Number(d.from) || 0, Number(d.to ?? d.from) || 0, Math.pow(u, power)));
   const clearings = (Array.isArray(mists.clearings_m) ? mists.clearings_m : [])
     .filter((k) => [k?.x, k?.y, k?.r_m].every(Number.isFinite) && k.r_m > 0)
+    .filter((k) => !(Number.isFinite(k.from_crossing) && c < k.from_crossing))   // not yet parted: the wall as it was (WLD-134)
     .map((k) => ({ id: k.id ?? null, x: k.x, y: k.y, r: k.r_m }));
   return {
     crossing: c,
