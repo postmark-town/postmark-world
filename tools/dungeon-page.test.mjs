@@ -18,6 +18,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markInside } from "./portals.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
@@ -60,7 +61,7 @@ before(async () => {
 /** The ids the Spectator's map draws once it has stopped redrawing. `worldState`
  *  replaces the served record when given. */
 async function drawnIds(worldState = null) {
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+  const page = await machinePage(browser, { viewport: { width: 1600, height: 1000 } });
   if (worldState)
     await page.route("**/world-state.json*", (route) =>
       route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(worldState) }));

@@ -40,6 +40,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { pointInDrawnBounds, standpointDotShown, townRegionMarks } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator", "viewer.mjs"), "utf8");
@@ -197,7 +198,7 @@ before(async () => {
 });
 
 async function openAs(handle) {
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.route("**/WORLD/walk-ledger.md", (route) => route.fulfill({ status: 200, contentType: "text/markdown", body: "# empty\n" }));

@@ -44,6 +44,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { townRegionMarks } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
@@ -211,7 +212,7 @@ before(async () => {
   [rig, office] = await Promise.all([bootRig(), bootStubOffice()]);
   browser = await chromium.launch();
   CLEANUP.push(() => browser.close());
-  page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+  page = await machinePage(browser, { viewport: { width: 1400, height: 900 } });
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.addInitScript((base) => { try { localStorage.setItem("pm.office.base", base); } catch {} }, "http://127.0.0.1:" + office.port);
   await page.addInitScript(() => { try { localStorage.setItem("pm_key", "rig-key-not-a-secret"); } catch {} });
