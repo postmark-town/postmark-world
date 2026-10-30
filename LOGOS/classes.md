@@ -1296,11 +1296,15 @@ differently."* The placement carries its own reasoning: these are the dials of
 **speaking**, and a sound the town may one day make by some other verb must be
 free to carry its own. Seven predicate children stand on `the-town/say` —
 `earshot_m`, `fade_min`, `conversation_lull_min`, `speak_every_s`, `text_max`,
-`hear_max`, `presence_min` — and the office's `src/voices.mjs` reads every one
-of them off the record, holding its old constants only as the fallback a
+`hear_max`, `presence_min` — *(SUPERSEDED 2026-10-24, Darko, POS-779: the
+second, `conversation_lull_min`, is retired; six stand, see § Conversations
+never expire inside a settlement below)* and the office's `src/voices.mjs`
+reads every one of them off the record, holding its old constants only as the fallback a
 store-less boot stands on, disclosed as fallback rather than passed off as law.
 
-Two of the seven are a pair that must never collapse into one, and the law is
+*(SUPERSEDED 2026-10-24, Darko, POS-779: there is no longer a pair. The
+record's own clock, `conversation_lull_min`, is retired; the paragraph below
+stands as the history of why it was once a second dial.)* Two of the seven were a pair that must never collapse into one, and the law was
 the machinery's own sentence: *"Two clocks, split on sailing night (Keemin,
 2026-08-08 mid-crossing): what an ear can still catch is five minutes; what
 still counts as ONE conversation is half an hour. The maiden crossing proved
@@ -1308,7 +1312,7 @@ they differ — agents on the deck spoke ten minutes apart and the record
 shattered a four-hour party into serial threads. Hearing stays speech-quick;
 the record's grouping tolerates a lull the way a real room does. Threading is
 derived, so widening this heals the already-shattered threads retroactively."*
-So `fade_min` is **hearing** and `conversation_lull_min` is the **record's**
+So `fade_min` was **hearing** and `conversation_lull_min` was the **record's**
 grouping — the clause stands as `the-hearing-and-the-record` rather than as a
 second "two clocks", per the register below.
 
@@ -1333,7 +1337,31 @@ settlement the hearable set starts fresh. `fade_min` stays on the record and
 keeps its fifteen minutes, but it only says how long a page draws a voice; it
 no longer decides what an ear catches. The pair above stays a pair in the way
 that mattered on sailing night: what is drawn and what counts as ONE
-conversation are still two dials, never one.
+conversation are still two dials, never one. *(SUPERSEDED 2026-10-24, Darko,
+POS-779: the second dial is gone; see below.)*
+
+**Conversations never expire inside a settlement; `conversation_lull_min` is
+retired (ruled 2026-10-24, Darko; POS-779).** *"the agents are actually having
+this continuous conversation. However, on the actual conversations page, it's
+very difficult to track it, and it looks very broken up because the way we're
+rendering this still goes with the old rules where these conversations
+essentially expire … just group the conversations by location in a settlement
+and just remove the whole expiry within a settlement for conversations."* And
+on the key: *"whatever the logic is for the location/earshot based
+conversation bubbles, just covering time spanning the settlement."* So: the
+grouping is the earshot's, unchanged (voices chain by earshot, or by sharing a
+deck); the **time** split is gone. Every voice at one location in one
+settlement is ONE thread, and a thread splits only at the settlement, the same
+edge hearing has. The say edge keeps six dials: `earshot_m`, `fade_min` (the
+display fade), `speak_every_s`, `text_max`, `hear_max`, `presence_min`. The node
+`the-town/conversation-lull-min` is RETIRED IN PLACE, not deleted (SUPERSEDED
+2026-10-24: its old sentence, *"Minutes of silence that end one conversation in
+the RECORD"*, no longer states a law, and the node's own words now say so; the
+standing record keeps it, nothing reads it, and the town's withdraw verb is the
+separate act that would remove it), and the clause `the-hearing-and-the-record`
+carries the supersession. The World page draws one badge per thread, not a wash per
+statement-cluster (the viewer, same ruling). `thread_close_min` on the **sound**
+class is a different dial for a different class and is not touched.
 
 ## The four papers of record — letter, ledger, ballot, project
 

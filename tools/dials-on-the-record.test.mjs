@@ -15,7 +15,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -31,10 +31,11 @@ const byId = new Map(marks.map((m) => [m.id, m]));
 //
 // AMENDED 2026-09-17 (Keemin, postmark#2917): "let's up fade_min to 15 and see
 // if that is enough" — hearing widens 5 → 15; the record's lull stays 30.
+// AMENDED 2026-10-24 (Darko, POS-779): the record's lull (conversation_lull_min)
+// is retired - a conversation never expires inside a settlement.
 const SAY_DIALS = {
   earshot_m: 60,
   fade_min: 15,
-  conversation_lull_min: 30,
   speak_every_s: 15,
   text_max: 500,
   hear_max: 20,
@@ -98,16 +99,20 @@ test("the dials carry their claim: every one is a readable sentence, none is a b
   }
 });
 
-test("the two clocks stay two: hearing and the record's grouping are different dials", () => {
-  const bySlot = new Map(dialsUnder("the-town/say").map((m) => [m.slot, m]));
-  const fade = Number(bySlot.get("fade_min")?.value);
-  const lull = Number(bySlot.get("conversation_lull_min")?.value);
-  assert.ok(Number.isFinite(fade) && Number.isFinite(lull), "both clocks must stand on the record");
-  assert.notEqual(fade, lull,
-    "fade_min is the DISPLAY fade (hearing reaches the settlement, 2026-09-26) and conversation_lull_min is the RECORD's grouping — collapsing them shatters a long party into serial threads (the maiden crossing, 2026-08-08)");
-  assert.ok(lull > fade, "the record's grouping tolerates a lull the display fade does not");
-  // the clause itself stands as a node, under its own name (the lint refused a
-  // second `the-two-clocks`: that slug is state-and-time.md's written/settled pair)
+test("the record has no lull clock: conversation_lull_min is retired (POS-779, Darko 2026-10-24)", () => {
+  // A conversation never expires inside a settlement and splits only at one, so
+  // the say edge carries no second grouping dial. The folded world-state.json is
+  // regenerated at the settlement, so this reads the mark FILES: the node stands
+  // on main (the harm gate refuses a standing mark that is merely deleted) but
+  // its own sentence says it is retired, and its clause says so.
+  const dir = join(ROOT, "WORLD", "marks", "let-there-be-light", "the-town-centre", "the-keeping-works", "postmark-edge", "say");
+  const node = readFileSync(join(dir, "conversation-lull-min", "mark.md"), "utf8");
+  assert.ok(node.includes("RETIRED, SUPERSEDED 2026-10-24 (Darko, POS-779)"), "the node says it is retired, in its own sentence");
+  const clause = readFileSync(join(dir, "the-hearing-and-the-record", "mark.md"), "utf8");
+  assert.match(clause, /SUPERSEDED 2026-10-24/, "the clause that named the lull carries the supersession");
+  assert.match(clause, /conversation_lull_min/, "and names what it retired");
+  assert.equal(Object.hasOwn(SAY_DIALS, "conversation_lull_min"), false, "and the ruling's own list no longer asks for it");
+  // the clause itself stands as a node, under its own name
   assert.ok(byId.has("the-town/the-hearing-and-the-record"),
-    "the two-clocks clause must stand as its own predicate on the say edge");
+    "the clause must stand as its own predicate on the say edge");
 });
