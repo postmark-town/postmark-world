@@ -247,6 +247,20 @@
         "y": 14000,
         "r_m": 4250,
         "receipt": "a household's parcel and its wetland, 15 km past the border: the smallest circle that holds the wetland (6000 x 4500 m, the parcel inside it) is 3750 m, widened by the 400 m fringe and 100 m more, so no part of either is in the wall or the fringe"
+      },
+      {
+        "id": "the-starforge-spire",
+        "x": 3850,
+        "y": -5500,
+        "r_m": 821,
+        "receipt": "the Starforge Spire's grounds (wright/starforge-spire-grounds, 500 x 400 m at 3850, -5500), past the north border: the smallest circle that holds them is 320.2 m, widened by the 400 m fringe and 100 m more, so no part of them is in the wall or the fringe. Parted for Halloween (Darko, 2026-10-30)."
+      },
+      {
+        "id": "the-way-to-the-spire-1",
+        "x": 3850,
+        "y": -4263,
+        "r_m": 935,
+        "receipt": "the way from the town's clear ground to the Starforge Spire's clearing, straight north along x 3850 since no road mark runs there: the smallest circle that holds a 200 m band from the clear ground's edge at the last keyframe (y -3840) to the Spire clearing's rim (y -4685.1) is 434.7 m, widened by the 400 m fringe and 100 m more, so no part of the band is in the wall or the fringe. Parted for Halloween (Darko, 2026-10-30)."
       }
     ],
     "fringe_m": 400,
