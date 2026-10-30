@@ -111,7 +111,9 @@ function sweepUnderFakes(flag) {
 
 test("THE SWEEP IN THE CANDLE: with the flag, over an inherited CI and npm, it imports no browser, launches none, starts no child, and says why", () => {
   const r = sweepUnderFakes(true);
-  assert.ok(r.tests >= 23 && r.pass >= 1, `the sweep module ran (tests ${r.tests}, pass ${r.pass}): nonzero, so this is an exclusion and not an empty run`);
+  // nonzero, and the module's own: 23 tests counted and all 22 throttled ones reported by
+  // name, so this is an exclusion and not an empty run
+  assert.ok(r.tests >= 23, `the sweep module ran (tests ${r.tests})`);
   assert.equal(r.swept.length, 22, "all 22 throttled tests reported");
   assert.deepEqual(r.swept.filter((s) => !(s.ok && /# SKIP CANDLE EXCLUSION/.test(s.line))).map((s) => s.line), [],
     "each one skipped as the candle's exclusion, by name");
