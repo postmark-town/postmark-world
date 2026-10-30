@@ -60,10 +60,13 @@ before(async () => {
 /** one page test in a child, throttled; its TAP and the machine receipt */
 function runThrottled(rel) {
   const log = join(mkdtempSync(join(tmpdir(), "wld71-sweep-")), "machine.jsonl");
+  // NODE_TEST_CONTEXT is the parent runner's: a child that inherits it reports to
+  // the parent's channel instead of running as a run of its own, and exits 0
+  // having passed nothing (measured on CI at f39d1ee7: all 22 "passed nothing")
+  const env = { ...process.env, [THROTTLE_ENV]: String(RATE), [MACHINE_LOG_ENV]: log };
+  delete env.NODE_TEST_CONTEXT;
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, ["--test", "--test-reporter=tap", rel], {
-      cwd: ROOT, env: { ...process.env, [THROTTLE_ENV]: String(RATE), [MACHINE_LOG_ENV]: log }, stdio: ["ignore", "pipe", "pipe"],
-    });
+    const child = spawn(process.execPath, ["--test", "--test-reporter=tap", rel], { cwd: ROOT, env, stdio: ["ignore", "pipe", "pipe"] });
     let out = "";
     child.stdout.on("data", (b) => { out += b; });
     child.stderr.on("data", (b) => { out += b; });
