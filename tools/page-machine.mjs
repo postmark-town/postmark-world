@@ -114,7 +114,7 @@ export async function machineContext(browser, { clock = "held", machine = ABLE_M
   const open = ctx.newPage.bind(ctx);
   ctx.newPage = async () => {
     const page = await open();
-    // NEGATIVE (WLD-71 FIX, to be reverted): the throttle is never sent
+    if (throttle > 1) await (await ctx.newCDPSession(page)).send("Emulation.setCPUThrottlingRate", { rate: throttle });
     // the sweep's receipt (tools/page-throttle-sweep.test.mjs): one line per real
     // page opened, with the machine it was opened on
     if (process.env[MACHINE_LOG_ENV]) appendFileSync(process.env[MACHINE_LOG_ENV], JSON.stringify({ clock, cores: machine.cores, memory: machine.memory, throttle }) + "\n");
