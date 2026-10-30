@@ -313,7 +313,7 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, walks
   // the fold took longer than 1.2 s to land (a loaded box), and the assertions
   // below went red on a page that was right. The pane opens once, when its lanes
   // have settled (POS-84), so its first rows are the event to wait for.
-  await page.waitForFunction(() => (window.__pos84 ?? []).some((s) => s.rows.length), null, { timeout: 120_000 });
+  // NEGATIVE (WLD-71, to be reverted): the old setup, no wait for the first rows
   // then wait for the pane to stop changing, and read the whole history off the page
   let last = "", held = 0, waited = 0;
   while (held < 1_200 && waited < 45_000) {
