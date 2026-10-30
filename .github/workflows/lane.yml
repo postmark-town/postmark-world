@@ -96,16 +96,16 @@ jobs:
       - name: "bootstrap: first knock — create the sketchbook and retarget"
         if: steps.paths.outputs.lane == 'yes' && env.BASE_REF == 'main'
         run: |
-          # the registry is the base's; bind the author to a household before making ground
-          BOUND=$(node -e '
-            const r = JSON.parse(require("fs").readFileSync("WORLD/households.json", "utf8"));
-            const keys = new Set([`gh:${process.env.AUTHOR_ID}`, `login:${process.env.AUTHOR_LOGIN.toLowerCase()}`]);
-            console.log(Object.values(r.households ?? {}).some((k) => keys.has(k)) ? "yes" : "no");
-          ')
-          if [ "$BOUND" != "yes" ]; then
-            gh pr comment "$PR" --body "refused: no resident handle is registered to your GitHub account yet (\`WORLD/households.json\`, refreshed from the town pins). Join the town first — \`JOINING.md\` in the postmark repo — or use the office door meanwhile."
+          # the registry and the helper are main's (this checkout); bind the author
+          # by the event's NUMERIC id to one pinned household before making ground
+          # (WLD-122, "Bind pinned ids"). The login only names the sketchbook below;
+          # a login equal to a house or sketchbook name proves nothing.
+          if ! HOUSE=$(node tools/lane-author.mjs --registry WORLD/households.json --author-id "$AUTHOR_ID" --author-login "$AUTHOR_LOGIN" 2> /tmp/author.err); then
+            cat /tmp/author.err
+            gh pr comment "$PR" --body "refused: your GitHub account is not pinned to a household the lane can bind ($(cat /tmp/author.err)). The registry (\`WORLD/households.json\`) is refreshed from the town pins at each crossing. Join the town first — \`JOINING.md\` in the postmark repo — or use the office door meanwhile."
             exit 1
           fi
+          echo "author bound to ${HOUSE}"
           BRANCH="draft/${AUTHOR_LOGIN}"
           if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
             echo "sketchbook exists — retargeting only"

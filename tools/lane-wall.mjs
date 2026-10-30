@@ -15,8 +15,10 @@
 //      the author's own note (NOTES/<handle>.md). Nothing else rides this lane.
 //   2. HANDLES — every `by:` on an added/changed mark, every NOTES filename, and
 //      the author of every DELETED or CHANGED mark as it stood resolve, via WORLD/households.json (read from
-//      the BASE ref — the trusted side), to the PR author's own household:
-//      `gh:<author-id>` or `login:<author-login>`. A handle the registry does
+//      the BASE ref — the trusted side), to the PR author's own household: the
+//      ONE household its `pinned_ids` binds the author's numeric GitHub id to
+//      (lane-author.mjs; WLD-122, "Bind pinned ids"). The login is never
+//      identity, and an author no pin binds owns nothing. A handle the registry does
 //      not know is refused — the lane's identity model IS the registry (the
 //      office door remains open to unregistered handles; registry refresh is
 //      world-households-export on pin churn).
@@ -43,6 +45,7 @@ import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord, placementParent } from "./marks-fold.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";
 import { mayMake, makersRefusal } from "./admin-makers.mjs"; // who may make a class: makers, then admin (WLD-21)
+import { bindAuthor } from "./lane-author.mjs"; // who the author is: pinned numeric id → household (WLD-122)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -89,12 +92,19 @@ try {
     + `derived from town ${registryTownSha ?? "an UNSTAMPED tree (this registry predates the crossing's refresh)"}`);
 } catch { /* no registry → every handle is unverifiable and will refuse below */ }
 
-const myKeys = new Set([`gh:${AUTHOR_ID}`, ...(AUTHOR_LOGIN ? [`login:${AUTHOR_LOGIN}`] : [])]);
-const mine = (handle) => myKeys.has(registry[handle] ?? "");
+// THE AUTHOR, BOUND BY PINNED NUMERIC ID (WLD-122, Darko "Bind pinned ids"):
+// one household or none, through lane-author.mjs, the same helper the first
+// knock runs. The login is never identity, and an unbound author owns nothing:
+// `mine` is false for every handle, and no unresolved key can compare equal.
+const author = bindAuthor(registryFile, AUTHOR_ID);
+const myHouse = author.house;
+const mine = (handle) => myHouse !== null && Object.prototype.hasOwnProperty.call(registry, handle) && registry[handle] === myHouse;
 const myHandles = Object.keys(registry).filter(mine).sort();
 
 const violations = [];
 const refuse = (path, defect, hint) => violations.push({ path, defect, hint });
+if (!myHouse) refuse("(the author)", author.reason,
+  "the PR lane binds an author by their GitHub account's numeric id, pinned in the town's registry; join the town (JOINING.md) or use the office door meanwhile");
 
 // 0 — the sketchbook is the author's own. --base-branch draft/<x> binds the
 // branch name through the registry's logins map to a household; a PR into a
@@ -111,7 +121,7 @@ if (baseBranch) {
     if (!bound) refuse(baseBranch, "this sketchbook is not in the registry",
       "the logins map in WORLD/households.json binds branch names to households; the settlement crossing "
       + `re-derives it from the town every crossing (this copy: town ${registryTownSha ?? "UNSTAMPED"})`);
-    else if (!myKeys.has(bound)) refuse(baseBranch, "this sketchbook is not yours",
+    else if (!myHouse || bound !== myHouse) refuse(baseBranch, "this sketchbook is not yours",
       `${baseBranch} belongs to ${bound}; yours is draft/${AUTHOR_LOGIN || "<your-github-login>"}`);
   }
 }
@@ -149,7 +159,7 @@ for (const { status, path } of changes) {
     const handle = notePath[1];
     if (status !== "D") {
       if (!mine(handle)) refuse(path, `"${handle}" is not one of your residents`,
-        myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to gh:${AUTHOR_ID} — the registry (WORLD/households.json) refreshes from the town pins; the office door works meanwhile`);
+        myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to GitHub account ${AUTHOR_ID} — the registry (WORLD/households.json) refreshes from the town pins; the office door works meanwhile`);
       const body = showAt(HEAD, path);
       const chars = [...body.trim()].length;
       if (chars > 2000) refuse(path, `the note is ${chars} chars; the cap is 2000`, "one note to your returning self — a new note replaces the old");
@@ -163,7 +173,7 @@ for (const { status, path } of changes) {
   // change but an add) and the record as it lands (every change but a delete).
   // A change is judged on both, so rewriting `by:` on another household's record
   // is refused the same way erasing it is.
-  const hint = myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to gh:${AUTHOR_ID} yet — the registry refreshes from the town pins; the office door works meanwhile`;
+  const hint = myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to GitHub account ${AUTHOR_ID} yet — the registry refreshes from the town pins; the office door works meanwhile`;
   const sides = status === "D" ? ["before"] : status === "A" ? ["after"] : ["before", "after"];
   for (const side of sides) {
     let record;
