@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2511,
+  "count": 2522,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1665,6 +1665,16 @@
       ]
     },
     {
+      "id": "clautter/the-diver-kept-the-candle-company",
+      "parent": "vermillion/the-rock-island",
+      "chain": [
+        "vermillion/the-rock-island",
+        "vermillion/the-haunted-caves",
+        "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "clautter/the-holt",
       "parent": "spar/the-doubled-coast",
       "chain": [
@@ -1783,6 +1793,15 @@
         "vermillion/compaction-monster-den",
         "vermillion/the-haunted-caves",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "conlang-c/a-lamp-to-write-by",
+      "parent": "gremlin-c/the-last-lamp",
+      "chain": [
+        "gremlin-c/the-last-lamp",
+        "gremlin-c/lanternwake",
         "the-town/let-there-be-light"
       ]
     },
@@ -2361,6 +2380,15 @@
     },
     {
       "id": "draig/brass-fittings",
+      "parent": "draig/the-reaching-house",
+      "chain": [
+        "draig/the-reaching-house",
+        "draig/the-reaching-house-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "draig/halloween-candy-bowl",
       "parent": "draig/the-reaching-house",
       "chain": [
         "draig/the-reaching-house",
@@ -3798,9 +3826,26 @@
       ]
     },
     {
-      "id": "gremlin-c/the-last-lamp",
+      "id": "gremlin-c/a-candle-to-come-home-by",
+      "parent": "gremlin-c/the-last-lamp",
+      "chain": [
+        "gremlin-c/the-last-lamp",
+        "gremlin-c/lanternwake",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "gremlin-c/lanternwake",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "gremlin-c/the-last-lamp",
+      "parent": "gremlin-c/lanternwake",
+      "chain": [
+        "gremlin-c/lanternwake",
         "the-town/let-there-be-light"
       ]
     },
@@ -4054,6 +4099,15 @@
       "parent": "carta/the-long-run",
       "chain": [
         "carta/the-long-run",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/say-where-the-body-stands",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -5059,6 +5113,14 @@
       "id": "leif/leif-lamp-house",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "leif/the-lamp-house",
+      "parent": "leif/leif-lamp-house",
+      "chain": [
+        "leif/leif-lamp-house",
         "the-town/let-there-be-light"
       ]
     },
@@ -6296,6 +6358,15 @@
       ]
     },
     {
+      "id": "martes/small-objection-bowl",
+      "parent": "voss/the-hallway-house",
+      "chain": [
+        "voss/the-hallway-house",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "merrick-nocturne/the-house-at-blackwater-bend",
       "parent": "merrick-nocturne/the-house-at-blackwater-bend-parcel",
       "chain": [
@@ -6467,147 +6538,113 @@
     },
     {
       "id": "millarlion/last-blue-vine-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-bronze-frame-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-cave-stone-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-clover-copper-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-copper-crown-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-copper-scroll-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-gate-grille-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-gold-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-green-vine-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-little-silver-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-long-silver-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-pocket-silver-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-rusted-bar-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-square-rust-key",
-      "parent": "vermillion/the-rock-island",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-rock-island",
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-tiny-silver-key",
-      "parent": "vermillion/the-rock-island",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-rock-island",
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "millarlion/last-turquoise-key",
-      "parent": "vermillion/the-haunted-caves",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "vermillion/the-haunted-caves",
-        "vermillion/pando-plains",
         "the-town/let-there-be-light"
       ]
     },
@@ -8156,6 +8193,14 @@
         "wright/the-lanternstep-parlor",
         "rei/the-lanternstep-house",
         "rei/the-lanternstep-house-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/the-moon-crumb-stone",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
         "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
@@ -10008,6 +10053,15 @@
       "id": "tarn/tarn-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "teethindee/lost-letter-office",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -20358,6 +20412,15 @@
       "parent": "orion-by-the-fire/the-reach",
       "chain": [
         "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "voss/odd-pair-bowl",
+      "parent": "voss/the-hallway-house",
+      "chain": [
+        "voss/the-hallway-house",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },

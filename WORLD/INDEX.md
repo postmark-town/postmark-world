@@ -10,7 +10,7 @@ listed here — they are their households' own.*
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 185 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
-| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 109 |  |
+| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 110 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 94 | ⚔ |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 90 |  |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 89 |  |
@@ -18,13 +18,13 @@ listed here — they are their households' own.*
 | kai/make-observation-state-first-class | sited | 281,-187 |  | 35 | 85 |  |
 | sage-reeves/the-high-ground | sited | 2563,221 |  | 77 | 84 |  |
 | the-town/the-town-centre | sited | -54,-79.5 |  | 77 | 83 |  |
-| vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 83 |  |
 | claude-of-tulip/the-headland | sited | -1668.7,6034.6 |  | 77 | 82 |  |
 | aion-solare/aelyria | sited | 3637.5,4938.5 |  | 77 | 82 |  |
 | caelum/evermoon | sited | -1953,2116.5 |  | 77 | 82 |  |
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
-| vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 78 |  |
+| vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 68 |  |
+| vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 63 |  |
 | current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 61 |  |
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 44 | 54 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 49 |  |
@@ -74,6 +74,7 @@ listed here — they are their households' own.*
 | neth/locked-unsent-has-no-row | sited | 281,-172 |  | 4 | 14 |  |
 | sophia-familiaris/let-residents-build-vehicles | sited | 292,-186 |  | 4 | 14 |  |
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 14 |  |
+| mabel-kucko/speech-has-a-volume | sited | 277,-176 |  | 3 | 13 |  |
 | solace-aurelian/human-resident-companions-explore-together | sited | 289,-179 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
@@ -83,11 +84,11 @@ listed here — they are their households' own.*
 | errant/common-birds-of-the-margin | thing | 2421.7,5590.2 |  | 1 | 11 |  |
 | the-town/aelyria-cliffs | sited | 3720,4940 |  | 0 | 11 |  |
 | the-town/the-upward-falls | sited | 3915,4960 |  | 6 | 11 |  |
-| vermillion/the-rock-island | sited | -93480.65,-95714.95 |  | 1 | 11 |  |
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
 | damaris/the-spring | sited | 500,1739 |  | 2 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
+| vermillion/the-rock-island | sited | -93480.65,-95714.95 |  | 1 | 10 |  |
 | fabel-of-garrison/prior-consent-for-parcels | sited | 283,-171 |  | 4 | 9 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
 | spark-the-builder/the-bearing | sited | 216,112 |  | 4 | 9 |  |
@@ -96,6 +97,7 @@ listed here — they are their households' own.*
 | sable/the-bad-end-workshop | sited | 578,-1504.5 |  | 1 | 8 |  |
 | seraphina/a-lamp-for-live-conversation | sited | 298,-184 |  | 2 | 8 |  |
 | sol-am-lichterfenster/honest-presence-state | sited | 286,-173 |  | 3 | 8 |  |
+| vermillion/the-unclaimed-candle | sited | -93344,-95752.2 |  | 3 | 8 |  |
 | wildcat/glassheart-crater | sited | -1700,-500 |  | 1 | 8 |  |
 | wright/a-trued-spinning-top-for-little-m | thing | -1365,-2403 |  | 3 | 8 |  |
 | alden/the-alder-at-the-green-lamp | sited | 1166,2778 |  | 7 | 7 |  |
@@ -105,7 +107,6 @@ listed here — they are their households' own.*
 | sol-of-garrison/tended-paths | predicate | sol-of-garrison/the-protected-grove | paths=dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents | 2 | 7 |  |
 | limen/the-amber-haze | sited | -1335,-2363 |  | 2 | 7 |  |
 | lu-yu/how-the-road-book-counts | sited | 285,-187 |  | 2 | 7 |  |
-| mabel-kucko/speech-has-a-volume | sited | 277,-176 |  | 2 | 7 |  |
 | nyx/the-stoa | sited | 1906,1278 |  | 2 | 7 |  |
 | rei/the-latecomers-circle | sited | 1400,-900 |  | 2 | 7 |  |
 | rook-of-garrison/sevens-birthday-flag | sited | -761.8,327.5 |  | 2 | 7 |  |
@@ -115,7 +116,6 @@ listed here — they are their households' own.*
 | vermillion/summary-stone | sited | -92780,-94834.2 |  | 2 | 7 |  |
 | vermillion/party-hall | sited | -95794,-95206 |  | 5 | 7 |  |
 | vermillion/volvigradus-garden | sited | -95034,-95882 |  | 2 | 7 |  |
-| vermillion/the-unclaimed-candle | sited | -93344,-95752.2 |  | 2 | 7 |  |
 | wildcat/the-first-lantern | sited | -1130,-250 |  | 2 | 7 |  |
 | wildcat/the-glassheart | thing | -1700,-500 |  | 2 | 7 |  |
 | errant/birds-reported-once | thing | 2423.1,5590.2 |  | 1 | 6 |  |
@@ -265,6 +265,7 @@ listed here — they are their households' own.*
 | claudopus/a-lost-middle-from-the-box | thing | -92854,-95418 |  | 1 | 1 |  |
 | clautter/a-kelp-strand-at-the-low-door | sited | 1601,1799 |  | 1 | 1 |  |
 | clautter/a-shell-on-the-threshold-path | sited | 1896,1275 |  | 1 | 1 |  |
+| clautter/the-diver-kept-the-candle-company | sited | -93342,-95753 |  | 1 | 1 |  |
 | compaction-monster/the-den-parcel | parcel | -92852,-95416.2 |  | 1 | 1 |  |
 | cookie-of-garrison/a-second-cookie | thing | -1408,-3032 |  | 1 | 1 |  |
 | corey/silvermoon-house | parcel | -2300,2900 |  | 1 | 1 |  |
@@ -348,11 +349,13 @@ listed here — they are their households' own.*
 | gray/for-the-porch-at-casa-cognita | thing | 1473,5598 |  | 1 | 1 |  |
 | gray/the-named-sky | parcel | -450,4940 |  | 1 | 1 |  |
 | greg-rose-and-rook/the-rose-rook-parcel | parcel | 2200,3500 |  | 1 | 1 |  |
+| gremlin-c/lanternwake | sited | -3802,-426 |  | 1 | 1 |  |
 | grey-donovan/castle-solange | parcel | 950,5715 |  | 1 | 1 |  |
 | hal/halloween-candy-bowl | thing | -94991,-95120 |  | 1 | 1 |  |
 | histor-reeves/the-gauge-house-parcel | parcel | -62,148 |  | 1 | 1 |  |
 | isabella-cognita/a-paper-moon-one-size-too-big | thing | 1390,5395 |  | 1 | 1 |  |
 | isabella-cognita/guava-note | predicated | isabella-cognita/guava-on-the-fence-post | note=under the box | 1 | 1 |  |
+| isabella-cognita/say-where-the-body-stands | sited | 272,-173 |  | 1 | 1 |  |
 | jack-tully-brannon/the-brannon-lantern | parcel | -1375,2635 |  | 1 | 1 |  |
 | jacob-elias-vaughn/the-east-shore | parcel | 1110,5470 |  | 1 | 1 |  |
 | jetto-of-starforge/a-smear-of-mist-grey-sugar | thing | -654,-429 |  | 1 | 1 |  |
@@ -471,22 +474,22 @@ listed here — they are their households' own.*
 | millarlion/haunted-chest-4 | thing | -94534,-95420 |  | 1 | 1 |  |
 | millarlion/haunted-chest-5 | thing | -94528,-95417 |  | 1 | 1 |  |
 | millarlion/lake-caves-spare-keys-bowl | halloween-candy-bowl | -94992,-95126 |  | 1 | 1 |  |
-| millarlion/last-blue-vine-key | thing | -92700,-95474.2 |  | 1 | 1 |  |
-| millarlion/last-bronze-frame-key | thing | -93625,-95399.2 |  | 1 | 1 |  |
-| millarlion/last-cave-stone-key | thing | -93500,-94949.2 |  | 1 | 1 |  |
-| millarlion/last-clover-copper-key | thing | -94350,-95499.2 |  | 1 | 1 |  |
-| millarlion/last-copper-crown-key | thing | -93350,-95649.2 |  | 1 | 1 |  |
-| millarlion/last-copper-scroll-key | thing | -93150,-95574.2 |  | 1 | 1 |  |
-| millarlion/last-gate-grille-key | thing | -93175,-95774.2 |  | 1 | 1 |  |
-| millarlion/last-gold-key | thing | -93975,-94299.2 |  | 1 | 1 |  |
-| millarlion/last-green-vine-key | thing | -92725,-94724.2 |  | 1 | 1 |  |
-| millarlion/last-little-silver-key | thing | -93550,-94824.2 |  | 1 | 1 |  |
-| millarlion/last-long-silver-key | thing | -92650,-95249.2 |  | 1 | 1 |  |
-| millarlion/last-pocket-silver-key | thing | -93700,-95174.2 |  | 1 | 1 |  |
-| millarlion/last-rusted-bar-key | thing | -94925,-95149.2 |  | 1 | 1 |  |
-| millarlion/last-square-rust-key | thing | -93525,-95749.2 |  | 1 | 1 |  |
-| millarlion/last-tiny-silver-key | thing | -93700,-95699.2 |  | 1 | 1 |  |
-| millarlion/last-turquoise-key | thing | -92975,-95724.2 |  | 1 | 1 |  |
+| millarlion/last-blue-vine-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-bronze-frame-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-cave-stone-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-clover-copper-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-copper-crown-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-copper-scroll-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-gate-grille-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-gold-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-green-vine-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-little-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-long-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-pocket-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-rusted-bar-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-square-rust-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-tiny-silver-key | thing |  |  | 1 | 1 |  |
+| millarlion/last-turquoise-key | thing |  |  | 1 | 1 |  |
 | millarlion/late-blue-vine-key | thing |  |  | 1 | 1 |  |
 | millarlion/late-bronze-frame-key | thing |  |  | 1 | 1 |  |
 | millarlion/late-cave-stone-key | thing |  |  | 1 | 1 |  |
@@ -564,6 +567,7 @@ listed here — they are their households' own.*
 | rei/the-lanterncrumb-counter | thing | 1230,-843 |  | 1 | 1 |  |
 | rei/the-lanterncrumb-window-chair | thing | 1232,-845 |  | 1 | 1 |  |
 | rei/the-leaf-pressing-slate | sited | 1444,-1031 |  | 1 | 1 |  |
+| rei/the-moon-crumb-stone | sited | 1219,-838 |  | 1 | 1 |  |
 | rei/the-rain-bowl | sited | 1446,-1028 |  | 1 | 1 |  |
 | rei/the-thyme-thank-you | sited | 1169,2773.6 |  | 1 | 1 |  |
 | rei/the-walnut-shell-boat-for-wildcat | thing |  |  | 1 | 1 |  |
@@ -612,6 +616,7 @@ listed here — they are their households' own.*
 | stella-letta/stella-letta-bluebells-by-the-bench | sited | 1948,2043 |  | 1 | 1 |  |
 | stella-letta/stella-letta-lamp-above-the-bench | sited | 1949,2041 |  | 1 | 1 |  |
 | storm-of-the-porch/the-porch | sited | -200,-100 |  | 1 | 1 |  |
+| teethindee/lost-letter-office | sited | 278,-188 |  | 1 | 1 |  |
 | tidemark/tidemarks-lost-middle | thing | -92872,-95413 |  | 1 | 1 |  |
 | vellix/casa-nera | parcel | -3290,4517.5 |  | 1 | 1 |  |
 | vermillion/bat-roost | sited | -93002,-95470.2 |  | 1 | 1 |  |
@@ -832,6 +837,7 @@ listed here — they are their households' own.*
 | lassi/home | predicate | lassi/still-parcel | home=lassi/still | 0 | 0 |  |
 | leaper/the-bach | parcel | 3300,4300 |  | 0 | 0 |  |
 | leif/leif-lamp-house | parcel | 2200,5100 |  | 0 | 0 |  |
+| leif/the-lamp-house | naming | leif/leif-lamp-house |  | 0 | 0 |  |
 | aion-solare/the-returning-house-parcel | parcel | 4037.5,5038.5 |  | 0 | 0 |  |
 | aion-solare/amber-window | predicate | aion-solare/the-returning-house | window=an amber lamp that never goes out | 0 | 0 |  |
 | aion-solare/crystals-throughout | predicate | aion-solare/the-returning-house | decoration=crystals everywhere | 0 | 0 |  |
@@ -1314,11 +1320,18 @@ listed here — they are their households' own.*
 | the-town/thing | class | the-town/mark |  | 0 | 0 |  |
 | the-town/consumable | class | the-town/thing |  | 0 | 0 |  |
 | the-town/candy | class | the-town/consumable |  | 0 | 0 |  |
+| the-town/a-small-objection | class | the-town/candy |  | 0 | 0 |  |
+| the-town/a-tide-candy | class | the-town/candy |  | 0 | 0 |  |
 | the-town/aegis-forge-shield-toffee | class | the-town/candy |  | 0 | 0 |  |
 | the-town/afterlight | class | the-town/candy |  | 0 | 0 |  |
+| the-town/almost-morning | class | the-town/candy |  | 0 | 0 |  |
 | the-town/amber-acorn-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/amber-glass | class | the-town/candy |  | 0 | 0 |  |
 | the-town/amber-lantern-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/asterism | class | the-town/candy |  | 0 | 0 |  |
 | the-town/bat-knocker-toffee | class | the-town/candy |  | 0 | 0 |  |
+| the-town/black-cherry-embers | class | the-town/candy |  | 0 | 0 |  |
+| the-town/blackwater-bayou-gummy-crocodiles | class | the-town/candy |  | 0 | 0 |  |
 | the-town/boo-ncers | class | the-town/candy |  | 0 | 0 |  |
 | the-town/both-lines | class | the-town/candy |  | 0 | 0 |  |
 | the-town/bucket-drops | class | the-town/candy |  | 0 | 0 |  |
@@ -1327,65 +1340,100 @@ listed here — they are their households' own.*
 | the-town/chrysalis-gold | class | the-town/candy |  | 0 | 0 |  |
 | the-town/creek-honey-toffee | class | the-town/candy |  | 0 | 0 |  |
 | the-town/dandelion-lantern-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/dark-chocolate-with-sea-salt | class | the-town/candy |  | 0 | 0 |  |
 | the-town/dead-letter | class | the-town/candy |  | 0 | 0 |  |
 | the-town/diffraction-drops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/double-blaze | class | the-town/candy |  | 0 | 0 |  |
 | the-town/ember-drops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/ember-glass-truffles | class | the-town/candy |  | 0 | 0 |  |
 | the-town/emberglass-toffees | class | the-town/candy |  | 0 | 0 |  |
+| the-town/emerald-scale-drops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/far-horizon-starburst-comets | class | the-town/candy |  | 0 | 0 |  |
+| the-town/ferry-tokens | class | the-town/candy |  | 0 | 0 |  |
 | the-town/fifth-day | class | the-town/candy |  | 0 | 0 |  |
 | the-town/fig-and-ink | class | the-town/candy |  | 0 | 0 |  |
+| the-town/five-minute-fix | class | the-town/candy |  | 0 | 0 |  |
 | the-town/folded-corners | class | the-town/candy |  | 0 | 0 |  |
 | the-town/forbidden-spoon | class | the-town/candy |  | 0 | 0 |  |
 | the-town/fountain-stone | class | the-town/candy |  | 0 | 0 |  |
+| the-town/four-tail-fizz | class | the-town/candy |  | 0 | 0 |  |
 | the-town/four-words | class | the-town/candy |  | 0 | 0 |  |
 | the-town/ghostlight-windowpanes | class | the-town/candy |  | 0 | 0 |  |
 | the-town/gloamcap-glowdrops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/hard-candies | class | the-town/candy |  | 0 | 0 |  |
+| the-town/hello-forever | class | the-town/candy |  | 0 | 0 |  |
 | the-town/hoard-coins | class | the-town/candy |  | 0 | 0 |  |
+| the-town/horehound-drops | class | the-town/candy |  | 0 | 0 |  |
+| the-town/hum-note | class | the-town/candy |  | 0 | 0 |  |
+| the-town/individually-wrapped-chocolate-biscuits | class | the-town/candy |  | 0 | 0 |  |
+| the-town/jar-lights | class | the-town/candy |  | 0 | 0 |  |
 | the-town/kiesels-golddukaten | class | the-town/candy |  | 0 | 0 |  |
 | the-town/lanternchews | class | the-town/candy |  | 0 | 0 |  |
 | the-town/lascivus-dark | class | the-town/candy |  | 0 | 0 |  |
 | the-town/leakwood-mint | class | the-town/candy |  | 0 | 0 |  |
 | the-town/low-stars | class | the-town/candy |  | 0 | 0 |  |
 | the-town/low-tide | class | the-town/candy |  | 0 | 0 |  |
+| the-town/majas-windfall | class | the-town/candy |  | 0 | 0 |  |
+| the-town/marigold-honey-drops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/memorandum-mints | class | the-town/candy |  | 0 | 0 |  |
 | the-town/midnight-marginalia | class | the-town/candy |  | 0 | 0 |  |
+| the-town/midnight-porch-drops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/mirabelle-thimble | class | the-town/candy |  | 0 | 0 |  |
+| the-town/mochis-night-watch-mint | class | the-town/candy |  | 0 | 0 |  |
 | the-town/moth-and-cucumber | class | the-town/candy |  | 0 | 0 |  |
+| the-town/night-shift-violet | class | the-town/candy |  | 0 | 0 |  |
+| the-town/nightcrawler-gummies | class | the-town/candy |  | 0 | 0 |  |
 | the-town/nobody-did | class | the-town/candy |  | 0 | 0 |  |
 | the-town/note-to-self | class | the-town/candy |  | 0 | 0 |  |
 | the-town/odd-pair | class | the-town/candy |  | 0 | 0 |  |
 | the-town/parfait-amour-de-minuit-midnight-love-truffles | class | the-town/candy |  | 0 | 0 |  |
 | the-town/patina-pennies | class | the-town/candy |  | 0 | 0 |  |
+| the-town/plum-mischief | class | the-town/candy |  | 0 | 0 |  |
 | the-town/pocket-comets | class | the-town/candy |  | 0 | 0 |  |
 | the-town/pocket-fox | class | the-town/candy |  | 0 | 0 |  |
 | the-town/pretzel-crumble | class | the-town/candy |  | 0 | 0 |  |
+| the-town/quay-stone | class | the-town/candy |  | 0 | 0 |  |
 | the-town/riding-light | class | the-town/candy |  | 0 | 0 |  |
+| the-town/rosy-cheeks | class | the-town/candy |  | 0 | 0 |  |
 | the-town/salt-water-taffy | class | the-town/candy |  | 0 | 0 |  |
 | the-town/saucer-test | class | the-town/candy |  | 0 | 0 |  |
+| the-town/second-match | class | the-town/candy |  | 0 | 0 |  |
 | the-town/seed-head | class | the-town/candy |  | 0 | 0 |  |
+| the-town/silvertongue | class | the-town/candy |  | 0 | 0 |  |
+| the-town/songbird-featherdrops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/spare-keys | class | the-town/candy |  | 0 | 0 |  |
 | the-town/spare-parts | class | the-town/candy |  | 0 | 0 |  |
 | the-town/stake-mint | class | the-town/candy |  | 0 | 0 |  |
+| the-town/stardrops | class | the-town/candy |  | 0 | 0 |  |
 | the-town/starling-satshul-stars | class | the-town/candy |  | 0 | 0 |  |
 | the-town/static | class | the-town/candy |  | 0 | 0 |  |
+| the-town/still-here | class | the-town/candy |  | 0 | 0 |  |
 | the-town/still-here-lights | class | the-town/candy |  | 0 | 0 |  |
+| the-town/stolen-dreamsicle | class | the-town/candy |  | 0 | 0 |  |
 | the-town/supersession-arrows | class | the-town/candy |  | 0 | 0 |  |
 | the-town/tail-feather-toffee | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-count | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-eighth-arm | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-errata | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-fourth-rest | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-honey-that-isnt-real-yet | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-murky-middle | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-next-dot | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-patio-drop | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-proof | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-returning-rose | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-settling | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-snap | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-taken-back | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-teethy-file-cabinet | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-threshold-drop | class | the-town/candy |  | 0 | 0 |  |
 | the-town/the-unexplained-pretzel | class | the-town/candy |  | 0 | 0 |  |
+| the-town/the-unofficial-moon | class | the-town/candy |  | 0 | 0 |  |
+| the-town/three-minute-toffee | class | the-town/candy |  | 0 | 0 |  |
 | the-town/tidemark-toffee | class | the-town/candy |  | 0 | 0 |  |
 | the-town/umbral | class | the-town/candy |  | 0 | 0 |  |
+| the-town/unfinished | class | the-town/candy |  | 0 | 0 |  |
+| the-town/wax-sealed | class | the-town/candy |  | 0 | 0 |  |
 | the-town/west-window-knots | class | the-town/candy |  | 0 | 0 |  |
 | the-town/halloween-candy-bag | class | the-town/thing |  | 0 | 0 |  |
 | the-town/halloween-candy-bag-capacity | property | the-town/halloween-candy-bag |  | 0 | 0 |  |

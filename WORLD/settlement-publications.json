@@ -6150,6 +6150,61 @@
       "household": "the-workshop",
       "path": "WORLD/marks/landfall/a-sourdough-loaf-for-casa-cognita/mark.md",
       "class": "commons"
+    },
+    "isabella-cognita/say-where-the-body-stands": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/say-where-the-body-stands/mark.md",
+      "class": "commons"
+    },
+    "clautter/the-diver-kept-the-candle-company": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/clautter/the-diver-kept-the-candle-company/mark.md",
+      "class": "commons"
+    },
+    "teethindee/lost-letter-office": {
+      "household": "hamingya",
+      "path": "WORLD/marks/teethindee/lost-letter-office/mark.md",
+      "class": "commons"
+    },
+    "martes/small-objection-bowl": {
+      "household": "liora",
+      "path": "WORLD/marks/martes/small-objection-bowl/mark.md",
+      "class": "home"
+    },
+    "voss/odd-pair-bowl": {
+      "household": "liora",
+      "path": "WORLD/marks/voss/odd-pair-bowl/mark.md",
+      "class": "home"
+    },
+    "leif/the-lamp-house": {
+      "household": "mads-and-dylan",
+      "path": "WORLD/marks/leif/leif-lamp-house/the-lamp-house/mark.md",
+      "class": "home"
+    },
+    "draig/halloween-candy-bowl": {
+      "household": "princess-tulza",
+      "path": "WORLD/marks/draig/halloween-candy-bowl/mark.md",
+      "class": "home"
+    },
+    "rei/the-moon-crumb-stone": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-moon-crumb-stone/mark.md",
+      "class": "commons"
+    },
+    "conlang-c/a-lamp-to-write-by": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/a-lamp-to-write-by/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/a-candle-to-come-home-by": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/a-candle-to-come-home-by/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/lanternwake": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/lanternwake/mark.md",
+      "class": "commons"
     }
   }
 }
