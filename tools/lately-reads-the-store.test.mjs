@@ -263,7 +263,7 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, walks
   // fallback file — the question — has room to show.
   if (noFold) await page.route(/\/(WORLD\/world-state\.json|api\/world\/state)(\?|$)/, (route) => route.abort());
   // THE WALK LANE LANDS LATE, ON PURPOSE (WLD-71): the office's walks answer is held
-  // until 2.5 s after BOTH its asking and the telling pane, longer than the quiet
+  // until 8 s after BOTH its asking and the telling pane, longer than the quiet
   // window below (1.2 s), which starts at the pane. The lanes are what the pane
   // waits on after the telling has drawn (the fold comes BEFORE the pane, so
   // holding it holds the pane, not the list). Counted from the asking alone, a
@@ -300,8 +300,11 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, walks
   }
   await page.goto("http://localhost:" + rig.port + "/", { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
-  // the pane is up: the held lane goes 2.5 s after it, or after its asking if later
-  if (walks) walks.asked.then(() => new Promise((r) => setTimeout(r, 2_500))).then(() => walks.release());
+  // the pane is up: the held lane goes 8 s after it, or after its asking if later.
+  // 8 s, not the quiet window's 1.2: that window counts its own 150 ms steps, and on
+  // a loaded page each step's read of the page takes longer, so its real length
+  // grows (at 6× CPU a 2.5 s hold was outlasted: fffb6dcb)
+  if (walks) walks.asked.then(() => new Promise((r) => setTimeout(r, 8_000))).then(() => walks.release());
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
 
   if (signedIn) {

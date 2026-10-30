@@ -78,7 +78,10 @@ function runThrottled(rel) {
       resolve({
         code, signal, pass: count("pass"), fail: count("fail"), skipped: count("skipped"), pages,
         failing: [...out.matchAll(/^\s*not ok \d+ - (.*)$/gm)].map((m) => m[1]),
-        errors: [...out.matchAll(/^\s+error: (.*)$/gm)].map((m) => m[1].slice(0, 200)).slice(0, 6),
+        // a TAP error is often a block (`error: |-` and the message on the lines
+        // below), and the message is the evidence: an assertion, or a timeout
+        errors: [...out.matchAll(/^([ \t]+)error: (?:\|-\n((?:\1[ \t]+.*\n|[ \t]*\n)+)|(.*)$)/gm)]
+          .map((m) => (m[3] ?? m[2] ?? "").replace(/\s+/g, " ").trim().slice(0, 300)).slice(0, 6),
         browserSkips: [...out.matchAll(/# SKIP.*(playwright is absent|NO PLAYWRIGHT).*$/gm)].map((m) => m[0].slice(0, 160)),
         skips: [...out.matchAll(/# SKIP(.*)$/gm)].map((m) => m[1].trim().slice(0, 120)),
       });
