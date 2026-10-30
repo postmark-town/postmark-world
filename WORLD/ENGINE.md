@@ -253,7 +253,10 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
   - **Where the wall stands.** `mistsAt(crossing, skeleton.mists)` puts a wall at the map's
     border (`border_m`, pinned config) on a crossing schedule: `front_m` per side (positive
     creeps onto the map, negative pulls back past the edge), `clearings_m` (open ground the
-    wall never takes: Pando Peak's ground and the far south-west), the fringe's `density`
+    wall never takes: Pando Peak's ground, the far south-west, and from crossing 282 the
+    Starforge Spire and the way to it; a clearing with a `from_crossing` stands only from that
+    crossing on, and before it the wall is as it was, so adding one never re-tells a past
+    crossing; WLD-134, Darko 2026-10-30), the fringe's `density`
     (eased in over the schedule), and the `veil` on all light. Before the schedule's first
     crossing it answers null, and every telling is the one it was before the Mists, byte for
     byte (`tools/mists.test.mjs`).

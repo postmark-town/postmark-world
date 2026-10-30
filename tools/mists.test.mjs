@@ -207,7 +207,9 @@ const outOfTheFringe = (mk, m) => corners(mk).every((q) => { const h = mistsHere
 // households' ground each receipt names is only told about, as returned notes.
 function clearingsHold({ skeleton, worldState }) {
   const ks = keyframesOf(skeleton), byId = new Map(worldState.marks.map((m) => [m.id, m]));
-  const committed = skeleton.mists.clearings_m.map((k) => ({ id: k.id, x: k.x, y: k.y, r: k.r_m }));
+  const committed = skeleton.mists.clearings_m.map((k) => ({ id: k.id, x: k.x, y: k.y, r: k.r_m, from: k.from_crossing }));
+  // a clearing with a from_crossing stands from that crossing on (WLD-134)
+  const standingAt = (c) => committed.filter((k) => !(Number.isFinite(k.from) && c < k.from)).map(({ id, x, y, r }) => ({ id, x, y, r }));
   for (const id of Object.keys(SIZED_FOR)) assert.ok(committed.some((k) => k.id === id), `the record carries the ${id} clearing`);
   const town = TOWN_IN_A_CLEARING.map((id) => byId.get(id));
   for (const [i, mk] of town.entries()) assert.ok(mk?.at && theTowns(mk), `the town's ${TOWN_IN_A_CLEARING[i]} is on the record`);
@@ -215,7 +217,7 @@ function clearingsHold({ skeleton, worldState }) {
   const note = (mid, text) => { if (!notes.has(mid)) notes.set(mid, text); };
   for (let c = ks[0]; c <= ks.at(-1) + 10; c += 1) {
     const m = mistsAt(c, skeleton.mists);
-    assert.deepEqual(m.clearings.map(({ id, x, y, r }) => ({ id, x, y, r })), committed, `the clearings stand as committed at crossing ${c}`);
+    assert.deepEqual(m.clearings.map(({ id, x, y, r }) => ({ id, x, y, r })), standingAt(c), `the clearings stand as committed at crossing ${c}`);
     for (const mk of town) {
       assert.ok(m.clearings.some((k) => Math.hypot(mk.at.x - k.x, mk.at.y - k.y) <= k.r), `the town's ${mk.id} stands in a clearing`);
       assert.ok(outOfTheFringe(mk, m), `the town's ${mk.id} is in the wall or a clearing's fringe at crossing ${c}`);
@@ -644,6 +646,25 @@ test("a standpoint in a clearing past the town's clear box carries the clearing'
   assert.equal(orient({ x: 0, y: -5000 }, w, { crossing: 9, dials: CLEAR }).you.mists, undefined, "before the Mists, no block at all");
   // past the box, held clear: the north edge is never told there
   for (let c = 272; c <= 290; c += 1) assert.doesNotMatch(airLine(orient({ x: 0, y: -5000 }, w, { crossing: c, dials: CLEAR }).you, c), /north edge/);
+});
+
+// A CLEARING MAY START AT A CROSSING (WLD-134, Darko 2026-10-30 09:59 "Add from crossing"): before its
+// from_crossing the wall stands where it stood, so adding one never re-tells a past crossing.
+test("a clearing with a from_crossing stands from that crossing on, and before it the wall is as it was", () => {
+  const later = { ...MISTS, clearings_m: [{ id: "always", x: 0, y: -2000, r_m: 300 }, { id: "parted", x: 0, y: -3000, r_m: 300, from_crossing: 15 }] };
+  const p = { x: 0, y: -3000 };
+  for (const c of [10, 14]) {
+    const m = mistsAt(c, later);
+    assert.deepEqual(m.clearings.map((k) => k.id), ["always"], `only the standing clearing at ${c}`);
+    assert.equal(mistsHere(p, m).inWall, true, `behind the wall before it parts (${c})`);
+  }
+  for (const c of [15, 16, 30]) {
+    const m = mistsAt(c, later);
+    assert.deepEqual(m.clearings.map((k) => k.id), ["always", "parted"], `both clearings at ${c}`);
+    assert.equal(mistsHere(p, m).inWall, false, `clear from its crossing (${c})`);
+  }
+  // a clearing without the field stands at every crossing, as before
+  assert.deepEqual(mistsAt(10, later).clearings.map((k) => k.id), ["always"]);
 });
 
 // A line that names an hour is false at the other crossing of the day, since
