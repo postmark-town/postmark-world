@@ -118,17 +118,36 @@ export async function machinePage(browser, options = {}) {
   return page;
 }
 
-/** Wait until the page has no fetch in flight and no body being read, at two
- *  checks a task apart, after at least one read: what the reads landed has been
- *  drawn. A page that polls (walkers every 15 s) is caught between polls. */
+/** One check of readsSettled, IN THE PAGE (exported so its rule is read directly).
+ *  `s` is this call's own state: quiet means nothing open AND no read started
+ *  since the last check, so a read that began and finished between two checks
+ *  (a fast one) starts the count again rather than slipping through. */
+export function settleCheck(r, s) {
+  if (!r.started || r.open) { s.quiet = 0; s.started = r.started; return false; }
+  if (r.started !== s.started) { s.quiet = 1; s.started = r.started; return false; }
+  s.quiet += 1;
+  return s.quiet >= 2;
+}
+
+let settleCalls = 0;
+/** Wait until the page has no fetch in flight and no body being read, and has
+ *  started none, across two checks a task apart, after at least one read: what
+ *  the reads landed has been drawn. A page that polls (walkers every 15 s) is
+ *  caught between polls. Each call counts its own quiet from nothing, so a second
+ *  call never rides the first one's (until 7650bf09 one shared counter carried
+ *  over: two calls in a row took [2, 1] checks). It says the READS are done, not
+ *  what they drew: wait for the page's own marker of the phase as well. */
 export async function readsSettled(page, { timeout = 90_000 } = {}) {
-  await page.waitForFunction(() => {
+  const key = JSON.stringify(`call-${++settleCalls}`);
+  // one expression carrying settleCheck's own source (Playwright evaluates it, so
+  // the page's CSP is not asked), so the rule exists once
+  await page.waitForFunction(`(() => {
     const r = window.__pmPageReads;
     if (!r) throw new Error("readsSettled needs a page from machineContext/machinePage");
-    if (!r.started || r.open) { window.__pmQuiet = 0; return false; }
-    window.__pmQuiet = (window.__pmQuiet ?? 0) + 1;
-    return window.__pmQuiet >= 2;
-  }, null, { timeout, polling: 50 });
+    const calls = (window.__pmSettle ??= {});
+    const s = (calls[${key}] ??= { quiet: 0, started: -1 });
+    return (${settleCheck})(r, s);
+  })()`, null, { timeout, polling: 50 });
 }
 
 /** Hold the answer to `url` (a Playwright route pattern) until release(): the

@@ -19,7 +19,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
-import { ABLE_MACHINE, NO_PLAYWRIGHT, THROTTLE_ENV, cpuThrottle, holdClockWithinATask, machineContext, machinePage, readsSettled, gate } from "./page-machine.mjs";
+import { ABLE_MACHINE, NO_PLAYWRIGHT, THROTTLE_ENV, cpuThrottle, holdClockWithinATask, machineContext, machinePage, readsSettled, settleCheck, gate } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (rel) => readFileSync(join(ROOT, rel), "utf8");
@@ -42,6 +42,37 @@ test("the run's throttle: none by default, a named rate, and a mistyped one refu
   assert.equal(cpuThrottle({ [THROTTLE_ENV]: "4" }), 4);
   assert.equal(cpuThrottle({ [THROTTLE_ENV]: "2.5" }), 2.5);
   for (const bad of ["fast", "-2", "0.5", "50"]) assert.throws(() => cpuThrottle({ [THROTTLE_ENV]: bad }), /a number from 1 to 20/, bad);
+});
+
+test("settleCheck: quiet is nothing open and nothing new started, twice; a fast read between checks starts the count again", () => {
+  const s = { quiet: 0, started: -1 };
+  assert.equal(settleCheck({ started: 0, open: 0 }, s), false, "no read yet is not settled");
+  assert.equal(settleCheck({ started: 2, open: 1 }, s), false, "a read open");
+  assert.equal(settleCheck({ started: 2, open: 0 }, s), false, "the first quiet check");
+  assert.equal(settleCheck({ started: 3, open: 0 }, s), false, "a read started AND finished since the last check: not quiet yet");
+  assert.equal(settleCheck({ started: 3, open: 0 }, s), true, "two quiet checks with nothing new between");
+});
+
+// Bevel's measurement at 7650bf09: two readsSettled calls in a row took [2, 1]
+// checks, the second riding the first's quiet count (one window.__pmQuiet, never
+// reset). A page stub that runs the expression readsSettled hands Playwright.
+test("readsSettled: each call counts its own quiet from nothing (a second call never rides the first's)", async () => {
+  const sandbox = { window: { __pmPageReads: { started: 1, open: 0 } } };
+  const checks = [];
+  const page = {
+    waitForFunction: async (expr) => {
+      assert.equal(typeof expr, "string", "an expression, so the page's CSP is not asked to eval");
+      let n = 0;
+      while (!runInNewContext(expr, sandbox)) { n++; if (n > 50) throw new Error("never settled"); }
+      checks.push(n + 1);
+    },
+  };
+  await readsSettled(page);
+  await readsSettled(page);
+  assert.deepEqual(checks, [2, 2], "two fresh calls, two checks each");
+  sandbox.window.__pmPageReads.started += 1;   // a read began and ended before the third call
+  await readsSettled(page);
+  assert.deepEqual(checks, [2, 2, 2]);
 });
 
 // ── the wiring: every browser test opens its pages through the helper ────────
