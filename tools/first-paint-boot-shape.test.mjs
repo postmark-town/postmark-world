@@ -68,6 +68,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { townRegionMarks, MINE_PAGE_SIZE } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
@@ -214,7 +215,7 @@ before(async () => {
 /** One signed-in boot, with every office request timed. */
 async function bootAndWatch() {
   office.forget();   // this office serves every boot; the portfolio book is this one's
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const asked = [];      // { url, at } — WHAT the boot asked for; the office keeps the ORDER
   page.on("request", (r) => asked.push({ url: r.url(), at: Date.now() }));
   await page.addInitScript((base) => { try { localStorage.setItem("pm.office.base", base); } catch {} },

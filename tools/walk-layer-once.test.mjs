@@ -318,6 +318,7 @@ import { createServer as createHttp } from "node:http";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage, readsSettled } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator", "viewer.mjs"), "utf8");
@@ -387,7 +388,7 @@ before(async () => {
 });
 
 async function openSpectator() {
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   const answer = { moved: 0 };
@@ -397,7 +398,10 @@ async function openSpectator() {
   await page.waitForSelector(".wv-minimap svg", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
   await page.waitForFunction(() => (document.querySelector("#wv-walk-layer")?.children.length ?? 0) > 0, null, { timeout: 60_000 });
-  await page.waitForTimeout(2500);
+  // THE BOOT HAS LANDED, AWAITED (WLD-71): the ledger and the faces arrive after
+  // the first draw and each draws again, so a count snapshotted before them reads
+  // their writes as the test's. Every read answered and drawn, not a sleep.
+  await readsSettled(page);
   return { page, errors, answer };
 }
 // the layer as it stands: how many writes so far, its nodes (held by reference
@@ -500,7 +504,6 @@ test("(4) sameWalkers: the same rows in the same order are the same answer; a mo
 test("(4) ON THE PAGE: a poll that answers the same rows writes nothing — the nodes are the same objects a poll later", async (t) => {
   if (!chromium) return t.skip(skipReason);
   const { page, errors } = await openSpectator();
-  await page.waitForTimeout(3000);           // let the boot's late arrivals (the ledger, the faces) land first
   const before = await snapshot(page);
   const polls0 = await page.evaluate(() => window.__pmViewer.walkDraws().pollsUnchanged);
   await page.waitForFunction((n) => window.__pmViewer.walkDraws().pollsUnchanged > n, polls0, { timeout: 20_000 });
@@ -515,8 +518,7 @@ test("(4) ON THE PAGE: a poll that answers the same rows writes nothing — the 
 
 test("(4) ON THE PAGE: a district crossing writes the layer ONCE — on the settle — and the poll that lands after it does not write again", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  const { page, errors } = await openSpectator();
-  await page.waitForTimeout(3000);
+  const { page, errors } = await openSpectator();   // the boot's late arrivals awaited there
   const before = await snapshot(page);
   const near0 = await page.evaluate(() => document.querySelectorAll("#wv-walk-layer .wv-walker-near").length);
   assert.equal(near0, 0, "the page must open at the far tier (empty frames) for a crossing to mean anything");
@@ -623,7 +625,7 @@ const FACE_COPY_96 = `/shelf/near-reader/${FACE_SHA}-96.png`;
  *  no faces and the actor is drawn as a monogram, which is what (5) reads. */
 async function openActingAs(handle, { faces = false } = {}) {
   const office = await bootStubOffice();
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.route("**/WORLD/walk-ledger.md", (route) => route.fulfill({ status: 200, contentType: "text/markdown", body: "# empty\n" }));
@@ -649,7 +651,7 @@ async function openActingAs(handle, { faces = false } = {}) {
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
   await page.waitForFunction(() => document.querySelectorAll("#wv-walk-layer [data-handle]").length >= 3, null, { timeout: 60_000 }).catch(() => {});
-  await page.waitForTimeout(4000);
+  await readsSettled(page);   // the boot's reads answered and drawn (WLD-71), not a sleep
   return { page, errors };
 }
 const readBodies = (page) => page.evaluate(() => {

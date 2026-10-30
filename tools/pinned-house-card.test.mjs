@@ -30,6 +30,7 @@ import { createServer } from "node:net";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
@@ -111,7 +112,7 @@ before(async () => {
 });
 
 async function openPage() {
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });

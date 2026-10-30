@@ -31,6 +31,7 @@ import { createServer as createHttp } from "node:http";
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // Where a shot goes when one is asked for. Off the tree by default — session
@@ -175,7 +176,7 @@ before(async () => {
 // suite in this repo already reads at.
 async function openTheRail() {
   const askedBefore = office.asked.length;
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   await page.addInitScript(
     (base) => { try { localStorage.setItem("pm.office.base", base); } catch {} },
     "http://127.0.0.1:" + office.port,

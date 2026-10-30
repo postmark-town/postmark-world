@@ -26,6 +26,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { formatEnterExit } from "./enter-exit.mjs";
+import { machineContext } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const STATE = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
@@ -67,15 +68,16 @@ before(async () => {
 test("the fixture has a room to stand in", () => assert.ok(ROOM, "a sited mark 15–60 m across, with no class and no entry law"));
 
 test("THE PAGE: a resident standing in a room while the Mists are on sees the room's scene with no sheet feather in it", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: the room's feather went UNGUARDED"); return; }
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
+  if (!chromium) { t.skip("NO PLAYWRIGHT — the room's feather went UNGUARDED"); return; }
+  // an able machine, SET (page-machine.mjs: its cores, and a clock held within a
+  // task so a loaded host's slow bake cannot turn lite on). In lite mode no feather
+  // is ever painted, and the claim below would pass with nothing to guard.
+  const ctx = await machineContext(browser, { viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
   await ctx.addInitScript(() => {
-    // crossing 247, five hours in: the Mists stand; an able machine, so not lite
+    // crossing 247, five hours in: the Mists stand
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
     const off = (Date.UTC(2026, 5, 12) + 247 * 12 * 3600e3 + 5 * 3600e3) - realNow();
     globalThis.Date = class extends RealDate { constructor(...a) { if (a.length === 0) super(realNow() + off); else super(...a); } static now() { return realNow() + off; } };
-    Object.defineProperty(Navigator.prototype, "hardwareConcurrency", { get: () => 16, configurable: true });
-    Object.defineProperty(Navigator.prototype, "deviceMemory", { get: () => 8, configurable: true });
     try { localStorage.setItem("pm_key", "room-feather-test"); } catch { /* the page reads a key or none */ }
   });
   // signed in as ann, who entered the room at crossing 240 (before the Mists, so
@@ -100,9 +102,10 @@ test("THE PAGE: a resident standing in a room while the Mists are on sees the ro
   await page.waitForTimeout(3000);   // every task the Mists' paint schedules has run
   const r = await page.evaluate(() => {
     const scene = document.querySelector(".wv-minimap.is-scene-mark > svg");
-    return { inRoom: !!scene, feather: !!scene?.querySelector(".wv-sheet-feather"), unfeather: !!scene?.querySelector(".wv-sheet-unfeather") };
+    return { inRoom: !!scene, lite: document.documentElement.classList.contains("wv-lite"), feather: !!scene?.querySelector(".wv-sheet-feather"), unfeather: !!scene?.querySelector(".wv-sheet-unfeather") };
   });
   assert.equal(r.inRoom, true, `standing in ${ROOM.id}`);
+  assert.equal(r.lite, false, "the page is not in lite mode, so the Mists' paint (and its feather) ran: the absence below can fail");
   assert.equal(r.feather, false, "the town's sheet feather is never laid over a room's floor");
   assert.equal(r.unfeather, false, "nor its mask");
   assert.deepEqual(errors, []);

@@ -31,6 +31,7 @@ import {
   THUMB_VARIANTS, THUMB_SIZES, thumbHref, thumbSizeFor, glyphScreenPx, noteThumbMissing, forgetThumbMisses,
   armThumbFallback, walkerFrameSVG, overlayHomeCardSVG, WALKER_FRAME, HOME_CARD, MINE_GLYPH_SCALE, markerScale,
 } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // the viewer as TEXT, for the call-site pins at the bottom (POS-163)
@@ -373,7 +374,7 @@ const skipReason = "playwright is absent, so the browser's half goes unmeasured:
 
 test("IN A REAL PAGE: a copy that is there costs one request; one that is not costs the 404 and the original, then stands", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  const page = await browser.newPage();
+  const page = await machinePage(browser);
   await page.goto(`http://127.0.0.1:${rig.port}/`, { waitUntil: "load", timeout: 60_000 });
   await page.waitForFunction(() => window.__thumbRigReady === true, null, { timeout: 30_000 });
   // let the image loads settle: the 404, the swap, the original
