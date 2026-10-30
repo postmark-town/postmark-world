@@ -115,7 +115,7 @@ before(async () => {
 async function open({ query = "", cores = 16, memory = 8, throttle = 0 } = {}) {
   const ctx = await machineContext(browser, {
     viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference", machine: { cores, memory },
-    ...(throttle ? { clock: "real", throttle } : {}),
+    clock: "real", ...(throttle ? { throttle } : {}),   // NEGATIVE (WLD-71): the old setup, the host's clock for every page
   });
   await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
@@ -222,7 +222,7 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
 test("the page on a phone: no seventh circle; the bell opens a menu holding the bell and lite mode", async (t) => {
   if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   // an able phone (the set machine, page-machine.mjs): its row reads "auto (off)"
-  const ctx = await machineContext(browser, { viewport: { width: 390, height: 844 }, hasTouch: true });
+  const ctx = await machineContext(browser, { viewport: { width: 390, height: 844 }, hasTouch: true, clock: "real" });   // NEGATIVE (WLD-71)
   await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
     const off = (Date.UTC(2026, 5, 12) + 247 * 12 * 3600e3 + 5 * 3600e3) - realNow();

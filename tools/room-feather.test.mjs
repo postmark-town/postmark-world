@@ -72,7 +72,7 @@ test("THE PAGE: a resident standing in a room while the Mists are on sees the ro
   // an able machine, SET (page-machine.mjs: its cores, and a clock held within a
   // task so a loaded host's slow bake cannot turn lite on). In lite mode no feather
   // is ever painted, and the claim below would pass with nothing to guard.
-  const ctx = await machineContext(browser, { viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
+  const ctx = await machineContext(browser, { viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference", clock: "real" });   // NEGATIVE (WLD-71)
   await ctx.addInitScript(() => {
     // crossing 247, five hours in: the Mists stand
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
