@@ -263,14 +263,13 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, walks
   // fallback file — the question — has room to show.
   if (noFold) await page.route(/\/(WORLD\/world-state\.json|api\/world\/state)(\?|$)/, (route) => route.abort());
   // THE WALK LANE LANDS LATE, ON PURPOSE (WLD-71): the office's walks answer is held
-  // 2.5 s past its asking, longer than the quiet window below (1.2 s). The lanes are
-  // what the pane waits on after the telling has drawn (the fold comes BEFORE the
-  // pane, so holding it holds the pane, not the list). That is a loaded box's
-  // order, set rather than waited for; the release is armed before the page loads.
-  if (walksLate) {
-    const walks = await gate(page, "**/world2/walks*");
-    walks.asked.then(() => new Promise((r) => setTimeout(r, 2_500))).then(() => walks.release());
-  }
+  // until 2.5 s after BOTH its asking and the telling pane, longer than the quiet
+  // window below (1.2 s), which starts at the pane. The lanes are what the pane
+  // waits on after the telling has drawn (the fold comes BEFORE the pane, so
+  // holding it holds the pane, not the list). Counted from the asking alone, a
+  // slow page asked early and drew the pane after the hold had run out (measured:
+  // 4× CPU at 25dbf93d), so the hold must be counted from the pane as well.
+  const walks = walksLate ? await gate(page, "**/world2/walks*") : null;
   await page.addInitScript(() => {
     window.__pos84 = [];
     const signature = () => [...document.querySelectorAll(".wv-acts .wv-act-line")]
@@ -301,6 +300,8 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, walks
   }
   await page.goto("http://localhost:" + rig.port + "/", { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
+  // the pane is up: the held lane goes 2.5 s after it, or after its asking if later
+  if (walks) walks.asked.then(() => new Promise((r) => setTimeout(r, 2_500))).then(() => walks.release());
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
 
   if (signedIn) {
@@ -310,7 +311,7 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, walks
   }
   // THE PANE OPENS FIRST (WLD-71). The quiet window below can only judge a list
   // that exists: started before the first rows, it ended on an empty pane whenever
-  // the fold took longer than 1.2 s to land (a loaded box), and the assertions
+  // the lanes took longer than 1.2 s to land (a loaded box), and the assertions
   // below went red on a page that was right. The pane opens once, when its lanes
   // have settled (POS-84), so its first rows are the event to wait for.
   // NEGATIVE (WLD-71, to be reverted): the old setup, no wait for the first rows
