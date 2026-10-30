@@ -25,6 +25,17 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { MACHINE_LOG_ENV, NO_PLAYWRIGHT, THROTTLE_ENV, stripComments } from "./page-machine.mjs";
+import { CANDLE_ENV } from "./run-candle-suites.mjs";
+
+// NOT IN THE CANDLE (WLD-71; Wright's review 2026-10-30 11:38). The settlement
+// crossing's gate (tools/run-candle-suites.mjs) sets WORLD_CANDLE_RUN=1 on its child,
+// and a crossing must not wait on 22 browsers at 4× CPU. There, this file probes no
+// browser and starts no child: its 22 throttled tests skip, saying why. CI and
+// `npm test` run them all. ONLY that name decides: an inherited CI=true,
+// GITHUB_ACTIONS or npm_lifecycle_event neither excludes the sweep nor brings it back.
+// (Not a [pin]: a pin is a source-text test, #2790; this is behaviour.)
+const IN_CANDLE = process.env[CANDLE_ENV] === "1";
+const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page sweep runs in CI and npm test, not in the settlement crossing — nothing rendered here`;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "tools/page-throttle-sweep.test.mjs";
@@ -54,6 +65,7 @@ test("the sweep's list is the census: every page test, none twice, not this file
 
 let chromium = null;
 before(async () => {
+  if (IN_CANDLE) return;   // the candle: no playwright import, no probe launch
   try { chromium = (await import("playwright")).chromium; const b = await chromium.launch(); await b.close(); } catch { chromium = null; }
 });
 
@@ -91,6 +103,7 @@ function runThrottled(rel) {
 
 for (const rel of SWEPT) {
   test(`AT ${RATE}× CPU: ${rel} is green, on real pages, every one throttled`, { timeout: 26 * 60_000 }, async (t) => {
+    if (IN_CANDLE) return t.skip(CANDLE_EXCLUSION);
     if (!chromium) return t.skip(`${NO_PLAYWRIGHT} — the ${RATE}× sweep of ${rel} went UNGUARDED`);
     const r = await runThrottled(rel);
     const own = OWN_RATE[rel];
