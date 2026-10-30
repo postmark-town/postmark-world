@@ -135,8 +135,78 @@ before(async () => {
 after(async () => { await browser?.close(); });
 const SKIP = "NO PLAYWRIGHT — the page half of the set machine went UNGUARDED";
 
-// a fixed piece of work, timed by Date (never held), in the page
-const busy = (page) => page.evaluate(() => { const t0 = Date.now(); let x = 0; for (let i = 0; i < 3e7; i++) x = (x + i * 7) % 1000003; return { ms: Date.now() - t0, x }; });
+// ── the throttle's WIRING, asserted, never timed (WLD-71 first review, FIX) ──
+//
+// Until the FIX at 07660a87 this half timed one unthrottled loop against one at 6×
+// and asked for a 2.5× ratio: a test of the host, in a helper whose whole point is
+// that page tests are not. A loaded box slowing the first loop false-reds a page
+// throttled correctly. What is asserted instead is the wiring, at the protocol: every
+// page a context opens is sent Emulation.setCPUThrottlingRate at the expected rate, on
+// its OWN CDP session, answered before the page is handed to the test; and none is
+// sent when no throttle is asked. The rate the page then runs at is Chromium's own
+// business; the slow machine it makes is lite-mode's subject (its 6×, real-clock case).
+
+/** set the run's WORLD_PAGE_CPU_THROTTLE around one call (the default is read at the call) */
+async function withRunRate(rate, fn) {
+  const was = process.env[THROTTLE_ENV];
+  if (rate === undefined) delete process.env[THROTTLE_ENV]; else process.env[THROTTLE_ENV] = rate;
+  try { return await fn(); } finally { if (was === undefined) delete process.env[THROTTLE_ENV]; else process.env[THROTTLE_ENV] = was; }
+}
+
+/** the scenarios, against any browser (a real one, or the spy below). `log` gets
+ *  { kind: "sent", page, method, params } when a CDP send has been ANSWERED, and the
+ *  scenario adds { kind: "returned", page } when the helper hands the page over. */
+async function throttleScenarios(browserLike, log) {
+  const opened = async (open) => { const page = await open(); log.push({ kind: "returned", page }); return page; };
+  const sentTo = (page) => log.filter((e) => e.kind === "sent" && e.page === page);
+  const expectRate = (page, rate, why) => {
+    const sent = sentTo(page);
+    if (!rate) { assert.deepEqual(sent.map((e) => e.method), [], `${why}: nothing is sent`); return; }
+    assert.deepEqual(sent.map((e) => [e.method, e.params]), [["Emulation.setCPUThrottlingRate", { rate }]], `${why}: one throttle, at ${rate}, on the page's own session`);
+    const answered = log.indexOf(sent[0]), handed = log.findIndex((e) => e.kind === "returned" && e.page === page);
+    assert.ok(answered >= 0 && handed > answered, `${why}: the throttle was answered before the page was handed over (sent at ${answered}, returned at ${handed})`);
+  };
+  const closing = [];
+  // the run's rate reaches EVERY page a context opens
+  const run = await withRunRate("4", () => machineContext(browserLike)); closing.push(run);
+  const a = await opened(() => run.newPage()), b = await opened(() => run.newPage());
+  expectRate(a, 4, "the run's rate, first page"); expectRate(b, 4, "the run's rate, second page");
+  assert.equal(run.machine.throttle, 4);
+  // a context's own rate outranks the run's
+  const own = await withRunRate("4", () => machineContext(browserLike, { throttle: 6 })); closing.push(own);
+  expectRate(await opened(() => own.newPage()), 6, "its own 6 over the run's 4");
+  // no throttle asked: nothing sent (unset, or the rate 1 a test names to stay unthrottled)
+  const none = await withRunRate(undefined, () => machineContext(browserLike)); closing.push(none);
+  expectRate(await opened(() => none.newPage()), 0, "no run rate");
+  const one = await withRunRate("4", () => machineContext(browserLike, { throttle: 1 })); closing.push(one);
+  expectRate(await opened(() => one.newPage()), 0, "throttle 1");
+  // and machinePage, the way most page tests open one
+  const p = await withRunRate("4", () => opened(() => machinePage(browserLike)));
+  expectRate(p, 4, "machinePage under the run's rate");
+  await p.close?.();
+  for (const ctx of closing) await ctx.close?.();
+}
+
+// THE SPY: a browser whose CDP answers a beat late, so a throttle sent but not
+// awaited is caught handing the page over first. It stands beside the real
+// browser below, never instead of it.
+function spyBrowser(log) {
+  return {
+    newContext: async () => ({
+      addInitScript: async () => {},
+      newPage: async () => ({ spy: Symbol("page"), once: () => {}, close: async () => {} }),
+      newCDPSession: async (page) => ({
+        send: async (method, params) => { await new Promise((r) => setTimeout(r, 5)); log.push({ kind: "sent", page, method, params }); return {}; },
+      }),
+      close: async () => {},
+    }),
+  };
+}
+
+test("the throttle's wiring, on the spy: every page sent the expected rate on its own session, answered before it is handed over", async () => {
+  const log = [];
+  await throttleScenarios(spyBrowser(log), log);
+});
 
 test("THE PAGE: a context from the helper is the able machine, its clock held within a task, its reads counted", async (t) => {
   if (!chromium) return t.skip(SKIP);
@@ -158,21 +228,24 @@ test("THE PAGE: a context from the helper is the able machine, its clock held wi
   await real.close();
 });
 
-test("THE PAGE: the run's throttle reaches every page a context opens; a context's own rate outranks it", async (t) => {
+test("THE PAGE: on real contexts, every page is sent the expected CPU throttle on its own CDP session, answered by Chromium before it is handed over", async (t) => {
   if (!chromium) return t.skip(SKIP);
-  const plain = await machinePage(browser, { throttle: 1 });
-  await busy(plain); const base = (await busy(plain)).ms;
-  await plain.close();
-  const was = process.env[THROTTLE_ENV];
-  process.env[THROTTLE_ENV] = "6";
-  let fromRun;
-  try { fromRun = await machineContext(browser); } finally { if (was === undefined) delete process.env[THROTTLE_ENV]; else process.env[THROTTLE_ENV] = was; }
-  assert.equal(fromRun.machine.throttle, 6, "the context took the run's rate");
-  const slowed = await fromRun.newPage();
-  await busy(slowed); const slow = (await busy(slowed)).ms;
-  await fromRun.close();
-  t.diagnostic(`unthrottled ${base} ms · ${THROTTLE_ENV}=6 ${slow} ms`);
-  assert.ok(slow > base * 2.5, `the same work under the run's 6× throttle took ${slow} ms against ${base} ms: the page was not throttled`);
+  // observe the REAL sessions: every newCDPSession on a real context is delegated to
+  // Playwright's own, and each send is logged once Chromium has answered it (an
+  // answer is acceptance; a refused send throws here). Restored after.
+  const log = [];
+  const probe = await machineContext(browser, { throttle: 1 });   // a real context, for its class
+  const proto = Object.getPrototypeOf(probe);
+  assert.equal(typeof proto.newCDPSession, "function", "Playwright's BrowserContext carries newCDPSession on its prototype");
+  await probe.close();
+  const realSession = proto.newCDPSession;
+  proto.newCDPSession = async function (page) {
+    const session = await realSession.call(this, page);
+    return { send: async (method, params) => { const r = await session.send(method, params); log.push({ kind: "sent", page, method, params }); return r; }, detach: () => session.detach() };
+  };
+  try { await throttleScenarios(browser, log); } finally { proto.newCDPSession = realSession; }
+  const sent = log.filter((e) => e.kind === "sent");
+  t.diagnostic(`real CDP: ${sent.length} throttle sends answered, at ${sent.map((e) => e.params.rate).join(", ")}; ${log.filter((e) => e.kind === "returned").length} pages handed over`);
 });
 
 test("THE PAGE: readsSettled waits for a read the page is still making; gate holds one until released", async (t) => {
