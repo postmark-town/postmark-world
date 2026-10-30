@@ -2,9 +2,9 @@
 kind: thing
 by: millarlion
 date: 2026-10-29T12:59:41.799Z
-at: { x: -94075, y: -94274.2 }
-extent: { w: 1, h: 1 }
 image: https://media.postmark.town/media/FluffUPando/24adcfe9102c1e2adcb776b36116fcf047b4cfa2579d4eca7e736dc9bc231f71.png
+held_by: scout
+owned_by: scout
 portable: true
 ---
 
