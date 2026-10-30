@@ -19,7 +19,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
-import { ABLE_MACHINE, NO_PLAYWRIGHT, THROTTLE_ENV, cpuThrottle, holdClockWithinATask, machineContext, machinePage, readsSettled, settleCheck, gate } from "./page-machine.mjs";
+import { ABLE_MACHINE, NO_PLAYWRIGHT, THROTTLE_ENV, cpuThrottle, holdClockWithinATask, machineContext, machinePage, readsSettled, settleCheck, gate, stripComments } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (rel) => readFileSync(join(ROOT, rel), "utf8");
@@ -76,7 +76,6 @@ test("readsSettled: each call counts its own quiet from nothing (a second call n
 });
 
 // ── the wiring: every browser test opens its pages through the helper ────────
-const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`\\])\/\/.*$/gm, "$1");
 const OWN_PHRASES = /playwright is absent|NO PLAYWRIGHT/;   // suite.yml's own grep, case and all
 /** what the census says about one test file's source: null when it drives no
  *  browser (a browser test launches chromium; most find playwright through a
@@ -104,14 +103,19 @@ test("the census sees what it is for: a bare page, a missing import and a quiet 
   assert.match(wiringOf(good.replace("NO PLAYWRIGHT", "Playwright is not installed")).join(), /skips without/);
   assert.deepEqual(wiringOf(good + `// ${bare("Page")} in a comment is prose\n`), [], "a comment is not code");
   assert.equal(wiringOf(`// ${launch} in a comment launches nothing\n`), null);
+  // a glob in a line comment opens no block comment (it once swallowed the
+  // sweep's own launch: "tools/*.test.mjs" … the next "*/")
+  const glob = `// every tools/${"*"}.test.mjs here\n${good}/** a doc ${"*"}/\n`;
+  assert.deepEqual(wiringOf(glob), [], "code after a glob comment is still read");
+  assert.match(wiringOf(glob.replace("machinePage(browser, {})", bare("Page"))).join(), /browser\.newPage/);
 });
 
 test("EVERY browser test in tools/ opens its pages on a set machine, and skips in suite.yml's words", () => {
   const files = readdirSync(join(ROOT, "tools")).filter((f) => f.endsWith(".test.mjs")).map((f) => `tools/${f}`);
   const census = Object.fromEntries(files.map((rel) => [rel, wiringOf(read(rel))]).filter(([, w]) => w !== null));
-  // the floor: the census is counting the suites it is about (22 page tests and
-  // this file at WLD-71)
-  assert.ok(Object.keys(census).length >= 23, `browser tests found: ${Object.keys(census).length}`);
+  // the floor: the census is counting the suites it is about (22 page tests, this
+  // file and the throttle sweep at WLD-71)
+  assert.ok(Object.keys(census).length >= 24, `browser tests found: ${Object.keys(census).length}`);
   for (const named of ["tools/lite-mode.test.mjs", "tools/room-feather.test.mjs", "tools/lately-reads-the-store.test.mjs", "tools/walk-layer-once.test.mjs"])
     assert.ok(named in census, `${named} is in the census`);
   const wrong = Object.fromEntries(Object.entries(census).filter(([, w]) => w.length));

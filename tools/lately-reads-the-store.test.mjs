@@ -246,7 +246,7 @@ before(async () => {
  * the one thing that looks fine either way. So an observer is installed before
  * any page script runs and every change to `.wv-acts` is kept, in order.
  */
-async function openAndWatch({ signedIn, officeAt = office, noFold = false, foldLate = false }) {
+async function openAndWatch({ signedIn, officeAt = office, noFold = false, walksLate = false }) {
   const askedBefore = officeAt.asked.length;
   const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
@@ -262,10 +262,15 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, foldL
   // already assumed no fold on this path; the rig now makes it so, and the
   // fallback file — the question — has room to show.
   if (noFold) await page.route(/\/(WORLD\/world-state\.json|api\/world\/state)(\?|$)/, (route) => route.abort());
-  // THE FOLD LANDS LATE, ON PURPOSE (WLD-71): its answer is held until the page has
-  // stood, pane attached and nothing in the list, for longer than the quiet window
-  // below (1.2 s). That is a loaded box's order, set rather than waited for.
-  const fold = foldLate ? await gate(page, /\/(WORLD\/world-state\.json|api\/world\/state)(\?|$)/) : null;
+  // THE WALK LANE LANDS LATE, ON PURPOSE (WLD-71): the office's walks answer is held
+  // 2.5 s past its asking, longer than the quiet window below (1.2 s). The lanes are
+  // what the pane waits on after the telling has drawn (the fold comes BEFORE the
+  // pane, so holding it holds the pane, not the list). That is a loaded box's
+  // order, set rather than waited for; the release is armed before the page loads.
+  if (walksLate) {
+    const walks = await gate(page, "**/world2/walks*");
+    walks.asked.then(() => new Promise((r) => setTimeout(r, 2_500))).then(() => walks.release());
+  }
   await page.addInitScript(() => {
     window.__pos84 = [];
     const signature = () => [...document.querySelectorAll(".wv-acts .wv-act-line")]
@@ -297,8 +302,6 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false, foldL
   await page.goto("http://localhost:" + rig.port + "/", { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
-  // released while the list is being watched, not before: the hold overlaps the wait
-  if (fold) fold.asked.then(() => new Promise((r) => setTimeout(r, 2_500))).then(() => fold.release());
 
   if (signedIn) {
     for (let i = 0; i < 200 && !officeAt.asked.some((p) => p.startsWith("/world/present")); i++) {
@@ -419,19 +422,19 @@ test("THE FIRST LIST IS THE LIST — a spectator's pane is never redrawn from sc
   assert.deepEqual(seen.errors, [], "the page threw: " + seen.errors.join(" | "));
 });
 
-// THE ORDER IS SET, NOT RACED (WLD-71). The cases above take the fold as it comes;
-// a loaded box serves it late. Here it is held past the quiet window on purpose,
-// and the pane is still read once it opens, its store walker and its first list
-// intact. Before the wait for the first rows this read an empty pane: "the pane
-// never showed a row".
-test("THE FOLD LANDING LATE CHANGES NOTHING — the pane is read once it opens, never before", async (t) => {
+// THE ORDER IS SET, NOT RACED (WLD-71). The cases above take the lanes as they
+// come; a loaded box serves them late. Here the walk lane is held past the quiet
+// window on purpose, and the pane is still read once it opens, the store's walker
+// (the held lane's own row) and its first list intact. Before the wait for the
+// first rows this read an empty pane: "the pane never showed a row".
+test("THE WALK LANE LANDING LATE CHANGES NOTHING — the pane is read once it opens, never before", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  const seen = await openAndWatch({ signedIn: false, foldLate: true });
+  const seen = await openAndWatch({ signedIn: false, walksLate: true });
   assert.equal(seen.nonEmpty.length > 0, true,
-    "the pane never showed a row (states seen: " + seen.history.length + "), so the read ended before the fold landed");
+    "the pane never showed a row (states seen: " + seen.history.length + "), so the read ended before the walk lane landed");
   assert.equal(seen.final.filter((row) => row.includes(STORE_WALKER)).length, 1,
-    "the store's departure is in the pane when the fold lands late: " + JSON.stringify(seen.final));
-  assert.deepEqual(seen.first, seen.final, "a late fold still opens the pane once, with its whole first list");
+    "the store's departure is in the pane when its lane lands late: " + JSON.stringify(seen.final));
+  assert.deepEqual(seen.first, seen.final, "a late lane still opens the pane once, with its whole first list");
   assert.deepEqual(seen.errors, [], "the page threw: " + seen.errors.join(" | "));
 });
 

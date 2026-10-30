@@ -30,8 +30,11 @@
 // late arrivals (the ledger, the faces) and what they draw have happened. It is
 // the wait to use instead of a sleep that "lets the boot land".
 
+import { appendFileSync } from "node:fs";
+
 export const ABLE_MACHINE = Object.freeze({ cores: 16, memory: 8 });
 export const THROTTLE_ENV = "WORLD_PAGE_CPU_THROTTLE";
+export const MACHINE_LOG_ENV = "WORLD_PAGE_MACHINE_LOG";
 
 // suite.yml refuses a run whose TAP holds this phrase (a viewer suite that
 // skipped for want of the browser guarded nothing), so every page test's skip says it
@@ -87,6 +90,15 @@ const trackReads = () => {
   }
 };
 
+/** A test file's code without its comment lines, for the census (page-machine.test,
+ *  page-throttle-sweep.test). By LINE, on purpose: a `/*` inside a line comment
+ *  ("tools/*.test.mjs") would open a block to a regex and swallow code. A line is
+ *  comment when it starts `//`, `/*` or `*`; a code line loses a ` // …` tail. */
+export const stripComments = (src) => src.split("\n")
+  .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
+  .map((line) => line.replace(/\s\/\/\s.*$/, ""))
+  .join("\n");
+
 /** A browser context on a SET machine. `clock`: "held" (the default) or "real";
  *  `machine`: the cores and memory navigator reports; `throttle`: a CPU rate for
  *  every page it opens (default: the run's WORLD_PAGE_CPU_THROTTLE). Every other
@@ -103,6 +115,9 @@ export async function machineContext(browser, { clock = "held", machine = ABLE_M
   ctx.newPage = async () => {
     const page = await open();
     if (throttle > 1) await (await ctx.newCDPSession(page)).send("Emulation.setCPUThrottlingRate", { rate: throttle });
+    // the sweep's receipt (tools/page-throttle-sweep.test.mjs): one line per real
+    // page opened, with the machine it was opened on
+    if (process.env[MACHINE_LOG_ENV]) appendFileSync(process.env[MACHINE_LOG_ENV], JSON.stringify({ clock, cores: machine.cores, memory: machine.memory, throttle }) + "\n");
     return page;
   };
   Object.defineProperty(ctx, "machine", { value: Object.freeze({ clock, cores: machine.cores, memory: machine.memory, throttle }) });
