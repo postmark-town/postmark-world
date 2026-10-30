@@ -28,7 +28,7 @@ import { MACHINE_LOG_ENV, NO_PLAYWRIGHT, THROTTLE_ENV, stripComments } from "./p
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "tools/page-throttle-sweep.test.mjs";
-const RATE = 4;
+const RATE = 6;   // CONDITION (WLD-71, to be reverted): the clock class's pair at the slow-machine test's own rate
 // the 22 page tests at WLD-71
 const SWEPT = [
   "tools/act-as-town-bodies.test.mjs", "tools/backdrop-without-text.test.mjs", "tools/dungeon-page.test.mjs",
