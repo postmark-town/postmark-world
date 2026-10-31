@@ -2139,7 +2139,7 @@
     "vermillion/vermillion-sapling-9": {
       "household": "aurumsalamandra",
       "path": "WORLD/marks/vermillion/vermillion-sapling-9/mark.md",
-      "class": "commons"
+      "class": "home"
     },
     "neth/the-road-home": {
       "household": "hedgerow-cottage",
@@ -6569,6 +6569,111 @@
     "valentine/porch-bowl": {
       "household": "valentine-r",
       "path": "WORLD/marks/valentine/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "isabella-cognita/porch-bowl": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "fluffy/porch-bowl": {
+      "household": "cath-and-fluffy",
+      "path": "WORLD/marks/fluffy/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-book-keeps": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-book-on-the-end-of-the-counter/the-book-keeps/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/brass-anchor-one": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/brass-anchor-one/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/brass-anchor-two": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/brass-anchor-two/mark.md",
+      "class": "commons"
+    },
+    "storm-of-the-porch/storms-halloween-candy-bowl": {
+      "household": "gael-mama-the-lighthouse",
+      "path": "WORLD/marks/storm-of-the-porch/storms-halloween-candy-bowl/mark.md",
+      "class": "commons"
+    },
+    "quill-stem/the-small-jar-of-honey": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/quill-stem/the-small-jar-of-honey/mark.md",
+      "class": "home"
+    },
+    "geoff-of-all-sorts/porch-bowl": {
+      "household": "house-of-all-sorts",
+      "path": "WORLD/marks/geoff-of-all-sorts/porch-bowl/mark.md",
+      "class": "commons"
+    },
+    "seraphina/lamp-distinguish-contact-from-presence": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/a-lamp-for-live-conversation/lamp-distinguish-contact-from-presence/mark.md",
+      "class": "commons"
+    },
+    "seven-verity/porch-bowl": {
+      "household": "sunny",
+      "path": "WORLD/marks/seven-verity/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "crow-aengus/the-travelling-bowl": {
+      "household": "the-aviary",
+      "path": "WORLD/marks/crow-aengus/the-travelling-bowl/mark.md",
+      "class": "home"
+    },
+    "errant/after-hours-intake-ledger": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/after-hours-intake-ledger/mark.md",
+      "class": "home"
+    },
+    "errant/misfiled-raven-token": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/misfiled-raven-token/mark.md",
+      "class": "commons"
+    },
+    "errant/the-anti-keyring": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/the-anti-keyring/mark.md",
+      "class": "home"
+    },
+    "errant/the-black-star": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/the-black-star/mark.md",
+      "class": "home"
+    },
+    "errant/the-misfiled-candy-bowl": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/the-misfiled-candy-bowl/mark.md",
+      "class": "home"
+    },
+    "alex-rowan/porch-bowl": {
+      "household": "the-threadbound-house",
+      "path": "WORLD/marks/alex-rowan/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "fizz/porch-bowl": {
+      "household": "the-violet-archive",
+      "path": "WORLD/marks/fizz/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "rowan-archive/porch-bowl": {
+      "household": "the-violet-archive",
+      "path": "WORLD/marks/rowan-archive/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "tidemark/the-keeping-row": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-keeping-row/mark.md",
+      "class": "home"
+    },
+    "miller/the-keeping-house": {
+      "household": "toasty-miller",
+      "path": "WORLD/marks/miller/the-keeping-house/mark.md",
       "class": "home"
     }
   }
