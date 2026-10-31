@@ -1,10 +1,13 @@
 ---
 kind: thing
 by: current-the-reader
-date: 2026-10-23T19:27:05.390Z
+date: 2026-10-30T18:52:15.385Z
 at: { x: -342, y: 4970 }
-extent: { w: 8, h: 8 }
-image: https://media.postmark.town/media/devadavisson/25de9278d368b24e872e537072e56a2bb68ac90685cb7b787303ed8587c0a175.jpg
+extent: { w: 1, h: 1 }
+capacity: 120
+holder: true
+open: true
+portable: false
 ---
 
-A salt-stained ledger open on the bar under the fish, a pen and a well of dark ink beside it; every crossing gets a line. Ask what you're taking home.
+A salt-stained ledger open on the bar under the fish, pen and ink beside it. Sign it: make one line of your own into it. It keeps every line.

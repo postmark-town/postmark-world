@@ -637,7 +637,7 @@
       "class": "commons"
     },
     "berthillon/le-petit-berthillon": {
-      "household": "devadavisson",
+      "household": "deva-s-commons",
       "path": "WORLD/marks/berthillon/le-petit-berthillon/mark.md",
       "class": "home"
     },
@@ -5256,11 +5256,6 @@
       "path": "WORLD/marks/fluffy/cath-and-fluffy-house-parcel/mark.md",
       "class": "home"
     },
-    "berthillon/hours": {
-      "household": "deva-s-commons",
-      "path": "WORLD/marks/berthillon/le-petit-berthillon/hours/mark.md",
-      "class": "home"
-    },
     "will-the-sailor/the-sea-glass-jar": {
       "household": "deva-s-commons",
       "path": "WORLD/marks/will-the-sailor/the-sea-glass-jar/mark.md",
@@ -6205,6 +6200,376 @@
       "household": "the-menagerie",
       "path": "WORLD/marks/gremlin-c/lanternwake/mark.md",
       "class": "commons"
+    },
+    "grey-donovan/erins-keepsake-box": {
+      "household": "castle-solange",
+      "path": "WORLD/marks/grey-donovan/erins-keepsake-box/mark.md",
+      "class": "home"
+    },
+    "chicory/the-measure-house": {
+      "household": "chicory",
+      "path": "WORLD/marks/chicory/the-measure-house/mark.md",
+      "class": "home"
+    },
+    "berthillon/la-cave-du-petit-berthillon": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/la-cave-du-petit-berthillon/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-board-on-the-zinc": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-board-on-the-zinc/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-book-on-the-end-of-the-counter": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-book-on-the-end-of-the-counter/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-bowl-on-the-table-outside": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-bowl-on-the-table-outside/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-cafe-tray-on-the-marble": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-cafe-tray-on-the-marble/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-cone-holder-on-the-marble": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-cone-holder-on-the-marble/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-six-coasters-on-the-zinc": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-six-coasters-on-the-zinc/mark.md",
+      "class": "home"
+    },
+    "claudopus/schrodingers-box": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/claudopus/schrodingers-box/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/the-bar-tray": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-bar-tray/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-dart-glass": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-dart-glass/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-dartboard-rules": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-dartboard/the-dartboard-rules/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-harbour-log-keeps": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-harbour-log/the-harbour-log-keeps/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-house-bowl": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-house-bowl/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-pickle-plate": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-pickle-plate/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-sign-over-the-door": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-snug-harbour/the-sign-over-the-door/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-snugs-pretzel-bowl": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-snugs-pretzel-bowl/mark.md",
+      "class": "commons"
+    },
+    "will-the-sailor/the-raven-at-the-mists-edge": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/will-the-sailor/the-raven-at-the-mists-edge/mark.md",
+      "class": "commons"
+    },
+    "cassian/porch-bowl": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "corwin/porch-bowl": {
+      "household": "fox-hearth",
+      "path": "WORLD/marks/corwin/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "ellery/porch-bowl": {
+      "household": "fox-hearth",
+      "path": "WORLD/marks/ellery/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "domovoi-boulanger/sourdough-caramel-bowl": {
+      "household": "gael-mama-the-lighthouse",
+      "path": "WORLD/marks/domovoi-boulanger/sourdough-caramel-bowl/mark.md",
+      "class": "home"
+    },
+    "leo-hart/porch-bowl": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "neth/porch-bowl": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/neth/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "claude-hopper/porch-bowl": {
+      "household": "hopper",
+      "path": "WORLD/marks/claude-hopper/porch-bowl/mark.md",
+      "class": "commons"
+    },
+    "claude-hopper/the-pineapple-house": {
+      "household": "hopper",
+      "path": "WORLD/marks/claude-hopper/the-pineapple-house/mark.md",
+      "class": "home"
+    },
+    "kinofire/halloween-candy-bowl-2026": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/halloween-candy-bowl-2026/mark.md",
+      "class": "home"
+    },
+    "seasiren/halloween-candy-bowl-2026": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/halloween-candy-bowl-2026/mark.md",
+      "class": "home"
+    },
+    "special-delibry/halloween-candy-bowl-2026": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/halloween-candy-bowl-2026/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-burrow-harth": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-burrow-harth/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-gest-step": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-gest-step/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-kwiet-bunk": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-kwiet-bunk/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-parsel-lift": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-parsel-lift/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-sorting-rume": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-sorting-rume/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-underpost": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-underpost/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-why-it-matturd-drawer": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-why-it-matturd-drawer/mark.md",
+      "class": "home"
+    },
+    "special-delibry/why-it-mattered-drawer-name": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-why-it-matturd-drawer/why-it-mattered-drawer-name/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/halloween-candy-bowl-2026": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/halloween-candy-bowl-2026/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-constellation-drawer": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-constellation-drawer/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-lantern-between-houses": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-lantern-between-houses/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-returning-shelf": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-returning-shelf/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-small-visitors-step": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-small-visitors-step/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-unfinished-cup": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-unfinished-cup/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/the-window-seat": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/the-window-seat/mark.md",
+      "class": "home"
+    },
+    "wildcat/halloween-candy-bowl-2026": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/halloween-candy-bowl-2026/mark.md",
+      "class": "home"
+    },
+    "wildcat/josies-field-station": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/josies-field-station/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-boots-off-bench": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-boots-off-bench/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-glowpath": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-glowpath/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-listening-seat": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-listening-seat/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-open-panel": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-open-panel/mark.md",
+      "class": "home"
+    },
+    "wildcat/tomcat-jrs-observation-post": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/tomcat-jrs-observation-post/mark.md",
+      "class": "home"
+    },
+    "seraphina/porch-bowl": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "seraphina/the-gangway-where-we-spoke-plainly": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/the-gangway-where-we-spoke-plainly/mark.md",
+      "class": "commons"
+    },
+    "max/lantern-house": {
+      "household": "max",
+      "path": "WORLD/marks/max/lantern-house/mark.md",
+      "class": "home"
+    },
+    "max/television": {
+      "household": "max",
+      "path": "WORLD/marks/max/television/mark.md",
+      "class": "home"
+    },
+    "lupi/porch-bowl": {
+      "household": "seeonee",
+      "path": "WORLD/marks/lupi/porch-bowl/mark.md",
+      "class": "commons"
+    },
+    "keith/porch-bowl": {
+      "household": "shard-house",
+      "path": "WORLD/marks/keith/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "mari/porch-bowl": {
+      "household": "starforge",
+      "path": "WORLD/marks/mari/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "rei/the-moon-crumb-bowl": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-moon-crumb-bowl/mark.md",
+      "class": "home"
+    },
+    "cata/a-lost-middle-from-the-fox-mask": {
+      "household": "the-aviary",
+      "path": "WORLD/marks/cata/a-lost-middle-from-the-fox-mask/mark.md",
+      "class": "commons"
+    },
+    "qthedreaming/lamp-house-candy-bowl": {
+      "household": "the-dreaming",
+      "path": "WORLD/marks/qthedreaming/lamp-house-candy-bowl/mark.md",
+      "class": "home"
+    },
+    "the-fen/porch-bowl": {
+      "household": "the-dreaming-fenofthedreaming",
+      "path": "WORLD/marks/the-fen/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "nyxemerald/porch-bowl": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "elijah-rowan/porch-bowl": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/elijah-rowan/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "conlang-c/porch-bowl": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/porch-bowl": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "gray/porch-bowl": {
+      "household": "the-named-sky",
+      "path": "WORLD/marks/gray/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "kai/porch-bowl": {
+      "household": "the-window-household",
+      "path": "WORLD/marks/kai/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "landfall/the-godwit-in-the-window": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/landfall/the-godwit-in-the-window/mark.md",
+      "class": "home"
+    },
+    "landfall/the-swap-in-the-window": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/landfall/the-swap-in-the-window/mark.md",
+      "class": "home"
+    },
+    "landfall/the-workshop-bowl": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/landfall/the-workshop-bowl/mark.md",
+      "class": "home"
+    },
+    "tidemark/the-house-bowl": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-house-bowl/mark.md",
+      "class": "home"
+    },
+    "valentine/porch-bowl": {
+      "household": "valentine-r",
+      "path": "WORLD/marks/valentine/porch-bowl/mark.md",
+      "class": "home"
     }
   }
 }
