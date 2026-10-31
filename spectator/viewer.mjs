@@ -4274,14 +4274,29 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
   const n = (v) => v.toFixed(1);
   const a = px({ x: m.clear.minX, y: m.clear.minY }), b = px({ x: m.clear.maxX, y: m.clear.maxY });
   const r = MISTS_FAR_M / mPerPx;
-  // the wall: everything outward of the clear ground, as one even-odd ring
-  const wall = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
-    + ` d="M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-    + ` M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z`
-    // each clearing is one more hole: a circle, drawn as two half-arcs
-    + (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
-      return ` M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; }).join("")
-    + `"/>`;
+  const sq = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`;
+  // THE CLEARINGS ARE CUT, NOT COUNTED (WLD-134, 2026-10-31: the Spire's
+  // clearing drew as wall). Each clearing used to be one more even-odd ring in
+  // the wall's own path, which is a hole only where a point is inside an ODD
+  // number of rings. Clearings that overlap the clear ground or each other (the
+  // way to the Spire overlaps both; the ragged rings, pushed out to where the
+  // paint turns opaque, overlap wider still) put a point inside two rings, and
+  // two holes made wall: the Spire's grounds were painted over and their
+  // pointer taken, while the engine told them clear. So the path keeps only the
+  // clear ground's ring, and each clearing is its own clip (the square less that
+  // one ring), nested: a point is drawn only if no clearing holds it, the union
+  // the engine's mistsHere already answers. Clips bind the pointer as well as
+  // the paint. No clearing, no clip: the wall is the path it always was.
+  const cut = (body, rings, tag) => !rings.length ? body
+    : `<defs>${rings.map((ring, i) => `<clipPath id="${id}-${tag}${i}" clipPathUnits="userSpaceOnUse"><path clip-rule="evenodd" d="${sq} ${ring}"/></clipPath>`).join("")}</defs>`
+      + rings.reduceRight((inner, _, i) => `<g clip-path="url(#${id}-${tag}${i})">${inner}</g>`, body);
+  // each clearing a circle, drawn as two half-arcs
+  const circles = (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
+    return `M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; });
+  // the wall: everything outward of the clear ground, as one even-odd ring, less the clearings
+  const wallPath = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
+    + ` d="${sq} M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z"/>`;
+  const wall = cut(wallPath, circles, "cut");
   if (painted && ragged) {
     const STEP = 60, pt = (q) => { const v = px(q); return `${n(v.x)} ${n(v.y)}`; };
     const out = (at, dir) => { const d = mistsOpaqueFromM(m, at, dir, { stepM: 15 }); return { x: at.x + dir.x * d, y: at.y + dir.y * d }; };
@@ -4292,15 +4307,14 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
     side(c.maxX, c.minY, c.maxX, c.maxY, { x: 1, y: 0 });
     side(c.maxX, c.maxY, c.minX, c.maxY, { x: 0, y: 1 });
     side(c.minX, c.maxY, c.minX, c.minY, { x: -1, y: 0 });
-    let d = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-      + ` M ${ring.map(pt).join(" L ")} Z`;
-    for (const k of m.clearings ?? []) {
+    const arcs = (m.clearings ?? []).map((k) => {
       const steps = Math.max(24, Math.ceil(2 * Math.PI * k.r / STEP)), arc = [];
       for (let i = 0; i < steps; i++) { const a = 2 * Math.PI * i / steps, dir = { x: Math.cos(a), y: Math.sin(a) };
         arc.push(out({ x: k.x + dir.x * k.r, y: k.y + dir.y * k.r }, dir)); }
-      d += ` M ${arc.map(pt).join(" L ")} Z`;
-    }
-    const back = `<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none" d="${d}"/>`;
+      return `M ${arc.map(pt).join(" L ")} Z`;
+    });
+    const back = cut(`<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none"`
+      + ` d="${sq} M ${ring.map(pt).join(" L ")} Z"/>`, arcs, "rcut");
     return `<g class="wv-mists" aria-hidden="true">${back}${wall.replace(` fill="${MISTS_INK}"`, ` fill="${MISTS_INK}" fill-opacity="0"`)}</g>`;
   }
   // a clearing's fringe: a soft ring on its own clear side, fading inward from the wall
