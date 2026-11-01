@@ -12,6 +12,9 @@
 > and a room is not on it, the difference is a defect — replace it with the
 > main-world primitive and say so here if a new one is ever earned.
 
+*Building code that mounts on or beside a scene? See
+[Integration craft](#integration-craft--code-that-mounts-on-or-beside-a-scene) at the foot.*
+
 ## The model
 
 The world is scenes all the way down. The main world is itself an entered state
@@ -131,3 +134,83 @@ system: if room names ever get drawn into a room's ground, it is the same thing.
   the real walk desk, stacked exits walk out level by level through the card's
   button, town remounts whole with the card gone and the dot back. Its rig left
   the repo with `demo/` — the file's header says what a rig must provide.
+
+## Integration craft — code that mounts on, or beside, a scene
+
+Three lessons for a builder whose code reads the viewer's painting or the home
+resolver from outside. Craft, not law: nothing here adds a rule, a field or an
+interface, and the difference list above is untouched. Pointers are symbols and
+test titles, not line numbers, so they survive edits. Measured at World
+`2173dcaa` and Site `493e08d0` (read-only); re-measure before leaning on either.
+
+**1. A scene swap replaces the svg. Reacquire it at use time.**
+`mountScene` clears the box (`boxEl.innerHTML = ""`) and appends the new ground;
+`mountRoomScene` holds the town's svg aside in `townKeep` and `remountTown`
+puts it back. So between an enter and an exit the svg you met at mount time can
+be detached, and a detached svg still answers `getBoundingClientRect` (zeros)
+and `viewBox` (stale), so a node kept from mount time measures a ghost. Ask for
+the connected, active painting each time you draw or measure, and re-point any
+`MutationObserver` when the node changes. The Site's cockpit does this with a
+`liveSvg()` over a caller-supplied `svgOf`, whose `mapSvg()` in
+`src/components/WorldCockpit.astro` prefers a connected `svg[data-wv-m-per-px]`
+and otherwise takes `#wv-overlay`'s `ownerSVGElement`
+(`src/lib/world-cockpit-mount.mjs`). The site tests that pin it
+(`test/world-cockpit-dock.test.mjs`, "the camera watch follows the living svg…")
+are regex pins over source text: they show the source says it, not that a swap
+was survived. Hunt for leftovers too: a bare `o.svg` read (one remains in that
+module, for a speech-bubble width budget) is the same mistake.
+
+**2. The viewer owns its camera; a room's painting owns its registration.**
+`view` is the camera and `applyView` is the one writer of the `viewBox`, which
+clamps (`test/viewer-camera-bounds.test.mjs`, "THE FENCE HAS ONE OWNER…", a
+source pin). An outside `setAttribute("viewBox", …)` moves the attribute and
+leaves `view`, `zoomK` and everything sized from them where they were, so the
+next wheel notch, refit or follow writes the stale `view` back. The camera
+functions (`mapCtx.frameOn`, `setView`, `lockOn`) are closure-local to
+`mountViewer`; the returned handle (`window.__pmViewer`) offers `rerender`,
+`reload`, `select`, `stop` and a few instruments, but no camera. So external
+code today has no verified way to move the camera: read it, don't write it.
+Reading is fine: the `viewBox` can be read for a zoom ratio, and `viewCentreM(ctx)`
+is the viewer's own pure reader (`tools/act-as-scene.test.mjs`, "viewCentreM…").
+Registration is per scene: the town's comes from the skeleton's `_grid`, a
+room's from `roomGround(mark)` (`originPx`, `mPerPx`, `ROOM_GROUND_UNITS`;
+difference #2), and every viewer projection reads the active
+`mapCtx.originPx/mPerPx` (`viewportWorldBounds`, `viewCentreM`, `frameOn`'s
+`camPx`). An overlay placed with the town grid on a room's svg lands at the
+wrong place and scale. As measured, the viewer sets no registration attribute
+on its svg (only `data-ground`, `data-tier` and the like), so an overlay has
+nothing in the DOM to read it from; if it needs one, that is a viewer change
+to be ruled, not a thing to assume.
+
+**3. A home or geometry test proves its wiring only if it follows the loader.**
+`homeOf` and `whereIs` (`tools/where-is.mjs`) are pure and answer from whatever
+`world` they are handed, so a test that builds `{ marks, parcels }` by hand
+proves the resolver and nothing about whether the page supplies those inputs
+(`tools/where-is.test.mjs` is that kind, and is right to be). The consumers
+build their world through `assembleWorld` (`tools/world-build.mjs`), which
+picks fields: once it dropped `households`, and every resolver test stayed green
+while the live readers answered "no home". The test that closes that gap runs
+the real assembly and then the resolver (`tools/homes-per-resident.test.mjs`,
+"D7 · …through assembleWorld"). Its sibling D8 goes through `buildWorld` over
+the published registry files, which is a real-record read: know that before
+running it. Write the test on the path the application takes, with synthetic
+inputs; do not bring back a seed manifest as the authority for homes.
+
+**The old four-word handshake is historical here.** Older notes name
+`pm:frame-on`, `pm:cockpit-dock`, `pm:act-as` and the stamps
+`data-wv-origin-x/y` and `data-wv-m-per-px`. The Site side exists at `493e08d0`
+(it dispatches the three events and reads the stamps in `gridNow()`, falling
+back to the town grid when there is none). The World side does not exist on
+`main` at `2173dcaa`: `spectator/viewer.mjs` has no listener for any of the
+three events and sets none of the stamps; its only inbound event is
+`pm:stood-out`, which the Site does dispatch. Listeners and a stamp exist on
+prototype branches that are not ancestors of `main` (checked with
+`git merge-base --is-ancestor` for the camera-request and stamp commits), so
+each name has one traced end on `main`, not two. Do not describe these as a
+current interface. The Site's own comments call `pm:act-as` and the dock and
+feed events "dead wire at this pin". Which
+World commit production serves is not established here: the Site's floor pin
+(`package.json`, also `WORLD-PIN.md`) is `50d1e6ee`, an ancestor of `main`
+without the listeners or the stamps, and the resolved pin is the newest
+`settlement/S<n>` tag at rebuild time, which this note did not read. Nothing
+here claims the live site works or fails.
