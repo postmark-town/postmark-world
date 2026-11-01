@@ -171,9 +171,6 @@ function fidelityRepo() {
   // gate reads whose each mark is, and a whole-tree copy without it is a tree
   // that gate cannot read.
   copyFileSync(join(REPO_SRC, "WORLD", "households.json"), join(repo, "WORLD", "households.json"));
-  // …and the portal lint's named exceptions: a whole-tree copy without them turns
-  // an excepted finding (a door let through by name) back into an error.
-  copyFileSync(join(REPO_SRC, "WORLD", "portal-lint-exceptions.json"), join(repo, "WORLD", "portal-lint-exceptions.json"));
   return repo;
 }
 
