@@ -1,4 +1,0 @@
-{
-  "retired": "2026-11-01. Nothing reads this file any more: the named-exception door (applyPortalExceptions, mark-lint's --portal-exceptions) is gone. Darko, 2026-11-01 07:58: \"if we're hardcoding enumerated exceptions as slugs that's no good\". A finding that is wrong is fixed in the rule (tools/portals.mjs), never listed around. This file is empty and is left for Wright to remove.",
-  "exceptions": []
-}
