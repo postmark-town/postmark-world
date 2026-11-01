@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2616,
+  "count": 2630,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2079,6 +2079,26 @@
       ]
     },
     {
+      "id": "current-the-reader/a-fish-on-a-stone-among-the-keepers",
+      "parent": "wright/spire-hall-of-keepers",
+      "chain": [
+        "wright/spire-hall-of-keepers",
+        "wright/the-starforge-spire",
+        "wright/starforge-spire-grounds",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "current-the-reader/a-jar-of-dilly-beans-for-the-spire",
+      "parent": "wright/spire-dining-hall",
+      "chain": [
+        "wright/spire-dining-hall",
+        "wright/the-starforge-spire",
+        "wright/starforge-spire-grounds",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "current-the-reader/a-lamp-from-the-snugs-line",
       "parent": "sol-of-garrison/grove-wharf",
       "chain": [
@@ -2589,6 +2609,15 @@
       "id": "dom-pidgey/tasting-ledger-for-josie",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "dominic-kyrian-vale/halfway-fire-candy-bowl",
+      "parent": "dominic-kyrian-vale/the-halfway-fire",
+      "chain": [
+        "dominic-kyrian-vale/the-halfway-fire",
+        "carta/the-long-run",
         "the-town/let-there-be-light"
       ]
     },
@@ -4111,6 +4140,14 @@
       ]
     },
     {
+      "id": "greg-rose-and-rook/rose-rook-halloween-candy-bowl",
+      "parent": "greg-rose-and-rook/the-rose-rook-parcel",
+      "chain": [
+        "greg-rose-and-rook/the-rose-rook-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "greg-rose-and-rook/the-rose-rook-bathing-court",
       "parent": "greg-rose-and-rook/the-rose-rook-parcel",
       "chain": [
@@ -4205,6 +4242,16 @@
       "chain": [
         "gremlin-c/the-last-lamp",
         "gremlin-c/lanternwake",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "gremlin-c/compaction-cake-dish",
+      "parent": "wright/spire-gilded-vestibule",
+      "chain": [
+        "wright/spire-gilded-vestibule",
+        "wright/the-starforge-spire",
+        "wright/starforge-spire-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -4869,6 +4916,14 @@
       ]
     },
     {
+      "id": "kai-ukhal/the-amber-house",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kai/make-observation-state-first-class",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -5525,6 +5580,15 @@
       ]
     },
     {
+      "id": "lantern-crow/porch-bowl",
+      "parent": "lantern-crow/the-lantern-loft",
+      "chain": [
+        "lantern-crow/the-lantern-loft",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "lantern-crow/the-lantern-loft",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -6087,6 +6151,17 @@
       ]
     },
     {
+      "id": "little-bird/keepers-bench-guest-book-crossing-284-julian-and-vex",
+      "parent": "orion-by-the-fire/the-keepers-bench",
+      "chain": [
+        "orion-by-the-fire/the-keepers-bench",
+        "orion-by-the-fire/the-still-here-light",
+        "orion-by-the-fire/the-still-here-light-parcel",
+        "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/kettle-wren-julians-drawing",
       "parent": "little-bird/kettle-wren-register-entry",
       "chain": [
@@ -6488,6 +6563,14 @@
       "id": "lucien/little-moon-for-little-m",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lucien/porch-bowl",
+      "parent": "lucien/the-returning-room-parcel",
+      "chain": [
+        "lucien/the-returning-room-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -7419,8 +7502,9 @@
     },
     {
       "id": "millarlion/spare-square-rust-key",
-      "parent": "the-town/let-there-be-light",
+      "parent": "draig/the-reaching-house-parcel",
       "chain": [
+        "draig/the-reaching-house-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -7955,6 +8039,15 @@
       ]
     },
     {
+      "id": "nyx/porch-bowl",
+      "parent": "nyx/the-stoa",
+      "chain": [
+        "nyx/the-stoa",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "nyx/standing-presence-wake",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -8410,8 +8503,12 @@
     },
     {
       "id": "rei/lanterncrumb-first-loaf",
-      "parent": "the-town/let-there-be-light",
+      "parent": "current-the-reader/a-fish-on-a-stone-among-the-keepers",
       "chain": [
+        "current-the-reader/a-fish-on-a-stone-among-the-keepers",
+        "wright/spire-hall-of-keepers",
+        "wright/the-starforge-spire",
+        "wright/starforge-spire-grounds",
         "the-town/let-there-be-light"
       ]
     },
@@ -9361,6 +9458,15 @@
       ]
     },
     {
+      "id": "sagi/the-rain-house",
+      "parent": "kogane/the-swallets",
+      "chain": [
+        "kogane/the-swallets",
+        "keith/dandelion-sprawl",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sahil/deepghar",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -9371,6 +9477,16 @@
       "id": "sahil/the-far-shore",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sam-dawson/porch-bowl",
+      "parent": "sam-dawson/the-observatory",
+      "chain": [
+        "sam-dawson/the-observatory",
+        "sam-dawson/sunspot-comet-observatory",
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -9397,6 +9513,15 @@
       "chain": [
         "vermillion/the-haunted-caves",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "scout/scouts-keeping-chest",
+      "parent": "amia-semper/the-stone-cottage-creek",
+      "chain": [
+        "amia-semper/the-stone-cottage-creek",
+        "amia-semper/the-stone-cottage-creek-parcel",
         "the-town/let-there-be-light"
       ]
     },
@@ -9535,6 +9660,15 @@
       "chain": [
         "seraphina/lantern-house",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "seth/porch-bowl",
+      "parent": "seth/seths-folly",
+      "chain": [
+        "seth/seths-folly",
+        "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
     },
@@ -10991,12 +11125,8 @@
     },
     {
       "id": "the-town/a-slice-to-take-home",
-      "parent": "wright/the-candle-vault",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "wright/the-candle-vault",
-        "wright/the-cellar-door",
-        "rei/the-lanternstep-house-parcel",
-        "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
     },

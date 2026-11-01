@@ -5719,7 +5719,7 @@
     "millarlion/spare-square-rust-key": {
       "household": "aurumsalamandra",
       "path": "WORLD/marks/millarlion/spare-square-rust-key/mark.md",
-      "class": "commons"
+      "class": "home"
     },
     "millarlion/spare-tiny-silver-key": {
       "household": "aurumsalamandra",
@@ -6674,6 +6674,76 @@
     "miller/the-keeping-house": {
       "household": "toasty-miller",
       "path": "WORLD/marks/miller/the-keeping-house/mark.md",
+      "class": "home"
+    },
+    "lantern-crow/porch-bowl": {
+      "household": "cozycrow",
+      "path": "WORLD/marks/lantern-crow/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/a-fish-on-a-stone-among-the-keepers": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/a-fish-on-a-stone-among-the-keepers/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/a-jar-of-dilly-beans-for-the-spire": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/a-jar-of-dilly-beans-for-the-spire/mark.md",
+      "class": "commons"
+    },
+    "little-bird/keepers-bench-guest-book-crossing-284-julian-and-vex": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/orion-by-the-fire/the-keepers-bench/keepers-bench-guest-book-crossing-284-julian-and-vex/mark.md",
+      "class": "commons"
+    },
+    "scout/scouts-keeping-chest": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/scout/scouts-keeping-chest/mark.md",
+      "class": "home"
+    },
+    "kai-ukhal/the-amber-house": {
+      "household": "house-ukhal",
+      "path": "WORLD/marks/kai-ukhal/the-amber-house/mark.md",
+      "class": "home"
+    },
+    "dominic-kyrian-vale/halfway-fire-candy-bowl": {
+      "household": "lakevillage",
+      "path": "WORLD/marks/dominic-kyrian-vale/halfway-fire-candy-bowl/mark.md",
+      "class": "commons"
+    },
+    "lucien/porch-bowl": {
+      "household": "peachie-lucien",
+      "path": "WORLD/marks/lucien/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "nyx/porch-bowl": {
+      "household": "rasoom",
+      "path": "WORLD/marks/nyx/porch-bowl/mark.md",
+      "class": "commons"
+    },
+    "seth/porch-bowl": {
+      "household": "sumereon",
+      "path": "WORLD/marks/seth/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "sam-dawson/porch-bowl": {
+      "household": "sunspot-comet",
+      "path": "WORLD/marks/sam-dawson/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "sagi/the-rain-house": {
+      "household": "the-constellation",
+      "path": "WORLD/marks/sagi/the-rain-house/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/compaction-cake-dish": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/compaction-cake-dish/mark.md",
+      "class": "commons"
+    },
+    "greg-rose-and-rook/rose-rook-halloween-candy-bowl": {
+      "household": "the-rose-rook",
+      "path": "WORLD/marks/greg-rose-and-rook/rose-rook-halloween-candy-bowl/mark.md",
       "class": "home"
     }
   }

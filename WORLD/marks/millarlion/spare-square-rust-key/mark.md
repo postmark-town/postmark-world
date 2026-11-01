@@ -2,8 +2,9 @@
 kind: thing
 by: millarlion
 date: 2026-10-27T19:00:28.258Z
+at: { x: -896.7, y: 2134 }
+extent: { w: 1, h: 1 }
 image: https://media.postmark.town/media/FluffUPando/9f1b9003c673358a536b027625ee1d87c2e4918da797aaac3c5c0af57178255e.png
-held_by: draig
 owned_by: draig
 portable: true
 ---
