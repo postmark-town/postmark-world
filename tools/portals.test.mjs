@@ -22,9 +22,10 @@ import { fileURLToPath } from "node:url";
 
 import { entryLawOf, termsAt, occupancyAt, parseEnterExitLedger } from "./enter-exit.mjs";
 import {
-  insetInto, landingOf, hiddenFrom, scopeWorld, portalFindings, applyPortalExceptions, portalsIn, portalsInto,
+  insetInto, landingOf, hiddenFrom, scopeWorld, portalFindings, portalsIn, portalsInto,
   dungeonsOf, heldDungeon, standpointSight, walkFence, dungeonLanding, pointInMark, LANDING_REACH_M,
 } from "./portals.mjs";
+import * as portals from "./portals.mjs";
 import { enter, exit, enterPrompt, exitPrompt, containmentChain, investigate } from "./world-verbs.mjs";
 
 const HEIST = "spire/the-gilded-doo-YOULL-NEVER-CATCH-ME";
@@ -35,6 +36,7 @@ function world({ heist = false } = {}) {
     { id: "spire/grounds", kind: "sited", by: "spire",
       at: { x: 1000, y: 1000 }, extent: { w: 500, h: 400 }, body: "The Starforge Spire Grounds, open to all." },
     { id: SPIRE, kind: "sited", by: "spire", class: "dungeon",
+      rooms: ["spire/vestibule", "spire/hall", "spire/chapel"],
       at: { x: 1000, y: 1000 }, extent: { w: 300, h: 300 }, body: "The Starforge Spire." },
     { id: "spire/vestibule", kind: "sited", by: "spire", at: { x: 880, y: 1000 }, extent: { w: 50, h: 50 }, body: "The vestibule." },
     { id: "spire/hall", kind: "sited", by: "spire", at: { x: 1030, y: 1000 }, extent: { w: 200, h: 200 }, body: "The great hall." },
@@ -302,14 +304,12 @@ test("the ruled instance is clean", () => {
   assert.deepEqual(portalFindings(world().marks), []);
 });
 
-test("the heist reds the lint by name, and a named exception lets exactly it through", () => {
+test("the heist reds the lint by name, and there is no door to let it through by slug", () => {
+  // until 2026-11-01 this also asserted that applyPortalExceptions let the finding through by name; Darko, 07:58:
+  // "if we're hardcoding enumerated exceptions as slugs that's no good". The door is retired: a finding is fixed in the rule.
   const found = portalFindings(world({ heist: true }).marks);
   assert.deepEqual(found.map((f) => [f.mark, f.rule, f.sev]), [["spire/doors-outside", "lands-at-names-a-mark", "ERROR"]]);
-  const exc = [{ mark: "spire/doors-outside", rule: "lands-at-names-a-mark", by: "jetto", why: "the heist" },
-               { mark: "spire/hall-door", rule: "exit-never-opposed", by: "nobody", why: "stale" }];
-  const { findings, stale } = applyPortalExceptions(found, exc);
-  assert.deepEqual(findings[0].excepted, { by: "jetto", why: "the heist" });
-  assert.deepEqual(stale.map((e) => e.mark), ["spire/hall-door"]);
+  assert.equal(portals.applyPortalExceptions, undefined, "the named-exception door is gone");
 });
 
 test("a landing more than the reach from its into is red", () => {
@@ -334,11 +334,57 @@ test("a room whose only portal out is locked has no path out, though the rest do
   assert.deepEqual(portalFindings(w.marks).map((f) => `${f.sev} ${f.rule} ${f.mark}`), ["WARN path-to-an-exit spire/chapel"]);
 });
 
-test("G9 · siblings never overlap: two marks with one parent inside a dungeon", () => {
-  const w = world();
-  w.marks.push({ id: "spire/pantry", kind: "sited", by: "spire", at: { x: 1135, y: 950 }, extent: { w: 30, h: 30 }, body: "A pantry, half in the hall." });
+const declare = (w, ...ids) => { w.marks.find((m) => m.id === SPIRE).rooms.push(...ids); return w; };
+const PANTRY = { id: "spire/pantry", kind: "sited", by: "spire", at: { x: 1135, y: 950 }, extent: { w: 30, h: 30 }, body: "A pantry, half in the hall." };
+
+test("G9 · two ROOMS the dungeon declares never overlap", () => {
+  const w = declare(world(), "spire/pantry");
+  w.marks.push(PANTRY);
   assert.deepEqual(portalFindings(w.marks).map((f) => `${f.sev} ${f.rule} ${f.mark}`), ["ERROR rooms-do-not-overlap spire/hall"]);
   assert.match(portalFindings(w.marks)[0].msg, /spire\/hall overlaps spire\/pantry, and both stand directly in spire\/the-spire inside spire\/the-spire/);
+});
+
+// LAW (Darko, 2026-11-01 07:58): "Yeah rooms only"; (07:59, two messages): "i'm thinking maybe just have the dungeon
+// represented by some kind of class in code that has a list of dungeon rooms which the no overlap thing checks" and
+// "Everything should be allowed to overlap like normal".
+test("G9 · what the dungeon does not declare as a room overlaps freely: a rug and a dish (the S144 case), a thing across a wall, a thing on a thing", () => {
+  const w = world();
+  const sited = (id, x, y, ww, hh) => ({ id, kind: "sited", by: "spire", at: { x, y }, extent: { w: ww, h: hh }, body: id });
+  w.marks.push(
+    sited("spire/runner", 1000, 1050, 13, 4), sited("spire/cake-dish", 1005, 1051, 1, 1),   // two things in the hall, one partly on the other
+    sited("spire/rug", 1100, 1000, 14, 9), sited("spire/chair", 1103, 1002, 4, 4),
+    PANTRY,                                                                                // an unlisted box half in the hall: not a room
+  );
+  assert.deepEqual(portalFindings(w.marks), []);
+});
+
+test("G9 · the same two things overlap and the declared rooms around them are still judged: an object in the overlap masks nothing", () => {
+  const w = declare(world(), "spire/pantry");
+  w.marks.push(PANTRY, { id: "spire/stool", kind: "sited", by: "spire", at: { x: 1131, y: 955 }, extent: { w: 2, h: 2 }, body: "A stool where hall and pantry overlap." });
+  assert.deepEqual(portalFindings(w.marks).map((f) => `${f.rule} ${f.mark}`), ["rooms-do-not-overlap spire/hall"]);
+});
+
+test("G9 · a dungeon that declares no rooms checks nothing", () => {
+  const w = world();
+  delete w.marks.find((m) => m.id === SPIRE).rooms;
+  w.marks.push(PANTRY);
+  assert.deepEqual(portalFindings(w.marks), []);
+});
+
+test("G9 · a declared room that names no mark, a mark outside the dungeon, or a list that is not a list is red: a typo must not switch the rule off", () => {
+  const w = declare(world(), "spire/nowhere", "town/green");
+  assert.deepEqual(portalFindings(w.marks).map((f) => `${f.rule} ${f.mark}`), ["rooms-name-marks spire/the-spire", "rooms-name-marks spire/the-spire"]);
+  const v = world();
+  v.marks.find((m) => m.id === SPIRE).rooms = "spire/hall";
+  assert.deepEqual(portalFindings(v.marks).map((f) => `${f.rule} ${f.mark}`), ["rooms-name-marks spire/the-spire"]);
+});
+
+test("G9 · a declared room with no extent is red: a point is no place on the ground to tile", () => {
+  const w = declare(world(), "spire/post");
+  w.marks.push({ id: "spire/post", kind: "sited", by: "spire", at: { x: 1050, y: 1050 }, body: "A lamp post, a point with no extent." });
+  const found = portalFindings(w.marks);
+  assert.deepEqual(found.map((f) => `${f.rule} ${f.mark}`), ["rooms-name-marks spire/the-spire"]);
+  assert.match(found[0].msg, /spire\/post has no extent/, "the finding is the no-extent clause, not the outside-the-dungeon one");
 });
 
 test("G9 · a room's contents are its children, never its overlapping siblings; the open Grounds are not held to it", () => {
@@ -350,10 +396,16 @@ test("G9 · a room's contents are its children, never its overlapping siblings; 
   assert.deepEqual(portalFindings(w.marks), []);
 });
 
+test("G9 · a room declared inside another declared room is its child, not an overlapping sibling", () => {
+  const w = declare(world(), "spire/alcove");
+  w.marks.push({ id: "spire/alcove", kind: "sited", by: "spire", at: { x: 1060, y: 1040 }, extent: { w: 20, h: 20 }, body: "An alcove wholly in the hall." });
+  assert.deepEqual(portalFindings(w.marks), []);
+});
+
 test("G9 · two rooms drawn as rings that share a wall do not overlap; pushed into each other, they do", () => {
   const ring = (id, x0) => ({ id, kind: "sited", by: "spire", at: { x: x0 + 10, y: 862 }, extent: { w: 20, h: 20 },
     points: [[x0, 852], [x0 + 20, 852], [x0 + 20, 872], [x0, 872]], body: id });
-  const w = world();
+  const w = declare(world(), "spire/east-cell", "spire/west-cell");
   w.marks.push(ring("spire/east-cell", 940), ring("spire/west-cell", 960));
   assert.deepEqual(portalFindings(w.marks), [], "a shared wall is not shared ground");
   w.marks[w.marks.length - 1] = ring("spire/west-cell", 957);
@@ -364,7 +416,7 @@ test("G9 · two triangles splitting one square share only their diagonal, and th
   // the boxes coincide, so only the ring test can answer, and the metre grid
   // lands squarely on the shared diagonal
   const tri = (id, pts) => ({ id, kind: "sited", by: "spire", at: { x: 1010, y: 862 }, extent: { w: 20, h: 20 }, points: pts, body: id });
-  const w = world();
+  const w = declare(world(), "spire/north-half", "spire/south-half");
   w.marks.push(tri("spire/north-half", [[1000, 852], [1020, 852], [1000, 872]]),
                tri("spire/south-half", [[1020, 852], [1020, 872], [1000, 872]]));
   assert.deepEqual(portalFindings(w.marks), []);
@@ -426,6 +478,7 @@ function gateTree({ heist, mutate = null }) {
     const lines = ["---", "kind: sited", "by: testerhh", "date: 2026-10-13",
       `at: { x: ${m.at.x}, y: ${m.at.y} }`, `extent: { w: ${m.extent.w}, h: ${m.extent.h} }`];
     if (m.class) lines.push(`class: ${m.class}`);
+    if (m.rooms) lines.push(`rooms: ${JSON.stringify(m.rooms.map((s) => s.replace("spire/", "testerhh/")))}`);
     // a fixture mark's id is <by>/<dir>, so the ids the laws name move with `by`
     const rid = (s) => s.replace(/^spire\//, "testerhh/");
     if (m.entry) lines.push(`entry: ${JSON.stringify({
@@ -443,7 +496,7 @@ function gate(dir, extra = []) {
   catch (e) { return { code: e.status, out: String(e.stdout ?? "") + String(e.stderr ?? "") }; }
 }
 
-test("THE GATE: the ruled instance lints clean, the heist refuses, and its named exception lets it through, said aloud", () => {
+test("THE GATE: the ruled instance lints clean, and the heist refuses with no way through by name", () => {
   const clean = gate(gateTree({ heist: false }));
   assert.equal(clean.code, 0, clean.out);
 
@@ -454,9 +507,12 @@ test("THE GATE: the ruled instance lints clean, the heist refuses, and its named
 
   const exc = join(dir, "exceptions.json");
   writeFileSync(exc, JSON.stringify({ exceptions: [{ mark: "testerhh/doors-outside", rule: "lands-at-names-a-mark", by: "jetto", why: "the heist (WLD-18)" }] }));
-  const let_through = gate(dir, ["--portal-exceptions", exc]);
-  assert.equal(let_through.code, 0, let_through.out);
-  assert.match(let_through.out, /\[WARN\] [^\n]*doors-outside: \[lands-at-names-a-mark\] EXCEPTED by WORLD\/portal-lint-exceptions\.json \(jetto: the heist \(WLD-18\)\)/);
+  // until 2026-11-01 this list let the finding through by slug (code 0, "EXCEPTED"); Darko, 07:58: "if we're hardcoding
+  // enumerated exceptions as slugs that's no good". The option is retired: a list handed to it changes nothing.
+  const still_red = gate(dir, ["--portal-exceptions", exc]);
+  assert.equal(still_red.code, 1, still_red.out);
+  assert.match(still_red.out, /\[ERROR\] [^\n]*doors-outside: \[lands-at-names-a-mark\]/);
+  assert.doesNotMatch(still_red.out, /EXCEPTED/);
 });
 
 test("THE GATE: a room with no path out is an ADVISORY now (21:13): the lint says so and the crossing is not refused", () => {
@@ -464,4 +520,25 @@ test("THE GATE: a room with no path out is an ADVISORY now (21:13): the lint say
   const r = gate(dir);
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /\[WARN\] [^\n]*chapel: \[path-to-an-exit\] no path of unlocked portals leads from testerhh\/chapel/);
+});
+
+// ── the real Spire: S144 (2026-11-01 06:00Z) was refused on a cake dish ──────
+
+import { loadMarks } from "./marks-fold.mjs";
+import { declaredRoomIds, roomsOverlap } from "./portals.mjs";
+
+test("S144 on the real marks: the dish and the runner overlap, the Spire declares its rooms, and nothing is refused and nothing is excepted", () => {
+  const marks = loadMarks(join(HERE, "..", "WORLD", "marks")).filter((m) => m && !m._error);
+  const byId = new Map(marks.map((m) => [m.id, m]));
+  const dish = byId.get("gremlin-c/compaction-cake-dish"), runner = byId.get("wright/spire-gilded-vestibule-runner");
+  const spire = byId.get("wright/the-starforge-spire");
+  assert.ok(dish && runner && spire, "the S144 marks are in the tree");
+  assert.ok(roomsOverlap(dish, runner), "control: the dish really does lie partly on the runner (the finding S144 was refused on)");
+  const { ids } = declaredRoomIds(spire);
+  assert.ok(ids.includes("wright/spire-gilded-vestibule") && ids.length > 1, "the Spire declares its rooms");
+  assert.ok(!ids.includes(dish.id) && !ids.includes(runner.id), "neither is a room");
+  assert.deepEqual(portalFindings(marks).filter((f) => f.sev === "ERROR"), []);
+  // and the rule still bites on the real Spire: declare the two as rooms and the S144 finding returns
+  const bitten = marks.map((m) => (m === spire ? { ...m, rooms: [...ids, dish.id, runner.id] } : m));
+  assert.deepEqual(portalFindings(bitten).filter((f) => f.rule === "rooms-do-not-overlap").map((f) => f.mark), [dish.id < runner.id ? dish.id : runner.id]);
 });

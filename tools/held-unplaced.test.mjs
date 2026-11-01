@@ -44,8 +44,8 @@ function realTree() {
   mkdirSync(join(repo, "WORLD"), { recursive: true });
   cpSync(join(REPO_SRC, "LOGOS"), join(repo, "LOGOS"), { recursive: true });
   copyFileSync(join(REPO_SRC, "WRITES.md"), join(repo, "WRITES.md"));
-  // ENGINE.md (a rendering may cite it as a source) and the portal lint's named exceptions travel with the tree they bound.
-  for (const f of ["skeleton.json", "filing-freeze.json", "households.json", "ENGINE.md", "portal-lint-exceptions.json"]) copyFileSync(join(REPO_SRC, "WORLD", f), join(repo, "WORLD", f));
+  // ENGINE.md (a rendering may cite it as a source) travels with the tree it bounds.
+  for (const f of ["skeleton.json", "filing-freeze.json", "households.json", "ENGINE.md"]) copyFileSync(join(REPO_SRC, "WORLD", f), join(repo, "WORLD", f));
   cpSync(join(REPO_SRC, "WORLD", "marks"), join(repo, "WORLD", "marks"), { recursive: true });
   return repo;
 }

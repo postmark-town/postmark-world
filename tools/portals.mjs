@@ -22,7 +22,7 @@
 
 import { isSited, instanceClassOf, heldBy } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { marksContain, overlapArea, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect, rectCorners } from "./geometry.mjs";
-import { entryLawOf, isStairs, REQUIRES_AT_SETTLEMENT, requiresHoldersIn } from "./enter-exit.mjs";
+import { entryLawOf, REQUIRES_AT_SETTLEMENT, requiresHoldersIn } from "./enter-exit.mjs";
 import { nameInSentence } from "./mark-name.mjs";
 
 export const DUNGEON_CLASS = "dungeon";
@@ -742,18 +742,41 @@ export function unmetRequires(portal, { holdings = null, marks = [], determined 
 //   requires-in-a-holder   the mark `requires` asks writes `holder: true`
 //   exit-carries-no-requires a portal out of a dungeon asks nothing: like an
 //                          exit's word, a condition locks from the outside only
-//   rooms-do-not-overlap   inside a dungeon, two marks with the same parent
-//                          never overlap (Darko, 2026-10-13 20:31: siblings
-//                          only; a room's contents sit inside it, and floors
-//                          tile rather than stack)
+//   rooms-do-not-overlap   inside a dungeon, two of the rooms the dungeon DECLARES
+//                          (its `rooms` list) never overlap (Darko, 2026-10-13
+//                          20:31: siblings only; a room's contents sit inside
+//                          it, and floors tile rather than stack). Nothing else
+//                          is judged: Darko, 2026-11-01 07:58: "Yeah rooms only";
+//                          07:59, two messages: "i'm thinking maybe just have the
+//                          dungeon represented by some kind of class in code that
+//                          has a list of dungeon rooms which the no overlap thing
+//                          checks" and "Everything should be allowed to overlap
+//                          like normal". A dungeon with no
+//                          `rooms` list checks nothing; no room is inferred from
+//                          geometry.
+//   rooms-name-marks       every id in a dungeon's `rooms` names a sited mark with
+//                          an extent that stands inside that dungeon (a typo in the
+//                          list would otherwise switch the overlap rule off)
 //
-// NO EXCEPTIONS LIVE HERE. A named one lives in WORLD/portal-lint-exceptions.json,
-// appended by whoever must answer for it, and mark-lint prints every exception it
-// honoured so the record shows the portal was let through, and by whom.
+// NO EXCEPTIONS. Not coded, not named: a finding that is wrong is fixed in the rule.
+// The named-exception door (WORLD/portal-lint-exceptions.json, applyPortalExceptions)
+// is retired. Darko, 2026-11-01 07:58: "if we're hardcoding enumerated exceptions as
+// slugs that's no good".
 export const PORTAL_RULES = Object.freeze([
   "into-names-a-mark", "lands-at-names-a-mark", "lands-at-reaches-into", "exit-never-opposed", "path-to-an-exit",
-  "rooms-do-not-overlap", "landing-inside", "requires-names-marks", "requires-in-a-holder", "exit-carries-no-requires",
+  "rooms-do-not-overlap", "rooms-name-marks", "landing-inside", "requires-names-marks", "requires-in-a-holder", "exit-carries-no-requires",
 ]);
+
+/** The rooms a dungeon declares: `rooms`, a list of mark ids on the dungeon.
+ *  Returns { ids, bad } where `bad` says why the value is unreadable (a dungeon
+ *  that writes no `rooms` has ids [] and no complaint: it checks nothing). */
+export function declaredRoomIds(dungeon) {
+  const raw = dungeon?.rooms;
+  if (raw === undefined || raw === null) return { ids: [], bad: null };
+  if (!Array.isArray(raw) || !raw.every((x) => typeof x === "string" && x !== ""))
+    return { ids: [], bad: "rooms is a list of mark ids, e.g. rooms: [\"household/slug\", ...]" };
+  return { ids: [...new Set(raw)], bad: null };
+}
 
 /** A mark's parent, by true containment: the smallest sited mark with an
  *  extent, larger than it, that wholly holds it. Two rooms that overlap are
@@ -897,13 +920,26 @@ export function portalFindings(marks) {
       if (!reaches.has(r))
         say(r, "path-to-an-exit", `no path of unlocked portals leads from ${r} out of ${d} — every room of a dungeon should have a way out that cannot be locked (advisory: exit is always offered)`, "WARN");
 
-    // siblings never overlap. Portals are left out: a portal is set in a wall
-    // and straddles it by design. A stair is not (it is a box inside a room), so
-    // a stair stays in, portal or not.
+    // THE ROOMS OF A DUNGEON NEVER OVERLAP, AND THEY ARE THE ROOMS IT DECLARES.
+    // The dungeon writes `rooms`, a list of mark ids; only those are judged, and
+    // only against each other. Nothing is inferred from geometry or from what a
+    // mark carries: a rug, a dish, a stair or a door overlaps what it likes
+    // (Darko, 2026-11-01 07:58 and 07:59, quoted at PORTAL_RULES). No list, no
+    // check. A room's parent is the smallest declared room that wholly holds it,
+    // else the dungeon, so a room declared inside another is its child.
+    const declared = declaredRoomIds(byId.get(d));
+    if (declared.bad) say(d, "rooms-name-marks", `${d}: ${declared.bad}`);
+    const roomMarks = [];
+    for (const id of declared.ids) {
+      const r = byId.get(id);
+      if (!r) say(d, "rooms-name-marks", `rooms: ${JSON.stringify(id)} names no mark`);
+      else if (id === d || !inD(id)) say(d, "rooms-name-marks", `rooms: ${id} does not stand inside ${d}`);
+      else if (!isSited(r) || !r.extent) say(d, "rooms-name-marks", `rooms: ${id} has no extent — a room is a place on the ground`);
+      else roomMarks.push(r);
+    }
     const groups = new Map();
-    for (const m of list) {
-      if (!isSited(m) || !m.extent || m.id === d || !inD(m.id) || (entryLawOf(m)?.into && !isStairs(m))) continue;
-      const parent = parentOf(m, list)?.id ?? null;
+    for (const m of roomMarks) {
+      const parent = parentOf(m, roomMarks)?.id ?? d;
       if (!groups.has(parent)) groups.set(parent, []);
       groups.get(parent).push(m);
     }
@@ -916,19 +952,4 @@ export function portalFindings(marks) {
     }
   }
   return found;
-}
-
-/** Applies a named exception list to the findings: an excepted finding comes
- *  back as `excepted` (with who and why), an exception that matched nothing as
- *  `stale`. The rule itself never changes. */
-export function applyPortalExceptions(findings, exceptions = []) {
-  const used = new Set();
-  const out = findings.map((f) => {
-    const i = exceptions.findIndex((e) => e && e.mark === f.mark && e.rule === f.rule);
-    if (i < 0) return f;
-    used.add(i);
-    return { ...f, excepted: { by: exceptions[i].by ?? null, why: exceptions[i].why ?? null } };
-  });
-  const stale = exceptions.map((e, i) => ({ e, i })).filter(({ i }) => !used.has(i)).map(({ e }) => e);
-  return { findings: out, stale };
 }

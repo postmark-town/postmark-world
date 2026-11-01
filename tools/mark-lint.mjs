@@ -36,7 +36,7 @@ import {
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact, parcelInteriorOf } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
-import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
+import { portalFindings } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
 
@@ -1218,49 +1218,25 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
 // `into` names a mark; every string `lands_at` names a mark; every landing
 // stands within LANDING_REACH_M of its `into`; an exit out of a dungeon is never
 // opposed; every room of a dungeon has a path of unlocked portals out (ADVISORY
-// since Darko's 21:13 change: a whole-dungeon exit is always offered); no two
-// marks with the same parent inside a dungeon overlap (Darko, 20:31: siblings only).
+// since Darko's 21:13 change: a whole-dungeon exit is always offered); and the
+// rooms a dungeon DECLARES (its `rooms` list) never overlap (Darko, 2026-11-01
+// 07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the
+// dungeon represented by some kind of class in code that has a list of dungeon rooms
+// which the no overlap thing checks" and "Everything should be allowed to overlap like normal").
 //
 // AN ERROR, AND IT REFUSES THE CROSSING. The settlement's harm gate runs this
 // lint as its first check (tools/harm-gate.mjs § 1), and Darko ruled the rules
 // airtight ("no exceptions in the rule"): a portal that strands whoever takes it
-// is harm to residents. The one way through is NAMED, never coded: an entry in
-// WORLD/portal-lint-exceptions.json ({ mark, rule, by, why }), appended by
-// whoever answers for it. An excepted finding prints as a warning that names
-// the exception, so every receipt shows the portal was let through and by whom,
-// and an exception that excuses nothing is said too.
-//
-// JURISDICTION, as the freeze's: this repository's own tree reads its own file;
-// a fixture tree reads one only when it passes --portal-exceptions.
+// is harm to residents. THERE IS NO WAY AROUND IT BY NAME. The named-exception
+// door (WORLD/portal-lint-exceptions.json) is retired: Darko, 2026-11-01 07:58,
+// "if we're hardcoding enumerated exceptions as slugs that's no good". A finding
+// that is wrong is fixed in the rule (portals.mjs), never listed around.
 {
-  const PORTAL_EXC_REL = "WORLD/portal-lint-exceptions.json";
-  const excPath = opt("--portal-exceptions", OWN_TREE ? join(REPO, PORTAL_EXC_REL) : null);
-  const excFile = (msg) => findings.push({ sev: "ERROR", file: PORTAL_EXC_REL, msg });
-  let exceptions = [];
-  // A MISSING list is an empty one: the strict direction, since absence can only
-  // let fewer portals through, never more. An unreadable one is an error.
-  if (excPath && existsSync(excPath)) {
-    let parsed = null;
-    try { parsed = JSON.parse(readFileSync(excPath, "utf8")); }
-    catch (e) { excFile(`could not be read as JSON (${String(e?.message ?? e).slice(0, 120)}) — the exception list is part of the gate, and a gate that cannot read its own list does not guess`); }
-    if (parsed) {
-      if (!Array.isArray(parsed.exceptions)) excFile("carries no `exceptions` array");
-      else for (const e of parsed.exceptions) {
-        if (!e || typeof e.mark !== "string" || !PORTAL_RULES.includes(e.rule) || !e.by || !e.why)
-          excFile(`an entry must name { mark, rule, by, why } with rule one of ${PORTAL_RULES.join(", ")} — got ${JSON.stringify(e)}`);
-        else exceptions.push(e);
-      }
-    }
-  }
-  const { findings: portal, stale } = applyPortalExceptions(portalFindings(marks), exceptions);
-  for (const f of portal) {
+  for (const f of portalFindings(marks)) {
     const rec = standingIndex.get(f.mark) ?? { id: f.mark };
-    if (f.excepted) warn(rec, `[${f.rule}] EXCEPTED by ${PORTAL_EXC_REL} (${f.excepted.by}: ${f.excepted.why}) — ${f.msg}`);
-    else if (f.sev === "WARN") warn(rec, `[${f.rule}] ${f.msg}`);
+    if (f.sev === "WARN") warn(rec, `[${f.rule}] ${f.msg}`);
     else err(rec, `[${f.rule}] ${f.msg}`);
   }
-  for (const e of stale)
-    findings.push({ sev: "WARN", file: PORTAL_EXC_REL, msg: `the exception for ${e.mark} (${e.rule}) matches no finding — it excuses nothing; remove it` });
 }
 
 // ---- the creature law, read whole as the tick reads it (POS-672) ----

@@ -1922,9 +1922,19 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   where you are (`within`), never through what you can see.
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
-  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). That every room has a path of
-  unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone. A portal let through anyway is let through by name, in
-  `WORLD/portal-lint-exceptions.json`, and every lint run says so.
+  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
+  the rooms a dungeon declares overlap. A dungeon declares its rooms in `rooms`, a list of mark ids (a property of
+  `the-town/dungeon`, the maker's word), and the lint judges only those, only against each other: a room declared inside
+  another is its child. Every other mark inside the dungeon (a rug, a dish, a stair, a door) overlaps what it likes,
+  nothing is inferred from geometry, and a dungeon that lists no rooms checks nothing (Darko, 2026-11-01
+  07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the dungeon represented by some kind
+  of class in code that has a list of dungeon rooms which the no overlap thing checks" and "Everything should be
+  allowed to overlap like normal"). Every id in
+  `rooms` must name a mark standing inside the dungeon, so a typo cannot switch the rule off. That every room has a
+  path of unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone.
+  **There is no list of exceptions.** A finding that is wrong is fixed in the rule, never let through by slug (Darko,
+  2026-11-01 07:58: "if we're hardcoding enumerated exceptions as slugs that's no good"); the named-exception file
+  `WORLD/portal-lint-exceptions.json` is retired.
 
 - **A door that opens when it holds what it asks for** (WLD-5 B; ruled 2026-10-18 21:23, 2026-10-19 17:48): a
   portal's entry may carry `requires: { holds: [ids], in, says }`. The passage is refused, and nothing is recorded,
@@ -1974,8 +1984,9 @@ answers **"Moving to higher/lower floors has not been implemented yet. Coming So
 - **A stair that writes its own `entry:` is read by that entry alone, as any mark is** (a portal when it writes
   `into`), and keeps the class. Nothing of the default carries over, its refusal included: a stair that writes its
   own opposed entry says the standing sentence. A later floor is reached by writing `into`, `lands_at` and a word.
-- **A stair is a box inside a room, not a door in a wall**, so it is held to the rule that siblings inside a
-  dungeon do not overlap, as a room is; portals set in walls stay exempt.
+- **A stair is a box inside a room, not a door in a wall.** Until 2026-11-01 it was held to the rule that siblings
+  inside a dungeon do not overlap, as a room is. It is not a room unless the dungeon lists it in `rooms`, so it
+  overlaps freely now (Darko, 2026-11-01 07:59: "Everything should be allowed to overlap like normal").
 
 ## The witnessed roll
 
