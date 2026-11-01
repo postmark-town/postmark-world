@@ -20,7 +20,18 @@ const record = ({ kind = "sited", by, tier, at, extent, body }) => {
   return `${lines.join("\n")}\n---\n\n${body}\n`;
 };
 
-function fixture(t) {
+// THE REGISTRY, in the shape the store-rendered export prints it (postmark-office
+// tools/world-households-export.mjs): households keyed hh:<house>, logins
+// binding each house's sketchbook name, and pinned_ids (WLD-122) binding each
+// numeric GitHub account to its one household. alice is account 1, mallory 3.
+const REGISTRY = (extra = {}) => ({
+  households: { alice: "hh:house-a", mallory: "hh:house-m" },
+  logins: { "house-a": "hh:house-a", "house-m": "hh:house-m" },
+  pinned_ids: { 1: "hh:house-a", 3: "hh:house-m" },
+  ...extra,
+});
+
+function fixture(t, registry = REGISTRY()) {
   const repo = mkdtempSync(join(tmpdir(), "postmark-lane-wall-"));
   t.after(() => rmSync(repo, { recursive: true, force: true }));
   const git = (...args) => execFileSync("git", ["-C", repo, ...args], {
@@ -32,7 +43,7 @@ function fixture(t) {
     writeFileSync(full, text);
   };
   mkdirSync(join(repo, "tools"), { recursive: true });
-  for (const file of withTool("lane-wall.mjs", "admin-makers.mjs"))
+  for (const file of withTool("lane-wall.mjs", "admin-makers.mjs", "lane-author.mjs"))
     cpSync(join(HERE, file), join(repo, "tools", file));
   put("WORLD/skeleton.json", JSON.stringify({ features: [], physics_registry: {} }, null, 2));
   put("WORLD/marks/let-there-be-light/mark.md", record({
@@ -42,10 +53,7 @@ function fixture(t) {
   put("WORLD/marks/let-there-be-light/alice-parcel/mark.md", record({
     kind: "parcel", by: "alice", at: { x: 100, y: 100 }, extent: { w: 100, h: 100 }, body: "alice's ground",
   }));
-  put("WORLD/households.json", JSON.stringify({
-    households: { alice: "gh:1", mallory: "gh:3" },
-    logins: { "house-a": "gh:1", "house-m": "gh:3" },
-  }, null, 2) + "\n");
+  put("WORLD/households.json", JSON.stringify(registry, null, 2) + "\n");
   git("init", "-q", "-b", "main");
   git("add", "-A");
   git("-c", "user.name=fixture", "-c", "user.email=fixture@test.invalid", "commit", "-q", "-m", "main");
@@ -96,7 +104,7 @@ test("lane-wall: a borrowed pen is refused, and the hint names your real handles
 
 test("lane-wall: paths outside the lane are refused (tools, canon, the registry itself)", (t) => {
   const { put, wall, commit } = fixture(t);
-  put("WORLD/households.json", JSON.stringify({ households: { mallory: "gh:1" } }) + "\n");
+  put("WORLD/households.json", JSON.stringify({ households: { mallory: "hh:house-a" }, pinned_ids: { 3: "hh:house-a" } }) + "\n");
   put("tools/innocent.mjs", "// nothing to see\n");
   commit("mallory reaches past the lane");
   const verdict = wall(3, "malloryhub");
@@ -143,7 +151,11 @@ test("lane-wall: an unregistered author is refused with the registry-lag hint, a
   commit("mallory writes in alice's notebook");
   const carol = wall(99, "carolhub");
   assert.equal(carol.ok, false);
-  assert.match(carol.violations[0].hint, /no handles are registered|not one of your residents/);
+  // WLD-122: an author no pin binds is refused first, by name, and owns nothing after
+  assert.match(carol.violations[0].defect, /GitHub account 99 is not pinned to any household/);
+  assert.match(carol.violations[0].hint, /numeric id, pinned in the town's registry/);
+  assert.ok(carol.violations.some((v) => /"alice" is not one of your residents/.test(v.defect) && /no handles are registered/.test(v.hint)),
+    "and the foreign note is still refused, with the registry-lag hint");
 });
 
 test("lane-wall: a change is judged as the record stood — rewriting another household's mark under your own name is refused", (t) => {
@@ -190,11 +202,7 @@ function withLaw({ put, commit, git }, admins) {
     put(`${WORKS}/postmark-node/sited/${k}/${k}-makers/mark.md`, makersNode(false));
   }
   put(`${WORKS}/postmark-node/sited/portal-ground/vehicle/mark.md`, classNode("vehicle", "portal-ground"));
-  put("WORLD/households.json", JSON.stringify({
-    households: { alice: "gh:1", mallory: "gh:3" },
-    logins: { "house-a": "gh:1", "house-m": "gh:3" },
-    ...(admins ? { admins } : {}),
-  }, null, 2) + "\n");
+  put("WORLD/households.json", JSON.stringify(REGISTRY(admins ? { admins } : {}), null, 2) + "\n");
   commit("the class law, and the registry's admins");
   git("switch", "-q", "-C", "pr-head", "main");
 }
@@ -204,7 +212,7 @@ const UNDER = "WORLD/marks/let-there-be-light/alice-parcel";
 
 test("lane-wall makers: an admin household makes a dungeon and a stair; a thing is anyone's", (t) => {
   const f = fixture(t);
-  withLaw(f, ["gh:1"]);
+  withLaw(f, ["hh:house-a"]);
   f.put(`${UNDER}/the-deep/mark.md`, classed("dungeon", { by: "alice", text: "rooms behind a door" }));
   f.put(`${UNDER}/the-flight/mark.md`, classed("stairs", { by: "alice", text: "a way up" }, { x: 120, y: 120 }));
   f.put(`${UNDER}/a-lamp/mark.md`, classed("thing", { by: "alice", text: "a lamp" }, { x: 130, y: 130 }));
@@ -215,7 +223,7 @@ test("lane-wall makers: an admin household makes a dungeon and a stair; a thing 
 
 test("lane-wall makers: a non-admin household is refused a dungeon, naming makers", (t) => {
   const f = fixture(t);
-  withLaw(f, ["gh:1"]);
+  withLaw(f, ["hh:house-a"]);
   f.put(`${UNDER}/mallorys-deep/mark.md`, classed("dungeon", { by: "mallory", text: "a dungeon of her own" }));
   f.commit("mallory makes a dungeon");
   const v = f.wall(3, "malloryhub");
@@ -226,7 +234,7 @@ test("lane-wall makers: a non-admin household is refused a dungeon, naming maker
 
 test("lane-wall makers: admin is the three classes exactly, so a vehicle (it extends portal-ground) is refused an admin household", (t) => {
   const f = fixture(t);
-  withLaw(f, ["gh:1"]);
+  withLaw(f, ["hh:house-a"]);
   f.put(`${UNDER}/a-cart/mark.md`, classed("vehicle", { by: "alice", text: "a cart on a timetable" }));
   f.commit("alice makes a vehicle");
   const v = f.wall(1, "alicehub");
@@ -236,11 +244,11 @@ test("lane-wall makers: admin is the three classes exactly, so a vehicle (it ext
 
 test("lane-wall makers: after a revocation what was made stands, and only what the diff adds or changes is judged", (t) => {
   const f = fixture(t);
-  withLaw(f, ["gh:1"]);
+  withLaw(f, ["hh:house-a"]);
   // alice's dungeon stood on main while her household was admin
   f.git("switch", "-q", "main");
   f.put(`${UNDER}/the-deep/mark.md`, classed("dungeon", { by: "alice", text: "rooms behind a door" }));
-  f.put("WORLD/households.json", JSON.stringify({ households: { alice: "gh:1", mallory: "gh:3" }, logins: { "house-a": "gh:1", "house-m": "gh:3" } }, null, 2) + "\n");
+  f.put("WORLD/households.json", JSON.stringify(REGISTRY(), null, 2) + "\n");
   f.commit("the dungeon stands; then the role is revoked (no admins printed)");
   f.git("switch", "-q", "-C", "pr-head", "main");
   f.put(`${UNDER}/a-lamp/mark.md`, classed("thing", { by: "alice", text: "a lamp" }, { x: 130, y: 130 }));
@@ -254,4 +262,105 @@ test("lane-wall makers: after a revocation what was made stands, and only what t
   const changed = f.wall(1, "alicehub");
   assert.equal(changed.ok, false, "a change is a making, judged as the role stands now");
   assert.match(changed.violations[0].defect, /"dungeon" answers makers: false/);
+});
+
+// ── THE AUTHOR, BOUND BY PINNED NUMERIC ID (WLD-122, Darko "Bind pinned ids") ─
+// The wall binds the author through lane-author.mjs: pinned_ids[<numeric id>]
+// is the ONE household the author acts for; the login is never identity, and
+// an author no pin binds owns nothing. Each case runs the real tools/lane-wall.mjs.
+const porchAt = (by, xy, body) => record({ by, at: xy, extent: { w: 4, h: 4 }, body });
+const IN_A = "WORLD/marks/let-there-be-light/alice-parcel";
+
+test("pinned: the author's numeric id binds their house; a RENAMED login changes nothing", (t) => {
+  const { put, wall, commit } = fixture(t);
+  put(`${IN_A}/bench/mark.md`, porchAt("alice", { x: 110, y: 110 }, "a bench on her own ground"));
+  commit("alice adds a bench");
+  assert.equal(wall(1, "alicehub").ok, true);
+  assert.equal(wall(1, "alice-renamed-2026").ok, true, "the same account under a new login is the same household");
+  assert.equal(wall(1, "ALICEHUB").ok, true, "case changes nothing either");
+});
+
+test("IMPERSONATION: an unpinned account whose login equals a declared house's name, or a solo resident's sketchbook alias, owns nothing — in the house's own sketchbook too", (t) => {
+  const reg = REGISTRY({
+    households: { alice: "hh:house-a", mallory: "hh:house-m", wren: "solo:wren" },
+    logins: { "house-a": "hh:house-a", "house-m": "hh:house-m", wren: "solo:wren" },
+  });
+  const { put, wall, commit } = fixture(t, reg);
+  put(`${IN_A}/forged/mark.md`, porchAt("alice", { x: 120, y: 120 }, "not alice"));
+  put("NOTES/wren.md", "not wren's note\n");
+  commit("an imposter writes as alice and as wren");
+  for (const [login, branch] of [["house-a", "draft/house-a"], ["wren", "draft/wren"], ["house-a", null]]) {
+    const v = wall(9, login, branch);
+    assert.equal(v.ok, false, `${login} → ${branch}: ${JSON.stringify(v)}`);
+    assert.match(v.violations[0].defect, /GitHub account 9 is not pinned to any household/);
+    assert.ok(v.violations.some((x) => /is not one of your residents/.test(x.defect)), "the marks and notes are refused too");
+  }
+});
+
+test("IMPERSONATION, the legacy key: a `login:`-keyed household is not bound by a GitHub login of that name", (t) => {
+  const reg = REGISTRY({
+    households: { alice: "hh:house-a", mallory: "hh:house-m", lena: "login:lena" },
+    logins: { "house-a": "hh:house-a", "house-m": "hh:house-m", lena: "login:lena" },
+  });
+  const { put, wall, commit } = fixture(t, reg);
+  put("NOTES/lena.md", "words in lena's notebook\n");
+  commit("an account named lena writes lena's note");
+  const v = wall(9, "lena", "draft/lena");
+  assert.equal(v.ok, false, JSON.stringify(v));
+  assert.ok(v.violations.some((x) => /"lena" is not one of your residents/.test(x.defect)));
+});
+
+test("ONE HOUSE, TWO HANDLES: one account authors for both of its house's residents; another house stays barred", (t) => {
+  const reg = REGISTRY({ households: { alice: "hh:house-a", "alice-too": "hh:house-a", mallory: "hh:house-m" } });
+  const { put, wall, commit } = fixture(t, reg);
+  put(`${IN_A}/bench/mark.md`, porchAt("alice", { x: 110, y: 110 }, "alice's bench"));
+  put(`${IN_A}/lamp/mark.md`, porchAt("alice-too", { x: 130, y: 130 }, "her housemate's lamp"));
+  commit("two residents of one house");
+  const own = wall(1, "alicehub", "draft/house-a");
+  assert.equal(own.ok, true, JSON.stringify(own.violations ?? []));
+  assert.deepEqual(own.handles, ["alice", "alice-too"]);
+  const other = wall(3, "malloryhub", "draft/house-m");
+  assert.equal(other.ok, false);
+  assert.ok(other.violations.every((x) => /is not one of your residents/.test(x.defect)));
+});
+
+test("THE SKETCHBOOK ALIAS answers only for the id-bound house: own alias passes, another house's and an unpinned author's are refused", (t) => {
+  const { put, wall, commit } = fixture(t);
+  put(`${IN_A}/gate/mark.md`, porchAt("alice", { x: 140, y: 140 }, "alice's gate"));
+  commit("alice adds a gate");
+  assert.equal(wall(1, "alicehub", "draft/house-a").ok, true);
+  const mallory = wall(3, "house-a", "draft/house-a");
+  assert.equal(mallory.ok, false, "a pinned author of another house, with a login named like this sketchbook");
+  assert.match(mallory.violations[0].defect, /this sketchbook is not yours/);
+  const unpinned = wall(9, "house-a", "draft/house-a");
+  assert.equal(unpinned.ok, false);
+  assert.ok(unpinned.violations.some((x) => /this sketchbook is not yours/.test(x.defect)));
+});
+
+test("THE BASE'S REGISTRY, NEVER THE HEAD'S: a head that pins the imposter is refused for the path, and the binding still reads the base", (t) => {
+  const { put, wall, commit } = fixture(t);
+  put("WORLD/households.json", JSON.stringify(REGISTRY({ pinned_ids: { 1: "hh:house-a", 3: "hh:house-m", 9: "hh:house-a" } })) + "\n");
+  put(`${IN_A}/forged/mark.md`, porchAt("alice", { x: 120, y: 120 }, "not alice"));
+  commit("the imposter pins themselves in the head and writes as alice");
+  const v = wall(9, "imposter");
+  assert.equal(v.ok, false);
+  assert.match(v.violations[0].defect, /GitHub account 9 is not pinned/, "the binding was read from the base");
+  assert.ok(v.violations.some((x) => /mark records and your own notes only/.test(x.defect)), "and the registry edit is refused as a path");
+});
+
+test("FAILS CLOSED: no pinned_ids (an older registry), an empty map, or an entry that is not a household — nobody is bound, and no null compares equal", (t) => {
+  for (const [why, reg, pattern] of [
+    ["no pinned_ids", { households: { alice: "hh:house-a" }, logins: { "house-a": "hh:house-a" } }, /carries no pinned_ids/],
+    ["empty map", REGISTRY({ pinned_ids: {} }), /not pinned to any household/],
+    ["null entry against null households", { households: { alice: null }, logins: { "house-a": null }, pinned_ids: { 1: null } }, /not a household key/],
+    ["empty entry", REGISTRY({ pinned_ids: { 1: "" } }), /not a household key/],
+  ]) {
+    const { put, wall, commit } = fixture(t, reg);
+    put(`${IN_A}/bench/mark.md`, porchAt("alice", { x: 110, y: 110 }, "alice's bench"));
+    commit("alice adds a bench");
+    const v = wall(1, "alicehub", "draft/house-a");
+    assert.equal(v.ok, false, `${why}: ${JSON.stringify(v)}`);
+    assert.match(v.violations[0].defect, pattern, why);
+    assert.ok(v.violations.some((x) => /is not one of your residents/.test(x.defect)), `${why}: alice's own mark is not hers without a binding`);
+  }
 });
