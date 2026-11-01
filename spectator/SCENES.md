@@ -154,7 +154,9 @@ the connected, active painting each time you draw or measure, and re-point any
 `liveSvg()` over a caller-supplied `svgOf`, whose `mapSvg()` in
 `src/components/WorldCockpit.astro` prefers a connected `svg[data-wv-m-per-px]`
 and otherwise takes `#wv-overlay`'s `ownerSVGElement`
-(`src/lib/world-cockpit-mount.mjs`). The site tests that pin it
+(`src/lib/world-cockpit-mount.mjs`). On the inspected World refs nothing sets
+that stamp (see the last paragraph), so the overlay fallback is the active path
+there. The site tests that pin it
 (`test/world-cockpit-dock.test.mjs`, "the camera watch follows the living svg…")
 are regex pins over source text: they show the source says it, not that a swap
 was survived. Hunt for leftovers too: a bare `o.svg` read (one remains in that
@@ -162,7 +164,7 @@ module, for a speech-bubble width budget) is the same mistake.
 
 **2. The viewer owns its camera; a room's painting owns its registration.**
 `view` is the camera and `applyView` is the one writer of the `viewBox`, which
-clamps (`test/viewer-camera-bounds.test.mjs`, "THE FENCE HAS ONE OWNER…", a
+clamps (`tools/viewer-camera-bounds.test.mjs`, "THE FENCE HAS ONE OWNER…", a
 source pin). An outside `setAttribute("viewBox", …)` moves the attribute and
 leaves `view`, `zoomK` and everything sized from them where they were, so the
 next wheel notch, refit or follow writes the stale `view` back. The camera
@@ -188,10 +190,13 @@ to be ruled, not a thing to assume.
 proves the resolver and nothing about whether the page supplies those inputs
 (`tools/where-is.test.mjs` is that kind, and is right to be). The consumers
 build their world through `assembleWorld` (`tools/world-build.mjs`), which
-picks fields: once it dropped `households`, and every resolver test stayed green
-while the live readers answered "no home". The test that closes that gap runs
-the real assembly and then the resolver (`tools/homes-per-resident.test.mjs`,
-"D7 · …through assembleWorld"). Its sibling D8 goes through `buildWorld` over
+picks fields: if it omitted a field the resolver needs (say a household map),
+every resolver test would stay green while the live readers answered "no
+home". A test that closes that gap runs the real assembly and then the
+resolver (`tools/homes-per-resident.test.mjs`, "D7 · …through assembleWorld").
+It closes the assembly pass-through only: its `worldState` is hand-built, so
+whether the fetched or folded world-state itself carries the field is not
+proved by D7. Its sibling D8 goes through `buildWorld` over
 the published registry files, which is a real-record read: know that before
 running it. Write the test on the path the application takes, with synthetic
 inputs; do not bring back a seed manifest as the authority for homes.
@@ -207,8 +212,7 @@ three events and sets none of the stamps; its only inbound event is
 prototype branches that are not ancestors of `main` (checked with
 `git merge-base --is-ancestor` for the camera-request and stamp commits), so
 each name has one traced end on `main`, not two. Do not describe these as a
-current interface. The Site's own comments call `pm:act-as` and the dock and
-feed events "dead wire at this pin". Which
+current interface. Which
 World commit production serves is not established here: the Site's floor pin
 (`package.json`, also `WORLD-PIN.md`) is `50d1e6ee`, an ancestor of `main`
 without the listeners or the stamps, and the resolved pin is the newest
