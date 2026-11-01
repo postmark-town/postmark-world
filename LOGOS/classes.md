@@ -2412,7 +2412,11 @@ the amendments that document enumerates. The law, compressed:
   with a dollar figure and a named beneficiary. **Keeping-stakes**
   (`keeping-stake extends stake`, to-class funding-quest) escrow on it; at
   epoch close, conversion runs pro-rata to dollars actually paid — unmatched
-  stakes return; treasury may cover a shortfall, minting nothing. The matched
+  stakes return; treasury may cover a shortfall, minting nothing. **Starforge
+  is not the treasury (2026-11-01):** the founder household gives like any
+  household, and its dollars toward a posted need mint it holo by the same
+  arithmetic (the town's ECONOMY-DIALS.json § law_side.keeping §
+  _starforge_gives holds the ruling). The matched
   pot converts to equity **exactly once**, split by **sigma**: the keeper's
   side mints back as their own equity (giving is a second witnessed act — the
   keeping-deed); the payers' side mints **holo** by dollar share.
