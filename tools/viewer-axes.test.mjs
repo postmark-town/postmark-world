@@ -76,6 +76,7 @@ import {
   TOUR_WALK_LEG,
   PRESETS,
   recentActivity,
+  activityFeed,
   actSubjectGone,
   activityDayLabel,
   activityDayKey,
@@ -1398,6 +1399,22 @@ test("the record of acts is newest-first, and admits that it knows two precision
   assert.equal(collapsed[0].subject, "the-town/the-locks", "and it is the LAST one, not the first");
   assert.equal(collapsed.filter((r) => r.kind === "mark").length, 1, "which leaves room for what else happened");
   assert.equal(collapsed.filter((r) => r.day === "2026-08-03").length, 1, "yesterday is its own day, and keeps its own walk");
+
+  // A DAY THAT HAS NOT COME IS NOT LATELY (S131): world#309's sweets are dated
+  // 2026-10-26, and the rail listed them by name above today's rows the evening
+  // before. Held back until their day (UTC), and counted nowhere until then.
+  const ahead = { departures: [{ iso: "2026-10-26T00:00:00.000Z", handle: "early" }],
+    marks: [{ id: "j/a-sweet", date: "2026-10-26T00:00:00.000Z", by: "j" }, { id: "b/today", date: "2026-10-25", by: "b" }],
+    stakes: [{ iso: "2026-10-27T09:00:00.000Z", handle: "k", mark: "b/today", n: 2 }],
+    blessings: [{ n: 132, date: "2026-10-26T00:00:00.000Z" }] };
+  const eve = activityFeed({ ...ahead, now: "2026-10-25T23:59:59.999Z", limit: 10 });
+  assert.deepEqual(eve.rows.map((r) => r.subject ?? r.kind), ["b/today"], "the evening before: today's mark only");
+  assert.equal(eve.total, 1, "and the count does not know the held rows either, so no \"more\" points at them");
+  const day = activityFeed({ ...ahead, now: "2026-10-26T00:00:00.000Z", limit: 10 });
+  assert.deepEqual(day.rows.filter((r) => r.day === "2026-10-26").map((r) => r.subject ?? r.kind).sort(), ["j/a-sweet", "settlement", "walk"],
+    "on the day, the day's rows arrive, labelled today");
+  assert.ok(day.rows.every((r) => r.day <= "2026-10-26"), "and the day after's stake still waits");
+  assert.equal(day.rows.find((r) => r.subject === "j/a-sweet").dayLabel, "today");
 });
 
 // ───────── the faces on the map ─────────

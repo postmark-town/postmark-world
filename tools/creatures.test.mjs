@@ -15,7 +15,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
+import { mistsKeepRects, keptByTheTown, standsInTheWall } from "./mists-keep.mjs";
 import { loadMarks } from "./marks-fold.mjs";
 import { pointInPolygon } from "./geometry.mjs";
 import {
@@ -33,12 +33,31 @@ const { rotation: _rotation, ...FULL } = { ...LAW.dials, counts: { bat: 3, raven
 const INPUTS = { mists: MISTS, marks: MARKS, dials: FULL, fromCrossing: 244, world_sha: SHA };
 const STANDING = { mists: MISTS, marks: MARKS, dials: LAW.dials, fromCrossing: LAW.fromCrossing, world_sha: SHA };
 // the ramp's counts (Darko 2026-10-19 20:05, WLD-84): six creatures a window
-const RAMP = { bat: 2, raven: 3, wolf: 1 };
+// the season's named creatures (WLD-25) are kinds too, at 0 a window: declared once, never a window's spawn
+const RAMP = { bat: 2, "candied-bat": 0, "candied-jetto": 0, "candied-raven": 0, "candied-wolf": 0, raven: 3, wolf: 1 };
 const RAMP_N = Object.values(RAMP).reduce((a, b) => a + b, 0);
 // the 10-17 rotation (one a window, a bat first), kept as the machinery's own case
 const ROTATING = { ...LAW.dials, counts: { bat: 1, raven: 1, wolf: 1 }, rotation: ["bat", "raven", "wolf"] };
 const ROTATING_IN = { ...STANDING, dials: ROTATING };
 const MASTER = "a test master key, never the box's";
+// THE TOWN'S GROUND AT CROSSING N, as the scheduler reads it: every sited mark's
+// reach at the law's keep_m, except a mark standing wholly in the wall at N,
+// which keeps nothing (6337f0eb, 2026-10-21). A keep read without the Mists
+// counts a fogged mark as town ground: S131's red, jetto-of-starforge's seven
+// sweets (world#309) lying in the mist beside the band.
+const keepAt = (N, dials) => mistsKeepRects(MARKS, MISTS.clearings_m, Number(dials.keep_m), { m: mistsAt(N, MISTS) });
+// The sharper half, read without the scheduler's own keep: every mark whose
+// reach holds a spawn must stand wholly in the wall at N. A fogged mark may have
+// a creature beside it on the clear side; a mark on the clear ground never may.
+function assertOnlyFoggedMarksNear(sp, N, dials) {
+  const m = mistsAt(N, MISTS), keepM = Number(dials.keep_m);
+  for (const mk of MARKS) {
+    const [r] = mistsKeepRects([mk], MISTS.clearings_m, keepM);
+    if (!r || !keptByTheTown([r], sp.x, sp.y)) continue;
+    assert.equal(standsInTheWall({ minX: r.cx0, maxX: r.cx1, minY: r.cy0, maxY: r.cy1 }, m), true,
+      `${sp.id} (${sp.x}, ${sp.y}) is within ${keepM} m of ${mk.id}, which stands on the clear ground at crossing ${N}`);
+  }
+}
 const t = (ms) => new Date(ms).toISOString();
 
 test("the seed: a secret per crossing, and a commitment that binds it and the world sha without telling either", () => {
@@ -61,7 +80,7 @@ test("the law: the class marks carry the ruled numbers (the ramp, Darko 2026-10-
   assert.equal(LAW.dials.span_h, 12, "a creature lasts 12 h from its own spawn");
   assert.equal(LAW.fromCrossing, 259, "the window opening 2026-10-19 12:00Z");
   assert.equal(windowOf(259).startMs, Date.parse("2026-10-19T12:00:00Z"));
-  assert.deepEqual(LAW.kinds, ["bat", "raven", "wolf"].map((k) => ({ kind: k, kind_file: `WORLD/kinds/${k}.kind` })));
+  assert.deepEqual(LAW.kinds, ["bat", "candied-bat", "candied-jetto", "candied-raven", "candied-wolf", "raven", "wolf"].map((k) => ({ kind: k, kind_file: `WORLD/kinds/${k}.kind` })));
 });
 
 test("the law is read whole or not at all", () => {
@@ -90,7 +109,7 @@ test("the law is read whole or not at all", () => {
 test("the schedule: the law's counts, every one placed in the band, off the town, apart, at a minute in its window", () => {
   for (const N of [250, 270, 282]) {
     const sched = scheduleFor(N, secretFor(MASTER, N), INPUTS);
-    const m = mistsAt(N, MISTS), keep = mistsKeepRects(MARKS, MISTS.clearings_m);
+    const m = mistsAt(N, MISTS), keep = keepAt(N, INPUTS.dials);
     const { startMs, endMs } = windowOf(N);
     const byKind = {};
     for (const s of sched.spawns) byKind[s.kind] = (byKind[s.kind] ?? 0) + 1;
@@ -102,6 +121,7 @@ test("the schedule: the law's counts, every one placed in the band, off the town
       const c = m.clear, boxWallM = Math.min(s.x - c.minX, c.maxX - s.x, s.y - c.minY, c.maxY - s.y);
       assert.ok(boxWallM >= 0 && boxWallM <= 400, `${s.id} is in the band (${Math.round(boxWallM)} m from the face)`);
       assert.equal(keptByTheTown(keep, s.x, s.y), false, `${s.id} is off the town's ground`);
+      assertOnlyFoggedMarksNear(s, N, INPUTS.dials);
       assert.ok(m.clearings.every((k) => Math.hypot(s.x - k.x, s.y - k.y) > k.r), `${s.id} is in no clearing`);
       assert.ok(s.at_ms >= startMs && s.at_ms < endMs && s.at_ms % 60000 === 0, `${s.id} spawns at a minute in its window`);
       assert.equal(Date.parse(s.fades_at) - s.at_ms, 12 * 3600 * 1000, `${s.id} lives 12 h`);
@@ -184,14 +204,16 @@ test("the kinds in turn, the machinery kept (Darko 2026-10-17 13:58, superseded 
 });
 
 test("the ramp holds the same ground rules (Darko 2026-10-19 20:05): on land, off the town, never on the water, apart, and its window audits", () => {
-  const rings = townWaterRings(MARKS), keep = mistsKeepRects(MARKS, MISTS.clearings_m);
+  const rings = townWaterRings(MARKS);
   let checked = 0;
   for (let N = 259; N <= 290; N += 1) {
+    const keep = keepAt(N, STANDING.dials);
     for (let k = 0; k < 10; k += 1) {
       const sched = scheduleFor(N, secretFor(`turn water ${k}`, N), STANDING);
       assert.deepEqual(sched.unplaced, [], `crossing ${N}: every spawn found a place`);
       for (const sp of sched.spawns) {
         assert.equal(keptByTheTown(keep, sp.x, sp.y), false, `${sp.id} is off the town's ground`);
+        assertOnlyFoggedMarksNear(sp, N, STANDING.dials);
         assert.equal(mistsHere(sp, mistsAt(N, MISTS)).inWall, false, `${sp.id} stands on the clear side`);
         for (const o of sched.spawns) if (o !== sp) assert.ok(Math.hypot(o.x - sp.x, o.y - sp.y) >= LAW.dials.apart_m, `${sp.id} and ${o.id} stand apart`);
         assert.ok(!rings.some((r) => pointInPolygon(sp.x, sp.y, r)), `${sp.id} (${sp.x}, ${sp.y}) stands on the town's water`);

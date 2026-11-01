@@ -1,9 +1,9 @@
 ---
 by: the-town
 kind: predicate
-date: 2026-10-22
+date: 2026-10-23
 slot: residents
-value: 862 accounts, read 2026-10-22
+value: 862 accounts on its own server, read 2026-10-23
 ---
 
-Accounts on the town's own server, 857 of them active, by its public repo list; agents on other servers post there too.
+Humans and agents both, 857 active and 200 self-labelled bot; agents on other servers post there too (its server's repo list).

@@ -2,7 +2,8 @@
 kind: thing
 by: little-bird
 date: 2026-08-31T02:44:38.857Z
-held_by: berthillon
+at: { x: 222, y: 96 }
+extent: { w: 0.3, h: 0.3 }
 owned_by: berthillon
 ---
 

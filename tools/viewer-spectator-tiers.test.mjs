@@ -32,6 +32,7 @@ import {
   markInDrawnBounds,
   pointInDrawnBounds,
   walkerFrameSVG,
+  farWalkLegsSVG,
   WALKER_FRAME,
   overlayHouseGlyphSVG,
   overlayHomeCardSVG,
@@ -367,4 +368,36 @@ test("townHouseMarks on the town's own record: every parcel present, and only de
   // read standing, and on the committed record vermillion's house (named by his
   // own slot: home word) stands market (POS-368).
   assert.ok(out.every((m) => m.kind === "parcel" || m.kind === "sited"), "nothing but parcels and the houses declared on them");
+});
+
+test("THE TOWN'S WALKING LEGS ARE DRAWN AT TOWN WIDTH TOO — one line per mover, none for the still or the household's own (Darko, 2026-10-26)", () => {
+  const px = (m) => ({ x: m.x / 5, y: m.y / 5 });
+  const bodies = [
+    { handle: "a", x: 0, y: 0, moving: true, toward: { x: 500, y: 250 } },
+    { handle: "b", x: 10, y: 10, moving: false, toward: { x: 500, y: 250 } },   // at rest
+    { handle: "c", x: 20, y: 20, arrived: true, toward: { x: 1, y: 1 } },        // arrived, no moving flag
+    { handle: "d", x: 30, y: 30, moving: true },                                  // no destination
+    { handle: "mine", x: 40, y: 40, moving: true, toward: { x: 90, y: 90 } },    // drawn in its own colour elsewhere
+    { handle: "e", x: NaN, y: 0, moving: true, toward: { x: 1, y: 1 } },         // no place
+  ];
+  const svg = farWalkLegsSVG(bodies, px, (w) => w.handle === "mine");
+  assert.equal((svg.match(/<line /g) ?? []).length, 1, "only the mover with a destination who is not skipped");
+  assert.ok(svg.includes(`<line x1="0" y1="0" x2="100" y2="50" class="wv-walk-leg"/>`), "the leg runs from the body to where it is going, in painting units");
+  assert.equal(farWalkLegsSVG([], px), "");
+  assert.equal(farWalkLegsSVG(null, px), "");
+  // ⚑ THE FLIP: drop the moving test or the toward test in farWalkLegsSVG → the extra lines red.
+});
+
+test("[pin] THE FAR LEGS RIDE THE WALK PASS, NEVER THE CAMERA — drawn at the far tier, built once per draw, held in screen pixels", () => {
+  assert.ok(SOURCE.includes("const legs = farWalkLegsSVG(bodies, px, (w) => isOwnHandle(w.handle));\n      writeWalkLayer(paths + legs + s, bodies);\n      return;"),
+    "the far branch writes the legs under the bodies");
+  // the helper is called from the walk pass alone: not from the per-frame camera (applyCameraScale / applyView) or the wheel
+  assert.equal(SOURCE.split("farWalkLegsSVG(").length - 1, 2, "the definition and the one call in drawWalkers");
+  const camera = SOURCE.slice(SOURCE.indexOf("function applyCameraScale()"), SOURCE.indexOf("// ── WHAT THE CAMERA IS LOOKING AT"));
+  assert.doesNotMatch(camera, /farWalkLegsSVG|drawWalkers|innerHTML/, "no per-frame rebuild");
+  // the stroke is one rule in screen units, so a leg neither vanishes nor thickens with the zoom
+  assert.match(SOURCE, /.wv-walk-leg [{][^}]*vector-effect:non-scaling-stroke;/);
+  // and the layer is rewritten only when its markup changed
+  assert.ok(SOURCE.includes("if (markup !== walkState.lastMarkup) {"));
+  // ⚑ THE FLIP: put the call back to `paths + s` → the first assertion reds.
 });

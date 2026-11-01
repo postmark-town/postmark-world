@@ -1,0 +1,15 @@
+{
+  "crossing": 282,
+  "covers_from": "2026-10-31T00:00:00.000Z",
+  "covers_to": "2026-10-31T12:00:00.000Z",
+  "complete": true,
+  "as_of_world": "0ca60f7f21a74cec47c6f2ee3d09e4b397bfccd0",
+  "event_count": 542,
+  "counts": {
+    "departure": 215,
+    "attachment": 43,
+    "emission": 242,
+    "creature": 8,
+    "creature-act": 34
+  }
+}

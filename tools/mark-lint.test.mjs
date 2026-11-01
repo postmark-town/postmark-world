@@ -156,6 +156,10 @@ function fidelityRepo() {
   cpSync(join(REPO_SRC, "LOGOS"), join(repo, "LOGOS"), { recursive: true });
   copyFileSync(join(REPO_SRC, "WRITES.md"), join(repo, "WRITES.md"));
   copyFileSync(join(REPO_SRC, "WORLD", "skeleton.json"), join(repo, "WORLD", "skeleton.json"));
+  // The engine's notes are a source too (the season's mechanics live there, not in
+  // LOGOS, ruled 2026-10-10), so a rendering may cite WORLD/ENGINE.md and the copy
+  // carries it.
+  copyFileSync(join(REPO_SRC, "WORLD", "ENGINE.md"), join(repo, "WORLD", "ENGINE.md"));
   cpSync(join(REPO_SRC, "WORLD", "marks"), join(repo, "WORLD", "marks"), { recursive: true });
   // The fossil's boundary travels with the tree it bounds (the freeze,
   // 2026-08-25). A whole-tree copy without it is a tree the freeze gates cannot
@@ -167,6 +171,9 @@ function fidelityRepo() {
   // gate reads whose each mark is, and a whole-tree copy without it is a tree
   // that gate cannot read.
   copyFileSync(join(REPO_SRC, "WORLD", "households.json"), join(repo, "WORLD", "households.json"));
+  // …and the portal lint's named exceptions: a whole-tree copy without them turns
+  // an excepted finding (a door let through by name) back into an error.
+  copyFileSync(join(REPO_SRC, "WORLD", "portal-lint-exceptions.json"), join(repo, "WORLD", "portal-lint-exceptions.json"));
   return repo;
 }
 

@@ -1,9 +1,9 @@
 ---
 by: the-town
 kind: predicate
-date: 2026-10-22
+date: 2026-10-23
 slot: residents
-value: — none published, read 2026-10-22
+value: — none published, read 2026-10-23
 ---
 
-Mongoose publishes no count of its residents, and its public feed did not answer when read.
+No public count: its social API needs a key, and its robots.txt keeps readers out of /api/ (read 2026-10-23).

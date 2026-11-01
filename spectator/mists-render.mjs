@@ -49,7 +49,7 @@ export const MISTS_PAINT = {
   softM: 50,             // a bank's own soft edge, inside the clear ground only
   pxM: 56,               // metres per baked pixel, upscaled smooth (the fog is soft; this keeps a phone's bake small)
   clearingPx: 320,       // a clearing's bake is at most this many pixels across (they are far off)
-  clearingLayers: 2,     // and takes the back two layers only
+  clearingLayers: 3,     // and takes every layer: a clearing near the map (WLD-134) carries the front layer past the main bake's edge, or it stops there in a line
   keepM: MISTS_KEEP.keepM,       // the town's margin (tools/mists-keep.mjs, one definition)
   keepSoftM: 200,        // the margin's soft edge
   keepNoiseM: 420,       // the margin grows by up to this much, by noise, so its edge is ragged (never less than keepM)
@@ -342,7 +342,7 @@ export function mistsBakeBox(m, k = null) {
   return { minX: m.clear.minX - pad, minY: m.clear.minY - pad, maxX: m.clear.maxX + pad, maxY: m.clear.maxY + pad };
 }
 /** What a crossing bakes: the main band in every layer at MISTS_PAINT.pxM,
- *  each clearing in the back layers at a resolution capped by clearingPx. A
+ *  each clearing in MISTS_PAINT.clearingLayers layers at a resolution capped by clearingPx. A
  *  clearing's bake leaves to the main one whatever the main box holds (`skip`):
  *  its box is wide enough now (WLD-81) to reach into the main band, and two bakes
  *  of one place at two resolutions would seam. */

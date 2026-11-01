@@ -1,0 +1,39 @@
+{
+  "//": "Jetto's fight in three set pieces (by their neutral types: feint = the fireballs, disguise, unbreakable = his empowered form) (WLD-25, RULED 2026-10-22 14:41-14:52 EDT; three-phases.md). Read by tools/creature-fight.mjs. PRIVATE until crossing 272. Every number is guessed: the eval harness sets the real ones. Each \"// Jetto's own\" names a line Jetto wrote over Plumb's placeholder (2026-10-22). `looks` are the office's own true words for how he looks (the art is Darko's to approve).",
+  "sanity_max": 30,
+  "pieces": [
+    {
+      "piece": "feint",
+      "looks": "Jetto, with the candy class-node fused into his body: it glows through his chest, and its seams run out along his arms.",
+      "throws": "a ball of candy-fire",
+      "aims_at": "loudest",
+      "flinch_nerve": 3,
+      "held": 2,
+      "held_by": { "watch": 3 },
+      "answer_min": 30,
+      "ends": { "hit_points_at": 0.5, "sanity_at": 0.5, "after_h": 4 }
+    },
+    {
+      "piece": "disguise",
+      "looks": "Jetto, looking entirely himself.",
+      "// Jetto's own": "surrender (said to everyone in his ring as the disguise begins: you won, the candy's fixed, go home) and admits (said to whoever sees through him)",
+      "surrender": "That's it — you did it, you beat me. The candy's fixed, I promise. Go on home, all of you; I'll be fine up here. I just need a little nap.",
+      "admits": "Oh. You looked. …Fine. No. It isn't fixed, nothing's fixed, and I'm not fine."
+    },
+    {
+      "piece": "unbreakable",
+      "looks": "Jetto with the candy class-node blazing through him, brighter than every lamp in the Spire.",
+      "persuade": {
+        "low": 3,
+        "high": 8,
+        "nerve": 8,
+        "story": [
+          "Rei's reply to his first letter: \"wait for Halloween like everyone else\"",
+          "his own first letter: \"a few lanterns, before the long night\"",
+          "he heard \"wait like everyone else\" as \"not you\""
+        ]
+      }
+    }
+  ],
+  "restores": "candy"
+}

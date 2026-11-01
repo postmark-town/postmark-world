@@ -59,11 +59,32 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD", "marks"));
 const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by === TOWN && String(m.class) === cls ? { ...m, named } : m));
 
+test("a named creature that returns (WLD-124): return_until is an ISO instant in UTC, carried as written; the season marks three entries", () => {
+  const ok = { slug: "den", at: { x: 1, y: 2 } };
+  const U = "2026-11-01T06:00:00Z";
+  assert.equal(creatureLaw(withNamed("wolf", [{ ...ok, return_until: U }])).named.find((d) => d.kind === "wolf").return_until, U);
+  assert.equal("return_until" in creatureLaw(withNamed("wolf", [ok])).named.find((d) => d.kind === "wolf"), false, "absent when not written");
+  for (const bad of ["2026-11-01", "2026-11-01T02:00:00-04:00", "tomorrow", 7, "2026-13-45T06:00:00Z"])
+    assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, return_until: bad }])), /return_until is .*not an ISO instant in UTC/, String(bad));
+  assert.deepEqual(creatureLaw(marks).named.filter((d) => d.return_until).map((d) => [d.id, d.return_until]), [
+    ["creature:candied-bat-lumber-room", U],
+    ["creature:candied-raven-mirror-room", U],
+    ["creature:candied-wolf-hall-of-keepers-again", U],
+  ], "three entries return, until the settlement at 06:00Z on 11-01 (none after it); the first wolf entry and the boss do not");
+});
+
 test("a kind class's named creatures are read whole: one id each, a place, what it carries and its crossing", () => {
   const law = creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 10, y: -20 }, carries: "the-town/a-thing", from_crossing: 300 }]));
-  assert.deepEqual(law.named, [{ id: "creature:wolf-den", kind: "wolf", x: 10, y: -20, carries: "the-town/a-thing", from_crossing: 300, declared: "the-town/wolf#den" }]);
-  assert.deepEqual(creatureLaw(marks).named, [], "the law today declares none");
-  assert.deepEqual(creatureLaw(withNamed("wolf", JSON.stringify([{ slug: "den", at: { x: 1, y: 2 } }]))).named.map((d) => d.id), ["creature:wolf-den"], "a JSON string is read as its list");
+  assert.deepEqual(law.named.filter((d) => d.kind === "wolf"), [{ id: "creature:wolf-den", kind: "wolf", x: 10, y: -20, carries: "the-town/a-thing", from_crossing: 300, declared: "the-town/wolf#den" }]);
+  assert.deepEqual(creatureLaw(marks).named.map((d) => [d.id, d.carries, d.from_crossing]), [
+    ["creature:candied-bat-lumber-room", "the-town/the-lumber-room-key", 272],
+    ["creature:candied-jetto-the-star-chapel", undefined, 272],
+    ["creature:candied-raven-mirror-room", "the-town/the-mirror-room-key", 272],
+    ["creature:candied-wolf-hall-of-keepers", "the-town/the-hall-of-keepers-key", 272],
+    ["creature:candied-wolf-hall-of-keepers-again", "the-town/the-hall-of-keepers-key", 274],
+  ], "the law declares the season's three, each with its key, none before the heist, and the wolf once more from crossing 274");
+  assert.deepEqual(creatureLaw(marks).named.find((d) => d.id === "creature:candied-wolf-hall-of-keepers-again").after, ["creature:candied-wolf-hall-of-keepers"], "the second wolf waits for the first to have ended");
+  assert.deepEqual(creatureLaw(withNamed("wolf", JSON.stringify([{ slug: "den", at: { x: 1, y: 2 } }]))).named.filter((d) => d.kind === "wolf").map((d) => d.id), ["creature:wolf-den"], "a JSON string is read as its list");
 });
 
 test("a bad declaration throws, so the law is read whole or not at all", () => {
@@ -73,7 +94,7 @@ test("a bad declaration throws, so the law is read whole or not at all", () => {
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, carries: "a-thing" }])), /not a mark's id/);
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, from_crossing: "soon" }])), /not a whole crossing/);
   // after (a creature that tempts): the named creatures that must all have ended first
-  assert.deepEqual(creatureLaw(withNamed("wolf", [{ ...ok, after: ["creature:wolf-first", "creature:wolf-second"] }])).named[0].after, ["creature:wolf-first", "creature:wolf-second"]);
+  assert.deepEqual(creatureLaw(withNamed("wolf", [{ ...ok, after: ["creature:wolf-first", "creature:wolf-second"] }])).named.find((d) => d.kind === "wolf").after, ["creature:wolf-first", "creature:wolf-second"]);
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, after: [] }])), /not a list of named creatures' ids/);
   assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, after: ["not-a-creature"] }])), /not a list of named creatures' ids/);
   assert.throws(() => creatureLaw(withNamed("wolf", [ok, ok])), /declared twice/);

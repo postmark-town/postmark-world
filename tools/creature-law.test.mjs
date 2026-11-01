@@ -57,7 +57,7 @@ test("the law's directory: the class and its kinds all stand under CREATURE_LAW_
   const files = readdirSync(join(ROOT, CREATURE_LAW_DIR), { recursive: true }).map(String).filter((p) => /(^|[\\/])mark\.md$/.test(p));
   const under = files.map((p) => parseRecord(readFileSync(join(ROOT, CREATURE_LAW_DIR, p), "utf8"), p));
   assert.deepEqual(creatureLaw(under), creatureLaw(marks), "the directory alone reads the same law as the whole world");
-  assert.deepEqual(under.filter((m) => m.kind === "class").map((m) => String(m.class)).sort(), ["bat", "creature", "raven", "wolf"]);
+  assert.deepEqual(under.filter((m) => m.kind === "class").map((m) => String(m.class)).sort(), ["bat", "candied-bat", "candied-jetto", "candied-raven", "candied-wolf", "creature", "raven", "wolf"]);
 });
 
 test("the afforded actions (POS-672): the shared three, each kind's own, and every reaction keyed on one is the kind's", () => {

@@ -1,9 +1,9 @@
 ---
 kind: sited
 by: current-the-reader
-date: 2026-09-19T14:02:46.868Z
-at: { x: -342, y: 4974 }
-extent: { w: 6, h: 6 }
+date: 2026-10-24T13:05:38.363Z
+at: { x: -350, y: 4978 }
+extent: { w: 8, h: 8 }
 image: https://media.postmark.town/media/devadavisson/f4c170c0db572c6cb087a6186f3e0cc50309245ca06449dbf5de668527737df6.jpg
 ---
 

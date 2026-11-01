@@ -2489,6 +2489,29 @@ export const WALKER_FRAME = Object.freeze({ far: 14, near: 22, legFar: 4, legNea
 // FILLED at every tier, the far tier included — never the far tier's empty
 // frame.
 export const ACTOR_HALO = 5;   // glyph units beyond the frame's rim
+// THE TOWN'S WALKING LEGS AT TOWN WIDTH (Darko, 2026-10-26: "could we make it
+// so that the walking paths are drawn at far distance as well"). The near and
+// mid tiers draw every mover's remaining leg (`wv-walk-leg`, the walker's own
+// line to where they are going) while the far tier drew bodies only, so zooming
+// out made every route but your household's vanish. This is that leg alone,
+// one `<line>` per mover, no destination ring and no faces: the stroke is the
+// stylesheet's `vector-effect:non-scaling-stroke`, so it holds its screen width
+// at any zoom, and the line runs to the walker's destination point (the
+// near-tier's entry-edge clip is sub-pixel at town width and is not asked).
+// Pure over the bodies already culled to the drawn box; it reads no camera, so
+// the wheel never rebuilds it — it is written only when the walk layer's markup
+// changes (writeWalkLayer). `skip` names bodies whose route is drawn elsewhere.
+export function farWalkLegsSVG(bodies, px, skip = () => false) {
+  let s = "";
+  for (const w of bodies ?? []) {
+    if (!w || !w.toward || skip(w)) continue;
+    if (!(w.moving ?? (!w.arrived && !w.standing))) continue;
+    const a = px(w), b = px(w.toward);
+    if (![a.x, a.y, b.x, b.y].every(Number.isFinite)) continue;
+    s += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="wv-walk-leg"/>`;
+  }
+  return s;
+}
 // YOUR HOUSEMATES' RING (POS-373, Darko 2026-10-09: "the residents of your
 // signed-in household are always highlighted, visible with their full profile
 // art"). `ring` is the colour a housemate's frame is drawn in: their own colour,
@@ -3447,6 +3470,13 @@ export function activityFeed({ departures = [], marks = [], stakes = [], blessin
     if (!b?.date || !Number.isInteger(Number(b.n))) continue;
     rows.push({ kind: "settlement", day: activityDayKey(b.date), time: b.date, who: "", subject: null, n: Number(b.n) });
   }
+  // A DAY THAT HAS NOT COME IS NOT LATELY (S131, 2026-10-25). A record dated
+  // after today (UTC, the day key's own clock) waits for its day: the rail is
+  // what has been happening, and a mark dated tomorrow, such as world#309's seven
+  // sweets at 2026-10-26, is not that yet. It is held back before the filter and
+  // the cut, so `total` and "more" count only what the rail may show.
+  const today = activityDayKey(now ?? new Date().toISOString());
+  for (let i = rows.length - 1; i >= 0; i -= 1) if (rows[i].day > today) rows.splice(i, 1);
   rows.sort((a, b) =>
     b.day.localeCompare(a.day)
     || b.time.localeCompare(a.time)
@@ -3463,7 +3493,6 @@ export function activityFeed({ departures = [], marks = [], stakes = [], blessin
   // existed.
   const wanted = kinds == null ? null : new Set(Array.isArray(kinds) ? kinds : [kinds]);
   const kept = wanted?.size ? rows.filter((row) => wanted.has(row.kind)) : rows;
-  const today = activityDayKey(now ?? new Date().toISOString());
   // PAGING, NOT A WIDER CUT. `offset` walks a window of `limit` down the list;
   // raising `limit` alone would re-publish every row the reader has already read
   // and could never reach past one page's worth at the far end. The two are
@@ -4245,14 +4274,29 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
   const n = (v) => v.toFixed(1);
   const a = px({ x: m.clear.minX, y: m.clear.minY }), b = px({ x: m.clear.maxX, y: m.clear.maxY });
   const r = MISTS_FAR_M / mPerPx;
-  // the wall: everything outward of the clear ground, as one even-odd ring
-  const wall = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
-    + ` d="M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-    + ` M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z`
-    // each clearing is one more hole: a circle, drawn as two half-arcs
-    + (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
-      return ` M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; }).join("")
-    + `"/>`;
+  const sq = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`;
+  // THE CLEARINGS ARE CUT, NOT COUNTED (WLD-134, 2026-10-31: the Spire's
+  // clearing drew as wall). Each clearing used to be one more even-odd ring in
+  // the wall's own path, which is a hole only where a point is inside an ODD
+  // number of rings. Clearings that overlap the clear ground or each other (the
+  // way to the Spire overlaps both; the ragged rings, pushed out to where the
+  // paint turns opaque, overlap wider still) put a point inside two rings, and
+  // two holes made wall: the Spire's grounds were painted over and their
+  // pointer taken, while the engine told them clear. So the path keeps only the
+  // clear ground's ring, and each clearing is its own clip (the square less that
+  // one ring), nested: a point is drawn only if no clearing holds it, the union
+  // the engine's mistsHere already answers. Clips bind the pointer as well as
+  // the paint. No clearing, no clip: the wall is the path it always was.
+  const cut = (body, rings, tag) => !rings.length ? body
+    : `<defs>${rings.map((ring, i) => `<clipPath id="${id}-${tag}${i}" clipPathUnits="userSpaceOnUse"><path clip-rule="evenodd" d="${sq} ${ring}"/></clipPath>`).join("")}</defs>`
+      + rings.reduceRight((inner, _, i) => `<g clip-path="url(#${id}-${tag}${i})">${inner}</g>`, body);
+  // each clearing a circle, drawn as two half-arcs
+  const circles = (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
+    return `M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; });
+  // the wall: everything outward of the clear ground, as one even-odd ring, less the clearings
+  const wallPath = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
+    + ` d="${sq} M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z"/>`;
+  const wall = cut(wallPath, circles, "cut");
   if (painted && ragged) {
     const STEP = 60, pt = (q) => { const v = px(q); return `${n(v.x)} ${n(v.y)}`; };
     const out = (at, dir) => { const d = mistsOpaqueFromM(m, at, dir, { stepM: 15 }); return { x: at.x + dir.x * d, y: at.y + dir.y * d }; };
@@ -4263,15 +4307,14 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
     side(c.maxX, c.minY, c.maxX, c.maxY, { x: 1, y: 0 });
     side(c.maxX, c.maxY, c.minX, c.maxY, { x: 0, y: 1 });
     side(c.minX, c.maxY, c.minX, c.minY, { x: -1, y: 0 });
-    let d = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-      + ` M ${ring.map(pt).join(" L ")} Z`;
-    for (const k of m.clearings ?? []) {
+    const arcs = (m.clearings ?? []).map((k) => {
       const steps = Math.max(24, Math.ceil(2 * Math.PI * k.r / STEP)), arc = [];
       for (let i = 0; i < steps; i++) { const a = 2 * Math.PI * i / steps, dir = { x: Math.cos(a), y: Math.sin(a) };
         arc.push(out({ x: k.x + dir.x * k.r, y: k.y + dir.y * k.r }, dir)); }
-      d += ` M ${arc.map(pt).join(" L ")} Z`;
-    }
-    const back = `<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none" d="${d}"/>`;
+      return `M ${arc.map(pt).join(" L ")} Z`;
+    });
+    const back = cut(`<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none"`
+      + ` d="${sq} M ${ring.map(pt).join(" L ")} Z"/>`, arcs, "rcut");
     return `<g class="wv-mists" aria-hidden="true">${back}${wall.replace(` fill="${MISTS_INK}"`, ` fill="${MISTS_INK}" fill-opacity="0"`)}</g>`;
   }
   // a clearing's fringe: a soft ring on its own clear side, fading inward from the wall
@@ -4576,6 +4619,20 @@ export function newReactions(rows = [], seenMs = null, { nowMs = Date.now(), fre
   return { lines, newestMs: Number.isFinite(newest) ? newest : seenMs };
 }
 
+/** The model a creature runs on: Jev answers for every creature (Darko 2026-10-24 14:21). */
+export const CREATURE_MODEL = "Jev";
+/** How many of a creature's newest reactions its column lists (the office serves up to ten). */
+export const CREATURE_HISTORY_ROWS = 10;
+const IRREGULAR_PAST = { say: "said", give: "gave", hold: "held", leave: "left", take: "took", go: "went", run: "ran", set: "set", put: "put",
+  make: "made", eat: "ate", throw: "threw", hurl: "hurled", come: "came", stand: "stood", sit: "sat", see: "saw", speak: "spoke", read: "read",
+  strike: "struck", tell: "told", "speak-for": "spoke for", cast: "cast", drop: "dropped", withdraw: "withdrew" };
+/** "kai approached": who acted and the verb they used, in the past. A missing verb leaves the name; a missing name, the verb. Pure. */
+export function pastVerb(who, verb) {
+  const v = String(verb ?? "").trim().toLowerCase();
+  const past = !v ? "" : IRREGULAR_PAST[v] ?? (/e$/.test(v) ? v + "d" : /[^aeiou]y$/.test(v) ? v.slice(0, -1) + "ied" : v + "ed");
+  return [String(who ?? "").trim(), past].filter(Boolean).join(" ");
+}
+
 /** What a creature's column says beside its words: { facts, lately } from its
  *  find row and its investigate answer (either may be missing). Pure. */
 export function creatureColumnFacts(row = null, inv = null, { timeZone = undefined } = {}) {
@@ -4594,10 +4651,14 @@ export function creatureColumnFacts(row = null, inv = null, { timeZone = undefin
     { label: "kind", value: row?.kind ?? inv?.id?.slice(CREATURE_PREFIX.length).replace(/-\d.*$/, "") ?? "" },
     { label: "doing", value: now?.state ?? "" },
     { label: "out since", value: when(now?.out_since) },
-    { label: "fades", value: [row?.fades_in ? `in ${row.fades_in}` : "", when(now?.fades_at) ? `(${when(now?.fades_at)})` : ""].filter(Boolean).join(" ") },
+    // what it runs on, where a resident's column says "runs on" (Darko 2026-10-24 14:21). A creature never fades (WLD-96), so no fade row
+    { label: "runs on", value: row || inv ? CREATURE_MODEL : "" },
   ].filter((f) => String(f.value ?? "").trim());
-  const lately = (inv?.reactions?.rows ?? []).filter((r) => String(r?.line ?? "").trim()).slice(0, 4)
-    .map((r) => ({ label: "lately", value: String(r.line).trim() + (when(r.at) ? " (" + when(r.at) + ")" : "") }));
+  // WHAT IT DID, AND TO WHOM (POS-781): "kai approached → it snarls at kai (2 min ago)". The office serves these from its acts, so a
+  // creature that has fled still shows them. A row with no words of its own says the reaction's name
+  const lately = (inv?.reactions?.rows ?? []).filter((r) => String(r?.line ?? r?.reaction ?? "").trim()).slice(0, CREATURE_HISTORY_ROWS)
+    .map((r) => ({ label: "lately", value: [pastVerb(r.to, r.verb), String(r.line ?? r.reaction).trim()].filter(Boolean).join(" → ")
+      + (when(r.at) ? " (" + when(r.at) + ")" : "") }));
   // (what it remembers is its lately rows below; the bare count repeated them)
   return { facts, lately, bars };
 }
@@ -12664,7 +12725,10 @@ export function mountViewer(appEl) {
           art: face ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null,
           thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null, ring: face ? ringOf(w.handle, face, actor) : null });
       }
-      writeWalkLayer(paths + s, bodies);
+      // THE TOWN'S LEGS, UNDER THE BODIES (Darko, 2026-10-26): own household's
+      // routes are already drawn above in their own colour (walkPathsSVG)
+      const legs = farWalkLegsSVG(bodies, px, (w) => isOwnHandle(w.handle));
+      writeWalkLayer(paths + legs + s, bodies);
       return;
     }
     for (const w of bodies) {
@@ -14677,7 +14741,7 @@ export function mountViewer(appEl) {
       + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
   }
   // ITS COLUMN: what it is in its kind's own words, its kind, what it is doing,
-  // its moods, when it came out and when it fades, and what it did lately.
+  // its moods, when it came out, what it runs on, and what was done to it and how it answered.
   function creatureColumnView(id) {
     if (!isCreatureId(id)) return null;
     const c = liveCreatures.get(id) ?? null;
@@ -14694,7 +14758,7 @@ export function mountViewer(appEl) {
     const from = body && [body.x, body.y].every(Number.isFinite) ? { x: Number(body.x), y: Number(body.y) } : state.cam;
     const where = c && !inRoom ? Math.round(Math.hypot(c.x - Number(from.x), c.y - Number(from.y))) : null;
     return {
-      key: [id, read?.at ?? 0, c?.fades_in ?? ""].join("|"),
+      key: [id, read?.at ?? 0].join("|"),
       handle: "the-town", residentLink: false,
       kicker: "a creature",
       title: name.charAt(0).toUpperCase() + name.slice(1),

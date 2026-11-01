@@ -25,6 +25,9 @@ test("an instance's own dials ride its store row; no class row carries any", () 
   }
   const classRows = state.marks.filter((m) => m.kind === "class");
   assert.ok(classRows.length > 100);
+  // No exception. Until WLD-128 (2026-10-30, Darko's HOTFIX go) the candy class carried a
+  // class-level `dials:` line (453d8f5f) and was named here as the one exception; that
+  // dial is reverted, so candy is held to the rule like every class.
   assert.deepEqual(classRows.filter((m) => m.dials !== undefined).map((m) => m.id), [], "a class's dials are its property rows");
 });
 

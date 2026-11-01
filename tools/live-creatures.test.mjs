@@ -8,7 +8,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  isCreatureId, liveCreaturesFrom, creatureReactionLines, creatureColumnFacts, creatureGlyphSVG, creatureDiamond, CREATURE_GLYPH, WALKER_FRAME,
+  isCreatureId, liveCreaturesFrom, creatureReactionLines, creatureColumnFacts, pastVerb, CREATURE_MODEL, creatureGlyphSVG, creatureDiamond, CREATURE_GLYPH, WALKER_FRAME,
 } from "../spectator/viewer.mjs";
 import { creatureSilhouette } from "../spectator/mists-render.mjs";
 
@@ -56,10 +56,15 @@ test("a creature's column: its kind, what it is doing, its moods as bars, when i
   assert.equal(by.moods, undefined, "no moods line");
   assert.equal(by.remembers, undefined, "no bare count");
   assert.equal(by["out since"], "Oct 15, 7:06 PM");
-  assert.equal(by.fades, "in 11h 55m (Oct 16, 7:06 AM)");
-  assert.deepEqual(lately, [{ label: "lately", value: "At the edge of the Mists a grey wolf stands perfectly still, watching visitor. (Oct 15, 7:06 PM)" }]);
+  // POS-781: a creature never fades (WLD-96), so no "fades" row; it runs on Jev, as a resident's column says what it runs on
+  assert.equal(by.fades, undefined, "no fade row");
+  assert.equal(by["runs on"], "Jev");
+  assert.equal(CREATURE_MODEL, "Jev");
+  // and each row names who acted and the verb they used (the fixture's reaction row says "say")
+  assert.deepEqual(lately, [{ label: "lately", value: "visitor said → At the edge of the Mists a grey wolf stands perfectly still, watching visitor. (Oct 15, 7:06 PM)" }]);
   // before its reading lands, the find row alone still says what it can
-  assert.deepEqual(creatureColumnFacts(wolf, null).facts.map((f) => f.label), ["kind", "fades"]);
+  assert.deepEqual(creatureColumnFacts(wolf, null).facts.map((f) => f.label), ["kind", "runs on"]);
+  assert.deepEqual(creatureColumnFacts(null, null).facts, [], "nothing read, nothing said");
 });
 
 test("on the painting: a TOKEN, a pastel red diamond with the kind's silhouette inside (play fix 40; WLD-82)", () => {
@@ -119,4 +124,21 @@ test("WLD-108: a creature's nameplate wears the creature icon, and an unresolved
   assert.doesNotThrow(() => iconsHTML([undefined, null]));
   assert.equal(iconsHTML([undefined]), "");
   assert.equal(iconsHTML([undefined, icon]), plate);
+});
+
+test("POS-781: the panel's history names the actor and the verb, lists more than four rows, and does not need the creature in the fold", () => {
+  assert.equal(pastVerb("kai", "approach"), "kai approached");
+  assert.equal(pastVerb("kai", "say"), "kai said");
+  assert.equal(pastVerb("kai", "carry"), "kai carried");
+  assert.equal(pastVerb("kai", "wave"), "kai waved");
+  assert.equal(pastVerb("kai", null), "kai");
+  const rows = Array.from({ length: 9 }, (_, i) => ({ to: "kai", verb: "approach", reaction: "snarl",
+    line: `The wolf snarls (${i}).`, at: `2026-10-15T23:0${i}:00.000Z` }));
+  const { lately } = creatureColumnFacts(null, { id: "creature:wolf-251-play1", reactions: { rows } }, { timeZone: "America/New_York" });
+  assert.equal(lately.length, 9, "more than the four it showed before");
+  assert.equal(lately[0].value, "kai approached → The wolf snarls (0). (Oct 15, 7:00 PM)");
+  // a creature that fled: no find row, but the office still answered its history, and the column keeps it
+  assert.equal(creatureColumnFacts(null, { id: "creature:wolf-251-play1", reactions: { rows } }).lately.length, 9);
+  // a row with no words of its own says the reaction's name rather than vanishing
+  assert.equal(creatureColumnFacts(null, { reactions: { rows: [{ to: "mo", verb: "walk", reaction: "flee", at: null }] } }).lately[0].value, "mo walked → flee");
 });

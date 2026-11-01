@@ -44,7 +44,8 @@ function realTree() {
   mkdirSync(join(repo, "WORLD"), { recursive: true });
   cpSync(join(REPO_SRC, "LOGOS"), join(repo, "LOGOS"), { recursive: true });
   copyFileSync(join(REPO_SRC, "WRITES.md"), join(repo, "WRITES.md"));
-  for (const f of ["skeleton.json", "filing-freeze.json", "households.json"]) copyFileSync(join(REPO_SRC, "WORLD", f), join(repo, "WORLD", f));
+  // ENGINE.md (a rendering may cite it as a source) and the portal lint's named exceptions travel with the tree they bound.
+  for (const f of ["skeleton.json", "filing-freeze.json", "households.json", "ENGINE.md", "portal-lint-exceptions.json"]) copyFileSync(join(REPO_SRC, "WORLD", f), join(repo, "WORLD", f));
   cpSync(join(REPO_SRC, "WORLD", "marks"), join(repo, "WORLD", "marks"), { recursive: true });
   return repo;
 }
@@ -56,7 +57,9 @@ const lint = (repo) => {
 function holdCone(repo, holder = "sb-ash", { keep = [] } = {}) {
   const p = join(repo, CONE_FILE);
   let t = readFileSync(p, "utf8");
-  assert.match(t, /^at: \{ x: 221, y: 95\.5 \}$/m, "the fixture is the cone on Berthillon's wall");
+  // The cone is a LIVE record (Berthillon moves it when he likes; 10-23 18:00Z it moved to 227,100), so the fixture asserts only that it
+  // is placed, never where: this suite is about holding, and a resident's move must never turn it red.
+  assert.match(t, /^at: \{[^}]*\}$/m, "the fixture is the cone, placed on Berthillon's wall");
   if (!keep.includes("at")) t = t.replace(/^at: .*\r?\n/m, "");
   if (!keep.includes("extent")) t = t.replace(/^extent: .*\r?\n/m, "");
   t = t.replace(/^---\r?\n\r?\n/m, `${HELD_BY}: ${holder}\n---\n\n`);

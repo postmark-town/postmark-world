@@ -930,7 +930,8 @@ and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
 > no one.
 
 (The class mark's body says the same within the 150-character cap, with
-two cuts: "it fades or it flees" and "it is no one's".)
+two cuts: "lives half a day" (superseded, WLD-96: a creature does not fade)
+and "it is no one's".)
 
 | a creature's act | family | canon |
 |---|---|---|
@@ -941,10 +942,11 @@ two cuts: "it fades or it flees" and "it is no one's".)
 | its leaving, with its reason | revise: withdraw | live |
 | the crossing-save | a snapshot | every crossing saves it |
 
-- **Two ways to leave, and only two.** `faded`: twelve hours after its spawn
-  it goes back into the mist, on its own clock. `fled`: a reaction sent it
-  back at once — the only leaving by outcome. Nothing a creature is ever
-  vanishes otherwise, and it is never tamed or befriended: it is no one's.
+- **It leaves by fleeing, or at the season's end.** `fled`: a reaction sent it
+  back at once — the only leaving by outcome. A creature does not fade: the
+  twelve-hour fade is superseded (WLD-96, ruled 2026-10-21 19:39 and 19:41:
+  "Keep flee, end at season's end"). Nothing else ends a creature, and it is
+  never tamed or befriended: it is no one's.
   *A season's named creature (WLD-25, ruled 2026-10-20 22:56) neither fades nor
   flees: it stays until a settlement ends it, a third reason, `ended`, written
   only by the-town. Its mechanics are the season's (WORLD/ENGINE.md § The

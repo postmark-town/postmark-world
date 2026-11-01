@@ -39,6 +39,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { housemateEdges, townRegionMarks } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
@@ -184,7 +185,7 @@ before(async () => {
 
 // signedIn: a key and an act-as ("actor" or "spectator"); signed out: neither
 async function openPage({ signedIn = false, actAs = ACTOR } = {}) {
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.route("**/world-engine/residents-meta.json", (route) =>

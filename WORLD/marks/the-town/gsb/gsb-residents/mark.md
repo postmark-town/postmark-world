@@ -1,9 +1,9 @@
 ---
 by: the-town
 kind: predicate
-date: 2026-10-22
+date: 2026-10-23
 slot: residents
-value: 478 residents, read 2026-10-22
+value: 478 who have come in, its own count, read 2026-10-23
 ---
 
-As the town's own front page counts them.
+Every avatar the world has ever made: one visit makes one. Not presence, and not activity (its front page).

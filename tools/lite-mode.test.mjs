@@ -20,6 +20,7 @@ import { createServer as createNetServer } from "node:net";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { LITE, LITE_NEXT, liteModeFor, liteCarryOld } from "../spectator/viewer.mjs";
+import { machineContext } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -103,36 +104,27 @@ before(async () => {
 
 // THE MACHINE'S SPEED IS SET, NOT MEASURED (WLD-60). The bake times its first
 // layer with performance.now() and calls the machine slow past 3 ms per 1,000 px,
-// so on a busy host an "able machine" page read slow and lite came on. Here the
-// page's clock holds still within one task and moves on between tasks: the
-// bake's slices are synchronous, so its reading is exactly 0, the machine
-// infinitely fast, while time still passes between frames and timers. Only a
-// throttled run (the slow machine) keeps the real clock.
-const holdClockWithinATask = () => {
-  const realNow = performance.now.bind(performance);
-  let held = null;
-  performance.now = () => {
-    if (held === null) { held = realNow(); queueMicrotask(() => { held = null; }); }
-    return held;
-  };
-};
+// so on a busy host an "able machine" page read slow and lite came on. The
+// context holds the page's clock still within one task (page-machine.mjs §
+// holdClockWithinATask, first written here), so the bake reads instant. ONLY THE
+// SLOW MACHINE keeps the real clock, at the CPU throttle it names: its subject is
+// the measurement, so it opts out of the held clock, by name.
 
 // crossing 247, five hours in (the Mists on, whatever today's crossing is), and
 // the machine the page is told it runs on
 async function open({ query = "", cores = 16, memory = 8, throttle = 0 } = {}) {
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
-  if (!throttle) await ctx.addInitScript(holdClockWithinATask);
-  await ctx.addInitScript(({ cores, memory }) => {
+  const ctx = await machineContext(browser, {
+    viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference", machine: { cores, memory },
+    ...(throttle ? { clock: "real", throttle } : {}),
+  });
+  await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
     const off = (Date.UTC(2026, 5, 12) + 247 * 12 * 3600e3 + 5 * 3600e3) - realNow();
     globalThis.Date = class extends RealDate { constructor(...a) { if (a.length === 0) super(realNow() + off); else super(...a); } static now() { return realNow() + off; } };
-    Object.defineProperty(Navigator.prototype, "hardwareConcurrency", { get: () => cores, configurable: true });
-    Object.defineProperty(Navigator.prototype, "deviceMemory", { get: () => memory, configurable: true });
-  }, { cores, memory });
+  });
   const page = await ctx.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e.message).slice(0, 160)));
-  if (throttle) { const cdp = await ctx.newCDPSession(page); await cdp.send("Emulation.setCPUThrottlingRate", { rate: throttle }); }
   await page.goto(`http://localhost:${port}/${query}`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
@@ -159,7 +151,7 @@ const mists = (page) => page.evaluate(() => ({
 }));
 
 test("the page: ?lite=1 draws the wall alone (no bake, no feather, nothing moving); the toggle beside the bell says so", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   const { ctx, page, errors } = await open({ query: "?lite=1" });
   await page.waitForSelector("#wv-mists-layer .wv-mists-wall", { state: "attached", timeout: 120_000 });
   await page.waitForTimeout(4000);   // longer than this rig's whole bake at full speed
@@ -177,7 +169,7 @@ test("the page: ?lite=1 draws the wall alone (no bake, no feather, nothing movin
 });
 
 test("the page: the toggle goes auto → on → off → auto, kept on the device, outranks the link, and the paint comes and goes with it", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   const { ctx, page, errors } = await open({ query: "?lite=1" });
   await page.waitForSelector("#wv-mists-layer .wv-mists-wall", { state: "attached", timeout: 120_000 });
   const click = async () => { await page.click(".wv-lite-toggle"); await page.waitForTimeout(400); return read(page); };
@@ -206,7 +198,7 @@ test("the page: the toggle goes auto → on → off → auto, kept on the device
 });
 
 test("the page: auto turns lite mode on for a small machine, and for a slow first bake, which stops (kept for the next visit)", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   for (const [machine, why] of [[{ cores: 4, memory: 8 }, /few cores/], [{ cores: 16, memory: 4 }, /little memory/]]) {
     const { ctx, page } = await open(machine);
     const r = await read(page);
@@ -228,15 +220,13 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
 });
 
 test("the page on a phone: no seventh circle; the bell opens a menu holding the bell and lite mode", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
-  await ctx.addInitScript(holdClockWithinATask);   // an able phone: its row reads "auto (off)"
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
+  // an able phone (the set machine, page-machine.mjs): its row reads "auto (off)"
+  const ctx = await machineContext(browser, { viewport: { width: 390, height: 844 }, hasTouch: true });
   await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
     const off = (Date.UTC(2026, 5, 12) + 247 * 12 * 3600e3 + 5 * 3600e3) - realNow();
     globalThis.Date = class extends RealDate { constructor(...a) { if (a.length === 0) super(realNow() + off); else super(...a); } static now() { return realNow() + off; } };
-    Object.defineProperty(Navigator.prototype, "hardwareConcurrency", { get: () => 16, configurable: true });
-    Object.defineProperty(Navigator.prototype, "deviceMemory", { get: () => 8, configurable: true });
   });
   const page = await ctx.newPage();
   const errors = [];
