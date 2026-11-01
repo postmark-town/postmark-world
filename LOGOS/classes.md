@@ -1024,8 +1024,18 @@ and "it is no one's".)
   (`tools/creatures.mjs § countsFor`). A null `rotation` brings every kind at
   its own count.
 - **Off until the town says so.** A null `from_crossing` dial spawns nothing.
-  It stands at 259, the window that opens 2026-10-19 at 12:00Z, the first
+  It stood at 259, the window that opened 2026-10-19 at 12:00Z, the first
   window seeded after that day's 06:00Z settlement.
+  **Off again after Halloween (WLD-142; RULED, Darko 2026-10-31 23:01 EDT,
+  verbatim):** "keep the mist as is, but we should probably remove all like the
+  Halloween creatures and the decorations." The dial is null from the first
+  blessing that carries this: no window seeded after it spawns a creature. This
+  is the season's end that WLD-96 left to his word ("Keep flee, end at season's
+  end"). The Mists themselves are the skeleton's and stay as they are (the last
+  keyframe, crossing 282). A window already seeded keeps the law at its own
+  seed's sha, so it finishes; the creatures already out are taken down by the
+  town's own `withdraw`, not by this law. The season's named creatures carry
+  their own `from_crossing` and `return_until` and do not read this dial.
 
 Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
 
