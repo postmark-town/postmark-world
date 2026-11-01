@@ -131,14 +131,20 @@ test("the lint: a WELCOMED portal into itself is a place you stand in, so a room
   assert.ok(!f.some((x) => x.mark === "home/the-stair"), "the default stair (opposed, into itself) is still no room");
 });
 
-test("the lint: a stair is a box inside a room, not a door in a wall, so it still counts for rooms-do-not-overlap", () => {
+// Until 2026-11-01 this asserted that a stair is held to rooms-do-not-overlap "as a room is". Darko, 07:58/07:59:
+// "Yeah rooms only" and "Everything should be allowed to overlap like normal". A stair is a room only if its
+// dungeon lists it in `rooms`.
+test("the lint: a stair is not a room unless the dungeon lists it, so it overlaps freely; listed, it is judged", () => {
   const w = world();
+  w.marks.find((m) => m.id === "home/house").rooms = ["home/hall", "home/landing"];
   // a 12 × 8 m stair straddling the hall's east wall, so the hall does not hold
   // it and it stands in the house beside the hall, over the hall's floor
   w.marks.push({ id: "home/wide-stair", kind: "sited", by: "home", class: STAIRS_CLASS,
     at: { x: 498, y: 500 }, extent: { w: 12, h: 8 }, body: "A wide stair." });
+  assert.deepEqual(portalFindings(w.marks).filter((x) => x.rule === "rooms-do-not-overlap"), [], "unlisted: no finding");
+  w.marks.find((m) => m.id === "home/house").rooms.push("home/wide-stair");
   const f = portalFindings(w.marks).filter((x) => x.rule === "rooms-do-not-overlap");
-  assert.ok(f.length > 0, "the overlap is named");
+  assert.ok(f.length > 0, "listed: the overlap is named");
   assert.ok(f.every((x) => x.sev === "ERROR"), JSON.stringify(f));
 });
 
