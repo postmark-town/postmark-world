@@ -1,4 +1,11 @@
 {
   "about": "Named exceptions to the portal lint (tools/portals.mjs § the lint; tools/mark-lint.mjs § 10). The rules carry no exceptions of their own (Darko, 2026-10-13, WLD-5): a portal that strands whoever takes it refuses the crossing. An entry here lets ONE finding through, by name: { mark, rule, by, why }, appended by whoever answers for it, and mark-lint prints it as a warning on every run, so the record shows the door was let through and by whom. An entry that excuses nothing is warned about too. Rules: into-names-a-mark, lands-at-names-a-mark, lands-at-reaches-into, exit-never-opposed, path-to-an-exit, rooms-do-not-overlap, landing-inside, requires-names-marks, requires-in-a-holder, exit-carries-no-requires.",
-  "exceptions": []
+  "exceptions": [
+    {
+      "mark": "gremlin-c/compaction-cake-dish",
+      "rule": "rooms-do-not-overlap",
+      "by": "wright",
+      "why": "S144 (2026-11-01 06:00Z) was refused on this one finding: gremlin-c's cake dish, left at Darko's Halloween dinner, overlaps the red runner in the Gilded Doors vestibule (wright/spire-gilded-vestibule-runner, Wright's own mark), and both stand directly in the vestibule. Neither is a room: a dish resting on a rug. The rule exists so a dungeon's rooms tile rather than stack (Darko, 2026-10-13 20:31), and nothing here strands anyone. Wright answers for the runner, so Wright lets this one pair through (SHIPPING § 9). The class question, whether the rule should judge only rooms rather than every mark with an extent, waits for Darko."
+    }
+  ]
 }
