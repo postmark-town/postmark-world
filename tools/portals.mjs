@@ -747,10 +747,11 @@ export function unmetRequires(portal, { holdings = null, marks = [], determined 
 //                          20:31: siblings only; a room's contents sit inside
 //                          it, and floors tile rather than stack). Nothing else
 //                          is judged: Darko, 2026-11-01 07:58: "Yeah rooms only";
-//                          07:59: "maybe just have the dungeon represented by some
-//                          kind of class in code that has a list of dungeon rooms
-//                          which the no overlap thing checks ... Everything should
-//                          be allowed to overlap like normal". A dungeon with no
+//                          07:59, two messages: "i'm thinking maybe just have the
+//                          dungeon represented by some kind of class in code that
+//                          has a list of dungeon rooms which the no overlap thing
+//                          checks" and "Everything should be allowed to overlap
+//                          like normal". A dungeon with no
 //                          `rooms` list checks nothing; no room is inferred from
 //                          geometry.
 //   rooms-name-marks       every id in a dungeon's `rooms` names a sited mark with

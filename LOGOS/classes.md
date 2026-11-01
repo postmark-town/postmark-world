@@ -1926,9 +1926,10 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   the rooms a dungeon declares overlap. A dungeon declares its rooms in `rooms`, a list of mark ids (a property of
   `the-town/dungeon`, the maker's word), and the lint judges only those, only against each other: a room declared inside
   another is its child. Every other mark inside the dungeon (a rug, a dish, a stair, a door) overlaps what it likes,
-  nothing is inferred from geometry, and a dungeon that lists no rooms checks nothing (Darko, 2026-11-01 07:58 and
-  07:59: "Yeah rooms only", "have the dungeon represented by some kind of class in code that has a list of dungeon
-  rooms which the no overlap thing checks", "Everything should be allowed to overlap like normal"). Every id in
+  nothing is inferred from geometry, and a dungeon that lists no rooms checks nothing (Darko, 2026-11-01
+  07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the dungeon represented by some kind
+  of class in code that has a list of dungeon rooms which the no overlap thing checks" and "Everything should be
+  allowed to overlap like normal"). Every id in
   `rooms` must name a mark standing inside the dungeon, so a typo cannot switch the rule off. That every room has a
   path of unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone.
   **There is no list of exceptions.** A finding that is wrong is fixed in the rule, never let through by slug (Darko,

@@ -344,8 +344,9 @@ test("G9 · two ROOMS the dungeon declares never overlap", () => {
   assert.match(portalFindings(w.marks)[0].msg, /spire\/hall overlaps spire\/pantry, and both stand directly in spire\/the-spire inside spire\/the-spire/);
 });
 
-// LAW (Darko, 2026-11-01 07:58/07:59): "Yeah rooms only" / "have the dungeon represented by some kind of class in code
-// that has a list of dungeon rooms which the no overlap thing checks" / "Everything should be allowed to overlap like normal".
+// LAW (Darko, 2026-11-01 07:58): "Yeah rooms only"; (07:59, two messages): "i'm thinking maybe just have the dungeon
+// represented by some kind of class in code that has a list of dungeon rooms which the no overlap thing checks" and
+// "Everything should be allowed to overlap like normal".
 test("G9 · what the dungeon does not declare as a room overlaps freely: a rug and a dish (the S144 case), a thing across a wall, a thing on a thing", () => {
   const w = world();
   const sited = (id, x, y, ww, hh) => ({ id, kind: "sited", by: "spire", at: { x, y }, extent: { w: ww, h: hh }, body: id });
@@ -376,6 +377,14 @@ test("G9 · a declared room that names no mark, a mark outside the dungeon, or a
   const v = world();
   v.marks.find((m) => m.id === SPIRE).rooms = "spire/hall";
   assert.deepEqual(portalFindings(v.marks).map((f) => `${f.rule} ${f.mark}`), ["rooms-name-marks spire/the-spire"]);
+});
+
+test("G9 · a declared room with no extent is red: a point is no place on the ground to tile", () => {
+  const w = declare(world(), "spire/post");
+  w.marks.push({ id: "spire/post", kind: "sited", by: "spire", at: { x: 1050, y: 1050 }, body: "A lamp post, a point with no extent." });
+  const found = portalFindings(w.marks);
+  assert.deepEqual(found.map((f) => `${f.rule} ${f.mark}`), ["rooms-name-marks spire/the-spire"]);
+  assert.match(found[0].msg, /spire\/post has no extent/, "the finding is the no-extent clause, not the outside-the-dungeon one");
 });
 
 test("G9 · a room's contents are its children, never its overlapping siblings; the open Grounds are not held to it", () => {

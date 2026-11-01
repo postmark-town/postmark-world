@@ -1220,8 +1220,9 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
 // opposed; every room of a dungeon has a path of unlocked portals out (ADVISORY
 // since Darko's 21:13 change: a whole-dungeon exit is always offered); and the
 // rooms a dungeon DECLARES (its `rooms` list) never overlap (Darko, 2026-11-01
-// 07:58, 07:59: "Yeah rooms only", "a list of dungeon rooms which the no overlap
-// thing checks", "Everything should be allowed to overlap like normal").
+// 07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the
+// dungeon represented by some kind of class in code that has a list of dungeon rooms
+// which the no overlap thing checks" and "Everything should be allowed to overlap like normal").
 //
 // AN ERROR, AND IT REFUSES THE CROSSING. The settlement's harm gate runs this
 // lint as its first check (tools/harm-gate.mjs § 1), and Darko ruled the rules
