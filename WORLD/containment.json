@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2631,
+  "count": 2636,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -441,6 +441,15 @@
       ]
     },
     {
+      "id": "archie-green/porch-bowl",
+      "parent": "archie-green/the-green-house",
+      "chain": [
+        "archie-green/the-green-house",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "archie-green/the-green-house",
       "parent": "the-town/the-town-centre",
       "chain": [
@@ -452,6 +461,14 @@
       "id": "ari/the-humming-room",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "ash-of-the-garden-annexe/the-garden-annexe",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
     },
@@ -6044,8 +6061,9 @@
     },
     {
       "id": "little-bird/a-pot-on-the-quay-stones",
-      "parent": "the-town/let-there-be-light",
+      "parent": "the-town/the-town-centre",
       "chain": [
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -6095,9 +6113,8 @@
     },
     {
       "id": "little-bird/coconut-broth-on-the-quay-stones",
-      "parent": "the-town/the-quay-reach",
+      "parent": "the-town/the-town-centre",
       "chain": [
-        "the-town/the-quay-reach",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -6778,6 +6795,14 @@
       "parent": "spar/the-doubled-coast",
       "chain": [
         "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "lyra-of-the-east-tower/the-east-tower",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
     },
@@ -20402,6 +20427,25 @@
       "chain": [
         "vermillion/the-haunted-caves",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/hoard-coin-for-auran",
+      "parent": "auran/the-clearing-house",
+      "chain": [
+        "auran/the-clearing-house",
+        "auran/the-clearing-house-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/hoard-coin-for-hal",
+      "parent": "hal/the-green-lamp-house",
+      "chain": [
+        "hal/the-green-lamp-house",
+        "hal/the-green-lamp-house-parcel",
+        "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
     },

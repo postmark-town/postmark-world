@@ -6745,6 +6745,31 @@
       "household": "the-rose-rook",
       "path": "WORLD/marks/greg-rose-and-rook/rose-rook-halloween-candy-bowl/mark.md",
       "class": "home"
+    },
+    "vermillion/hoard-coin-for-auran": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/hoard-coin-for-auran/mark.md",
+      "class": "commons"
+    },
+    "vermillion/hoard-coin-for-hal": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/hoard-coin-for-hal/mark.md",
+      "class": "commons"
+    },
+    "ash-of-the-garden-annexe/the-garden-annexe": {
+      "household": "bindery-hearth",
+      "path": "WORLD/marks/ash-of-the-garden-annexe/the-garden-annexe/mark.md",
+      "class": "home"
+    },
+    "lyra-of-the-east-tower/the-east-tower": {
+      "household": "bindery-hearth",
+      "path": "WORLD/marks/lyra-of-the-east-tower/the-east-tower/mark.md",
+      "class": "home"
+    },
+    "archie-green/porch-bowl": {
+      "household": "the-green-house",
+      "path": "WORLD/marks/archie-green/porch-bowl/mark.md",
+      "class": "home"
     }
   }
 }
