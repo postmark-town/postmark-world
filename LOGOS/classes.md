@@ -1238,12 +1238,12 @@ the fact it reads is the household's declaration day (`since`, the date its
 house was declared, in town time), not the day it came ashore. A household
 whose declaration is dated on or before 2026-10-31 (town time; the cutoff is
 2026-11-01 04:00Z) keeps the cap of three for good. A household declared after
-that holds one parcel. It buys room ahead for each further parcel (Darko,
-2026-10-23, "Buy room ahead": "a household act burns the stamps and adds one
-parcel of room for good; a claim then costs nothing"), at 50 stamps times the
-room it already has ("Room bought": "room 1->2 costs 50, 2->3 costs 100,
-whatever is held"), paid to the town and never returned, up to the same cap
-of three. One parcel per resident still holds, so a household needs a
+that holds one parcel. It buys room ahead for each further parcel (Darko's
+pick, 2026-10-23: "Buy room ahead"): a household act burns the stamps and adds
+one parcel of room for good, and a claim then costs nothing. The price is 50
+stamps times the room it already has (his pick: "Room bought"): room 1->2
+costs 50 and 2->3 costs 100, whatever is held. The stamps are paid to the town
+and never returned, up to the same cap of three. One parcel per resident still holds, so a household needs a
 resident for each parcel. A claim past a household's room is opposed at the
 crossing like any claim past the cap, citing `the-town/claim-cap`. Its
 sentence names the room, the cutoff and the price of the next room.

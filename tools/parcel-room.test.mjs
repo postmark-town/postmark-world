@@ -27,7 +27,7 @@ const households = { ash: "hh:the-rowan", birch: "hh:the-rowan", cedar: "hh:the-
 const three = [P("ash/one", "ash", 0, NOV(2)), P("birch/two", "birch", 500, NOV(3)), P("cedar/three", "cedar", 1000, NOV(4))];
 const foldWith = (marks, houseFacts) => fold({ marks: marks.map((m) => ({ ...m })), terrain: { features: [] }, stakes: [], tick: 1, households, houseFacts });
 
-test("the law's numbers: declared on or before 10-31 in town time, one parcel, 50 stamps per parcel held", () => {
+test("the law's numbers: declared on or before 10-31 in town time, one parcel, 50 stamps times the room already bought", () => {
   assert.equal(PARCEL_SETTLED_BY, "2026-11-01T04:00:00Z");
   assert.equal(PARCEL_SETTLED_BY_DAY, "2026-10-31");
   // the day is the town's own date of the instant just before the cutoff
