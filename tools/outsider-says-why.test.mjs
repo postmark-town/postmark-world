@@ -74,8 +74,13 @@ function fakeHost(name) {
 function pageHarness() {
   const requests = [], rendered = [];
   const head = fakeHost("the Telling's head"), mapSide = fakeHost("the map side");
+  // BOTH HOSTS START WITH A CHILD, so where the note is put among them is a real check: an empty fake host cannot tell
+  // prepend from append (the re-review's note). The Telling's head holds its sub line first; the map side holds the painting.
+  const sub = { name: "the Telling's sub line", parentElement: null }, minimap = { name: "the painting", parentElement: null };
+  head.append(sub);
+  mapSide.append(minimap);
   const note = { textContent: "", hidden: true, parentElement: null };   // the element the painter finds at .wv-lens-note
-  head.append(note);                                                     // where the markup puts it
+  head.append(note);                                                     // where the markup puts it: after the sub line
   const phone = { on: false };                                           // under 720 px, which the page asks matchMedia
   const resized = [];
   const hosts = { ".wv-lens-note": note, ".wv-viewhead": head, ".wv-map .wv-sticky": mapSide };
@@ -116,7 +121,7 @@ function pageHarness() {
     globalThis.probe = { state, readCache, read: () => loadResidentRead(null, state.handle), render: () => renderCurrent(),
       fold: () => applyPaintingOnly(), resize: () => onViewerResize() };
   `, context);
-  return { probe: context.probe, requests, rendered, resized, note, head, mapSide, phone };
+  return { probe: context.probe, requests, rendered, resized, note, head, mapSide, sub, minimap, phone };
 }
 
 const ownRead = (extra = {}) => ({ handle: "rig-actor", records: {}, ...extra });
@@ -221,7 +226,8 @@ async function lensOnWithLine(h, line = LINE) {
 
 test("a phone has no Telling (under 720 px .wv-view is display:none): the line is drawn at the map side, where the toggle is", async () => {
   const h = pageHarness();
-  assert.equal(h.note.parentElement, h.head, "control: the markup puts it in the Telling's head");
+  assert.deepEqual(h.head.children, [h.sub, h.note], "control: the markup puts it in the Telling's head, after the sub line");
+  assert.deepEqual(h.mapSide.children, [h.minimap], "control: the map side holds the painting and nothing else");
   h.phone.on = true;
   await lensOnWithLine(h);
   h.probe.render();
@@ -229,8 +235,9 @@ test("a phone has no Telling (under 720 px .wv-view is display:none): the line i
   assert.equal(h.note.parentElement, h.mapSide, "out of the Telling's head, into the map's side");
   assert.equal(h.note.textContent, LINE);
   assert.equal(h.note.hidden, false);
-  assert.equal(h.mapSide.children[0], h.note, "at the top of the map side, as the toast is");
-  assert.equal(h.head.children.length, 0, "and no copy is left in the hidden head");
+  // ⚑ THE FLIP: host.prepend(el) → host.append(el) for the map side → the line lands under the painting; this reds (the host is not empty)
+  assert.deepEqual(h.mapSide.children, [h.note, h.minimap], "at the TOP of the map side, above the painting, as the toast is");
+  assert.deepEqual(h.head.children, [h.sub], "and no copy is left in the hidden head");
 });
 
 test("the Telling folded away (.wv-view is visibility:hidden): the line is drawn at the map side too", async () => {
@@ -249,7 +256,8 @@ test("a wide page with the Telling showing keeps the line in the Telling's head,
   await lensOnWithLine(h);
   h.probe.render();
   assert.equal(h.note.parentElement, h.head, "wide, unfolded: the head");
-  assert.equal(h.mapSide.children.length, 0, "control: nothing is at the map side");
+  assert.deepEqual(h.head.children, [h.sub, h.note], "after the sub line, as the markup has it");
+  assert.deepEqual(h.mapSide.children, [h.minimap], "control: nothing of the line is at the map side");
   h.phone.on = true;
   h.probe.render();
   assert.equal(h.note.parentElement, h.mapSide, "control: it went to the map side");
@@ -257,7 +265,9 @@ test("a wide page with the Telling showing keeps the line in the Telling's head,
   h.probe.render();
   // ⚑ THE FLIP: paintLensNote never moves the element back → it stays at the map side over a Telling that shows; this reds
   assert.equal(h.note.parentElement, h.head, "wide again: back in the head");
-  assert.equal(h.mapSide.children.length, 0);
+  assert.deepEqual(h.mapSide.children, [h.minimap]);
+  // ⚑ THE FLIP: host.append(el) → host.prepend(el) for the head → the line lands above the sub line; this reds (the host is not empty)
+  assert.deepEqual(h.head.children, [h.sub, h.note], "and after the sub line again, not before it");
   assert.equal(h.note.textContent, LINE);
 });
 
