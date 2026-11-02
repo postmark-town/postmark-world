@@ -62,16 +62,13 @@ test("the Mists stay as they are: past the last keyframe they hold it, and the c
 test("the named candied creatures stand on their own: each has its own crossing, and nothing returns past the 06:00Z cutoff", () => {
   const CUTOFF = Date.parse("2026-11-01T06:00:00Z");
   const named = LAW.named.map((d) => d.id).sort();
-  assert.deepEqual(named, [
-    "creature:candied-bat-lumber-room", "creature:candied-jetto-the-star-chapel", "creature:candied-raven-mirror-room",
-    "creature:candied-wolf-hall-of-keepers", "creature:candied-wolf-hall-of-keepers-again",
-  ], "the season's five declarations");
+  // until WLD-135 this asserted the season's five declarations (bat, raven, two wolves, Jetto); they are retired
+  assert.deepEqual(named, [], "no named declaration remains: the season's five are retired");
   for (const d of LAW.named) {
     assert.ok(Number.isInteger(d.from_crossing), `${d.id} names its own from_crossing, so the class's off dial neither moves nor needs it`);
     assert.ok(d.return_until == null || Date.parse(d.return_until) <= CUTOFF,
       `${d.id}: a returning declaration ends no later than 2026-11-01T06:00Z (strictly-before settlements only); the rest are written once and never return`);
   }
   const returning = LAW.named.filter((d) => d.return_until != null).map((d) => d.id).sort();
-  assert.deepEqual(returning, ["creature:candied-bat-lumber-room", "creature:candied-raven-mirror-room", "creature:candied-wolf-hall-of-keepers-again"],
-    "the three that came back each week; the original wolf and Jetto were declared once and ended");
+  assert.deepEqual(returning, [], "none returns: the three that came back each week are retired with the rest");
 });
