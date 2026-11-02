@@ -14650,8 +14650,11 @@ export function mountViewer(appEl) {
     return {
       // the place line is in the key: it changes when the page learns a kind is a thing (not ground)
       key: ["resident", handle, worldEpoch, inv ? "read" : "-", card ? "card" : "-", JSON.stringify(profile.facts), profile.picture ?? "", profile.pronouns ?? "", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
-      handle, residentLink: false,
-      residentHref: residentHref(handle),
+      // THE WAY TO THEIR PAGE STAYS ON (WLD-145, Darko 2026-11-01 19:18: "we somehow lost that
+      // functionality"). This view was cut from a mark's, whose `residentLink: false` is right
+      // (a mark's handle is its author) and wrong here (the handle IS the resident), so the
+      // column drew no link. It also carried a `residentHref` the column never read.
+      handle,
       kicker: face.household || "a resident",
       title: face.name || handle,
       pronouns: profile.pronouns,

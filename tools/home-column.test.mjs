@@ -18,11 +18,15 @@
 // sentence.
 import test from "node:test";
 import assert from "node:assert/strict";
+import vm from "node:vm";
 import { readFileSync } from "node:fs";
 import {
   parseHomeMarkdown, parseInline, safeLinkHref, homeHandleForParcel, isParcelMark,
   homeColumnModel, renderHomeColumn, createHomeColumn,
 } from "../spectator/home-column.mjs";
+import {
+  residentProfileView, residentHref, residentFace, walkerHoverId, walkerHandleFromHoverId, walkingLabel,
+} from "../spectator/viewer.mjs";
 
 // ── the stand-in ────────────────────────────────────────────────────────────
 
@@ -572,4 +576,72 @@ test("a resident's pronouns sit in the title row beside the name, as text; absen
   const none = render(homeColumnModel({ handle: "sb-dov", title: "Dov" }));
   assert.equal(byClass(none, "wv-homecol-pronouns").length, 0, "nothing written, nothing shown");
   assert.equal(homeColumnModel({ handle: "x", pronouns: "   " }).pronouns, null, "blank is not a word");
+});
+
+// ── THE WAY TO A RESIDENT'S PAGE (WLD-145; WLD-125 for the rest of the columns) ──
+//
+// Darko, 2026-11-01 19:18: "where (if at all) have we filed fixing the world page so resident
+// columns link back to the resident page? like by clicking their name? we somehow lost that
+// functionality." The column has always drawn "the resident page →" for a view that does not
+// turn it off. A mark's view and a creature's turn it off (their handle is an author, or the
+// town). The resident's own view was cut from a mark's and kept the switch (b06a478c8), so the
+// one column whose handle IS the resident drew no link.
+
+const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
+
+/** A closure function's own text from viewer.mjs, two-space indented (as outsider-and-fill.test.mjs lifts loadResidentRead). */
+function bodyOf(name) {
+  const text = SOURCE.match(new RegExp(`^  function ${name}\\([^\\n]*\\) \\{[\\s\\S]*?^  \\}`, "m"))?.[0];
+  assert.ok(text, `source extraction: ${name}`);
+  return text;
+}
+
+/**
+ * The view the page builds for a resident's column: residentColumnView's own body, run against
+ * stand-ins for the page's state that nothing asserted here reads. The card is synthetic.
+ */
+function residentViewFor(card, handle = "rig-ash") {
+  const context = vm.createContext({
+    residentProfileView, residentHref, walkerHandleFromHoverId, walkingLabel,
+    residentHoldLines: () => null, handsLines: () => null,
+    walkState: { walkers: [{ handle, standing: true }] }, hands: { for: null, holdings: null },
+    faceOf: (h) => residentFace(h, { name: "Rig Ash", household: "rig-house" }),
+    walkerPlace: () => "in the Town Centre", residentCloseLook: () => null, residentCard: () => card,
+    worldEpoch: 1, state: { handle: "someone-else" }, onResidentPath: () => false,
+    holdingFacts: () => [], closeLooks: new Map(), asWho: () => "", markIdentity: (m) => m.id, byId: new Map(),
+  });
+  vm.runInContext(bodyOf("residentColumnView"), context);
+  const made = context.residentColumnView(walkerHoverId(handle));
+  assert.ok(made, "the page builds a column for a resident who is on the map");
+  return made;
+}
+
+test("a view turns the way to the resident page off with `residentLink: false`, and only then", () => {
+  const host = element("aside");
+  const column = createHomeColumn({ doc, host, imagePath: shelfGate, residentHref: (h) => `/residents/${h}/` });
+  column.open({ ...view("a/p", "aaa"), door: { description: "words" } });
+  assert.equal(byClass(host, "wv-homecol-resident")[0]?.getAttribute("href"), "/residents/aaa/", "a view that says nothing gets the way to its handle's page");
+  column.open({ ...view("b/p", "bbb"), door: { description: "words" }, residentLink: false });
+  assert.equal(byClass(host, "wv-homecol-resident").length, 0, "a view that turns it off gets none");
+  // ⚑ THE FLIP: paint `residentHref: null` for every view (drop the call in createHomeColumn) → the first line reds;
+  //   ignore view.residentLink → the second reds
+});
+
+test("A RESIDENT'S COLUMN LINKS TO THEIR PAGE: the view the page builds does not turn it off, and the real column draws it", () => {
+  const v = residentViewFor({ profile: { bio: "A figure by the lamp." } });
+  assert.notEqual(v.residentLink, false, "the resident's view leaves the way to their page on");
+  const host = element("aside");
+  createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+  const [out] = byClass(host, "wv-homecol-resident");
+  assert.equal(out?.getAttribute("href"), "/residents/rig-ash/", "the link is the page's own resident route for this handle");
+  assert.equal(serialize(out), "the resident page →");
+  // ⚑ THE FLIP: put `residentLink: false,` back beside `handle,` in residentColumnView → this reds at the notEqual
+});
+
+test("[pin] a mark's column and a creature's column still turn the resident link off: their handle is an author or the town, not a resident", () => {
+  // text pins, because those two builders are closures far too wide to run here; the behaviour they
+  // switch is the controller's, tested above. WLD-125 decides, link by link, which of them gain one.
+  assert.match(bodyOf("markColumnView"), /residentLink: false,/, "a mark's handle is the household that made it");
+  assert.match(bodyOf("creatureColumnView"), /residentLink: false,/, "a creature's handle is the town's");
+  // ⚑ THE FLIP: delete either line → its assertion reds, and not the other
 });
