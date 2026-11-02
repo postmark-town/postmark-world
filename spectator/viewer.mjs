@@ -5904,10 +5904,9 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-view { overflow-x:auto; min-width:0; min-height:60vh; border-right:1px solid var(--line);
   transition:opacity .22s ease, visibility 0s; }
 .wv-telling { padding:16px 20px 26px; }
-/* One pane per resident of the household, each built when that resident is
-   first selected and kept, all but one hidden. The switch is this attribute
-   moving: for a pane that is still true, the markup, the engine read and the
-   cells' handlers are already paid for by the time the reader clicks. */
+/* One pane per resident of the household, built ahead, all but one hidden. The
+   switch is this attribute moving: the markup, the engine read and the cells'
+   handlers are already paid for by the time the reader clicks. */
 .wv-telling-pane[hidden] { display:none; }
 /* collapsed to a zero-width column rather than display:none, because a slide is
    the point and display does not animate. The panel keeps its box and simply has
