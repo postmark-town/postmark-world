@@ -5702,8 +5702,12 @@ const DRAW_DIALS = [
   { key: "placed_art_min_m", label: "hangs its picture above (m)", min: 25, max: 4000, step: 25 },
 ];
 
-const STYLE = `
-.wv { --night:#14171d; --panel:#1c2129; --panel2:#20262f; --line:#2e3542;
+// The three slices of the shell that the 3D view shares with this one (WLD-144;
+// WLD-105: "Where the World exports a thing, import it"). Each is the exact text
+// that STYLE carried at that spot, interpolated back in place below, so the page
+// emits the same bytes it always did. The root rule sets the defaults (amber, gold,
+// the draft grey…) on .wv itself; a host's season frame overrides them there.
+export const WV_ROOT_CSS = `.wv { --night:#14171d; --panel:#1c2129; --panel2:#20262f; --line:#2e3542;
   --paper:#e8e0cf; --dim:#9a9280; --amber:#e8c56a; --amber-dark:#b8964a; --err:#d98a7a;
   --you:#e0654a; /* ember — "this is you", softened from alarm-red (Keemin 2026-07-30) */
   --mono:ui-monospace,"SF Mono",Consolas,Menlo,monospace;
@@ -5722,7 +5726,19 @@ const STYLE = `
      this world is warm, so a draft reads as not yet of it. */
   --draft:#9aa0ab; --draft-dark:#5d636e;
   background:var(--night); color:var(--paper); font:16px/1.55 Georgia,"Times New Roman",serif;
-  min-height:100vh; }
+  min-height:100vh; }`;
+export const WV_EXTENT_CSS = `.wv-extent { display:inline-flex; align-items:center; gap:4px; opacity:.8; }
+.wv-extent svg { display:block; }
+.wv-extent svg rect, .wv-extent svg polygon { fill:rgba(154,146,128,.18); stroke:var(--dim); stroke-width:1; }
+.wv-extent-t { font-size:.66rem; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap; }`;
+export const WV_ENTER_CSS = `/* the door, on the card it belongs to */
+.wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
+  border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
+.wv-enter:hover { background:rgba(224,160,42,.12); }
+.wv-enter[disabled] { opacity:.6; cursor:default; }`;
+
+const STYLE = `
+${WV_ROOT_CSS}
 .wv * { box-sizing:border-box; }
 /* ONE FOCUS RING for the whole viewer. Four controls used to take the browser's
    outline away and lean on their hover style instead — which leaves someone
@@ -6039,10 +6055,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-chip.stamps { border-color:var(--stamp-violet-dark); color:var(--stamp-violet); }
 .wv-chip.signal { border-color:var(--amber-dark); color:var(--amber); }
 .wv-chip.dim { opacity:.6; }
-.wv-extent { display:inline-flex; align-items:center; gap:4px; opacity:.8; }
-.wv-extent svg { display:block; }
-.wv-extent svg rect, .wv-extent svg polygon { fill:rgba(154,146,128,.18); stroke:var(--dim); stroke-width:1; }
-.wv-extent-t { font-size:.66rem; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap; }
+${WV_EXTENT_CSS}
 .wv-cluster { margin-top:7px; font-size:.8rem; font-style:italic; color:var(--amber); opacity:.85; }
 .wv-tallies { margin-top:22px; padding-top:10px; font-size:.82rem; color:var(--dim); border-top:1px solid var(--line); max-width:76ch; }
 /* what this standpoint has CROSSED INTO — never where it is standing (R15) */
@@ -6057,11 +6070,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   border-left:5px solid var(--amber); background:rgba(224,160,42,.07); }
 .wv-int-company { margin:8px 0 0; font-size:.86rem; font-style:italic; color:var(--dim); }
 .wv-int-plaque > .wv-int-company:first-child { margin-top:0; }
-/* the door, on the card it belongs to */
-.wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
-  border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
-.wv-enter:hover { background:rgba(224,160,42,.12); }
-.wv-enter[disabled] { opacity:.6; cursor:default; }
+${WV_ENTER_CSS}
 .wv-cross-sheet.is-far .wv-walk-enter { border-color:var(--amber); color:var(--amber); }
 .wv-cross-sheet { margin:10px 0 0; padding:10px 12px; border-left:4px solid var(--amber);
   background:rgba(224,160,42,.07); font-size:.92rem; }
