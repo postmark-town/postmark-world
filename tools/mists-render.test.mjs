@@ -206,9 +206,10 @@ test("the creatures: seeded by the crossing, sparse at 244 and populated by 284,
 // Halloween creatures and the decorations." The Mists stay as they are; the creatures painted into them stand
 // through the last crossing of Halloween and none are drawn after it. Crossing-driven, like the Mists: a dial
 // turned back to a Halloween crossing still shows what stood then.
-// CAN-FAIL FLIPS: drop the gate in mistsCreatures (the gate case reds); gate on >= (the last crossing reds);
-// move `last` a crossing either way (the schedule case and the gate case red). The no-Mists case is the control
-// that stays green through those, and reds only if the wall check goes.
+// CAN-FAIL FLIPS (each run alone): drop the gate in mistsCreatures (the gate case reds); gate on >= (the gate
+// case and "populated by 284" red); move `last` to 285 (only the schedule case reds: the gate case reads the
+// table's own `last`) or to 283 (the schedule case and "populated by 284" red); drop the wall check (the
+// no-Mists case reds, by TypeError, and "populated by 284" with it).
 const HALLOWEEN_END = Date.parse("2026-11-01T07:00:00Z");   // postmark-site src/lib/halloween-frame.mjs, HALLOWEEN_FRAME.until
 const crossingStart = (n) => CROSSING_EPOCH_UTC + n * CROSSING_MS;
 const creaturesAt = (n) => mistsCreatures(mistsAt(n, MISTS), { first: 244, keep: KEEP });
