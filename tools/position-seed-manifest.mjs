@@ -12,7 +12,7 @@
 // resident, what the record can say about where they are, and what a placement
 // would have to assert to make that durable.
 //
-// It lives beside `seeding/manifest.json` and for the same reason: `seeding/` is
+// It lives in `seeding/` (position-seed-manifest.json) and for the same reason: `seeding/` is
 // outside `WORLD/`, because WORLD/ holds only what is backed. A manifest is a
 // build intermediate a human reads before anything lands.
 //

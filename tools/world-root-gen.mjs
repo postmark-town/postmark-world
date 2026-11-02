@@ -234,10 +234,6 @@ const worldExtent = 320000; // ~±160 km: contains the on-map world and the far 
 if (LAW_ONLY) writeRootLaw();
 else writeRootAndTerrain();
 
-function allFeatures() {
-  return [...(skeleton.features ?? []), ...(skeleton.far_features ?? [])];
-}
-
 function writeRootAndTerrain() {
   // root — the light itself; its body is the charter, its mechanic the day-axis
   writeMarkRaw("", {

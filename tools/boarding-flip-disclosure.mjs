@@ -52,7 +52,6 @@ import {
 } from "./vessel.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const WHEELHOUSE = "the-town/the-wheelhouse";
 
 const argOf = (flag) => { const i = process.argv.indexOf(flag); return i === -1 ? null : process.argv[i + 1]; };
 const AS_JSON = process.argv.includes("--json");

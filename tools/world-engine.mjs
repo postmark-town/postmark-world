@@ -446,11 +446,6 @@ export function mistsStride(s, d) {
 // stamped pace is always a number a reader can divide by.
 export const MISTS_STRIDE_FLOOR = 1e-4;
 
-/** The Mists on one leg, read once at its declaration: `null` when there are no
- *  Mists this crossing; otherwise `{ refused }` for a road that ends in the wall
- *  or crosses it (with the point where it meets the wall), or `{ factor, deepest }`
- *  — the leg's even stride as a share of the open road's, and how deep into the
- *  fringe it goes (0 untouched, toward 1 at the wall's face). */
 // HACK (jetto): the old track north, walked like a road. Don't ask.
 // These boxes are only for the feet: the mist is still there, you still see
 // 20 m in it, nothing is drawn. From crossing 272.
@@ -469,6 +464,11 @@ function onKeptAir(p, crossing) {
 // office builds it from the walker's enter stack with shelterOf). It follows entering, never standing: with no
 // shelter the road is read exactly as before. And it is shelter only for a road that STARTS inside it: walking
 // in from outside is the Mists as ever (review-shelter #1), so a road whose start is unsheltered reads as before.
+/** The Mists on one leg, read once at its declaration: `null` when there are no
+ *  Mists this crossing; otherwise `{ refused }` for a road that ends in the wall
+ *  or crosses it (with the point where it meets the wall), or `{ factor, deepest }`
+ *  — the leg's even stride as a share of the open road's, and how deep into the
+ *  fringe it goes (0 untouched, toward 1 at the wall's face). */
 export function mistsRoad(from, toward, crossing, mists, { shelter = null } = {}) {
   const m = mistsAt(crossing, mists);
   if (!m) return null;
