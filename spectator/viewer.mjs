@@ -5889,6 +5889,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   color:var(--dim); font-family:var(--mono); font-weight:400; }
 .wv-view-sub { margin:5px 0 0; color:var(--dim); font-size:.76rem; line-height:1.5;
   font-style:italic; max-width:48ch; }
+.wv-lens-note { margin:6px 0 0; font-size:.76rem; line-height:1.5; max-width:48ch; }
 .wv-viewhead + .wv-telling { padding-top:12px; }
 
 /* Two panels, no bars. Both are content to their own edges — the painting runs
@@ -7236,6 +7237,7 @@ const MARKUP = `
     <div class="wv-viewhead">
       <h2>The Telling</h2>
       <p class="wv-view-sub">closer to how your agent sees the world — the record told in words from where you stand, never drawn</p>
+      <p class="wv-lens-note wv-quiet" role="status" hidden></p>
     </div>
     <div class="wv-telling"><div class="wv-quiet">opening your eyes…</div></div>
   </section>
@@ -7638,6 +7640,10 @@ export const mineForSight = (outsider, mine) => (outsider ? new Map() : mine);
  *  ignores the undeclared query key and answers your own sight, so an outsider
  *  read is believed only when it says `lens: "outsider"`. Pure. */
 export const lensAnswered = (asked, read) => !asked || read?.lens === OUTSIDER_LENS;
+/** The line the office says when the lens changed nothing for this household (POS-823: "when the World's outsider
+ *  view changes nothing for a household, say why"), exactly as it sent it; "" when it sent none. The office holds the
+ *  whole world, so it alone knows; this page keeps no rule and no wording of its own. Only a lens read's line counts. Pure. */
+export const lensNoteOf = (read) => (read?.lens === OUTSIDER_LENS && typeof read?.lens_note === "string" ? read.lens_note.trim() : "");
 /** Is a read that just landed still the one the page wants? The office, the
  *  actor AND the lens it was asked under must all still hold (WLD-110 F1). Pure. */
 export const readStillWanted = ({ handle, office, lens }, now) => handle === now.handle && office === now.office && lens === now.lens;
@@ -15991,6 +15997,17 @@ export function mountViewer(appEl) {
       ? "viewing as an outsider: the world as a stranger sees it (read-only). Click to see as yourself again."
       : "view as an outsider: the world as a stranger sees it, as if your household owned nothing (read-only)";
   }
+  // THE OUTSIDER VIEW SAYS WHY IT CHANGED NOTHING (POS-823): the office's line, as it sent it, at the head of the
+  // Telling. The page keeps no rule and no wording of its own: it reads the line off the lens read it holds for this
+  // standpoint and crossing (the cache key carries the lens, so with the lens off it finds your own sight, which has
+  // none), and an office that sends none shows nothing.
+  function paintLensNote() {
+    const el = root.querySelector(".wv-lens-note");
+    if (!el) return;
+    const line = lensNoteOf(readCache.get(residentStandpointKey(null, state.handle)));
+    el.textContent = line;
+    el.hidden = !line;
+  }
   function outsiderUnavailable() {
     if (!state.outsider) return;
     state.outsider = false;
@@ -16019,6 +16036,7 @@ export function mountViewer(appEl) {
   }
   function renderCurrent() {
     paintOutsiderButton();
+    paintLensNote();
     renderStandpointReadouts();
     if (state.view === "telling") renderTelling();
     renderModeControls();

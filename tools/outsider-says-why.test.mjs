@@ -77,7 +77,6 @@ function pageHarness() {
     const readCache = new Map(), readPending = new Map();
     let readError = null, byId, homeSet, mapCtx = {};
     const mineSet = { marks: new Map() };
-    const onResidentPath = () => !!state.handle;
     ${bodyOf("residentStandpointKey")}
     ${bodyOf("loadResidentRead")}
     ${bodyOf("paintLensNote")}
@@ -125,7 +124,7 @@ test("lens off: the line goes, even with the lens read still cached and carrying
   assert.equal(h.note.hidden, false, "control: it was showing");
   h.probe.state.outsider = false;
   h.probe.render();
-  // ⚑ THE FLIP: drop the `state.outsider &&` guard in paintLensNote → it keeps showing over the owner's own sight; this reds
+  // ⚑ THE FLIP: drop the `#outsider` suffix from residentStandpointKey → the lens read and your own sight share a slot, the line stays up over the owner's own view; this reds
   assert.equal(h.note.hidden, true);
   assert.equal(h.note.textContent, "");
 });
