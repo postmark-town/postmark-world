@@ -15284,7 +15284,7 @@ export function mountViewer(appEl) {
   // points in the art", and "a card doesn't even tell you if something is a
   // thing or not". So the glance is now the smallest of the three levels he
   // approved ("each shown only when asked for"): the mark's NAME, set BESIDE its
-  // drawn ground (positionBubbles passes the footprint as `reach`), raised only
+  // drawn ground (positionBubbles passes the footprint as `reach`), raised
   // at once, in the same frame as the highlight (see raiseGlance). No body: the
   // words are the click's, in the column.
   //
