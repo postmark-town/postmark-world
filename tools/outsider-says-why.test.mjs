@@ -29,8 +29,10 @@ const { lensQuery, mineForSight, lensAnswered, readStillWanted, residentReadKey,
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SOURCE = readFileSync(join(HERE, "..", "spectator", "viewer.mjs"), "utf8");
 
-// the line the office sends today (typed here on purpose; the page must show whatever string it is handed)
-const LINE = "Nothing here changes: nothing of yours is in a closed place, and a place that isn't closed is open to everyone.";
+// the line the office sends today (typed here on purpose; the page must show whatever string it is handed).
+// Until 2026-11-02 this typed "Nothing here changes: nothing of yours is in a closed place, ..."; the settled line speaks of what
+// strangers see of your PUBLISHED marks, which is true on this page too, where the lens also drops a household's drafts.
+const LINE = "Strangers see your published marks just as you do: none of them is in a closed place.";
 
 // ── the pure half: which string the page may show ───────────────────────────
 test("lensNoteOf: the office's line while the read is a lens read, and nothing otherwise", () => {
@@ -53,37 +55,68 @@ function bodyOf(name) {
   return text;
 }
 
+// a one-line `const name = ...;` at the closure's level (the page's one resize handler is written so)
+function constOf(name) {
+  const text = SOURCE.match(new RegExp(`^  const ${name} = [^\\n]*$`, "m"))?.[0];
+  assert.ok(text, `source extraction: ${name}`);
+  return text;
+}
+
+// a fake DOM host that moves an element the way append and prepend do: out of its old parent, into the new one
+function fakeHost(name) {
+  const host = { name, children: [] };
+  const take = (el) => { if (el.parentElement) el.parentElement.children = el.parentElement.children.filter((c) => c !== el); el.parentElement = host; };
+  host.append = (el) => { take(el); host.children.push(el); };
+  host.prepend = (el) => { take(el); host.children.unshift(el); };
+  return host;
+}
+
 function pageHarness() {
   const requests = [], rendered = [];
-  const note = { textContent: "", hidden: true };   // the element the painter finds at .wv-lens-note
+  const head = fakeHost("the Telling's head"), mapSide = fakeHost("the map side");
+  const note = { textContent: "", hidden: true, parentElement: null };   // the element the painter finds at .wv-lens-note
+  head.append(note);                                                     // where the markup puts it
+  const phone = { on: false };                                           // under 720 px, which the page asks matchMedia
+  const resized = [];
+  const hosts = { ".wv-lens-note": note, ".wv-viewhead": head, ".wv-map .wv-sticky": mapSide };
   const context = vm.createContext({
     residentReadKey, lensQuery, mineForSight, lensAnswered, readStillWanted, OUTSIDER_LENS, lensNoteOf: viewer.lensNoteOf,
-    requests, rendered, note,
+    requests, rendered, note, phone, resized,
     fetch: (url) => new Promise((resolve) => { requests.push({ url, answer: (j) => resolve({ ok: true, json: async () => j }) }); }),
     authHeaders: () => ({}), residentById: () => new Map(),
     loadTownHouses: () => {}, loadHands: () => {}, withTownHouses: () => {}, buildHomeSet: () => new Set(), allMarks: () => [],
     outsiderUnavailable: () => {},
-    root: { querySelector: (selector) => (selector === ".wv-lens-note" ? note : null) },
+    root: { classList: { toggle: () => {} }, querySelector: (selector) => hosts[selector] ?? null },
     // everything else renderCurrent calls: it is the paint spine, so each is a counted no-op here
     paintOutsiderButton: () => rendered.push("button"), renderStandpointReadouts: () => {}, renderTelling: () => rendered.push("telling"),
     renderModeControls: () => {}, renderSpectatorCoordinate: () => {}, renderEnterExitPanel: () => {}, syncScene: () => {},
     standpointKey: () => "k", loadMinimap: () => {},
+    // and what applyPaintingOnly and the resize handler call
+    renderBubbles: () => {}, positionBubbles: () => resized.push("bubbles"), placeTour: () => {}, drawOverlay: () => {},
+    sizeSearchField: () => {}, seatRoomCard: () => {},
+    setTimeout: () => 0, clearTimeout: () => {}, requestAnimationFrame: () => 0,
   });
   vm.runInContext(`
+    const $ = (r, s) => r.querySelector(s);
     const officeBase = () => "https://office-a.invalid";
     const officeUrl = (path) => officeBase() + path;
-    const state = { handle: "rig-actor", crossing: 500, outsider: false, view: "telling" };
+    const state = { handle: "rig-actor", crossing: 500, outsider: false, view: "telling", paintingOnly: false };
     const walkState = { walkers: [{ handle: "rig-actor" }] };
     const readCache = new Map(), readPending = new Map();
-    let readError = null, byId, homeSet, mapCtx = {};
+    let readError = null, byId, homeSet, mapCtx = {}, lastRadial = null, settleTimer = null;
     const mineSet = { marks: new Map() };
+    const onPhone = () => phone.on;
     ${bodyOf("residentStandpointKey")}
     ${bodyOf("loadResidentRead")}
+    ${bodyOf("tellingShows")}
     ${bodyOf("paintLensNote")}
     ${bodyOf("renderCurrent")}
-    globalThis.probe = { state, readCache, read: () => loadResidentRead(null, state.handle), render: () => renderCurrent() };
+    ${bodyOf("applyPaintingOnly")}
+    ${constOf("onViewerResize")}
+    globalThis.probe = { state, readCache, read: () => loadResidentRead(null, state.handle), render: () => renderCurrent(),
+      fold: () => applyPaintingOnly(), resize: () => onViewerResize() };
   `, context);
-  return { probe: context.probe, requests, rendered, note };
+  return { probe: context.probe, requests, rendered, note, head, mapSide, phone };
 }
 
 const ownRead = (extra = {}) => ({ handle: "rig-actor", records: {}, ...extra });
@@ -171,4 +204,96 @@ test("[pin] the Telling's head holds the element the painter finds, hidden at lo
   assert.ok(head, "the Telling's head");
   assert.match(head, /<p class="wv-lens-note wv-quiet" role="status" hidden><\/p>/, "in the head, hidden until the office has a line");
   assert.match(SOURCE, /^\.wv-lens-note \{/m, "and it has a style");
+  assert.match(SOURCE, /^\.wv-map \.wv-lens-note \{/m, "and a style for the map side, where it goes when the Telling cannot be seen");
+});
+
+// ── the toggle is on the map, so the line goes where the toggle is when the Telling cannot be seen ────────────
+// (POS-823, the review of 5e869ee8, finding A.) Under 720 px `.wv-view` is display:none, and a folded Telling is
+// visibility:hidden, so a line in the Telling's head is never read on a phone or with the Telling folded. The page
+// puts it at the map side then, the host reRender's toast already uses for the folded case. Still display-only:
+// the string is the office's, and the page only decides where it can be read.
+async function lensOnWithLine(h, line = LINE) {
+  h.probe.state.outsider = true;
+  const pending = h.probe.read();
+  h.requests[0].answer(lensRead({ lens_note: line }));
+  await pending;
+}
+
+test("a phone has no Telling (under 720 px .wv-view is display:none): the line is drawn at the map side, where the toggle is", async () => {
+  const h = pageHarness();
+  assert.equal(h.note.parentElement, h.head, "control: the markup puts it in the Telling's head");
+  h.phone.on = true;
+  await lensOnWithLine(h);
+  h.probe.render();
+  // ⚑ THE FLIP: tellingShows ignores the phone → the line stays in the head, which a phone never shows; this reds
+  assert.equal(h.note.parentElement, h.mapSide, "out of the Telling's head, into the map's side");
+  assert.equal(h.note.textContent, LINE);
+  assert.equal(h.note.hidden, false);
+  assert.equal(h.mapSide.children[0], h.note, "at the top of the map side, as the toast is");
+  assert.equal(h.head.children.length, 0, "and no copy is left in the hidden head");
+});
+
+test("the Telling folded away (.wv-view is visibility:hidden): the line is drawn at the map side too", async () => {
+  const h = pageHarness();
+  h.probe.state.paintingOnly = true;
+  await lensOnWithLine(h);
+  h.probe.render();
+  // ⚑ THE FLIP: tellingShows ignores the fold → the line stays in the folded Telling; this reds
+  assert.equal(h.note.parentElement, h.mapSide);
+  assert.equal(h.note.hidden, false);
+  assert.equal(h.note.textContent, LINE);
+});
+
+test("a wide page with the Telling showing keeps the line in the Telling's head, and takes it back when the phone grows wide", async () => {
+  const h = pageHarness();
+  await lensOnWithLine(h);
+  h.probe.render();
+  assert.equal(h.note.parentElement, h.head, "wide, unfolded: the head");
+  assert.equal(h.mapSide.children.length, 0, "control: nothing is at the map side");
+  h.phone.on = true;
+  h.probe.render();
+  assert.equal(h.note.parentElement, h.mapSide, "control: it went to the map side");
+  h.phone.on = false;
+  h.probe.render();
+  // ⚑ THE FLIP: paintLensNote never moves the element back → it stays at the map side over a Telling that shows; this reds
+  assert.equal(h.note.parentElement, h.head, "wide again: back in the head");
+  assert.equal(h.mapSide.children.length, 0);
+  assert.equal(h.note.textContent, LINE);
+});
+
+test("folding the Telling repaints the line at once, without waiting for another render", async () => {
+  const h = pageHarness();
+  await lensOnWithLine(h);
+  h.probe.render();
+  assert.equal(h.note.parentElement, h.head, "control: showing in the head");
+  h.probe.state.paintingOnly = true;   // the toggle's own click does this, then calls applyPaintingOnly
+  h.probe.fold();
+  // ⚑ THE FLIP: drop `paintLensNote();` from applyPaintingOnly → the line is stranded in the folded Telling until some render; this reds
+  assert.equal(h.note.parentElement, h.mapSide);
+  assert.equal(h.note.hidden, false);
+});
+
+test("a resize across the phone breakpoint repaints the line (the page's one resize handler)", async () => {
+  const h = pageHarness();
+  await lensOnWithLine(h);
+  h.probe.render();
+  assert.equal(h.note.parentElement, h.head, "control: showing in the head");
+  h.phone.on = true;                   // the phone is turned upright: the Telling goes, the map stays
+  h.probe.resize();
+  // ⚑ THE FLIP: drop `paintLensNote();` from onViewerResize → the line is stranded in a Telling that is gone; this reds
+  assert.equal(h.note.parentElement, h.mapSide);
+  assert.equal(h.note.hidden, false);
+  assert.ok(h.resized.includes("bubbles"), "control: the handler's own work still ran");
+});
+
+test("with no line the map side holds nothing to read, on a phone too", async () => {
+  const h = pageHarness();
+  h.phone.on = true;
+  h.probe.state.outsider = true;
+  const pending = h.probe.read();
+  h.requests[0].answer(lensRead());    // an office that sends none
+  await pending;
+  h.probe.render();
+  assert.equal(h.note.hidden, true);
+  assert.equal(h.note.textContent, "");
 });
