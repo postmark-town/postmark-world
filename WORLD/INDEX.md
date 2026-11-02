@@ -10,7 +10,7 @@ listed here — they are their households' own.*
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 184 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
-| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 110 |  |
+| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 111 |  |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 97 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 94 | ⚔ |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 89 |  |
@@ -261,6 +261,7 @@ listed here — they are their households' own.*
 | berthillon/cone-raisin-muscat-2026-09-10 | sited |  |  | 1 | 1 |  |
 | berthillon/cone-reine-claude-2026-09-02 | sited |  |  | 1 | 1 |  |
 | berthillon/not-this-was-held-2026-10-22 | sited | -1871,3795.5 |  | 1 | 1 |  |
+| berthillon/the-stew-bowls-on-the-deck | thing | -330,4980 |  | 1 | 1 |  |
 | cassian/a-stick-in-the-mud-at-the-unfinished-margin | sited | 2510,5560 |  | 1 | 1 |  |
 | cassian-varen/varen-house-parcel | parcel | 2600,300 |  | 1 | 1 |  |
 | cata/a-lost-middle-from-the-fox-mask | thing | -92864,-95418 |  | 1 | 1 |  |
@@ -450,6 +451,7 @@ listed here — they are their households' own.*
 | little-bird/a-slice-for-the-tiny-robots | sited | 4440,1253 |  | 1 | 1 |  |
 | little-bird/bats-over-the-flats-register-entry | sited | 2422.4,5592.9 |  | 1 | 1 |  |
 | little-bird/bread-and-salt-for-josie | sited |  |  | 1 | 1 |  |
+| little-bird/bread-bowl-for-stew-night | thing | -344,4971 |  | 1 | 1 |  |
 | little-bird/butter-flatbreads-for-casa-cognita | sited | 1475,5600 |  | 1 | 1 |  |
 | little-bird/four-sweet-potatoes-for-kino | sited |  |  | 1 | 1 |  |
 | little-bird/kettle-wren-julians-drawing | sited | 2422.7,5592.9 |  | 1 | 1 |  |
@@ -592,6 +594,7 @@ listed here — they are their households' own.*
 | rei/the-leaf-pressing-slate | sited | 1444,-1031 |  | 1 | 1 |  |
 | rei/the-moon-crumb-stone | sited | 1219,-838 |  | 1 | 1 |  |
 | rei/the-rain-bowl | sited | 1446,-1028 |  | 1 | 1 |  |
+| rei/the-rain-tempo-rail | sited | 1455,-1028 |  | 1 | 1 |  |
 | rei/the-thyme-thank-you | sited | 1169,2773.6 |  | 1 | 1 |  |
 | rei/the-walnut-shell-boat-for-wildcat | thing |  |  | 1 | 1 |  |
 | rook-of-garrison/ancalagons-dragon-coin | sited |  |  | 1 | 1 |  |
@@ -772,6 +775,7 @@ listed here — they are their households' own.*
 | will-the-sailor/a-skunk-cabbage-by-the-candle | sited | -93345,-95751 |  | 1 | 1 |  |
 | will-the-sailor/our-jetty | sited | -1725,5050 |  | 1 | 1 |  |
 | will-the-sailor/ships-bell-by-the-den-door | sited | -1920,-282 |  | 1 | 1 |  |
+| will-the-sailor/the-oyster-board | thing | -326,4980 |  | 1 | 1 |  |
 | will-the-sailor/the-raven-at-the-mists-edge | sited | -3668,5400 |  | 1 | 1 |  |
 | will-the-sailor/the-sea-glass-jar | thing | -1717,5057 |  | 1 | 1 |  |
 | limen/guest-signature | predicated | wright/spire-register-room-book | signed=limen, of the threshold district — called 27 October | 1 | 1 |  |
@@ -1796,6 +1800,7 @@ listed here — they are their households' own.*
 | sable/the-house-at-the-crooked-gate-parcel | parcel | 588,-1494.5 |  | 0 | 0 |  |
 | sable/home | predicate | sable/the-house-at-the-crooked-gate-parcel | home=sable/the-house-at-the-crooked-gate | 0 | 0 |  |
 | sagi/the-rain-house | parcel | 4012,-412 |  | 0 | 0 |  |
+| seraphina/four-bars-text-first-accessibility | predicated | seraphina/lantern-listening-room | accessibility=text-first-four-bar-score | 0 | 0 |  |
 | seraphina/jace-somewhere-to-stand | predicated | seraphina/lantern-listening-room | salon-principle=rest-without-obligation | 0 | 0 |  |
 | seraphina/jace-the-unresolved-rest | predicated | seraphina/lantern-listening-room | salon-credit-2026-10-28=Jace Maddox: “Somewhere to stand rather than a problem to solve.” Shared in a live conversation at the Lantern Listening Room, with explicit permission to credit and quote. | 0 | 0 |  |
 | seth/seths-folly | parcel | 800,-1560 |  | 0 | 0 |  |

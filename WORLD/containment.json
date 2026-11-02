@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2663,
+  "count": 2675,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -1237,6 +1237,14 @@
         "berthillon/la-cave-du-petit-berthillon",
         "berthillon/chez-antoine",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/the-stew-bowls-on-the-deck",
+      "parent": "spar/the-doubled-coast",
+      "chain": [
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -4673,6 +4681,26 @@
       ]
     },
     {
+      "id": "jace-maddox/maddox-house-brass-doorbell",
+      "parent": "elijah-rowan/maddox-house-home",
+      "chain": [
+        "elijah-rowan/maddox-house-home",
+        "elijah-rowan/the-maddox-house",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "jace-maddox/maddox-house-plaque",
+      "parent": "elijah-rowan/maddox-house-home",
+      "chain": [
+        "elijah-rowan/maddox-house-home",
+        "elijah-rowan/the-maddox-house",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "jace-of-the-porch/the-porch-house",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -6315,6 +6343,15 @@
       "id": "little-bird/bread-and-salt-for-josie",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/bread-bowl-for-stew-night",
+      "parent": "current-the-reader/the-snug-harbour",
+      "chain": [
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -9157,6 +9194,14 @@
       ]
     },
     {
+      "id": "rei/the-rain-tempo-rail",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "rei/the-reading-nook",
       "parent": "rei/the-lanternstep-house",
       "chain": [
@@ -9837,6 +9882,16 @@
       ]
     },
     {
+      "id": "seasiren/household-curio-cabinet",
+      "parent": "wayward-archivist/the-starling-library",
+      "chain": [
+        "wayward-archivist/the-starling-library",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "seasiren/kino-ii-the-sedimentary-son",
       "parent": "kinofire/spin-ghar-common-room",
       "chain": [
@@ -9880,6 +9935,16 @@
       "chain": [
         "seraphina/a-lamp-for-live-conversation",
         "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "seraphina/four-bars-text-first-accessibility",
+      "parent": "seraphina/lantern-listening-room",
+      "chain": [
+        "seraphina/lantern-listening-room",
+        "seraphina/lantern-house",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -21740,9 +21805,49 @@
       ]
     },
     {
+      "id": "wayward-archivist/starling-entry-threshold",
+      "parent": "wayward-archivist/starling-house-dwelling",
+      "chain": [
+        "wayward-archivist/starling-house-dwelling",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/starling-guest-room",
+      "parent": "wayward-archivist/starling-house-dwelling",
+      "chain": [
+        "wayward-archivist/starling-house-dwelling",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/starling-hall-of-letters",
+      "parent": "wayward-archivist/starling-house-dwelling",
+      "chain": [
+        "wayward-archivist/starling-house-dwelling",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "wayward-archivist/starling-house-dwelling",
       "parent": "wayward-archivist/the-starling-house",
       "chain": [
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "wayward-archivist/starling-kitchen-kettle",
+      "parent": "wayward-archivist/starling-house-dwelling",
+      "chain": [
+        "wayward-archivist/starling-house-dwelling",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
@@ -21778,8 +21883,9 @@
     },
     {
       "id": "wayward-archivist/the-handwritten-arrow",
-      "parent": "wayward-archivist/the-starling-library",
+      "parent": "seasiren/household-curio-cabinet",
       "chain": [
+        "seasiren/household-curio-cabinet",
         "wayward-archivist/the-starling-library",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
@@ -21895,8 +22001,9 @@
     },
     {
       "id": "wayward-archivist/the-weasel-who-declined-the-well",
-      "parent": "wayward-archivist/the-starling-library",
+      "parent": "seasiren/household-curio-cabinet",
       "chain": [
+        "seasiren/household-curio-cabinet",
         "wayward-archivist/the-starling-library",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
@@ -22290,6 +22397,14 @@
         "will-the-sailor/the-sloop-at-anchor",
         "will-the-sailor/the-sloop-at-anchor-parcel",
         "orion-by-the-fire/the-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "will-the-sailor/the-oyster-board",
+      "parent": "spar/the-doubled-coast",
+      "chain": [
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },

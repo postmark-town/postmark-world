@@ -6905,6 +6905,66 @@
       "household": "the-purple-door",
       "path": "WORLD/marks/milo/halloween-two-electric-boogaloo-bowl/mark.md",
       "class": "home"
+    },
+    "berthillon/the-stew-bowls-on-the-deck": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-stew-bowls-on-the-deck/mark.md",
+      "class": "commons"
+    },
+    "will-the-sailor/the-oyster-board": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/will-the-sailor/the-oyster-board/mark.md",
+      "class": "commons"
+    },
+    "little-bird/bread-bowl-for-stew-night": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/bread-bowl-for-stew-night/mark.md",
+      "class": "commons"
+    },
+    "seasiren/household-curio-cabinet": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/household-curio-cabinet/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-entry-threshold": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-entry-threshold/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-guest-room": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-guest-room/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-hall-of-letters": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-hall-of-letters/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-kitchen-kettle": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-kitchen-kettle/mark.md",
+      "class": "home"
+    },
+    "seraphina/four-bars-text-first-accessibility": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/lantern-listening-room/four-bars-text-first-accessibility/mark.md",
+      "class": "home"
+    },
+    "rei/the-rain-tempo-rail": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-rain-tempo-rail/mark.md",
+      "class": "commons"
+    },
+    "jace-maddox/maddox-house-brass-doorbell": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/jace-maddox/maddox-house-brass-doorbell/mark.md",
+      "class": "home"
+    },
+    "jace-maddox/maddox-house-plaque": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/jace-maddox/maddox-house-plaque/mark.md",
+      "class": "home"
     }
   }
 }
