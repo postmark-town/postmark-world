@@ -186,7 +186,11 @@ const SIZED_FOR = {
 };
 // the town's own marks the clearings hold, which they must keep clear
 const TOWN_IN_A_CLEARING = ["the-town/pando-peak", "the-town/the-pando-landing"];
-const keyframesOf = (skeleton) => skeleton.mists.schedule.map((e) => e.crossing);
+// The season's STANDING keyframes: those before the withdrawal. Until 2026-11-02 this was every keyframe, and the last
+// one was the wall at its fullest; WLD-147 (Darko: "full removal for mists") appends a hold at the last standing
+// crossing and a keyframe at `withdrawn_from` that pulls the wall away (mistsAt is null there), so the last
+// keyframe is no longer a state the engine tells. Whole-withdrawal checks live in tools/mists-withdrawn.test.mjs.
+const keyframesOf = (skeleton) => skeleton.mists.schedule.filter((e) => !(e.crossing >= (skeleton.mists.withdrawn_from ?? Infinity))).map((e) => e.crossing);
 const KEYFRAMES = () => keyframesOf(real().skeleton);
 const corners = (p) => {
   const hw = (p.extent?.w ?? 0) / 2, hh = (p.extent?.h ?? 0) / 2;
@@ -215,7 +219,8 @@ function clearingsHold({ skeleton, worldState }) {
   for (const [i, mk] of town.entries()) assert.ok(mk?.at && theTowns(mk), `the town's ${TOWN_IN_A_CLEARING[i]} is on the record`);
   const notes = new Map();   // one note per household mark: the first crossing it is told at
   const note = (mid, text) => { if (!notes.has(mid)) notes.set(mid, text); };
-  for (let c = ks[0]; c <= ks.at(-1) + 10; c += 1) {
+  // every crossing the Mists stand (until 2026-11-02 this ran ten past the last keyframe, to see the wall hold; it holds now through the last standing one)
+  for (let c = ks[0]; c <= ks.at(-1); c += 1) {
     const m = mistsAt(c, skeleton.mists);
     assert.deepEqual(m.clearings.map(({ id, x, y, r }) => ({ id, x, y, r })), standingAt(c), `the clearings stand as committed at crossing ${c}`);
     for (const mk of town) {
@@ -244,7 +249,7 @@ function townClear({ skeleton, worldState }) {
   const town = worldState.marks.filter((m) => m.at && theTowns(m) && !isFrame(m) && !RUNS_INTO_THE_MIST.has(m.id));
   assert.ok(town.length > 50, `the town's own marks are all here (${town.length})`);
   const covered = {};
-  for (const c of [...ks, ks.at(-1) + 10]) {
+  for (const c of ks) {   // until 2026-11-02 also ks.at(-1) + 10, to see the wall hold; the last standing keyframe is that hold now
     const m = mistsAt(c, skeleton.mists);
     for (const mk of town) assert.equal(behindTheWall(mk, m), false, `the town's ${mk.id} is behind the wall at crossing ${c}`);
     covered[c] = worldState.marks.filter((mk) => mk.at && !theTowns(mk) && !isFrame(mk) && behindTheWall(mk, m)).map((mk) => mk.id);
@@ -343,7 +348,7 @@ const lawSample = ({ skeleton }, n = 20) => (parcels) => {
 };
 // The season's crossings: its keyframes (the Mists' schedule and the ladder's
 // rungs) and the last crossing read, with one crossing between each pair.
-const seasonCrossings = (skeleton, last = 300) => {
+const seasonCrossings = (skeleton, last = skeleton.mists.withdrawn_from - 1) => {   // until 2026-11-02 the default was 300; the Mists stand through the last crossing before the withdrawal
   const keys = [...new Set([...keyframesOf(skeleton), ...SEASON_LADDER.map((r) => r.from), last])].sort((a, b) => a - b);
   return keys.flatMap((c, i) => (i && c - keys[i - 1] > 1 ? [Math.floor((keys[i - 1] + c) / 2), c] : [c]));
 };
@@ -427,7 +432,7 @@ test("A TALL THING past the north wall: 100 m high, behind the wall at every key
   const w = assembleWorld({ worldState: { ...worldState, marks: [...worldState.marks, tall] }, skeleton });
   const nearest = worldState.marks.filter((m) => m.kind === "parcel" && m.at && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000)
     .reduce((a, p) => (Math.hypot(p.at.x - tall.at.x, p.at.y - tall.at.y) < Math.hypot(a.at.x - tall.at.x, a.at.y - tall.at.y) ? p : a));
-  for (const crossing of [...KEYFRAMES(), 300]) {
+  for (const crossing of KEYFRAMES()) {   // until 2026-11-02 also 300, to see the wall hold; the last standing keyframe is that hold now
     const m = mistsAt(crossing, skeleton.mists);
     assert.equal(mistsHere(tall.at, m).inWall, true, `behind the wall at ${crossing}`);
     for (const from of [{ x: 0, y: 0 }, { x: 575, y: -2600 }, nearest.at]) {
@@ -453,16 +458,21 @@ test("THE CLEARING: land far past the border keeps open air round it, and no lin
 test("THE THICKENING: the density eases in, from its first value to its last, gaining more every crossing", () => {
   const { skeleton } = real();
   const ks = KEYFRAMES(), d = skeleton.mists.density;
+  // The easing runs over the density's OWN span (WLD-147). Until 2026-11-02 it ran from the schedule's first keyframe
+  // to its last, and `ks.at(-1)` was 282; the withdrawal appends keyframes, so the span is now named by the record.
+  const first = d.from_crossing ?? ks[0], full = d.to_crossing ?? ks.at(-1);
+  assert.equal(first, ks[0], "the density starts thickening with the season");
+  assert.equal(full, 282, "and finishes at the keyframe the wall reaches its fullest, as it always did");
   const at = (c) => mistsAt(c, skeleton.mists).density;
-  assert.equal(+at(ks[0]).toFixed(6), d.from);
-  assert.equal(+at(ks.at(-1)).toFixed(6), d.to);
+  assert.equal(+at(first).toFixed(6), d.from);
+  assert.equal(+at(full).toFixed(6), d.to);
   let lastStep = 0;
-  for (let c = ks[0] + 1; c <= ks.at(-1); c += 1) {
+  for (let c = first + 1; c <= full; c += 1) {
     const step = at(c) - at(c - 1);
     assert.ok(step > lastStep, `crossing ${c} gains more than the one before (${step} vs ${lastStep})`);
     lastStep = step;
   }
-  assert.equal(at(ks.at(-1) + 20), at(ks.at(-1)), "and holds after");
+  for (let c = full + 1; c <= ks.at(-1); c += 1) assert.equal(at(c), at(full), `and holds after, at ${c}, through the last crossing the Mists stand`);
 });
 
 // THE BEFORE-START IDENTITY, on the real record: the record's own schedule, at
