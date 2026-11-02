@@ -527,18 +527,21 @@ test("THE GATE: a room with no path out is an ADVISORY now (21:13): the lint say
 import { loadMarks } from "./marks-fold.mjs";
 import { declaredRoomIds, roomsOverlap } from "./portals.mjs";
 
-test("S144 on the real marks: the dish and the runner overlap, the Spire declares its rooms, and nothing is refused and nothing is excepted", () => {
+test("S144 on the real marks: the dish and the runner overlap, the Spire is no dungeon and declares no rooms (WLD-135), and nothing is refused and nothing is excepted", () => {
   const marks = loadMarks(join(HERE, "..", "WORLD", "marks")).filter((m) => m && !m._error);
   const byId = new Map(marks.map((m) => [m.id, m]));
   const dish = byId.get("gremlin-c/compaction-cake-dish"), runner = byId.get("wright/spire-gilded-vestibule-runner");
   const spire = byId.get("wright/the-starforge-spire");
   assert.ok(dish && runner && spire, "the S144 marks are in the tree");
   assert.ok(roomsOverlap(dish, runner), "control: the dish really does lie partly on the runner (the finding S144 was refused on)");
-  const { ids } = declaredRoomIds(spire);
-  assert.ok(ids.includes("wright/spire-gilded-vestibule") && ids.length > 1, "the Spire declares its rooms");
-  assert.ok(!ids.includes(dish.id) && !ids.includes(runner.id), "neither is a room");
+  // until 2026-11-01 this asserted "the Spire declares its rooms" (its `rooms` named the vestibule and 21 more). WLD-135,
+  // RULED by Darko 2026-11-01 18:24 EST (verbatim: "agreed on the 121 call"), agreeing to Wright's recommendation "The
+  // whole first floor of the Starforge Spire stops being a dungeon": so the Spire's mark left the class, and its `rooms`
+  // went with it.
+  assert.equal(portals.isDungeon(spire), false, "the Spire is no dungeon (WLD-135)");
+  assert.deepEqual(declaredRoomIds(spire).ids, [], "and declares no rooms, so no room rule of its own can refuse the S144 shape");
   assert.deepEqual(portalFindings(marks).filter((f) => f.sev === "ERROR"), []);
-  // and the rule still bites on the real Spire: declare the two as rooms and the S144 finding returns
-  const bitten = marks.map((m) => (m === spire ? { ...m, rooms: [...ids, dish.id, runner.id] } : m));
+  // and the rule still bites on the real ground: put the Spire back as a dungeon declaring the two, and the S144 finding returns
+  const bitten = marks.map((m) => (m === spire ? { ...m, kind: "dungeon", rooms: [dish.id, runner.id] } : m));
   assert.deepEqual(portalFindings(bitten).filter((f) => f.rule === "rooms-do-not-overlap").map((f) => f.mark), [dish.id < runner.id ? dish.id : runner.id]);
 });
