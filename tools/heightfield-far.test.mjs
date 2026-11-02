@@ -618,7 +618,7 @@ const mainBuildHeightfield = mainKernel(DIALS);
 test("the embedded main kernel is main's text (checked against the pinned source when git has it)", (t) => {
   let source;
   try { source = execFileSync("git", ["show", `${MAIN_PIN}:tools/world-engine.mjs`], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }); }
-  catch { t.diagnostic(`the pinned base ${MAIN_PIN.slice(0, 8)} is not in this checkout; the embedded kernel was not compared`); return; }
+  catch { t.skip(`the pinned base ${MAIN_PIN.slice(0, 8)} is not in this checkout (a shallow clone); the embedded kernel was not compared`); return; }
   const start = source.indexOf("export function buildHeightfield(");
   const last = /^function buildGrid\([^\n]*\) \{/m.exec(source);
   const slice = source.slice(start, source.indexOf("\n}", last.index) + 2).replace("export function buildHeightfield", "function buildHeightfield");
@@ -910,6 +910,63 @@ test("a cloud collapsed onto few doubles at 4e15 m: the stop rule's margin is go
   const fast = buildHeightfield({ controlPoints }).elevationAt;
   const slow = referenceHeightfield({ controlPoints });
   for (let i = 0; i < 6000; i += 1) agree(fast, slow, 4e15 + u() * 14 - 2, 4e15 + u() * 14 - 2, "collapsed cloud");
+});
+
+// ── THE STOP RULE'S MARGIN: A POINT FILED IN THE NEXT RING, A HAIR INSIDE THE EDGE ──
+//
+// The ring walk stops when the K-th distance held is inside the nearest edge of the
+// rings walked, less a margin of 1e-9 of a cell. A point is filed by floor(x / size)
+// but the edge is (cx + 1) * size: two roundings that can disagree by about one ulp
+// of x. Once an ulp of x passes the margin (an index of about 2^23 cells, where an
+// ulp is about 2^-29 of a cell against 1e-9) the walk can stop with a point just
+// across the edge, filed in the next ring but physically nearer than the K-th held.
+// Constructed per trial: K points in the sample's own cell, the K-th a hair inside
+// the computed edge, and one point filed one ring out at the lowest double that
+// still files there. `main`'s kernel (exact keys at these indices) answers some of
+// these wrongly from 2^23 and none below 2^23; the field equals the sort in all.
+function marginTrial(cx, seed) {
+  let s = 13;                                              // the cell size; settled below from the points themselves
+  for (let iter = 0; iter < 30; iter += 1) {
+    const u = rng(seed);
+    const B = (cx + 1) * s, cy = 3;
+    const Sx = B - (0.25 + 0.2 * u()) * s, Sy = (cy + 0.5) * s;
+    if (Math.floor(Sx / s) !== cx) return null;
+    let Px = B;
+    for (let k = 1; k <= 8; k += 1) { const c = nudge(B, -k); if (Math.floor(c / s) >= cx + 1) Px = c; else break; }
+    const edge = Math.min(Sx - cx * s, B - Sx, Sy - cy * s, (cy + 1) * s - Sy) - s * 1e-9;   // the ring walk's own arithmetic at ring 0
+    const controlPoints = [];
+    for (let i = 0; i < 100; i += 1) controlPoints.push({ x: Sx - 8 * s - u() * 100, y: Sy + (u() - 0.5) * 100, h: 1000 + i, id: `f${i}` });
+    for (let i = 0; i < 7; i += 1) controlPoints.push({ x: Sx - (0.02 + 0.01 * i) * s, y: Sy + (i % 2 ? 0.01 : -0.01) * s, h: 10 + i, id: `own${i}` });
+    let kth = edge * (1 - 1e-12), qy = Sy + kth;
+    while (!((Sy - qy) ** 2 < edge * edge)) { kth *= 0.999999; qy = Sy + kth; }
+    controlPoints.push({ x: Sx, y: qy, h: 50, id: "kth" });                       // the K-th seat, a hair inside the edge
+    controlPoints.push({ x: Px, y: Sy, h: 777, id: "across" });                    // filed one ring out, physically nearer
+    const settled = cellSize(controlPoints, 8);
+    if (Object.is(settled, s)) return { controlPoints, x: Sx, y: Sy };
+    s = settled;
+  }
+  return null;
+}
+
+test("a point filed one ring out and a hair inside the edge: the field is the sort's at every index; main's walk was not from 2^23", () => {
+  const wrongOnMain = new Map();
+  for (const lg of [12, 18, 19, 20, 21, 22, 23, 24, 26, 28, 30]) {
+    let made = 0, wrong = 0;
+    for (let seed = 1; seed <= 240; seed += 1) {
+      const t = marginTrial(2 ** lg + seed * 7, seed);
+      if (!t) continue;
+      made += 1;
+      const slow = referenceHeightfield({ controlPoints: t.controlPoints });
+      agree(buildHeightfield({ controlPoints: t.controlPoints }).elevationAt, slow, t.x, t.y, `margin trial 2^${lg} seed ${seed}`);
+      if (!Object.is(mainBuildHeightfield({ controlPoints: t.controlPoints }).elevationAt(t.x, t.y), slow(t.x, t.y))) wrong += 1;
+    }
+    assert.ok(made >= 150, `2^${lg}: only ${made} trials could be built`);
+    wrongOnMain.set(lg, wrong);
+  }
+  for (const [lg, wrong] of wrongOnMain) {
+    if (lg <= 22) assert.equal(wrong, 0, `main was wrong ${wrong} times at 2^${lg}, below the margin's bound`);
+    else assert.ok(wrong > 20, `main was wrong only ${wrong} times at 2^${lg} (the construction must reach the defect or it proves nothing)`);
+  }
 });
 
 test("the file compared a great many samples against the sort", (t) => {
