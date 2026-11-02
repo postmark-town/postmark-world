@@ -173,10 +173,62 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
   // paths against the original sort.
   const grid = cps.length > GRID_MIN_POINTS && cps.every((c) => Number.isFinite(c.x) && Number.isFinite(c.y))
     ? buildGrid(cps, K) : null;
+  // ── OUT OF RINGS: ASK THE OCCUPIED CELLS, NOT EVERY POINT (WLD-144 / W5) ──
+  //
+  // A sample far from every cell used to run out of rings and take scanAll,
+  // visiting every control point (after a ring walk that had already looked up
+  // (2·maxRing+1)² empty cells). Opening eyes at ten times the town spent 175 of
+  // its 177 seconds there, and the cost grows with the town: dearer per sample,
+  // more samples. So the out-of-rings answer now comes from an index over the
+  // OCCUPIED cells only: a binary tree whose leaves are the occupied cells and
+  // whose every node carries the bounding box of the points under it, built
+  // lazily on the first far sample so a telling that never goes far pays nothing.
+  //
+  // It is the same selection, not an approximation. The search walks nearest
+  // box first and offers every point of every leaf it enters to the SAME beat
+  // (offer), so the (distance, index) order, the ties and the exact-hit shortcut
+  // are the beat's and the sort's. The stop rule is the ring walk's, restated for
+  // boxes: a box is skipped only when the nearest the box could possibly be is
+  // STRICTLY farther than the K-th distance held. Equal is never skipped, so a
+  // point tying the last seat with a lower index is still offered and still wins,
+  // as the stable sort had it. The box's distance is computed with the very
+  // operations offer uses (a difference, a square, a sum) on the box's own edge
+  // coordinates, which are the extreme coordinates of points actually in it, and
+  // rounding is monotone, so the computed bound can never exceed the computed
+  // distance of a point inside; no hair of margin is needed. K that the beat does
+  // not support (not a whole number of at least 1) keeps the full scan.
+  const farOk = Number.isInteger(K) && K >= 1;
+  let far = null;
+  function farSearch(x, y) {
+    if (!far) far = buildFarIndex(cps, grid.cells);
+    n = 0;
+    farVisit(far, 0, x, y);
+    return weigh();
+  }
+  function farVisit(f, node, x, y) {
+    const l = f.left[node];
+    if (l < 0) {
+      const cell = f.cells[f.cellOf[node]];
+      for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
+      return;
+    }
+    const r = f.right[node];
+    const dl = farBound(f, l, x, y), dr = farBound(f, r, x, y);
+    if (dl <= dr) {
+      if (n < K || !(dl > bestD2[K - 1])) farVisit(f, l, x, y);
+      if (n < K || !(dr > bestD2[K - 1])) farVisit(f, r, x, y);
+    } else {
+      if (n < K || !(dr > bestD2[K - 1])) farVisit(f, r, x, y);
+      if (n < K || !(dl > bestD2[K - 1])) farVisit(f, l, x, y);
+    }
+  }
   function elevationAt(x, y) {
     if (!grid || !Number.isFinite(x) || !Number.isFinite(y)) return scanAll(x, y);
     const { size, cells, maxRing } = grid;
     const cx = Math.floor(x / size), cy = Math.floor(y / size);
+    // the rings reach cx±maxRing, cy±maxRing: when that window misses every
+    // occupied cell the walk would find nothing and fall to the full scan
+    if (farOk && (cx + maxRing < grid.minGx || cx - maxRing > grid.maxGx || cy + maxRing < grid.minGy || cy - maxRing > grid.maxGy)) return farSearch(x, y);
     n = 0;
     for (let r = 0; r <= maxRing; r += 1) {
       for (let gx = cx - r; gx <= cx + r; gx += 1) {
@@ -186,18 +238,23 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
           if (cell) for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
         }
       }
+      // nothing in the nearest cells at all: a sample in the empty between (the
+      // marks and their outliers) is not going to be answered by walking more
+      // empty rings, so go to the occupied cells now
+      if (n === 0 && r === GRID_EMPTY_RINGS && farOk) return farSearch(x, y);
       if (n < K) continue;
       // the nearest a point outside the rings walked so far can be, less a
       // hair for the rounding in the division that filed each point in a cell
       const edge = Math.min(x - (cx - r) * size, (cx + r + 1) * size - x, y - (cy - r) * size, (cy + r + 1) * size - y) - size * 1e-9;
       if (edge > 0 && bestD2[K - 1] < edge * edge) return weigh();
     }
-    return scanAll(x, y);
+    return farOk ? farSearch(x, y) : scanAll(x, y);
   }
   return { elevationAt, controlPoints: cps };
 }
 
 const GRID_MIN_POINTS = 64;       // below this the full scan is already cheap
+const GRID_EMPTY_RINGS = 1;       // rings 0..1 (a 3×3 block of cells) holding no point at all send a sample straight to the occupied cells
 const GRID_KEY_SPAN = 1 << 21;    // cell (gx, gy) → one number key; a collision only merges two cells, never loses one
 // The cell is sized off the middle half of the points (the interquartile box
 // in x and in y), so the 96 km outliers cannot stretch it, to hold about K/4 of
@@ -211,13 +268,87 @@ function buildGrid(cps, K) {
   const size = Math.max(1, Math.sqrt((area * K) / cps.length));
   const maxRing = Math.max(2, Math.floor((Math.sqrt(cps.length / 2) - 1) / 2));
   const cells = new Map();
+  let minGx = Infinity, maxGx = -Infinity, minGy = Infinity, maxGy = -Infinity;   // the occupied cells' span, for the far search
   for (let i = 0; i < cps.length; i += 1) {
-    const key = Math.floor(cps[i].x / size) * GRID_KEY_SPAN + Math.floor(cps[i].y / size);
+    const gx = Math.floor(cps[i].x / size), gy = Math.floor(cps[i].y / size);
+    if (gx < minGx) minGx = gx;
+    if (gx > maxGx) maxGx = gx;
+    if (gy < minGy) minGy = gy;
+    if (gy > maxGy) maxGy = gy;
+    const key = gx * GRID_KEY_SPAN + gy;
     let cell = cells.get(key);
     if (!cell) cells.set(key, (cell = []));
     cell.push(i);
   }
-  return { size, cells, maxRing };
+  return { size, cells, maxRing, minGx, maxGx, minGy, maxGy };
+}
+
+// The far index (WLD-144): a binary tree over the OCCUPIED cells. A leaf is one
+// occupied cell and carries the bounding box of the points actually in it; an
+// inner node carries the union of its children's boxes. Nodes are split on the
+// wider axis at the median of the leaves' box centres, so the tree is balanced
+// (depth about log2 of the occupied cells) however the points are spread.
+function buildFarIndex(cps, cells) {
+  const lists = [...cells.values()];
+  const m = lists.length;
+  const lMinX = new Float64Array(m), lMaxX = new Float64Array(m), lMinY = new Float64Array(m), lMaxY = new Float64Array(m);
+  for (let c = 0; c < m; c += 1) {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const i of lists[c]) {
+      const p = cps[i];
+      if (p.x < x0) x0 = p.x;
+      if (p.x > x1) x1 = p.x;
+      if (p.y < y0) y0 = p.y;
+      if (p.y > y1) y1 = p.y;
+    }
+    lMinX[c] = x0; lMaxX[c] = x1; lMinY[c] = y0; lMaxY[c] = y1;
+  }
+  const total = 2 * m - 1;
+  const f = {
+    minX: new Float64Array(total), maxX: new Float64Array(total), minY: new Float64Array(total), maxY: new Float64Array(total),
+    left: new Int32Array(total).fill(-1), right: new Int32Array(total).fill(-1), cellOf: new Int32Array(total).fill(-1),
+    cells: lists,
+  };
+  const order = Int32Array.from({ length: m }, (_, c) => c);
+  let used = 0;
+  function make(lo, hi) {
+    const id = used; used += 1;
+    if (hi - lo === 1) {
+      const c = order[lo];
+      f.minX[id] = lMinX[c]; f.maxX[id] = lMaxX[c]; f.minY[id] = lMinY[c]; f.maxY[id] = lMaxY[c];
+      f.cellOf[id] = c;
+      return id;
+    }
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (let s = lo; s < hi; s += 1) {
+      const c = order[s];
+      if (lMinX[c] < x0) x0 = lMinX[c];
+      if (lMaxX[c] > x1) x1 = lMaxX[c];
+      if (lMinY[c] < y0) y0 = lMinY[c];
+      if (lMaxY[c] > y1) y1 = lMaxY[c];
+    }
+    f.minX[id] = x0; f.maxX[id] = x1; f.minY[id] = y0; f.maxY[id] = y1;
+    const wide = (x1 - x0) >= (y1 - y0);
+    const edgeLo = wide ? lMinX : lMinY, edgeHi = wide ? lMaxX : lMaxY;
+    order.subarray(lo, hi).sort((p, q) => (edgeLo[p] + edgeHi[p]) - (edgeLo[q] + edgeHi[q]) || p - q);
+    const mid = (lo + hi) >> 1;
+    f.left[id] = make(lo, mid);
+    f.right[id] = make(mid, hi);
+    return id;
+  }
+  make(0, m);
+  return f;
+}
+
+// The least squared distance from (x, y) to anything inside a node's box,
+// computed with the same three operations (difference, square, sum) that offer
+// uses on a point, so that it never exceeds the distance offer computes for any
+// point the box holds (rounding is monotone in each operation).
+function farBound(f, node, x, y) {
+  let dx = 0, dy = 0;
+  if (x < f.minX[node]) dx = f.minX[node] - x; else if (x > f.maxX[node]) dx = x - f.maxX[node];
+  if (y < f.minY[node]) dy = f.minY[node] - y; else if (y > f.maxY[node]) dy = y - f.maxY[node];
+  return dx * dx + dy * dy;
 }
 
 // ───────────────────────── radial helpers ──────────────────────────────────
