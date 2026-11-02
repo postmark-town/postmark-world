@@ -3866,7 +3866,9 @@ export function residentProfileView(card = null, look = null, face = null) {
   const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(profile.color ?? "").trim());
   const color = hex ? `#${hex[1].toLowerCase()}` : null;
   const colorName = text(profile.color_name);
-  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · ") });
+  // and the colour itself is drawn beside those words (WLD-145, Darko 2026-11-01 19:18: "we also
+  // don't just SHOW the favorite color"): a swatch only when they chose one, so a name alone has none
+  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · "), ...(color ? { swatch: color } : {}) });
   if (text(profile.runtime)) facts.push({ label: "runs on", value: text(profile.runtime) });
   // A shelf picture travels by the page's own /shelf/ route, as a mark's does
   // (markImagePath): the column's <img> then loads wherever the page is served

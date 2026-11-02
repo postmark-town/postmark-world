@@ -21,7 +21,7 @@ import assert from "node:assert/strict";
 import vm from "node:vm";
 import { readFileSync } from "node:fs";
 import {
-  parseHomeMarkdown, parseInline, safeLinkHref, homeHandleForParcel, isParcelMark,
+  parseHomeMarkdown, parseInline, safeLinkHref, safeSwatch, homeHandleForParcel, isParcelMark,
   homeColumnModel, renderHomeColumn, createHomeColumn,
 } from "../spectator/home-column.mjs";
 import {
@@ -644,4 +644,64 @@ test("[pin] a mark's column and a creature's column still turn the resident link
   assert.match(bodyOf("markColumnView"), /residentLink: false,/, "a mark's handle is the household that made it");
   assert.match(bodyOf("creatureColumnView"), /residentLink: false,/, "a creature's handle is the town's");
   // ⚑ THE FLIP: delete either line → its assertion reds, and not the other
+});
+
+// ── THE COLOUR ITSELF (WLD-145, Darko 2026-11-01 19:18: "we also don't just SHOW the favorite color") ──
+
+test("safeSwatch: a hex colour and nothing else, lowercased; a resident's word never reaches a style", () => {
+  assert.equal(safeSwatch("#E6AC52"), "#e6ac52");
+  assert.equal(safeSwatch("  #c90 "), "#c90");
+  for (const bad of ["red", "#abcd", "#abcde", "#12345g", "#1234567", "e6ac52", "rgb(1,2,3)", "url(x)", "#fff;background:url(javascript:1)", '#fff" onclick="x', "", null, undefined, 7])
+    assert.equal(safeSwatch(bad), null, `refused: ${String(bad)}`);
+});
+
+test("a fact carries a swatch only when it is a colour; every other fact keeps its exact shape", () => {
+  const model = homeColumnModel({ handle: "x", facts: [
+    { label: "colour", value: "the running lamp · #E6AC52", swatch: "#E6AC52" },
+    { label: "colour", value: "ember", swatch: "red; background:url(x)" },
+    { label: "class", value: "room" },
+  ] });
+  assert.deepEqual(model.facts, [
+    { label: "colour", value: "the running lamp · #E6AC52", detail: null, swatch: "#e6ac52" },
+    { label: "colour", value: "ember", detail: null },
+    { label: "class", value: "room", detail: null },
+  ], "a valid swatch is kept lowercased; an invalid one, and a fact without one, have no swatch key at all");
+});
+
+test("THE COLOUR ITSELF: the line draws a chip before its words, the chip is a hex and nothing else, and the words are unchanged", () => {
+  const host = render(homeColumnModel({ handle: "x", facts: [
+    { label: "colour", value: "the running lamp · #e6ac52", swatch: "#e6ac52" },
+    { label: "runs on", value: "Claude or Codex" },
+  ] }));
+  const [ddColour, ddRuns] = find(host, "dd");
+  const [chip] = byClass(ddColour, "wv-homecol-swatch");
+  assert.ok(chip, "the colour line has a chip");
+  assert.equal(chip.getAttribute("style"), "background:#e6ac52", "painted with the one value");
+  assert.equal(chip.getAttribute("aria-hidden"), "true", "the name and the hex are the words; the chip is only the look");
+  assert.equal(ddColour.children[0], chip, "before the words");
+  assert.equal(serialize(ddColour), "the running lamp · #e6ac52", "and the words are as they were");
+  assert.equal(byClass(ddRuns, "wv-homecol-swatch").length, 0, "no other line has one");
+  assert.equal(serialize(ddRuns), "Claude or Codex");
+  // the sink checks as well as the model: a model built by hand with a hostile swatch draws none
+  const hostile = renderHomeColumn(doc, element("aside"),
+    { ...homeColumnModel({ handle: "x" }), facts: [{ label: "colour", value: "ember", detail: null, swatch: "red;background:url(x)" }] }, { imagePath: shelfGate });
+  assert.equal(byClass(hostile, "wv-homecol-swatch").length, 0, "a swatch that is not a hex colour never becomes a style");
+  assert.equal(serialize(find(hostile, "dd")[0]), "ember");
+  // ⚑ THE FLIPS: drop the chip branch in renderHomeColumn → the first assertions red; let safeSwatch pass anything → the hostile line reds
+});
+
+test("THE COLOUR REACHES THE SCREEN: a resident's card, through the page's own resident view and the real column, draws the colour they chose and never the map's", () => {
+  const draw = (card) => {
+    const host = element("aside");
+    createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(residentViewFor(card));
+    return host;
+  };
+  const chosen = draw({ profile: { color: "#E6AC52", color_name: "the running lamp" } });
+  assert.equal(byClass(chosen, "wv-homecol-swatch")[0]?.getAttribute("style"), "background:#e6ac52", "the colour they chose");
+  assert.match(serialize(byClass(chosen, "wv-homecol-facts")[0]), /the running lamp · #e6ac52/, "beside its name and hex");
+  // the page hands the column a face in the town's gold for a resident with no colour of their own;
+  // none of that gold may arrive as a swatch
+  assert.equal(byClass(draw({ profile: { bio: "A figure." } }), "wv-homecol-swatch").length, 0, "chose nothing, nothing drawn");
+  assert.equal(byClass(draw({ profile: { color_name: "ember" } }), "wv-homecol-swatch").length, 0, "a name alone is words only");
+  // ⚑ THE FLIP: drop `...(color ? { swatch: color } : {})` from residentProfileView → the first line reds
 });

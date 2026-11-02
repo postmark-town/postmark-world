@@ -72,6 +72,14 @@ export function safeLinkHref(raw) {
   return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
 }
 
+/** A colour this column will paint as a swatch, or null. A `#` and three or six
+ *  hex digits and nothing else, lowercased: it becomes a `style`, so it is
+ *  checked as a colour rather than escaped as a string (WLD-145). */
+export function safeSwatch(raw) {
+  const s = String(raw ?? "").trim();
+  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(s) ? s.toLowerCase() : null;
+}
+
 // ── the markdown, as data ───────────────────────────────────────────────────
 //
 // A deliberately small subset — the shapes home pages are actually written in
@@ -280,9 +288,16 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // writes them with textContent like everything else. Empty for a parcel
     // and a region unless their caller hands some in.
     facts: (facts ?? []).filter((f) => f && String(f.value ?? "").trim())
-      .map((f) => ({ label: String(f.label ?? "").trim(), value: String(f.value).trim(),
-        // the full description a short line opens to (play row 70); none, a plain line
-        detail: String(f.detail ?? "").trim() || null })),
+      .map((f) => {
+        // THE COLOUR A LINE IS ABOUT, drawn beside it (WLD-145, Darko 2026-11-01 19:18: "we also
+        // don't just SHOW the favorite color"). A fact with none has no `swatch` key at all, so
+        // every other column's facts read exactly as they did.
+        const swatch = safeSwatch(f.swatch);
+        return { label: String(f.label ?? "").trim(), value: String(f.value).trim(),
+          // the full description a short line opens to (play row 70); none, a plain line
+          detail: String(f.detail ?? "").trim() || null,
+          ...(swatch ? { swatch } : {}) };
+      }),
     relations: (relations ?? []).map((r) => ({
       label: String(r?.label ?? "").trim(),
       items: (r?.items ?? []).filter((i) => i && String(i.id ?? "").trim())
@@ -666,7 +681,20 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
         more.appendChild(body);
         dd.appendChild(more);
       } else {
-        dd.textContent = fact.value;
+        // THE COLOUR ITSELF, before its name and hex (WLD-145). A chip the page's CSS
+        // sizes; its one inline value is a hex colour and nothing else (`safeSwatch`,
+        // checked here as well as in the model). A line that opens to a description
+        // carries none: no fact has both.
+        const hex = safeSwatch(fact.swatch);
+        if (hex) {
+          const chip = el(doc, "span", "wv-homecol-swatch");
+          chip.setAttribute("style", `background:${hex}`);
+          chip.setAttribute("aria-hidden", "true");
+          dd.appendChild(chip);
+          dd.appendChild(doc.createTextNode(fact.value));
+        } else {
+          dd.textContent = fact.value;
+        }
       }
       list.appendChild(dt);
       list.appendChild(dd);
@@ -937,6 +965,9 @@ export const HOME_COLUMN_CSS = `
   font-size:.8rem; line-height:1.45; }
 .wv-homecol-facts dt { color:var(--dim); text-transform:lowercase; }
 .wv-homecol-facts dd { margin:0; color:var(--paper); overflow-wrap:anywhere; }
+/* the colour a line names, drawn beside its words (WLD-145); the ring keeps a dark colour visible on the panel */
+.wv-homecol-swatch { display:inline-block; width:.85em; height:.85em; margin-right:.5em; border-radius:50%;
+  vertical-align:-.1em; box-shadow:0 0 0 1px rgba(232,224,207,.45); }
 .wv-homecol-fact-line { cursor:pointer; list-style:none; display:inline; border-bottom:1px dotted transparent; }
 .wv-homecol-fact-line::-webkit-details-marker { display:none; }
 .wv-homecol-fact-line::after { content:"▸"; display:inline-block; margin-left:.35em; color:var(--dim); font-size:.8em; transition:transform .12s; }
