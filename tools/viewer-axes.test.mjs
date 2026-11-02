@@ -2100,7 +2100,7 @@ test("a verb reads as its own name, hyphens and all", () => {
   assert.equal(actionLabel(""), "");
 });
 
-// ───────── per-resident views, built ahead (step 6) ─────────
+// ───────── per-resident views, built on first selection and kept (step 6) ─────────
 
 test("a resident's read is observed BY THE RESIDENT; only a spectator is a spectator", () => {
   // O13: the engine ranks a field of view for an observer, and the telling and

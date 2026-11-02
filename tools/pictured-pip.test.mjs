@@ -4,7 +4,8 @@
 // often blocks them and makes them look bad. and the image makes it obvious
 // there's a mark there anyway." The parcel already had the shape for this —
 // its pip is transparent under the home card (`.ov-pip.ov-pip-home`), still
-// the hover anchor, the hit target and the fan's seat. This extends the same
+// the hover anchor, the hit target and (while the map fanned; it passes no fan
+// since WLD-95, 2026-10-20) the fan's seat. This extends the same
 // contract to any mark whose picture is ON THE PAINTING in the draw: hung at
 // far/mid (`drawPlacedArt`'s set) or drawn over its extent at near
 // (`sceneArtSVG` in the furnishing pass). A mark at mid keeps its dot — that
