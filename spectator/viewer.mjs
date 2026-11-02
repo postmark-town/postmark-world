@@ -1834,9 +1834,10 @@ export function roomCardHTML({ roomId = null, plateHTML = "", exitLabel = "↤ s
 // ── the plaque ──────────────────────────────────────────────────────────────
 //
 // What the telling still says about the room once the card carries its head:
-// who else is in it. The name and the room's own body live on the card (above);
-// printing them again at the top of the telling would be the one room told
-// twice on one screen. An empty company is no plaque at all.
+// who else is in it. The name lives on the card (above, as its nameplate) and
+// the room's own body in the column that a press on the plate opens; printing
+// either again at the top of the telling would be the one room told twice on
+// one screen. An empty company is no plaque at all.
 export function interiorPlaqueHTML({ room, bodies = [], you = null } = {}) {
   if (!room?.id || !bodies.length) return "";
   const others = bodies.filter((h) => h !== you);
