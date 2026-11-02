@@ -18,8 +18,10 @@ import {
 const D = (o) => ({ iso: "2026-07-27T00:00:00.000Z", targetExtent: null, targetMarkId: null, ...o });
 
 test("the fractional clock's integer part IS the crossing number", () => {
-  // The engine's currentCrossing is floor((now - epoch)/12h); ours must agree,
-  // or a walker's clock and the world's fog run on different time.
+  // The office's currentCrossing is floor((now - epoch)/12h); ours must agree,
+  // or a walker's clock and the world's fog run on different time. This pins
+  // fractionalCrossing against walk.mjs's own CROSSING_EPOCH_UTC and CROSSING_MS
+  // only; it does not read the office's copy of them.
   for (const n of [0, 1, 7, 90]) {
     const t = CROSSING_EPOCH_UTC + n * CROSSING_MS + CROSSING_MS / 3;
     assert.equal(Math.floor(fractionalCrossing(t)), n, `crossing ${n}`);
