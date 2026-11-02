@@ -12,9 +12,9 @@
 
 import { isSited, isGround, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
-  fieldOfView, radialSerialize, statusAt, lightLevelAt, fogModel,
+  fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
-  bearingDeg, quantizeBearing, distanceBand, DIALS,
+  DIALS,
 } from "./world-engine.mjs";
 import { homeOf } from "./where-is.mjs"; // the ONE home resolver (declared, own parcel, household)
 import { propertyOf } from "./class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
@@ -24,9 +24,9 @@ import {
 import {
   adjudicate, containsEdges as containsEdgesOf, entityChild, entryLawOf, formatEnterExit,
   isMark, occupantsOf, termsAt, withinOf,
-} from "./enter-exit.mjs"; // DEMO SLICE — the enter-exit acts (step 5, jetto/enter-exit-demo)
+} from "./enter-exit.mjs"; // the enter-exit acts (production, planted as law 2026-08-22; see its header)
 import {
-  pointInMark, markInside, roomHolds, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
+  pointInMark, roomHolds, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
   landingOf, passageTargetOf, portalsIn, portalsInto, dungeonLanding, exitLockWords, lockStandsWords, lockedPassage, hhmmZ,
   unmetRequires, requiresHolderOf, requiresHoldersOf,
 } from "./portals.mjs"; // WLD-5: portals and the dungeon class, one home for the verbs and the lint
@@ -66,22 +66,12 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
       // AN ENTERED MARK IS SHELTER: standing within one, the Mists hide nothing it holds (airLine says so)
       ...(mists && shelterOf(world, entered, state) ? { sheltered: true } : {}),
     },
-    // enter/exit are DEMO-SLICE verbs (step 5) — listed so a reader of the
-    // demo sees the pair, and pointedly listed apart from walk, which reaches
-    // coordinates and never an inside.
+    // enter/exit are listed so a reader sees the pair, and pointedly listed
+    // apart from walk, which reaches coordinates and never an inside.
     verbs: ["open-your-eyes", "investigate(mark)", "walk(dir, dist)", "enter(mark)", "exit(mark)"],
   };
 }
 
-// ───────────────────────── open-your-eyes — the FOV telling ──────────────────
-// Field of view in radial coordinates: quantized bearings, named distance bands,
-// ranked by angular size modulated by stamps, capped at the context budget, fog
-// and darkness applied, signal-marks cutting through. Returns both the raw fov
-// (for callers) and a `tell()` that renders the human/agent-facing prose.
-//
-// `actor` is the handle of the resident the eyes belong to (WLD-9): their home,
-// as tools/where-is.mjs § homeOf resolves it, is carried beyond the budget when
-// it is in view. No actor, or a home that resolves to nowhere, changes nothing.
 /** AN ENTERED MARK IS SHELTER (Darko 2026-10-15): the test of a point the Mists leave alone for a walker whose enter
  *  stack is `entered` (mark ids): inside any of those marks. With `standpoint`, only the entered marks that contain it
  *  count: an entered mark you stand outside shelters nothing. null when nothing counts, so the Mists read as ever.
@@ -114,6 +104,15 @@ export function sightFrameOf(world, entered, standpoint = null) {
   return (mk) => roomHolds(room, mk, marks);
 }
 
+// ───────────────────────── open-your-eyes — the FOV telling ──────────────────
+// Field of view in radial coordinates: quantized bearings, named distance bands,
+// ranked by angular size modulated by stamps, capped at the context budget, fog
+// and darkness applied, signal-marks cutting through. Returns both the raw fov
+// (for callers) and a `tell()` that renders the human/agent-facing prose.
+//
+// `actor` is the handle of the resident the eyes belong to (WLD-9): their home,
+// as tools/where-is.mjs § homeOf resolves it, is carried beyond the budget when
+// it is in view. No actor, or a home that resolves to nowhere, changes nothing.
 export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null, entered = null } = {}) {
   const home = actor ? homeOf(actor, world) : null;
   const fov = fieldOfView(state, world, { crossing, budget, dials, keep: home?.placed ? home.mark_id : null,
@@ -165,7 +164,7 @@ export const pointWithinMark = pointInMark;
 // The target additionally carries `weight_parts`, which is that ✦ number's
 // receipt (marks-fold.mjs § partsOf) — because a reader shown one figure built
 // out of three sources cannot otherwise tell which of them they are looking at.
-// `occupancy` (DEMO SLICE, step 5) is OPTIONAL and defaults to empty, so every
+// `occupancy` (the enter-exit acts' derived occupants) is OPTIONAL and defaults to empty, so every
 // existing caller gets a byte-identical answer. Passed, the manifest grows its
 // entity children — who is aboard is a child of the ship, and investigate is
 // the read that opens one mark, so it is where "who's here" belongs.
@@ -337,10 +336,11 @@ function markDescent(fromIds, world, byId, opts) {
 }
 
 // ───────────────────────── walk — the walk dial + anonymous wear ─────────────
-// Move `distM` metres in a compass `dir`. `walkSpeed` here is the skeleton's 60 km
-// per crossing (decision 008) — the LEGACY engine dial; the live resident stride is
-// 60 km per crossing (008b, 2026-08-16), read off `the-town/resident` by the office.
-// A walk here spends `distM / walkSpeed` crossings. The path lands
+// Move `distM` metres in a compass `dir`. `walkSpeed` is read from the skeleton's
+// walk_speed_m_per_crossing, 60 km per crossing since e505ca95 (POS-223): the same
+// number as the live resident stride (008b, 2026-08-16), which the office reads off
+// `the-town/resident`. Decision 008's original 15 km survives only as the fossil
+// fallback in the body below. A walk here spends `distM / walkSpeed` crossings. The path lands
 // in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
 // you wander is more intimate than who you wrote (epic § Paths are wear).
 export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } = {}) {
@@ -381,7 +381,7 @@ export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } 
 
 // ───────────────────────── enter / exit(mark) — the crossings ───────────────
 //
-// DEMO SLICE (step 5). Walk and entry are fully decoupled axes (R15): the walk
+// Walk and entry are fully decoupled axes (R15): the walk
 // above moves you to coordinates and never puts you INSIDE anything —
 // geometrically-inside-legally-outside is a real state, and it is the visitor
 // standing on the deck who never stepped aboard. Entry is the other axis, and
@@ -1176,13 +1176,14 @@ function directChildren(contained) {
 // rei/the-lanternseed-gardens: a door in a field.
 //
 // THRESHOLD_KINDS answers "what must I CROSS?" and deliberately stays sited.
-// A crossing is an authored consent act that appends a row to the threshold
+// A crossing is an authored consent act that appends a row to the enter-exit
 // ledger, and a parcel is a land title, not a room — "wright enters
 // rei/the-lanternstep-house-parcel" would put a claim in the permanent record
 // that nobody made. It would also part the derivation from the record already
 // written: occupancy is derived from the ledger's own rows, and every crossing
-// in WORLD/threshold-ledger.md was recorded under the sited-only chain. That
-// this is a bound and not an oversight is pinned by its own test below.
+// in the enter-exit ledger (enter-exit.mjs § LEDGER_HEADER) was recorded under
+// the sited-only chain. That this is a bound and not an oversight is pinned by
+// tools/parcel-parents.test.mjs ("THE BOUND, PINNED").
 // Whether a title is a threshold is the founder's call, and it is one list away.
 const CONTAINER_KINDS = ["sited", "parcel"];
 const THRESHOLD_KINDS = ["sited"];
