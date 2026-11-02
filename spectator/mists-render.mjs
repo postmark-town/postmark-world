@@ -143,9 +143,13 @@ export function mistsReachM(m) {
  * ragged face inward. That face is the noise's, centred on the true face, so it
  * wanders both ways about it: it can stand on the clear side, and a pocket just
  * behind the true face (up to mistsBackM) can stand short of it, ramping up over
- * softM. Everything further behind the true face than mistsBackM + softM is
- * opaque, even over the town's margin. The front layers are weather and never
- * reach 1 (their alpha is capped at the layer's `alpha`).
+ * softM. All of that holds before the town's keep-out: the keep-out thins the
+ * back layer only on the clear side of the true face (a point not behind it,
+ * toward keepHaze, less the bank the margin lets stand out from the face), never
+ * behind it, so everything further behind the true face than mistsBackM + softM
+ * is opaque, even over the town's margin. The front layers are weather and never
+ * reach 1 (their alpha is capped at the layer's `alpha`); the keep-out thins
+ * them wherever it reaches, past the face too.
  */
 export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const L = MISTS_PAINT.layers[layer], reach = mistsReachM(m) * L.reach;
