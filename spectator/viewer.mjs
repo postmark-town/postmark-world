@@ -4579,6 +4579,35 @@ export function creatureIcon() {
   return markIcons({ kind: "sited", id: CREATURE_PREFIX, at: { x: 0, y: 0 } }, { cls: "creature" })[0];
 }
 
+/** The creature's own CSS in the 2D page's STYLE: the live-creature token (art, hit, disc, awareness ring,
+ *  highlight) and the red nameplate accent, one contiguous slice that `STYLE` interpolates at its original place
+ *  (WLD-144 W3; WLD-105). Bytes unchanged. Exported so the 3D view imports it instead of copying it. */
+export const CREATURE_CSS = `/* THE LIVE CREATURES (play fix 35): the Mists' own silhouette, dark with a pale
+   rim so it reads on any ground, held at a pip's size; the creature icon at its
+   feet at street zoom; their answer to an act in a note like the walk's */
+.ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
+.ov-creature-art { fill:#4a2326; pointer-events:none; }
+/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
+   portrait sits, the rim in a deeper red of the same hue, and no legs */
+.ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
+.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
+.ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
+.wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
+.wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */`;
+
+/** A live creature's nameplate (the hover plate): its icon and its name, the plate's `data-nameplate` carrying
+ *  its id. Pure: takes the creature row ({ id, name, ... } from liveCreaturesFrom), and a missing row is "".
+ *  Hoisted out of `mountViewer`, where it took the lookup key and read `liveCreatures.get(key)`; the row's own
+ *  `id` is that key, because the one writer sets `liveCreatures.set(c.id, c)` (loadLiveCreatures).
+ *  Its other dependencies are top-level in this module: `esc` (the escaper above), `iconsHTML` (imported from
+ *  ./mark-icons.mjs) and `creatureIcon` (above). */
+export function creatureNameplateHTML(c) {
+  if (!c) return "";
+  return '<div class="wv-nameplate" data-nameplate="' + esc(c.id) + '">'
+    + '<span class="wv-np-what">' + iconsHTML([creatureIcon()]) + '</span>'
+    + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
+}
+
 /** The living creatures in an apex find answer: [{ id, kind, name, x, y, fades_in }]. Pure. */
 export function liveCreaturesFrom(answer) {
   const rows = answer?.found?.creatures ?? answer?.creatures ?? [];
@@ -6828,18 +6857,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   font:600 .82rem/1.35 Consolas,Menlo,monospace; opacity:0; transition:opacity .25s; pointer-events:none; }
 .wv-walk-note.show { opacity:1; }
 .wv-walk-note.refusal { border-color:#b5524a; color:#f0b0a8; }
-/* THE LIVE CREATURES (play fix 35): the Mists' own silhouette, dark with a pale
-   rim so it reads on any ground, held at a pip's size; the creature icon at its
-   feet at street zoom; their answer to an act in a note like the walk's */
-.ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
-.ov-creature-art { fill:#4a2326; pointer-events:none; }
-/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
-   portrait sits, the rim in a deeper red of the same hue, and no legs */
-.ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
-.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
-.ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
-.wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
-.wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */
+${CREATURE_CSS}
 .wv-choose-row.is-convo { border-left:3px solid #7f93a6; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
 .wv-choose-row.is-creature { border-left:3px solid #d8706a; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
 .wv-creature-note { position:absolute; z-index:9; left:50%; bottom:58px; transform:translateX(-50%); max-width:min(34rem,80%);
@@ -14732,13 +14750,6 @@ export function mountViewer(appEl) {
     }
     return rings + out;
   }
-  function creatureNameplateHTML(id) {
-    const c = liveCreatures.get(id);
-    if (!c) return "";
-    return '<div class="wv-nameplate" data-nameplate="' + esc(id) + '">'
-      + '<span class="wv-np-what">' + iconsHTML([creatureIcon()]) + '</span>'
-      + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
-  }
   // ITS COLUMN: what it is in its kind's own words, its kind, what it is doing,
   // its moods, when it came out, what it runs on, and what was done to it and how it answered.
   function creatureColumnView(id) {
@@ -15331,7 +15342,7 @@ export function mountViewer(appEl) {
   function paintGlance(el, id) {
     const handle = walkerHandleFromHoverId(id);
     const creature = isCreatureId(id);
-    const html = handle ? walkerBubbleHTML(handle) : creature ? creatureNameplateHTML(id) : markNameplateHTML(id);
+    const html = handle ? walkerBubbleHTML(handle) : creature ? creatureNameplateHTML(liveCreatures.get(id)) : markNameplateHTML(id);
     if (!html) { el.hidden = true; glanceShown = null; return; }
     el.className = `wv-bubble is-hover${handle ? "" : ` is-nameplate ${creature ? "is-creature" : markClasses(byId.get(id))}`}`;
     if (el._pmHtml !== html) { el._pmHtml = html; el.innerHTML = html; }
