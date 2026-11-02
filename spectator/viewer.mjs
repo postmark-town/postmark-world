@@ -14657,6 +14657,7 @@ export function mountViewer(appEl) {
       // (a mark's handle is its author) and wrong here (the handle IS the resident), so the
       // column drew no link. It also carried a `residentHref` the column never read.
       handle,
+      titleLink: true,   // and their name in the header is that link ("like by clicking their name?")
       kicker: face.household || "a resident",
       title: face.name || handle,
       pronouns: profile.pronouns,

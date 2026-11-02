@@ -729,3 +729,34 @@ test("THE BIO IS NEVER CUT HERE: one at the office's 400-character cap, ending m
   assert.deepEqual(two.children.map(serialize), ["First, a few words.", "Second, a few more."]);
   // ⚑ THE FLIP: `text(profile.bio)?.slice(0, 200)` in residentProfileView → the first assertion reds
 });
+
+// ── THE NAME IS THE LINK (WLD-145: "like by clicking their name?"; a resident's column only) ──
+
+test("the name in the header links to the resident's page only when a view says its title is a person", () => {
+  const person = homeColumnModel({ handle: "x", title: "Rig Ash", residentHref: "/residents/x/", titleLink: true });
+  assert.equal(person.titleLink, true);
+  assert.equal(homeColumnModel({ handle: "x", residentHref: "/residents/x/" }).titleLink, false, "a view that does not ask keeps its title as words");
+  assert.equal(homeColumnModel({ handle: "x", titleLink: true }).titleLink, false, "no page to go to, no link");
+  const [h2] = byClass(render(person), "wv-homecol-title");
+  const [a] = find(h2, "a");
+  assert.equal(a?.getAttribute("href"), "/residents/x/");
+  assert.equal(a?.getAttribute("rel"), "noopener");
+  assert.equal(serialize(h2), "Rig Ash", "the name itself is unchanged");
+  const home = byClass(render(homeColumnModel({ handle: "x", title: "the Trueing-House", residentHref: "/residents/x/" })), "wv-homecol-title")[0];
+  assert.equal(find(home, "a").length, 0, "a home's title is not a link");
+  // ⚑ THE FLIPS: drop the model's `titleLink` → the first line reds; drop the renderer's branch → the href line reds
+});
+
+test("A RESIDENT'S NAME IS THEIR LINK: through the page's own resident view and the real column; a mark's and a creature's views do not ask for it", () => {
+  const v = residentViewFor({ profile: { bio: "A figure." } });
+  assert.equal(v.titleLink, true, "the page's resident view asks for it");
+  const host = element("aside");
+  createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+  const [a] = find(byClass(host, "wv-homecol-title")[0], "a");
+  assert.equal(a?.getAttribute("href"), "/residents/rig-ash/", "the name goes to the page's own resident route for this handle");
+  assert.equal(serialize(a), "Rig Ash");
+  assert.equal(byClass(host, "wv-homecol-resident").length, 1, "and the line at the foot is still there");
+  assert.doesNotMatch(bodyOf("markColumnView"), /titleLink/, "WLD-125 decides, link by link, whether a mark's title is one");
+  assert.doesNotMatch(bodyOf("creatureColumnView"), /titleLink/);
+  // ⚑ THE FLIPS: drop `titleLink: true,` from residentColumnView → the first line reds; drop `titleLink: !!view.titleLink,` from the controller's paint → the href line reds
+});

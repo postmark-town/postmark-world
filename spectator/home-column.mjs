@@ -228,7 +228,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -273,6 +273,9 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
       : error ? `the office did not answer for this home — ${error}`
       : "nothing written here yet",
     residentHref: residentHref ?? null,
+    // THE NAME IS THE LINK, when the view says its title is a person and there is a page to go to
+    // (WLD-145, Darko 2026-11-01 19:18: "like by clicking their name?"). A home's title is not.
+    titleLink: !!(titleLink && residentHref),
     // THE ENTER BUTTON (founder, 2026-09-11: "add the enter button for the parcel
     // columns? and it just enters the parcel"). The column names a parcel; a
     // reader who can act gets the same door the little card offers, on the same
@@ -510,7 +513,16 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
   // nav's corner was chrome; the name is what the eye reads first
   const titleRow = el(doc, "div", "wv-homecol-titlerow");
   const title = el(doc, "h2", "wv-homecol-title");
-  title.textContent = model.title;
+  if (model.titleLink && model.residentHref) {
+    // A RESIDENT'S NAME IS THE WAY TO THEIR PAGE (WLD-145): the same href as the line at the foot
+    const name = el(doc, "a", "wv-homecol-title-link");
+    name.setAttribute("href", model.residentHref);
+    name.setAttribute("rel", "noopener");
+    name.textContent = model.title;
+    title.appendChild(name);
+  } else {
+    title.textContent = model.title;
+  }
   titleRow.appendChild(title);
   if (model.pronouns) {
     const theirs = el(doc, "span", "wv-homecol-pronouns");
@@ -836,6 +848,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       // a mark's column names its author in the byline; the link out is a
       // home's, so a view may turn it off
       residentHref: residentHref && view.residentLink !== false ? residentHref(view.handle) : null,
+      titleLink: !!view.titleLink,
       parcelId: view.parcelId ?? null,
       canEnter: !!view.canEnter,
       byline: view.byline ?? null,
@@ -918,6 +931,9 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-scroll { flex:1; min-height:0; overflow-y:auto; padding:14px 15px 26px;
   scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 .wv-homecol-title { margin:0; color:var(--paper); font-size:1.22rem; line-height:1.25; }
+/* a resident's name is the way to their page (WLD-145): a name first, with a faint rule that says it is a link */
+.wv-homecol-title-link { color:inherit; text-decoration:none; border-bottom:1px dotted rgba(232,224,207,.35); }
+.wv-homecol-title-link:hover, .wv-homecol-title-link:focus-visible { color:var(--amber); border-bottom-color:var(--amber); }
 /* the door beside the name (founder, 2026-09-11) */
 .wv-homecol-titlerow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .wv-homecol-pronouns { color:var(--muted, #9aa3ad); font-size:.82rem; font-style:italic; }
