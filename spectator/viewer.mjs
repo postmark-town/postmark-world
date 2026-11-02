@@ -11826,8 +11826,8 @@ export function mountViewer(appEl) {
       // THE FAN RIDES INSIDE THE SCALED SPACE, which is why it is a `cx`/`cy` on
       // the circle rather than an addition to the translate: scaled by the same
       // variable, it stays the constant few panel pixels it was when the string
-      // divided it by k. (No fan is passed since WLD-95 — the `null`s below —
-      // but the parameters stay for the overlay builders that take one.)
+      // divided it by k. (Since WLD-95 the `null`s below pass none, but the
+      // parameters stay for the overlay builders that take one.)
       glyphIds.add(m.id);
       if (full.kind === "parcel") {
         s += homeCard(full, p, null, nameOf(m), tier);
