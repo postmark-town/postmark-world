@@ -5890,6 +5890,11 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-view-sub { margin:5px 0 0; color:var(--dim); font-size:.76rem; line-height:1.5;
   font-style:italic; max-width:48ch; }
 .wv-lens-note { margin:6px 0 0; font-size:.76rem; line-height:1.5; max-width:48ch; }
+/* where it goes when the Telling cannot be seen (a phone, or the Telling folded): the top of the map's side, right
+   above the toggle's cluster, in flow like the "world moved" toast so it cannot sit on a wrapped row of buttons. It
+   sets no display, so the hidden attribute still hides it. */
+.wv-map .wv-lens-note { position:sticky; top:6px; z-index:5; align-self:flex-end; margin:6px 10px 8px; padding:4px 13px;
+  max-width:min(30rem,calc(100% - 20px)); background:var(--panel2); border:1px solid var(--amber-dark); border-radius:14px; }
 .wv-viewhead + .wv-telling { padding-top:12px; }
 
 /* Two panels, no bars. Both are content to their own edges — the painting runs
@@ -15830,6 +15835,7 @@ export function mountViewer(appEl) {
       button.title = on ? "show the telling" : "hide the telling and give the painting the page";
     }
     $(root, ".wv-main")?.classList.toggle("is-telling-collapsed", on);
+    paintLensNote();   // the outsider line is read in the Telling, or at the map side when the Telling is folded (POS-823)
     renderBubbles();
     // The pane is mid-slide. Re-measure when the slide ENDS, not on the next
     // frame — a single rAF lands in the middle of a 300 ms transition, which is
@@ -15915,7 +15921,7 @@ export function mountViewer(appEl) {
   }
 
   // a window resize is the same event as a toggle, only slower
-  const onViewerResize = () => { mapCtx?.refit?.(); sizeSearchField(); seatRoomCard(); positionBubbles(); placeTour(); };
+  const onViewerResize = () => { mapCtx?.refit?.(); sizeSearchField(); seatRoomCard(); positionBubbles(); placeTour(); paintLensNote(); };
   window.addEventListener("resize", onViewerResize);
   // THE COCKPIT'S ONE WORD TO THIS PANE — see standOutOfRoom for why the redraw
   // cannot wait for the ledger's clock. Guarded like the dock and feed seams
@@ -15997,14 +16003,25 @@ export function mountViewer(appEl) {
       ? "viewing as an outsider: the world as a stranger sees it (read-only). Click to see as yourself again."
       : "view as an outsider: the world as a stranger sees it, as if your household owned nothing (read-only)";
   }
-  // THE OUTSIDER VIEW SAYS WHY IT CHANGED NOTHING (POS-823): the office's line, as it sent it, at the head of the
-  // Telling. The page keeps no rule and no wording of its own: it reads the line off the lens read it holds for this
-  // standpoint and crossing (the cache key carries the lens, so with the lens off it finds your own sight, which has
-  // none), and an office that sends none shows nothing.
+  // THE OUTSIDER VIEW SAYS WHY IT CHANGED NOTHING (POS-823): the office's line, as it sent it. The page keeps no rule
+  // and no wording of its own: it reads the line off the lens read it holds for this standpoint and crossing (the
+  // cache key carries the lens, so with the lens off it finds your own sight, which has none), and an office that
+  // sends none shows nothing. It only decides WHERE the line can be read.
+  //
+  // The toggle is on the map, so a line left in the Telling is never read when the Telling is not there to be seen:
+  // on a phone (under 720 px `.wv-view` is display:none) or folded away (visibility:hidden). Then the line goes where
+  // the toggle is, the map's side: the host reRender's toast already uses when the Telling is folded (review of
+  // 5e869ee8, finding A). reRender itself is left as it was: on a phone its toast would take space for good.
+  function tellingShows() {
+    return !state.paintingOnly && !onPhone();
+  }
   function paintLensNote() {
     const el = root.querySelector(".wv-lens-note");
     if (!el) return;
     const line = lensNoteOf(readCache.get(residentStandpointKey(null, state.handle)));
+    const inHead = tellingShows();
+    const host = inHead ? root.querySelector(".wv-viewhead") : root.querySelector(".wv-map .wv-sticky");
+    if (host && el.parentElement !== host) (inHead ? host.append(el) : host.prepend(el));
     el.textContent = line;
     el.hidden = !line;
   }

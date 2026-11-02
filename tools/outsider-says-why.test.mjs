@@ -116,7 +116,7 @@ function pageHarness() {
     globalThis.probe = { state, readCache, read: () => loadResidentRead(null, state.handle), render: () => renderCurrent(),
       fold: () => applyPaintingOnly(), resize: () => onViewerResize() };
   `, context);
-  return { probe: context.probe, requests, rendered, note, head, mapSide, phone };
+  return { probe: context.probe, requests, rendered, resized, note, head, mapSide, phone };
 }
 
 const ownRead = (extra = {}) => ({ handle: "rig-actor", records: {}, ...extra });
