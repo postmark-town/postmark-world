@@ -29,7 +29,10 @@ test("[pin] the pill is the pip opened: its cap is the pip (the icon only where 
 });
 
 test("[pin] no timer: the pill opens with the highlight, and the glance's delay is gone", () => {
-  assert.match(SOURCE, /const GLANCE_DELAY_MS = 0;/);
+  const rg = fn("raiseGlance");
+  assert.match(rg, /paintGlance\(el, id\);/, "the glance is painted in the same call that raises it");
+  assert.doesNotMatch(rg, /setTimeout/, "no timer between the hover and the plate");
+  assert.doesNotMatch(SOURCE, /GLANCE_DELAY_MS/, "the delay constant is gone, not held at 0");
   const rb = fn("renderBubbles");
   assert.ok(rb.indexOf("renderPills();") > 0 && rb.indexOf("renderPills();") < rb.indexOf("if (!state.paintingOnly) {"),
     "decided in the same pass as the column and the highlight, in both view modes");
