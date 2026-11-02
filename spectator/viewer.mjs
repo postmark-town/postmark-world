@@ -2439,6 +2439,28 @@ export function clipSegmentToBox(from, to, box) {
   };
 }
 
+/**
+ * The part of a walk still to be walked: from where the walker IS at `at`, to
+ * where they are going. Null when there is no leg to draw: no departure, a
+ * finished walk (arrived) or a stop (standing).
+ *
+ * THE DIRECTION IS THE POINT (WLD-144, Bevel 2026-11-02): this is the REMAINING
+ * segment, `positionAt(departure, at)` to `departure.toward`. It is not the
+ * origin to the walker, and not the path already walked.
+ *
+ * Pure, and exported so the 2D walk paths and the 3D trails read one leg
+ * instead of keeping two copies (WLD-105). It adds no clock and no maths: the
+ * position and its arrived/standing flags are positionAt's, `at` is passed
+ * through untouched (undefined stays undefined, so positionAt's own default
+ * clock applies exactly as it did inline), and clipping to the painting stays
+ * with the caller (clipSegmentToBox).
+ */
+export function remainingWalkLeg(departure, at) {
+  const here = positionAt(departure, at);
+  if (!here || here.arrived || here.standing) return null;   // a finished walk is not a path
+  return { from: here, to: departure.toward };
+}
+
 // ── HOW MUCH BIGGER "YOURS" IS (Keemin, 2026-09-13: "let's make them bigger
 // than the others") ────────────────────────────────────────────────────────
 //
@@ -12595,9 +12617,9 @@ export function mountViewer(appEl) {
     for (const handle of handles) {
       const departure = currentDeparture(departures, handle);
       if (!departure) continue;
-      const now_ = positionAt(departure, now);
-      if (!now_ || now_.arrived || now_.standing) continue;   // a finished walk is not a path
-      const seg = clipSegmentToBox(now_, departure.toward, box);
+      const leg = remainingWalkLeg(departure, now);            // where they are, to where they are going
+      if (!leg) continue;                                      // a finished walk is not a path
+      const seg = clipSegmentToBox(leg.from, leg.to, box);
       if (!seg) continue;                                      // all of it is off the sheet
       const a = px(seg.from), b = px(seg.to);
       const colour = faceOf(handle).color ?? "#bfe4c6";
