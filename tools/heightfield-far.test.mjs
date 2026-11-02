@@ -898,6 +898,20 @@ test("samples whose cell index straddles the ring limit are the sort's, and main
   }
 });
 
+test("a cloud collapsed onto few doubles at 4e15 m: the stop rule's margin is gone there, so the field must not walk rings", () => {
+  // at 4e15 the doubles are half a metre apart: 80 points in a 10 m box fall on 20
+  // x values, the cell is the 1 m minimum, and the rounding in the ring walk's edge
+  // (about the size of a cell) is far past its 1e-9-of-a-cell margin. Walking rings
+  // here answers wrongly in about 1 sample in 200 (measured with the walk allowed up
+  // to 2^52); the ring limit sends these to the occupied-cell search, which is exact.
+  const u = rng(80);
+  const q = (v) => Math.round(v * 8) / 8;
+  const controlPoints = Array.from({ length: 80 }, () => { const p = { x: q(4e15 + u() * 10), y: q(4e15 + u() * 10), h: u() * 100 }; return p; });
+  const fast = buildHeightfield({ controlPoints }).elevationAt;
+  const slow = referenceHeightfield({ controlPoints });
+  for (let i = 0; i < 6000; i += 1) agree(fast, slow, 4e15 + u() * 14 - 2, 4e15 + u() * 14 - 2, "collapsed cloud");
+});
+
 test("the file compared a great many samples against the sort", (t) => {
   t.diagnostic(`${checked} samples compared bit for bit (Object.is) against the stable-sort oracle`);
   assert.ok(checked > 100000, `only ${checked} samples were compared`);
