@@ -22,7 +22,7 @@
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
 import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
-import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
+import { openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
 import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creature's ring stops at its room's walls (WLD-25)
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
@@ -8371,12 +8371,6 @@ export function mountViewer(appEl) {
     data.trueWorld = ws.json;
   }
 
-  // Kept for the hosts that call it (the published `reload` handle, the replay
-  // shell): both halves, in the old order, with the old name.
-  async function loadData() {
-    await loadFold();
-    applyWorldLayer();
-  }
   // re-pull the fold from the same source and re-assemble (auto-update). The skeleton
   // is stable across a write, so only world-state is refetched.
   async function reloadWorld() {
@@ -8765,21 +8759,23 @@ export function mountViewer(appEl) {
   function isMine(m) {
     return !!m?.id && state.mineIds.has(m.id);
   }
-  // ───────── per-resident views, built ahead ─────────
+  // ───────── per-resident views, kept once built ─────────
   //
   // A household is ONE world seen from N standpoints: the payload
   // (`data.myWorld`), the portfolio and the mine-set are all household-grain,
   // so what actually differs per resident is small — a standpoint, the telling
-  // read from it, a camera, and two office answers. Those are built ahead and
-  // kept in the DOM, one hidden pane per handle, so selecting a resident costs
-  // a visibility toggle and a viewBox instead of an engine call and a rebuild.
+  // read from it, and the resident's home, balance and action palette. A view,
+  // once built, is kept in the DOM (one hidden pane per handle), so selecting a
+  // resident whose pane is still true costs a visibility toggle and a viewBox
+  // instead of an engine call and a rebuild. Nothing builds a view ahead of
+  // being asked: see "warming is gone" below.
   //
   // A pane goes stale for reasons that are NOT its standpoint: the record
   // re-folds, the crossing moves, the reader changes the filter or a dial.
   // `viewSignature()` is exactly those reasons, in one string — a pane built
-  // under a different one is rebuilt rather than shown. There is no second
-  // invalidation concept: whatever refreshes the active view re-warms the rest.
-  const viewCache = new Map(); // handle → { pane, cam, origin, view, radial, home, balance, palette, signature }
+  // under a different one is rebuilt, when a reader switches onto it, rather
+  // than shown. There is no second invalidation concept.
+  const viewCache = new Map(); // handle → { pane, origin, radial, home, balance, palette, signature }
   const viewSignature = () => [
     worldEpoch, state.crossing, state.markFilter,
     identityResolved() ? 1 : 0, JSON.stringify(state.dials),
@@ -8787,12 +8783,11 @@ export function mountViewer(appEl) {
                      // inside what is stale the moment the ledger says otherwise
   ].join("|");
   const standpointKey = () => (isSpectating() || !state.handle ? SPECTATOR_ACTOR : state.handle);
-  const samePlace = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y;
 
   function cacheEntry(handle) {
     let entry = viewCache.get(handle);
     if (!entry) {
-      entry = { pane: null, cam: null, origin: null, radial: null, home: null, balance: null, palette: null, signature: null };
+      entry = { pane: null, origin: null, radial: null, home: null, balance: null, palette: null, signature: null };
       viewCache.set(handle, entry);
     }
     return entry;
@@ -8825,9 +8820,7 @@ export function mountViewer(appEl) {
       const radial = composeTelling(pane, standpoint, key);
       if (entry) {
         const origin = originFor(key);
-        const moved = !samePlace(origin, entry.origin);
         entry.pane = pane;
-        entry.cam = { x: standpoint.x, y: standpoint.y };
         entry.origin = origin ? { x: origin.x, y: origin.y } : null;
         entry.radial = radial;
         entry.signature = viewSignature();
@@ -9841,8 +9834,9 @@ export function mountViewer(appEl) {
   //    the same furnishing pass the room does, and difference #6 stops being a
   //    difference. SCENES.md is amended in the same commit.
   // The town's own rendering of its ground, mounted exactly as the atlas was
-  // until 2026-09-08 (that code, restored): scripts stripped, images made lazy,
-  // relative art paths rebased on the atlas directory. Null when the file is
+  // until 2026-09-08 (that code, restored): scripts stripped, images made lazy.
+  // It has since lost its words, pictures and frames too (below), so no art path
+  // is left to rebase. Null when the file is
   // absent or unreadable — never a throw, because the generated ground is the
   // answer then and the reader must not see "the ground didn't draw" for a
   // missing picture.
@@ -9959,11 +9953,6 @@ export function mountViewer(appEl) {
           for (const poly of bySlug.values()) last.parentNode.insertBefore(doc.importNode(poly, true), last.nextSibling);
         }
       }
-      const base = new URL(ATLAS_GROUND_URL, location.origin);
-      svg.querySelectorAll("image").forEach((im) => {
-        const hh = im.getAttribute("href") ?? im.getAttribute("xlink:href");
-        if (hh && !/^(https?:)?\//.test(hh)) { im.setAttribute("href", new URL(hh, base).pathname); im.removeAttribute("xlink:href"); }
-      });
       return document.importNode(svg, true);
     } catch { return null; }
   }
@@ -18031,11 +18020,4 @@ export function mountViewer(appEl) {
   };
   try { window.__pmViewer = handle; } catch { /* no window: the tests import this file */ }
   return handle;
-}
-
-// ───────── tiny helpers (display only) ─────────
-function firstWords(body, n) {
-  const s = String(body ?? "").replace(/^\s*(sits|region|kind|at|date|slot|value|household|mark|parent)\s*:\s*/i, "").trim().replace(/\s+/g, " ");
-  const w = s.split(" ").slice(0, n).join(" ");
-  return w + (s.split(" ").length > n ? "…" : "");
 }
