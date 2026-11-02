@@ -12,6 +12,11 @@
 // generator (no Math.random: a failure must replay).
 
 import { test } from "node:test";
+import { execFileSync } from "node:child_process";
+import { readFileSync, writeFileSync, mkdtempSync, unlinkSync, rmdirSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 
 import { DIALS, buildHeightfield } from "./world-engine.mjs";
@@ -460,6 +465,436 @@ test("far samples cost a fraction of a full scan, at a few thousand and tens of 
     }
     assert.ok(Number.isFinite(sink));
     assert.ok(far * margin < full, `n=${n}: ${N} far samples took ${far.toFixed(1)}ms; a plain full scan took ${full.toFixed(1)}ms`);
+  }
+});
+
+// ══ WLD-144 DISPOSITION (Bevel, D25): THE GRID KEYS MUST NOT ALIAS ═══════════════
+//
+// `main` filed each cell under the number gx * 2^21 + gy. Past a cell index of
+// 2^32 that number needs more than 53 bits, so a double rounds it and different
+// cells share a key; the ring walk then reads one list twice and offers the same
+// point more than once, which fills the K seats with copies and moves the answer.
+// The cells are now filed by (gx, gy) exactly, and a sample whose cell index is
+// too large for the ring loop to count in (past 2^52) goes to the occupied-cell
+// search instead of looping forever. Both are corrections of existing `main`
+// behaviour at coordinates no real sample reaches (the town's marks reach about
+// 135 km, a cell index of about 400); everywhere else the answers are main's own
+// bit for bit, which the kernel below is here to say.
+
+// ── MAIN'S NUMERIC KERNEL, VERBATIM ──────────────────────────────────────────
+// buildHeightfield, GRID_MIN_POINTS, GRID_KEY_SPAN and buildGrid exactly as they
+// are in tools/world-engine.mjs at the pinned base (postmark-world 89d8cbd2, the
+// main this PR started from), with only the `export` keyword removed. It needs no
+// World import, no record and no fixture. The test after this block checks the
+// copy against the pinned source whenever git can show it.
+const MAIN_PIN = "89d8cbd235d62df94b5d6793433dade8cef665ff";
+function mainKernel(DIALS) {
+function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = DIALS.idw_k }) {
+  if (!controlPoints?.length) throw new Error("heightfield needs control points");
+  const cps = controlPoints.map((c) => ({ x: c.x, y: c.y, h: c.h, id: c.id ?? null }));
+  const K = Math.min(k, cps.length);
+  // THE K NEAREST, WITHOUT SORTING THE WORLD TO FIND THEM.
+  //
+  // This function is the floor of the whole engine: line-of-sight samples it
+  // along every ray, so opening one pair of eyes calls it tens of thousands of
+  // times. It used to answer by building an object for EVERY control point,
+  // sorting all of them, and keeping the first eight — O(n log n) work and n
+  // allocations to select a constant 8. Profiling put 91% of openYourEyes in
+  // here, and it was quietly superlinear in the size of the town, because the
+  // control points are extracted from the marks: a town with 5× the marks has
+  // 8× the control points, so every sample got dearer at the same time as there
+  // were more samples to take. 743 marks → 1.3 s; 3,830 marks → 4.5 MINUTES.
+  //
+  // A fixed-size insertion beat is the whole fix. K is 8, so the inner shuffle
+  // is a handful of moves and never grows; the scratch is hoisted out of the
+  // call because allocating it per sample was a large share of the cost on its
+  // own (the profiler's GC line). Answers are BIT-IDENTICAL to the sort — same
+  // points, same order, same summation — and a test pins that against the
+  // original implementation rather than against a remembered number.
+  //
+  // Ties keep the earlier control point, which is what the stable sort did: an
+  // equal distance is decided by the index, so a latecomer never displaces the
+  // point that was already holding the seat.
+  const bestD2 = new Float64Array(K);
+  const bestH = new Float64Array(K);
+  const bestI = new Int32Array(K);
+  let n = 0;
+  // one candidate into the beat, ordered by (distance, index) — the index only
+  // ever decides a tie, which the full scan below never meets out of order
+  function offer(i, x, y) {
+    const c = cps[i];
+    const dx = x - c.x, dy = y - c.y;
+    const d2 = dx * dx + dy * dy;
+    if (n === K && !(d2 < bestD2[K - 1] || (d2 === bestD2[K - 1] && i < bestI[K - 1]))) return;   // cannot beat the worst held
+    let j = n < K ? n : K - 1;
+    while (j > 0 && (d2 < bestD2[j - 1] || (d2 === bestD2[j - 1] && i < bestI[j - 1]))) {
+      bestD2[j] = bestD2[j - 1]; bestH[j] = bestH[j - 1]; bestI[j] = bestI[j - 1]; j -= 1;
+    }
+    bestD2[j] = d2; bestH[j] = c.h; bestI[j] = i;
+    if (n < K) n += 1;
+  }
+  function weigh() {
+    if (bestD2[0] === 0) return bestH[0];       // exactly on a control point
+    let wsum = 0, hsum = 0;
+    for (let i = 0; i < n; i += 1) { const w = 1 / Math.pow(bestD2[i], power / 2); wsum += w; hsum += w * bestH[i]; }
+    return hsum / wsum;
+  }
+  function scanAll(x, y) {
+    n = 0;
+    for (let i = 0; i < cps.length; i += 1) offer(i, x, y);
+    return weigh();
+  }
+  // ── A GRID OVER THE POINTS, SO A SAMPLE ASKS ITS NEIGHBOURS FIRST (POS-228) ──
+  //
+  // The beat above still visits every control point for every sample, and the
+  // telling takes tens of thousands of samples; part 1's profile of the live
+  // page put elevationAt at 9–14% of the main thread. So the points are
+  // bucketed into square cells, and a sample walks rings of cells outward from
+  // its own until the K it holds are CLOSER than anything a further ring could
+  // contain — then stops. A sample far from every cell (the outliers sit 96 km
+  // out) runs out of rings and takes the full scan, which is the old answer.
+  //
+  // THE ANSWER MUST NOT MOVE BY A BIT, and the reason it cannot is the stop
+  // rule. A point left unvisited is at least the ring's edge away, and the
+  // search only stops when the K-th distance held is strictly inside that edge
+  // (with a margin for the edge's own rounding) — so every point that could sit
+  // in the K, or tie with its last seat, was visited. Visiting order is by cell
+  // rather than by index, so ties are broken on the INDEX explicitly: the same
+  // (distance, index) order the stable sort kept, and the same order the full
+  // scan's strict comparisons keep. heightfield-selection.test.mjs holds both
+  // paths against the original sort.
+  const grid = cps.length > GRID_MIN_POINTS && cps.every((c) => Number.isFinite(c.x) && Number.isFinite(c.y))
+    ? buildGrid(cps, K) : null;
+  function elevationAt(x, y) {
+    if (!grid || !Number.isFinite(x) || !Number.isFinite(y)) return scanAll(x, y);
+    const { size, cells, maxRing } = grid;
+    const cx = Math.floor(x / size), cy = Math.floor(y / size);
+    n = 0;
+    for (let r = 0; r <= maxRing; r += 1) {
+      for (let gx = cx - r; gx <= cx + r; gx += 1) {
+        const edgeX = gx === cx - r || gx === cx + r;
+        for (let gy = cy - r; gy <= cy + r; gy += (edgeX || r === 0) ? 1 : 2 * r) {
+          const cell = cells.get(gx * GRID_KEY_SPAN + gy);
+          if (cell) for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
+        }
+      }
+      if (n < K) continue;
+      // the nearest a point outside the rings walked so far can be, less a
+      // hair for the rounding in the division that filed each point in a cell
+      const edge = Math.min(x - (cx - r) * size, (cx + r + 1) * size - x, y - (cy - r) * size, (cy + r + 1) * size - y) - size * 1e-9;
+      if (edge > 0 && bestD2[K - 1] < edge * edge) return weigh();
+    }
+    return scanAll(x, y);
+  }
+  return { elevationAt, controlPoints: cps };
+}
+
+const GRID_MIN_POINTS = 64;       // below this the full scan is already cheap
+const GRID_KEY_SPAN = 1 << 21;    // cell (gx, gy) → one number key; a collision only merges two cells, never loses one
+// The cell is sized off the middle half of the points (the interquartile box
+// in x and in y), so the 96 km outliers cannot stretch it, to hold about K/4 of
+// them — measured on the town's 627 points over twenty tellings, ~350 m cells
+// ran 2.1–2.3× faster than the full scan, where 700 m and 240 m cells were
+// slower. The rings stop once walking them would visit more cells than half the
+// points: past that, the full scan is the cheaper way to the same answer.
+function buildGrid(cps, K) {
+  const iqr = (vals) => { const s = [...vals].sort((a, b) => a - b); return s[Math.floor(s.length * 0.75)] - s[Math.floor(s.length * 0.25)]; };
+  const area = Math.max(1, iqr(cps.map((c) => c.x)) * iqr(cps.map((c) => c.y)));
+  const size = Math.max(1, Math.sqrt((area * K) / cps.length));
+  const maxRing = Math.max(2, Math.floor((Math.sqrt(cps.length / 2) - 1) / 2));
+  const cells = new Map();
+  for (let i = 0; i < cps.length; i += 1) {
+    const key = Math.floor(cps[i].x / size) * GRID_KEY_SPAN + Math.floor(cps[i].y / size);
+    let cell = cells.get(key);
+    if (!cell) cells.set(key, (cell = []));
+    cell.push(i);
+  }
+  return { size, cells, maxRing };
+}
+  return buildHeightfield;
+}
+const mainBuildHeightfield = mainKernel(DIALS);
+
+test("the embedded main kernel is main's text (checked against the pinned source when git has it)", (t) => {
+  let source;
+  try { source = execFileSync("git", ["show", `${MAIN_PIN}:tools/world-engine.mjs`], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }); }
+  catch { t.diagnostic(`the pinned base ${MAIN_PIN.slice(0, 8)} is not in this checkout; the embedded kernel was not compared`); return; }
+  const start = source.indexOf("export function buildHeightfield(");
+  const last = /^function buildGrid\([^\n]*\) \{/m.exec(source);
+  const slice = source.slice(start, source.indexOf("\n}", last.index) + 2).replace("export function buildHeightfield", "function buildHeightfield");
+  assert.ok(mainKernel.toString().includes(slice), "the embedded kernel is the pinned source, byte for byte");
+});
+
+// ── BEVEL'S CASE ─────────────────────────────────────────────────────────────
+// A 100-unit cloud translated to x = 1e11, k = 8, power = 2, seed-1 generator
+// (his reproduction, WLD-144-review-354-alias-repro.mjs). Invented points only.
+function bevelCloud() {
+  let seed = 1;
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
+  return Array.from({ length: 100 }, (_, i) => ({ id: `probe-${i}`, x: 1e11 + 100 * random(), y: 100 * random(), h: 100 * random() }));
+}
+
+test("Bevel's translated cloud: the field answers what the sort answers, where main's aliased keys did not", () => {
+  const controlPoints = bevelCloud();
+  const [x, y] = [99999999966.26978, 18.36111723144477];
+  const slow = referenceHeightfield({ controlPoints, k: 8, power: 2 });
+  const fast = buildHeightfield({ controlPoints, k: 8, power: 2 }).elevationAt;
+  const main = mainBuildHeightfield({ controlPoints, k: 8, power: 2 }).elevationAt;
+  assert.equal(slow(x, y), 43.43058509395884, "the oracle's answer");
+  assert.equal(Object.is(fast(x, y), slow(x, y)), true, `the field says ${fast(x, y)}`);
+  assert.equal(main(x, y), 56.13266877711569, "main's answer, from the same point offered several times (the defect, kept here as the reason for this test)");
+  // and from inside the cloud, where the near ring walk (not the far search) answers
+  const u = rng(1234);
+  let mainWrong = 0;
+  for (let i = 0; i < 400; i += 1) {
+    const sx = 1e11 + u() * 100, sy = u() * 100;
+    agree(fast, slow, sx, sy, "inside Bevel's cloud");
+    if (!Object.is(main(sx, sy), slow(sx, sy))) mainWrong += 1;
+  }
+  assert.ok(mainWrong > 0, "main's aliased keys do move answers inside such a cloud (else this case proves nothing)");
+});
+
+// ── TRANSLATED CLOUDS ────────────────────────────────────────────────────────
+
+// a cloud of n points in a `width` box whose corner is at (ox, oy); coordinates are
+// multiples of 1/8 so they are exact doubles at every offset up to 1e15
+function cloudAt(n, width, ox, oy, seed) {
+  const u = rng(seed);
+  const q = (v) => Math.round(v * 8) / 8;
+  return Array.from({ length: n }, (_, i) => ({ x: q(ox + u() * width), y: q(oy + u() * width), h: Math.round(u() * 4000) / 10, id: `q${i}` }));
+}
+
+test("translated clouds at 1e9, 1e11, 1e13 and 1e15 on x, on y and on both: samples inside, beside and outside are the sort's", () => {
+  const before = checked;
+  let fields = 0;
+  for (const off of [1e9, 1e11, 1e13, 1e15]) {
+    for (const [ox, oy] of [[off, 0], [0, off], [off, off], [-off, off]]) {
+      for (const [n, width, k] of [[100, 100, 8], [300, 3000, 8], [90, 40, 3], [200, 800, 17]]) {
+        const seed = Math.floor(off / 1e3 + n * 13 + width);
+        const controlPoints = cloudAt(n, width, ox, oy, seed);
+        const fast = buildHeightfield({ controlPoints, k }).elevationAt;
+        const slow = referenceHeightfield({ controlPoints, k });
+        const u = rng(seed + 7);
+        for (let i = 0; i < 180; i += 1) {
+          const r = u();
+          let x, y;
+          if (r < 0.40) { x = ox + u() * width; y = oy + u() * width; }                                              // inside
+          else if (r < 0.55) { const c = controlPoints[Math.floor(u() * n)]; x = c.x; y = c.y; }                    // on a point
+          else if (r < 0.70) { const c = controlPoints[Math.floor(u() * n)]; x = c.x + (u() - 0.5) * 8; y = c.y + (u() - 0.5) * 8; }   // beside one
+          else if (r < 0.85) { x = ox + (u() - 0.5) * width * 3 + width / 2; y = oy + (u() - 0.5) * width * 3 + width / 2; }          // in and just outside
+          else if (r < 0.95) { const a = u() * 2 * Math.PI, R = width * (2 + u() * 200); x = ox + width / 2 + Math.cos(a) * R; y = oy + width / 2 + Math.sin(a) * R; }   // far from it
+          else { x = (u() - 0.5) * 2e5; y = (u() - 0.5) * 2e5; }                                                    // back at the town's own scale
+          agree(fast, slow, x, y, `cloud at (${ox}, ${oy}) n=${n} width=${width} k=${k}`);
+        }
+        fields += 1;
+      }
+    }
+  }
+  assert.ok(fields === 64 && checked - before === 64 * 180, `${checked - before} samples over ${fields} translated fields`);
+});
+
+// ── MAIN'S OWN ANSWERS, WHERE ITS KEYS DO NOT ALIAS ──────────────────────────
+
+test("on every field main answered correctly the field is main's answer to the bit (main's kernel run beside it)", () => {
+  const before = checked;
+  const shapes = [
+    () => town(65, 201, 4000, 2), () => town(300, 202, 9000, 3), () => town(900, 203, 14000, 5), () => town(2500, 204, 30000, 6),
+    () => cloudAt(120, 500, 25000, -40000, 205), () => cloudAt(400, 6000, 1e6, 1e6, 206),
+    () => cloudAt(150, 100, 1e9, 0, 207),                       // 1e9 on x: a cell index of about 7e7, still under 2^32
+  ];
+  let fields = 0;
+  for (const make of shapes) {
+    const controlPoints = make();
+    for (const [k, power] of [[8, 2], [1, 2], [3, 1], [17, 3], [8, 4]]) {
+      const fast = buildHeightfield({ controlPoints, k, power }).elevationAt;
+      const main = mainBuildHeightfield({ controlPoints, k, power }).elevationAt;
+      const xs = controlPoints.map((c) => c.x), ys = controlPoints.map((c) => c.y);
+      const lo = [Math.min(...xs), Math.min(...ys)], hi = [Math.max(...xs), Math.max(...ys)];
+      const u = rng(k * 1000 + power + fields);
+      for (let i = 0; i < 400; i += 1) {
+        const r = u();
+        let x, y;
+        if (r < 0.4) { x = lo[0] + u() * (hi[0] - lo[0]); y = lo[1] + u() * (hi[1] - lo[1]); }
+        else if (r < 0.55) { const c = controlPoints[Math.floor(u() * controlPoints.length)]; x = c.x; y = c.y; }
+        else if (r < 0.75) { x = lo[0] + (u() * 3 - 1) * (hi[0] - lo[0]); y = lo[1] + (u() * 3 - 1) * (hi[1] - lo[1]); }
+        else if (r < 0.95) { const a = u() * 2 * Math.PI, R = 20000 + u() * 180000; x = (lo[0] + hi[0]) / 2 + Math.cos(a) * R; y = (lo[1] + hi[1]) / 2 + Math.sin(a) * R; }
+        else { x = Math.round(lo[0] + u() * (hi[0] - lo[0])); y = Math.round(lo[1] + u() * (hi[1] - lo[1])); }
+        agree(fast, main, x, y, `against main: field ${fields} k=${k} power=${power}`);
+      }
+      fields += 1;
+    }
+  }
+  assert.ok(fields === 35 && checked - before === 35 * 400, `${checked - before} samples compared with main's kernel over ${fields} fields`);
+});
+
+// ── NO CANDIDATE OFFERED TWICE (Bevel, 17:33Z) ───────────────────────────────
+//
+// "Not aliased" has to hold for the cells the ring walk LOOKS UP as well as the
+// cells that are stored: a repeated lookup key repeats a candidate even when the
+// stored cells are distinct. So this runs a copy of the engine in which every
+// call to `offer` is counted per index, and the count is reset whenever the beat
+// is emptied (a sample that is handed from the ring walk to the far search starts
+// a fresh beat, which is how it has always started the scan, so a point may be
+// offered again after that reset and is not deduplicated across it). Within a beat,
+// no index may be offered twice, and the K held at the end holds no index twice. The copy is made from the engine's own text with
+// three lines of hooks added, in a temp folder; nothing is written to the repo.
+function hooked(source, { beats, far }) {
+  const count = (re, text) => (text.match(re) ?? []).length;
+  assert.equal(count(/^ {2}function offer\(i, x, y\) \{$/gm, source), 1, "one offer");
+  assert.equal(count(/^ {2}function weigh\(\) \{$/gm, source), 1, "one weigh");
+  assert.equal(count(/^ {4}n = 0;$/gm, source), beats, "the places the beat is emptied (scan, ring walk, and the far search where there is one)");
+  assert.equal(count(/^ {2}function farSearch\(x, y\) \{$/gm, source), far, "the far search, where there is one");
+  return source
+    .replace(/^ {2}function offer\(i, x, y\) \{$/m, (m) => `${m}\n    globalThis.__hf.offer(i);`)
+    .replace(/^ {2}function weigh\(\) \{$/m, (m) => `${m}\n    globalThis.__hf.held(bestI, n);`)
+    .replace(/^ {4}n = 0;$/gm, (m) => `${m} globalThis.__hf.beat();`)
+    .replace(/^ {2}function farSearch\(x, y\) \{$/m, (m) => `${m}\n    globalThis.__hf.far();`);
+}
+const hf = { seen: new Set(), repeats: 0, heldRepeats: 0, offers: 0, far: 0, beats: 0, held(idx, k) { if (new Set(Array.from(idx).slice(0, k)).size !== k) this.heldRepeats += 1; }, offer(i) { this.offers += 1; if (this.seen.has(i)) this.repeats += 1; this.seen.add(i); }, beat() { this.seen = new Set(); this.beats += 1; }, farCall() { this.far += 1; } };
+globalThis.__hf = { offer: (i) => hf.offer(i), beat: () => hf.beat(), far: () => hf.farCall(), held: (idx, k) => hf.held(idx, k) };
+function hfReset() { hf.seen = new Set(); hf.repeats = 0; hf.heldRepeats = 0; hf.offers = 0; hf.far = 0; hf.beats = 0; }
+
+async function hookedHead() {
+  const here = new URL(".", import.meta.url);
+  const dir = mkdtempSync(join(tmpdir(), "hf-far-"));
+  const file = join(dir, "world-engine.hooked.mjs");
+  try {
+    const source = readFileSync(new URL("./world-engine.mjs", here), "utf8").replace(/from "\.\/([a-z-]+\.mjs)"/g, (m, f) => `from ${JSON.stringify(new URL(`./${f}`, here).href)}`);
+    writeFileSync(file, hooked(source, { beats: 3, far: 1 }));
+    return (await import(pathToFileURL(file).href)).buildHeightfield;
+  } finally { try { unlinkSync(file); rmdirSync(dir); } catch { /* the temp folder is the OS's to sweep */ } }
+}
+function hookedMain() {
+  const patched = hooked(mainKernel.toString(), { beats: 2, far: 0 });
+  return (0, eval)(`(${patched})`)(DIALS);
+}
+
+test("in any one beat no candidate index is offered twice: near and far paths, ordinary fields and translated clouds", async () => {
+  const build = await hookedHead();
+  const fields = [];
+  for (const [n, seed, spread] of [[65, 1, 3000], [300, 2, 9000], [1500, 3, 20000]]) fields.push({ name: `town ${n}`, controlPoints: town(n, seed, spread, 3) });
+  fields.push({ name: "lattice with duplicates", controlPoints: [...Array.from({ length: 400 }, (_, i) => ({ x: (i % 20) * 50, y: Math.floor(i / 20) * 50, h: i })), ...Array.from({ length: 60 }, (_, i) => ({ x: 250, y: 250, h: 900 + i }))] });
+  for (const off of [1e4, 1e6, 1e7, 1e9, 1e11, 1e13, 1e15]) for (const [ox, oy] of [[off, 0], [0, off], [off, off], [-off, -off]]) fields.push({ name: `cloud at ${ox},${oy}`, ox, oy, controlPoints: cloudAt(150, 400, ox, oy, 19) });
+  let samples = 0, nearAnswers = 0;
+  hfReset();
+  for (const { name, controlPoints, ox = 0, oy = 0 } of fields) {
+    const f = build({ controlPoints }).elevationAt;
+    const slow = referenceHeightfield({ controlPoints });
+    const u = rng(controlPoints.length * 31 + 5);
+    const xs = controlPoints.map((c) => c.x), ys = controlPoints.map((c) => c.y);
+    const lo = [Math.min(...xs), Math.min(...ys)], hi = [Math.max(...xs), Math.max(...ys)];
+    for (let i = 0; i < 700; i += 1) {
+      const r = u();
+      let x, y;
+      if (r < 0.45) { x = lo[0] + u() * (hi[0] - lo[0]); y = lo[1] + u() * (hi[1] - lo[1]); }
+      else if (r < 0.6) { const c = controlPoints[Math.floor(u() * controlPoints.length)]; x = c.x; y = c.y; }
+      else if (r < 0.8) { x = lo[0] + (u() * 3 - 1) * (hi[0] - lo[0]); y = lo[1] + (u() * 3 - 1) * (hi[1] - lo[1]); }
+      else if (r < 0.95) { const a = u() * 2 * Math.PI, R = 30000 + u() * 170000; x = (lo[0] + hi[0]) / 2 + Math.cos(a) * R; y = (lo[1] + hi[1]) / 2 + Math.sin(a) * R; }
+      else { x = ox + (u() - 0.5) * 1e5; y = oy + (u() - 0.5) * 1e5; }
+      const farBefore = hf.far, repeatsBefore = hf.repeats;
+      const a = f(x, y);
+      samples += 1;
+      if (hf.far === farBefore) nearAnswers += 1;
+      if (hf.repeats !== repeatsBefore) assert.fail(`${name}: a candidate was offered twice in one beat at (${x}, ${y})`);
+      if (hf.heldRepeats) assert.fail(`${name}: the held K has a repeated index at (${x}, ${y})`);
+      if (!Object.is(a, slow(x, y))) assert.fail(`${name}: the hooked engine disagrees with the sort at (${x}, ${y})`);
+    }
+  }
+  assert.ok(samples >= 20000 && nearAnswers > 3000 && hf.far > 3000, `${samples} samples: ${nearAnswers} answered by the ring walk, ${hf.far} by the far search, ${hf.offers} offers, ${hf.repeats} repeats, ${hf.heldRepeats} held sets with a repeat`);
+});
+
+test("the offer counter can fail: main's kernel, counted the same way, offers one point repeatedly in Bevel's cloud", () => {
+  const build = hookedMain();
+  const controlPoints = bevelCloud();
+  const f = build({ controlPoints, k: 8, power: 2 }).elevationAt;
+  hfReset();
+  f(99999999966.26978, 18.36111723144477);
+  const bevel = hf.repeats;
+  hfReset();
+  const u = rng(4);
+  for (let i = 0; i < 200; i += 1) f(1e11 + u() * 100, u() * 100);
+  assert.ok(bevel > 0 && hf.repeats > 100 && hf.heldRepeats > 100, `main repeated ${bevel} candidates at Bevel's sample, ${hf.repeats} over 200 inside samples, ${hf.heldRepeats} held sets with a repeat`);
+  // and the same counter on main where its keys are exact sees nothing
+  const g = build({ controlPoints: town(300, 8, 6000, 2) }).elevationAt;
+  hfReset();
+  for (let i = 0; i < 300; i += 1) g((u() - 0.5) * 8000, (u() - 0.5) * 8000);
+  assert.equal(hf.repeats + hf.heldRepeats, 0, "main's own walk offers each index once where its keys do not alias");
+});
+
+// ── CELL INDEXES AT THE RING LIMIT, AND PAST 2^53: ONE CHILD PROCESS EACH ─────
+//
+// A ring loop that cannot count (gx + 1 === gx past 2^53) never returns, and a
+// hang inside a test hangs the suite. So these cases run in a child node process
+// with a hard timeout: a hang fails the test. The child builds the cloud, answers
+// samples inside it, just outside it and far from it, and compares each with the
+// sort's answer; the parent checks nothing came back different.
+const CHILD = `
+const { buildHeightfield } = await import(process.env.HF_ENGINE);
+${rng.toString()}
+${cloudAt.toString()}
+${referenceHeightfield.toString()}
+const spec = JSON.parse(process.env.HF_CASE);
+const controlPoints = spec.controlPoints;
+const f = buildHeightfield({ controlPoints, k: 8, power: 2 }).elevationAt;
+const slow = referenceHeightfield({ controlPoints, k: 8, power: 2 });
+let bad = 0, first = null;
+for (const [x, y] of spec.samples) { const a = f(x, y), b = slow(x, y); if (!Object.is(a, b)) { bad += 1; first ??= [x, y, a, b]; } }
+console.log(JSON.stringify({ total: spec.samples.length, bad, first }));
+`;
+
+function runChild(spec, timeoutMs = 30000) {
+  const out = execFileSync(process.execPath, ["--input-type=module", "-e", CHILD], {
+    encoding: "utf8", timeout: timeoutMs, killSignal: "SIGKILL", stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env, HF_ENGINE: new URL("./world-engine.mjs", import.meta.url).href, HF_CASE: JSON.stringify(spec) },
+  });
+  return JSON.parse(out.trim().split("\n").pop());
+}
+
+test("cell indexes at the ring limit (2^19) and on to 2^64, inside, beside and far from the occupied span: each terminates and equals the sort", () => {
+  const cases = [];
+  for (const c of [2 ** 19 - 3, 2 ** 19 + 3, 2 ** 24, 2 ** 32 - 2, 2 ** 32 + 2, 2 ** 52 - 1000, 2 ** 53 - 1000, 2 ** 53 - 1, 2 ** 53, 2 ** 53 + 1000, 2 ** 54, 2 ** 60, 2 ** 64]) {
+    for (const axes of ["x", "y", "xy"]) cases.push([c, axes]);
+  }
+  for (const [c, axes] of cases) {
+    const base = cloudAt(128, 64, 0, 0, 3);
+    const size = cellSize(base, 8);
+    const ox = axes.includes("x") ? c * size : 0, oy = axes.includes("y") ? c * size : 0;
+    const controlPoints = base.map((p) => ({ ...p, x: p.x + ox, y: p.y + oy }));
+    const u = rng(c % 1e6 + axes.length);
+    const samples = [];
+    for (const p of controlPoints.slice(0, 20)) samples.push([p.x, p.y]);                                              // on a point
+    for (let i = 0; i < 60; i += 1) samples.push([ox + u() * 64, oy + u() * 64]);                                      // inside the cloud
+    for (let i = 0; i < 40; i += 1) samples.push([ox + (u() - 0.5) * 64 * 30, oy + (u() - 0.5) * 64 * 30]);            // beside it, a few cells to hundreds of cells off
+    for (const d of [-1e6, 1e6]) samples.push([ox + d, oy + d], [ox + d, oy], [ox, oy + d]);                           // outside the span
+    samples.push([0, 0], [-ox, -oy], [ox * 2, oy * 2], [ox / 2, oy / 2], [ox, 0], [0, oy]);                            // elsewhere on the plane
+    const r = runChild({ controlPoints, samples });
+    assert.equal(r.bad, 0, `cell index ${c} on ${axes}: ${r.bad} of ${r.total} differ from the sort, first ${JSON.stringify(r.first)}`);
+  }
+});
+
+test("a child that does not return fails its test (the harness itself)", () => {
+  // the control for the isolation: a child that sleeps past its timeout must throw
+  assert.throws(() => execFileSync(process.execPath, ["-e", "setTimeout(() => {}, 60000)"], { timeout: 700, killSignal: "SIGKILL", stdio: "ignore" }), (e) => e.code === "ETIMEDOUT");
+});
+
+test("samples whose cell index straddles the ring limit are the sort's, and main's where main's keys are exact", () => {
+  // cells of about 12 m: x from 2^19 cells less to 2^19 cells more
+  for (const [n, width] of [[100, 100], [300, 3000]]) {
+    const base = cloudAt(n, width, 0, 0, 29);
+    const size = cellSize(base, 8);
+    for (const mult of [0.97, 0.999, 1, 1.001, 1.03]) {
+      const ox = mult * 2 ** 19 * size, oy = -mult * 2 ** 19 * size;
+      const controlPoints = base.map((p) => ({ ...p, x: Math.round((p.x + ox) * 8) / 8, y: Math.round((p.y + oy) * 8) / 8 }));
+      const fast = buildHeightfield({ controlPoints }).elevationAt;
+      const slow = referenceHeightfield({ controlPoints });
+      const main = mainBuildHeightfield({ controlPoints }).elevationAt;
+      const u = rng(n + Math.round(mult * 1000));
+      for (let i = 0; i < 400; i += 1) {
+        const x = ox + (u() * 1.6 - 0.3) * width, y = oy + (u() * 1.6 - 0.3) * width;
+        agree(fast, slow, x, y, `ring limit mult=${mult} n=${n}`);
+        agree(fast, main, x, y, `ring limit against main mult=${mult} n=${n}`);   // main's keys are exact here (index far under 2^32)
+      }
+    }
   }
 });
 

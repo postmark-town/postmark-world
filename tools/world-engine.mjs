@@ -200,7 +200,7 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
   const farOk = Number.isInteger(K) && K >= 1;
   let far = null;
   function farSearch(x, y) {
-    if (!far) far = buildFarIndex(cps, grid.cells);
+    if (!far) far = buildFarIndex(cps, grid.lists);
     n = 0;
     farVisit(far, 0, x, y);
     return weigh();
@@ -226,6 +226,10 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
     if (!grid || !Number.isFinite(x) || !Number.isFinite(y)) return scanAll(x, y);
     const { size, cells, maxRing } = grid;
     const cx = Math.floor(x / size), cy = Math.floor(y / size);
+    // a sample whose own cell index is past GRID_RING_INDEX is not walked at all
+    // (see the constant): it is answered from the occupied cells, or by the scan
+    // for a k the far search is not asked for
+    if (Math.abs(cx) > GRID_RING_INDEX || Math.abs(cy) > GRID_RING_INDEX) return farOk ? farSearch(x, y) : scanAll(x, y);
     // the rings reach cx±maxRing, cy±maxRing: when that window misses every
     // occupied cell the walk would find nothing and fall to the full scan
     if (farOk && (cx + maxRing < grid.minGx || cx - maxRing > grid.maxGx || cy + maxRing < grid.minGy || cy - maxRing > grid.maxGy)) return farSearch(x, y);
@@ -233,8 +237,10 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
     for (let r = 0; r <= maxRing; r += 1) {
       for (let gx = cx - r; gx <= cx + r; gx += 1) {
         const edgeX = gx === cx - r || gx === cx + r;
+        const column = cells.get(gx);
+        if (!column) continue;
         for (let gy = cy - r; gy <= cy + r; gy += (edgeX || r === 0) ? 1 : 2 * r) {
-          const cell = cells.get(gx * GRID_KEY_SPAN + gy);
+          const cell = column.get(gy);
           if (cell) for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
         }
       }
@@ -255,7 +261,23 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
 
 const GRID_MIN_POINTS = 64;       // below this the full scan is already cheap
 const GRID_EMPTY_RINGS = 1;       // rings 0..1 (a 3×3 block of cells) holding no point at all send a sample straight to the occupied cells
-const GRID_KEY_SPAN = 1 << 21;    // cell (gx, gy) → one number key; a collision only merges two cells, never loses one
+// The ring walk is for cell indices a double counts in exactly and a margin can
+// cover. Past 2^19 (about half a million cells from the origin) a sample goes to
+// the occupied-cell search, which has no ring loops and no edge to round. Three
+// things go wrong in the walk past it, at cell indices no real sample has (the
+// cell is at least 1 m, so this is a coordinate of at least 524 km, and the engine's
+// own frame, world_scale_extent_m, is 50 km): the stop rule's margin (1e-9 of a
+// cell) is outgrown by the rounding in x - (cx - r) * size once |cx| is a few
+// million (rounding near 2^-52 of |cx| cells), and the loop variable stops
+// advancing at 2^53 (gx + 1 === gx), which is where main's walk never returned.
+const GRID_RING_INDEX = 2 ** 19;
+// The cells are filed by (gx, gy) exactly: a Map of columns, each a Map of cells.
+// They used to be filed under the single number gx * 2^21 + gy, which a double
+// holds exactly only while it stays under 2^53 (a cell index under 2^32) and
+// while no two cells' gy differ by 2^21; past that two cells shared a key, the
+// ring walk read a list twice and offered a point more than once (WLD-144, Bevel).
+// An answer anywhere the old key was exact is unchanged: the walk visits the same
+// cells in the same order, a column that holds nothing is skipped whole.
 // The cell is sized off the middle half of the points (the interquartile box
 // in x and in y), so the 96 km outliers cannot stretch it, to hold about K/4 of
 // them — measured on the town's 627 points over twenty tellings, ~350 m cells
@@ -267,7 +289,7 @@ function buildGrid(cps, K) {
   const area = Math.max(1, iqr(cps.map((c) => c.x)) * iqr(cps.map((c) => c.y)));
   const size = Math.max(1, Math.sqrt((area * K) / cps.length));
   const maxRing = Math.max(2, Math.floor((Math.sqrt(cps.length / 2) - 1) / 2));
-  const cells = new Map();
+  const cells = new Map(), lists = [];
   let minGx = Infinity, maxGx = -Infinity, minGy = Infinity, maxGy = -Infinity;   // the occupied cells' span, for the far search
   for (let i = 0; i < cps.length; i += 1) {
     const gx = Math.floor(cps[i].x / size), gy = Math.floor(cps[i].y / size);
@@ -275,12 +297,13 @@ function buildGrid(cps, K) {
     if (gx > maxGx) maxGx = gx;
     if (gy < minGy) minGy = gy;
     if (gy > maxGy) maxGy = gy;
-    const key = gx * GRID_KEY_SPAN + gy;
-    let cell = cells.get(key);
-    if (!cell) cells.set(key, (cell = []));
+    let column = cells.get(gx);
+    if (!column) cells.set(gx, (column = new Map()));
+    let cell = column.get(gy);
+    if (!cell) { column.set(gy, (cell = [])); lists.push(cell); }
     cell.push(i);
   }
-  return { size, cells, maxRing, minGx, maxGx, minGy, maxGy };
+  return { size, cells, lists, maxRing, minGx, maxGx, minGy, maxGy };
 }
 
 // The far index (WLD-144): a binary tree over the OCCUPIED cells. A leaf is one
@@ -288,8 +311,7 @@ function buildGrid(cps, K) {
 // inner node carries the union of its children's boxes. Nodes are split on the
 // wider axis at the median of the leaves' box centres, so the tree is balanced
 // (depth about log2 of the occupied cells) however the points are spread.
-function buildFarIndex(cps, cells) {
-  const lists = [...cells.values()];
+function buildFarIndex(cps, lists) {
   const m = lists.length;
   const lMinX = new Float64Array(m), lMaxX = new Float64Array(m), lMinY = new Float64Array(m), lMaxY = new Float64Array(m);
   for (let c = 0; c < m; c += 1) {
