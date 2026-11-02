@@ -213,7 +213,10 @@ export function homeHandleForParcel(parcel, homeMark = null) {
   return ground || null;
 }
 
-/** Is this mark a parcel — the one mark kind that gets a column? */
+/** Is this mark a parcel — the kind whose column is the HOME column (the home
+ *  that stands on it, from the door)? Regions, creatures, residents and every
+ *  other mark get a column from this same builder too, fed by the viewer's own
+ *  view of each; this is only the test that picks the parcel's. */
 export function isParcelMark(mark) {
   return !!mark && mark.kind === "parcel";
 }
