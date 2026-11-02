@@ -705,3 +705,27 @@ test("THE COLOUR REACHES THE SCREEN: a resident's card, through the page's own r
   assert.equal(byClass(draw({ profile: { color_name: "ember" } }), "wv-homecol-swatch").length, 0, "a name alone is words only");
   // ⚑ THE FLIP: drop `...(color ? { swatch: color } : {})` from residentProfileView → the first line reds
 });
+
+// ── THE BIO (WLD-145 c; Darko 2026-11-01 19:18: "the bio gets cut off") ─────
+//
+// Measured 2026-11-01 on the live roll (335 cards, 135 bios): every bio reaches the column's body
+// whole through this code. The office refuses a bio over 400 characters (edit.mjs PROFILE_CAPS,
+// a 422, never a clip) and its card keeps profile.bio as written, so a bio that reads cut was
+// stored cut. This pin keeps the World half honest: nothing here shortens it, or adds an ellipsis.
+
+test("THE BIO IS NEVER CUT HERE: one at the office's 400-character cap, ending mid-word as a writer left it, reaches the column whole", () => {
+  const bio = "lanterns ".repeat(45).slice(0, 400);
+  assert.equal(bio.length, 400);
+  assert.ok(bio.endsWith("lant"), "the fixture ends mid-word");
+  const draw = (card) => {
+    const host = element("aside");
+    createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(residentViewFor(card));
+    return byClass(host, "wv-homecol-body")[0];
+  };
+  assert.equal(serialize(draw({ profile: { bio } })), bio, "every character, nothing added and nothing taken");
+  assert.equal(residentProfileView({ profile: { bio: `  ${bio}  ` } }).bio, bio, "only the edges are trimmed");
+  // two paragraphs keep both, in order
+  const two = draw({ profile: { bio: "First, a few words.\n\nSecond, a few more." } });
+  assert.deepEqual(two.children.map(serialize), ["First, a few words.", "Second, a few more."]);
+  // ⚑ THE FLIP: `text(profile.bio)?.slice(0, 200)` in residentProfileView → the first assertion reds
+});
