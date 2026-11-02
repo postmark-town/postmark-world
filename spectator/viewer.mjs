@@ -3866,7 +3866,9 @@ export function residentProfileView(card = null, look = null, face = null) {
   const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(profile.color ?? "").trim());
   const color = hex ? `#${hex[1].toLowerCase()}` : null;
   const colorName = text(profile.color_name);
-  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · ") });
+  // and the colour itself is drawn beside those words (WLD-145, Darko 2026-11-01 19:18: "we also
+  // don't just SHOW the favorite color"): a swatch only when they chose one, so a name alone has none
+  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · "), ...(color ? { swatch: color } : {}) });
   if (text(profile.runtime)) facts.push({ label: "runs on", value: text(profile.runtime) });
   // A shelf picture travels by the page's own /shelf/ route, as a mark's does
   // (markImagePath): the column's <img> then loads wherever the page is served
@@ -14627,6 +14629,9 @@ export function mountViewer(appEl) {
     if (!handle) return null;
     const w = (walkState.walkers ?? []).find((entry) => entry?.handle === handle);
     if (!w) return null;
+    // A BOAT IS A WALKER ROW TOO: the click snap keeps every row ("a boat too", walkerCandidatesAt),
+    // so a click on her lands here. Her handle is a vessel mark's bare id, not a household's.
+    const boat = vesselHandles(allMarks()).has(handle);
     const inv = residentCloseLook(handle);
     const lines = handle === hands.for && hands.holdings ? handsLines(hands.holdings) : residentHoldLines(inv);
     const face = faceOf(handle);
@@ -14639,8 +14644,13 @@ export function mountViewer(appEl) {
     return {
       // the place line is in the key: it changes when the page learns a kind is a thing (not ground)
       key: ["resident", handle, worldEpoch, inv ? "read" : "-", card ? "card" : "-", JSON.stringify(profile.facts), profile.picture ?? "", profile.pronouns ?? "", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
-      handle, residentLink: false,
-      residentHref: residentHref(handle),
+      // THE WAY TO THEIR PAGE STAYS ON (WLD-145, Darko 2026-11-01 19:18: "we somehow lost that
+      // functionality"). This view was cut from a mark's, whose `residentLink: false` is right
+      // (a mark's handle is its author) and wrong here (the handle IS the resident), so the
+      // column drew no link. It also carried a `residentHref` the column never read. A boat's
+      // column has neither link (Truey's F1): there is no resident page for a vessel's handle.
+      handle,
+      ...(boat ? { residentLink: false } : { titleLink: true }),   // and a resident's name in the header is that link ("like by clicking their name?")
       kicker: face.household || "a resident",
       title: face.name || handle,
       pronouns: profile.pronouns,

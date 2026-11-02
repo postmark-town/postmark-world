@@ -72,6 +72,14 @@ export function safeLinkHref(raw) {
   return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
 }
 
+/** A colour this column will paint as a swatch, or null. A `#` and three or six
+ *  hex digits and nothing else, lowercased: it becomes a `style`, so it is
+ *  checked as a colour rather than escaped as a string (WLD-145). */
+export function safeSwatch(raw) {
+  const s = String(raw ?? "").trim();
+  return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(s) ? s.toLowerCase() : null;
+}
+
 // ── the markdown, as data ───────────────────────────────────────────────────
 //
 // A deliberately small subset — the shapes home pages are actually written in
@@ -220,7 +228,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -265,6 +273,9 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
       : error ? `the office did not answer for this home — ${error}`
       : "nothing written here yet",
     residentHref: residentHref ?? null,
+    // THE NAME IS THE LINK, when the view says its title is a person and there is a page to go to
+    // (WLD-145, Darko 2026-11-01 19:18: "like by clicking their name?"). A home's title is not.
+    titleLink: !!(titleLink && residentHref),
     // THE ENTER BUTTON (founder, 2026-09-11: "add the enter button for the parcel
     // columns? and it just enters the parcel"). The column names a parcel; a
     // reader who can act gets the same door the little card offers, on the same
@@ -280,9 +291,16 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // writes them with textContent like everything else. Empty for a parcel
     // and a region unless their caller hands some in.
     facts: (facts ?? []).filter((f) => f && String(f.value ?? "").trim())
-      .map((f) => ({ label: String(f.label ?? "").trim(), value: String(f.value).trim(),
-        // the full description a short line opens to (play row 70); none, a plain line
-        detail: String(f.detail ?? "").trim() || null })),
+      .map((f) => {
+        // THE COLOUR A LINE IS ABOUT, drawn beside it (WLD-145, Darko 2026-11-01 19:18: "we also
+        // don't just SHOW the favorite color"). A fact with none has no `swatch` key at all, so
+        // every other column's facts read exactly as they did.
+        const swatch = safeSwatch(f.swatch);
+        return { label: String(f.label ?? "").trim(), value: String(f.value).trim(),
+          // the full description a short line opens to (play row 70); none, a plain line
+          detail: String(f.detail ?? "").trim() || null,
+          ...(swatch ? { swatch } : {}) };
+      }),
     relations: (relations ?? []).map((r) => ({
       label: String(r?.label ?? "").trim(),
       items: (r?.items ?? []).filter((i) => i && String(i.id ?? "").trim())
@@ -495,7 +513,16 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
   // nav's corner was chrome; the name is what the eye reads first
   const titleRow = el(doc, "div", "wv-homecol-titlerow");
   const title = el(doc, "h2", "wv-homecol-title");
-  title.textContent = model.title;
+  if (model.titleLink && model.residentHref) {
+    // A RESIDENT'S NAME IS THE WAY TO THEIR PAGE (WLD-145): the same href as the line at the foot
+    const name = el(doc, "a", "wv-homecol-title-link");
+    name.setAttribute("href", model.residentHref);
+    name.setAttribute("rel", "noopener");
+    name.textContent = model.title;
+    title.appendChild(name);
+  } else {
+    title.textContent = model.title;
+  }
   titleRow.appendChild(title);
   if (model.pronouns) {
     const theirs = el(doc, "span", "wv-homecol-pronouns");
@@ -666,7 +693,20 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
         more.appendChild(body);
         dd.appendChild(more);
       } else {
-        dd.textContent = fact.value;
+        // THE COLOUR ITSELF, before its name and hex (WLD-145). A chip the page's CSS
+        // sizes; its one inline value is a hex colour and nothing else (`safeSwatch`,
+        // checked here as well as in the model). A line that opens to a description
+        // carries none: no fact has both.
+        const hex = safeSwatch(fact.swatch);
+        if (hex) {
+          const chip = el(doc, "span", "wv-homecol-swatch");
+          chip.setAttribute("style", `background:${hex}`);
+          chip.setAttribute("aria-hidden", "true");
+          dd.appendChild(chip);
+          dd.appendChild(doc.createTextNode(fact.value));
+        } else {
+          dd.textContent = fact.value;
+        }
       }
       list.appendChild(dt);
       list.appendChild(dd);
@@ -808,6 +848,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       // a mark's column names its author in the byline; the link out is a
       // home's, so a view may turn it off
       residentHref: residentHref && view.residentLink !== false ? residentHref(view.handle) : null,
+      titleLink: !!view.titleLink,
       parcelId: view.parcelId ?? null,
       canEnter: !!view.canEnter,
       byline: view.byline ?? null,
@@ -890,6 +931,9 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-scroll { flex:1; min-height:0; overflow-y:auto; padding:14px 15px 26px;
   scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 .wv-homecol-title { margin:0; color:var(--paper); font-size:1.22rem; line-height:1.25; }
+/* a resident's name is the way to their page (WLD-145): a name first, with a faint rule that says it is a link */
+.wv-homecol-title-link { color:inherit; text-decoration:none; border-bottom:1px dotted rgba(232,224,207,.35); }
+.wv-homecol-title-link:hover, .wv-homecol-title-link:focus-visible { color:var(--amber); border-bottom-color:var(--amber); }
 /* the door beside the name (founder, 2026-09-11) */
 .wv-homecol-titlerow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .wv-homecol-pronouns { color:var(--muted, #9aa3ad); font-size:.82rem; font-style:italic; }
@@ -937,6 +981,9 @@ export const HOME_COLUMN_CSS = `
   font-size:.8rem; line-height:1.45; }
 .wv-homecol-facts dt { color:var(--dim); text-transform:lowercase; }
 .wv-homecol-facts dd { margin:0; color:var(--paper); overflow-wrap:anywhere; }
+/* the colour a line names, drawn beside its words (WLD-145); the ring keeps a dark colour visible on the panel */
+.wv-homecol-swatch { display:inline-block; width:.85em; height:.85em; margin-right:.5em; border-radius:50%;
+  vertical-align:-.1em; box-shadow:0 0 0 1px rgba(232,224,207,.45); }
 .wv-homecol-fact-line { cursor:pointer; list-style:none; display:inline; border-bottom:1px dotted transparent; }
 .wv-homecol-fact-line::-webkit-details-marker { display:none; }
 .wv-homecol-fact-line::after { content:"▸"; display:inline-block; margin-left:.35em; color:var(--dim); font-size:.8em; transition:transform .12s; }
