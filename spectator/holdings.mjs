@@ -231,10 +231,11 @@ export function sayCardNote({ dials = null, conversations = null } = {}) {
 // ── A KIND OF THING IS A THING ───────────────────────────────────────────────
 
 /**
- * Whether a mark's class is thing or a kind of thing. `lineage` is either the
- * class chain's names (the fold's class marks, `classChain`) or the office's
+ * Whether a mark's class is thing or a kind of thing. The second argument is
+ * `{ chain, pointer }`, whichever the page holds: `chain` is the class chain's
+ * names (the fold's class marks, `classChain`), `pointer` the office's
  * `class_pointer` ("kind: halloween-candy-bowl · a thing · a sited — explain: …",
- * office class-read.mjs § classPointer), whichever the page holds.
+ * office class-read.mjs § classPointer).
  */
 export function isThingKind(cls, { chain = null, pointer = null } = {}) {
   if (cls === "thing") return true;
