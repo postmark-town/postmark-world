@@ -12,7 +12,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsBackM, mistsCoreM, mistsOpaqueFromM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, mistsCreatureBox, mistsCreatureSVG, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { mistsBakePlan, mistsSheetFeatherAt, mistsRenderAt, mistsBakeAt, mistsTrueDistance, mistsColourAt, mistsCoreHex, mistsReachM, mistsBackM, mistsCoreM, mistsOpaqueFromM, mistsKeepRects, mistsKeepAt, mistsOpenCountry, mistsCreatures, MISTS_CREATURES, mistsCreatureBox, mistsCreatureSVG, bellFor, BELL_PARTIALS, MISTS_PAINT, MISTS_TINT } from "../spectator/mists-render.mjs";
+import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MISTS = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8")).mists;
@@ -200,9 +201,50 @@ test("the creatures: seeded by the crossing, sparse at 244 and populated by 284,
   assert.deepEqual(mistsCreatures(null), [], "no Mists, no creatures");
 });
 
+// THE PAINTED CREATURES END WITH HALLOWEEN (WLD-142).
+// LAW (Darko, 2026-10-31 23:01 EDT, WLD-142): "keep the mist as is, but we should probably remove all like the
+// Halloween creatures and the decorations." The Mists stay as they are; the creatures painted into them stand
+// through the last crossing of Halloween and none are drawn after it. Crossing-driven, like the Mists: a dial
+// turned back to a Halloween crossing still shows what stood then.
+// CAN-FAIL FLIPS: drop the gate in mistsCreatures (the gate case reds); gate on >= (the last crossing reds);
+// move `last` a crossing either way (the schedule case and the gate case red). The no-Mists case is the control
+// that stays green through those, and reds only if the wall check goes.
+const HALLOWEEN_END = Date.parse("2026-11-01T07:00:00Z");   // postmark-site src/lib/halloween-frame.mjs, HALLOWEEN_FRAME.until
+const crossingStart = (n) => CROSSING_EPOCH_UTC + n * CROSSING_MS;
+const creaturesAt = (n) => mistsCreatures(mistsAt(n, MISTS), { first: 244, keep: KEEP });
+
+test("the painted creatures' last crossing is the last that starts at or before Halloween's end (WLD-142)", () => {
+  assert.equal(new Date(crossingStart(284)).toISOString(), "2026-11-01T00:00:00.000Z", "crossing 284 starts at midnight UTC on the first of November");
+  assert.equal(new Date(crossingStart(285)).toISOString(), "2026-11-01T12:00:00.000Z", "and 285 twelve hours later, after Halloween's 07:00Z end");
+  const last = MISTS_CREATURES.last;
+  assert.ok(Number.isInteger(last), "the table names its last crossing");
+  assert.ok(crossingStart(last) <= HALLOWEEN_END, `LAW 2026-10-31 23:01, remove the Halloween creatures: crossing ${last} starts ${new Date(crossingStart(last)).toISOString()}, within Halloween`);
+  assert.ok(crossingStart(last + 1) > HALLOWEEN_END, `and the next crossing, ${last + 1}, starts ${new Date(crossingStart(last + 1)).toISOString()}, after it, so it paints none`);
+});
+
+test("the painted creatures stand through the last crossing and none are drawn after it (WLD-142)", () => {
+  const last = MISTS_CREATURES.last, onLast = creaturesAt(last);
+  assert.ok(onLast.length >= 25, `LAW: keep the mist as is: the last crossing of Halloween, ${last}, still paints its creatures (${onLast.length}); dialling back shows what stood`);
+  for (const n of [last + 1, last + 2, 300, 1000])
+    assert.deepEqual(creaturesAt(n), [], `LAW 2026-10-31 23:01, remove the Halloween creatures: crossing ${n}, after Halloween, paints none`);
+  // the control: the very Mists of crossing last + 1, read as crossing `last`, still paint their creatures, so the
+  // empty lists above are the gate's, not a missing wall, clearing or keep-out
+  assert.ok(mistsCreatures({ ...mistsAt(last + 1, MISTS), crossing: last }, { first: 244, keep: KEEP }).length >= 25,
+    "control: the same Mists, one crossing earlier, paint their creatures");
+});
+
+test("no Mists, no creatures: before the last crossing and after it the list is still empty (WLD-142)", () => {
+  const last = MISTS_CREATURES.last;
+  for (const m of [null, undefined, {}, { crossing: last }, { crossing: last + 1 }])
+    assert.deepEqual(mistsCreatures(m, { first: 244, keep: KEEP }), [], `no wall (${JSON.stringify(m)}): none, before and after the gate alike`);
+});
+
 test("the drawn silhouette, not its point, stands wholly behind the wall: every corner of every box, at every crossing of the season (WLD-56 D5, review of #219 F1)", () => {
+  // until 2026-11-01 this looped to 288 and asserted boxes > 500 (557 boxes at origin/main ef2c1b2, crossings 286
+  // and 288 standing 37 each). The painted creatures end at MISTS_CREATURES.last (WLD-142), so the season's
+  // crossings end there: 483 boxes at the same head.
   let boxes = 0;
-  for (let n = 244; n <= 288; n += 2) {
+  for (let n = 244; n <= MISTS_CREATURES.last; n += 2) {
     const m = mistsAt(n, MISTS);
     for (const c of mistsCreatures(m, { first: 244, keep: KEEP })) {
       const b = mistsCreatureBox(c);
@@ -213,7 +255,7 @@ test("the drawn silhouette, not its point, stands wholly behind the wall: every 
       boxes += 1;
     }
   }
-  assert.ok(boxes > 500, `the season's silhouettes were all checked (${boxes})`);
+  assert.ok(boxes > 430, `the season's silhouettes were all checked (${boxes})`);
 });
 
 test("the box is the one the silhouette is drawn in: its path's box at its size, from its point", () => {

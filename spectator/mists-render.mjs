@@ -405,6 +405,14 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
 // between that edge and the face.
 export const MISTS_CREATURES = {
   full: 284,
+  // THE PAINTED CREATURES END WITH HALLOWEEN (WLD-142, Darko 2026-10-31 23:01 EDT: "keep the mist as is, but
+  // we should probably remove all like the Halloween creatures and the decorations."). `last` is the last
+  // crossing that still paints them: mistsCreatures gives none after it, and a dial turned back to `last` or
+  // earlier shows what stood then. 284 is the last crossing that STARTS at or before Halloween's end,
+  // 2026-11-01T07:00:00Z (postmark-site src/lib/halloween-frame.mjs, HALLOWEEN_FRAME.until; the town's own
+  // end, 06:00Z, gives the same). Crossing N starts at CROSSING_EPOCH_UTC + N * CROSSING_MS, from tools/walk.mjs
+  // (2026-06-12T00:00Z and 12 h), so 284 starts 2026-11-01T00:00Z and 285 starts 2026-11-01T12:00Z.
+  last: 284,
   wolves: [2, 9], ravens: [3, 16], bats: [2, 10],         // at the first crossing and from `full`
   sizeM: { wolf: 620, raven: 320, bat: 230 },
   // how far behind the wall's true face each silhouette's nearest edge stands, metres (> 0: wholly in the wall)
@@ -415,9 +423,10 @@ function seeded(seed) {
   return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 /** Where the creatures stand at this crossing (metres, the engine's frame):
- *  [{ kind: "wolf"|"raven"|"bat", x, y, sizeM, flip, pose, eyes, phase }]. Pure. */
+ *  [{ kind: "wolf"|"raven"|"bat", x, y, sizeM, flip, pose, eyes, phase }]. None
+ *  after `MISTS_CREATURES.last` (WLD-142). Pure. */
 export function mistsCreatures(m, { first = 244, keep = null } = {}) {
-  if (!m?.clear) return [];
+  if (!m?.clear || m.crossing > MISTS_CREATURES.last) return [];
   const C = MISTS_CREATURES, t = Math.max(0, Math.min(1, (m.crossing - first) / (C.full - first)));
   const count = ([a, b]) => Math.round(a + (b - a) * t);
   const r = seeded(Math.imul((m.crossing | 0) + 1, 2654435761));
