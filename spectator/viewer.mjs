@@ -14640,6 +14640,9 @@ export function mountViewer(appEl) {
     if (!handle) return null;
     const w = (walkState.walkers ?? []).find((entry) => entry?.handle === handle);
     if (!w) return null;
+    // A BOAT IS A WALKER ROW TOO: the click snap keeps every row ("a boat too", walkerCandidatesAt),
+    // so a click on her lands here. Her handle is a vessel mark's bare id, not a household's.
+    const boat = vesselHandles(allMarks()).has(handle);
     const inv = residentCloseLook(handle);
     const lines = handle === hands.for && hands.holdings ? handsLines(hands.holdings) : residentHoldLines(inv);
     const face = faceOf(handle);
@@ -14655,9 +14658,10 @@ export function mountViewer(appEl) {
       // THE WAY TO THEIR PAGE STAYS ON (WLD-145, Darko 2026-11-01 19:18: "we somehow lost that
       // functionality"). This view was cut from a mark's, whose `residentLink: false` is right
       // (a mark's handle is its author) and wrong here (the handle IS the resident), so the
-      // column drew no link. It also carried a `residentHref` the column never read.
+      // column drew no link. It also carried a `residentHref` the column never read. A boat's
+      // column has neither link (Truey's F1): there is no resident page for a vessel's handle.
       handle,
-      titleLink: true,   // and their name in the header is that link ("like by clicking their name?")
+      ...(boat ? { residentLink: false } : { titleLink: true }),   // and a resident's name in the header is that link ("like by clicking their name?")
       kicker: face.household || "a resident",
       title: face.name || handle,
       pronouns: profile.pronouns,

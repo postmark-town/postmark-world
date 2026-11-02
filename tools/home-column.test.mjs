@@ -25,7 +25,7 @@ import {
   homeColumnModel, renderHomeColumn, createHomeColumn,
 } from "../spectator/home-column.mjs";
 import {
-  residentProfileView, residentHref, residentFace, walkerHoverId, walkerHandleFromHoverId, walkingLabel,
+  residentProfileView, residentHref, residentFace, walkerHoverId, walkerHandleFromHoverId, walkingLabel, vesselHandles,
 } from "../spectator/viewer.mjs";
 
 // ── the stand-in ────────────────────────────────────────────────────────────
@@ -597,17 +597,26 @@ function bodyOf(name) {
 }
 
 /**
+ * The fold, as far as a boat is concerned: a timetable mark names her vessel by mark id, and the walkers
+ * door publishes her under the bare handle (the same shape as viewer-axes.test.mjs). Synthetic.
+ */
+const FOLD = [
+  { id: "the-town/the-wheelhouse", mechanic: "timetable", timetable: { vessel: "the-town/the-post-office", stops: [] } },
+  { id: "the-town/the-post-office" },
+];
+
+/**
  * The view the page builds for a resident's column: residentColumnView's own body, run against
  * stand-ins for the page's state that nothing asserted here reads. The card is synthetic.
  */
 function residentViewFor(card, handle = "rig-ash") {
   const context = vm.createContext({
-    residentProfileView, residentHref, walkerHandleFromHoverId, walkingLabel,
+    residentProfileView, residentHref, walkerHandleFromHoverId, walkingLabel, vesselHandles,
     residentHoldLines: () => null, handsLines: () => null,
     walkState: { walkers: [{ handle, standing: true }] }, hands: { for: null, holdings: null },
-    faceOf: (h) => residentFace(h, { name: "Rig Ash", household: "rig-house" }),
+    faceOf: (h) => residentFace(h, { name: h === "rig-ash" ? "Rig Ash" : h, household: "rig-house" }),
     walkerPlace: () => "in the Town Centre", residentCloseLook: () => null, residentCard: () => card,
-    worldEpoch: 1, state: { handle: "someone-else" }, onResidentPath: () => false,
+    worldEpoch: 1, state: { handle: "someone-else" }, onResidentPath: () => false, allMarks: () => FOLD,
     holdingFacts: () => [], closeLooks: new Map(), asWho: () => "", markIdentity: (m) => m.id, byId: new Map(),
   });
   vm.runInContext(bodyOf("residentColumnView"), context);
@@ -635,7 +644,7 @@ test("A RESIDENT'S COLUMN LINKS TO THEIR PAGE: the view the page builds does not
   const [out] = byClass(host, "wv-homecol-resident");
   assert.equal(out?.getAttribute("href"), "/residents/rig-ash/", "the link is the page's own resident route for this handle");
   assert.equal(serialize(out), "the resident page →");
-  // ⚑ THE FLIP: put `residentLink: false,` back beside `handle,` in residentColumnView → this reds at the notEqual
+  // ⚑ THE FLIP: put `residentLink: false` back on a resident's view in residentColumnView (the branch that is not a boat's) → this reds at the notEqual
 });
 
 test("[pin] a mark's column and a creature's column still turn the resident link off: their handle is an author or the town, not a resident", () => {
@@ -651,7 +660,10 @@ test("[pin] a mark's column and a creature's column still turn the resident link
 test("safeSwatch: a hex colour and nothing else, lowercased; a resident's word never reaches a style", () => {
   assert.equal(safeSwatch("#E6AC52"), "#e6ac52");
   assert.equal(safeSwatch("  #c90 "), "#c90");
-  for (const bad of ["red", "#abcd", "#abcde", "#12345g", "#1234567", "e6ac52", "rgb(1,2,3)", "url(x)", "#fff;background:url(javascript:1)", '#fff" onclick="x', "", null, undefined, 7])
+  // a string that only ENDS in a valid hex is the leading anchor's to refuse: without the `^` each of these comes
+  // back whole and would be written into a `style` (Truey's review of this PR, F2)
+  const endsInHex = ["red;#fff", "x#fff", "url(x)#e6ac52", "red;background:url(https://evil.example/x);#fff"];
+  for (const bad of ["red", "#abcd", "#abcde", "#12345g", "#1234567", "e6ac52", "rgb(1,2,3)", "url(x)", "#fff;background:url(javascript:1)", '#fff" onclick="x', ...endsInHex, "", null, undefined, 7])
     assert.equal(safeSwatch(bad), null, `refused: ${String(bad)}`);
 });
 
@@ -758,5 +770,52 @@ test("A RESIDENT'S NAME IS THEIR LINK: through the page's own resident view and 
   assert.equal(byClass(host, "wv-homecol-resident").length, 1, "and the line at the foot is still there");
   assert.doesNotMatch(bodyOf("markColumnView"), /titleLink/, "WLD-125 decides, link by link, whether a mark's title is one");
   assert.doesNotMatch(bodyOf("creatureColumnView"), /titleLink/);
-  // ⚑ THE FLIPS: drop `titleLink: true,` from residentColumnView → the first line reds; drop `titleLink: !!view.titleLink,` from the controller's paint → the href line reds
+  // ⚑ THE FLIPS: drop `titleLink: true` from residentColumnView's flags → the first line reds; drop `titleLink: !!view.titleLink,` from the controller's paint → the href line reds
+});
+
+// ── A BOAT IS NOT A RESIDENT (Truey's review of this PR, F1) ────────────────
+//
+// A boat is a walker row the page keeps as a click target ("a boat too", viewer.mjs § walkerCandidatesAt), so a
+// click on her reaches residentColumnView. Her handle is a vessel mark's bare id, not a household's: there is no
+// resident page for it, so only a resident's column links.
+
+test("A BOAT'S COLUMN HAS NO RESIDENT LINK, neither the name nor the foot line; a resident's, from the same fold, has both", () => {
+  assert.equal(vesselHandles(FOLD).has("the-post-office"), true, "the fixture's boat is the fold's vessel");
+  assert.equal(vesselHandles(FOLD).has("rig-ash"), false, "and the resident is not");
+  const draw = (handle, card) => {
+    const v = residentViewFor(card, handle);
+    const host = element("aside");
+    createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+    return { v, host };
+  };
+  const boat = draw("the-post-office", null);   // the office has no resident card for a boat
+  assert.equal(boat.v.residentLink, false, "the boat's view switches the link off");
+  assert.notEqual(boat.v.titleLink, true, "and does not ask for the name link");
+  assert.equal(byClass(boat.host, "wv-homecol-resident").length, 0, "no \"the resident page →\" for a boat");
+  assert.equal(find(byClass(boat.host, "wv-homecol-title")[0], "a").length, 0, "and her name is not a link");
+  assert.equal(serialize(byClass(boat.host, "wv-homecol-title")[0]), "the-post-office", "her column is still drawn, with her name");
+  // the control: the same fold and the same stand-ins, a resident
+  const person = draw("rig-ash", { profile: { bio: "A figure." } });
+  assert.equal(byClass(person.host, "wv-homecol-resident").length, 1, "a resident, from the same fold, still has the foot line");
+  assert.equal(find(byClass(person.host, "wv-homecol-title")[0], "a").length, 1, "and the name link");
+  // ⚑ THE FLIPS: drop the vessel guard in residentColumnView → the boat's assertions red; make every walker a boat → the control reds;
+  //   leave the name link's flag on a boat (the model gates it on the href, so it draws nothing) → only the notEqual reds
+});
+
+// ── THE PAGE HANDS THE COLUMN ITS residentHref (Truey's review of this PR, F3) ──
+
+test("the page hands the column the real residentHref: the page's own createHomeColumn call, lifted and run, carries it", () => {
+  // Every test above builds its own column, so none could see whether the page does. The call is lifted and run
+  // rather than matched as text, so a commented-out line cannot satisfy it; its other arguments are stand-ins.
+  const call = SOURCE.match(/^  const homeColumn = createHomeColumn\(\{[\s\S]*?^  \}\);/m)?.[0];
+  assert.ok(call, "source extraction: the page's createHomeColumn call");
+  let handed = null;
+  const context = vm.createContext({
+    createHomeColumn: (options) => { handed = options; return {}; },
+    document: {}, $: () => null, root: {}, readHomePage: () => null, markImagePath: () => null, residentHref,
+  });
+  vm.runInContext(call, context);
+  assert.ok(handed, "the call ran and reached the column");
+  assert.equal(handed.residentHref, residentHref, "the column is handed the page's own residentHref, so every column's link is built by the one handle rule");
+  // ⚑ THE FLIPS: drop `residentHref,` from the call → undefined, this reds; hand it any other function → not the page's own, this reds
 });
