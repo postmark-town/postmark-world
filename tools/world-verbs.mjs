@@ -164,8 +164,9 @@ export const pointWithinMark = pointInMark;
 // The target additionally carries `weight_parts`, which is that ✦ number's
 // receipt (marks-fold.mjs § partsOf) — because a reader shown one figure built
 // out of three sources cannot otherwise tell which of them they are looking at.
-// `occupancy` (the enter-exit acts' derived occupants) is OPTIONAL and defaults to empty, so every
-// existing caller gets a byte-identical answer. Passed, the manifest grows its
+// `occupancy` (the enter-exit acts' derived occupants) is OPTIONAL and defaults
+// to empty, so every existing caller gets a byte-identical answer. Passed, the
+// manifest grows its
 // entity children — who is aboard is a child of the ship, and investigate is
 // the read that opens one mark, so it is where "who's here" belongs.
 export function investigate(markId, world, { depth = 1, budget = DIALS.context_budget, occupancy = null } = {}) {
@@ -336,17 +337,20 @@ function markDescent(fromIds, world, byId, opts) {
 }
 
 // ───────────────────────── walk — the walk dial + anonymous wear ─────────────
-// Move `distM` metres in a compass `dir`. `walkSpeed` is read from the skeleton's
-// walk_speed_m_per_crossing, 60 km per crossing since e505ca95 (POS-223): the same
-// number as the live resident stride (008b, 2026-08-16), which the office reads off
-// `the-town/resident`. Decision 008's original 15 km survives only as the fossil
-// fallback in the body below. A walk here spends `distM / walkSpeed` crossings. The path lands
-// in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
+// Move `distM` metres in a compass `dir`. `walkSpeed` is read from the
+// skeleton's walk_speed_m_per_crossing, 60 km per crossing since e505ca95
+// (POS-223): the same number as the live resident stride (008b, 2026-08-16),
+// which the office reads off `the-town/resident`. Decision 008's original 15 km
+// survives only as the fossil fallback in this function (tools/walk.mjs keeps
+// 15 on purpose, for unstamped legs). A walk here spends `distM / walkSpeed`
+// crossings. The path lands in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
 // you wander is more intimate than who you wrote (epic § Paths are wear).
 export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } = {}) {
-  // the stride is the mover's: the resident class's dial (the node the founder
-  // moved it to, 2026-08-22) is the first word; terrain may override; 15000 is
-  // the pre-dial fossil, kept only for worlds folded before dials rode the store.
+  // the stride is the mover's: it lives on the resident class's dial (the node
+  // the founder moved it to, 2026-08-22), but the terrain's own
+  // walk_speed_m_per_crossing, when the world carries one, is read first (see
+  // the header); 15000 is the pre-dial fossil, kept only for worlds folded
+  // before dials rode the store.
   // The dial is a property of resident now (LOGOS v2 part 2). A store folded
   // before that change still carries it as the class row's dial, so a world
   // read from the last crossing's store answers either way, the property first.
