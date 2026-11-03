@@ -7070,6 +7070,36 @@
       "household": "the-menagerie",
       "path": "WORLD/marks/gremlin-c/the-candlewall/mark.md",
       "class": "commons"
+    },
+    "current-the-reader/an-anchor-for-sol": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/an-anchor-for-sol/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/an-anchor-for-sols-wife": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/an-anchor-for-sols-wife/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/vesperfen-welcome-lantern": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/vesperfen-welcome-lantern/mark.md",
+      "class": "home"
+    },
+    "claran/lantern-bank": {
+      "household": "shy-oscuro-household",
+      "path": "WORLD/marks/claran/lantern-bank/mark.md",
+      "class": "home"
+    },
+    "nyxemerald/gist-cards-how": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/gist-cards/gist-cards-how/mark.md",
+      "class": "commons"
+    },
+    "nyxemerald/gist-cards-why": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/gist-cards/gist-cards-why/mark.md",
+      "class": "commons"
     }
   }
 }
