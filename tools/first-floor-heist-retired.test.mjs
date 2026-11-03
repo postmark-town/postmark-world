@@ -1,20 +1,22 @@
 // first-floor-heist-retired.test.mjs — the first-floor heist's declarations are retired (WLD-135, part 1 of 2).
 //
-// The declaration side only: the four candied class marks no longer declare a `named`
-// creature (the bat, the raven, both wolves, the boss), and the chapel door no longer
-// asks for the three keys. The keys themselves are withdrawn separately, through the
-// town's door; nothing here reads, needs or proves them.
+// The four candied class marks no longer declare a `named` creature (the bat, the raven,
+// both wolves, the boss), and the chapel door no longer asks for the three keys. The same
+// PR deletes the three key mark files by hand (the existing marks-ingest hand-deletion
+// route); that deletion and its live retirement (the operator's ingest and receipt) are
+// not proved by anything here, and no case below reads or needs a key file.
 //
-// READS: exactly five authored files, by path (no loader, no whole-world read): the four
-// class marks and the door. Everything else is synthetic and in memory.
+// ARTIFACT CASES (1-3) read exactly five authored files, by path (no loader, no
+// whole-world read): the four class marks and the door.
 //
-// THE COUPLING (why it is one change): a door cleared while a declaration still waits on
-// it leaves a creature waiting on no lock (a fault); an `after_door` dropped while the lock
-// stands leaves an eligible boss; keys gone while the lock stands leaves a wait nothing can
-// meet. Only the complete retirement is none of those.
+// CASE 4 IS A SYNTHETIC COUPLING CONTROL, not an artifact falsifier: in-memory marks only,
+// documenting why the declarations and the door change together (a door cleared while a
+// declaration still waits on it leaves a creature waiting on no lock; an `after_door`
+// dropped while the lock stands leaves an eligible boss; keys gone while the lock stands
+// leaves a wait nothing can meet). It never reads the repo's classes or door.
 //
-// CAN-FAIL FLIPS: write any `named` entry back onto one of the four classes (the reader
-// case and the file case red); write `requires` back onto the door (the door case reds).
+// CAN-FAIL FLIPS (artifact cases): write any `named` entry back onto one of the four
+// classes (cases 1 and 2 red); write `requires` back onto the door (case 3 reds).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -86,7 +88,7 @@ const door = (requires) => ({ id: DOOR, kind: "thing", by: "tower", at: { x: 0, 
 const tokens = () => ASKS.map((id, i) => ({ id, kind: "thing", by: "the-town", body: "A token.", held_by: HOLDERS[i] }));
 const WAITING = { id: "creature:candied-jetto-den", after_door: DOOR };
 
-test("the three bad shapes are each caught, and only the complete retirement is none of them", () => {
+test("synthetic coupling control: door-only, after_door-only and keys-only are each a bad shape for the after-door reader", () => {
   // the whole heist as it stood (synthetic): a lock, its tokens, a boss that waits on it. Healthy.
   assert.equal(afterDoorRefusal(WAITING, [door(LOCK), ...tokens()]), null);
   assert.deepEqual(afterDoorOpen(WAITING, [door(LOCK), ...tokens()]), { open: true });
@@ -105,8 +107,5 @@ test("the three bad shapes are each caught, and only the complete retirement is 
   const keysGone = afterDoorOpen(WAITING, [door(LOCK)]);
   assert.equal(keysGone.open, false);
   assert.equal(keysGone.shut, true, "a real lock, shut for good");
-
-  // the complete retirement: no declaration waits, no door asks. Nothing dangles in either direction.
-  assert.equal(afterDoorRefusal(undefined, [door(null)]), null);
-  assert.deepEqual(afterDoorOpen({ id: "creature:none" }, [door(null)]), { open: true }, "nothing declared, nothing to wait on");
+  // (the complete retirement, no declaration and no requirement, is what cases 1-3 assert of the real files)
 });
