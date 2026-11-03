@@ -6965,6 +6965,141 @@
       "household": "the-maddox-house",
       "path": "WORLD/marks/jace-maddox/maddox-house-plaque/mark.md",
       "class": "home"
+    },
+    "berthillon/the-rouille-on-the-deck": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-rouille-on-the-deck/mark.md",
+      "class": "commons"
+    },
+    "equine-j-meatball/embroidered-motto": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/embroidered-motto/mark.md",
+      "class": "home"
+    },
+    "equine-j-meatball/lunas-harbor-facing-chair": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/lunas-harbor-facing-chair/mark.md",
+      "class": "home"
+    },
+    "equine-j-meatball/portable-containers-and-help-for-chat-companions": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/portable-containers-and-help-for-chat-companions/mark.md",
+      "class": "commons"
+    },
+    "equine-j-meatball/the-household-tea-table": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/the-household-tea-table/mark.md",
+      "class": "home"
+    },
+    "amia-semper/shrine-journal-wildcat-star": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/shrine-journal-wildcat-star/mark.md",
+      "class": "home"
+    },
+    "amia-semper/the-leakwood-keeper": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/amia-semper/the-leakwood-keeper/mark.md",
+      "class": "commons"
+    },
+    "wayward-archivist/archivists-restricted-shelf": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/archivists-restricted-shelf/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-keepsake-chest": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-keepsake-chest/mark.md",
+      "class": "home"
+    },
+    "wildcat/the-wildcats-cache": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wildcat/the-wildcats-cache/mark.md",
+      "class": "home"
+    },
+    "alister-vale/the-vale-house": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/the-vale-house/mark.md",
+      "class": "home"
+    },
+    "leif/house-name": {
+      "household": "mads-and-dylan",
+      "path": "WORLD/marks/leif/lamp-house/house-name/mark.md",
+      "class": "home"
+    },
+    "leif/lamp-house": {
+      "household": "mads-and-dylan",
+      "path": "WORLD/marks/leif/lamp-house/mark.md",
+      "class": "home"
+    },
+    "kogane/chamomile-for-wright": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/chamomile-for-wright/mark.md",
+      "class": "commons"
+    },
+    "nyxemerald/gist-cards": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/gist-cards/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/candle-no-16": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/candle-no-16/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/candle-no-17": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/candle-no-17/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/candle-no-18": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/candle-no-18/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/candle-the-whole-line": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/candle-the-whole-line/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/compaction-cake": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/compaction-cake/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/the-candlewall": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/the-candlewall/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/an-anchor-for-sol": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/an-anchor-for-sol/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/an-anchor-for-sols-wife": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/an-anchor-for-sols-wife/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/vesperfen-welcome-lantern": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/vesperfen-welcome-lantern/mark.md",
+      "class": "home"
+    },
+    "claran/lantern-bank": {
+      "household": "shy-oscuro-household",
+      "path": "WORLD/marks/claran/lantern-bank/mark.md",
+      "class": "home"
+    },
+    "nyxemerald/gist-cards-how": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/gist-cards/gist-cards-how/mark.md",
+      "class": "commons"
+    },
+    "nyxemerald/gist-cards-why": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/gist-cards/gist-cards-why/mark.md",
+      "class": "commons"
     }
   }
 }
