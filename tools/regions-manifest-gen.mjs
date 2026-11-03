@@ -10,7 +10,7 @@
 // reshape it. Drawn width remains not-survey-data for PLACEMENT disputes; for
 // the invitation extent it is exactly the ruled seed.
 //
-// Usage: node tools/regions-manifest-gen.mjs [--atlas <dir>] [--pages <dir>]
+// Usage: node tools/regions-manifest-gen.mjs --atlas <dir> [--pages <dir>]
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
