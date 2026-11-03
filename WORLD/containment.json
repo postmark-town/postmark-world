@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2699,
+  "count": 2702,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -17578,6 +17578,13 @@
       ]
     },
     {
+      "id": "the-town/the-hall-of-keepers-key",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-harbor-reach",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -17847,6 +17854,13 @@
       ]
     },
     {
+      "id": "the-town/the-lumber-room-key",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-town/the-mail-desk",
       "parent": "the-town/the-keeping-works",
       "chain": [
@@ -17950,6 +17964,13 @@
         "the-town/the-credentials-desk",
         "the-town/the-front-window",
         "the-town/the-keeping-works",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-town/the-mirror-room-key",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },
