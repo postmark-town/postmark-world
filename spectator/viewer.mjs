@@ -15307,9 +15307,9 @@ export function mountViewer(appEl) {
   // points in the art", and "a card doesn't even tell you if something is a
   // thing or not". So the glance is now the smallest of the three levels he
   // approved ("each shown only when asked for"): the mark's NAME, set BESIDE its
-  // drawn ground (positionBubbles passes the footprint as `reach`), raised only
-  // after the pointer has rested (GLANCE_DELAY_MS) so a sweep across the map
-  // flashes nothing. No body: the words are the click's, in the column.
+  // drawn ground (positionBubbles passes the footprint as `reach`), raised
+  // at once, in the same frame as the highlight (see raiseGlance). No body: the
+  // words are the click's, in the column.
   //
   // THE DOT RIDES BESIDE THE NAME (Darko, 18:00): the mark's own pip is hidden
   // while it is hovered (renderMarkHighlight), so the plate wears it instead —
@@ -15335,19 +15335,12 @@ export function mountViewer(appEl) {
       + (states.length ? `<span class="wv-np-icons">${iconsHTML(states)}</span>` : "")
       + `</div>`;
   }
-  // A RESTING POINTER, NOT A PASSING ONE. The glance waits this long on one mark
-  // before it is raised.
-  // NO TIMER (play fix 37, Darko 19:29: "make it happen simultaneously as like
-  // the highlight on hover effect"): what a glance shows, it shows at once.
-  const GLANCE_DELAY_MS = 0;
-  // …AND A SHOWN PLATE GETS A BEAT BEFORE IT GOES. Nearly every mark stands
+  // A SHOWN PLATE GETS A BEAT BEFORE IT GOES. Nearly every mark stands
   // inside some larger ground, so the pointer leaving a pip on its way to the
   // plate's icons is, for a moment, pointing at the forecourt around it. For
   // this long the plate stays put; a pointer that reaches it holds it.
   const GLANCE_GRACE_MS = 220;
   let glanceShown = null;     // the id the hover bubble is showing, or null
-  let glancePending = null;   // the id waiting out the delay, or null
-  let glanceTimer = null;
   let glanceNext = null;      // what the pointer is on while a shown plate takes its beat
   let glanceLeaving = null;   // that beat's timer
   let glanceHeld = false;     // the pointer is resting on the nameplate itself
@@ -15360,33 +15353,17 @@ export function mountViewer(appEl) {
     if (el._pmHtml !== html) { el._pmHtml = html; el.innerHTML = html; }
     el.hidden = false;
   }
+  // NO TIMER (play fix 37, Darko 19:29: "make it happen simultaneously as like
+  // the highlight on hover effect"): what a glance shows, it shows at once.
   function raiseGlance(el, id) {
     if (!id) {
-      clearTimeout(glanceTimer);
-      glanceTimer = null; glancePending = null; glanceShown = null;
+      glanceShown = null;
       el.hidden = true;
       return;
     }
-    if (id === glancePending) return;
-    if (!GLANCE_DELAY_MS) {
-      clearTimeout(glanceTimer);
-      glanceTimer = null; glancePending = null; glanceShown = id;
-      paintGlance(el, id);
-      positionBubbles();
-      return;
-    }
-    el.hidden = true;
-    glanceShown = null;
-    glancePending = id;
-    clearTimeout(glanceTimer);
-    glanceTimer = setTimeout(() => {
-      glanceTimer = null;
-      if (glancePending !== id) return;
-      glancePending = null;
-      glanceShown = id;
-      paintGlance(el, id);
-      positionBubbles();
-    }, GLANCE_DELAY_MS);
+    glanceShown = id;
+    paintGlance(el, id);
+    positionBubbles();
   }
   function renderHoverBubble(id) {
     const el = bubbleEl("hover");
