@@ -168,12 +168,19 @@ export const isUnstakedCommons = (m) =>
  *
  * The fold's published `tier` is the DERIVED STANDING, not the line the record
  * carries — marks-fold.mjs says so where it builds the projection — and
- * `markStanding` returns "constitution" ONLY when `by === the-town`:
+ * `markStanding` returns "constitution" ONLY when `by === the-town`. When this
+ * tool was written (2026-09-09) the rule read
  *
  *     if ((mark.by ?? mark.household) === TOWN && mark.tier === "constitution")
  *       return "constitution";
  *
- * Everything else walks the ground chain and comes out "home" or "market". So
+ * and since POS-702 (cf9e67dd, 2026-10-19) the town's marks ARE the
+ * constitution, whatever `tier:` line they carry:
+ *
+ *     if (townOwned(mark)) return "constitution";   // mark-standing.mjs
+ *
+ * The conclusion below is the same under either form. Everything else walks the
+ * ground chain and comes out "home" or "market". So
  * reading the projected field would make exemption (1) a rule that can NEVER
  * FIRE for the exact case the ruling names — a resident-authored law node —
  * while looking correct on every town-owned row, which the town rule already
