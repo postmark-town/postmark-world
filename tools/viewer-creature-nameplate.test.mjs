@@ -180,8 +180,15 @@ test("wiring: the closure is gone, and the one call site passes the looked-up ro
 // MARK_ICON_CSS (spectator/mark-icons.mjs): other modules, other lanes. Each is
 // replaced at its place by a fixed token before hashing, so a moved, dropped or
 // doubled interpolation of either still fails, but their own CSS is theirs to change.
-const PINNED_MASKED_STYLE_SHA256 = "038a0763ffef37836a6cbd4248fa6976f318bdc3c7322e29fac6649bee74db29";
-const PINNED_MASKED_STYLE_BYTES = 106507;
+//
+// RE-PINNED IN THE WLD-144 BATCH (PR #356), because main moved. Main 3cc1d218 (POS-823, the outsider-lens note)
+// added the `.wv-lens-note` rules to STYLE, 628 bytes, so the digest above no longer describes main. The pin below is
+// sha256 of the masked STYLE that main's OWN `spectator/viewer.mjs` emits at 3cc1d218b0adc250ba423b139ff7d97a920294e9,
+// 107135 bytes, by the same first route as above (the file written beside symlinks to the real spectator/ and
+// tools/, its own `mountViewer` under a stub DOM). The same script run on the base 82e23532 reproduced the old
+// digest, and run on the batch head gave this digest too: the batch emits main's STYLE byte for byte.
+const PINNED_MASKED_STYLE_SHA256 = "94d56a4157be8427e46c0a1854ae319b1aea22cfea64978538491f2b410361a7";
+const PINNED_MASKED_STYLE_BYTES = 107135;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";
