@@ -1,26 +1,31 @@
 // first-floor-heist-retired.test.mjs — the first-floor heist's declarations are retired (WLD-135, part 1 of 2).
 //
 // The four candied class marks no longer declare a `named` creature (the bat, the raven,
-// both wolves, the boss), and the chapel door no longer asks for the three keys. The same
-// PR deletes the three key mark files by hand (the existing marks-ingest hand-deletion
-// route); that deletion and its live retirement (the operator's ingest and receipt) are
-// not proved by anything here, and no case below reads or needs a key file.
+// both wolves, the boss), and the chapel door no longer asks for the three keys.
 //
-// ARTIFACT CASES (1-3) read exactly five authored files, by path (no loader, no
-// whole-world read): the four class marks and the door.
+// The three keys are KEPT (Darko, 2026-11-03 09:44 EDT, WLD-135/a Spire keys: "Keep them").
+// They stay their owners' as keepsakes in the knights and open nothing now. Until that
+// ruling this PR deleted the three key files by hand; it no longer deletes or edits them.
+// Case 4 asserts they are still in the tree; that their content is main's (owner, holder,
+// body) is proved by blob equality against main at hand-in, not pinned here, because
+// custody moves at settlements.
 //
-// CASE 4 IS A SYNTHETIC COUPLING CONTROL, not an artifact falsifier: in-memory marks only,
+// ARTIFACT CASES (1-4) read authored files by path (no loader, no whole-world read):
+// the four class marks, the door and the three keys.
+//
+// CASE 5 IS A SYNTHETIC COUPLING CONTROL, not an artifact falsifier: in-memory marks only,
 // documenting why the declarations and the door change together (a door cleared while a
 // declaration still waits on it leaves a creature waiting on no lock; an `after_door`
 // dropped while the lock stands leaves an eligible boss; keys gone while the lock stands
 // leaves a wait nothing can meet). It never reads the repo's classes or door.
 //
 // CAN-FAIL FLIPS (artifact cases): write any `named` entry back onto one of the four
-// classes (cases 1 and 2 red); write `requires` back onto the door (case 3 reds).
+// classes (cases 1 and 2 red); write `requires` back onto the door (case 3 reds); delete
+// any one key file (case 4 reds, and its in-memory control shows each missing key is named).
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseRecord } from "./marks-fold.mjs";
@@ -30,6 +35,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CLASS_DIR = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/creature";
 const CLASSES = ["candied-bat", "candied-raven", "candied-wolf", "candied-jetto"];
 const DOOR_FILE = "WORLD/marks/wright/spire-hall-of-keepers-to-star-chapel/mark.md";
+const KEY_FILES = ["the-lumber-room-key", "the-mirror-room-key", "the-hall-of-keepers-key"].map((k) => `WORLD/marks/the-town/${k}/mark.md`);
 const read = (rel) => readFileSync(join(ROOT, rel), "utf8");
 const classFile = (k) => `${CLASS_DIR}/${k}/mark.md`;
 
@@ -77,6 +83,27 @@ test("the chapel door keeps its passage and asks for nothing", () => {
   assert.doesNotMatch(text, /requires/, "no requirement anywhere in the file");
 });
 
+// ── the keys are kept ───────────────────────────────────────────────────────────────
+
+// What is wrong with the three key files as `readText` sees them (null = no file): one line per key.
+// Only the facts the Keep ruling fixes are read; owner, holder and body move at settlements and are not.
+const keyGaps = (readText) => KEY_FILES.flatMap((path) => {
+  const text = readText(path);
+  if (text == null) return [`${path}: missing`];
+  const rec = parseRecord(text, path);
+  return rec.kind === "thing" && rec.by === TOWN ? [] : [`${path}: not a the-town thing`];
+});
+
+test("the three keys are kept: each key file is still in the tree, a the-town thing (Darko 11-03 09:44, \"Keep them\")", () => {
+  assert.deepEqual(keyGaps((p) => (existsSync(join(ROOT, p)) ? read(p) : null)), [], "the three keys are kept, not retired");
+  // the control, in memory (invented bodies): the same check names each missing key, one at a time
+  const kept = (p) => `---\nkind: thing\nby: ${TOWN}\nheld_by: tower/holder\nowned_by: someone\n---\n\nAn invented key.\n`;
+  assert.deepEqual(keyGaps(kept), [], "three kept keys: no gap");
+  for (const gone of KEY_FILES)
+    assert.deepEqual(keyGaps((p) => (p === gone ? null : kept(p))), [`${gone}: missing`], `${gone} missing is caught`);
+  assert.deepEqual(keyGaps((p) => kept(p).replace("kind: thing", "kind: event")), KEY_FILES.map((p) => `${p}: not a the-town thing`), "a key turned into something else is caught");
+});
+
 // ── the coupling, in memory ─────────────────────────────────────────────────────────
 
 const DOOR = "tower/inner-door";
@@ -107,5 +134,5 @@ test("synthetic coupling control: door-only, after_door-only and keys-only are e
   const keysGone = afterDoorOpen(WAITING, [door(LOCK)]);
   assert.equal(keysGone.open, false);
   assert.equal(keysGone.shut, true, "a real lock, shut for good");
-  // (the complete retirement, no declaration and no requirement, is what cases 1-3 assert of the real files)
+  // (the real state, no declaration, no requirement and the keys kept, is what cases 1-4 assert of the real files)
 });

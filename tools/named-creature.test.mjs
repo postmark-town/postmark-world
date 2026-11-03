@@ -59,7 +59,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD", "marks"));
 const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by === TOWN && String(m.class) === cls ? { ...m, named } : m));
 
-test("a named creature that returns (WLD-124): return_until is an ISO instant in UTC, carried as written; the season marks three entries", () => {
+test("a named creature that returns (WLD-124): return_until is an ISO instant in UTC, carried as written; the season's three returning entries are retired (WLD-135)", () => {
   const ok = { slug: "den", at: { x: 1, y: 2 } };
   const U = "2026-11-01T06:00:00Z";
   assert.equal(creatureLaw(withNamed("wolf", [{ ...ok, return_until: U }])).named.find((d) => d.kind === "wolf").return_until, U);
