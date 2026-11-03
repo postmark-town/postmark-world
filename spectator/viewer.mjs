@@ -3914,9 +3914,18 @@ export function residentProfileView(card = null, look = null, face = null) {
 // town's own law, but this is a link built from map data, so it is encoded
 // rather than trusted — and a handle that isn't handle-shaped gets no link at
 // all rather than a guessed one.
+//
+// WHAT THE TOWN OWNS HAS NO RESIDENT PAGE (WLD-125; RULED, Darko 2026-11-02 08:32 EST, "I agree with
+// your recs on all calls", the morning dash's call being: a World link from something the town owns
+// draws no link). The town's marks, regions and creatures all carry the handle `the-town`, and
+// `/residents/the-town/` is a 404 on the site. This is the one place the page turns a handle into a
+// link (the home column's foot line and name, and the walker card's "their page →", both come here),
+// so the town's handle is refused here, once, and every link built from an owner inherits it.
 const HANDLE_RE = /^[a-z0-9][a-z0-9-]*$/;
+const TOWN_HANDLE = "the-town";
 export function residentHref(handle) {
   const s = String(handle ?? "").trim();
+  if (s === TOWN_HANDLE) return null;
   return HANDLE_RE.test(s) ? `/residents/${encodeURIComponent(s)}/` : null;
 }
 
