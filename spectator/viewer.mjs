@@ -8038,6 +8038,33 @@ export function layoutReactionBubbles(bubbles = [], avoid = [], { width = Infini
   return out;
 }
 
+/**
+ * The office's `walks[]` onto the ledger's own departure grammar.
+ *
+ * `parseWalkLedger` defines that grammar and this is the same record in
+ * another wrapper: `within` and `to` are the STORE's column names for what
+ * walk.mjs reads as `targetExtent` and `targetMarkId` — the office's own
+ * `/world2/walks` says so where it renders them. Every other field is
+ * name-for-name. Unrecognized rows are COLLECTED, not silently dropped, which
+ * is the parser's own stance; one unreadable row must not discard the nine
+ * hundred good ones beside it.
+ */
+export function walksFromOffice(body) {
+  const departures = [], unrecognized = [];
+  for (const w of Array.isArray(body?.walks) ? body.walks : []) {
+    if (!w?.iso || !w?.handle || !w?.from || !w?.toward) { unrecognized.push(w); continue; }
+    departures.push({
+      iso: String(w.iso), handle: String(w.handle),
+      from: w.from, toward: w.toward, at: w.at,
+      targetExtent: w.within ?? null,
+      targetMarkId: w.to ?? null,
+      pace: w.pace ?? null,
+      line: w.line ?? null,
+    });
+  }
+  return { departures, unrecognized };
+}
+
 export function mountViewer(appEl) {
   if (!appEl) throw new Error("mountViewer needs a host element");
   const shadowHost = appEl;
@@ -17479,32 +17506,6 @@ export function mountViewer(appEl) {
   // args (the w43 nginx conf), and a since to the millisecond missed it on every
   // load (~18 s under party load). Every page in one hour asks the same thing.
   const walkWindowSince = () => new Date(Math.floor((Date.now() - walkWindowDays * 86_400_000) / 3_600_000) * 3_600_000).toISOString();
-  /**
-   * The office's `walks[]` onto the ledger's own departure grammar.
-   *
-   * `parseWalkLedger` defines that grammar and this is the same record in
-   * another wrapper: `within` and `to` are the STORE's column names for what
-   * walk.mjs reads as `targetExtent` and `targetMarkId` — the office's own
-   * `/world2/walks` says so where it renders them. Every other field is
-   * name-for-name. Unrecognized rows are COLLECTED, not silently dropped, which
-   * is the parser's own stance; one unreadable row must not discard the nine
-   * hundred good ones beside it.
-   */
-  function walksFromOffice(body) {
-    const departures = [], unrecognized = [];
-    for (const w of Array.isArray(body?.walks) ? body.walks : []) {
-      if (!w?.iso || !w?.handle || !w?.from || !w?.toward) { unrecognized.push(w); continue; }
-      departures.push({
-        iso: String(w.iso), handle: String(w.handle),
-        from: w.from, toward: w.toward, at: w.at,
-        targetExtent: w.within ?? null,
-        targetMarkId: w.to ?? null,
-        pace: w.pace ?? null,
-        line: w.line ?? null,
-      });
-    }
-    return { departures, unrecognized };
-  }
   let departures = [];
   // ONE INSTANT PER LOAD, threaded through: the chain, the cut and the absence
   // sentence must all name the same fortnight, or the sentence a reader is
