@@ -550,6 +550,16 @@ function loadStakes() {
 // unchanged. rects are centered on at, sized by extent) ----------
 export { rect, overlapArea, contains, marksContain, polygonOf, ringMatchesClaim } from "./geometry.mjs";
 import { rect, overlapArea, contains, marksContain, polygonOf, rectInsideRing } from "./geometry.mjs";
+
+// a parcel's rect: its written rect, a missing or zero side filled from the
+// dials' standard parcel (the whole fold, `admitDelta` and `sovereignInResult`
+// all size a parcel this one way)
+function parcelRect(mk, dials) {
+  const r = rect(mk);
+  r.w = r.w || dials.parcel_w;
+  r.h = r.h || dials.parcel_h;
+  return r;
+}
 import { deriveOutsiders, outsidersJson, outsidersMarkdown } from "./region-outsiders.mjs";
 import { carve } from "./determination.mjs";
 import { resolveConsent, consentMap, CONSENT_FIELD } from "./consent.mjs";
@@ -1124,7 +1134,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // 2026-10-17): one index over the marks this fold holds, asked by every
   // geometric question below, never the place as a proxy for the lineage
   const KIDX = kindIndexOf(marks);
-  const isSited = (m) => isSitedIn(m, KIDX), isGround = (m) => isGroundIn(m, KIDX);
+  const sitedHere = (m) => isSitedIn(m, KIDX), isGround = (m) => isGroundIn(m, KIDX);
 
   // ---------- the household grain (Keemin's rulings, 2026-08-07 + 2026-08-10) ----------
   // A mark's `by:` is a resident HANDLE. A household is the HUMAN behind it:
@@ -1167,7 +1177,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // why the cap's verdict must be a function of the record, and for the two
   // other rules this loop decides that move with it.
   for (const mk of parcelsInClaimOrder(byId)) {
-    const r = rect(mk); r.w = r.w || dials.parcel_w; r.h = r.h || dials.parcel_h;
+    const r = parcelRect(mk, dials);
     if (parcelByHh.has(mk.household) && !ONE_PARCEL_PER_HANDLE_EXCEPTIONS.has(mk.id)) { errors.push({ mark: mk.id, error: ONE_PER_RESIDENT_REFUSAL }); continue; }
     const cred = credHh(mk.household);
     const held = parcelsByCred.get(cred) ?? 0;
@@ -1249,7 +1259,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // person with two handles was a stranger on their own ground: their own mark
   // standing in their own parcel folded as a commons mark, exposed to rivalry.
   for (const mk of byId.values()) {
-    if (isSited(mk)) {
+    if (sitedHere(mk)) {
       const held = parcelRectsByCred.get(mk._cred) ?? [];
       mk._sovereign = held.some((pr) => contains(pr, rect(mk)));
     }
@@ -1269,7 +1279,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
 
   // containment edges (computed, never authored): sited-in-sited by geometry; predicated/naming by parent ref
   const children = new Map(); const parentOf = new Map();
-  const sited = [...byId.values()].filter(mk => isSited(mk));
+  const sited = [...byId.values()].filter(mk => sitedHere(mk));
   for (const a of sited) for (const b of sited) {
     if (a === b) continue;
     const ra = rect(a), rb = rect(b);
@@ -1331,7 +1341,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   // parent. A law return's ground is not touched: it took its subtree.
   if (consent.alone?.size) {
     const standing = [...byId.values()].filter((mk) => !gone.has(mk.id));
-    const standingSited = standing.filter((mk) => isSited(mk));
+    const standingSited = standing.filter((mk) => sitedHere(mk));
     const root = worldRootOf([...byId.values()]);
     const smallestSitedAround = (b) => {
       const rb = rect(b);
@@ -1344,7 +1354,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       return best ? best.id : null;
     };
     for (const mk of standing) {
-      if (isSited(mk) && consent.alone.has(parentOf.get(mk.id))) {
+      if (sitedHere(mk) && consent.alone.has(parentOf.get(mk.id))) {
         const up = smallestSitedAround(mk);
         if (up) parentOf.set(mk.id, up); else parentOf.delete(mk.id);
       }
@@ -2138,8 +2148,8 @@ const sameRect = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y && a.w === b
  */
 function deltaView(mk, cred, rectsByCred, world = null) {
   const kidx = kindIndexOf(world ?? [mk]);
-  const isSited = (m) => isSitedIn(m, kidx);
-  const held = isSited(mk) ? (rectsByCred.get(cred) ?? []) : [];
+  const sitedHere = (m) => isSitedIn(m, kidx);
+  const held = sitedHere(mk) ? (rectsByCred.get(cred) ?? []) : [];
   // The containment answer, asked of the WHOLE folded world plus this delta's
   // own candidates — the same question `fold` asks, so a mark's standing does
   // not depend on which of the two paths judged it. Published `placementParent`
@@ -2151,7 +2161,7 @@ function deltaView(mk, cred, rectsByCred, world = null) {
     id: mk.id, kind: mk.kind, by: mk.by ?? mk.household, household: mk.household ?? mk.by,
     declared_household: cred, date: mk.date,
     at: mk.at, extent: mk.extent, parent: mk.parent, slot: mk.slot, value: mk.value,
-    sovereign: isSited(mk) ? held.some((pr) => contains(pr, rect(mk))) : false,
+    sovereign: sitedHere(mk) ? held.some((pr) => contains(pr, rect(mk))) : false,
     body: mk.body,
     // who holds it, for a thing printed as held: the sweep's unpublish verdict reads it off this view (POS-688)
     ...(mk[HELD_BY] !== undefined ? { [HELD_BY]: mk[HELD_BY] } : {}),
@@ -2164,19 +2174,6 @@ function deltaView(mk, cred, rectsByCred, world = null) {
   };
 }
 
-/**
- * ADMIT k CANDIDATES AGAINST AN ALREADY-FOLDED WORLD. Pure: no fs, no git.
- *
- * `candidates` are the delta's own records, parsed at the branch ref — the same
- * shape `loadMarks` yields, so they carry `_parentMarkId` from their path.
- * `_replacing: true` marks a candidate that MODIFIES a mark main already holds:
- * it substitutes rather than collides, which is why the duplicate check below
- * cannot simply ask whether the id exists.
- *
- * Returns `{ views, errors }`. A non-empty `errors` is the quarantine, carrying
- * the fold's own error grammar so the crossing's journal reads the same either
- * way.
- */
 /**
  * SOVEREIGNTY AGAINST A WHOLE RESULT (WLD-51; review-214, D1). `admitDelta`
  * judges each view's `sovereign` against the parcels admitted before it in
@@ -2195,9 +2192,7 @@ export function sovereignInResult(views, world, { dials = DIALS } = {}) {
   const rectsByCred = new Map();
   for (const mk of world.values()) {
     if (mk.kind !== "parcel") continue;
-    const r = rect(mk);
-    r.w = r.w || dials.parcel_w;
-    r.h = r.h || dials.parcel_h;
+    const r = parcelRect(mk, dials);
     const cred = mk.declared_household ?? mk.household;
     if (!rectsByCred.has(cred)) rectsByCred.set(cred, []);
     rectsByCred.get(cred).push(r);
@@ -2209,6 +2204,19 @@ export function sovereignInResult(views, world, { dials = DIALS } = {}) {
   }
 }
 
+/**
+ * ADMIT k CANDIDATES AGAINST AN ALREADY-FOLDED WORLD. Pure: no fs, no git.
+ *
+ * `candidates` are the delta's own records, parsed at the branch ref — the same
+ * shape `loadMarks` yields, so they carry `_parentMarkId` from their path.
+ * `_replacing: true` marks a candidate that MODIFIES a mark main already holds:
+ * it substitutes rather than collides, which is why the duplicate check below
+ * cannot simply ask whether the id exists.
+ *
+ * Returns `{ views, errors }`. A non-empty `errors` is the quarantine, carrying
+ * the fold's own error grammar so the crossing's journal reads the same either
+ * way.
+ */
 export function admitDelta(candidates, base, { dials = DIALS } = {}) {
   const errors = [];
   const views = new Map();
@@ -2252,9 +2260,7 @@ export function admitDelta(candidates, base, { dials = DIALS } = {}) {
     const handle = mk.household ?? mk.by;
     const cred = base.credOf(handle);
     if (mk.kind === "parcel") {
-      const r = rect(mk);
-      r.w = r.w || dials.parcel_w;
-      r.h = r.h || dials.parcel_h;
+      const r = parcelRect(mk, dials);
       // one parcel per RESIDENT, by written law (the-town/one-per-resident,
       // 2026-10-04) — the one rule that stays at resident grain while everything downstream counts
       // households. Replacing the household's own parcel is a relocation, not a
