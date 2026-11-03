@@ -29,7 +29,7 @@ import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } fro
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
 import { propertyOf, propertyValue } from "../tools/class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2); a property's value as the record writes it
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
-import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
+import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING, CROSSING_EPOCH_UTC, CROSSING_MS } from "../tools/walk.mjs";
 import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mjs";
 // the town's own roster of regions, stated once in the record's own view: a water
 // mark carries a ring too, and the sea is not a region anyone is filed under
@@ -5672,8 +5672,7 @@ const stepLabel = (m) => (m >= 1000 ? `${(m / 1000).toFixed(m % 1000 ? 1 : 0)} k
 // since the ledger's first delivery day; the "provisional pending a ruling" line is
 // now the viewer's default). fog is the crossing's weather, so an open tab that
 // rolls over a crossing boundary re-tells with fresh weather.
-const CROSSING_EPOCH_UTC = Date.UTC(2026, 5, 12); // 2026-06-12T00:00Z
-const liveCrossing = () => Math.max(0, Math.floor((Date.now() - CROSSING_EPOCH_UTC) / (12 * 3600 * 1000)));
+const liveCrossing = () => Math.max(0, Math.floor((Date.now() - CROSSING_EPOCH_UTC) / CROSSING_MS));
 
 // dev-pane dials — the FOV-time leans only (assembly-time idw stays fixed, so a
 // dial change never re-folds or re-assembles: it re-tells). Each is {key,label,
