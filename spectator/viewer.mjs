@@ -2447,6 +2447,28 @@ export function clipSegmentToBox(from, to, box) {
   };
 }
 
+/**
+ * The part of a walk still to be walked: from where the walker IS at `at`, to
+ * where they are going. Null when there is no leg to draw: no departure, a
+ * finished walk (arrived) or a stop (standing).
+ *
+ * THE DIRECTION IS THE POINT (WLD-144, Bevel 2026-11-02): this is the REMAINING
+ * segment, `positionAt(departure, at)` to `departure.toward`. It is not the
+ * origin to the walker, and not the path already walked.
+ *
+ * Pure, and exported so the 2D walk paths and the 3D trails read one leg
+ * instead of keeping two copies (WLD-105). It adds no clock and no maths: the
+ * position and its arrived/standing flags are positionAt's, `at` is passed
+ * through untouched (undefined stays undefined, so positionAt's own default
+ * clock applies exactly as it did inline), and clipping to the painting stays
+ * with the caller (clipSegmentToBox).
+ */
+export function remainingWalkLeg(departure, at) {
+  const here = positionAt(departure, at);
+  if (!here || here.arrived || here.standing) return null;   // a finished walk is not a path
+  return { from: here, to: departure.toward };
+}
+
 // ── HOW MUCH BIGGER "YOURS" IS (Keemin, 2026-09-13: "let's make them bigger
 // than the others") ────────────────────────────────────────────────────────
 //
@@ -4587,6 +4609,35 @@ export function creatureIcon() {
   return markIcons({ kind: "sited", id: CREATURE_PREFIX, at: { x: 0, y: 0 } }, { cls: "creature" })[0];
 }
 
+/** The creature's own CSS in the 2D page's STYLE: the live-creature token (art, hit, disc, awareness ring,
+ *  highlight) and the red nameplate accent, one contiguous slice that `STYLE` interpolates at its original place
+ *  (WLD-144 W3; WLD-105). Bytes unchanged. Exported so the 3D view imports it instead of copying it. */
+export const CREATURE_CSS = `/* THE LIVE CREATURES (play fix 35): the Mists' own silhouette, dark with a pale
+   rim so it reads on any ground, held at a pip's size; the creature icon at its
+   feet at street zoom; their answer to an act in a note like the walk's */
+.ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
+.ov-creature-art { fill:#4a2326; pointer-events:none; }
+/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
+   portrait sits, the rim in a deeper red of the same hue, and no legs */
+.ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
+.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
+.ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
+.wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
+.wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */`;
+
+/** A live creature's nameplate (the hover plate): its icon and its name, the plate's `data-nameplate` carrying
+ *  its id. Pure: takes the creature row ({ id, name, ... } from liveCreaturesFrom), and a missing row is "".
+ *  Hoisted out of `mountViewer`, where it took the lookup key and read `liveCreatures.get(key)`; the row's own
+ *  `id` is that key, because the one writer sets `liveCreatures.set(c.id, c)` (loadLiveCreatures).
+ *  Its other dependencies are top-level in this module: `esc` (the escaper above), `iconsHTML` (imported from
+ *  ./mark-icons.mjs) and `creatureIcon` (above). */
+export function creatureNameplateHTML(c) {
+  if (!c) return "";
+  return '<div class="wv-nameplate" data-nameplate="' + esc(c.id) + '">'
+    + '<span class="wv-np-what">' + iconsHTML([creatureIcon()]) + '</span>'
+    + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
+}
+
 /** The living creatures in an apex find answer: [{ id, kind, name, x, y, fades_in }]. Pure. */
 export function liveCreaturesFrom(answer) {
   const rows = answer?.found?.creatures ?? answer?.creatures ?? [];
@@ -5709,8 +5760,12 @@ const DRAW_DIALS = [
   { key: "placed_art_min_m", label: "hangs its picture above (m)", min: 25, max: 4000, step: 25 },
 ];
 
-const STYLE = `
-.wv { --night:#14171d; --panel:#1c2129; --panel2:#20262f; --line:#2e3542;
+// The three slices of the shell that the 3D view shares with this one (WLD-144;
+// WLD-105: "Where the World exports a thing, import it"). Each is the exact text
+// that STYLE carried at that spot, interpolated back in place below, so the page
+// emits the same bytes it always did. The root rule sets the defaults (amber, gold,
+// the draft grey…) on .wv itself; a host's season frame overrides them there.
+export const WV_ROOT_CSS = `.wv { --night:#14171d; --panel:#1c2129; --panel2:#20262f; --line:#2e3542;
   --paper:#e8e0cf; --dim:#9a9280; --amber:#e8c56a; --amber-dark:#b8964a; --err:#d98a7a;
   --you:#e0654a; /* ember — "this is you", softened from alarm-red (Keemin 2026-07-30) */
   --mono:ui-monospace,"SF Mono",Consolas,Menlo,monospace;
@@ -5729,7 +5784,19 @@ const STYLE = `
      this world is warm, so a draft reads as not yet of it. */
   --draft:#9aa0ab; --draft-dark:#5d636e;
   background:var(--night); color:var(--paper); font:16px/1.55 Georgia,"Times New Roman",serif;
-  min-height:100vh; }
+  min-height:100vh; }`;
+export const WV_EXTENT_CSS = `.wv-extent { display:inline-flex; align-items:center; gap:4px; opacity:.8; }
+.wv-extent svg { display:block; }
+.wv-extent svg rect, .wv-extent svg polygon { fill:rgba(154,146,128,.18); stroke:var(--dim); stroke-width:1; }
+.wv-extent-t { font-size:.66rem; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap; }`;
+export const WV_ENTER_CSS = `/* the door, on the card it belongs to */
+.wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
+  border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
+.wv-enter:hover { background:rgba(224,160,42,.12); }
+.wv-enter[disabled] { opacity:.6; cursor:default; }`;
+
+const STYLE = `
+${WV_ROOT_CSS}
 .wv * { box-sizing:border-box; }
 /* ONE FOCUS RING for the whole viewer. Four controls used to take the browser's
    outline away and lean on their hover style instead — which leaves someone
@@ -6052,10 +6119,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-chip.stamps { border-color:var(--stamp-violet-dark); color:var(--stamp-violet); }
 .wv-chip.signal { border-color:var(--amber-dark); color:var(--amber); }
 .wv-chip.dim { opacity:.6; }
-.wv-extent { display:inline-flex; align-items:center; gap:4px; opacity:.8; }
-.wv-extent svg { display:block; }
-.wv-extent svg rect, .wv-extent svg polygon { fill:rgba(154,146,128,.18); stroke:var(--dim); stroke-width:1; }
-.wv-extent-t { font-size:.66rem; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap; }
+${WV_EXTENT_CSS}
 .wv-cluster { margin-top:7px; font-size:.8rem; font-style:italic; color:var(--amber); opacity:.85; }
 .wv-tallies { margin-top:22px; padding-top:10px; font-size:.82rem; color:var(--dim); border-top:1px solid var(--line); max-width:76ch; }
 /* what this standpoint has CROSSED INTO — never where it is standing (R15) */
@@ -6070,11 +6134,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   border-left:5px solid var(--amber); background:rgba(224,160,42,.07); }
 .wv-int-company { margin:8px 0 0; font-size:.86rem; font-style:italic; color:var(--dim); }
 .wv-int-plaque > .wv-int-company:first-child { margin-top:0; }
-/* the door, on the card it belongs to */
-.wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
-  border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
-.wv-enter:hover { background:rgba(224,160,42,.12); }
-.wv-enter[disabled] { opacity:.6; cursor:default; }
+${WV_ENTER_CSS}
 .wv-cross-sheet.is-far .wv-walk-enter { border-color:var(--amber); color:var(--amber); }
 .wv-cross-sheet { margin:10px 0 0; padding:10px 12px; border-left:4px solid var(--amber);
   background:rgba(224,160,42,.07); font-size:.92rem; }
@@ -6841,18 +6901,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   font:600 .82rem/1.35 Consolas,Menlo,monospace; opacity:0; transition:opacity .25s; pointer-events:none; }
 .wv-walk-note.show { opacity:1; }
 .wv-walk-note.refusal { border-color:#b5524a; color:#f0b0a8; }
-/* THE LIVE CREATURES (play fix 35): the Mists' own silhouette, dark with a pale
-   rim so it reads on any ground, held at a pip's size; the creature icon at its
-   feet at street zoom; their answer to an act in a note like the walk's */
-.ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
-.ov-creature-art { fill:#4a2326; pointer-events:none; }
-/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
-   portrait sits, the rim in a deeper red of the same hue, and no legs */
-.ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
-.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
-.ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
-.wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
-.wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */
+${CREATURE_CSS}
 .wv-choose-row.is-convo { border-left:3px solid #7f93a6; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
 .wv-choose-row.is-creature { border-left:3px solid #d8706a; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
 .wv-creature-note { position:absolute; z-index:9; left:50%; bottom:58px; transform:translateX(-50%); max-width:min(34rem,80%);
@@ -8043,6 +8092,33 @@ export function layoutReactionBubbles(bubbles = [], avoid = [], { width = Infini
     out.push({ el: bub.el, x: box.x, y: box.y, tailX: Math.max(8, Math.min(w - 8, bub.anchor.x - box.x)) });
   }
   return out;
+}
+
+/**
+ * The office's `walks[]` onto the ledger's own departure grammar.
+ *
+ * `parseWalkLedger` defines that grammar and this is the same record in
+ * another wrapper: `within` and `to` are the STORE's column names for what
+ * walk.mjs reads as `targetExtent` and `targetMarkId` — the office's own
+ * `/world2/walks` says so where it renders them. Every other field is
+ * name-for-name. Unrecognized rows are COLLECTED, not silently dropped, which
+ * is the parser's own stance; one unreadable row must not discard the nine
+ * hundred good ones beside it.
+ */
+export function walksFromOffice(body) {
+  const departures = [], unrecognized = [];
+  for (const w of Array.isArray(body?.walks) ? body.walks : []) {
+    if (!w?.iso || !w?.handle || !w?.from || !w?.toward) { unrecognized.push(w); continue; }
+    departures.push({
+      iso: String(w.iso), handle: String(w.handle),
+      from: w.from, toward: w.toward, at: w.at,
+      targetExtent: w.within ?? null,
+      targetMarkId: w.to ?? null,
+      pace: w.pace ?? null,
+      line: w.line ?? null,
+    });
+  }
+  return { departures, unrecognized };
 }
 
 export function mountViewer(appEl) {
@@ -12621,9 +12697,9 @@ export function mountViewer(appEl) {
     for (const handle of handles) {
       const departure = currentDeparture(departures, handle);
       if (!departure) continue;
-      const now_ = positionAt(departure, now);
-      if (!now_ || now_.arrived || now_.standing) continue;   // a finished walk is not a path
-      const seg = clipSegmentToBox(now_, departure.toward, box);
+      const leg = remainingWalkLeg(departure, now);            // where they are, to where they are going
+      if (!leg) continue;                                      // a finished walk is not a path
+      const seg = clipSegmentToBox(leg.from, leg.to, box);
       if (!seg) continue;                                      // all of it is off the sheet
       const a = px(seg.from), b = px(seg.to);
       const colour = faceOf(handle).color ?? "#bfe4c6";
@@ -14755,13 +14831,6 @@ export function mountViewer(appEl) {
     }
     return rings + out;
   }
-  function creatureNameplateHTML(id) {
-    const c = liveCreatures.get(id);
-    if (!c) return "";
-    return '<div class="wv-nameplate" data-nameplate="' + esc(id) + '">'
-      + '<span class="wv-np-what">' + iconsHTML([creatureIcon()]) + '</span>'
-      + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
-  }
   // ITS COLUMN: what it is in its kind's own words, its kind, what it is doing,
   // its moods, when it came out, what it runs on, and what was done to it and how it answered.
   function creatureColumnView(id) {
@@ -15347,7 +15416,7 @@ export function mountViewer(appEl) {
   function paintGlance(el, id) {
     const handle = walkerHandleFromHoverId(id);
     const creature = isCreatureId(id);
-    const html = handle ? walkerBubbleHTML(handle) : creature ? creatureNameplateHTML(id) : markNameplateHTML(id);
+    const html = handle ? walkerBubbleHTML(handle) : creature ? creatureNameplateHTML(liveCreatures.get(id)) : markNameplateHTML(id);
     if (!html) { el.hidden = true; glanceShown = null; return; }
     el.className = `wv-bubble is-hover${handle ? "" : ` is-nameplate ${creature ? "is-creature" : markClasses(byId.get(id))}`}`;
     if (el._pmHtml !== html) { el._pmHtml = html; el.innerHTML = html; }
@@ -17468,32 +17537,6 @@ export function mountViewer(appEl) {
   // args (the w43 nginx conf), and a since to the millisecond missed it on every
   // load (~18 s under party load). Every page in one hour asks the same thing.
   const walkWindowSince = () => new Date(Math.floor((Date.now() - walkWindowDays * 86_400_000) / 3_600_000) * 3_600_000).toISOString();
-  /**
-   * The office's `walks[]` onto the ledger's own departure grammar.
-   *
-   * `parseWalkLedger` defines that grammar and this is the same record in
-   * another wrapper: `within` and `to` are the STORE's column names for what
-   * walk.mjs reads as `targetExtent` and `targetMarkId` — the office's own
-   * `/world2/walks` says so where it renders them. Every other field is
-   * name-for-name. Unrecognized rows are COLLECTED, not silently dropped, which
-   * is the parser's own stance; one unreadable row must not discard the nine
-   * hundred good ones beside it.
-   */
-  function walksFromOffice(body) {
-    const departures = [], unrecognized = [];
-    for (const w of Array.isArray(body?.walks) ? body.walks : []) {
-      if (!w?.iso || !w?.handle || !w?.from || !w?.toward) { unrecognized.push(w); continue; }
-      departures.push({
-        iso: String(w.iso), handle: String(w.handle),
-        from: w.from, toward: w.toward, at: w.at,
-        targetExtent: w.within ?? null,
-        targetMarkId: w.to ?? null,
-        pace: w.pace ?? null,
-        line: w.line ?? null,
-      });
-    }
-    return { departures, unrecognized };
-  }
   let departures = [];
   // ONE INSTANT PER LOAD, threaded through: the chain, the cut and the absence
   // sentence must all name the same fortnight, or the sentence a reader is
