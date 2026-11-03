@@ -37,7 +37,7 @@ import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact, parcelInteriorOf } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 import { portalFindings } from "./portals.mjs";
-import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
+import { classIndex, classChain, ownProperties, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -72,7 +72,9 @@ const JSON_OUT = args.includes("--json");
 
 // `property` joins with LOGOS v2 part 2 (ruled 2026-10-16): a class's property
 // is a node of its own (§ Property and predicate). The instances' `kind:` still
-// names how a mark stands until the kind migration (W2) folds `class:` into it.
+// names how a mark stands in the old form; since the kind migration (W2) a `kind:`
+// names the class itself, and the standing words are still read (§1 warns the
+// old form's `class:` to fold into `kind:`).
 // (Posts are not world records: they live in the office's post machine, and
 // the 61 idea and bounty marks move there in a later lane; settled WLD-73 G7.)
 // `predicate` joins with W2's G10 (settled 2026-10-17): a claim's kind names its
@@ -91,9 +93,6 @@ const PROPERTY_TIERS = new Set(["constitution", "sovereign"]);
 // their readers already use (a dial's key, a predicate's slot).
 const PROPERTY_NAME_RE = /^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)*$/;
 const TOWN = "the-town"; // the town-tier author; only it may claim constitution
-// The world root, kept as a name rather than as a check: the freeze repealed the
-// containment question this gate used to ask of the tree (§6), so nothing here
-// reads placementParent any more. The fold answers containment now.
 const BODY_MAX = 150; // chars (07-22 ruling)
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -203,12 +202,6 @@ const standingOf = (m) => markStanding(m, standingIndex);
 // in for geography, and both clauses would go quietly wrong for the first mark
 // filed at its id. Same function the fold and WORLD/containment.json use.
 const { parent: containedBy } = containmentParents(marks);
-
-const slugsByHousehold = new Map();
-const childCount = new Map();
-for (const m of marks) {
-  if (m._parentMarkId) childCount.set(m._parentMarkId, (childCount.get(m._parentMarkId) ?? 0) + 1);
-}
 
 for (const rec of marks) {
   // 0. unreadable frontmatter — nothing else can be trusted
@@ -413,7 +406,7 @@ for (const rec of marks) {
     if (rec.at !== undefined || rec.extent !== undefined || rec.points !== undefined)
       err(rec, `a held thing carries no at/extent — it is published but unplaced, and shows as ${holderOf}'s contents until it is set down (POS-688)`);
   }
-  // 4b. ITS OWNER, when not its maker (POS-688, Darko 2026-10-19): a resident's
+  // 4a'. ITS OWNER, when not its maker (POS-688, Darko 2026-10-19): a resident's
   // handle, never the maker's own (the maker owns it unprinted), and only a thing.
   const ownerOf = ownedBy(rec);
   if (rec[OWNED_BY] !== undefined && (ownerOf == null || ownerOf.includes("/")))
@@ -643,7 +636,7 @@ for (const rec of marks) {
 {
   // `held_by` is the record grammar's, like placementParent: where a held thing is instead of a place (POS-688)
   const RESERVED = new Set(["id", "by", "date", "household", "declared_household", "parent", "placementParent", "stamps", "weight", "sovereign", "kind", "class", "tier", "body", "slug", HELD_BY, OWNED_BY]);
-  // how a mark stands names its class until W2 folds `class:` into `kind:`
+  // a standing word (the old form of `kind:`) names its class; since W2 a `kind:` names the class directly
   const STANDING_CLASS = { sited: "sited", parcel: "parcel", predicated: "predicate", naming: "naming" };
   const STANDING_FIELDS = { sited: ["at", "extent"], parcel: ["at", "extent"], predicated: ["slot", "value"], naming: ["slot", "value"] };
   const undeclared = new Map(); // `${class}\u0000${field}` -> { first, count }
@@ -694,11 +687,14 @@ for (const rec of marks) {
 // written inside it — that is arithmetic about a file, not a claim about the
 // world — and the fossil is exactly what keeps it stable: nothing moves, so no
 // mark's frame is ever re-derived out from under its digits again.
+// The world's root mark: the frame every other mark's file numbers hang from.
+// It is looked up by name for the frame law only; containment is the fold's (§6).
 const ROOT_MARK = marks.find((m) => m.slug === WORLD_ROOT_SLUG);
 const WORLD_CENTRE = ROOT_MARK?.at ? { x: ROOT_MARK.at.x, y: ROOT_MARK.at.y } : { x: 0, y: 0 };
 // The centre `rec`'s file numbers would be written against if it were filed
 // directly inside `start` — the nearest positioned ancestor from `start` up
-// (start itself included) whose tier ranks at or above rec's own.
+// (start itself included) whose frame rank (rankOf: constitution over market over
+// draft) is at or above rec's own.
 const frameOriginFrom = (rec, start) => {
   const continued = isPredicate(rec) || rec.kind === "naming";
   const rank = rankOf(rec);
@@ -863,7 +859,8 @@ const parentOf = (rec) => (rec._parentMarkId ? byId.get(rec._parentMarkId) : nul
 // 6b. the loader and the law agree — a check on the MACHINERY, not on any
 // resident. Everything above trusts `loadMarks` to have composed each mark's
 // world position correctly; this is the one place that trust is tested. Same
-// walk §6 uses, run over the directory chain each record actually has.
+// frame law above (frameOriginFrom), run over the directory chain each record
+// actually has.
 if (declaredCoords(marks) === COORDS_RELATIVE) {
   for (const rec of marks) {
     if (rec._error || !rec._fileAt || rec === ROOT_MARK) continue; // the root IS the frame
