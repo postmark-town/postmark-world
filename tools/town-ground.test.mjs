@@ -443,7 +443,8 @@ test("[pin] THE CALL SITE PASSES A SET THAT EXISTS — a CHEAP SECOND GUARD, not
   // ⚑ THE CALL SITE MOVED AGAIN ON 2026-10-13 (WLD-5): the assembled world is
   // read through `sightOf` (the world tools' standpointSight, so a dungeon draws
   // as its own mark alone). Same fold, same skeleton, scoped before anything draws.
-  assert.match(VIEWER, /world = sightOf\(assembleWorld\(\{ worldState: data\.worldState, skeleton: data\.skeleton \}\)\)/);
+  // (WLD-97 W1 added the flat fallback for a skeleton whose height dials can't be read)
+  assert.match(VIEWER, /world = sightOf\(assembleWorld\(\{ worldState: data\.worldState, skeleton: data\.skeleton, whenHeightsUnread: "flat" \}\)\)/);
   assert.doesNotMatch(VIEWER, /townGround\(data\.marks/, "`data.marks` is undefined and always was");
   // THE ORIGINAL BUG, still watched: a set that does not exist. `world.marks`
   // is now the one that can be absent — the resident path never assembles a

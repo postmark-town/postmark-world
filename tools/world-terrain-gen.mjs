@@ -17,7 +17,7 @@
 //   --atlas defaults to this repo's own PROJECTS/build-the-town/atlas copy;
 //   point it at the live clone's atlas dir for a fresh derive. The source
 //   used is printed loudly either way.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -62,6 +62,20 @@ const candA = JSON.parse(readFileSync(join(ATLAS, "terrain-candidate-A.json"), "
 const m = (px, py) => ({ x: Math.round((px - ORIGIN.x) * K), y: Math.round((py - ORIGIN.y) * K) });
 const mPt = (p) => ({ ...m(p.x, p.y), ...(p.w !== undefined ? { w_m: Math.round(p.w * K) } : {}) });
 
+// THE HEIGHT DIALS HAVE ONE HOME: WORLD/skeleton.json (WLD-97, review of part 1).
+// The elevation block (datum, quay, fog ceiling, pace, the river's fall, every
+// region's band and anchor) and each lake's surface are ruled dials, not
+// extractions from the atlas, so a terraform edits the skeleton alone and a
+// regenerate carries them across from the committed record unchanged. They were
+// typed here too, a second copy a terraform would have had to find.
+const RECORD = process.env.SKELETON_IN ?? join(ROOT, "WORLD/skeleton.json"); // SKELETON_IN: the suite's terraform-then-regenerate
+const committed = existsSync(RECORD) ? JSON.parse(readFileSync(RECORD, "utf8")) : null;
+if (!committed?.elevation?.regions?.length)
+  throw new Error(`${RECORD} carries no elevation dials: they are ruled data that lives only there (restore the file from git, then regenerate)`);
+const LAKE_SURFACE = Object.fromEntries((committed.features ?? [])
+  .filter((f) => f.kind === "lake" && f.surface_m !== undefined)
+  .map((f) => [f.id, { surface_m: f.surface_m, ...(f.surface_receipt ? { surface_receipt: f.surface_receipt } : {}) }]));
+
 const skeleton = {
   _law: "WORLD/skeleton.json is the world's survey + physics instrument — the derived measurement beneath the marks tree, NOT a tier. Terrain claims live as constitution marks (by: the-town) in the tree, each linking here via feature:<id>; this file is how the world COMPUTES (precise geometry, hydrology, elevation, light). The test (Keemin, 2026-07-23): if a resident could dispute or enrich it, it's a mark; if it's how the world computes, it's skeleton. Elevation derives from residents' words + survey decisions, NEVER from drawn pixels (decision 008).",
   _grid: { cell_m: 1, scale: "5 m per atlas px (RULED 2026-07-17)", origin: `the Origin — {0,0}, where the ferry lands; center of the Town Centre, atlas (${ORIGIN.x},${ORIGIN.y}); x east, y south, z in meters above sea (decision 008)` },
@@ -82,34 +96,8 @@ const skeleton = {
     signal: { honored: true, receipt: "Orion's announce-yourself law made mechanics (decision 008); a light declared on the record cuts fog for the whole town" },
     timetable: { honored: true, receipt: "the Post Office as a scheduled service (Keemin, 2026-08-07): a mark carrying a timetable — stops by mark id, departure times, its own pace — becomes a body that moves on a clock. Boarding is presence, not a verb (ENGINE.md § the timetable mechanic)" },
   },
-  elevation: {
-    _ruling: "survey decision 008 (Keemin, 2026-07-22) — all values are dials, movable by ruling, never silently",
-    datum: "sea = 0 m at the coasts and the mouth",
-    quay_m: 5,
-    fog_ceiling_m: 22,
-    north_trend: "~1.45% climb, quay to the north rim (~+60 m at the map's edge)",
-    open_ground_principle: "unclaimed ground stays gentle and unremarkable until a resident gives it words — height is canon too",
-    walk_speed_m_per_crossing: 60000,
-    regions: [
-      { id: "the-town-centre", band_m: [4, 6], note: "flat quayside, both banks low" },
-      { id: "the-lanternseed-gardens", band_m: [10, 20], note: "lower slope" },
-      { id: "the-trueing-terrace", band_m: [30, 45], note: "stepped terraces, above fog" },
-      { id: "north-rim", band_m: [55, 65], note: "the map's north edge; the mountain itself is off-map (see far_features)" },
-      { id: "the-high-ground", band_m: [30, 40], note: "the second rise, east — distinct from the north hill, a saddle between" },
-      { id: "the-threshold-district", band_m: [0, 5], note: "four ~3 m steps descending from the Centre to river level; the lower two under the fog ceiling" },
-      { id: "the-still-reach-and-blackwater-bend", band_m: [2, 4], note: "floodplain, flat — merrick's inlet sits here" },
-      { id: "the-long-run", band_m: [0, 5], note: "banks stepping to 0 through the two locks (~2-3 m each)" },
-      { id: "the-east-low-hills", band_m: [15, 25], note: "knolls — the East Window District's western wall" },
-      { id: "the-east-window-district", band_m: [5, 12], note: "open field, rolling east" },
-      { id: "evermoon", band_m: [10, 25], note: "gentle dark upland on the WEST band (post-move, provisional on caelum's word); shallow twin-mooned lake basin — the night native to the pole" },
-      { id: "the-protected-grove", band_m: [30, 50], note: "NW forested upland rising to the corner; Memory Lake basin; the watchtower knoll the local summit" },
-      { id: "the-lochan", band_m: [22, 28], note: "NE upland hollow — a CLOSED basin, no inlet, no outlet: 'a lake that belongs to no river' is literally hydrology" },
-      { id: "the-reach", band_m: [0, 30], note: "west-coast basalt cliffs +15-30, shingle at 0" },
-      { id: "the-headland", band_m: [10, 20], note: "raised promontory, sea on three sides" },
-      { id: "the-doubled-coast", band_m: [0, 8], note: "low shore" },
-      { id: "aelyria", band_m: [5, 10], note: "LOW cliffs, gentle inland — plus a modest inland scarp so the upward falls has a drop to fall up" },
-    ],
-  },
+  // the committed record's own dials (see THE HEIGHT DIALS HAVE ONE HOME above)
+  elevation: committed.elevation,
   light: {
     _ruling: "day-axis canon (atlas 2026-07-21) + 07-22 recalibration — PROVISIONAL on caelum's word (the Evermoon move reverts wholly at his word)",
     dawn_pole_m: m(1500, 850),
@@ -132,7 +120,7 @@ const skeleton = {
       receipt: "finn: 'the main current split off, and what was left settled into still water' — a pool, not a point; nothing in it moves" },
     { id: "the-locks", kind: "locks", at_m: LOCKS.map(p => m(p.x, p.y)),
       receipt: "the two gates on the straightened lower run; carta's lock house stands at the lower (atlas v2). Each steps ~2-3 m of the last drop (decision 008)" },
-    ...(candA.lakes || []).map(l => ({ id: l.id || "lake", kind: "lake", center_m: m(l.cx, l.cy), rx_m: l.rx * K, ry_m: l.ry * K, receipt: l.receipt })),
+    ...(candA.lakes || []).map(l => ({ id: l.id || "lake", kind: "lake", center_m: m(l.cx, l.cy), rx_m: l.rx * K, ry_m: l.ry * K, ...(LAKE_SURFACE[l.id] ?? {}), receipt: l.receipt })),
     ...(candA.cliffs || []).map(c => ({ id: c.id, kind: "cliffs", line_m: c.pts.map(mPt), receipt: c.receipt })),
     ...(candA.oddities || []).map(o => ({ id: o.id || "oddity", kind: "oddity", at_m: m(o.x, o.y), receipt: o.receipt })),
     ...(candA.water_offshoots || []).map(w => ({ id: w.id, kind: w.kind, centerline_m: w.pts.map(mPt), round_end: !!w.round_end, receipt: w.receipt })),
