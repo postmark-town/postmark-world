@@ -37,7 +37,10 @@ test("it stands at the track's north end, on the clear side of the wall, outside
   const { x, y } = sign.at;
   assert.ok(x >= north.minX && x <= north.maxX, `x ${x} is within the track's width`);
   assert.ok(Math.abs(y - north.maxY) <= 50, `y ${y} is at the track's north end (${north.maxY})`);
-  const last = skeleton.mists.schedule.at(-1).crossing;
+  // the wall at its fullest: the last STANDING keyframe. Until 2026-11-02 this was schedule.at(-1), the last keyframe;
+  // WLD-147 withdraws the Mists from `withdrawn_from`, whose keyframe is the one that pulls the wall away (mistsAt is null there).
+  const standing = skeleton.mists.schedule.filter((k) => !(k.crossing >= (skeleton.mists.withdrawn_from ?? Infinity)));
+  const last = standing.at(-1).crossing;
   const m = mistsAt(last, skeleton.mists);
   const h = mistsHere({ x, y }, m);
   assert.equal(h.inWall, false, "never inside the wall");

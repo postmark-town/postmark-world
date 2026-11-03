@@ -10,6 +10,10 @@
 // fringe and clearings are the skeleton's and are not touched. The named candied creatures
 // carry their own `from_crossing` and `return_until`, so none of them depends on the dial.
 //
+// SUPERSEDED IN PART 2026-11-02 (WLD-147; Darko, 17:06 EST, in chat: "full removal for mists"): "the Mists stay"
+// no longer holds. They stand as they were through the last crossing before the record's `withdrawn_from` and are
+// gone from it (tools/mists-withdrawn.test.mjs). The creature half of this file is unchanged.
+//
 // CAN-FAIL FLIPS: write the dial back to 259 (the law and the windows cases red); drop a
 // named creature's own from_crossing (the named case reds); let a named return_until run
 // past 2026-11-01T06:00Z (the named case reds). The control case holds the scheduler live.
@@ -50,12 +54,21 @@ test("a crossing after Halloween spawns no creature, and the same inputs with th
   assert.ok(live.spawns.length > 0, "control: with the old launch dial the same scheduler spawns, so the zero above is the dial's");
 });
 
-test("the Mists stay as they are: past the last keyframe they hold it, and the creature law does not move them (WLD-142)", () => {
-  const last = MISTS.schedule[MISTS.schedule.length - 1].crossing;
-  assert.equal(last, 282, "the last keyframe is crossing 282 (the Mists stay there)");
+// UNTIL 2026-11-02 (WLD-142 -> WLD-147) this test asserted the other half of Darko's 10-31 word, "keep the mist as is":
+// that the last keyframe was crossing 282 and the Mists held it at every later crossing (285, 300, 400). Darko ruled
+// "full removal for mists" (2026-11-02 17:06 EST, WLD-147): the Mists stand at that keyframe through the last crossing
+// before `withdrawn_from` and are gone from it. The creature law still does not move them, and it still does not need them
+// to be off: this file's dial is null either way.
+test("the Mists held the last standing keyframe until the withdrawal (WLD-142, then WLD-147), and the creature law does not move them", () => {
+  const W = MISTS.withdrawn_from;
+  assert.ok(Number.isInteger(W) && W > FIRST_AFTER, "the record names the crossing the Mists are withdrawn from, after Halloween's end");
+  const standing = MISTS.schedule.filter((k) => k.crossing < W);
+  assert.equal(standing.at(-1).crossing, W - 1, "the last standing keyframe is the hold the withdrawal writes");
+  assert.deepEqual(standing.at(-2), { crossing: 282, front_m: 760, veil: 0.5 }, "and the keyframe before it is crossing 282, where the Mists were kept");
   const telling = (N) => { const { crossing: _c, ...rest } = mistsAt(N, MISTS); return JSON.stringify(rest); };
-  const held = telling(last);
-  for (const N of [FIRST_AFTER, 300, 400]) assert.equal(telling(N), held, `crossing ${N}: the Mists stand at the last keyframe`);
+  const held = telling(282);
+  for (const N of [FIRST_AFTER, W - 1]) assert.equal(telling(N), held, `crossing ${N}: the Mists still stand as they did at 282`);
+  assert.equal(mistsAt(W, MISTS), null, `crossing ${W}: withdrawn`);
   assert.ok(MISTS.border_m && MISTS.clearings_m.length > 0, "the wall's border and the clearings are still the skeleton's");
 });
 
