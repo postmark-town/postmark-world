@@ -17,8 +17,33 @@
 // memory — so a re-run needs a restarted rig, not a reseed.
 //
 // Exits 1 on the first failed assertion, 0 with a receipt table when green.
-// The rig's own WORLD record is the fixture: rei stands inside the Lanternstep
-// House on the threshold ledger this branch carries.
+// The rig's own record is the fixture, and it is found, not assumed: the script
+// acts as each handle in the page's roster in turn until one stands inside a
+// room on the enter-exit ledger the rig serves.
+//
+// NOTE, read before a re-run: several assertions below predate later rulings.
+// This list was read from viewer.mjs's source; no rig was run, so treat it as
+// a map, not a verdict. They want updating, not trusting.
+//   · the ruled-paper pattern (`#wv-scene-rule-pat`, removed with the grid,
+//     POS-89 2026-09-15): the `paper` reading and its check cannot pass;
+//   · the rail's footprint button (`.wv-map-fp`, removed 2026-09-11): `fpBtn`
+//     is false, so the footprint check cannot pass;
+//   · the room card is a NAMEPLATE since 2026-10-15 (Darko, 18:20): the room's
+//     `.wv-nameplate` plus a small way-out button, with no `.wv-card[data-id]`
+//     cell, no `.cbody` and no expansion, and a press on the name opens the
+//     room's column. So `roomCardReading`'s `names` and `expanded` are always
+//     null/false: "it is the room's own card" cannot pass, `clickRoomCell`
+//     finds nothing to click so `expandFold`'s EXPANDS check cannot pass (in
+//     either view mode), its FOLDS half has nothing to fold, and "it RESTS
+//     compact" passes only because nothing can expand;
+//   · "the FILLED pill … the row's whole width": the colours are still the
+//     card's, but the way out is now the small `width:auto` button of the
+//     `.is-plate` card, so the "spans its row" half describes the old card;
+//   · "the room card is open": it asks for a card taller than 40px, which a
+//     one-row plate may not be (not settled by reading);
+//   · the town-remount check is named for the atlas (`atlasBack`, any
+//     `<image>`), which left on 2026-09-08; it can pass only on art the town
+//     hangs.
 import { chromium } from "playwright";
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -50,8 +75,9 @@ await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); 
 await page.waitForTimeout(1200);
 
 // ── into the room: act as whichever resident the RIG's own record puts inside
-// (the demo seeds its own git-ignored state, so the cast varies by worktree —
-// the fixture is found, not assumed; jetto-scene's reproducibility lesson)
+// (a rig seeds its own state, so the cast varies from rig to rig and worktree
+// to worktree — the fixture is found, not assumed; jetto-scene's
+// reproducibility lesson)
 const roster = await page.evaluate(() =>
   [...document.querySelectorAll("[data-act-as]")].map((x) => x.dataset.actAs).filter((h) => h !== "__spectator__"));
 let actor = null;
@@ -74,7 +100,9 @@ check("the rig offers an entered resident as the fixture", !!actor, actor ?? `ro
 // OPEN, NOT EXPANDED (the second POS-206 PR, same day: "the card is always open
 // but not expanded, and you can click to expand it"): it RESTS compact, a real
 // click on the room's cell folds the expansion open, a second click shut, and
-// the way out stays inside the card in both states.
+// the way out stays inside the card in both states. (That is the card as of
+// 2026-09-23; it has been a nameplate since 2026-10-15 — see the NOTE in the
+// header for what in this section no longer describes the page.)
 const roomCardReading = () => page.evaluate(() => {
   const box = document.querySelector(".wv-minimap");
   const bb = box?.getBoundingClientRect();
@@ -243,8 +271,12 @@ await page.screenshot({ path: join(SHOTS, "scene-b-hover.png") });
 check("hovering a room thing raises the same glance/highlight the town raises", glanced);
 
 // ── click a thing: the same selection, in BOTH view modes ───────────────────
-// The demo rig runs telling-open, where a selection lands on the CELL (the
+// This pass expects telling-open, where a selection lands on the CELL (the
 // bubble is deliberately the painting-only affordance) — identical to the town.
+// The page starts painting-only unless its storage says otherwise
+// (readPaintingOnly), and this script seeds none and has toggled the view an
+// even number of times by here — so the expectation holds only on a rig that
+// starts telling-open.
 await page.mouse.click(hover.x, hover.y);
 await page.waitForTimeout(800);
 const selected = await page.evaluate(() => document.querySelector(".is-mark-selected")?.dataset?.id ?? null);
