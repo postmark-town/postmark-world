@@ -1032,7 +1032,12 @@ and "it is no one's".)
   blessing that carries this: no window seeded after it spawns a creature. This
   is the season's end that WLD-96 left to his word ("Keep flee, end at season's
   end"). The Mists themselves are the skeleton's and stay as they are (the last
-  keyframe, crossing 282). A window already seeded keeps the law at its own
+  keyframe, crossing 282). *SUPERSEDED 2026-11-02 (WLD-147; Darko, 17:06 EST, in
+  chat, RULED: "full removal for mists"): that sentence. The Mists stand as they
+  did at 282 through the last crossing before the record's `withdrawn_from` and
+  are gone from it (WORLD/ENGINE.md § The Mists). With no wall and no fringe a
+  creature has no ground to come out of (`tools/creatures.mjs` scheduleFor), so
+  this dial has nothing to turn back on.* A window already seeded keeps the law at its own
   seed's sha, so it finishes; the creatures already out are taken down by the
   town's own `withdraw`, not by this law. The season's named creatures carry
   their own `from_crossing` and `return_until` and do not read this dial.

@@ -297,15 +297,25 @@ export function fogModel(crossing, dials = DIALS) {
 //              the map; negative means it has pulled back past the edge. veil
 //              [0..1] is the share of all light the Mists take (lightLevelAt).
 //              Between two entries both move linearly; after the last they hold.
-//   density    { from, to, power }  the fringe's thickness where it meets the
-//              wall, eased from the schedule's first crossing to its last:
-//              from + (to − from) · u^power, u the share of the span gone. A
-//              power above 1 thickens slowly at first and faster as the last
-//              crossing nears.
+//   density    { from, to, power, from_crossing?, to_crossing? }  the fringe's
+//              thickness where it meets the wall, eased from the schedule's first
+//              crossing to its last: from + (to − from) · u^power, u the share of
+//              the span gone. A power above 1 thickens slowly at first and faster
+//              as the last crossing nears. A density that names its own
+//              from_crossing and to_crossing eases over THAT span instead (WLD-147:
+//              the withdrawal appends keyframes, and an easing that followed the
+//              last keyframe would stretch and so re-tell every crossing already told).
+//   withdrawn_from  the first crossing with NO MISTS AT ALL (WLD-147, Darko
+//              2026-11-02 17:06 EST: "full removal for mists"). From it mistsAt
+//              answers null, whatever the schedule says after it. Absent, the
+//              Mists never end and the last keyframe holds, as before.
 //
 // BEFORE THE SCHEDULE'S FIRST CROSSING THERE ARE NO MISTS: mistsAt answers null,
-// and every reader then answers exactly as it did before the Mists existed. Like
-// the weather, it is a pure function of the crossing number, so replay holds.
+// and every reader then answers exactly as it did before the Mists existed. FROM
+// `withdrawn_from` ON THERE ARE NONE AGAIN, and the answer is the same null, so
+// the telling of every crossing from then on is the one a town with no Mists in
+// its record gives, byte for byte (tools/mists-withdrawn.test.mjs). Like the
+// weather, it is a pure function of the crossing number, so replay holds.
 //
 // THE WALL OCCLUDES EVERYTHING BEHIND IT. It has no ceiling and no height
 // exemption, and a signal's light does not cut it: no sight line that passes
@@ -330,16 +340,18 @@ export function mistsAt(crossing, mists) {
   if (!sched.length || !b || ![b.minX, b.minY, b.maxX, b.maxY].every(Number.isFinite)) return null;
   const c = crossing | 0;
   if (c < sched[0].crossing) return null;                    // before the dial: no Mists at all
+  if (Number.isFinite(mists.withdrawn_from) && c >= mists.withdrawn_from) return null;   // WLD-147: withdrawn, no Mists at all
   let i = 0;
   while (i + 1 < sched.length && sched[i + 1].crossing <= c) i += 1;
   const a = sched[i], z = sched[i + 1] ?? a;
   const t = z === a ? 0 : (c - a.crossing) / (z.crossing - a.crossing);
   const fa = sidesOf(a.front_m), fz = sidesOf(z.front_m);
   const front = Object.fromEntries(SIDES.map((s) => [s, lerpN(fa[s], fz[s], t)]));
-  // the density's own eased curve over the whole schedule
-  const first = sched[0].crossing, last = sched[sched.length - 1].crossing;
-  const u = last > first ? Math.max(0, Math.min(1, (c - first) / (last - first))) : 1;
+  // the density's own eased curve over the whole schedule, or over the span its own record names (WLD-147)
   const d = mists.density ?? {};
+  const first = Number.isFinite(d.from_crossing) ? d.from_crossing : sched[0].crossing;
+  const last = Number.isFinite(d.to_crossing) ? d.to_crossing : sched[sched.length - 1].crossing;
+  const u = last > first ? Math.max(0, Math.min(1, (c - first) / (last - first))) : 1;
   const power = Number(d.power) > 0 ? Number(d.power) : 1;
   const density = clamp01(lerpN(Number(d.from) || 0, Number(d.to ?? d.from) || 0, Math.pow(u, power)));
   const clearings = (Array.isArray(mists.clearings_m) ? mists.clearings_m : [])

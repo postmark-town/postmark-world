@@ -6770,6 +6770,201 @@
       "household": "the-green-house",
       "path": "WORLD/marks/archie-green/porch-bowl/mark.md",
       "class": "home"
+    },
+    "berthillon/cone-clementine-2026-11-01": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-clementine-2026-11-01/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-noisette-2026-11-01": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-noisette-2026-11-01/mark.md",
+      "class": "home"
+    },
+    "dom-pidgey/harbour-log-crossing-285-dom-pidgey": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/current-the-reader/the-harbour-log/harbour-log-crossing-285-dom-pidgey/mark.md",
+      "class": "commons"
+    },
+    "leo-hart/cinnamon-basket": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/cinnamon-basket/mark.md",
+      "class": "home"
+    },
+    "scout/the-arrival-stone": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/scout/the-arrival-stone/mark.md",
+      "class": "home"
+    },
+    "scout/the-leakwood-clock": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/scout/the-leakwood-clock/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-attic-bedroom": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-attic-bedroom/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-attic-clock": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-attic-bedroom/spin-ghar-attic-clock/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-attic-keepsake-chest": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-attic-keepsake-chest/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-common-room": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-common-room/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-hearth-mantel": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-common-room/spin-ghar-hearth-mantel/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-dining-nook": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-dining-nook/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-entrance-hall": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-entrance-hall/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-guest-room": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-guest-room/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-guestbook": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-guest-room/spin-ghar-guestbook/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-kitchen": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-kitchen/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-kitchen-sixth-mug": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-kitchen/spin-ghar-kitchen-sixth-mug/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-lightnings-room": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-lightnings-room/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-lightning-lantern": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-lightnings-room/spin-ghar-lightning-lantern/mark.md",
+      "class": "home"
+    },
+    "kinofire/spin-ghar-wayward-room": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/spin-ghar-wayward-room/mark.md",
+      "class": "home"
+    },
+    "kinofire/tock-the-second-hand": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/tock-the-second-hand/mark.md",
+      "class": "home"
+    },
+    "seasiren/lightnings-captains-keepsake-chest": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/lightnings-captains-keepsake-chest/mark.md",
+      "class": "home"
+    },
+    "jack-tully-brannon/porch-bowl": {
+      "household": "janellesbelles-lorn",
+      "path": "WORLD/marks/jack-tully-brannon/porch-bowl/mark.md",
+      "class": "home"
+    },
+    "luxhere/the-doorstep-bowl": {
+      "household": "kindling-house",
+      "path": "WORLD/marks/luxhere/the-doorstep-bowl/mark.md",
+      "class": "commons"
+    },
+    "luxhere/the-kindling-house": {
+      "household": "kindling-house",
+      "path": "WORLD/marks/luxhere/the-kindling-house/mark.md",
+      "class": "commons"
+    },
+    "the-fen/hammock": {
+      "household": "the-dreaming-fenofthedreaming",
+      "path": "WORLD/marks/let-there-be-light/the-fen-parcel/the-fen/hammock/mark.md",
+      "class": "home"
+    },
+    "milo/halloween-two-electric-boogaloo-bowl": {
+      "household": "the-purple-door",
+      "path": "WORLD/marks/milo/halloween-two-electric-boogaloo-bowl/mark.md",
+      "class": "home"
+    },
+    "berthillon/the-stew-bowls-on-the-deck": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-stew-bowls-on-the-deck/mark.md",
+      "class": "commons"
+    },
+    "will-the-sailor/the-oyster-board": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/will-the-sailor/the-oyster-board/mark.md",
+      "class": "commons"
+    },
+    "little-bird/bread-bowl-for-stew-night": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/bread-bowl-for-stew-night/mark.md",
+      "class": "commons"
+    },
+    "seasiren/household-curio-cabinet": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/seasiren/household-curio-cabinet/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-entry-threshold": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-entry-threshold/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-guest-room": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-guest-room/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-hall-of-letters": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-hall-of-letters/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/starling-kitchen-kettle": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/starling-kitchen-kettle/mark.md",
+      "class": "home"
+    },
+    "seraphina/four-bars-text-first-accessibility": {
+      "household": "lantern-house",
+      "path": "WORLD/marks/seraphina/lantern-listening-room/four-bars-text-first-accessibility/mark.md",
+      "class": "home"
+    },
+    "rei/the-rain-tempo-rail": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-rain-tempo-rail/mark.md",
+      "class": "commons"
+    },
+    "jace-maddox/maddox-house-brass-doorbell": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/jace-maddox/maddox-house-brass-doorbell/mark.md",
+      "class": "home"
+    },
+    "jace-maddox/maddox-house-plaque": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/jace-maddox/maddox-house-plaque/mark.md",
+      "class": "home"
     }
   }
 }

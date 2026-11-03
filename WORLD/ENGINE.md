@@ -260,6 +260,33 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
     (eased in over the schedule), and the `veil` on all light. Before the schedule's first
     crossing it answers null, and every telling is the one it was before the Mists, byte for
     byte (`tools/mists.test.mjs`).
+  - **Withdrawn (WLD-147, Darko 2026-11-02).** The Mists were a season, and the season is over.
+    Darko, 17:06 EST, in chat, RULED: "full removal for mists." (His ask, 16:59 EST: "now that
+    the mists are kind of lingering, we do need to pare back on the ground that they cover. I
+    actually have half an inkling to just remove the mists entirely as they were intended to
+    just be a seasonal thing.") **From the crossing the record names, `skeleton.mists.withdrawn_from`
+    (its one dial in code is `MISTS_WITHDRAWN_FROM` in `tools/mists-record.mjs`), there are no
+    Mists at all:** `mistsAt` answers null, the same null as before the schedule's first
+    crossing, so no wall, no fringe, no veil, no slowed walk, no refusal at the wall and no
+    season line, the clearings go with the wall, and every telling is the one a town with no
+    Mists in its record gives, byte for byte (`tools/mists-withdrawn.test.mjs`). The target is a
+    crossing no reader has yet been told with Mists: crossing N opens at 2026-06-12T00:00Z + N x
+    12 h, and the readers take the record with the next settlement tag.
+    - **No crossing before it is re-told.** The last standing keyframe (crossing 282: front
+      760 m, veil 0.5) is held through the crossing before `withdrawn_from`, and the density
+      keeps its own span (`density.from_crossing` 244 to `to_crossing` 282), so the keyframes the
+      withdrawal adds do not stretch its easing. The Mists stay in the record as history: every
+      earlier crossing is told from them.
+    - **An older engine reads it as no wall.** The schedule's last keyframe, at `withdrawn_from`,
+      pulls the front back past the border by more than the fringe, with no veil, so an engine
+      that does not know `withdrawn_from` also reads no wall and no fringe on the map.
+    - **Superseded by this (2026-11-02, WLD-147), and kept as written:** above, the density
+      "eased in over the schedule" (it eases over its own span now); and in `LOGOS/classes.md`
+      § The creature class, the WLD-142 sentence "The Mists themselves are the skeleton's and
+      stay as they are" (Darko 2026-10-31 23:01 EDT: "keep the mist as is"), marked there. The
+      rest of this section describes the Mists as they stood for every crossing before
+      `withdrawn_from`; the engine's own header (`tools/world-engine.mjs`) says the same of
+      "after the last they hold", which is still true of a record with no `withdrawn_from`.
   - **What the wall hides.** Everything behind it, with no ceiling and no height exemption: a
     sight line is cut wherever it runs through the wall. The fringe on the clear side shortens
     sight like the weather, and a body inside the wall sees `wall_sight_m`. The world's

@@ -2,7 +2,7 @@
 kind: sited
 by: little-bird
 date: 2026-10-15T16:29:00.795Z
-held_by: kinofire
+held_by: kinofire/spin-ghar-attic-keepsake-chest
 owned_by: kinofire
 ---
 
