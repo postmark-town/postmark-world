@@ -26,6 +26,8 @@ import {
 } from "../spectator/home-column.mjs";
 import {
   residentProfileView, residentHref, residentFace, walkerHoverId, walkerHandleFromHoverId, walkingLabel, vesselHandles,
+  isRegionMark, isCreatureId, creatureColumnFacts, creatureIcon, chooserIdsFrom, isAmbientMark, enterAffordance,
+  standpointOccupancy, effectiveWeight, kickerOf, markByline, WORLD_ROOT_ID,
 } from "../spectator/viewer.mjs";
 
 // ── the stand-in ────────────────────────────────────────────────────────────
@@ -818,4 +820,170 @@ test("the page hands the column the real residentHref: the page's own createHome
   assert.ok(handed, "the call ran and reached the column");
   assert.equal(handed.residentHref, residentHref, "the column is handed the page's own residentHref, so every column's link is built by the one handle rule");
   // ⚑ THE FLIPS: drop `residentHref,` from the call → undefined, this reds; hand it any other function → not the page's own, this reds
+});
+
+// ── WHAT THE TOWN OWNS DRAWS NO LINK (WLD-125, part 2 of 2) ─────────────────
+//
+// LAW (RULED, Darko 2026-11-02 08:32 EST, "ok from the morning dash: I agree with your recs on all calls"; Wright's
+// 14:34Z comment on WLD-125 states the call): "a World link from something the town owns draws no link. The town's
+// marks, regions and creatures link to no resident page. That also ends the two region links that 404 today
+// (/residents/the-town/)."
+//
+// Measured at World main 3cc1d218b, counts only: 2 of the record's 14 region marks are the town's, and each drew "the
+// resident page →" to /residents/the-town/, which is a 404 on the site. A mark's column and a creature's column
+// already turn the link off with `residentLink: false`. That switch is one door, so every test below reads the town's
+// handle on its own as well (the page's view with the switch taken off), and a later link choice for marks or
+// creatures (WLD-125's other six, still open) cannot bring the town's link back by flipping it.
+//
+// Every record below is invented (LANE-DISCIPLINE § Residents' data is public: tests use invented data because real
+// records change under you). The handles `rig-ash` and `the-lamplighter` are residents of this file only.
+
+/** What a view draws as ways out to the site, through the page's own residentHref and the real column. */
+function drawnLinks(v) {
+  const host = element("aside");
+  createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+  const title = byClass(host, "wv-homecol-title")[0];
+  assert.ok(title, "the column was drawn");
+  return {
+    foot: byClass(host, "wv-homecol-resident").map((a) => a.getAttribute("href")),
+    name: find(title, "a").map((a) => a.getAttribute("href")),
+    anchors: find(host, "a").map((a) => a.getAttribute("href")),
+  };
+}
+const NO_LINKS = { foot: [], name: [], anchors: [] };
+/** the page's view with the way-out switch taken off the table, so the handle rule is the only thing left to refuse */
+const withoutTheSwitch = (v) => { const { residentLink, ...rest } = v; return rest; };
+
+/** regionColumnView's own body, run against stand-ins for the page's state; the door is never answered. */
+function regionViewFor(mark) {
+  const context = vm.createContext({
+    isRegionMark, markImagePath: () => null, byId: new Map([[mark.id, mark]]), allMarks: () => [mark],
+    regionDoors: new Map(), readRegionDoor: () => {}, markIdentity: (m) => m.name ?? m.id, iconsOf: () => [],
+  });
+  vm.runInContext(bodyOf("regionColumnView"), context);
+  const made = context.regionColumnView(mark.id);
+  assert.ok(made, `the page builds a region column for ${mark.id}`);
+  return made;
+}
+
+/** creatureColumnView's own body, run against stand-ins; a live row and no investigate answer yet. */
+function creatureViewFor(row) {
+  const context = vm.createContext({
+    isCreatureId, liveCreatures: new Map([[row.id, row]]), creatureReads: new Map(), loadCreatureReading: () => {},
+    creatureColumnFacts, creatureIcon, sceneRoomId: null, byId: new Map(), pointInRect: () => false, rect: () => null,
+    markIdentity: (m) => m.id, isSpectating: () => true, walkState: { walkers: [] }, state: { cam: { x: 0, y: 0 }, handle: null },
+  });
+  vm.runInContext(bodyOf("creatureColumnView"), context);
+  const made = context.creatureColumnView(row.id);
+  assert.ok(made, `the page builds a creature column for ${row.id}`);
+  return made;
+}
+
+/**
+ * markColumnView's own body, run against stand-ins for the page's state that nothing asserted here reads (the
+ * record has no holdings, no law, no occupants, no read and no walkers). The real exports it calls stay real.
+ */
+function markViewFor(mark) {
+  const context = vm.createContext({
+    walkerHandleFromHoverId, chooserIdsFrom, isParcelMark, isRegionMark, isAmbientMark, enterAffordance, standpointOccupancy,
+    effectiveWeight, kickerOf, markByline, markImagePath: () => null, walkerHoverId, WORLD_ROOT_ID,
+    byId: new Map([[mark.id, mark]]), markName: (m) => ({ name: m.name ?? m.id }), markIdentity: (m) => m.name ?? m.id,
+    radialWhere: () => ({ detail: "in the Town Centre" }), columnReading: () => null,
+    state: { palette: { entries: [] }, handle: null }, standpointKey: () => null, enterExitLedger: { acts: [] }, occupancyClock: () => 0,
+    occupantsOf: () => new Map(), liveOccupancy: () => ({}), faceOf: (h) => ({ name: h }), entryLawOf: () => null,
+    markCloseLook: () => null, noteThingKind: () => {}, holderLines: () => null, heldBy: () => null, heldLine: () => null,
+    isThingId: () => false, iconsOf: () => [], instanceClassOf: () => null, ownedBy: () => null, hands: { for: null },
+    holdingFacts: () => [], polygonOf: () => null, polygonBBox: () => null, liveCreatures: new Map(), pointInsideMark: () => false,
+    silhouetteURL: () => "", bubbleTrail: [], worldEpoch: 1, enterExitEpoch: 1, sceneRoomId: null, canAct: () => false, loadAgentRead: () => null,
+  });
+  vm.runInContext(bodyOf("markColumnView"), context);
+  const made = context.markColumnView(mark.id);
+  assert.ok(made, `the page builds a mark column for ${mark.id}`);
+  return made;
+}
+
+const TOWN_REGION = { id: "the-town/the-headland", kind: "sited", by: "the-town", household: "the-town", name: "the Headland", body: "A headland the town keeps." };
+const RESIDENT_REGION = { id: "rig-ash/the-reach", kind: "sited", by: "rig-ash", household: "rig-house", name: "the Reach", body: "A reach a resident founded." };
+const TOWN_CREATURE = { id: "creature:rig-moth-1-0", kind: "moth", name: "a rig moth", x: 10, y: 20 };
+const TOWN_MARK = { id: "the-town/a-rig-lamp", kind: "sited", by: "the-town", household: "the-town", name: "A Rig Lamp", body: "A lamp the town keeps." };
+const RESIDENT_MARK = { id: "rig-ash/a-rig-lamp", kind: "sited", by: "rig-ash", household: "rig-house", name: "A Rig Lamp", body: "A lamp a resident made." };
+
+test("residentHref refuses the town's handle and only the town's: a lookalike, a longer name and a neighbour still link", () => {
+  assert.equal(residentHref("the-town"), null, "the town has no resident page");
+  assert.equal(residentHref("  the-town  "), null, "the same handle with its edges trimmed, as the rule has always trimmed");
+  // the rule is one exact handle: anything wider would take a real resident's link with it
+  for (const handle of ["the-town-crier", "the-townsfolk", "the-towne", "the-lamplighter", "town", "rig-ash"])
+    assert.equal(residentHref(handle), `/residents/${handle}/`, `${handle} is a resident and still links`);
+  // and the older refusals are unchanged: uppercase and shapes that are not handles never linked
+  for (const bad of ["The-Town", "the town", "the-town/", "", null, "../the-town"]) assert.equal(residentHref(bad), null, `no link for: ${String(bad)}`);
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the first two lines red; widen it to `s.startsWith("the-")` or
+  //   `s.includes("town")` → the lookalike lines red, and not the first two
+});
+
+test("A TOWN-OWNED REGION DRAWS NO LINK, and a resident's region still links to its founder: the page's own region view through the real column", () => {
+  const town = regionViewFor(TOWN_REGION);
+  assert.equal(town.handle, "the-town", "the page's region view carries the town's handle: this is the town's own region");
+  assert.deepEqual(drawnLinks(town), NO_LINKS, "nothing in the column goes to the site: no foot line, no name link, no anchor at all");
+  // the control, on the same builder and the same column: only the owner differs
+  const mine = regionViewFor(RESIDENT_REGION);
+  assert.equal(mine.handle, "rig-ash");
+  assert.deepEqual(drawnLinks(mine).foot, ["/residents/rig-ash/"], "a resident-founded region still has its foot line, to its founder");
+  assert.equal(drawnLinks(mine).name.length, 0, "and no name link (a region's title is not a person)");
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the first assertion that reads the column reds; make residentHref
+  //   return null for everything → the control reds, and not the town's
+});
+
+test("A TOWN-OWNED CREATURE DRAWS NO LINK, with the page's switch and without it", () => {
+  const v = creatureViewFor(TOWN_CREATURE);
+  assert.equal(v.handle, "the-town", "a creature's handle is the town's");
+  assert.equal(v.residentLink, false, "the page turns the way out off for a creature");
+  assert.deepEqual(drawnLinks(v), NO_LINKS, "with the page's switch: no link");
+  // the town's handle on its own: the switch is not there to save it
+  assert.deepEqual(drawnLinks(withoutTheSwitch(v)), NO_LINKS, "without the switch: still no link, because the owner is the town");
+  // the control that makes the absence mean something: the same bare view under a resident's handle does link
+  assert.deepEqual(drawnLinks({ ...withoutTheSwitch(v), handle: "rig-ash" }).foot, ["/residents/rig-ash/"], "the harness can draw this link");
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the without-the-switch assertion reds, and not the one before it;
+  //   delete `residentLink: false,` from creatureColumnView → the `residentLink` assertion reds (the pin above it reds too)
+});
+
+test("A TOWN-OWNED MARK DRAWS NO LINK, with the page's switch and without it; a resident's mark has no link either, as it never had", () => {
+  const v = markViewFor(TOWN_MARK);
+  assert.equal(v.handle, "the-town", "a mark's handle is the household that made it: here, the town");
+  assert.equal(v.residentLink, false, "the page turns the way out off for a mark");
+  assert.deepEqual(drawnLinks(v), NO_LINKS, "with the page's switch: no link");
+  assert.deepEqual(drawnLinks(withoutTheSwitch(v)), NO_LINKS, "without the switch: still no link, because the owner is the town");
+  // a resident's mark: unchanged. The page's switch keeps it linkless (WLD-125's choice 2, a mark's link to its author, is still open)...
+  const mine = markViewFor(RESIDENT_MARK);
+  assert.equal(mine.handle, "rig-ash");
+  assert.deepEqual(drawnLinks(mine), NO_LINKS, "a resident's mark: no link today, as before this change");
+  // ...and the handle rule alone would let it link, so the town's absence above is the town's rule and not a dead harness
+  assert.deepEqual(drawnLinks(withoutTheSwitch(mine)).foot, ["/residents/rig-ash/"], "the same view without the switch links to its author");
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the town's without-the-switch assertion reds, and not the ones before it;
+  //   delete `residentLink: false,` from markColumnView → the `residentLink` assertion reds (the pin above it reds too)
+});
+
+test("any view whose handle is the town's draws neither the foot line nor the name link, a parcel's and a person's shape included", () => {
+  // the shapes the page builds for a home (a parcel held by the town: none today, the rule is the class) and for a person (titleLink)
+  for (const shape of [{}, { titleLink: true }, { residentLink: undefined }])
+    assert.deepEqual(drawnLinks({ ...view("the-town/p", "the-town"), door: { description: "words" }, ...shape }), NO_LINKS, JSON.stringify(shape));
+  // the control: the same shapes under a resident's handle link as they always did
+  const person = drawnLinks({ ...view("rig-ash/p", "rig-ash"), door: { description: "words" }, titleLink: true });
+  assert.deepEqual(person.foot, ["/residents/rig-ash/"]);
+  assert.deepEqual(person.name, ["/residents/rig-ash/"]);
+  // ⚑ THE FLIP: delete the `s === TOWN_HANDLE` line in residentHref → all three town lines red
+});
+
+test("the walker card's \"their page →\" is the other place a handle becomes a link: it draws none for the town, and still does for a resident", () => {
+  const cardFor = (handle) => {
+    const context = vm.createContext({
+      walkState: { walkers: [{ handle, standing: true }] }, walkerPlace: () => "in the Town Centre", formatEtaCrossings: () => "",
+      faceOf: (h) => residentFace(h, { name: h, household: "rig-house" }), residentHref, esc: (s) => String(s ?? ""),
+    });
+    vm.runInContext(bodyOf("walkerBubbleHTML"), context);
+    return context.walkerBubbleHTML(handle, { pressable: true });
+  };
+  assert.ok(cardFor("rig-ash").includes('<a href="/residents/rig-ash/">their page →</a>'), "a resident's pinned card still has the link");
+  assert.ok(!cardFor("the-town").includes("their page"), "the town's card has none");
+  assert.ok(!cardFor("the-town").includes("/residents/"), "and no path to the site at all");
+  // ⚑ THE FLIP: delete the `s === TOWN_HANDLE` line in residentHref → the town assertions red, and not the control
 });
