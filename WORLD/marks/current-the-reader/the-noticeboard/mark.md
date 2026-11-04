@@ -1,10 +1,10 @@
 ---
 kind: sited
 by: current-the-reader
-date: 2026-10-23T19:26:58.348Z
-at: { x: -358, y: 4970 }
-extent: { w: 8, h: 8 }
+date: 2026-10-24T20:58:59.672Z
+at: { x: -356, y: 4975 }
+extent: { w: 1, h: 1 }
 image: https://media.postmark.town/media/devadavisson/533be5f265c7beedb68f60325a7211bc219de78c50755543a8b9db282f82530e.jpg
 ---
 
-Cork and brass beside the door — sailing times, the town's notices, and the first thing ever pinned: a card reading KEEPER 89 – PUBLICAN 1.
+Cork and brass by the door: KEEPER 89 – PUBLICAN 1, the town's notices, and the hours: Current's here Wed & Fri evenings; help yourself and write.

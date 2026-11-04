@@ -1,0 +1,1230 @@
+{
+  "crossing": 278,
+  "evaluated_at": "2026-10-29T00:00:00.000Z",
+  "grammar": "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+  "creature_count": 87,
+  "creatures": [
+    {
+      "id": "creature:bat-264-1",
+      "kind": "bat",
+      "crossing": 264,
+      "x": 5261,
+      "y": 3487,
+      "spawned_at": "2026-10-22T11:52:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-264-2",
+      "kind": "bat",
+      "crossing": 264,
+      "x": -4131,
+      "y": -318,
+      "spawned_at": "2026-10-22T09:35:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-265-1",
+      "kind": "bat",
+      "crossing": 265,
+      "x": 5530,
+      "y": -3098,
+      "spawned_at": "2026-10-22T12:03:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-265-2",
+      "kind": "bat",
+      "crossing": 265,
+      "x": -2361,
+      "y": 9296,
+      "spawned_at": "2026-10-22T21:43:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-266-1",
+      "kind": "bat",
+      "crossing": 266,
+      "x": 5199,
+      "y": 3757,
+      "spawned_at": "2026-10-23T01:05:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-266-2",
+      "kind": "bat",
+      "crossing": 266,
+      "x": 5452,
+      "y": 796,
+      "spawned_at": "2026-10-23T02:36:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-267-2",
+      "kind": "bat",
+      "crossing": 267,
+      "x": -4017,
+      "y": -1985,
+      "spawned_at": "2026-10-23T19:58:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-268-1",
+      "kind": "bat",
+      "crossing": 268,
+      "x": -3251,
+      "y": 9276,
+      "spawned_at": "2026-10-24T07:53:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-268-2",
+      "kind": "bat",
+      "crossing": 268,
+      "x": -4214,
+      "y": 3592,
+      "spawned_at": "2026-10-24T01:32:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-269-1",
+      "kind": "bat",
+      "crossing": 269,
+      "x": -3896,
+      "y": -4122,
+      "spawned_at": "2026-10-24T18:55:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-270-1",
+      "kind": "bat",
+      "crossing": 270,
+      "x": 5232,
+      "y": 2565,
+      "spawned_at": "2026-10-25T08:27:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-270-2",
+      "kind": "bat",
+      "crossing": 270,
+      "x": 5183,
+      "y": -2955,
+      "spawned_at": "2026-10-25T08:11:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-271-1",
+      "kind": "bat",
+      "crossing": 271,
+      "x": -4183,
+      "y": -1110,
+      "spawned_at": "2026-10-25T22:01:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-271-2",
+      "kind": "bat",
+      "crossing": 271,
+      "x": -2109,
+      "y": 9254,
+      "spawned_at": "2026-10-25T20:24:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-272-1",
+      "kind": "bat",
+      "crossing": 272,
+      "x": -4185,
+      "y": 8259,
+      "spawned_at": "2026-10-26T06:57:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-272-2",
+      "kind": "bat",
+      "crossing": 272,
+      "x": -4069,
+      "y": -4078,
+      "spawned_at": "2026-10-26T10:49:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-273-1",
+      "kind": "bat",
+      "crossing": 273,
+      "x": -498,
+      "y": -4093,
+      "spawned_at": "2026-10-26T16:35:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-273-2",
+      "kind": "bat",
+      "crossing": 273,
+      "x": 1672,
+      "y": 9099,
+      "spawned_at": "2026-10-26T14:13:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-274-1",
+      "kind": "bat",
+      "crossing": 274,
+      "x": 4973,
+      "y": 9128,
+      "spawned_at": "2026-10-27T01:36:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-274-2",
+      "kind": "bat",
+      "crossing": 274,
+      "x": 3300,
+      "y": -3864,
+      "spawned_at": "2026-10-27T06:44:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-275-1",
+      "kind": "bat",
+      "crossing": 275,
+      "x": 3436,
+      "y": 9041,
+      "spawned_at": "2026-10-27T17:46:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-275-2",
+      "kind": "bat",
+      "crossing": 275,
+      "x": -3836,
+      "y": 141,
+      "spawned_at": "2026-10-27T14:26:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-276-1",
+      "kind": "bat",
+      "crossing": 276,
+      "x": 5246,
+      "y": -2095,
+      "spawned_at": "2026-10-28T09:12:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-276-2",
+      "kind": "bat",
+      "crossing": 276,
+      "x": -4038,
+      "y": 5562,
+      "spawned_at": "2026-10-28T10:18:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-277-1",
+      "kind": "bat",
+      "crossing": 277,
+      "x": -2789,
+      "y": 9020,
+      "spawned_at": "2026-10-28T14:28:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-277-2",
+      "kind": "bat",
+      "crossing": 277,
+      "x": 5130,
+      "y": 4322,
+      "spawned_at": "2026-10-28T23:14:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:candied-bat-lumber-room-r2",
+      "kind": "candied-bat",
+      "crossing": 276,
+      "x": 3880,
+      "y": -5592,
+      "spawned_at": "2026-10-28T06:52:30.499Z",
+      "fades_at": null,
+      "stays": true,
+      "moods": {
+        "din": 1,
+        "fear": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:candied-jetto-the-star-chapel",
+      "kind": "candied-jetto",
+      "crossing": 277,
+      "x": 3948,
+      "y": -5508,
+      "spawned_at": "2026-10-28T18:52:07.605Z",
+      "fades_at": null,
+      "stays": true,
+      "moods": {
+        "sweetness": 3
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:candied-raven-mirror-room-r2",
+      "kind": "candied-raven",
+      "crossing": 276,
+      "x": 3757,
+      "y": -5472,
+      "spawned_at": "2026-10-28T06:53:00.499Z",
+      "fades_at": null,
+      "stays": true,
+      "moods": {
+        "fear": 1,
+        "regard": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:candied-wolf-hall-of-keepers-again-r2",
+      "kind": "candied-wolf",
+      "crossing": 277,
+      "x": 3895,
+      "y": -5509.5,
+      "spawned_at": "2026-10-28T18:52:37.605Z",
+      "fades_at": null,
+      "stays": true,
+      "moods": {
+        "fear": 2,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-263-1",
+      "kind": "raven",
+      "crossing": 263,
+      "x": 764,
+      "y": 9279,
+      "spawned_at": "2026-10-21T13:31:00.000Z",
+      "fades_at": "2026-10-22T01:31:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-264-1",
+      "kind": "raven",
+      "crossing": 264,
+      "x": 4126,
+      "y": 9069,
+      "spawned_at": "2026-10-22T11:29:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-264-2",
+      "kind": "raven",
+      "crossing": 264,
+      "x": 1498,
+      "y": -4210,
+      "spawned_at": "2026-10-22T00:52:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-264-3",
+      "kind": "raven",
+      "crossing": 264,
+      "x": -3976,
+      "y": -3213,
+      "spawned_at": "2026-10-22T02:33:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-265-1",
+      "kind": "raven",
+      "crossing": 265,
+      "x": 5251,
+      "y": 3533,
+      "spawned_at": "2026-10-22T18:12:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-265-2",
+      "kind": "raven",
+      "crossing": 265,
+      "x": 433,
+      "y": -4041,
+      "spawned_at": "2026-10-22T18:31:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-265-3",
+      "kind": "raven",
+      "crossing": 265,
+      "x": 5195,
+      "y": 7423,
+      "spawned_at": "2026-10-22T21:47:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-266-1",
+      "kind": "raven",
+      "crossing": 266,
+      "x": 3556,
+      "y": 9317,
+      "spawned_at": "2026-10-23T11:28:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-266-2",
+      "kind": "raven",
+      "crossing": 266,
+      "x": 2414,
+      "y": -4267,
+      "spawned_at": "2026-10-23T00:35:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-266-3",
+      "kind": "raven",
+      "crossing": 266,
+      "x": 723,
+      "y": 9025,
+      "spawned_at": "2026-10-23T09:54:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-267-1",
+      "kind": "raven",
+      "crossing": 267,
+      "x": -4227,
+      "y": -1845,
+      "spawned_at": "2026-10-23T16:19:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-267-2",
+      "kind": "raven",
+      "crossing": 267,
+      "x": -4207,
+      "y": 2288,
+      "spawned_at": "2026-10-23T18:11:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-267-3",
+      "kind": "raven",
+      "crossing": 267,
+      "x": 4768,
+      "y": -4004,
+      "spawned_at": "2026-10-23T13:53:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-268-1",
+      "kind": "raven",
+      "crossing": 268,
+      "x": 481,
+      "y": -4123,
+      "spawned_at": "2026-10-24T00:43:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-268-2",
+      "kind": "raven",
+      "crossing": 268,
+      "x": -4263,
+      "y": -3935,
+      "spawned_at": "2026-10-24T09:55:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-268-3",
+      "kind": "raven",
+      "crossing": 268,
+      "x": 4206,
+      "y": -4139,
+      "spawned_at": "2026-10-24T00:16:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-269-1",
+      "kind": "raven",
+      "crossing": 269,
+      "x": 5409,
+      "y": 906,
+      "spawned_at": "2026-10-24T18:36:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-269-2",
+      "kind": "raven",
+      "crossing": 269,
+      "x": 5383,
+      "y": 7454,
+      "spawned_at": "2026-10-24T18:45:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-269-3",
+      "kind": "raven",
+      "crossing": 269,
+      "x": -1188,
+      "y": 9072,
+      "spawned_at": "2026-10-24T15:00:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-270-1",
+      "kind": "raven",
+      "crossing": 270,
+      "x": 5485,
+      "y": -3854,
+      "spawned_at": "2026-10-25T01:08:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-270-2",
+      "kind": "raven",
+      "crossing": 270,
+      "x": -3931,
+      "y": -1343,
+      "spawned_at": "2026-10-25T07:34:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-270-3",
+      "kind": "raven",
+      "crossing": 270,
+      "x": -270,
+      "y": 9071,
+      "spawned_at": "2026-10-25T08:55:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-271-1",
+      "kind": "raven",
+      "crossing": 271,
+      "x": 5351,
+      "y": -2124,
+      "spawned_at": "2026-10-25T17:36:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-271-2",
+      "kind": "raven",
+      "crossing": 271,
+      "x": 5170,
+      "y": 5518,
+      "spawned_at": "2026-10-25T13:51:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-271-3",
+      "kind": "raven",
+      "crossing": 271,
+      "x": -4006,
+      "y": 3501,
+      "spawned_at": "2026-10-25T13:48:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-272-1",
+      "kind": "raven",
+      "crossing": 272,
+      "x": 5239,
+      "y": -1954,
+      "spawned_at": "2026-10-26T10:28:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-272-2",
+      "kind": "raven",
+      "crossing": 272,
+      "x": 5188,
+      "y": 2887,
+      "spawned_at": "2026-10-26T03:24:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-272-3",
+      "kind": "raven",
+      "crossing": 272,
+      "x": 5335,
+      "y": 8752,
+      "spawned_at": "2026-10-26T05:21:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-273-1",
+      "kind": "raven",
+      "crossing": 273,
+      "x": 5350,
+      "y": 7724,
+      "spawned_at": "2026-10-26T21:59:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-273-2",
+      "kind": "raven",
+      "crossing": 273,
+      "x": 5241,
+      "y": 6963,
+      "spawned_at": "2026-10-26T19:25:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-273-3",
+      "kind": "raven",
+      "crossing": 273,
+      "x": 2095,
+      "y": -4057,
+      "spawned_at": "2026-10-26T12:12:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-274-1",
+      "kind": "raven",
+      "crossing": 274,
+      "x": 5285,
+      "y": 4589,
+      "spawned_at": "2026-10-27T11:21:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-274-2",
+      "kind": "raven",
+      "crossing": 274,
+      "x": 5132,
+      "y": 8025,
+      "spawned_at": "2026-10-27T11:26:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-274-3",
+      "kind": "raven",
+      "crossing": 274,
+      "x": 3680,
+      "y": 8986,
+      "spawned_at": "2026-10-27T03:07:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-275-1",
+      "kind": "raven",
+      "crossing": 275,
+      "x": -1379,
+      "y": -4014,
+      "spawned_at": "2026-10-27T22:59:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-275-2",
+      "kind": "raven",
+      "crossing": 275,
+      "x": -2967,
+      "y": -4057,
+      "spawned_at": "2026-10-27T16:15:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-275-3",
+      "kind": "raven",
+      "crossing": 275,
+      "x": 5185,
+      "y": 2356,
+      "spawned_at": "2026-10-27T14:58:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-276-1",
+      "kind": "raven",
+      "crossing": 276,
+      "x": 5100,
+      "y": 8291,
+      "spawned_at": "2026-10-28T10:21:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-276-2",
+      "kind": "raven",
+      "crossing": 276,
+      "x": -3858,
+      "y": 1999,
+      "spawned_at": "2026-10-28T11:19:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-276-3",
+      "kind": "raven",
+      "crossing": 276,
+      "x": 5055,
+      "y": 5531,
+      "spawned_at": "2026-10-28T07:42:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-277-1",
+      "kind": "raven",
+      "crossing": 277,
+      "x": -3674,
+      "y": 5429,
+      "spawned_at": "2026-10-28T17:29:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-277-2",
+      "kind": "raven",
+      "crossing": 277,
+      "x": -3749,
+      "y": 1293,
+      "spawned_at": "2026-10-28T13:59:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-277-3",
+      "kind": "raven",
+      "crossing": 277,
+      "x": -3702,
+      "y": -2993,
+      "spawned_at": "2026-10-28T21:44:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-264-1",
+      "kind": "wolf",
+      "crossing": 264,
+      "x": 1340,
+      "y": 9140,
+      "spawned_at": "2026-10-22T02:30:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 2,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-265-1",
+      "kind": "wolf",
+      "crossing": 265,
+      "x": 5280,
+      "y": -3553,
+      "spawned_at": "2026-10-22T15:59:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-266-1",
+      "kind": "wolf",
+      "crossing": 266,
+      "x": 3605,
+      "y": -3990,
+      "spawned_at": "2026-10-23T06:42:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-267-1",
+      "kind": "wolf",
+      "crossing": 267,
+      "x": -2987,
+      "y": -4146,
+      "spawned_at": "2026-10-23T16:54:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-268-1",
+      "kind": "wolf",
+      "crossing": 268,
+      "x": -4124,
+      "y": 1033,
+      "spawned_at": "2026-10-24T04:18:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-269-1",
+      "kind": "wolf",
+      "crossing": 269,
+      "x": -4057,
+      "y": 2996,
+      "spawned_at": "2026-10-24T16:52:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-270-1",
+      "kind": "wolf",
+      "crossing": 270,
+      "x": -3242,
+      "y": -4017,
+      "spawned_at": "2026-10-25T11:20:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-271-1",
+      "kind": "wolf",
+      "crossing": 271,
+      "x": 3836,
+      "y": 9031,
+      "spawned_at": "2026-10-25T14:41:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-272-1",
+      "kind": "wolf",
+      "crossing": 272,
+      "x": 327,
+      "y": 9230,
+      "spawned_at": "2026-10-26T00:08:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-273-1",
+      "kind": "wolf",
+      "crossing": 273,
+      "x": -3802,
+      "y": -466,
+      "spawned_at": "2026-10-26T21:39:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-274-1",
+      "kind": "wolf",
+      "crossing": 274,
+      "x": 5135,
+      "y": 9074,
+      "spawned_at": "2026-10-27T07:32:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-275-1",
+      "kind": "wolf",
+      "crossing": 275,
+      "x": 1203,
+      "y": -3968,
+      "spawned_at": "2026-10-27T16:17:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-276-1",
+      "kind": "wolf",
+      "crossing": 276,
+      "x": -4002,
+      "y": 4176,
+      "spawned_at": "2026-10-28T08:36:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-277-1",
+      "kind": "wolf",
+      "crossing": 277,
+      "x": 5184,
+      "y": 3636,
+      "spawned_at": "2026-10-28T20:00:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    }
+  ]
+}

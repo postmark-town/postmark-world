@@ -7,13 +7,14 @@
 // the lakes are true ellipses. A bounding box around a river is not a river.
 //
 // Scope is the walk gate ONLY. Parcel admissibility no longer consults water
-// (ruling 6: parcels block parcels, full stop), so nothing else imports this.
+// (ruling 6: parcels block parcels, full stop), so parcel code does not
+// import this; its importers are the spectator viewer, walk-demo-seed and
+// water-shapes-gen.
 //
-// THE SEA IS NOT GATED. `the-sea` carries no edge geometry — its own note says
-// the shoreline lives in the atlas COASTLINE and is a seeding item. Ruling 4
-// names this as the v1 exception, so v1 gates inland water and a walker CAN walk
-// into the sea. Deliberately visible rather than silently absent: `seaGated()`
-// returns false and callers may say so.
+// THE SEA IS NOW KNOWN TO THE ORACLE. Ruling 4 named it the v1 exception because
+// `the-sea` carried no edge geometry; it has a `ring_m` now (see seaFeature below),
+// so `seaGated()` returns true. That reports what the oracle knows, not what the
+// door enforces.
 //
 // Pure: no fs, no clock, no engine import. Browser-safe.
 
@@ -111,7 +112,7 @@ export function waterFeatures(skeleton) {
   );
 }
 
-// Is `the-sea` gated? No — see the header. Callers may report this honestly.
+// Is `the-sea` gated? Yes — see seaGated() below. Callers may report this honestly.
 // THE SEA. It is a closed AREA, not a capsule chain or an ellipse, so it carries a
 // third geometry vocabulary: `ring_m`, extracted by world-terrain-gen from the
 // atlas COASTLINE closed against the atlas frame.

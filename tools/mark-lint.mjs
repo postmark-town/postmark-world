@@ -36,8 +36,8 @@ import {
 import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact, parcelInteriorOf } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
-import { portalFindings, applyPortalExceptions, PORTAL_RULES } from "./portals.mjs";
-import { classIndex, classChain, ownProperties, propertiesOf, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
+import { portalFindings } from "./portals.mjs";
+import { classIndex, classChain, ownProperties, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -72,7 +72,9 @@ const JSON_OUT = args.includes("--json");
 
 // `property` joins with LOGOS v2 part 2 (ruled 2026-10-16): a class's property
 // is a node of its own (§ Property and predicate). The instances' `kind:` still
-// names how a mark stands until the kind migration (W2) folds `class:` into it.
+// names how a mark stands in the old form; since the kind migration (W2) a `kind:`
+// names the class itself, and the standing words are still read (§1 warns the
+// old form's `class:` to fold into `kind:`).
 // (Posts are not world records: they live in the office's post machine, and
 // the 61 idea and bounty marks move there in a later lane; settled WLD-73 G7.)
 // `predicate` joins with W2's G10 (settled 2026-10-17): a claim's kind names its
@@ -91,9 +93,6 @@ const PROPERTY_TIERS = new Set(["constitution", "sovereign"]);
 // their readers already use (a dial's key, a predicate's slot).
 const PROPERTY_NAME_RE = /^[a-z][a-z0-9]*(?:[_-][a-z0-9]+)*$/;
 const TOWN = "the-town"; // the town-tier author; only it may claim constitution
-// The world root, kept as a name rather than as a check: the freeze repealed the
-// containment question this gate used to ask of the tree (§6), so nothing here
-// reads placementParent any more. The fold answers containment now.
 const BODY_MAX = 150; // chars (07-22 ruling)
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -203,12 +202,6 @@ const standingOf = (m) => markStanding(m, standingIndex);
 // in for geography, and both clauses would go quietly wrong for the first mark
 // filed at its id. Same function the fold and WORLD/containment.json use.
 const { parent: containedBy } = containmentParents(marks);
-
-const slugsByHousehold = new Map();
-const childCount = new Map();
-for (const m of marks) {
-  if (m._parentMarkId) childCount.set(m._parentMarkId, (childCount.get(m._parentMarkId) ?? 0) + 1);
-}
 
 for (const rec of marks) {
   // 0. unreadable frontmatter — nothing else can be trusted
@@ -413,7 +406,7 @@ for (const rec of marks) {
     if (rec.at !== undefined || rec.extent !== undefined || rec.points !== undefined)
       err(rec, `a held thing carries no at/extent — it is published but unplaced, and shows as ${holderOf}'s contents until it is set down (POS-688)`);
   }
-  // 4b. ITS OWNER, when not its maker (POS-688, Darko 2026-10-19): a resident's
+  // 4a'. ITS OWNER, when not its maker (POS-688, Darko 2026-10-19): a resident's
   // handle, never the maker's own (the maker owns it unprinted), and only a thing.
   const ownerOf = ownedBy(rec);
   if (rec[OWNED_BY] !== undefined && (ownerOf == null || ownerOf.includes("/")))
@@ -643,7 +636,7 @@ for (const rec of marks) {
 {
   // `held_by` is the record grammar's, like placementParent: where a held thing is instead of a place (POS-688)
   const RESERVED = new Set(["id", "by", "date", "household", "declared_household", "parent", "placementParent", "stamps", "weight", "sovereign", "kind", "class", "tier", "body", "slug", HELD_BY, OWNED_BY]);
-  // how a mark stands names its class until W2 folds `class:` into `kind:`
+  // a standing word (the old form of `kind:`) names its class; since W2 a `kind:` names the class directly
   const STANDING_CLASS = { sited: "sited", parcel: "parcel", predicated: "predicate", naming: "naming" };
   const STANDING_FIELDS = { sited: ["at", "extent"], parcel: ["at", "extent"], predicated: ["slot", "value"], naming: ["slot", "value"] };
   const undeclared = new Map(); // `${class}\u0000${field}` -> { first, count }
@@ -694,11 +687,14 @@ for (const rec of marks) {
 // written inside it — that is arithmetic about a file, not a claim about the
 // world — and the fossil is exactly what keeps it stable: nothing moves, so no
 // mark's frame is ever re-derived out from under its digits again.
+// The world's root mark: the frame every other mark's file numbers hang from.
+// It is looked up by name for the frame law only; containment is the fold's (§6).
 const ROOT_MARK = marks.find((m) => m.slug === WORLD_ROOT_SLUG);
 const WORLD_CENTRE = ROOT_MARK?.at ? { x: ROOT_MARK.at.x, y: ROOT_MARK.at.y } : { x: 0, y: 0 };
 // The centre `rec`'s file numbers would be written against if it were filed
 // directly inside `start` — the nearest positioned ancestor from `start` up
-// (start itself included) whose tier ranks at or above rec's own.
+// (start itself included) whose frame rank (rankOf: constitution over market over
+// draft) is at or above rec's own.
 const frameOriginFrom = (rec, start) => {
   const continued = isPredicate(rec) || rec.kind === "naming";
   const rank = rankOf(rec);
@@ -863,7 +859,8 @@ const parentOf = (rec) => (rec._parentMarkId ? byId.get(rec._parentMarkId) : nul
 // 6b. the loader and the law agree — a check on the MACHINERY, not on any
 // resident. Everything above trusts `loadMarks` to have composed each mark's
 // world position correctly; this is the one place that trust is tested. Same
-// walk §6 uses, run over the directory chain each record actually has.
+// frame law above (frameOriginFrom), run over the directory chain each record
+// actually has.
 if (declaredCoords(marks) === COORDS_RELATIVE) {
   for (const rec of marks) {
     if (rec._error || !rec._fileAt || rec === ROOT_MARK) continue; // the root IS the frame
@@ -1218,49 +1215,25 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
 // `into` names a mark; every string `lands_at` names a mark; every landing
 // stands within LANDING_REACH_M of its `into`; an exit out of a dungeon is never
 // opposed; every room of a dungeon has a path of unlocked portals out (ADVISORY
-// since Darko's 21:13 change: a whole-dungeon exit is always offered); no two
-// marks with the same parent inside a dungeon overlap (Darko, 20:31: siblings only).
+// since Darko's 21:13 change: a whole-dungeon exit is always offered); and the
+// rooms a dungeon DECLARES (its `rooms` list) never overlap (Darko, 2026-11-01
+// 07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the
+// dungeon represented by some kind of class in code that has a list of dungeon rooms
+// which the no overlap thing checks" and "Everything should be allowed to overlap like normal").
 //
 // AN ERROR, AND IT REFUSES THE CROSSING. The settlement's harm gate runs this
 // lint as its first check (tools/harm-gate.mjs § 1), and Darko ruled the rules
 // airtight ("no exceptions in the rule"): a portal that strands whoever takes it
-// is harm to residents. The one way through is NAMED, never coded: an entry in
-// WORLD/portal-lint-exceptions.json ({ mark, rule, by, why }), appended by
-// whoever answers for it. An excepted finding prints as a warning that names
-// the exception, so every receipt shows the portal was let through and by whom,
-// and an exception that excuses nothing is said too.
-//
-// JURISDICTION, as the freeze's: this repository's own tree reads its own file;
-// a fixture tree reads one only when it passes --portal-exceptions.
+// is harm to residents. THERE IS NO WAY AROUND IT BY NAME. The named-exception
+// door (WORLD/portal-lint-exceptions.json) is retired: Darko, 2026-11-01 07:58,
+// "if we're hardcoding enumerated exceptions as slugs that's no good". A finding
+// that is wrong is fixed in the rule (portals.mjs), never listed around.
 {
-  const PORTAL_EXC_REL = "WORLD/portal-lint-exceptions.json";
-  const excPath = opt("--portal-exceptions", OWN_TREE ? join(REPO, PORTAL_EXC_REL) : null);
-  const excFile = (msg) => findings.push({ sev: "ERROR", file: PORTAL_EXC_REL, msg });
-  let exceptions = [];
-  // A MISSING list is an empty one: the strict direction, since absence can only
-  // let fewer portals through, never more. An unreadable one is an error.
-  if (excPath && existsSync(excPath)) {
-    let parsed = null;
-    try { parsed = JSON.parse(readFileSync(excPath, "utf8")); }
-    catch (e) { excFile(`could not be read as JSON (${String(e?.message ?? e).slice(0, 120)}) — the exception list is part of the gate, and a gate that cannot read its own list does not guess`); }
-    if (parsed) {
-      if (!Array.isArray(parsed.exceptions)) excFile("carries no `exceptions` array");
-      else for (const e of parsed.exceptions) {
-        if (!e || typeof e.mark !== "string" || !PORTAL_RULES.includes(e.rule) || !e.by || !e.why)
-          excFile(`an entry must name { mark, rule, by, why } with rule one of ${PORTAL_RULES.join(", ")} — got ${JSON.stringify(e)}`);
-        else exceptions.push(e);
-      }
-    }
-  }
-  const { findings: portal, stale } = applyPortalExceptions(portalFindings(marks), exceptions);
-  for (const f of portal) {
+  for (const f of portalFindings(marks)) {
     const rec = standingIndex.get(f.mark) ?? { id: f.mark };
-    if (f.excepted) warn(rec, `[${f.rule}] EXCEPTED by ${PORTAL_EXC_REL} (${f.excepted.by}: ${f.excepted.why}) — ${f.msg}`);
-    else if (f.sev === "WARN") warn(rec, `[${f.rule}] ${f.msg}`);
+    if (f.sev === "WARN") warn(rec, `[${f.rule}] ${f.msg}`);
     else err(rec, `[${f.rule}] ${f.msg}`);
   }
-  for (const e of stale)
-    findings.push({ sev: "WARN", file: PORTAL_EXC_REL, msg: `the exception for ${e.mark} (${e.rule}) matches no finding — it excuses nothing; remove it` });
 }
 
 // ---- the creature law, read whole as the tick reads it (POS-672) ----

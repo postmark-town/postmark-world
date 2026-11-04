@@ -38,7 +38,7 @@
 import { isGround } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join, dirname, relative, sep } from "node:path";
+import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord, placementParent } from "./marks-fold.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";

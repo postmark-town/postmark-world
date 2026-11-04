@@ -1,0 +1,73 @@
+# The candied raven: a key creature of the Spire, in the Mirror Room (WLD-25, Sitting C built 2026-10-21).
+# PRIVATE (postmark-world-spire) until crossing 272. Its behaviour is public law once it is; ONLY ITS
+# ANSWERS ARE SECRET, and they are not in this file: they are POS-712's (an office-held key, one fragment
+# a window, a published commitment, revealed at retirement).
+#
+# TWO ROADS, either one finishes it (#691; the key drops at the settlement to the first finisher):
+#   - MEMORY ACROSS VISITS (ruled 10-19 20:03; the test ruled 10-21 08:34): one fragment a visit (a
+#     window), three in all, drawn for each resident from the PUBLIC word list below by the office's
+#     sealed secret and told in that resident's reply alone (POS-712, lupi's shape B). Once all three are
+#     told it asks for them back: a `call` holding them in order finishes it (code checks, code finishes).
+#     No line ever holds a fragment: lines are public. It declares no ease of its own.
+#   - FORCE: its resolve, worn down by strike, full again at every settlement.
+# WHOM IT PRESSES: the one who forgets (a call when it is asking, told.asks, that does not answer: 2), and
+# otherwise the careless actor and the striker.
+# THE NUMBERS are a first cut for the eval harness to tune (rail/spire-creatures/gap-read.md § 4).
+kind: candied-raven
+name: the candied raven
+voice: a big black raven on the Mirror Room's toppled table, its feathers glazed hard and bright with sugar, one eye always on the mirrors' backs
+about: a raven that ate the stolen sweets and turned every mirror in the room to the wall; it remembers everything said to it, and it asks for it back
+what: >
+  A raven that followed the stolen candy into the Spire and ate the brightest of it. The sugar does not
+  keep outside the Keeping Works: it has glazed the raven's feathers into something it no longer
+  recognises, so it turned all seventeen mirrors to face the stone, one by one, and sat down among them.
+  It is clever, and it is lonely, and it has decided that the only company worth keeping is company that
+  remembers. It tells each visitor a little of something, and on the next visit it asks for all of it
+  back, in order. Forget, and it will make sure you remember the forgetting.
+ring_m: 30
+tastes: Bright things, still; it turns a sweet over with its beak and sets it down again, sick of the taste.
+moods:
+  fear: 0..3 = 1 | bold | watchful | ruffled | ready to fly at you
+  regard: 0..3 = 1 | contempt | doubt | interest | trust
+
+finishable: true
+resolve: 42
+strike: 3
+
+# ── WHAT IT DOES WITH VISITORS ──────────────────────────────────────────────────────────────────
+reaction regards "it regards you": when act.verb == "watch" does self.regard +1 says The raven turns its head and gives {actor} one bright eye, then the other, as if checking they are the same visitor in both.
+reaction lets-come "it lets you come": when act.verb == "approach" and self.fear <= 1 says The raven lets {actor} come, and does not move, but every mirror's back seems to lean in to listen.
+reaction mantles "it mantles over its table": when act.verb == "approach" and self.fear >= 2 does press 1 on actor says The raven spreads its glazed wings over the table and hisses. {target} has come closer than it likes.
+reaction scolds "it scolds you for the manners": when act.verb == "shoo" does self.fear +1 ; self.regard -1 ; press 1 on actor says The raven hops back, wings half open, and scolds {target} in a voice made of three other voices. It will remember that.
+reaction answers-call "it calls back": when act.verb == "call" says The raven answers {actor} from among the mirrors, and for a moment it sounds like someone else entirely.
+reaction mimics "it calls back in your own voice": when act.verb == "call" and heard.any says The raven answers {actor} in {actor}'s own voice, exactly: "{heard}"
+reaction turns-over "it turns it over": when act.verb == "offer" says The raven turns the {offered} over with its beak, looks at {actor} a long moment, and sets it down. It wanted something else from them.
+reaction keeps "it keeps it": when act.verb == "offer" and self.regard >= 2 does self.regard +1 says The raven takes the {offered} from {actor} and tucks it behind the stack of mirrors, with the other things it has decided to keep.
+reaction notes-house "it counts a household": when act.verb != "watch" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" and actor.housemates >= 1 does self.regard +1 says The raven looks from {actor} to the others of their house, and back, the way you would count something you meant to remember.
+reaction notes "it notes it": when act.verb != "watch" and act.verb != "approach" and act.verb != "shoo" and act.verb != "call" and act.verb != "offer" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" says The raven's eye follows what {actor} does, and its beak moves, as if it were saying it over to itself for later.
+reaction pecks "it pecks at the careless": when act.verb != "watch" and act.verb != "call" and act.verb != "offer" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" and self.regard <= 1 does press 1 on actor loudest says The raven drops off the table and pecks {target} hard on the hand, once, the way you would tap a forgetful pupil.
+
+# ── MEMORY: what it tells, and what it asks back (POS-712) ──────────────────────────────────────
+# The words are public on purpose: the rules are public, the draws are sealed, and the secret is
+# revealed when the raven is retired. What is secret is which three each resident was told, in order.
+fragments: 3
+fragment_words: amber, anchor, bell, candle, cinder, clover, ember, feather, ferry, gilt, harbour, ink, kettle, lantern, marble, moth, needle, orchard, pebble, quill, ribbon, salt, sparrow, tallow, thimble, thistle, velvet, wick, willow, yarrow
+
+reaction tells "it tells you something, very quietly": when told.now says The raven hops close to {actor} and says one word, very quietly, in a voice like someone they once knew. Then it looks away, as if it had said nothing at all.
+reaction tells-again "it makes sure you heard": when told.now and self.regard >= 2 says The raven leans in to {actor} and says its word again, slower, the way you would tell something to someone you mean to see again.
+reaction forgets "it makes sure you remember forgetting": when act.verb == "call" and told.asks does self.regard -1 ; press 2 on actor says The raven hears {target} get it wrong and goes very still. Then it comes off the table at them, beak first, so that this, at least, they will remember.
+reaction remembered "it hears it all back": when act.verb == "call" and told.answered does finish ; self.regard +3 ; self.fear -3 says The raven hears every word of it back from {actor}, in order, and turns the mirrors round one by one to face the room. It sits a long while looking at itself. It will give up the key at the settlement, and it knows to whom.
+
+# ── FORCE: strike, its glass-peck, and its resolve falling ────────────────────────────────────────
+reaction glass-peck "it answers with a glass-peck": when act.verb == "strike" and self.resolve > 28 does self.regard -1 ; press 2 on striker says The raven comes off the table like a thrown thing and glass-pecks {target}, its sugared beak as hard as the mirrors' edges.
+reaction remembers-you "it remembers who struck it": when act.verb == "strike" and self.resolve > 14 does self.regard -1 ; press 1 on striker actor says The raven fixes {target} with one eye. It is not hurrying. It is memorising them.
+reaction mirror-turn "it turns a mirror round": when act.verb == "strike" and self.resolve <= 28 and self.resolve > 14 does press 1 on loudest says With a heave of its wings the raven turns one mirror round to face the room, and {target} has to see themselves in it, glazed and sticky and small.
+reaction last-glass "it fights with what it has left": when act.verb == "strike" and self.resolve <= 14 and self.resolve > 0 does press 2 on striker loudest says The raven's glaze is cracking. It throws itself at {target} anyway, all beak and glass and fury.
+reaction falls "it falls among the mirrors": when act.verb == "strike" and self.resolve <= 0 does self.fear +3 says The raven falls among the mirrors and lies there, its glazed wings spread, looking at nothing at all.
+
+# ── HELPING: it counts who helps whom, and who forgets to ─────────────────────────────────────────
+reaction counts-help "it counts the kindness": when act.verb == "steady" does self.regard +1 says The raven watches {actor} steady their friend, and something in it marks the debt down, the way it marks down everything.
+reaction pecks-helper "it pecks the one who helps": when act.verb == "steady" and self.regard <= 1 does press 1 on actor says The raven does not trust kindness it has not been told the reason for. It pecks {target} once, to see what they will do.
+reaction tests-shield "it tests the shield": when act.verb == "shield" does press 1 on shielder says The raven goes for the friend and finds {target} in the way. It cocks its head, interested now.
+
+ending: The candied raven is finished. It gives up the key from among the mirrors, and the town puts it in {finisher}'s hands. {names} were there with it in the Mirror Room.

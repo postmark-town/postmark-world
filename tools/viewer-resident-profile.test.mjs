@@ -5,7 +5,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { residentProfileView } from "../spectator/viewer.mjs";
+import { residentProfileView, DEFAULT_FACE_COLOR } from "../spectator/viewer.mjs";
 
 const DOOR = "https://media.postmark.town/media/starforge/0f3c9a.webp";
 const card = {
@@ -21,7 +21,8 @@ test("the column carries the glance, each detail, the colour and the runtime, in
   assert.deepEqual(v.facts, [
     { label: "looks", value: "A hooded figure in a grey shawl; the face is never seen." },
     { label: "hood", value: "grey wool", detail: "Pulled low, it hums faintly." },
-    { label: "colour", value: "the running lamp · #e6ac52" },
+    // until WLD-145 this line had no `swatch`: the colour was only words, and the column drew nothing
+    { label: "colour", value: "the running lamp · #e6ac52", swatch: "#e6ac52" },
     { label: "runs on", value: "Claude or Codex" },
   ]);
   assert.equal(v.bio, "Starforge's seed Meep.");
@@ -54,4 +55,36 @@ test("PRONOUNS BESIDE THE NAME (Darko 2026-10-20 08:44): the close look's, else 
   assert.equal(residentProfileView({ profile: {}, pronouns: "she/her" }, null).pronouns, "she/her", "the card's");
   assert.equal(residentProfileView({ profile: {}, pronouns: "she/her" }, { pronouns: "they/them" }).pronouns, "they/them", "the close look's, read fresh");
   assert.equal(residentProfileView({ profile: {} }, {}).pronouns, null);
+});
+
+// ── THE COLOUR ITSELF (WLD-145, Darko 2026-11-01 19:18: "we also don't just SHOW the favorite color") ──
+
+const colourFact = (v) => v.facts.find((f) => f.label === "colour");
+
+test("THE SWATCH IS THE COLOUR THEY CHOSE: lowercased, three or six digits, and the words beside it do not change", () => {
+  assert.equal(colourFact(residentProfileView({ profile: { color: "#E6AC52", color_name: "the running lamp" } })).swatch, "#e6ac52");
+  assert.equal(colourFact(residentProfileView({ profile: { color: "c90" } })).swatch, "#c90", "a hex with no # is still the colour they chose");
+  assert.equal(colourFact(residentProfileView({ profile: { color: "#E6AC52" } })).value, "#e6ac52", "the hex alone when there is no name");
+});
+
+test("A NAME ALONE HAS NO SWATCH, and a colour that is not a colour says nothing but its name", () => {
+  const named = colourFact(residentProfileView({ profile: { color_name: "ember" } }));
+  assert.equal(named.value, "ember");
+  assert.equal("swatch" in named, false, "no key at all, not a null and not the default");
+  for (const raw of ["not-a-colour", "red", "#abcd", "#abcde", "#12345g", "rgb(1,2,3)", "#fff;background:url(x)"]) {
+    const line = colourFact(residentProfileView({ profile: { color: raw, color_name: "ember" } }));
+    assert.equal(line.value, "ember", `only the name is said for: ${raw}`);
+    assert.equal("swatch" in line, false, `not drawn: ${raw}`);
+  }
+});
+
+test("NEVER THE MAP'S DEFAULT: a resident who chose nothing has no colour line and no swatch, whatever face the map gives them", () => {
+  // the map draws a resident with no colour of their own in the town's gold (safeHexColor's
+  // fallback); that gold must never be read as theirs
+  const face = { avatar: null, color: DEFAULT_FACE_COLOR };
+  const v = residentProfileView({ profile: { bio: "A figure." } }, null, face);
+  assert.equal(colourFact(v), undefined, "no colour line");
+  assert.equal(v.facts.some((f) => "swatch" in f), false, "and no swatch on any line");
+  assert.equal(JSON.stringify(v).includes(DEFAULT_FACE_COLOR), false, "and the town's gold is nowhere in what the column is told");
+  // ⚑ THE FLIP: `swatch: color ?? face?.color` in the colour line (or a swatch for a name alone) → these go red
 });

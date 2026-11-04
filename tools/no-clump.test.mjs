@@ -12,7 +12,20 @@ import { readFileSync } from "node:fs";
 import { creatureGlyphSVG, chooserLeadLine, contestedMarksAtPoint, MARK_SNAP_RADIUS_PX, walkerHoverId } from "../spectator/viewer.mjs";
 
 const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
-const layer = SOURCE.slice(SOURCE.indexOf("  function liveCreatureGlyphs(px, tier) {"), SOURCE.indexOf("  function creatureNameplateHTML(id) {"));
+// The glyph layer is the source from `liveCreatureGlyphs` up to the next sibling in `mountViewer`'s scope,
+// `creatureColumnView`. (It used to end at the nameplate closure, which WLD-144 W3 hoisted to a top-level export
+// far above; ending there would now slice backwards to "".) The range is asserted ordered and non-empty below.
+const LAYER_START = SOURCE.indexOf("  function liveCreatureGlyphs(px, tier) {");
+const LAYER_END = SOURCE.indexOf("  function creatureColumnView(id) {");
+const layer = SOURCE.slice(LAYER_START, LAYER_END);
+
+test("the glyph layer's source range is found, ordered and non-empty", () => {
+  assert.ok(LAYER_START >= 0, "the layer's start marker is in the source");
+  assert.ok(LAYER_END > LAYER_START, "its end marker comes after its start (a later sibling in the same scope)");
+  assert.ok(layer.length > 0 && layer.includes("creatureGlyphSVG"), "the range holds the glyph loop");
+  assert.ok(layer.includes("return rings + out;"), "and the whole function, to its return");
+  assert.ok(!layer.includes("function creatureColumnView"), "and stops short of the next function");
+});
 
 test("a stacked trio draws at its true points: one place, three tokens, nothing moved", () => {
   const at = { x: 380.2, y: -537 };

@@ -90,6 +90,7 @@ import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { gate, machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -245,9 +246,9 @@ before(async () => {
  * the one thing that looks fine either way. So an observer is installed before
  * any page script runs and every change to `.wv-acts` is kept, in order.
  */
-async function openAndWatch({ signedIn, officeAt = office, noFold = false }) {
+async function openAndWatch({ signedIn, officeAt = office, noFold = false, walksLate = false }) {
   const askedBefore = officeAt.asked.length;
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   // THE FOLD IS NOT THESE TESTS' QUESTION (2026-09-16, the flake: 4 red in 10
@@ -261,6 +262,14 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false }) {
   // already assumed no fold on this path; the rig now makes it so, and the
   // fallback file — the question — has room to show.
   if (noFold) await page.route(/\/(WORLD\/world-state\.json|api\/world\/state)(\?|$)/, (route) => route.abort());
+  // THE WALK LANE LANDS LATE, ON PURPOSE (WLD-71): the office's walks answer is held
+  // until 8 s after BOTH its asking and the telling pane, longer than the quiet
+  // window below (1.2 s), which starts at the pane. The lanes are what the pane
+  // waits on after the telling has drawn (the fold comes BEFORE the pane, so
+  // holding it holds the pane, not the list). Counted from the asking alone, a
+  // slow page asked early and drew the pane after the hold had run out (measured:
+  // 4× CPU at 25dbf93d), so the hold must be counted from the pane as well.
+  const walks = walksLate ? await gate(page, "**/world2/walks*") : null;
   await page.addInitScript(() => {
     window.__pos84 = [];
     const signature = () => [...document.querySelectorAll(".wv-acts .wv-act-line")]
@@ -291,6 +300,11 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false }) {
   }
   await page.goto("http://localhost:" + rig.port + "/", { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
+  // the pane is up: the held lane goes 8 s after it, or after its asking if later.
+  // 8 s, not the quiet window's 1.2: that window counts its own 150 ms steps, and on
+  // a loaded page each step's read of the page takes longer, so its real length
+  // grows (at 6× CPU a 2.5 s hold was outlasted: fffb6dcb)
+  if (walks) walks.asked.then(() => new Promise((r) => setTimeout(r, 8_000))).then(() => walks.release());
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
 
   if (signedIn) {
@@ -298,7 +312,13 @@ async function openAndWatch({ signedIn, officeAt = office, noFold = false }) {
       await page.waitForTimeout(150);
     }
   }
-  // wait for the pane to stop changing, then read the whole history off the page
+  // THE PANE OPENS FIRST (WLD-71). The quiet window below can only judge a list
+  // that exists: started before the first rows, it ended on an empty pane whenever
+  // the lanes took longer than 1.2 s to land (a loaded box), and the assertions
+  // below went red on a page that was right. The pane opens once, when its lanes
+  // have settled (POS-84), so its first rows are the event to wait for.
+  await page.waitForFunction(() => (window.__pos84 ?? []).some((s) => s.rows.length), null, { timeout: 120_000 });
+  // then wait for the pane to stop changing, and read the whole history off the page
   let last = "", held = 0, waited = 0;
   while (held < 1_200 && waited < 45_000) {
     await page.waitForTimeout(150); waited += 150;
@@ -403,6 +423,22 @@ test("THE FIRST LIST IS THE LIST — a spectator's pane is never redrawn from sc
   assert.deepEqual(seen.first, seen.final,
     "the spectator's first list was replaced rather than added to — it was drawn to be thrown away. "
     + "first " + JSON.stringify(seen.first) + " final " + JSON.stringify(seen.final));
+  assert.deepEqual(seen.errors, [], "the page threw: " + seen.errors.join(" | "));
+});
+
+// THE ORDER IS SET, NOT RACED (WLD-71). The cases above take the lanes as they
+// come; a loaded box serves them late. Here the walk lane is held past the quiet
+// window on purpose, and the pane is still read once it opens, the store's walker
+// (the held lane's own row) and its first list intact. Before the wait for the
+// first rows this read an empty pane: "the pane never showed a row".
+test("THE WALK LANE LANDING LATE CHANGES NOTHING — the pane is read once it opens, never before", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  const seen = await openAndWatch({ signedIn: false, walksLate: true });
+  assert.equal(seen.nonEmpty.length > 0, true,
+    "the pane never showed a row (states seen: " + seen.history.length + "), so the read ended before the walk lane landed");
+  assert.equal(seen.final.filter((row) => row.includes(STORE_WALKER)).length, 1,
+    "the store's departure is in the pane when its lane lands late: " + JSON.stringify(seen.final));
+  assert.deepEqual(seen.first, seen.final, "a late lane still opens the pane once, with its whole first list");
   assert.deepEqual(seen.errors, [], "the page threw: " + seen.errors.join(" | "));
 });
 

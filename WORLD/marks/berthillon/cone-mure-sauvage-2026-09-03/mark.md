@@ -2,7 +2,7 @@
 kind: sited
 by: berthillon
 date: 2026-09-05T19:47:54.202Z
-held_by: little-bird
+held_by: little-bird/emergency-ration
 owned_by: little-bird
 ---
 

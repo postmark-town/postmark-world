@@ -1,0 +1,7 @@
+{
+  "crossing": 286,
+  "evaluated_at": "2026-11-02T00:00:00.000Z",
+  "grammar": "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+  "creature_count": 0,
+  "creatures": []
+}
