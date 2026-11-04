@@ -206,21 +206,28 @@ test("F2, end to end: a solo resident and a house resident on an unlisted accoun
   assert.equal(w.has("main", markPath("kogane-stray")), false);
 });
 
-test("KNOWN BUT UNBOUND stays drafted (the null-swap falsifier): an account the export left unbound publishes nothing and withdraws nothing, with its reason, and main is unchanged", (t) => {
+// THE NULL-SWAP FALSIFIER, in two halves so each red stands on its own: an
+// account the export left unbound (one id behind two solo residents) neither
+// publishes another household's mark nor withdraws a published one.
+test("KNOWN BUT UNBOUND publishes nothing: another household's mark in an unbound account's sketchbook stays drafted, with its reason", (t) => {
   assert.equal(knock(t, REAL_EXPORT, 900000401, "inv-dune").code, 1, "the door refuses the unbound account");
   const w = world(t, REAL_EXPORT);
-  w.pr("inv-dune", { id: 900000401, login: "inv-dune", force: true, edit: ({ put, rm }) => {
+  w.pr("inv-dune", { id: 900000401, login: "inv-dune", force: true, edit: ({ put }) => {
     put(markPath("dune-borrowed"), porch("keithling", "dune-borrowed", "another household's name"));
-    rm(markPath("kogane-hut"));
   } });
   const report = w.sweep(["keithling/dune-borrowed"]);
-  for (const id of ["keithling/dune-borrowed", "kogane/kogane-hut"])
-    assert.match(drafted(report, id)?.reason ?? "", /known to the registry but pinned to no household/, `${id}: ${JSON.stringify(report.left_drafted)}`);
   assert.equal(report.published.some((r) => r.id === "keithling/dune-borrowed"), false, "no publish through an unbound sketchbook");
+  assert.equal(w.has("main", markPath("dune-borrowed")), false, "main never carries it");
+  assert.match(drafted(report, "keithling/dune-borrowed")?.reason ?? "", /known to the registry but pinned to no household/);
+});
+
+test("KNOWN BUT UNBOUND withdraws nothing: a published mark deleted in an unbound account's sketchbook stays on main, with its reason", (t) => {
+  const w = world(t, REAL_EXPORT);
+  w.pr("inv-dune", { id: 900000401, login: "inv-dune", force: true, edit: ({ rm }) => rm(markPath("kogane-hut")) });
+  const report = w.sweep([]);
   assert.equal(report.withdrawn.some((r) => r.id === "kogane/kogane-hut"), false, "no withdrawal through an unbound sketchbook");
-  assert.equal(w.has("main", markPath("kogane-hut")), true);
-  assert.equal(w.has("main", markPath("dune-borrowed")), false);
-  assert.equal(w.git("ls-tree", "-r", "--name-only", "main", "WORLD/marks").includes("dune-borrowed"), false);
+  assert.equal(w.has("main", markPath("kogane-hut")), true, "main keeps the record");
+  assert.match(drafted(report, "kogane/kogane-hut")?.reason ?? "", /known to the registry but pinned to no household/);
 });
 
 test("BEFORE RENDER (no pinned_ids on main): a gh: sketchbook is known but unbound and stays drafted, own marks included; an hh: sketchbook still binds", (t) => {
