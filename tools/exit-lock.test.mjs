@@ -75,6 +75,43 @@ test("LOCKED OUT, every way in is refused with a line naming when, and nothing i
   assert.equal(e.rows, undefined, "no rows at all");
 });
 
+// WLD-132 (Yew's phantom exit): a lock the office made because the resident's nerve ran out says so. The cause is the
+// exit act's own recorded `fled: "nerve"`, carried on the lock the office hands in; an exit the resident made carries
+// none and keeps the words above byte for byte. Nothing else about the lock moves.
+const FLED_LINE = "Your nerve ran out at 17:12Z, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.";
+const EXIT_LINE = "You left the Spire by exit at 17:12Z, so you can't come back in until the next settlement (18:00Z). Nothing was recorded.";
+const FLED = { [SPIRE]: { until: UNTIL, left_at: LEFT, fled: "nerve" } };
+
+test("WLD-132 · A FLEE SAYS WHY, through the real passage: nerve, when, and when you may return; the lock itself is the same lock", () => {
+  const w = world({ determined: { [`${SPIRE}::name`]: "the Spire" } });
+  const e = enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: FLED });
+  assert.equal(e.refused, "dungeon-locked");
+  assert.equal(e.error, FLED_LINE);
+  assert.equal(e.dungeon, SPIRE);
+  assert.equal(e.locked_until, UNTIL, "the same lock, the same instant");
+  assert.equal(e.rows, undefined, "nothing is written");
+  // the dungeon itself, from its outline, is the same lock with the same words
+  assert.equal(enter(AT(1100, 1100), SPIRE, w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: FLED }).error, FLED_LINE);
+});
+
+test("WLD-132 · AN EXIT THE RESIDENT MADE KEEPS ITS WORDS BYTE FOR BYTE, and so does a lock with no cause, an unknown cause, or no time", () => {
+  const w = world({ determined: { [`${SPIRE}::name`]: "the Spire" } });
+  const ask = (lock) => enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: { [SPIRE]: lock } }).error;
+  assert.equal(ask({ until: UNTIL, left_at: LEFT }), EXIT_LINE, "no cause recorded (every lock before this change)");
+  assert.equal(ask({ until: UNTIL, left_at: LEFT, fled: null }), EXIT_LINE, "a null cause");
+  assert.equal(ask({ until: UNTIL, left_at: LEFT, fled: "" }), EXIT_LINE, "an empty cause");
+  assert.equal(ask({ until: UNTIL, left_at: LEFT, fled: "hunger" }), EXIT_LINE, "a cause this word does not know is not guessed");
+  assert.equal(ask({ until: UNTIL, left_at: null, fled: "nerve" }), "Your nerve ran out, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.", "a fled lock with no recorded time still says why");
+  assert.equal(lockedOutWords({ dungeon: SPIRE, until: UNTIL, left_at: LEFT }), "You left the Spire by exit at 17:12Z, so you can't come back in until the next settlement (18:00Z). Nothing was recorded.", "the words function alone, no cause (its default determined names the dungeon from its id)");
+});
+
+test("WLD-132 · A FLEE LOCKS ONLY THE DUNGEON IT FLED: another dungeon's flee, or none, lets the same passage through", () => {
+  const ask = (lockedOut) => enter(AT(845, 1000), "spire/doors-outside", world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut });
+  assert.equal(ask({ "elsewhere/crypt": { until: UNTIL, left_at: LEFT, fled: "nerve" } }).error, undefined);
+  assert.equal(ask(null).error, undefined);
+  assert.ok(ask({}).entered.includes(SPIRE));
+});
+
 test("LOCKED OUT: the dungeon itself, entered from anywhere in its outline", () => {
   const e = enter(AT(1100, 1100), SPIRE, world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: LOCKED });
   assert.equal(e.refused, "dungeon-locked");

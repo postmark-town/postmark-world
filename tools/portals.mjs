@@ -570,7 +570,8 @@ export function dungeonLanding(dungeonId, marks, { enteredVia = null, state = nu
 // class's law, counted per dungeon (any portal, or entering from its outline)
 // and per resident. The office holds the record (the exit act's `locked_until`)
 // and hands a passage the locks in force as `lockedOut`: { <dungeon id>:
-// { until, left_at } }. What the lock does and what it says are here.
+// { until, left_at, fled? } } (`fled: "nerve"` is the exit act's own recorded cause when the office made
+// the exit because the resident's nerve ran out). What the lock does and what it says are here.
 
 const pad2 = (n) => String(n).padStart(2, "0");
 /** An instant as the town says settlement times: "18:00Z". Null when unreadable. */
@@ -598,8 +599,14 @@ export function lockStandsWords({ dungeon, until, determined = {} }) {
 /** A refused re-entry (A-G2, ruled 09:21): "You left the Spire by exit at
  *  17:12Z, so you can't come back in until the next settlement (18:00Z).
  *  Nothing was recorded." */
-export function lockedOutWords({ dungeon, until, left_at = null, determined = {} }) {
+export function lockedOutWords({ dungeon, until, left_at = null, fled = null, determined = {} }) {
   const left = hhmmZ(left_at);
+  // WLD-132 (Yew's phantom exit): an exit the office made because the resident's nerve ran out says so,
+  // from the cause the exit act recorded (`fled: "nerve"`). Any other value, or none, is the ordinary line:
+  // "by exit" is true only of an exit the resident made, and an unknown cause is not guessed.
+  if (fled === "nerve")
+    return `Your nerve ran out${left ? ` at ${left}` : ""}, so you fled ${nameInSentence(dungeon, determined)} and can't come back in`
+      + ` until the next settlement (${hhmmZ(until) ?? until}). Nothing was recorded.`;
   return `You left ${nameInSentence(dungeon, determined)} by exit${left ? ` at ${left}` : ""}, so you can't come back in`
     + ` until the next settlement (${hhmmZ(until) ?? until}). Nothing was recorded.`;
 }
