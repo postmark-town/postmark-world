@@ -596,33 +596,19 @@ export function lockStandsWords({ dungeon, until, determined = {} }) {
   return `You can't come back into ${nameInSentence(dungeon, determined)} until the next settlement (${hhmmZ(until) ?? until}).`;
 }
 
-/** "the Bat's ring" for a creature id `creature:<kind>-…`, named by that kind's class mark (the town's, `extends: creature`)
- *  through `nameInSentence`; the longest kind that prefixes the id wins. Null when no declared kind places the id. */
-function creatureRingWords(creatureId, marks, determined) {
-  if (typeof creatureId !== "string" || !creatureId.startsWith("creature:")) return null;
-  const kind = (marks ?? [])
-    .filter((m) => m?.kind === "class" && m.extends === "creature" && typeof m.class === "string" && m.class && m.id && creatureId.startsWith(`creature:${m.class}-`))
-    .sort((a, b) => b.class.length - a.class.length)[0];
-  // a determined name may carry its own "The": the sentence supplies one
-  return kind ? `the ${nameInSentence(kind.id, determined).replace(/^the /i, "")}'s ring` : null;
-}
-
 /** A refused re-entry (A-G2, ruled 09:21): "You left the Spire by exit at
  *  17:12Z, so you can't come back in until the next settlement (18:00Z).
  *  Nothing was recorded." */
-export function lockedOutWords({ dungeon, until, left_at = null, fled = null, fled_by = null, determined = {}, marks = [] }) {
+export function lockedOutWords({ dungeon, until, left_at = null, fled = null, determined = {} }) {
   const left = hhmmZ(left_at);
   // WLD-132 (Yew's phantom exit): an exit the office made because the resident's nerve ran out says so,
   // from the cause the exit act recorded (`fled: "nerve"`). Any other value, or none, is the ordinary line:
   // "by exit" is true only of an exit the resident made, and an unknown cause is not guessed.
-  // WLD-132: when the exit act also recorded the creature whose encounter took the nerve, its ring is named by the
-  // kind's own class mark through the same naming the dungeon is named by. A creature this record cannot place
-  // (a legacy lock, a kind no longer declared) is not guessed: the line then says only that nerve ran out.
-  if (fled === "nerve") {
-    const ring = creatureRingWords(fled_by, marks, determined);
-    return `Your nerve ran out${ring ? ` in ${ring}` : ""}${left ? ` at ${left}` : ""}, so you fled ${nameInSentence(dungeon, determined)} and can't come back in`
+  // The exit act may also record `fled_by` (the creature whose encounter took the nerve); the words do not use it
+  // (Wright 2026-11-04 14:06Z: the cause, the time and the return, no creature name).
+  if (fled === "nerve")
+    return `Your nerve ran out${left ? ` at ${left}` : ""}, so you fled ${nameInSentence(dungeon, determined)} and can't come back in`
       + ` until the next settlement (${hhmmZ(until) ?? until}). Nothing was recorded.`;
-  }
   return `You left ${nameInSentence(dungeon, determined)} by exit${left ? ` at ${left}` : ""}, so you can't come back in`
     + ` until the next settlement (${hhmmZ(until) ?? until}). Nothing was recorded.`;
 }
@@ -646,7 +632,7 @@ export function lockedPassage(portal, { pick = null, marks = [], held = [], lock
   });
   if (locks.some((l) => !l)) return null;
   const lock = locks[0];
-  return { ...lock, words: lockedOutWords({ ...lock, determined, marks }) };
+  return { ...lock, words: lockedOutWords({ ...lock, determined }) };
 }
 
 // ── A DOOR THAT OPENS WHEN IT HOLDS WHAT IT ASKS FOR (WLD-5 B) ───────────────
