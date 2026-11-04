@@ -53,7 +53,7 @@ const SPOT = {
   "keith-old": ["slate", 1010], "kogane-hut": ["slate", 1050], "keith-new": ["slate", 1020], "dune-borrowed": ["slate", 1080],
   "keith-early": ["slate", 1100], "from-nowhere": ["slate", 1120], "by-stranger": ["slate", 1140],
   "wren-old": ["wren", 2010], "wren-new": ["wren", 2020], "wren-early": ["wren", 2050],
-  "fern-new": ["moss", 3020], "kogane-stray": ["moss", 3050],
+  "fern-old": ["moss", 3010], "fern-new": ["moss", 3020], "kogane-stray": ["moss", 3050],
 };
 const markPath = (slug) => slug === "town-well" ? "WORLD/marks/let-there-be-light/town-well/mark.md"
   : `WORLD/marks/let-there-be-light/${PARCEL[SPOT[slug][0]]}/${slug}/mark.md`;
@@ -64,7 +64,7 @@ const spot = (slug) => ({ x: SPOT[slug][1], y: SPOT[slug][1] });
 const porch = (by, slug, body) => record({ by, at: spot(slug), extent: { w: 4, h: 4 }, body: `${body} — ${`${slug} `.repeat(8)}`.slice(0, 140).trim() });
 
 // What main already carries, published: each resident's old mark, a town-signed record.
-const PUBLISHED = { "keith-old": "keithling", "wren-old": "wren", "kogane-hut": "kogane", "town-well": "the-town" };
+const PUBLISHED = { "keith-old": "keithling", "wren-old": "wren", "fern-old": "fern", "kogane-hut": "kogane", "town-well": "the-town" };
 
 // ── the first knock, as lane.yml runs it (gh and git stubbed) ────────────────
 function bootstrapScript() {
@@ -204,6 +204,37 @@ test("F2, end to end: a solo resident and a house resident on an unlisted accoun
   assert.ok(report.withdrawn.some((r) => r.id === "wren/wren-old"), JSON.stringify(report.left_drafted));
   assert.match(drafted(report, "kogane/kogane-stray")?.reason ?? "", /authorship: "kogane" is hh:slate-house's resident; this sketchbook is hh:moss-house's/);
   assert.equal(w.has("main", markPath("kogane-stray")), false);
+});
+
+// F2's UNLISTED-ACCOUNT shape, WITHDRAWAL (review of 90d5988c: the builder's fixture tested fern's publish only, so fern's
+// withdrawal was never exercised; the reviewer measured it in scratch, and these two keep that measurement): a house resident
+// on an account the house does not list (`gh:900000202` in `logins`, bound by `pinned_ids`) withdraws a published mark of
+// their own, alone and in the same crossing as an add, through the real road. The bodies are distinct invented ones; the
+// near-identical-small-records rename edge named at `porch` is a property of the sweep's replay and is not touched here.
+test("F2 unlisted account, WITHDRAWAL alone: fern withdraws a published mark of their own from their own login's sketchbook, and the crossing honours it", (t) => {
+  assert.equal(knock(t, REAL_EXPORT, 900000202, "inv-fern").code, 0);
+  const w = world(t, REAL_EXPORT);
+  const withdraw = w.pr("inv-fern", { id: 900000202, login: "inv-fern", edit: ({ rm }) => rm(markPath("fern-old")) });
+  assert.equal(withdraw.ok, true, JSON.stringify(withdraw));
+  assert.equal(w.has("main", markPath("fern-old")), true, "before the crossing, main still carries it");
+  const report = w.sweep([]);
+  assert.ok(report.withdrawn.some((r) => r.id === "fern/fern-old"), `fern's withdrawal is honoured: ${JSON.stringify(report.left_drafted)}`);
+  assert.equal(w.has("main", markPath("fern-old")), false, "main lost it");
+  assert.equal(drafted(report, "fern/fern-old"), undefined, "and it was not left drafted");
+});
+
+test("F2 unlisted account, ADD + WITHDRAW in one crossing: fern's new mark publishes and the old one is withdrawn together", (t) => {
+  assert.equal(knock(t, REAL_EXPORT, 900000202, "inv-fern").code, 0);
+  const w = world(t, REAL_EXPORT);
+  assert.equal(w.pr("inv-fern", { id: 900000202, login: "inv-fern", edit: ({ put }) => {
+    put(markPath("fern-new"), porch("fern", "fern-new", "fern's new mark, a lantern by the moss"));
+  } }).ok, true);
+  assert.equal(w.pr("inv-fern", { id: 900000202, login: "inv-fern", edit: ({ rm }) => rm(markPath("fern-old")) }).ok, true);
+  const report = w.sweep(["fern/fern-new"]);
+  assert.ok(report.published.some((r) => r.id === "fern/fern-new"), `fern's add publishes: ${JSON.stringify(report.left_drafted)}`);
+  assert.ok(report.withdrawn.some((r) => r.id === "fern/fern-old"), `fern's withdrawal is honoured in the same crossing: ${JSON.stringify(report.left_drafted)}`);
+  assert.equal(w.has("main", markPath("fern-new")), true);
+  assert.equal(w.has("main", markPath("fern-old")), false);
 });
 
 // THE NULL-SWAP FALSIFIER, in two halves so each red stands on its own: an

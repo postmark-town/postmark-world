@@ -64,6 +64,19 @@ test("sketchbookRefusal: a login names a sketchbook the author may knock on only
   assert.match(sketchbookRefusal(REGISTRY, "wren", "hh:house-m"), /bound to another household/, "a solo alias is wren's");
 });
 
+test("sketchbookRefusal names the TRUE cause: another household's sketchbook is 'bound to another household'; a known but unbound one is 'not pinned to any one household'", () => {
+  const other = sketchbookRefusal(REAL_EXPORT, "inv-fern", "hh:slate-house");
+  assert.match(other, /draft\/inv-fern is bound to another household/);
+  const unbound = sketchbookRefusal(REAL_EXPORT, "inv-dune", "hh:slate-house");
+  assert.match(unbound, /draft\/inv-dune is known to the registry but is not pinned to any one household/);
+  assert.doesNotMatch(unbound, /another household/, "no household owns it, so none is named");
+  // the decision is unchanged: both still refuse, the author's own and a nobody's still do not
+  assert.equal(sketchbookRefusal(REAL_EXPORT, "inv-fern", "hh:moss-house"), null, "the author's own account sketchbook");
+  assert.equal(sketchbookRefusal(REAL_EXPORT, "nobody-yet", "hh:slate-house"), null, "an unknown name is nobody's");
+  assert.ok(sketchbookRefusal({ logins: REAL_EXPORT.logins }, "inv-wren", "solo:wren"), "no pinned_ids: an account sketchbook binds nobody, so it is refused, as before");
+  assert.match(sketchbookRefusal({ logins: REAL_EXPORT.logins }, "inv-wren", "solo:wren"), /not pinned to any one household/);
+});
+
 // ── THE ACTUAL WORKFLOW STEP ─────────────────────────────────────────────────
 
 /** The bootstrap step's `run:` script, as lane.yml has it. */
@@ -131,7 +144,9 @@ test("THE FIRST KNOCK refuses impersonation: an unpinned account named like a de
   for (const login of ["house-a", "wren", "lena", "alicehub"]) {
     const r = knock(t, { id: 9, login });
     assert.equal(r.code, 1, `${login}: ${r.out}`);
-    assert.match(r.calls, /gh pr comment 7 --body refused: your GitHub account is not pinned/);
+    // genuinely unpinned stays refused, with the lane's neutral outer prefix and the helper's own cause inside it
+    assert.match(r.calls, /gh pr comment 7 --body refused: the PR lane could not admit this change \(lane-author: GitHub account 9 is not pinned to any household\)/, login);
+    assert.doesNotMatch(r.calls, /your GitHub account is not pinned to a household the lane can bind/, `${login}: the old outer prefix is gone`);
     assert.doesNotMatch(r.calls, /git push|gh pr edit/, `${login}: no sketchbook made, nothing retargeted`);
   }
 });
@@ -139,7 +154,8 @@ test("THE FIRST KNOCK refuses impersonation: an unpinned account named like a de
 test("THE FIRST KNOCK refuses a pinned author whose login names ANOTHER household's sketchbook", (t) => {
   const r = knock(t, { id: 3, login: "house-a" });
   assert.equal(r.code, 1, r.out);
-  assert.match(r.calls, /bound to another household/);
+  assert.match(r.calls, /gh pr comment 7 --body refused: the PR lane could not admit this change \(lane-author: the sketchbook draft\/house-a is bound to another household/);
+  assert.doesNotMatch(r.calls, /GitHub account \d+ is not pinned|your GitHub account is not pinned/, "a PINNED author is not called unpinned, by the outer prefix or the inner cause");
   assert.doesNotMatch(r.calls, /git push|gh pr edit/);
 });
 
@@ -197,11 +213,19 @@ test("THE #316 REPLAY, first knock: a two-account house's second account is admi
     ["an ambiguous account (two solo residents; the export bound it to nothing)", 900000401, "inv-dune", /not pinned to any household/],
     ["a pinned author whose login names another household's account sketchbook", 900000101, "inv-fern", /bound to another household/],
     // T1 (delta review): a pinned author whose login names a KNOWN but unbound account's sketchbook
-    ["a pinned author whose login names an unbound account's sketchbook", 900000101, "inv-dune", /bound to another household/],
+    ["a pinned author whose login names an unbound account's sketchbook", 900000101, "inv-dune", /the sketchbook draft\/inv-dune is known to the registry but is not pinned to any one household/],
   ]) {
     const r = knock(t, { id, login, registry: REAL_EXPORT });
     assert.equal(r.code, 1, `${why}: ${r.out}`);
     assert.match(r.calls, said, why);
+    // the outer prefix is the lane's neutral one for EVERY refusal; it never claims the account is unpinned
+    assert.match(r.calls, /gh pr comment 7 --body refused: the PR lane could not admit this change \(/, `${why}: neutral outer prefix`);
+    assert.doesNotMatch(r.calls, /your GitHub account is not pinned to a household the lane can bind/, `${why}: the old outer prefix is gone`);
+    if (id === 900000101) {
+      // K1 (review): a PINNED author refused over a sketchbook is told the true cause of THAT sketchbook, never "unpinned"
+      assert.doesNotMatch(r.calls, /GitHub account \d+ is not pinned/, `${why}: the author is pinned`);
+      assert.equal(/another household/.test(r.calls), login === "inv-fern", `${why}: "another household" only where the sketchbook really is another household's`);
+    }
     assert.doesNotMatch(r.calls, /git push|gh pr edit/, `${why}: no sketchbook made, nothing retargeted`);
   }
 });

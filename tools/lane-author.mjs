@@ -89,7 +89,10 @@ export function sketchbookRefusal(registry, login, house) {
   const name = String(login ?? "").toLowerCase();
   const bound = sketchbookHouse(registry, name);
   if (!bound.known) return null;
-  return bound.house !== null && bound.house === house ? null
+  if (bound.house !== null && bound.house === house) return null;
+  // two different truths, one refusal: a sketchbook can be bound to ANOTHER household, or to none at all (WLD-122, review K1)
+  return bound.house === null
+    ? `the sketchbook draft/${name} is known to the registry but is not pinned to any one household, so the lane cannot tell that it is yours`
     : `the sketchbook draft/${name} is bound to another household, not to the one your account is pinned to`;
 }
 
