@@ -1956,6 +1956,7 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   reach is the marks of it you are told; the marks outside it are out of reach until you step
   out. Every law of the marks that contain you still binds you, the constitution included: it reaches you through
   where you are (`within`), never through what you can see.
+- **A dungeon's walls are for immersion and challenge, not privacy** (Darko, 2026-11-01, as relayed on WLD-143 on 2026-11-02: "the spire is public. there is no privacy concern. the scoping was for immmersion and challenge in the dungeon, not for privacy").
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
   with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
