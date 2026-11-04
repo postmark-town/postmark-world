@@ -51,21 +51,78 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { clipSegmentToBox, MINE_GLYPH_SCALE, townRegionMarks } from "../spectator/viewer.mjs";
 import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
 
-// Two real parcels from the record this rig serves, both near the town centre so
-// both are inside the opening view. One is given to the household as PUBLISHED,
-// the other only as BACKED, and the whole of claim 2 is the difference.
-const OWNED_ID = "berthillon/chez-antoine";
-const BACKED_ID = "histor-reeves/the-gauge-house-parcel";
-const markOf = (id) => SERVED.marks.find((m) => m?.id === id);
+// ── THE WORLD IS INVENTED, AND FIXED (WLD-119 B1) ──────────────────────────
+//
+// This file used to take its parcels from the committed record (two real houses
+// and eight real neighbours, standing at one resident's exact coordinates) and to
+// DROP any that had gone missing with .filter(Boolean). Both were accidents: the
+// behaviour under test is "a published parcel is louder than a backed one, in the
+// same frame", which has nothing to do with which house is where today, and a
+// withdrawn neighbour would have shrunk the fixture without anyone being told.
+//
+// So the rig now serves a SYNTHETIC world through the server's own WORLD_DIR seam
+// (WLD-29; the same one resident-middle-on-the-page.test.mjs and placed-art.test.mjs
+// use): a frame, one region ring (the ground the read's records need), and parcels
+// the test invents. Every member the assertions need is REQUIRED BY NAME: if one is
+// not in the world below, the file fails saying which, rather than running on less.
+const TOWN = { x: 0, y: 0 };
+const plot = (who, at) => ({ id: `${who}/the-plot`, kind: "parcel", tier: "home", by: who, household: who, at, extent: { w: 25, h: 25 }, body: `${who}'s plot` });
+// the standpoint is the owned parcel's own place, as the real read had it
+const STANDPOINT = { x: 200, y: 100 };
+// One is given to the household as PUBLISHED, the other only as BACKED, and the
+// whole of claim 2 is the difference. Both stand inside the opening view.
+const OWNED = plot("rig-owner", STANDPOINT);
+const BACKED = plot("rig-backer", { x: 330, y: 20 });
+const OWNED_ID = OWNED.id, BACKED_ID = BACKED.id;
+// eight more, so there ARE beads to be louder than (a read with an empty `nearby`
+// draws nothing at all, which made every assertion vacuous the first time)
+const OTHERS = [[-300, -200], [-150, 260], [40, -340], [380, 220], [520, -60], [-460, 80], [90, 330], [-80, -90]]
+  .map(([x, y], i) => plot(`rig-neighbour-${i + 1}`, { x: TOWN.x + x, y: TOWN.y + y }));
+const NEIGHBOURS = [OWNED_ID, BACKED_ID, ...OTHERS.map((m) => m.id)];
+const REGION = { id: "rig-town/the-town-centre", kind: "sited", tier: "constitution", by: "rig-town", at: TOWN, extent: { w: 1400, h: 1400 }, body: "a synthetic region",
+  points: [{ x: -700, y: -700 }, { x: 700, y: -700 }, { x: 700, y: 700 }, { x: -700, y: 700 }] };
+const FRAME = { id: "rig-town/let-there-be-light", kind: "sited", tier: "constitution", by: "rig-town", at: TOWN, extent: { w: 40000, h: 40000 }, body: "the world frame" };
+const MARKS = [FRAME, REGION, OWNED, BACKED, ...OTHERS];
+const FOLD = {
+  tick: 0, dials: {}, marks: MARKS,
+  parcels: [OWNED, BACKED, ...OTHERS].map((p) => ({ id: p.id, household: p.household, at: p.at, extent: p.extent })),
+  determined: {}, vague: [], rivalries: [], portfolios: {}, terrain_weight: {}, errors: [],
+};
+// the registration the map mounts on, and nothing else: no terrain, no regions of its own, no Mists
+const SKELETON = {
+  _grid: { cell_m: 1, scale: "5 m per atlas px", origin: "the Origin, synthetic: atlas (485,760)" },
+  // what the spectator's fold path assembles a world from (assembleWorld reads these two); the values are the town's own dials, invented here as constants
+  elevation: { fog_ceiling_m: 22, quay_m: 5 },
+  light: { dawn_pole_m: { x: 5075, y: 450 }, dark_pole_m: { x: -1900, y: 2150 } },
+  features: [], far_features: [], physics_registry: {},
+};
+const byId = new Map(MARKS.map((m) => [m.id, m]));
+/** a required member of the world, or a failure that names it: nothing is dropped silently */
+const must = (id) => {
+  const m = byId.get(id);
+  if (!m) throw new Error(`fixture member "${id}" is required by this file and is not in the invented world`);
+  return m;
+};
+const markOf = must;
+function syntheticWorld() {
+  const dir = mkdtempSync(join(tmpdir(), "wld119-mine-world-"));
+  CLEANUP.push(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, "world-state.json"), JSON.stringify(FOLD));
+  writeFileSync(join(dir, "skeleton.json"), JSON.stringify(SKELETON));
+  // the ledgers are synthetic too: the server serves them from WORLD_DIR, so no real walk or crossing reaches this page
+  writeFileSync(join(dir, "walk-ledger.md"), "# walks\n\nsynthetic: nobody has walked in the rig\n");
+  writeFileSync(join(dir, "enter-exit-ledger.md"), "# crossings\n\nsynthetic: nobody has entered anything in the rig\n");
+  return dir;
+}
 
 // ── the pure part, which needs no browser ──────────────────────────────────
 
@@ -101,6 +158,16 @@ test("YOURS IS BIGGER THAN THEIRS, AND NOT BY SO MUCH THAT IT SWALLOWS THEM", ()
     "a card at town width must not swallow its neighbours — " + MINE_GLYPH_SCALE + " is past an accent");
 });
 
+test("THE INVENTED WORLD IS WHOLE: every member this file needs is in it, by name, and none was dropped to make it fit", () => {
+  const required = [OWNED_ID, BACKED_ID, ...NEIGHBOURS, REGION.id, FRAME.id];
+  const missing = required.filter((id) => !byId.has(id));
+  assert.deepEqual(missing, [], "required fixture members absent from the invented world: " + missing.join(", "));
+  assert.equal(NEIGHBOURS.length, 10, "ten neighbours: the owned, the backed and eight more");
+  assert.equal(new Set(NEIGHBOURS).size, NEIGHBOURS.length, "no member listed twice");
+  // and every one the page will be told about is a real member of the fold it will be served
+  for (const id of NEIGHBOURS) assert.equal(must(id).kind, "parcel", id + " is a parcel");
+});
+
 // ── the page ───────────────────────────────────────────────────────────────
 
 const PLAYWRIGHT_PATHS = ["playwright"];
@@ -126,30 +193,17 @@ const MY_HANDLES = ["berthillon", "rig-arrival"];
 const LEDGER = [
   "# the rig's walk ledger",
   "",
-  "- 2026-08-09T12:00:00.000Z · berthillon · from 221,95.5 · toward 2600,1900 · at 99999.0000 · within 40,40 · to the-town/the-post-office · pace 15",
+  "- 2026-08-09T12:00:00.000Z · berthillon · from 200,100 · toward 2600,1900 · at 99999.0000 · within 40,40 · to the-town/the-post-office · pace 15",
   "- 2026-08-09T12:00:00.000Z · rig-arrival · from -94570,-94570 · toward -30,40 · at 99999.0000 · within 9,26 · to the-town/the-post-office · pace 405",
   "",
 ].join("\n");
 
-// The neighbourhood the read reports, taken from the record this rig serves
-// rather than invented: the standpoint's own parcel, the one the household only
-// backs, and eight real neighbours so there ARE beads to be louder than. A read
-// with an empty `nearby` draws nothing at all, which would make every assertion
-// below vacuous — the first run of this file proved that by timing out.
-const NEIGHBOURS = [
-  "berthillon/chez-antoine",
-  "histor-reeves/the-gauge-house-parcel",
-  "postmaster/the-waiting-room-parcel",
-  "illuminator/the-looking-room-parcel",
-  "levi-kieran-ackerman/levi-kieran-ackerman-parcel",
-  "kilean/the-east-facing-apartment-parcel",
-  "vertas-marginalia/la-lanterne-parcel",
-  "jack-astra/the-signal-box-parcel",
-  "rei/the-lanternstep-house-parcel",
-  "limen/the-threshold-house-parcel",
-];
-const STANDPOINT = { x: 221, y: 95.5 };
-const nearbyRows = NEIGHBOURS.map((id) => markOf(id)).filter(Boolean).map((m) => ({
+// The neighbourhood the read reports: the standpoint's own parcel, the one the
+// household only backs, and eight neighbours (NEIGHBOURS, above) so there ARE beads
+// to be louder than. A read with an empty `nearby` draws nothing at all, which would
+// make every assertion below vacuous — the first run of this file proved that by
+// timing out.
+const nearbyRows = NEIGHBOURS.map((id) => must(id)).map((m) => ({
   id: m.id, at: m.at, kind: m.kind, tier: m.tier,
   distance_m: Math.round(Math.hypot(m.at.x - STANDPOINT.x, m.at.y - STANDPOINT.y)),
   bearing: "N",
@@ -167,11 +221,11 @@ const READ = {
   // handed in (5 marks)". That is what the first runs of this file hit, and the
   // page said so plainly in the minimap box while every assertion here read an
   // empty DOM. The office's own read carries the rings for exactly this reason,
-  // so the fixture carries them too, taken from the record the rig serves.
+  // so the fixture carries them too: the invented region, and every neighbour.
   records: Object.fromEntries([
-    ...townRegionMarks(SERVED.marks),
-    ...NEIGHBOURS.map((id) => markOf(id)),
-  ].filter(Boolean).map((m) => [m.id, m])),
+    ...townRegionMarks(MARKS),
+    ...NEIGHBOURS.map((id) => must(id)),
+  ].map((m) => [m.id, m])),
   telling: "The rig's air is clear.",
   present: { residents: [] },
 };
@@ -190,8 +244,8 @@ async function bootStubOffice() {
       // the whole of "yours": one parcel published, one merely backed
       return send({
         drafts: [], docket: [],
-        published: [markOf(OWNED_ID)].filter(Boolean),
-        backed: [markOf(BACKED_ID)].filter(Boolean),
+        published: [must(OWNED_ID)],
+        backed: [must(BACKED_ID)],
         counts: { drafts: 0, docket: 0, published: 1, backed: 1 }, complete: true,
       });
     }
@@ -241,7 +295,7 @@ async function bootRig(atlasPort) {
   const port = await freePort();
   const proc = spawn(process.execPath, [join(ROOT, "spectator", "server.mjs")], {
     cwd: ROOT,
-    env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:" + atlasPort },
+    env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:" + atlasPort, WORLD_DIR: syntheticWorld() },
     stdio: ["ignore", "pipe", "pipe"],
   });
   CLEANUP.push(() => proc.kill());
