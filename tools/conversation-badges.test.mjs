@@ -54,3 +54,48 @@ test("review: the reader's own choice persists per viewer, in try/catch, and the
   assert.match(SOURCE, /convoStore\(on\);/);
   assert.match(SOURCE, /classList\.toggle\("on", convoVisible\)/);
 });
+
+// ── POS-779 whole-carrier review W1: a thread on the deck keeps its dashed ring ──
+// The ring is the badge's circle (`wv-convo`, plus `is-live`); `is-aboard` is on the badge WRAPPER (`wv-convo-badge`). A rule written for
+// `.wv-convo.is-aboard` matches nothing in that markup. The paired check below runs the viewer's own stylesheet text through a small
+// cascade (class selectors and descendant combinators, specificity, then source order, which is all these rules use) for the four
+// badges a map can hold, built the way the badge's markup builds them.
+function cascadeDash(circleClasses, wrapperClasses) {
+  const css = SOURCE.slice(SOURCE.indexOf(".wv-faint-ring, .wv-convo {"), SOURCE.indexOf("@keyframes wv-convo-breathe"));
+  const rules = [];
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const dash = /stroke-dasharray:\s*([^;]+);?/.exec(m[2]);
+    if (!dash) continue;
+    for (const sel of m[1].replace(/\/\*[\s\S]*?\*\//g, "").split(",")) rules.push({ sel: sel.trim(), dash: dash[1].trim() });
+  }
+  const has = (classes, token) => token.split(".").filter(Boolean).every((c) => classes.includes(c));
+  let best = null;
+  rules.forEach((r, order) => {
+    const tokens = r.sel.split(/\s+/);
+    const last = tokens.pop();
+    if (!has(circleClasses, last)) return;
+    // each earlier token must match the wrapper (the only ancestor the markup gives the ring), in order
+    if (tokens.length > 1 || (tokens.length === 1 && !has(wrapperClasses, tokens[0]))) return;
+    const spec = r.sel.split(/[\s.]+/).filter(Boolean).length;
+    if (!best || spec > best.spec || (spec === best.spec && order > best.order)) best = { spec, order, dash: r.dash };
+  });
+  return best?.dash ?? null;
+}
+
+test("W1 · the badge markup puts is-aboard on the wrapper and is-live on the ring (the shape the stylesheet must serve)", () => {
+  assert.match(SOURCE, /class="wv-convo-badge\$\{live \? " is-live" : " is-cooling"\}\$\{t\.aboard \? " is-aboard" : ""\}"/);
+  assert.match(SOURCE, /<circle r="\$\{CONVO_BADGE_R\}" class="wv-convo\$\{live \? " is-live" : ""\}"\/>/);
+});
+
+test("W1 · deck ON: a thread on the deck is dashed whether it is live or cooling; deck OFF: live is solid and cooling is the dotted day line", () => {
+  const ring = (live) => ["wv-convo", ...(live ? ["is-live"] : [])];
+  const badge = (live, aboard) => ["wv-convo-badge", live ? "is-live" : "is-cooling", ...(aboard ? ["is-aboard"] : [])];
+  assert.equal(cascadeDash(ring(true), badge(true, true)), "6 5", "deck, live");
+  assert.equal(cascadeDash(ring(false), badge(false, true)), "6 5", "deck, cooling");
+  assert.equal(cascadeDash(ring(true), badge(true, false)), "none", "ground, live: solid, breathing");
+  assert.equal(cascadeDash(ring(false), badge(false, false)), "3 4", "ground, cooling: the shared dotted line");
+});
+
+test("W1 · the retired selector is gone: no rule names `.wv-convo.is-aboard`", () => {
+  assert.doesNotMatch(SOURCE, /\.wv-convo\.is-aboard/);
+});
