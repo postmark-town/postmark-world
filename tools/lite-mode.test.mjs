@@ -179,6 +179,15 @@ const pageState = (page) => page.evaluate(() => {
     feather: !!document.querySelector(".wv-sheet-feather"),
   };
 });
+/** Close an OWNED context, but never wait on it past the same bound as the state read: a close that rejects, throws or
+ *  never settles must not delay or replace the failure being reported. A late completion or rejection is already
+ *  handled (the .catch is attached to the close itself), so it cannot surface as an unhandled rejection. */
+async function closeBounded(ctx) {
+  let timer;
+  try {
+    await Promise.race([Promise.resolve().then(() => ctx.close()).catch(() => {}), new Promise((resolve) => { timer = setTimeout(resolve, STATE_READ_MS); })]);
+  } finally { clearTimeout(timer); }
+}
 async function stateLine(page, errors, label, waitedMs) {
   let state, timer;
   try {
@@ -255,9 +264,10 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
   try {
     await page.waitForFunction(() => document.documentElement.classList.contains("wv-lite"), null, { timeout: 180_000 });
   } catch (e) {
-    // the page's state, bounded, then the ORIGINAL failure, unchanged: this case still fails exactly as it did
-    t.diagnostic(await stateLine(page, errors, "slow case: the 180 s wait for wv-lite TIMED OUT", Date.now() - waitStart));
-    await ctx.close().catch(() => {});
+    // the page's state, bounded, then the ORIGINAL failure, unchanged: this case still fails exactly as it did. The label
+    // says only that the wait FAILED: whether it was Playwright's timeout is what the re-thrown error says, not this line.
+    t.diagnostic(await stateLine(page, errors, "slow case: the wait for wv-lite FAILED (the original error is re-thrown unchanged)", Date.now() - waitStart));
+    await closeBounded(ctx);
     throw e;
   }
   t.diagnostic(await stateLine(page, errors, "slow case: wv-lite came on", Date.now() - waitStart));

@@ -75,6 +75,7 @@ before(async () => {
 // with the child. This forwards ONLY lines of that shape, bounded and checked, and only as information: it is
 // computed from the child's output, printed before the assertions, and read by none of them. It never dumps the
 // child's output, never decides an outcome, and a missing, oversized or malformed line is labelled unavailable.
+const LITE_STATE_CHILD = "tools/lite-mode.test.mjs";   // the only child that is expected to print a lite_state line
 const LITE_STATE_MAX = { records: 3, bytes: 2048, text: 300 };
 const LITE_STATE_KEYS = ["lite_state", "waited_ms", "waited_ms_is", "page_errors", "lite", "slowKey", "storedChoice", "toggleLabel", "toggleTitle", "wall", "paint", "feather", "unknown"];
 function liteStatesOf(out) {
@@ -143,6 +144,7 @@ for (const rel of SWEPT) {
     // informational only (nothing below reads it), and labelled as the CHILD's, not the direct run's
     if (r.liteStates.seen) t.diagnostic(`lite-state forwarded by this sweep from the CHILD run of ${rel} under the ${RATE}× sweep (not the direct run): `
       + JSON.stringify(r.liteStates.records) + (r.liteStates.seen > r.liteStates.records.length ? ` · ${r.liteStates.seen - r.liteStates.records.length} more not forwarded` : ""));
+    else if (rel === LITE_STATE_CHILD) t.diagnostic(`lite-state UNAVAILABLE: the CHILD run of ${rel} under the ${RATE}× sweep printed no lite-state line (it may have failed before the slow case, or the line is missing); no cause is implied`);
     assert.deepEqual(r.failing, [], `red at ${RATE}× CPU: ${r.failing.join(" | ")} — ${r.errors.join(" | ")}`);
     assert.deepEqual(r.browserSkips, [], "a page test skipped for want of the browser, so nothing was proved");
     assert.equal(r.code, 0, `the child exited ${r.code ?? r.signal}`);
