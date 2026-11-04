@@ -112,6 +112,45 @@ test("WLD-132 · A FLEE LOCKS ONLY THE DUNGEON IT FLED: another dungeon's flee, 
   assert.ok(ask({}).entered.includes(SPIRE));
 });
 
+// WLD-132, the creature: the exit act may also record `fled_by`, the id of the creature whose encounter took the nerve. Its
+// ring is named by that kind's class mark through the naming the dungeon is named by; an id this world cannot place is not
+// guessed. Two invented kinds, so a wrong association is a different word, not a missing one.
+const KINDS = [
+  { id: "the-town/wolf", kind: "class", by: "the-town", extends: "creature", class: "wolf" },
+  { id: "the-town/candied-wolf", kind: "class", by: "the-town", extends: "creature", class: "candied-wolf" },
+  { id: "the-town/bat", kind: "class", by: "the-town", extends: "creature", class: "bat" },
+];
+const WOLF = "creature:wolf-291-3", BAT = "creature:bat-291-7";
+const ringWorld = (kinds = KINDS) => { const w = world({ determined: { [`${SPIRE}::name`]: "the Spire" } }); return { ...w, marks: [...w.marks, ...kinds] }; };
+const askRing = (fled_by, w = ringWorld(), lock = { until: UNTIL, left_at: LEFT, fled: "nerve" }) =>
+  enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: { [SPIRE]: { ...lock, ...(fled_by === undefined ? {} : { fled_by }) } } });
+
+test("WLD-132 · THE RECORDED CREATURE'S RING IS NAMED, through the real passage; the lock, its dungeon and its instant are the same", () => {
+  const e = askRing(WOLF);
+  assert.equal(e.refused, "dungeon-locked");
+  assert.equal(e.error, "Your nerve ran out in the Wolf's ring at 17:12Z, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.");
+  assert.equal(e.dungeon, SPIRE);
+  assert.equal(e.locked_until, UNTIL);
+  assert.equal(e.rows, undefined, "nothing is written");
+  assert.equal(askRing(BAT).error, e.error.replace("Wolf's", "Bat's"), "a different recorded creature, a different ring");
+});
+
+test("WLD-132 · THE LONGEST DECLARED KIND PLACES THE ID, a determined name is used as given, and what cannot be placed is not guessed", () => {
+  assert.match(askRing("creature:candied-wolf-291-1").error, /^Your nerve ran out in the Candied Wolf's ring at 17:12Z,/, "candied-wolf, not wolf");
+  assert.match(askRing(WOLF, { ...ringWorld(), determined: { [`${SPIRE}::name`]: "the Spire", "the-town/wolf::name": "The Grey Wolf" } }).error, /^Your nerve ran out in the Grey Wolf's ring at 17:12Z,/);
+  for (const [label, by] of [["no id", undefined], ["null", null], ["empty", ""], ["a kind nobody declares", "creature:hound-291-1"], ["not a creature id", "ann"], ["a number", 7]])
+    assert.equal(askRing(by).error, FLED_LINE, label);
+  assert.equal(askRing(WOLF, ringWorld([])).error, FLED_LINE, "the kind's class mark is not in this world");
+  assert.equal(askRing(WOLF, ringWorld([{ ...KINDS[0], extends: "thing" }])).error, FLED_LINE, "only a creature kind places a creature");
+});
+
+test("WLD-132 · A CREATURE ID IS NOT A CAUSE: without `fled: nerve` the words are the exit's, whatever fled_by holds", () => {
+  assert.equal(askRing(WOLF, ringWorld(), { until: UNTIL, left_at: LEFT }).error, EXIT_LINE);
+  assert.equal(askRing(WOLF, ringWorld(), { until: UNTIL, left_at: LEFT, fled: "hunger" }).error, EXIT_LINE);
+  assert.equal(askRing(WOLF, ringWorld(), { until: UNTIL, left_at: null, fled: "nerve" }).error,
+    "Your nerve ran out in the Wolf's ring, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.", "no recorded time: the clause is omitted, the ring is kept");
+});
+
 test("LOCKED OUT: the dungeon itself, entered from anywhere in its outline", () => {
   const e = enter(AT(1100, 1100), SPIRE, world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: LOCKED });
   assert.equal(e.refused, "dungeon-locked");
