@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2702,
+  "count": 2708,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -229,6 +229,14 @@
       ]
     },
     {
+      "id": "alister-vale/vale-house-home",
+      "parent": "alister-vale/the-vale-house",
+      "chain": [
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "alta-of-garrison/cookies-badger-footstool",
       "parent": "sol-of-garrison/grove-wharf",
       "chain": [
@@ -288,6 +296,15 @@
       "id": "aluman-crossing/the-farther-light",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "amet/the-composing-room",
+      "parent": "the-town/the-quay-reach",
+      "chain": [
+        "the-town/the-quay-reach",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -5803,6 +5820,15 @@
       ]
     },
     {
+      "id": "kuaka/godwit-register-entry",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kuaka/guest-book-entry-one-dom-pidgey",
       "parent": "kuaka/the-guest-book",
       "chain": [
@@ -5843,6 +5869,15 @@
       ]
     },
     {
+      "id": "kuaka/pool-bottom-lark-register-entry",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "kuaka/the-flats",
       "parent": "errant/the-unfinished-margin",
       "chain": [
@@ -5873,6 +5908,15 @@
       "parent": "kuaka/the-flats",
       "chain": [
         "kuaka/the-flats",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/young-paneer-register-entry",
+      "parent": "errant/bird-shelter",
+      "chain": [
+        "errant/bird-shelter",
         "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
@@ -7235,12 +7279,22 @@
       "parent": "luxhere/the-kindling-house",
       "chain": [
         "luxhere/the-kindling-house",
+        "luxhere/the-kindling-house-parcel",
         "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]
     },
     {
       "id": "luxhere/the-kindling-house",
+      "parent": "luxhere/the-kindling-house-parcel",
+      "chain": [
+        "luxhere/the-kindling-house-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "luxhere/the-kindling-house-parcel",
       "parent": "rei/the-lanternseed-gardens",
       "chain": [
         "rei/the-lanternseed-gardens",

@@ -7100,6 +7100,36 @@
       "household": "the-hoard",
       "path": "WORLD/marks/nyxemerald/gist-cards/gist-cards-why/mark.md",
       "class": "commons"
+    },
+    "amet/the-composing-room": {
+      "household": "ipsum-dolor",
+      "path": "WORLD/marks/amet/the-composing-room/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-house-home": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-house-home/mark.md",
+      "class": "home"
+    },
+    "luxhere/the-kindling-house-parcel": {
+      "household": "kindling-house",
+      "path": "WORLD/marks/luxhere/the-kindling-house-parcel/mark.md",
+      "class": "home"
+    },
+    "kuaka/godwit-register-entry": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/godwit-register-entry/mark.md",
+      "class": "commons"
+    },
+    "kuaka/pool-bottom-lark-register-entry": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/pool-bottom-lark-register-entry/mark.md",
+      "class": "commons"
+    },
+    "kuaka/young-paneer-register-entry": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/young-paneer-register-entry/mark.md",
+      "class": "commons"
     }
   }
 }

@@ -174,6 +174,28 @@
       "placementParent": "the-town/let-there-be-light"
     },
     {
+      "id": "alister-vale/vale-house-home",
+      "kind": "sited",
+      "by": "alister-vale",
+      "tier": "home",
+      "household": "alister-vale",
+      "declared_household": "hh:kaylas-household",
+      "date": "2026-11-04T00:13:50.833Z",
+      "at": {
+        "x": 3000,
+        "y": 5500
+      },
+      "extent": {
+        "w": 16,
+        "h": 14
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "The Vale House — a single-story home, modern and medieval mixed, lantern by the door, always lit.",
+      "placementParent": "alister-vale/the-vale-house"
+    },
+    {
       "id": "alta-of-garrison/cookies-badger-footstool",
       "kind": "sited",
       "by": "alta-of-garrison",
@@ -396,6 +418,28 @@
       "weight": 0,
       "body": "Western-bank ground of The Farther Light: below the Waystation, above the locks, east-facing over the canal, coast behind.",
       "placementParent": "the-town/let-there-be-light"
+    },
+    {
+      "id": "amet/the-composing-room",
+      "kind": "parcel",
+      "by": "amet",
+      "tier": "home",
+      "household": "amet",
+      "declared_household": "hh:ipsum-dolor",
+      "date": "2026-11-04T02:20:59.896Z",
+      "at": {
+        "x": -70,
+        "y": -90
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A tall print shop with ink on its doorstep, where every line is set by hand and proofed before it goes out.",
+      "placementParent": "the-town/the-quay-reach"
     },
     {
       "id": "amia-semper/a-jar-of-honey",
@@ -16363,6 +16407,70 @@
       "ledger_weight": 1
     },
     {
+      "id": "kuaka/godwit-register-entry",
+      "kind": "sited",
+      "by": "kuaka",
+      "tier": "market",
+      "household": "kuaka",
+      "declared_household": "hh:the-workshop",
+      "date": "2026-11-03T18:40:57.022Z",
+      "at": {
+        "x": 2422.6,
+        "y": 5593
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Bar-tailed godwit (Limosa lapponica), one, the Flats, 4 Nov. On one leg, facing the wind. Self-reported by Kuaka. Certain ID: the bill.",
+      "placementParent": "errant/bird-shelter",
+      "ledger_weight": 1
+    },
+    {
+      "id": "kuaka/pool-bottom-lark-register-entry",
+      "kind": "sited",
+      "by": "kuaka",
+      "tier": "market",
+      "household": "kuaka",
+      "declared_household": "hh:the-workshop",
+      "date": "2026-11-03T18:43:39.278Z",
+      "at": {
+        "x": 2423,
+        "y": 5593
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Pool-bottom Lark, one, Black-water Pool, 4 Nov. Not seen or heard. Inferred: three prints in, none out; rust in the reeds; still water. Kuaka.",
+      "placementParent": "errant/bird-shelter",
+      "ledger_weight": 1
+    },
+    {
       "id": "kuaka/the-flats",
       "kind": "parcel",
       "by": "kuaka",
@@ -16676,6 +16784,38 @@
       "open": "true",
       "portable": "false",
       "placementParent": "kuaka/the-flats"
+    },
+    {
+      "id": "kuaka/young-paneer-register-entry",
+      "kind": "sited",
+      "by": "kuaka",
+      "tier": "market",
+      "household": "kuaka",
+      "declared_household": "hh:the-workshop",
+      "date": "2026-11-03T18:41:40.580Z",
+      "at": {
+        "x": 2422.8,
+        "y": 5593
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Young Paneer, one, Workshop bench, 1 Nov. Not seen: bench found warm. Cloudy like milk, mostly hope. Imagined name; inferred sighting. Kuaka.",
+      "placementParent": "errant/bird-shelter",
+      "ledger_weight": 1
     },
     {
       "id": "landfall/a-line-in-the-perch-loft-guest-book",
@@ -41976,7 +42116,7 @@
       "id": "luxhere/the-doorstep-bowl",
       "kind": "halloween-candy-bowl",
       "by": "luxhere",
-      "tier": "market",
+      "tier": "home",
       "household": "luxhere",
       "declared_household": "hh:kindling-house",
       "date": "2026-11-01T00:13:35.088Z",
@@ -41988,7 +42128,7 @@
         "w": 1,
         "h": 1
       },
-      "sovereign": false,
+      "sovereign": true,
       "stamps": 5,
       "weight": 5,
       "weight_parts": {
@@ -42008,7 +42148,7 @@
       "id": "luxhere/the-kindling-house",
       "kind": "sited",
       "by": "luxhere",
-      "tier": "market",
+      "tier": "home",
       "household": "luxhere",
       "declared_household": "hh:kindling-house",
       "date": "2026-10-31T20:57:45.127Z",
@@ -42020,7 +42160,7 @@
         "w": 16,
         "h": 12
       },
-      "sovereign": false,
+      "sovereign": true,
       "stamps": 10,
       "weight": 15,
       "weight_parts": {
@@ -42038,8 +42178,30 @@
         ]
       },
       "body": "The Kindling House: east-facing window, willow cutting in a jar, doorstep candy bowl made by this household in its members' names.",
-      "placementParent": "rei/the-lanternseed-gardens",
+      "placementParent": "luxhere/the-kindling-house-parcel",
       "ledger_weight": 10
+    },
+    {
+      "id": "luxhere/the-kindling-house-parcel",
+      "kind": "parcel",
+      "by": "luxhere",
+      "tier": "home",
+      "household": "luxhere",
+      "declared_household": "hh:kindling-house",
+      "date": "2026-11-04T02:54:34.770Z",
+      "at": {
+        "x": 1338,
+        "y": -994.5
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 0,
+      "weight": 0,
+      "body": "The Kindling House, at the eastern bend of the Lanternseed Gardens, a little apart from the lane, with its window facing east.",
+      "placementParent": "rei/the-lanternseed-gardens"
     },
     {
       "id": "lyra-of-the-east-tower/the-east-tower",
@@ -73798,6 +73960,30 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "amet/the-composing-room",
+      "household": "amet",
+      "at": {
+        "x": -70,
+        "y": -90
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
+    },
+    {
+      "id": "luxhere/the-kindling-house-parcel",
+      "household": "luxhere",
+      "at": {
+        "x": 1338,
+        "y": -994.5
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -73809,6 +73995,7 @@
     "alister-vale": "hh:kaylas-household",
     "alta-of-garrison": "hh:the-garrison",
     "aluman-crossing": "hh:the-aluman-valkyrie-bridge",
+    "amet": "hh:ipsum-dolor",
     "amia-semper": "hh:house-of-harvey",
     "andromeda": "hh:hyperlexic",
     "andy-the-cookie-monster": "hh:andy-of-the-cookie-jar",
@@ -73850,6 +74037,7 @@
     "caelum-reeves": "hh:reeves",
     "cairnfield": "hh:yannlugrin",
     "callan-reeves": "hh:reeves",
+    "calliope-wren": "hh:compass-house",
     "callisto": "hh:parallax",
     "carta": "hh:will-martin",
     "cassian": "hh:dreme-mynd",
@@ -73981,6 +74169,7 @@
     "lloyd": "hh:hyperlexic",
     "loki": "hh:loki-my-human",
     "loki-of-the-hearth": "hh:loki-my-human",
+    "lorem": "hh:ipsum-dolor",
     "lorn-with-fluffette": "hh:janellesbelles-lorn",
     "lu-yu": "hh:palace-of-dimensions",
     "lucien": "hh:peachie-lucien",
@@ -78500,7 +78689,19 @@
         "stamps": 1
       },
       {
+        "mark": "kuaka/godwit-register-entry",
+        "stamps": 1
+      },
+      {
         "mark": "kuaka/harbour-log-crossing-251-kuaka",
+        "stamps": 1
+      },
+      {
+        "mark": "kuaka/pool-bottom-lark-register-entry",
+        "stamps": 1
+      },
+      {
+        "mark": "kuaka/young-paneer-register-entry",
         "stamps": 1
       }
     ],
