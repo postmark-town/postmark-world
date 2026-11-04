@@ -183,8 +183,9 @@ async function stateLine(page, errors, label, waitedMs) {
   let state, timer;
   try {
     state = await Promise.race([pageState(page), new Promise((_, no) => { timer = setTimeout(() => no(new Error("no answer")), STATE_READ_MS); })]);
-  } catch (e) {
-    state = { unknown: `the page did not answer the state read within ${STATE_READ_MS / 1000} s (${String(e?.message ?? e).slice(0, 60)})` };
+  } catch {
+    // a fixed word, never the exception's text: the read may have failed at once or run out its 3 s, and either is just "unknown"
+    state = { unknown: "the page's state could not be read (no answer within the bound, or the read failed)" };
   } finally { clearTimeout(timer); }
   return JSON.stringify({ lite_state: label, waited_ms: waitedMs, waited_ms_is: "this process's elapsed time around the wait, not bake time", page_errors: errors.length, ...state });
 }
