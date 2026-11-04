@@ -102,7 +102,7 @@ jobs:
           # a login equal to a house or sketchbook name proves nothing.
           if ! HOUSE=$(node tools/lane-author.mjs --registry WORLD/households.json --author-id "$AUTHOR_ID" --author-login "$AUTHOR_LOGIN" 2> /tmp/author.err); then
             cat /tmp/author.err
-            gh pr comment "$PR" --body "refused: your GitHub account is not pinned to a household the lane can bind ($(cat /tmp/author.err)). The registry (\`WORLD/households.json\`) is refreshed from the town pins at each crossing. Join the town first — \`JOINING.md\` in the postmark repo — or use the office door meanwhile."
+            gh pr comment "$PR" --body "refused: the PR lane could not admit this change ($(cat /tmp/author.err)). The registry (\`WORLD/households.json\`) is refreshed from the town pins at each crossing. Join the town first — \`JOINING.md\` in the postmark repo — or use the office door meanwhile."
             exit 1
           fi
           echo "author bound to ${HOUSE}"
