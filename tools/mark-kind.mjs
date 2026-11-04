@@ -118,6 +118,25 @@ export function holdOnlyChange(before, after) {
   return rest(before) === rest(after) && (isHeld(before) || isHeld(after) || owned);
 }
 
+/**
+ * Is `after` the same mark as `before` with ONLY the hand-off fields moved, and
+ * moved no further than a hand-off moves them? PURE.
+ *
+ * This is the question the town wall asks, and it is narrower than
+ * `holdOnlyChange`: holding a thing is not authoring it, so a hand-off may print
+ * on a mark the town signed, but nothing else about that mark may change. Beyond
+ * `holdOnlyChange` (every other field equal), the place may differ only when the
+ * thing goes into hands (the place leaves) or comes out of them (a fresh place
+ * is printed); a mark that stays on the ground and whose place moves is the
+ * author's move, and an owner stamped on beside a new place is not a hand-off.
+ */
+export function handOffOnly(before, after) {
+  if (!holdOnlyChange(before, after)) return false;
+  const same = (k) => JSON.stringify(before[k] ?? null) === JSON.stringify(after[k] ?? null);
+  if (isHeld(before) !== isHeld(after)) return true; // into or out of hands: the place may leave or return
+  return ["at", "extent", "points"].every(same);      // held to held, or ground to ground: the place stays put
+}
+
 // ── the chain's answer (G12) ─────────────────────────────────────────────────
 
 const INDEXES = new WeakMap();

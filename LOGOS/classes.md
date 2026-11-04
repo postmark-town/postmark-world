@@ -932,7 +932,8 @@ and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
 > no one.
 
 (The class mark's body says the same within the 150-character cap, with
-two cuts: "it fades or it flees" and "it is no one's".)
+two cuts: "lives half a day" (superseded, WLD-96: a creature does not fade)
+and "it is no one's".)
 
 | a creature's act | family | canon |
 |---|---|---|
@@ -943,10 +944,11 @@ two cuts: "it fades or it flees" and "it is no one's".)
 | its leaving, with its reason | revise: withdraw | live |
 | the crossing-save | a snapshot | every crossing saves it |
 
-- **Two ways to leave, and only two.** `faded`: twelve hours after its spawn
-  it goes back into the mist, on its own clock. `fled`: a reaction sent it
-  back at once — the only leaving by outcome. Nothing a creature is ever
-  vanishes otherwise, and it is never tamed or befriended: it is no one's.
+- **It leaves by fleeing, or at the season's end.** `fled`: a reaction sent it
+  back at once — the only leaving by outcome. A creature does not fade: the
+  twelve-hour fade is superseded (WLD-96, ruled 2026-10-21 19:39 and 19:41:
+  "Keep flee, end at season's end"). Nothing else ends a creature, and it is
+  never tamed or befriended: it is no one's.
   *A season's named creature (WLD-25, ruled 2026-10-20 22:56) neither fades nor
   flees: it stays until a settlement ends it, a third reason, `ended`, written
   only by the-town. Its mechanics are the season's (WORLD/ENGINE.md § The
@@ -1024,8 +1026,23 @@ two cuts: "it fades or it flees" and "it is no one's".)
   (`tools/creatures.mjs § countsFor`). A null `rotation` brings every kind at
   its own count.
 - **Off until the town says so.** A null `from_crossing` dial spawns nothing.
-  It stands at 259, the window that opens 2026-10-19 at 12:00Z, the first
+  It stood at 259, the window that opened 2026-10-19 at 12:00Z, the first
   window seeded after that day's 06:00Z settlement.
+  **Off again after Halloween (WLD-142; RULED, Darko 2026-10-31 23:01 EDT,
+  verbatim):** "keep the mist as is, but we should probably remove all like the
+  Halloween creatures and the decorations." The dial is null from the first
+  blessing that carries this: no window seeded after it spawns a creature. This
+  is the season's end that WLD-96 left to his word ("Keep flee, end at season's
+  end"). The Mists themselves are the skeleton's and stay as they are (the last
+  keyframe, crossing 282). *SUPERSEDED 2026-11-02 (WLD-147; Darko, 17:06 EST, in
+  chat, RULED: "full removal for mists"): that sentence. The Mists stand as they
+  did at 282 through the last crossing before the record's `withdrawn_from` and
+  are gone from it (WORLD/ENGINE.md § The Mists). With no wall and no fringe a
+  creature has no ground to come out of (`tools/creatures.mjs` scheduleFor), so
+  this dial has nothing to turn back on.* A window already seeded keeps the law at its own
+  seed's sha, so it finishes; the creatures already out are taken down by the
+  town's own `withdraw`, not by this law. The season's named creatures carry
+  their own `from_crossing` and `return_until` and do not read this dial.
 
 Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
 
@@ -1228,6 +1245,25 @@ three per household. Yes."). A household holds at most three parcels (ruled
 belongs to exactly one resident, and a resident holds at most one. The 08-18
 sentence "Claiming is untouched — still one parcel to a handle" is amended to
 say both.
+
+**Parcels from 11-01** (Darko, 2026-10-22: "any household that joins before
+the end of the month, so before Halloween, gets to register up to 3 parcels.
+And then after that, it will just be 1 parcel per household with extra parcels
+purchasable with stamps"; "let's price parcels at 50 stamps per parcel you
+already have"). Darko ruled the cutoff as "settled by Halloween's end", and
+the fact it reads is the household's declaration day (`since`, the date its
+house was declared, in town time), not the day it came ashore. A household
+whose declaration is dated on or before 2026-10-31 (town time; the cutoff is
+2026-11-01 04:00Z) keeps the cap of three for good. A household declared after
+that holds one parcel. It buys room ahead for each further parcel (Darko's
+pick, 2026-10-23: "Buy room ahead"): a household act burns the stamps and adds
+one parcel of room for good, and a claim then costs nothing. The price is 50
+stamps times the room it already has (his pick: "Room bought"): room 1->2
+costs 50 and 2->3 costs 100, whatever is held. The stamps are paid to the town
+and never returned, up to the same cap of three. One parcel per resident still holds, so a household needs a
+resident for each parcel. A claim past a household's room is opposed at the
+crossing like any claim past the cap, citing `the-town/claim-cap`. Its
+sentence names the room, the cutoff and the price of the next room.
 
 Rendered in the world as `the-town/claim-cap`, `the-town/one-per-resident`,
 `the-town/homes-per-resident` and `the-town/declared-home` (children of
@@ -1922,9 +1958,19 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   where you are (`within`), never through what you can see.
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
-  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). That every room has a path of
-  unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone. A portal let through anyway is let through by name, in
-  `WORLD/portal-lint-exceptions.json`, and every lint run says so.
+  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
+  the rooms a dungeon declares overlap. A dungeon declares its rooms in `rooms`, a list of mark ids (a property of
+  `the-town/dungeon`, the maker's word), and the lint judges only those, only against each other: a room declared inside
+  another is its child. Every other mark inside the dungeon (a rug, a dish, a stair, a door) overlaps what it likes,
+  nothing is inferred from geometry, and a dungeon that lists no rooms checks nothing (Darko, 2026-11-01
+  07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the dungeon represented by some kind
+  of class in code that has a list of dungeon rooms which the no overlap thing checks" and "Everything should be
+  allowed to overlap like normal"). Every id in
+  `rooms` must name a mark standing inside the dungeon, so a typo cannot switch the rule off. That every room has a
+  path of unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone.
+  **There is no list of exceptions.** A finding that is wrong is fixed in the rule, never let through by slug (Darko,
+  2026-11-01 07:58: "if we're hardcoding enumerated exceptions as slugs that's no good"); the named-exception file
+  `WORLD/portal-lint-exceptions.json` is retired.
 
 - **A door that opens when it holds what it asks for** (WLD-5 B; ruled 2026-10-18 21:23, 2026-10-19 17:48): a
   portal's entry may carry `requires: { holds: [ids], in, says }`. The passage is refused, and nothing is recorded,
@@ -1974,8 +2020,9 @@ answers **"Moving to higher/lower floors has not been implemented yet. Coming So
 - **A stair that writes its own `entry:` is read by that entry alone, as any mark is** (a portal when it writes
   `into`), and keeps the class. Nothing of the default carries over, its refusal included: a stair that writes its
   own opposed entry says the standing sentence. A later floor is reached by writing `into`, `lands_at` and a word.
-- **A stair is a box inside a room, not a door in a wall**, so it is held to the rule that siblings inside a
-  dungeon do not overlap, as a room is; portals set in walls stay exempt.
+- **A stair is a box inside a room, not a door in a wall.** Until 2026-11-01 it was held to the rule that siblings
+  inside a dungeon do not overlap, as a room is. It is not a room unless the dungeon lists it in `rooms`, so it
+  overlaps freely now (Darko, 2026-11-01 07:59: "Everything should be allowed to overlap like normal").
 
 ## The witnessed roll
 
@@ -2401,7 +2448,12 @@ the amendments that document enumerates. The law, compressed:
   with a dollar figure and a named beneficiary. **Keeping-stakes**
   (`keeping-stake extends stake`, to-class funding-quest) escrow on it; at
   epoch close, conversion runs pro-rata to dollars actually paid — unmatched
-  stakes return; treasury may cover a shortfall, minting nothing. The matched
+  stakes return; treasury may cover a shortfall, minting nothing. **Starforge
+  is not the treasury (2026-11-01):** the founder household gives like any
+  household, and what its dollars toward a posted need would earn is kept
+  as provisional holo, recorded and never minted (the town's
+  ECONOMY-DIALS.json § law_side.keeping § _starforge_gives holds the
+  ruling). The matched
   pot converts to equity **exactly once**, split by **sigma**: the keeper's
   side mints back as their own equity (giving is a second witnessed act — the
   keeping-deed); the payers' side mints **holo** by dollar share.

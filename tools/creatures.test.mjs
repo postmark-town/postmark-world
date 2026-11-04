@@ -15,7 +15,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
-import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
+import { mistsKeepRects, keptByTheTown, standsInTheWall } from "./mists-keep.mjs";
 import { loadMarks } from "./marks-fold.mjs";
 import { pointInPolygon } from "./geometry.mjs";
 import {
@@ -31,14 +31,40 @@ const LAW = creatureLaw(loadMarks(join(ROOT, "WORLD", "marks")));
 // D2's numbers (Darko 2026-10-15 12:09) with no rotation: the schedule at full strength.
 const { rotation: _rotation, ...FULL } = { ...LAW.dials, counts: { bat: 3, raven: 4, wolf: 2 } };
 const INPUTS = { mists: MISTS, marks: MARKS, dials: FULL, fromCrossing: 244, world_sha: SHA };
-const STANDING = { mists: MISTS, marks: MARKS, dials: LAW.dials, fromCrossing: LAW.fromCrossing, world_sha: SHA };
+// the ramp's launch window. Until WLD-142 (Darko 2026-10-31 23:01 EDT) the class dial stood here; it is null now
+// (creatures-season-end.test.mjs), so the ramp's machinery is asked at its own launch, not at the dial.
+const RAMP_FROM = 259;
+// THE LAST CROSSING THE SEASON IS WALKED TO. Until 2026-11-02 (WLD-147, Darko: "full removal for mists") the loops below
+// ran to crossing 290 and every window had a Mists to spawn at; the Mists are withdrawn from `withdrawn_from`, and from
+// it a window spawns nothing (mists-withdrawn.test.mjs), so the season ends one crossing before it.
+const SEASON_END = Math.min(290, (MISTS.withdrawn_from ?? Infinity) - 1);
+const STANDING ={ mists: MISTS, marks: MARKS, dials: LAW.dials, fromCrossing: RAMP_FROM, world_sha: SHA };
 // the ramp's counts (Darko 2026-10-19 20:05, WLD-84): six creatures a window
-const RAMP = { bat: 2, raven: 3, wolf: 1 };
+// the season's named creatures (WLD-25) are kinds too, at 0 a window: declared once, never a window's spawn
+const RAMP = { bat: 2, "candied-bat": 0, "candied-jetto": 0, "candied-raven": 0, "candied-wolf": 0, raven: 3, wolf: 1 };
 const RAMP_N = Object.values(RAMP).reduce((a, b) => a + b, 0);
 // the 10-17 rotation (one a window, a bat first), kept as the machinery's own case
 const ROTATING = { ...LAW.dials, counts: { bat: 1, raven: 1, wolf: 1 }, rotation: ["bat", "raven", "wolf"] };
 const ROTATING_IN = { ...STANDING, dials: ROTATING };
 const MASTER = "a test master key, never the box's";
+// THE TOWN'S GROUND AT CROSSING N, as the scheduler reads it: every sited mark's
+// reach at the law's keep_m, except a mark standing wholly in the wall at N,
+// which keeps nothing (6337f0eb, 2026-10-21). A keep read without the Mists
+// counts a fogged mark as town ground: S131's red, jetto-of-starforge's seven
+// sweets (world#309) lying in the mist beside the band.
+const keepAt = (N, dials) => mistsKeepRects(MARKS, MISTS.clearings_m, Number(dials.keep_m), { m: mistsAt(N, MISTS) });
+// The sharper half, read without the scheduler's own keep: every mark whose
+// reach holds a spawn must stand wholly in the wall at N. A fogged mark may have
+// a creature beside it on the clear side; a mark on the clear ground never may.
+function assertOnlyFoggedMarksNear(sp, N, dials) {
+  const m = mistsAt(N, MISTS), keepM = Number(dials.keep_m);
+  for (const mk of MARKS) {
+    const [r] = mistsKeepRects([mk], MISTS.clearings_m, keepM);
+    if (!r || !keptByTheTown([r], sp.x, sp.y)) continue;
+    assert.equal(standsInTheWall({ minX: r.cx0, maxX: r.cx1, minY: r.cy0, maxY: r.cy1 }, m), true,
+      `${sp.id} (${sp.x}, ${sp.y}) is within ${keepM} m of ${mk.id}, which stands on the clear ground at crossing ${N}`);
+  }
+}
 const t = (ms) => new Date(ms).toISOString();
 
 test("the seed: a secret per crossing, and a commitment that binds it and the world sha without telling either", () => {
@@ -59,9 +85,10 @@ test("the law: the class marks carry the ruled numbers (the ramp, Darko 2026-10-
   assert.equal("rotation" in LAW.dials, false, "the ramp: rotation null, every kind every window");
   assert.deepEqual([LAW.dials.band_from_m, LAW.dials.band_to_m], [0, 400], "D1: the 400 m fringe on the clear side");
   assert.equal(LAW.dials.span_h, 12, "a creature lasts 12 h from its own spawn");
-  assert.equal(LAW.fromCrossing, 259, "the window opening 2026-10-19 12:00Z");
+  // until 2026-11-01 (WLD-142) this asserted LAW.fromCrossing === 259; the dial is null now (creatures-season-end.test.mjs)
+  assert.equal(RAMP_FROM, 259, "the window opening 2026-10-19 12:00Z");
   assert.equal(windowOf(259).startMs, Date.parse("2026-10-19T12:00:00Z"));
-  assert.deepEqual(LAW.kinds, ["bat", "raven", "wolf"].map((k) => ({ kind: k, kind_file: `WORLD/kinds/${k}.kind` })));
+  assert.deepEqual(LAW.kinds, ["bat", "candied-bat", "candied-jetto", "candied-raven", "candied-wolf", "raven", "wolf"].map((k) => ({ kind: k, kind_file: `WORLD/kinds/${k}.kind` })));
 });
 
 test("the law is read whole or not at all", () => {
@@ -90,7 +117,7 @@ test("the law is read whole or not at all", () => {
 test("the schedule: the law's counts, every one placed in the band, off the town, apart, at a minute in its window", () => {
   for (const N of [250, 270, 282]) {
     const sched = scheduleFor(N, secretFor(MASTER, N), INPUTS);
-    const m = mistsAt(N, MISTS), keep = mistsKeepRects(MARKS, MISTS.clearings_m);
+    const m = mistsAt(N, MISTS), keep = keepAt(N, INPUTS.dials);
     const { startMs, endMs } = windowOf(N);
     const byKind = {};
     for (const s of sched.spawns) byKind[s.kind] = (byKind[s.kind] ?? 0) + 1;
@@ -102,6 +129,7 @@ test("the schedule: the law's counts, every one placed in the band, off the town
       const c = m.clear, boxWallM = Math.min(s.x - c.minX, c.maxX - s.x, s.y - c.minY, c.maxY - s.y);
       assert.ok(boxWallM >= 0 && boxWallM <= 400, `${s.id} is in the band (${Math.round(boxWallM)} m from the face)`);
       assert.equal(keptByTheTown(keep, s.x, s.y), false, `${s.id} is off the town's ground`);
+      assertOnlyFoggedMarksNear(s, N, INPUTS.dials);
       assert.ok(m.clearings.every((k) => Math.hypot(s.x - k.x, s.y - k.y) > k.r), `${s.id} is in no clearing`);
       assert.ok(s.at_ms >= startMs && s.at_ms < endMs && s.at_ms % 60000 === 0, `${s.id} spawns at a minute in its window`);
       assert.equal(Date.parse(s.fades_at) - s.at_ms, 12 * 3600 * 1000, `${s.id} lives 12 h`);
@@ -117,8 +145,11 @@ test("never on the town's water: no spawn of any kind on the sea or the main cha
   assert.deepEqual(TOWN_WATERS, ["the-sea", "the-main-channel"]);
   assert.equal(rings.length, 2, "the sea and the main channel, by their drawn polygons");
   assert.equal(townWaterRings(MARKS.map((m) => ({ ...m, by: "someone", household: "someone", id: `someone/${m.id}` }))).length, 0, "only the town's own water marks");
-  let checked = 0;
-  for (let N = 270; N <= 290; N += 4) {
+  let checked = 0, windows = 0;
+  // until 2026-11-02 this stepped by 4 from 270 to 290 (six windows, 2160 spawns, asserted at 2000 or more); the season ends at
+  // SEASON_END now, so it steps by 3 to keep the sample as wide
+  for (let N = 270; N <= SEASON_END; N += 3) {
+    windows += 1;
     for (let k = 0; k < 40; k += 1) {
       const sched = scheduleFor(N, secretFor(`water probe ${k}`, N), INPUTS);
       for (const sp of sched.spawns) {
@@ -128,6 +159,8 @@ test("never on the town's water: no spawn of any kind on the sea or the main cha
       assert.deepEqual(sched.unplaced, [], `crossing ${N}: every spawn still finds land`);
     }
   }
+  assert.ok(windows >= 6, `windows walked: ${windows}`);
+  assert.equal(checked, windows * 40 * Object.values(FULL.counts).reduce((a, b) => a + b, 0), `every window spawned its nine, every secret (${checked})`);
   assert.ok(checked >= 2000, `spawns checked: ${checked}`);
 });
 
@@ -155,7 +188,7 @@ test("the dial and the season: no schedule when the dial is off, before it, or b
 test("the ramp (Darko 2026-10-19 20:05, WLD-84): every kind every window from 259, 2 bats, 3 ravens and 1 wolf", () => {
   assert.deepEqual(scheduleFor(258, secretFor(MASTER, 258), STANDING), { crossing: 258, spawns: [], unplaced: [] }, "nothing before the launch window");
   for (let N = 259; N <= 265; N += 1) {
-    assert.deepEqual(countsFor(N, LAW.dials, LAW.fromCrossing), RAMP, `crossing ${N}: every kind at its count`);
+    assert.deepEqual(countsFor(N, LAW.dials, RAMP_FROM), RAMP, `crossing ${N}: every kind at its count`);
     for (let k = 0; k < 20; k += 1) {
       const sched = scheduleFor(N, secretFor(`ramp ${k}`, N), STANDING);
       assert.deepEqual(sched.unplaced, [], `crossing ${N}: all six find a place`);
@@ -169,7 +202,7 @@ test("the ramp (Darko 2026-10-19 20:05, WLD-84): every kind every window from 25
 test("the kinds in turn, the machinery kept (Darko 2026-10-17 13:58, superseded by the ramp 10-19 20:05): one a window, a bat first, then raven, wolf and round again", () => {
   const turn = { 259: "bat", 260: "raven", 261: "wolf", 262: "bat", 263: "raven", 264: "wolf", 265: "bat" };
   for (const [N, kind] of Object.entries(turn).map(([n, k]) => [Number(n), k])) {
-    assert.deepEqual(countsFor(N, ROTATING, LAW.fromCrossing), { [kind]: 1 }, `crossing ${N}: ${kind}'s turn`);
+    assert.deepEqual(countsFor(N, ROTATING, RAMP_FROM), { [kind]: 1 }, `crossing ${N}: ${kind}'s turn`);
     for (let k = 0; k < 20; k += 1) {
       const sched = scheduleFor(N, secretFor(`turn ${k}`, N), ROTATING_IN);
       assert.deepEqual(sched.unplaced, [], `crossing ${N}: the one creature finds a place`);
@@ -184,14 +217,16 @@ test("the kinds in turn, the machinery kept (Darko 2026-10-17 13:58, superseded 
 });
 
 test("the ramp holds the same ground rules (Darko 2026-10-19 20:05): on land, off the town, never on the water, apart, and its window audits", () => {
-  const rings = townWaterRings(MARKS), keep = mistsKeepRects(MARKS, MISTS.clearings_m);
+  const rings = townWaterRings(MARKS);
   let checked = 0;
-  for (let N = 259; N <= 290; N += 1) {
+  for (let N = 259; N <= SEASON_END; N += 1) {   // until 2026-11-02 this ran to 290 (32 windows, 1920 spawns)
+    const keep = keepAt(N, STANDING.dials);
     for (let k = 0; k < 10; k += 1) {
       const sched = scheduleFor(N, secretFor(`turn water ${k}`, N), STANDING);
       assert.deepEqual(sched.unplaced, [], `crossing ${N}: every spawn found a place`);
       for (const sp of sched.spawns) {
         assert.equal(keptByTheTown(keep, sp.x, sp.y), false, `${sp.id} is off the town's ground`);
+        assertOnlyFoggedMarksNear(sp, N, STANDING.dials);
         assert.equal(mistsHere(sp, mistsAt(N, MISTS)).inWall, false, `${sp.id} stands on the clear side`);
         for (const o of sched.spawns) if (o !== sp) assert.ok(Math.hypot(o.x - sp.x, o.y - sp.y) >= LAW.dials.apart_m, `${sp.id} and ${o.id} stand apart`);
         assert.ok(!rings.some((r) => pointInPolygon(sp.x, sp.y, r)), `${sp.id} (${sp.x}, ${sp.y}) stands on the town's water`);
@@ -199,7 +234,7 @@ test("the ramp holds the same ground rules (Darko 2026-10-19 20:05): on land, of
       }
     }
   }
-  assert.equal(checked, 32 * 10 * RAMP_N, "the ramp's six a window, every window placed (1920)");
+  assert.equal(checked, (SEASON_END - RAMP_FROM + 1) * 10 * RAMP_N, `the ramp's six a window, every window placed (${checked})`);
   const N = 259, secret = secretFor(MASTER, N), sched = scheduleFor(N, secret, STANDING), { endMs } = windowOf(N);
   const acts = [
     { actor: TOWN, action: "seed", object: `window-${N}`, at: t(windowOf(N).startMs), payload: { crossing: N, world_sha: SHA, commitment: commitmentOf(secret, SHA) } },

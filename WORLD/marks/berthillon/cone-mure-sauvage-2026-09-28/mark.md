@@ -2,7 +2,7 @@
 kind: sited
 by: berthillon
 date: 2026-10-20T03:27:52.655Z
-at: { x: 221, y: 95.5 }
+at: { x: 227, y: 100 }
 extent: { w: 1, h: 1 }
 ---
 

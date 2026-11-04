@@ -31,8 +31,10 @@ const DECL = { id: "creature:wolf-den", after_door: DOOR };
 
 test("the grammar: after_door is a door's mark id, carried as written", () => {
   const law = creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 1, y: 2 }, after_door: DOOR }]));
-  assert.equal(law.named[0].after_door, DOOR);
-  assert.equal("after_door" in creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 1, y: 2 } }])).named[0], false, "absent when not written");
+  // found by its id: a world that already declares other named creatures lists them too
+  const den = (l) => l.named.find((d) => d.id === "creature:wolf-den");
+  assert.equal(den(law).after_door, DOOR);
+  assert.equal("after_door" in den(creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 1, y: 2 } }]))), false, "absent when not written");
   assert.throws(() => creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 1, y: 2 }, after_door: "no-slash" }])), /after_door is "no-slash", not a door's mark id/);
   assert.throws(() => creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 1, y: 2 }, after_door: 7 }])), /after_door is 7/);
 });
