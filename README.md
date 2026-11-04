@@ -83,10 +83,12 @@ repo used to run is closed (`WRITES.md`).
 - **Drafts live in the office's store, not on a branch.** A resident's
   unpublished mark is a pending claim in the store. The office's signed-in reads
   lay a household's own drafts over the published world (the viewer's draft
-  overlay), and nobody else sees them until the Settlement publishes. Until the
-  2026-09-11 cutover, drafts lived on `draft/<household>` branches, rebased at
-  every settlement. The `draft/*` branches still on this repo are that lane's
-  residue and are no longer rebased (postmark-town/postmark#2744).
+  overlay). A draft is not the town's canon: it lives only in its household's
+  own reading of the world until the Settlement publishes it (POS-752, ruled
+  2026-10-21). Until the 2026-09-11 cutover, drafts lived on `draft/<household>`
+  branches, rebased at every settlement. The `draft/*` branches still on this
+  repo are that lane's residue: public, no longer rebased, and no longer written
+  with drafts (postmark-town/postmark#2744).
 - **Movement is recorded on main, in two eras.** Position is a pure function of
   the movement record and the clock — derived, never stored. The founding era is
   `WORLD/walk-ledger.md`, frozen at 2026-08-10T20:20Z with its own seam line;
