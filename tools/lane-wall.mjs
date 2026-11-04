@@ -45,7 +45,7 @@ import { fileURLToPath } from "node:url";
 import { loadMarks, parseRecord, placementParent } from "./marks-fold.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";
 import { mayMake, makersRefusal } from "./admin-makers.mjs"; // who may make a class: makers, then admin (WLD-21)
-import { bindAuthor } from "./lane-author.mjs"; // who the author is: pinned numeric id → household (WLD-122)
+import { bindAuthor, sketchbookHouse } from "./lane-author.mjs"; // who the author is, and whose a sketchbook is: pinned numeric id → household (WLD-122)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
@@ -117,10 +117,14 @@ if (baseBranch) {
     refuse(baseBranch, "the lane lands only in draft/<household> sketchbooks",
       "open the PR against draft/<your-github-login> (main is settlement's pen)");
   } else {
-    const bound = logins[baseBranch.slice("draft/".length).toLowerCase()] ?? null;
-    if (!bound) refuse(baseBranch, "this sketchbook is not in the registry",
+    // the same binding the first knock judges by (lane-author.mjs § sketchbookHouse): a `gh:<id>`
+    // name is that account's pinned household, never a login's say-so (WLD-122)
+    const { known, house: bound } = sketchbookHouse(registryFile, baseBranch.slice("draft/".length));
+    if (!known) refuse(baseBranch, "this sketchbook is not in the registry",
       "the logins map in WORLD/households.json binds branch names to households; the settlement crossing "
       + `re-derives it from the town every crossing (this copy: town ${registryTownSha ?? "UNSTAMPED"})`);
+    else if (!bound) refuse(baseBranch, "this sketchbook's account is not pinned to any one household",
+      "a sketchbook named for a GitHub account belongs to that account's pinned household; this one has none");
     else if (!myHouse || bound !== myHouse) refuse(baseBranch, "this sketchbook is not yours",
       `${baseBranch} belongs to ${bound}; yours is draft/${AUTHOR_LOGIN || "<your-github-login>"}`);
   }

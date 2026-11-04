@@ -364,3 +364,55 @@ test("FAILS CLOSED: no pinned_ids (an older registry), an empty map, or an entry
     assert.ok(v.violations.some((x) => /is not one of your residents/.test(x.defect)), `${why}: alice's own mark is not hers without a binding`);
   }
 });
+
+// ── THE REAL EXPORT'S SHAPES (WLD-122; office#796 review F2) ─────────────────
+// What postmark-office tools/world-households-export.mjs printed (office#796,
+// households/logins/pinned_ids verbatim) over an invented store; see
+// tools/lane-author.test.mjs § THE REAL EXPORT'S SHAPES for who is who.
+const REAL_EXPORT = {
+  households: { dew: "solo:dew", dune: "solo:dune", fern: "hh:moss-house", keithling: "hh:slate-house", kogane: "hh:slate-house", moss: "hh:moss-house", wren: "solo:wren" },
+  logins: {
+    dew: "solo:dew", dune: "solo:dune", "inv-dew": "gh:900000401", "inv-dune": "gh:900000401", "inv-fern": "gh:900000202",
+    "inv-keith": "hh:slate-house", "inv-kogane": "hh:slate-house", "inv-moss": "hh:moss-house", "inv-wren": "gh:900000301",
+    "moss-house": "hh:moss-house", "slate-house": "hh:slate-house", wren: "solo:wren",
+  },
+  pinned_ids: { 900000101: "hh:slate-house", 900000102: "hh:slate-house", 900000201: "hh:moss-house", 900000202: "hh:moss-house", 900000301: "solo:wren" },
+};
+
+test("THE #316 REPLAY, the wall: the second account writes its own and its housemate's note in its own sketchbook; an unregistered account owns nothing", (t) => {
+  const { put, wall, commit } = fixture(t, REAL_EXPORT);
+  put("NOTES/keithling.md", "keith's own note\n");
+  put("NOTES/kogane.md", "a housemate's note\n");
+  commit("keith writes");
+  const keith = wall(900000102, "inv-keith", "draft/inv-keith");
+  assert.equal(keith.ok, true, JSON.stringify(keith));
+  const stranger = wall(900000999, "inv-keith", "draft/inv-keith");
+  assert.equal(stranger.ok, false);
+  assert.ok(stranger.violations.some((v) => /GitHub account 900000999 is not pinned to any household/.test(v.defect)));
+  assert.ok(stranger.violations.some((v) => /this sketchbook is not yours/.test(v.defect)));
+});
+
+test("F2, the wall: a login sketchbook the export left as gh:<id> is its account's household's: its own resident and housemate pass, another house and an unbound account are refused", (t) => {
+  const { put, wall, commit } = fixture(t, REAL_EXPORT);
+  put("NOTES/fern.md", "fern's own note\n");
+  commit("fern writes");
+  assert.equal(wall(900000202, "inv-fern", "draft/inv-fern").ok, true, "fern in her own login's sketchbook");
+  const wren = wall(900000301, "inv-wren", "draft/inv-fern");
+  assert.equal(wren.ok, false);
+  assert.ok(wren.violations.some((v) => /this sketchbook is not yours/.test(v.defect) && /hh:moss-house/.test(v.hint)), JSON.stringify(wren));
+  const dune = wall(900000401, "inv-dune", "draft/inv-dune");
+  assert.equal(dune.ok, false, "an account the export bound to nothing owns nothing, its sketchbook included");
+  assert.ok(dune.violations.some((v) => /not pinned to any one household/.test(v.defect)), JSON.stringify(dune));
+});
+
+test("F2, the wall: a solo resident's login sketchbook is theirs; a housemate shares a house's account sketchbook, another house does not", (t) => {
+  const { put, wall, commit } = fixture(t, REAL_EXPORT);
+  put("NOTES/moss.md", "moss's note, in fern's account's sketchbook\n");
+  commit("moss writes");
+  assert.equal(wall(900000201, "inv-moss", "draft/inv-fern").ok, true, "moss-house's sketchbook is moss-house's");
+  assert.equal(wall(900000101, "inv-kogane", "draft/inv-fern").ok, false, "slate-house's account is not moss-house's");
+  const solo = fixture(t, REAL_EXPORT);
+  solo.put("NOTES/wren.md", "wren's note\n");
+  solo.commit("wren writes");
+  assert.equal(solo.wall(900000301, "inv-wren", "draft/inv-wren").ok, true, "a solo resident in their own login's sketchbook");
+});

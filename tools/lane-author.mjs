@@ -61,14 +61,35 @@ export function bindAuthor(registry, authorId) {
 }
 
 /**
+ * The household a sketchbook NAME is bound to, for both doors: `{ known, house }`.
+ * `known` is whether `logins` names it at all; `house` is the household key it
+ * binds, or null. A `gh:<id>` value names an ACCOUNT, not a house: the export
+ * leaves a pinned login as `gh:<id>` when no house lists that account (a solo
+ * resident; a house resident on an account the house does not list), so that
+ * account's household is its `pinned_ids` entry, the same table bindAuthor
+ * reads. An id the table does not hold binds no house. `logins` itself is not
+ * changed or trusted further: a login still never proves who knocked.
+ */
+export function sketchbookHouse(registry, name) {
+  const key = String(name ?? "").toLowerCase();
+  const logins = isPlainObject(registry?.logins) ? registry.logins : {};
+  if (!Object.prototype.hasOwnProperty.call(logins, key)) return { known: false, house: null };
+  const value = logins[key];
+  const account = typeof value === "string" ? /^gh:([1-9][0-9]*)$/.exec(value) : null;
+  const house = !account ? value
+    : isPlainObject(registry?.pinned_ids) && Object.prototype.hasOwnProperty.call(registry.pinned_ids, account[1]) ? registry.pinned_ids[account[1]] : null;
+  return { known: true, house: typeof house === "string" && /^[a-z]+:./.test(house) ? house : null };
+}
+
+/**
  * The sketchbook a login names, judged against the bound house: `null` when the
  * author may knock there (the name is theirs, or nobody's yet), else the reason.
  */
 export function sketchbookRefusal(registry, login, house) {
   const name = String(login ?? "").toLowerCase();
-  const logins = isPlainObject(registry?.logins) ? registry.logins : {};
-  if (!Object.prototype.hasOwnProperty.call(logins, name)) return null;
-  return logins[name] === house ? null
+  const bound = sketchbookHouse(registry, name);
+  if (!bound.known) return null;
+  return bound.house !== null && bound.house === house ? null
     : `the sketchbook draft/${name} is bound to another household, not to the one your account is pinned to`;
 }
 

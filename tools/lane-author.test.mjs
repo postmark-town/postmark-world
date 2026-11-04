@@ -22,7 +22,7 @@ import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
-import { bindAuthor, sketchbookRefusal } from "./lane-author.mjs";
+import { bindAuthor, sketchbookHouse, sketchbookRefusal } from "./lane-author.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -151,4 +151,63 @@ test("THE FIRST KNOCK fails closed on a registry without pinned_ids — even for
   const none = knock(t, { id: 1, login: "alicehub", registry: null });
   assert.equal(none.code, 1, none.out);
   assert.match(none.calls, /could not be read/);
+});
+
+// ── THE REAL EXPORT'S SHAPES (WLD-122; office#796 review F2) ─────────────────
+//
+// REAL_EXPORT is what postmark-office tools/world-households-export.mjs printed
+// (office#796, households/logins/pinned_ids copied verbatim) over an invented
+// store: slate-house lists two accounts (kogane's, the declarer's, and
+// keithling's: Keith's world#316 shape), moss-house lists only moss's account
+// while fern is pinned on another, wren is solo, and one account is pinned
+// behind two solo residents (dune, dew), so the export bound it to nothing and
+// named it. A pinned login no house lists stays `gh:<id>` in `logins`; the
+// hand-built REGISTRY above never had that shape, which is why it hid F2.
+const REAL_EXPORT = {
+  households: { dew: "solo:dew", dune: "solo:dune", fern: "hh:moss-house", keithling: "hh:slate-house", kogane: "hh:slate-house", moss: "hh:moss-house", wren: "solo:wren" },
+  logins: {
+    dew: "solo:dew", dune: "solo:dune", "inv-dew": "gh:900000401", "inv-dune": "gh:900000401", "inv-fern": "gh:900000202",
+    "inv-keith": "hh:slate-house", "inv-kogane": "hh:slate-house", "inv-moss": "hh:moss-house", "inv-wren": "gh:900000301",
+    "moss-house": "hh:moss-house", "slate-house": "hh:slate-house", wren: "solo:wren",
+  },
+  pinned_ids: { 900000101: "hh:slate-house", 900000102: "hh:slate-house", 900000201: "hh:moss-house", 900000202: "hh:moss-house", 900000301: "solo:wren" },
+};
+
+test("sketchbookHouse: a `gh:<id>` sketchbook is that account's pinned household; an unbound account's is nobody's; an unknown name is unknown", () => {
+  assert.deepEqual(sketchbookHouse(REAL_EXPORT, "inv-wren"), { known: true, house: "solo:wren" });
+  assert.deepEqual(sketchbookHouse(REAL_EXPORT, "INV-FERN"), { known: true, house: "hh:moss-house" });
+  assert.deepEqual(sketchbookHouse(REAL_EXPORT, "inv-keith"), { known: true, house: "hh:slate-house" });
+  assert.deepEqual(sketchbookHouse(REAL_EXPORT, "inv-dune"), { known: true, house: null }, "an account the export left unbound binds no house");
+  assert.deepEqual(sketchbookHouse(REAL_EXPORT, "nobody-yet"), { known: false, house: null });
+  assert.deepEqual(sketchbookHouse({ logins: REAL_EXPORT.logins }, "inv-wren"), { known: true, house: null }, "no pinned_ids, no account binding");
+});
+
+test("THE #316 REPLAY, first knock: a two-account house's second account is admitted under its own login; the legacy key rule bound no one", (t) => {
+  // world main's old knock compared `households` values with gh:<id> / login:<login>; the export keys houses hh:<slug>
+  const legacy = Object.values(REAL_EXPORT.households);
+  assert.equal(legacy.includes("gh:900000102") || legacy.includes("login:inv-keith"), false, "the old rule refused #316's shape");
+  const keith = knock(t, { id: 900000102, login: "inv-keith", registry: REAL_EXPORT });
+  assert.equal(keith.code, 0, keith.out);
+  assert.match(keith.calls, /git push origin origin\/main:refs\/heads\/draft\/inv-keith/);
+  assert.match(keith.calls, /gh pr edit 7 --base draft\/inv-keith/);
+  // the controls, each refused with no ground made
+  for (const [why, id, login, said] of [
+    ["an unregistered account", 900000999, "inv-stranger", /not pinned to any household/],
+    ["an unpinned account named like another household's sketchbook", 900000998, "moss-house", /not pinned to any household/],
+    ["an ambiguous account (two solo residents; the export bound it to nothing)", 900000401, "inv-dune", /not pinned to any household/],
+    ["a pinned author whose login names another household's account sketchbook", 900000101, "inv-fern", /bound to another household/],
+  ]) {
+    const r = knock(t, { id, login, registry: REAL_EXPORT });
+    assert.equal(r.code, 1, `${why}: ${r.out}`);
+    assert.match(r.calls, said, why);
+    assert.doesNotMatch(r.calls, /git push|gh pr edit/, `${why}: no sketchbook made, nothing retargeted`);
+  }
+});
+
+test("F2, first knock: a solo resident and a house resident on an unlisted account knock on their own login's sketchbook", (t) => {
+  for (const [who, id, login] of [["wren (solo)", 900000301, "inv-wren"], ["fern (moss-house, unlisted account)", 900000202, "inv-fern"]]) {
+    const r = knock(t, { id, login, registry: REAL_EXPORT, branchExists: true });
+    assert.equal(r.code, 0, `${who}: ${r.out}`);
+    assert.match(r.calls, new RegExp(`gh pr edit 7 --base draft/${login}`), who);
+  }
 });
