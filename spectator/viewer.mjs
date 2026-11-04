@@ -204,6 +204,74 @@ export function edgePointToward(viewport, target, inset = 0) {
 // A mark's name, read one way by the page and the verbs (tools/mark-name.mjs; WLD-5).
 export { deslugMarkId, resolveMarkName };
 
+// THE CONVERSATION LIST IS PAGED, AND THE MAP READS ALL OF IT THAT IT DRAWS (POS-779, office #769).
+// `GET /world/conversations` answers the FIRST PAGE of each section (the newest live threads, the newest threads of earlier
+// settlements) with a `next_threads` cursor for the rest. A map that drew only that first page would lose the 41st thread
+// and read as if nobody was there, so this follows the cursors, merges the pages, and SAYS what it did: the threads read
+// plus a state (ok / partial / legacy / unavailable). Nothing here widens the office: the same endpoint, the parameters it
+// already takes (`voices=0` is its lean summary, a thread without its lines, which is all a badge needs; `limit` and
+// `closed` its list limits; `next_threads` its keyset cursor).
+export const CONVO_PAGE = 100;                // threads per lean page: the door's largest list limit
+export const CONVO_MAX_PAGES = 8;             // pages followed per section in one read: a cut past it is `partial`, never silence
+export const CONVO_CLOSED_KEEP_MS = 24 * 3600 * 1000; // a thread from an earlier settlement is drawn for a day, so older ones are not followed for
+
+/**
+ * @param get   (query string) => Promise<{ ok, body }>: one GET of /world/conversations (a transport failure is { ok: false })
+ * @returns { state, live, closed, meta, cut }
+ *   state   "unavailable" (the first page could not be read: live/closed are null, the caller keeps what it had),
+ *           "partial" (a cursor was left standing: the cap, a failed follow or a list that changed under the read),
+ *           "legacy" (the office's short in-memory record, which has no pages and no way back), or "ok"
+ *   cut     the sections left unread
+ */
+export async function readConvoPages(get, { now = Date.now(), keepMs = CONVO_CLOSED_KEEP_MS, maxPages = CONVO_MAX_PAGES } = {}) {
+  const first = await get(`?voices=0&limit=${CONVO_PAGE}&closed=${CONVO_PAGE}`);
+  const b = first?.body;
+  if (!first?.ok || !b || b.error || !Array.isArray(b.live) || !Array.isArray(b.closed)) return { state: "unavailable", live: null, closed: null, meta: null, cut: [] };
+  const out = { live: [], closed: [] };
+  const seen = { live: new Set(), closed: new Set() };
+  // a thread id names one thread within a read; a repeat (a page seam) is the same thread, never a second badge
+  const add = (section, threads) => {
+    for (const t of threads) {
+      const id = t?.id == null ? null : String(t.id);
+      if (id !== null) { if (seen[section].has(id)) continue; seen[section].add(id); }
+      out[section].push(t);
+    }
+  };
+  add("live", b.live);
+  add("closed", b.closed);
+  const cut = [];
+  for (const section of ["live", "closed"]) {
+    let cursor = b.next_threads?.[section] ?? null;
+    let pages = 0;
+    // an older settlement's threads come newest first: once the newest unread would be past the day it is drawn for, stop
+    const wanted = () => {
+      if (section === "live" || !out.closed.length) return true;
+      const last = Date.parse(out.closed[out.closed.length - 1]?.latest);
+      return !Number.isFinite(last) || now - last <= keepMs;
+    };
+    while (cursor && wanted()) {
+      if (pages >= maxPages) { cut.push(section); break; }
+      const more = await get(`?next_threads=${encodeURIComponent(cursor)}&voices=0&limit=${CONVO_PAGE}`);
+      pages += 1;
+      const m = more?.body;
+      // a refusal, a transport failure, or the office saying the list changed since the cursor was cut: what is held stands, and is said to be a part
+      if (!more?.ok || !m || m.error || m.regenerated || !Array.isArray(m.threads)) { cut.push(section); break; }
+      add(section, m.threads);
+      cursor = m.next_threads ?? null;
+    }
+  }
+  const meta = Object.fromEntries(["earshot_m", "fade_minutes", "hearable_since"].filter((k) => Object.hasOwn(b, k)).map((k) => [k, b[k]]));
+  return { state: cut.length ? "partial" : b.incomplete_legacy ? "legacy" : "ok", live: out.live, closed: out.closed, meta, cut };
+}
+
+/** What the 💬 control says about the read, or null when there is nothing to add. Plain words, no counts it does not have. */
+export function convoReadNote(state) {
+  if (state === "unavailable") return "The office could not be read just now, so the conversations drawn may be out of date.";
+  if (state === "partial") return "Only the newest conversations are drawn; the office has more than were read.";
+  if (state === "legacy") return "The office is on its short in-memory record, so older conversations are not drawn.";
+  return null;
+}
+
 /** THE PARCEL CARD IS LABELLED WITH THE PARCEL'S OWN NAME (Keemin, 2026-09-20:
  *  "let's just use the parcel's name, and strip the word 'parcel'").
  *
@@ -12297,22 +12365,50 @@ export function mountViewer(appEl) {
   // the say class's numbers as the office publishes them for pages (voices.mjs § conversations):
   // earshot_m, fade_minutes (the DISPLAY fade) and hearable_since (the ear's window: the settlement)
   let convoMeta = null;
-  const convoMetaOf = (body) => Object.fromEntries(["earshot_m", "fade_minutes", "hearable_since"].filter((k) => Object.hasOwn(body ?? {}, k)).map((k) => [k, body[k]]));
   // THE READER'S OWN CHOICE persists per browser (POS-779, review): the default is on, a reader who
   // switched it off stays off. Storage can be absent or throw (private windows, blocked data); then the default stands.
   const CONVO_KEY = "pm.world.conversations";
   const convoStored = () => { try { const v = globalThis.localStorage?.getItem(CONVO_KEY); return v === "off" ? false : v === "on" ? true : null; } catch { return null; } };
   const convoStore = (on) => { try { globalThis.localStorage?.setItem(CONVO_KEY, on ? "on" : "off"); } catch { /* the choice just does not persist */ } };
   let convoVisible = convoStored() ?? true;  // on by default since POS-779 (upper-right 💬 hides it); hidden draws nothing, hits nothing, fetches nothing
-  async function loadConversations() {
+  // What the last read did (readConvoPages): the 💬 control says it when it is not a whole one.
+  let convoRead = "ok";
+  let convoLoading = null;
+  const convoGet = async (query) => {
     try {
-      const r = await fetch(officeUrl("/world/conversations"), { credentials: "same-origin" });
-      if (!r.ok) return;
-      const body = await r.json();
-      if (Array.isArray(body?.live) && Array.isArray(body?.closed))
-        convoState = { live: body.live, closed: body.closed };
-      if (body && !body.error) convoMeta = convoMetaOf(body);
-    } catch { /* a quiet lane contributes nothing, and the map is unchanged */ }
+      const r = await fetch(officeUrl("/world/conversations" + query), { credentials: "same-origin" });
+      let body = null;
+      try { body = await r.json(); } catch { body = null; }
+      return { ok: r.ok, body };
+    } catch { return { ok: false, body: null }; }
+  };
+  function paintConvoRead() {
+    const btn = $(root, ".wv-map-convo");
+    if (!btn) return;
+    if (!btn.dataset.baseTitle) btn.dataset.baseTitle = btn.title;
+    const note = convoReadNote(convoRead);
+    btn.dataset.convoRead = convoRead;
+    btn.title = note ? `${btn.dataset.baseTitle} ${note}` : btn.dataset.baseTitle;
+  }
+  // ONE READ AT A TIME: the list is several pages now, so a second tick (or a toggle) while one is in flight takes that one's answer
+  function loadConversations() {
+    if (convoLoading) return convoLoading;
+    convoLoading = (async () => {
+      try {
+        const read = await readConvoPages(convoGet);
+        if (read.state === "unavailable") {
+          // the office did not answer: what is drawn stays, and the control says it may be old (the map is otherwise unchanged)
+          convoRead = "unavailable";
+        } else {
+          convoState = { live: read.live, closed: read.closed };
+          convoMeta = read.meta;
+          convoRead = read.state;
+        }
+        paintConvoRead();
+      } catch { /* a quiet lane contributes nothing, and the map is unchanged */ }
+      finally { convoLoading = null; }
+    })();
+    return convoLoading;
   }
 
   function actorWalker() {
