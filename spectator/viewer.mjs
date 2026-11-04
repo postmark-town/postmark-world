@@ -6882,7 +6882,8 @@ ${WV_ENTER_CSS}
 .wv-convo { fill:rgba(183,198,212,.06); stroke:#7f93a6; }
 .wv-convo.is-live { fill:rgba(183,198,212,.12); stroke:#b7c6d4; stroke-width:2;
   stroke-dasharray:none; animation:wv-convo-breathe 3.2s ease-in-out infinite; }
-.wv-convo.is-aboard { stroke-dasharray:6 5; }
+/* a thread on the deck keeps its dashed ring, live or cooling: is-aboard sits on the badge wrapper, the ring is its circle */
+.wv-convo-badge.is-aboard .wv-convo { stroke-dasharray:6 5; }
 /* the badge (POS-779): a pale gray-white disc carrying the conversation icon; the ring is the
    shared dotted line when the thread is from an earlier settlement, solid and breathing when live */
 .wv-convo-disc { fill:#cfd6dd; }
