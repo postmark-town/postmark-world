@@ -2190,6 +2190,23 @@ Rendered as `the-town/downed-not-dead`. Ruled by the founder 2026-08-26.
   published live."*). Making marks into a holder, or giving into one, is
   live: what a published holder holds (a published chest, a resident) is
   published, and what a pending holder holds shares its pending state.
+- **A full holder set down travels with what it holds, and withdrawn before
+  it publishes it comes back whole** (WLD-138; Darko 2026-11-03, *"Yes, at
+  settlement"*; Wright, AUTHORITY 2026-11-04 12:01 and 16:00 UTC). A holder
+  made in hand may be set down with things in it. What it holds stays its
+  contents, by its id: pending with it, reached by nobody until it
+  publishes, and printed inside it at the settlement, never loose. If its
+  maker withdraws its draft before it publishes, the same holder comes back
+  to the hands it was set down from, with everything it holds, in the
+  withdrawal's one act, exactly once, and under the carry cap (hands that
+  are full refuse the withdrawal, and nothing moves). This is a
+  restoration, not a creation: the hold record gains one face, `put-back`,
+  beside give, drop, take, make, consume and set-down. It keeps the original
+  id, record and quantities, never makes a second thing or takes a name,
+  and costs its resident no act or stamp of its own; its only writer is the
+  withdrawal itself, under the withdrawal's own owner, escrow and replay
+  guards. A holder whose draft does not publish for another reason (refused
+  or held at the clearing) is not this rule's case.
 - **A holding is a set of marks** (ruled 2026-10-16 15:46–15:48, *"Yes,
   that's better"*). A count describes that set at some resolution, a class
   and a number; a read gives it at the nearest common class, and investigate
