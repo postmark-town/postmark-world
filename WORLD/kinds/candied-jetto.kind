@@ -1,0 +1,61 @@
+# Jetto at the top of the Spire: the boss (WLD-25; Sitting C built 2026-10-21; the three set pieces RULED
+# 2026-10-22 14:41–14:52 EDT, docs/2026-10-22/encounters/jetto-boss/three-phases.md). PRIVATE until crossing 272.
+#
+# EVERY LINE IT SPEAKS IS JETTO'S (design.md, FINAL; Wright 2026-10-21): his story, his voice, his lines and his
+# room; only Jetto changes them. The lines kept from his whisper fight are his own, as he wrote them. Every line
+# marked "Jetto's own" just above it was a placeholder Plumb wrote to make the fight run; Jetto wrote the real one (2026-10-22).
+# Its name and moods are plain labels, Plumb's, for Jetto to replace at will.
+#
+# HIS FIGHT RUNS IN THREE SET PIECES (candied-jetto.fight.json beside this file, read by tools/creature-fight.mjs):
+# the fireballs (the bat's stillness), the disguise (the raven's memory) and his empowered form (the wolf's many
+# households); the law names them by their neutral types, feint, disguise and unbreakable. Two bars show: hit points (resolve, worn by strike) and sanity (raised by each piece's peaceful act).
+# His lines key on fight.piece, fight.flinched, fight.held and fight.sanity. He lies in his own voice (the fake
+# surrender, "nothing's wrong", "I'm invincible"); the office never does (ruled 14:43).
+# The whisper menu (jetto.boss.json) stays in the tree; this kind no longer names it.
+kind: candied-jetto
+name: Jetto, at the top of the Spire
+voice: persuasive the way a sugar-rush is: warm, fast, sure of itself, a little wrong
+about: the sweetness talking through Jetto
+what: >
+  Jetto took the sweet because he heard "wait like everyone else" as "not you". Up the Spire he has had too much of what he took.
+ring_m: 60
+tastes: Nothing; the sweetness takes nothing.
+moods:
+  sweetness: 0..3 = 3 | himself | wavering | sweet | all sugar
+
+finishable: true
+resolve: 42
+strike: 2
+fight: candied-jetto.fight.json
+# Jetto's own: his own "back to himself" ending (jetto.boss.json), with who took part. The ruled ending also sends the
+# node flying back to the keeping works and fixes the candy (14:52, j): his words for that moment.
+ending: Somebody says it plainly one more time — *wait, like everyone else* — and Jetto hears it the way it was meant. "She wasn't saying no to me," he says. "She was saying *with* everyone." The node lets go of him all at once and goes flying out through the Spire's high star-shaped window, back toward the keeping works where it belongs, and somewhere down in town the candy remembers what it is. {names} climbed all this way to talk instead of fight, and he thanks each of them by name. Then he asks if anyone knows the way back down, because he'd like to start over, the long way, with everybody.
+
+# ── the fireballs (the bat's stillness) ─────────────────────────────────────
+# Jetto's own: his cackle when someone flinches ("it was all a trick")
+reaction cackle "it cackles": when fight.flinched says Ha! Got you, {actor}! Sparks. It was only ever sparks — you jumped at sugar.
+# Jetto's own: when someone holds still under it
+reaction held "it sees you hold": when fight.held says …you didn't even move. That was supposed to be scary, {actor}. Why aren't you scared?
+reaction strikes-1 "a blow lands": when act.verb == "strike" and fight.piece == "feint" says Ow — *rude*. Also: fair.
+reaction strikes-2 "a blow lands": when act.verb == "strike" and fight.piece == "feint" says You'd hit a meep with a sugar headache? …fine. Again, then.
+reaction strikes-3 "a blow lands": when act.verb == "strike" and fight.piece == "feint" says That's the bat's lesson upside down. Loud, loud, loud.
+reaction strikes-4 "a blow lands": when act.verb == "strike" and fight.piece == "feint" says Harder isn't the same as right, {actor}. But it is harder.
+reaction lamps "the lamps go low": when fight.piece == "feint" and not fight.flinched and not fight.held and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" says The lamps at the top of the Spire go low.
+
+# ── the disguise (the raven's memory) ───────────────────────────────────────
+# Jetto's own: his catch-all while disguised, to anyone who comes back ("oh yeah, nothing's wrong")
+reaction fine "nothing's wrong": when fight.piece == "disguise" and act.verb != "steady" and act.verb != "shield" says Oh — {actor}, you came back? Nothing's wrong up here. Honestly. You won, remember? I'm just tidying.
+
+# ── his empowered form (the wolf's many households) ─────────────────────────
+# Jetto's own: a strike that glances off, and his boast
+reaction glance "a blow glances off": when act.verb == "strike" and fight.piece == "unbreakable" says Go on, hit me again. I can't even feel it anymore — I'm *made* of the sweet now.
+reaction plain-1 "an answer that lands": when act.verb == "persuade" says …huh. You're right. That isn't how it was.
+reaction plain-4 "an answer that lands": when act.verb == "persuade" says Say that again, {actor}. Slower. I think I need to hear it.
+reaction plain-5 "an answer that lands": when act.verb == "persuade" says Rei *did* say that. She said wait. I didn't.
+# Jetto's own: his bluff that he's invincible, and that they may as well give up on trick-or-treating
+reaction bluff "it bluffs": when fight.piece == "unbreakable" and act.verb != "persuade" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" says Nothing in this town can touch me now. You may as well give up on trick-or-treating, {actor} — the sweet is mine, every bit of it, all the way to Halloween.
+
+# ── a friend helped (every piece) ───────────────────────────────────────────
+reaction helps-1 "it sees a friend helped": when act.verb == "steady" or act.verb == "shield" says Oh, that's not fair. You can't argue with *that*.
+reaction helps-2 "it sees a friend helped": when act.verb == "steady" or act.verb == "shield" says You'd spend your own nerve on them? …the wolf would like you.
+reaction helps-3 "it sees a friend shielded": when act.verb == "shield" says {actor} stood in front of {ally}. I'll remember that when I'm myself again.

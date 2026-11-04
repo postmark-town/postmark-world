@@ -85,6 +85,8 @@ import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
 import { pointInPolygon, polygonOf } from "./geometry.mjs";
 import { classIndex, propertyOf } from "./class-properties.mjs";
 import { AFFORDED_VERBS } from "./creature-kind.mjs";
+import { entryLawOf, REQUIRES_AT_SETTLEMENT } from "./enter-exit.mjs";
+import { unmetRequires } from "./portals.mjs";
 
 export const TOWN = "the-town";
 export const DESPAWN_REASONS = Object.freeze(["faded", "fled", "ended"]);
@@ -166,9 +168,16 @@ export function creatureLaw(records) {
 
 /**
  * A kind class's named creatures (WLD-25), its mark's `named`: a list of
- * { slug, at: { x, y }, carries?, from_crossing?, after? }, read whole like `actions`.
+ * { slug, at: { x, y }, carries?, from_crossing?, after?, after_door?, return_until? }, read whole like `actions`.
+ * `return_until` (WLD-124, 2026-10-27): an ISO instant in UTC. A creature that carries it COMES BACK after
+ * it ends, as a new generation of the same declaration, at each settlement strictly before that instant
+ * (read by the office's creature-tick namedSpawns). The declaration is written once.
  * `after` (a creature that tempts, its fight's opening): the ids of named
  * creatures (creature:<kind>-<slug>) that must all have ended before it comes out.
+ * `after_door` (2026-10-22, WLD-25/k): a door's mark id. The creature comes out
+ * at the first settlement whose world shows that door open: its `requires` met
+ * as the settlement printed it (portals.mjs § unmetRequires), so the door must
+ * count `at: "settlement"` (mark-lint holds it to that) and the two open together.
  * Each is one creature, `creature:<kind>-<slug>`, standing at `at` from its
  * crossing on (the class's launch dial when it names none), and carrying the
  * standing thing `carries` names, which goes to its first finisher. A bad slug,
@@ -188,10 +197,44 @@ function namedOf(mark, kind) {
     if (d.from_crossing != null && !Number.isInteger(d.from_crossing)) throw new Error(`${where}'s from_crossing is ${JSON.stringify(d.from_crossing)}, not a whole crossing`);
     if (d.after != null && (!Array.isArray(d.after) || !d.after.length || d.after.some((a) => !isCreatureId(a))))
       throw new Error(`${where}'s after is ${JSON.stringify(d.after)}, not a list of named creatures' ids`);
+    if (d.after_door != null && (typeof d.after_door !== "string" || !d.after_door.includes("/")))
+      throw new Error(`${where}'s after_door is ${JSON.stringify(d.after_door)}, not a door's mark id (<by>/<slug>)`);
+    if (d.return_until != null && (typeof d.return_until !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$/.test(d.return_until) || !Number.isFinite(Date.parse(d.return_until))))
+      throw new Error(`${where}'s return_until is ${JSON.stringify(d.return_until)}, not an ISO instant in UTC (YYYY-MM-DDTHH:MM:SSZ)`);
     return { id: `${ID_PREFIX}${kind}-${d.slug}`, kind, x, y, ...(d.carries != null ? { carries: d.carries } : {}),
       ...(d.from_crossing != null ? { from_crossing: d.from_crossing } : {}), ...(d.after != null ? { after: [...d.after] } : {}),
+      ...(d.after_door != null ? { after_door: d.after_door } : {}),
+      ...(d.return_until != null ? { return_until: d.return_until } : {}),
       declared: `${TOWN}/${kind}#${d.slug}` };
   });
+}
+
+/** Why a named declaration's `after_door` can never open it, or null: the door is a mark
+ *  whose entry `requires` counts `at: "settlement"`. A door that reads the live record,
+ *  asks nothing, or is not there would keep the creature in for good. */
+export function afterDoorRefusal(decl, marks = []) {
+  if (decl?.after_door == null) return null;
+  const door = (marks ?? []).find((m) => m?.id === decl.after_door);
+  if (!door) return `its after_door ${JSON.stringify(decl.after_door)} names no mark`;
+  const req = entryLawOf(door)?.requires;
+  if (!req) return `its after_door ${decl.after_door} asks for nothing (no entry.requires), so it is no lock to wait on`;
+  if (req.malformed) return `its after_door ${decl.after_door} asks for something it does not say plainly (${req.malformed})`;
+  if (req.at !== REQUIRES_AT_SETTLEMENT) return `its after_door ${decl.after_door} reads the live record; a creature waits on a door that counts at: "settlement", so the two open at the same settlement`;
+  return null;
+}
+
+/** Has a named declaration's door opened in this world (the world as a settlement printed
+ *  it)? `{ open: true }`, or `{ open: false, why }`; a declaration with no `after_door` is
+ *  open; a door that is only shut says `shut: true` (a wait, not a fault). The tick asks it of
+ *  the blessed world, so the creature comes out at the first
+ *  settlement whose world shows the door open, the same reading the door's passage makes. */
+export function afterDoorOpen(decl, marks = []) {
+  if (decl?.after_door == null) return { open: true };
+  const bad = afterDoorRefusal(decl, marks);
+  if (bad) return { open: false, why: bad };
+  const unmet = unmetRequires((marks ?? []).find((m) => m?.id === decl.after_door), { marks });
+  const n = (v) => (Array.isArray(v) ? v.length : Number(v));   // a door that is not shown says only its counts
+  return unmet ? { open: false, shut: true, why: `its door ${decl.after_door} is shut: ${n(unmet.requires.held)} of ${unmet.requires.asks ?? n(unmet.requires.holds)} in place at this settlement` } : { open: true };
 }
 
 /** WHERE AN AFFORDED ACTION MAY BE TAKEN FROM: in sight of the creature, or inside its ring. */
@@ -369,7 +412,7 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
   const { startMs } = windowOf(N);
   const spanMs = Number(dials.span_h) * 3600 * 1000;
   const from = Number(dials.band_from_m), to = Number(dials.band_to_m), apart = Number(dials.apart_m) || 0;
-  const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m));
+  const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m), { m });
   const waters = townWaterRings(marks);
   const minutes = CROSSING_MS / 60000;
   // Each spawn's draws are named by its own id (its minute, then two per try), so

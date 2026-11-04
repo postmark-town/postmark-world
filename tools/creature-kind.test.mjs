@@ -153,7 +153,7 @@ test("the ring's verbs are the resident's ordinary public acts (the G5 list)", (
 });
 
 test("the afforded actions: the six ruled verbs, frozen, none of them a ring verb", () => {
-  assert.deepEqual([...AFFORDED_VERBS], ["watch", "approach", "shoo", "call", "offer", "whisper"]);
+  assert.deepEqual([...AFFORDED_VERBS], ["watch", "approach", "shoo", "call", "offer", "whisper", "dodge", "persuade"]);
   assert.ok(Object.isFrozen(AFFORDED_VERBS));
   assert.deepEqual(AFFORDED_VERBS.filter((v) => RING_VERBS.includes(v)), [], "an aimed act and an ambient act are never the same word");
   assert.deepEqual([...LINE_SLOTS], ["actor", "offered", "heard", "target", "ally"], "target: a finishable kind's press; ally: a tempting kind's (creature-kind-encounter.test.mjs, creature-tempts.test.mjs)");

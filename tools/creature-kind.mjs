@@ -125,9 +125,11 @@ export const RING_VERBS = Object.freeze(["walk", "enter", "exit", "say", "take",
 
 /** The afforded actions a creature class may declare (POS-672; ruled 2026-10-16
  *  18:06): watch, approach and shoo on every creature; call and offer on the wolf
- *  and the raven; whisper on the bat. Which ones a creature takes is its classes'
+ *  and the raven; whisper on the bat. A creature whose fight runs in set pieces
+ *  (creature-fight.mjs) adds dodge (from a feint aimed at you) and persuade
+ *  (WLD-25, ruled 2026-10-22). Which ones a creature takes is its classes'
  *  `actions`, never this list: this is only every verb a kind file may key on. */
-export const AFFORDED_VERBS = Object.freeze(["watch", "approach", "shoo", "call", "offer", "whisper"]);
+export const AFFORDED_VERBS = Object.freeze(["watch", "approach", "shoo", "call", "offer", "whisper", "dodge", "persuade"]);
 
 /** An encounter's verbs, keyed on by a finishable kind only (see the header): brute
  *  force aimed at the creature, and two aimed at another resident in its ring. */
@@ -155,6 +157,10 @@ const EASE_FIELDS = new Set(["ease.mine", "ease.all", "ease.first_m"]);
  *  (D4: the creature knows the dyad): how many residents and households stand in its ring, the
  *  actor's housemates there, the actor's nerve, and whether the actor has struck it. */
 const RING_FIELDS = new Set(["ring.residents", "ring.households", "actor.housemates", "actor.nerve", "actor.struck"]);
+/** What a kind whose fight runs in set pieces may read besides (creature-fight.mjs): the set piece it is
+ *  in ("feint", "disguise", "unbreakable"), its sanity this window, and whether this act flinched
+ *  from a feint aimed at the actor or held under it. */
+export const FIGHT_FIELDS = Object.freeze(["fight.piece", "fight.sanity", "fight.flinched", "fight.held"]);
 
 // ── the expression language ────────────────────────────────────────────────────
 const TOKEN = /\s*(?:(\d+(?:\.\d+)?)|("(?:[^"\\]|\\.)*")|(==|!=|<=|>=|<|>|\(|\))|([A-Za-z_][\w.-]*))/y;
@@ -316,7 +322,8 @@ const MOOD = /^([a-z][\w-]*):\s*(-?\d+)\.\.(-?\d+)\s*=\s*(-?\d+)\s*(?:\|(.*))?$/
 const REACTION = /^reaction\s+([a-z][\w-]*)\s+"([^"]*)":\s*when\s+(.*?)(?:\s+does\s+(.*?))?\s+says\s+(.*)$/;
 const SINGLE = new Set(["kind", "name", "voice", "about", "ring_m", "flags", "tastes", "finishable", "ending", "fragments", "fragment_words",
   "resolve", "strike", "ease", // an encounter's lines (a finishable kind only)
-  "tempts", "who", "fight_size"]); // a creature that tempts (creature-tempts.mjs)
+  "tempts", "who", "fight_size", // a creature that tempts (creature-tempts.mjs)
+  "fight"]); // a creature whose fight runs in set pieces (creature-fight.mjs)
 /** What a telling kind's conditions may read (POS-712): told.now (it told the actor a fragment with
  *  this act), told.answered (this act's words answered every fragment, in order) and told.asks
  *  (every fragment is told, it is asking, and this act did not answer: the one who forgets). */
@@ -353,10 +360,18 @@ function encounterOf(kind, source) {
     throw new Error(`${source}: tempts:, who: and fight_size: come together (its menu, who speaks for it, and its fight's size)`);
   if (kind.tempts !== undefined) {
     if (!kind.finishable) throw new Error(`${source}: tempts: belongs to a finishable kind (finishable: true); ${MISTS_ONLY}`);
-    if (!/^[a-z][a-z0-9.-]*.json$/.test(kind.tempts)) throw new Error(`${source}: tempts: names a menu file beside it, <name>.json (got ${JSON.stringify(kind.tempts)})`);
+    if (!/^[a-z][a-z0-9.-]*\.json$/.test(kind.tempts)) throw new Error(`${source}: tempts: names a menu file beside it, <name>.json (got ${JSON.stringify(kind.tempts)})`);
     if (!/^[a-z0-9][a-z0-9-]*$/.test(kind.who)) throw new Error(`${source}: who: is a resident's handle (got ${JSON.stringify(kind.who)})`);
     kind.fight_size = whole("fight_size", kind.fight_size, 3);
     if (kind.resolve !== undefined || kind.ease !== undefined) throw new Error(`${source}: a creature that tempts keeps two tallies, never a resolve: or an ease:`);
+  }
+  // A CREATURE WHOSE FIGHT RUNS IN SET PIECES (creature-fight.mjs): its fight file beside it, and its
+  // hit points (resolve: and strike:). It has no ease (its peaceful bar is the fight's sanity) and never tempts
+  if (kind.fight !== undefined) {
+    if (!kind.finishable) throw new Error(`${source}: fight: belongs to a finishable kind (finishable: true); ${MISTS_ONLY}`);
+    if (!/^[a-z][a-z0-9.-]*\.json$/.test(kind.fight)) throw new Error(`${source}: fight: names a fight file beside it, <name>.json (got ${JSON.stringify(kind.fight)})`);
+    if (kind.resolve === undefined) throw new Error(`${source}: a fight in set pieces needs resolve: and strike: (its hit points)`);
+    if (kind.ease !== undefined || kind.tempts !== undefined) throw new Error(`${source}: a fight in set pieces keeps its own sanity: never an ease: or a tempts:`);
   }
   if (kind.ease !== undefined) {
     // `only <verb>` (a per-resident ease): any other act of yours charged in its ring empties your own ease,
@@ -451,7 +466,7 @@ export function parseKind(text, { source = "kind file" } = {}) {
   encounterOf(kind, source);
 
   const known = new Set([...ACT_FIELDS, ...(kind.fragments ? TOLD_FIELDS : []), ...Object.keys(kind.moods).map((k) => `self.${k}`), ...kind.flags.map((f) => `self.${f}`),
-    ...(kind.resolve ? RESOLVE_FIELDS : []), ...(kind.ease ? EASE_FIELDS : []), ...(kind.finishable ? RING_FIELDS : [])]);
+    ...(kind.resolve ? RESOLVE_FIELDS : []), ...(kind.ease ? EASE_FIELDS : []), ...(kind.finishable ? RING_FIELDS : []), ...(kind.fight ? FIGHT_FIELDS : [])]);
   const verbs = kind.finishable ? [...RING_VERBS, ...AFFORDED_VERBS, ...ENCOUNTER_VERBS] : [...RING_VERBS, ...AFFORDED_VERBS];
   for (const { n, m } of pending) {
     const [, name, sentence, cond, does, says] = m;
@@ -473,7 +488,7 @@ export function parseKind(text, { source = "kind file" } = {}) {
     const names = [...line.matchAll(/\{([^}]*)\}/g)].map((x) => x[1]);
     for (const x of names) if (!LINE_SLOTS.includes(x)) fail(n, `a line may name {actor}, {offered}, {heard}, {target} or {ally} and nothing else (got {${x}})`);
     // {ally}: filled by code. On a steady or a shield, the friend it was for; otherwise the other resident the temptation in this exchange named
-    if (names.includes("ally") && kind.tempts === undefined) fail(n, `a line naming {ally} belongs to a creature that tempts (tempts:): {ally} is the friend a steady or shield was for, or the resident its temptation named`);
+    if (names.includes("ally") && kind.tempts === undefined && kind.fight === undefined) fail(n, `a line naming {ally} belongs to a creature that tempts (tempts:) or fights in set pieces (fight:): {ally} is the friend a steady or shield was for, or the resident its temptation named`);
     const needs = requiredOf(when);
     if (names.includes("offered") && !needs.verbs.has("offer")) fail(n, `a line naming {offered} needs a condition that requires act.verb == "offer" (in its top-level and)`);
     if (names.includes("heard") && !needs.ids.has("heard.any")) fail(n, `a line naming {heard} needs a condition that requires heard.any (in its top-level and)`);
@@ -498,8 +513,8 @@ export function startState(kind) {
  *  { verb, distance_m, approaching, heard? } (heard: the words the creature could
  *  repeat, or none), `actor` { times }. `encounter` is a finishable kind's
  *  window, as the office counts it: { resolve, ease: { mine, all, first_m },
- *  ring: { residents, households }, actor: { housemates, nerve, struck } };
- *  absent, every number reads 0. */
+ *  ring: { residents, households }, actor: { housemates, nerve, struck },
+ *  fight: { piece, sanity, flinched, held } }; absent, every number reads 0. */
 export function scopeOf(state, act = {}, actor = {}, encounter = {}) {
   const self = { ...state.moods };
   for (const f of state.flags ?? []) self[f] = true;
@@ -514,6 +529,8 @@ export function scopeOf(state, act = {}, actor = {}, encounter = {}) {
     ease: { mine: num(encounter.ease?.mine), all: num(encounter.ease?.all), first_m: num(encounter.ease?.first_m) },
     // POS-712: the office's word on a telling creature's act; a kind that does not tell never reads it
     told: { now: !!act.told?.now, answered: !!act.told?.answered, asks: !!act.told?.asks },
+    // a fight in set pieces (creature-fight.mjs), as the office reads it: its set piece, its sanity, and this act's answer to a feint
+    fight: { piece: String(encounter.fight?.piece ?? ""), sanity: num(encounter.fight?.sanity), flinched: !!encounter.fight?.flinched, held: !!encounter.fight?.held },
   };
 }
 

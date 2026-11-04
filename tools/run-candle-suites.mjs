@@ -30,6 +30,17 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const PIN_PATTERN = "^\\[pin\\] ";
 const PIN_RE = new RegExp(PIN_PATTERN);
 
+// THE CANDLE SAYS IT IS THE CANDLE (WLD-71; Wright's review 2026-10-30 11:38, NO-MERGE
+// until the stress sweep stays out of the settlement). Set to "1" on the node --test
+// child this runner starts, and on nothing else. A suite that must not run in the
+// crossing (tools/page-throttle-sweep.test.mjs: 22 page tests in browsers at 4×
+// CPU, which CI and `npm test` run) reads this one name, and nothing CI or npm
+// set, so an inherited CI=true or npm_lifecycle_event cannot put it back. It is
+// NOT a pin: a pin reads source text (#2790); this is a behaviour test the
+// crossing should not wait on.
+export const CANDLE_ENV = "WORLD_CANDLE_RUN";
+export const candleChildEnv = (env = process.env) => ({ ...env, [CANDLE_ENV]: "1" });
+
 // every test/it title declared at the top of a line, with its quote style
 const TITLE_RE = /^\s*(?:test|it)\s*\(\s*(["'`])((?:\\.|(?!\1)[\s\S])*)\1/;
 
@@ -91,7 +102,7 @@ function main() {
   const run = spawnSync(
     process.execPath,
     ["--test", `--test-skip-pattern=${PIN_PATTERN}`, ...files],
-    { stdio: "inherit", cwd: dirname(HERE) }
+    { stdio: "inherit", cwd: dirname(HERE), env: candleChildEnv() }
   );
   if (run.error) {
     console.error("candle gate REFUSED: node --test could not be started: " + run.error.message);

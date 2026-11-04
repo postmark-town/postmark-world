@@ -395,7 +395,7 @@ test("[pin] FALSIFIER — the drawn set is decided by WHO is reading, not by wha
   assert.ok(!/world\?\.marks/.test(residentArm),
     "the resident arm reads the index, never the fold");
   // switching back to a resident refills the index from that resident's read
-  assert.match(code, /byId = residentById\(cachedRead, mineSet\.marks\)/,
+  assert.match(code, /byId = residentById\(cachedRead, mineForSight\(state\.outsider, mineSet\.marks\)\)/,
     "selectActor refills byId from the returning resident's own read");
   // `buildHomeSet` lost its manifest argument when the seeding manifest was
   // deleted (postmark#3025); what this pin protects is unchanged — byId and

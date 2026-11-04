@@ -25,6 +25,7 @@ import { createServer as createNetServer } from "node:net";
 import { createServer } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -116,7 +117,7 @@ before(async () => {
 });
 
 async function readGround(port) {
-  const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+  const page = await machinePage(browser, { viewport: { width: 1400, height: 900 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e.message).slice(0, 160)));
   await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });

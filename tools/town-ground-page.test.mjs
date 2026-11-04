@@ -62,6 +62,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { townRegionMarks, homesOfParcel, markImagePath } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -153,7 +154,7 @@ before(async () => {
  *  question is what the DRAWING CODE does at a zoom, and setting the viewBox
  *  moves the picture without asking it. */
 async function readGround({ zoomToNear = false, stopAtTier = "near", tellingOpen = false } = {}) {
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+  const page = await machinePage(browser, { viewport: { width: 1600, height: 1000 } });
   // ⚑ `tellingOpen` EXISTS BECAUSE A GATE NOBODY CAN SEE IS A GATE NOBODY CAN
   // TEST (2026-09-11). Painting-only is the page's DEFAULT (readPaintingOnly
   // returns true for an unset key), and it already suppresses every `<title>` on
@@ -374,7 +375,7 @@ test("THE CULL IS A CULL — what the camera is over decides what is drawn, and 
     "playwright is absent: the spectator's viewport cull is unguarded on the page. Nothing else in the suite "
     + "drives drawOverlay's drawn set against a moving camera, which is the half a pure bounds test cannot reach.");
 
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+  const page = await machinePage(browser, { viewport: { width: 1600, height: 1000 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.goto(`http://localhost:${rig.port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });
@@ -581,7 +582,7 @@ test("THE HOUSE IS THE TARGET — the card's own edge decides what a hover reach
     "playwright is absent: the drawn-box hit test is unguarded on the page. The ranking is proved in "
     + "viewer-axes, which cannot tell a box that is measured from a box that is measured in the right place.");
 
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+  const page = await machinePage(browser, { viewport: { width: 1600, height: 1000 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   // the Telling open, because painting-only suppresses the hover label and the

@@ -253,10 +253,40 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
   - **Where the wall stands.** `mistsAt(crossing, skeleton.mists)` puts a wall at the map's
     border (`border_m`, pinned config) on a crossing schedule: `front_m` per side (positive
     creeps onto the map, negative pulls back past the edge), `clearings_m` (open ground the
-    wall never takes: Pando Peak's ground and the far south-west), the fringe's `density`
+    wall never takes: Pando Peak's ground, the far south-west, and from crossing 282 the
+    Starforge Spire and the way to it; a clearing with a `from_crossing` stands only from that
+    crossing on, and before it the wall is as it was, so adding one never re-tells a past
+    crossing; WLD-134, Darko 2026-10-30), the fringe's `density`
     (eased in over the schedule), and the `veil` on all light. Before the schedule's first
     crossing it answers null, and every telling is the one it was before the Mists, byte for
     byte (`tools/mists.test.mjs`).
+  - **Withdrawn (WLD-147, Darko 2026-11-02).** The Mists were a season, and the season is over.
+    Darko, 17:06 EST, in chat, RULED: "full removal for mists." (His ask, 16:59 EST: "now that
+    the mists are kind of lingering, we do need to pare back on the ground that they cover. I
+    actually have half an inkling to just remove the mists entirely as they were intended to
+    just be a seasonal thing.") **From the crossing the record names, `skeleton.mists.withdrawn_from`
+    (its one dial in code is `MISTS_WITHDRAWN_FROM` in `tools/mists-record.mjs`), there are no
+    Mists at all:** `mistsAt` answers null, the same null as before the schedule's first
+    crossing, so no wall, no fringe, no veil, no slowed walk, no refusal at the wall and no
+    season line, the clearings go with the wall, and every telling is the one a town with no
+    Mists in its record gives, byte for byte (`tools/mists-withdrawn.test.mjs`). The target is a
+    crossing no reader has yet been told with Mists: crossing N opens at 2026-06-12T00:00Z + N x
+    12 h, and the readers take the record with the next settlement tag.
+    - **No crossing before it is re-told.** The last standing keyframe (crossing 282: front
+      760 m, veil 0.5) is held through the crossing before `withdrawn_from`, and the density
+      keeps its own span (`density.from_crossing` 244 to `to_crossing` 282), so the keyframes the
+      withdrawal adds do not stretch its easing. The Mists stay in the record as history: every
+      earlier crossing is told from them.
+    - **An older engine reads it as no wall.** The schedule's last keyframe, at `withdrawn_from`,
+      pulls the front back past the border by more than the fringe, with no veil, so an engine
+      that does not know `withdrawn_from` also reads no wall and no fringe on the map.
+    - **Superseded by this (2026-11-02, WLD-147), and kept as written:** above, the density
+      "eased in over the schedule" (it eases over its own span now); and in `LOGOS/classes.md`
+      § The creature class, the WLD-142 sentence "The Mists themselves are the skeleton's and
+      stay as they are" (Darko 2026-10-31 23:01 EDT: "keep the mist as is"), marked there. The
+      rest of this section describes the Mists as they stood for every crossing before
+      `withdrawn_from`; the engine's own header (`tools/world-engine.mjs`) says the same of
+      "after the last they hold", which is still true of a record with no `withdrawn_from`.
   - **What the wall hides.** Everything behind it, with no ceiling and no height exemption: a
     sight line is cut wherever it runs through the wall. The fringe on the clear side shortens
     sight like the weather, and a body inside the wall sees `wall_sight_m`. The world's
@@ -321,6 +351,11 @@ same night (W1–W11). A season's mechanics, kept here rather than in LOGOS (the
   `named`: a slug, a place, what it carries, the crossing it comes from). Each is
   spawned ONCE EVER by the-town at its place with `stays: true`: it never fades.
   Its kind file says `finishable: true`, so it never flees either.
+- **Waiting on a door (2026-10-22, carrying out WLD-25/k).** A declaration may name
+  `after_door`, a door's mark id. The creature then comes out at the first
+  settlement whose world shows that door open: its `requires` met as that
+  settlement printed it. The door must count `at: "settlement"`, which the lint
+  holds it to, so the door and the creature open at the same settlement.
 - **Finished by anyone, by any road.** A reaction carrying the effect `finish`,
   or a mechanic that checks its own answer in code, writes one `finish` row: the
   creature, the resident and the resident's act that earned it. Once per resident.

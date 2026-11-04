@@ -12,7 +12,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
-import { residentReadKey, lightsRequest } from "../spectator/viewer.mjs";
+import { residentReadKey, lightsRequest, lensQuery, mineForSight, lensAnswered, readStillWanted, OUTSIDER_LENS } from "../spectator/viewer.mjs";
 
 const source = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
 function body(name) {
@@ -29,7 +29,7 @@ function arrow(name) {
 function fixture() {
   const requests = [];
   const context = vm.createContext({
-    residentReadKey, lightsRequest, requests,
+    residentReadKey, lightsRequest, requests, lensQuery, mineForSight, lensAnswered, readStillWanted, OUTSIDER_LENS,
     fetch: (url) => new Promise((resolve) => { requests.push({ url, answer: (j) => resolve({ ok: true, json: async () => j }) }); }),
     syncs: 0, renders: 0, authHeaders: () => ({}),
     residentById: () => new Map(), loadTownHouses: () => {}, withTownHouses: () => {},

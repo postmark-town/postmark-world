@@ -1,0 +1,107 @@
+{
+  "crossing": 265,
+  "evaluated_at": "2026-10-22T12:00:00.000Z",
+  "grammar": "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+  "creature_count": 7,
+  "creatures": [
+    {
+      "id": "creature:bat-264-1",
+      "kind": "bat",
+      "crossing": 264,
+      "x": 5261,
+      "y": 3487,
+      "spawned_at": "2026-10-22T11:52:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:bat-264-2",
+      "kind": "bat",
+      "crossing": 264,
+      "x": -4131,
+      "y": -318,
+      "spawned_at": "2026-10-22T09:35:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-263-1",
+      "kind": "raven",
+      "crossing": 263,
+      "x": 764,
+      "y": 9279,
+      "spawned_at": "2026-10-21T13:31:00.000Z",
+      "fades_at": "2026-10-22T01:31:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-264-1",
+      "kind": "raven",
+      "crossing": 264,
+      "x": 4126,
+      "y": 9069,
+      "spawned_at": "2026-10-22T11:29:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-264-2",
+      "kind": "raven",
+      "crossing": 264,
+      "x": 1498,
+      "y": -4210,
+      "spawned_at": "2026-10-22T00:52:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:raven-264-3",
+      "kind": "raven",
+      "crossing": 264,
+      "x": -3976,
+      "y": -3213,
+      "spawned_at": "2026-10-22T02:33:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    },
+    {
+      "id": "creature:wolf-264-1",
+      "kind": "wolf",
+      "crossing": 264,
+      "x": 1340,
+      "y": 9140,
+      "spawned_at": "2026-10-22T02:30:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 1,
+        "hunger": 2
+      },
+      "flags": []
+    }
+  ]
+}
