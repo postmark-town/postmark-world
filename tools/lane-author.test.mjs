@@ -196,6 +196,8 @@ test("THE #316 REPLAY, first knock: a two-account house's second account is admi
     ["an unpinned account named like another household's sketchbook", 900000998, "moss-house", /not pinned to any household/],
     ["an ambiguous account (two solo residents; the export bound it to nothing)", 900000401, "inv-dune", /not pinned to any household/],
     ["a pinned author whose login names another household's account sketchbook", 900000101, "inv-fern", /bound to another household/],
+    // T1 (delta review): a pinned author whose login names a KNOWN but unbound account's sketchbook
+    ["a pinned author whose login names an unbound account's sketchbook", 900000101, "inv-dune", /bound to another household/],
   ]) {
     const r = knock(t, { id, login, registry: REAL_EXPORT });
     assert.equal(r.code, 1, `${why}: ${r.out}`);
