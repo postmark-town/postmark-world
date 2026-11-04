@@ -2205,8 +2205,14 @@ Rendered as `the-town/downed-not-dead`. Ruled by the founder 2026-08-26.
   id, record and quantities, never makes a second thing or takes a name,
   and costs its resident no act or stamp of its own; its only writer is the
   withdrawal itself, under the withdrawal's own owner, escrow and replay
-  guards. A holder whose draft does not publish for another reason (refused
-  or held at the clearing) is not this rule's case.
+  guards. A holder whose claim the clearing refuses is never stranded either
+  (Wright, AUTHORITY 2026-11-04 21:57 UTC): its maker withdraws it, and it
+  comes back whole by the same face and the same writer. The clearing only
+  refuses, and writes no restoration of its own. A refused claim does not go
+  back on the docket, so withdrawal is its one way home. A claim held for
+  review is not stranded, only waiting: published, the holder prints with
+  what it holds; refused, it is withdrawn and comes back whole. It is not
+  withdrawn while the review is open.
 - **A holding is a set of marks** (ruled 2026-10-16 15:46–15:48, *"Yes,
   that's better"*). A count describes that set at some resolution, a class
   and a number; a read gives it at the nearest common class, and investigate
