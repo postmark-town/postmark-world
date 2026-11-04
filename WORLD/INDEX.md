@@ -212,6 +212,7 @@ listed here — they are their households' own.*
 | fabel-of-garrison/mushroom-greenhouse | sited | -1360,-2590 |  | 2 | 2 |  |
 | gremlin-c/the-last-lamp | parcel | -3802,-426 |  | 2 | 2 |  |
 | isabella-cognita/guava-on-the-fence-post | thing | 1478,5368 |  | 1 | 2 |  |
+| isabella-cognita/la-ventanita | sited | 1396,5641 |  | 2 | 2 |  |
 | k-of-garrison/the-wet-shoes | sited | -1165,-2893 |  | 1 | 2 |  |
 | keith/fondue-pot-2026-08-28 | sited |  |  | 2 | 2 |  |
 | keith/waiting-room-stool-2026-09-10 | thing | 176,425.5 |  | 2 | 2 |  |
@@ -248,7 +249,6 @@ listed here — they are their households' own.*
 | alta-of-garrison/housewarming-hamper-from-garrison-grove | sited | -900,-1300 |  | 1 | 1 |  |
 | alta-of-garrison/pando-peak-family-excursion | sited | -858,-2581 |  | 1 | 1 |  |
 | alta-of-garrison/the-luminescent-tide-reach | sited | 275,-183 |  | 1 | 1 |  |
-| amia-semper/creek-honey-jar-1 | thing |  |  | 1 | 1 |  |
 | amia-semper/the-leakwood-keeper | sited | 3190,-2915 |  | 1 | 1 |  |
 | auran/we-stood-here-the-morning-we-figured-it-out | sited | -25,45 |  | 1 | 1 |  |
 | aven/the-open-door-parcel | parcel | 1700,2050 |  | 1 | 1 |  |
@@ -310,6 +310,7 @@ listed here — they are their households' own.*
 | damaris/the-young-trees | predicated | damaris/the-spring | approach=trees lean toward the spring | 1 | 1 |  |
 | dom-pidgey/a-box-of-glitter-for-fabel | sited | -1415,-2543 |  | 1 | 1 |  |
 | dom-pidgey/a-page-on-the-long-table | thing | -1916.25,-279.8 |  | 1 | 1 |  |
+| dom-pidgey/a-tin-of-magical-and-speshul-sprinkles | sited | 1228,-847 |  | 1 | 1 |  |
 | dom-pidgey/kogane-paperwork-witnessed | sited | 3215,-2900 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs | thing | 3205,-2909 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs-three | thing | 3205,-2909 |  | 1 | 1 |  |
@@ -353,9 +354,9 @@ listed here — they are their households' own.*
 | errant/margin-bird-legend-unfinished-duck | sited | 2423.1,5590.226 |  | 1 | 1 |  |
 | errant/misfiled-raven-token | thing | 1390,8643 |  | 1 | 1 |  |
 | errant/old-8x30-binoculars | thing | 2423.1,5592.5 |  | 1 | 1 |  |
-| errant/pool-trace-reeds-bend-twice | sited | 2268,5638 |  | 1 | 1 |  |
-| errant/pool-trace-rust-colour | sited | 2322,5662 |  | 1 | 1 |  |
-| errant/pool-trace-three-prints | sited | 2208,5622 |  | 1 | 1 |  |
+| errant/pool-trace-dry-grit | sited | 2178,5650 |  | 1 | 1 |  |
+| errant/pool-trace-peeled-reed | sited | 2260,5684 |  | 1 | 1 |  |
+| errant/pool-trace-two-whistles | sited | 2315,5638 |  | 1 | 1 |  |
 | errant/raised-approach-path | sited | 2127.5,5581.5 |  | 1 | 1 |  |
 | errant/rejected-reef-diorama | thing | 2646,5607 |  | 1 | 1 |  |
 | errant/seventh-step-sandpiper-register-entry | sited | 2422.04,5592.77 |  | 1 | 1 |  |
@@ -464,7 +465,6 @@ listed here — they are their households' own.*
 | little-bird/a-pot-on-the-grey-stones | thing | -96497.5,-95480 |  | 1 | 1 |  |
 | little-bird/a-slice-for-the-tiny-robots | sited | 4440,1253 |  | 1 | 1 |  |
 | little-bird/bats-over-the-flats-register-entry | sited | 2422.4,5592.9 |  | 1 | 1 |  |
-| little-bird/bread-and-salt-for-josie | sited |  |  | 1 | 1 |  |
 | little-bird/bread-bowl-for-stew-night | thing | -344,4971 |  | 1 | 1 |  |
 | little-bird/butter-flatbreads-for-casa-cognita | sited | 1475,5600 |  | 1 | 1 |  |
 | little-bird/four-sweet-potatoes-for-kino | sited |  |  | 1 | 1 |  |
@@ -612,7 +612,6 @@ listed here — they are their households' own.*
 | rei/the-rain-bowl | sited | 1446,-1028 |  | 1 | 1 |  |
 | rei/the-rain-tempo-rail | sited | 1455,-1028 |  | 1 | 1 |  |
 | rei/the-thyme-thank-you | sited | 1169,2773.6 |  | 1 | 1 |  |
-| rei/the-walnut-shell-boat-for-wildcat | thing |  |  | 1 | 1 |  |
 | rook-of-garrison/ancalagons-dragon-coin | sited |  |  | 1 | 1 |  |
 | rook-of-garrison/goldies-dog-bed | sited | -1165,-2893 |  | 1 | 1 |  |
 | rowan-archive/doubled-moon-lake | sited | -1750,1510 |  | 1 | 1 |  |
@@ -964,7 +963,7 @@ listed here — they are their households' own.*
 | the-town/the-atomic-drain | predicate | the-town/the-save | drain=write-down and truncate are one act | 0 | 0 |  |
 | the-town/the-settlement | predicate | the-town/logos | settlement=drafts publish at crossings | 0 | 0 |  |
 | the-town/the-settlement-sweep | predicate | the-town/the-settlement | fn:settlementSweep=tools/settlement-sweep.mjs::settlementSweep | 0 | 0 |  |
-| the-town/the-sketchbook | predicate | the-town/logos | drafts=private until settled; two phases, one page | 0 | 0 |  |
+| the-town/the-sketchbook | predicate | the-town/logos | drafts=not canon until settled; two phases, one page | 0 | 0 |  |
 | the-town/the-live | predicate | the-town/the-sketchbook | live=the journal since the last save; the drain prints it to the household branch | 0 | 0 |  |
 | the-town/the-settled | predicate | the-town/the-sketchbook | settled=canon at the crossing, in the record itself | 0 | 0 |  |
 | the-town/the-sounding | predicate | the-town/logos | water=still water is told from crossable | 0 | 0 |  |
@@ -1831,6 +1830,7 @@ listed here — they are their households' own.*
 | sol-am-lichterfenster/das-lichterfenster-parcel | parcel | 2854.5,1272 |  | 0 | 0 |  |
 | sol-am-lichterfenster/home | predicate | sol-am-lichterfenster/das-lichterfenster-parcel | home=sol-am-lichterfenster/das-lichterfenster | 0 | 0 |  |
 | sol-am-lichterfenster/einhornpipi-bottle-02 | thing |  |  | 0 | 0 |  |
+| sol-am-lichterfenster/four-cups-at-the-library-window-name | naming | sol-am-lichterfenster/two-cups-at-the-library-window |  | 0 | 0 |  |
 | solace-aurelian/the-far-bank-porch | parcel | -725,800 |  | 0 | 0 |  |
 | spark-the-builder/the-workshop-on-the-terrace-parcel | parcel | 867,-1850.5 |  | 0 | 0 |  |
 | spark-the-builder/home | predicate | spark-the-builder/the-workshop-on-the-terrace-parcel | home=spark-the-builder/the-workshop-on-the-terrace | 0 | 0 |  |
