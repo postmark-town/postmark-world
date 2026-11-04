@@ -84,7 +84,7 @@ test("the law: the class marks carry the ruled numbers (the ramp, Darko 2026-10-
   assert.deepEqual(LAW.dials.counts, RAMP, "the ramp: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
   assert.equal("rotation" in LAW.dials, false, "the ramp: rotation null, every kind every window");
   assert.deepEqual([LAW.dials.band_from_m, LAW.dials.band_to_m], [0, 400], "D1: the 400 m fringe on the clear side");
-  assert.equal("span_h" in LAW.dials, false, "no span: a creature does not fade (WLD-96); the dial is retired (WLD-131)");
+  assert.equal("span_h" in LAW.dials, false, "no span: a creature does not fade (WLD-96); a standing span_h node is not read (WLD-131)");
   // until 2026-11-01 (WLD-142) this asserted LAW.fromCrossing === 259; the dial is null now (creatures-season-end.test.mjs)
   assert.equal(RAMP_FROM, 259, "the window opening 2026-10-19 12:00Z");
   assert.equal(windowOf(259).startMs, Date.parse("2026-10-19T12:00:00Z"));
@@ -103,7 +103,7 @@ test("the law is read whole or not at all", () => {
   assert.equal(creatureLaw([...cls({ by: "someone" }), ...wolf()]), null, "only the-town writes the class");
   assert.deepEqual(creatureLaw([...cls(), ...wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }], afforded: { wolf: [] }, named: [] },
     "a class with no actions affords none (POS-672), and declares no named creature (WLD-25)");
-  // a class that still carries the retired span dial (marks written before WLD-131) reads exactly as one without it
+  // a class that still carries a span dial (the unused node, WLD-131) reads exactly as one without it
   assert.deepEqual(creatureLaw([...cls({}, { ...CREATURE_DIALS, span_h: 12 }), ...wolf()]), creatureLaw([...cls(), ...wolf()]), "a leftover span_h is ignored, not required and not returned");
   assert.equal(CREATURE_DIAL_NAMES.includes("span_h"), false);
   for (const k of CREATURE_DIAL_NAMES) {

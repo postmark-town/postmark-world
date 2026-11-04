@@ -1024,7 +1024,8 @@ it flees or its season ends; it is no one's.")
   w44 a creature stands where it spawned and holds nothing: its stalking and
   circling are lines, and fleeing is its only leaving early.
   *SUPERSEDED 2026-10-21 (WLD-96): "each lasts 12 h from that minute (`span_h`)".
-  The `span_h` dial is retired (WLD-131); a spawn row written before WLD-96 keeps
+  The `span_h` node is unused and stands until the town retires it by its own
+  act (WLD-131, WLD-158); nothing reads it. A spawn row written before WLD-96 keeps
   its `fades_at`, and a `faded` withdraw is still honoured, as history.*
   *SUPERSEDED 2026-10-17 13:58 (Darko, WLD-56): one creature a window, the
   kinds in turn, a bat first.* Each kind's `count_per_window` is 1, and the class's
