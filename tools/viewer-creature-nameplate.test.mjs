@@ -196,8 +196,16 @@ test("wiring: the closure is gone, and the one call site passes the looked-up ro
 // not this test's code, and not computed from the code under test at run time. The same route on main 8a2c13d834d6a7d1475367ff6346ff936b90d3df
 // reproduced the 107135-byte digest 94d56a4157be8427e46c0a1854ae319b1aea22cfea64978538491f2b410361a7, and a line diff of the two masked
 // texts is exactly those 7 added lines. CREATURE_CSS and its neighbours are untouched.
-const PINNED_MASKED_STYLE_SHA256 = "d50d860cf701dce6c9dd5eb1bff820d092cd1e345cbece63fcb01bf315323081";
-const PINNED_MASKED_STYLE_BYTES = 107568;
+//
+// RE-PINNED IN POS-779 (World #306, review W1), an INTENDED change to STYLE: the dead rule `.wv-convo.is-aboard` (the class sits on the badge
+// wrapper, so it matched nothing) becomes `.wv-convo-badge.is-aboard .wv-convo`, with a one-line comment: 143 bytes added, nothing else moved.
+// The pin below is sha256 of the masked STYLE that `spectator/viewer.mjs` at 690822c0df87822eaccbe3963e11100df9b6e3cb (blob
+// c442c0bf9f500ddbf37423c8e36780875d6ecad3) emits, 107711 bytes, by the same one-off route (the commit's file written beside symlinks to the
+// real spectator/ and tools/, its own `mountViewer` under a stub DOM, the two foreign interpolations masked, hashed), not this test's code.
+// The same script reproduced both digests above on their commits: 94d56a41… (107135 bytes) on main 8a2c13d8 and d50d860c… (107568 bytes)
+// on c78042ec.
+const PINNED_MASKED_STYLE_SHA256 = "ed771ead2b455be7c4544f78986fc77b4fa9082add90e93128cce45159bd05e1";
+const PINNED_MASKED_STYLE_BYTES = 107711;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";
