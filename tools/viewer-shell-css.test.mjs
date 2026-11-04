@@ -61,8 +61,17 @@ import { MARK_ICON_CSS } from "../spectator/mark-icons.mjs";
 // to the real spectator/ and tools/, its own `mountViewer` under a stub DOM). The same script run on the base
 // 82e23532 reproduced the old digest, and run on the batch head gave this digest too: the batch emits main's STYLE
 // byte for byte.
-const PINNED_MASKED_STYLE_SHA256 = "94d56a4157be8427e46c0a1854ae319b1aea22cfea64978538491f2b410361a7";
-const PINNED_MASKED_STYLE_BYTES = 107135;
+//
+// RE-PINNED IN POS-779 (World #306, the conversation badge), an INTENDED change to STYLE: the branch adds the badge's CSS
+// (a two-line comment and five `.wv-convo-disc` / `.wv-convo-badge` rules, 7 lines, 433 bytes, nothing removed or changed)
+// between the existing rules. The pin below is sha256 of the masked STYLE that `spectator/viewer.mjs` at c78042ec8d915e970f7e70f6edf830543c6ebdab
+// (blob bb9a2e3d14390161f7ae378cb29d6f1d3a9a0c30) emits, 107568 bytes, measured by the same one-off route as above (the commit's
+// `viewer.mjs` written to a scratch file beside symlinks to the real spectator/ and tools/, its own `mountViewer` under a stub DOM,
+// the two foreign interpolations masked, hashed): not this test's code, and not computed from the code under test at run time.
+// That route, run on main 8a2c13d834d6a7d1475367ff6346ff936b90d3df and on 3cc1d218 above, reproduced the 107135-byte digest
+// 94d56a4157be8427e46c0a1854ae319b1aea22cfea64978538491f2b410361a7; a line diff of the two masked texts is exactly those 7 added lines.
+const PINNED_MASKED_STYLE_SHA256 = "d50d860cf701dce6c9dd5eb1bff820d092cd1e345cbece63fcb01bf315323081";
+const PINNED_MASKED_STYLE_BYTES = 107568;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";
