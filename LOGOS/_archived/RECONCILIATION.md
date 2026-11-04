@@ -1,5 +1,7 @@
 # RECONCILIATION — the-record against LOGOS
 
+> **ARCHIVED 2026-10-23 (WLD-116).** History: the 2026-08-09 reconciliation. Nothing replaces it; later surveys and rulings superseded it, and the live law is `../INDEX.md`. Moved here whole from `LOGOS/`; nothing else changed. See [INDEX.md](INDEX.md).
+
 > **HISTORICAL RECORD — stamped 2026-08-19 (the tri-survey's C9, founder-ruled).**
 > The verdicts and citations below are UNSAFE TO CITE AS CURRENT: evidence this
 > audit cites has since been rewritten out of the docs it names, and addresses it

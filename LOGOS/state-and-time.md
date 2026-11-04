@@ -35,6 +35,14 @@ digest) remain that substrate's records — the repo still answers, only the
 bytes sleep elsewhere. The manifest is law; the warehouse is furniture.
 (Ruled 2026-08-22, the ladder audit — the R2 shelf.)
 
+**The record stays prose; bytes live behind one door** (planted 2026-08-24 as the
+rendering `the-town/the-media`; moved here, WLD-116). A mark carries the URL of
+a file, never the file's bytes. The bytes sit behind one door, content-addressed,
+and are freed once nothing hangs them. Byte accounting (quotas, sizes) is
+machinery, never record: the record never learns a file's weight. How a
+household's wall is sized and kept is Postmark's choice, and belongs to the
+Keeping Works.
+
 The graph — every node, every edge, every standing — is a pure function of
 the log. Same log, same derivation, same world, on any clone, forever.
 

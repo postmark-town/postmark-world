@@ -13,13 +13,14 @@ only how it stands — sited, predicated, parcel, naming or `class` — and is a
 different word for a different thing (WORLD/marks/SCHEMA.md)." The records,
 the mark lint and SCHEMA.md keep that filing until the owed data change
 (WLD-73 part 2).* This document was `LOGOS/kinds.md`;
-that path stays for a season as a pointer here, so its older mentions still
-resolve.
+that path now stands as a pointer in `LOGOS/_archived/`, so its older mentions
+still resolve.
 
 The marks that render this document — `the-town/the-standing-question`,
-`the-town/the-fading` and `the-town/the-human-lane` — still cite it at its old
-path, and their rendering is declared there (LOGOS/kinds.md), where the lint
-reads it; their records are not rewritten for a rename.
+`the-town/the-fading` and `the-town/the-human-lane` — cite that archived
+pointer (`LOGOS/_archived/kinds.md`), where their rendering is declared and the
+lint reads it; their `source:` lines were repointed there when the file was
+archived (WLD-116), and nothing else in their records changed.
 (The three-kinds rendering predated the third supersession and said the retired
 storage binding; removed by the seed act, 2026-08-13 — re-render piecewise.)
 
@@ -59,6 +60,19 @@ mark, a terrain feature, or **an entity**, a living node with no mark of its own
 named `<class>:<id>` (today `resident:<handle>`). The entity's household is its
 author by default; the predicate takes the entity's locus, carries no geometry
 and is never drawn; it is canon live, since only that household writes on it. [classes.md](classes.md) § Predicates on an entity.*
+
+*Amended 2026-10-23 (WLD-116, Darko): the node has three branches. A **mark**
+is a positioned claim, and a predicate is a mark that describes another. A
+**post** is an ask, which is *want* ([classes.md](classes.md) § Posts). A **law
+node** is a rule, which is *what is*: a class, a property, an invariant. A law
+node is not positioned, is not a mark, and has no body-length cap; a proposed
+class or amendment is a post whose ruling writes it ([classes.md](classes.md)
+§ The law node).*
+
+*A predicate is its parent continued (ruled 2026-08-02; moved here from the
+rendering `the-town/the-continuation`, WLD-116): it inherits its parent's
+extent whole, depth adds specificity and never location, and its own children
+can only be predicates. `WORLD/marks/SCHEMA.md` has the on-disk form.*
 
 What is *not* a property, and therefore not a predicate (*read from
 2026-10-16: neither a property nor a predicate*):
