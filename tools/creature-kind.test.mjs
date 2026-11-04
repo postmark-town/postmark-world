@@ -32,7 +32,7 @@ test("a kind file reads whole: its fields, moods with their levels, flags and re
   const k = parseKind(FIXTURE);
   assert.equal(k.kind, "test-beast");
   assert.equal(k.ring_m, 50);
-  assert.equal(k.span_h, undefined, "the span is the class's dial, not the kind's");
+  assert.equal(k.span_h, undefined, "a kind carries no span: a creature does not fade");
   assert.equal(k.what, "A fixture for the reader's tests. Two lines of it.");
   assert.deepEqual(k.moods.fear, { lo: 0, hi: 3, start: 1, levels: ["calm", "uneasy", "frightened", "terrified"] });
   assert.deepEqual(k.moods.curiosity, { lo: 0, hi: 3, start: 2, levels: ["elsewhere", "aware", "interested", "rapt"] });
@@ -116,7 +116,7 @@ test("a flag may carry an Object.prototype name, and it holds only once set", ()
   }
 });
 
-test("the span is not the kind's: a kind file with span_h is refused", () => {
+test("a kind file has no span: one with span_h is refused", () => {
   assert.throws(() => parseKind(FIXTURE.replace("ring_m: 50\n", "ring_m: 50\nspan_h: 12\n")), /line 10: cannot read "span_h: 12"/);
 });
 

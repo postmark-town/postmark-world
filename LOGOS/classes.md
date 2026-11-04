@@ -923,7 +923,7 @@ the first class to write its canon down, `canon: live` — the first live
 create edge, which is what sets an entity apart from a mark. The three kinds
 of the season are its subclasses, `wolf`, `raven` and `bat`, each a class
 whose law is its kind file (`WORLD/kinds/<kind>.kind`, read by
-`tools/creature-kind.mjs`): its moods, its awareness ring, its span, the
+`tools/creature-kind.mjs`): its moods, its awareness ring, the
 reactions its `when` allows, and the line each one leaves. The class's words,
 and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
 
@@ -931,9 +931,13 @@ and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
 > near it in its own way, and goes back: it fades, or it flees; it belongs to
 > no one.
 
-(The class mark's body says the same within the 150-character cap, with
-two cuts: "lives half a day" (superseded, WLD-96: a creature does not fade)
-and "it is no one's".)
+*SUPERSEDED in part (WLD-96, ruled 2026-10-21 19:39 and 19:41): a creature does
+not fade, so "lives half a day" and "it fades" no longer hold. It goes back when
+it flees or its season ends. What stands is the rest: it answers what is done
+near it in its own way, and it belongs to no one.*
+
+(The class mark's body says that within the 150-character cap: "…goes back when
+it flees or its season ends; it is no one's.")
 
 | a creature's act | family | canon |
 |---|---|---|
@@ -1015,10 +1019,13 @@ and "it is no one's".)
   never in a clearing, never on or within 440 m of the town's ground (the
   class's `band_from_m`, `band_to_m` and `keep_m` dials). Each window brings a
   wolf 2, a raven 4 and a bat 3 (each kind's `count_per_window`), each at its
-  own seeded minute, and each lasts 12 h from that minute (`span_h`), so the
-  creatures overlap across a crossing rather than turning over at once. In
+  own seeded minute. A creature does not fade: it stays until it flees or its
+  season ends (above), so the creatures of one window overlap the next's. In
   w44 a creature stands where it spawned and holds nothing: its stalking and
   circling are lines, and fleeing is its only leaving early.
+  *SUPERSEDED 2026-10-21 (WLD-96): "each lasts 12 h from that minute (`span_h`)".
+  The `span_h` dial is retired (WLD-131); a spawn row written before WLD-96 keeps
+  its `fades_at`, and a `faded` withdraw is still honoured, as history.*
   *SUPERSEDED 2026-10-17 13:58 (Darko, WLD-56): one creature a window, the
   kinds in turn, a bat first.* Each kind's `count_per_window` is 1, and the class's
   `rotation` dial names the kinds in turn, `bat raven wolf`: window

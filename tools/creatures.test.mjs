@@ -19,8 +19,8 @@ import { mistsKeepRects, keptByTheTown, standsInTheWall } from "./mists-keep.mjs
 import { loadMarks } from "./marks-fold.mjs";
 import { pointInPolygon } from "./geometry.mjs";
 import {
-  creatureLaw, countsFor, CREATURE_DIAL_NAMES, TOWN, TOWN_WATERS, townWaterRings, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
-  scheduleFor, dueSpawns, auditWindow, creaturesAt, creaturesWritten, dueFades, creaturesSnapshot,
+  creatureLaw, countsFor, CREATURE_DIAL_NAMES, DESPAWN_REASONS, TOWN, TOWN_WATERS, townWaterRings, secretFor, commitmentOf, windowOf, creatureId, isCreatureId, creaturesOn,
+  scheduleFor, dueSpawns, auditWindow, creaturesWritten, creaturesSnapshot,
 } from "./creatures.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -84,7 +84,7 @@ test("the law: the class marks carry the ruled numbers (the ramp, Darko 2026-10-
   assert.deepEqual(LAW.dials.counts, RAMP, "the ramp: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
   assert.equal("rotation" in LAW.dials, false, "the ramp: rotation null, every kind every window");
   assert.deepEqual([LAW.dials.band_from_m, LAW.dials.band_to_m], [0, 400], "D1: the 400 m fringe on the clear side");
-  assert.equal(LAW.dials.span_h, 12, "a creature lasts 12 h from its own spawn");
+  assert.equal("span_h" in LAW.dials, false, "no span: a creature does not fade (WLD-96); the dial is retired (WLD-131)");
   // until 2026-11-01 (WLD-142) this asserted LAW.fromCrossing === 259; the dial is null now (creatures-season-end.test.mjs)
   assert.equal(RAMP_FROM, 259, "the window opening 2026-10-19 12:00Z");
   assert.equal(windowOf(259).startMs, Date.parse("2026-10-19T12:00:00Z"));
@@ -96,13 +96,16 @@ test("the law is read whole or not at all", () => {
   // the loader hands over: a record with its parent
   const props = (id, dials) => Object.entries(dials).map(([name, v]) =>
     ({ id: `${id}-${name}`, kind: "property", by: TOWN, tier: "constitution", parent: id, name, default: v === null ? "null" : v }));
-  const CREATURE_DIALS = { from_crossing: 270, rotation: null, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 };
+  const CREATURE_DIALS = { from_crossing: 270, rotation: null, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150 };
   const cls = (over = {}, dials = CREATURE_DIALS) => [{ id: "the-town/creature", kind: "class", by: TOWN, class: "creature", ...over }, ...props("the-town/creature", dials)];
   const wolf = (over = {}, dials = { count_per_window: 2 }) => [{ id: "the-town/wolf", kind: "class", by: TOWN, class: "wolf", extends: "creature", kind_file: "WORLD/kinds/wolf.kind", ...over }, ...props("the-town/wolf", dials)];
   assert.equal(creatureLaw([]), null, "no class, no creatures");
   assert.equal(creatureLaw([...cls({ by: "someone" }), ...wolf()]), null, "only the-town writes the class");
-  assert.deepEqual(creatureLaw([...cls(), ...wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }], afforded: { wolf: [] }, named: [] },
+  assert.deepEqual(creatureLaw([...cls(), ...wolf()]), { fromCrossing: 270, dials: { counts: { wolf: 2 }, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150 }, kinds: [{ kind: "wolf", kind_file: "WORLD/kinds/wolf.kind" }], afforded: { wolf: [] }, named: [] },
     "a class with no actions affords none (POS-672), and declares no named creature (WLD-25)");
+  // a class that still carries the retired span dial (marks written before WLD-131) reads exactly as one without it
+  assert.deepEqual(creatureLaw([...cls({}, { ...CREATURE_DIALS, span_h: 12 }), ...wolf()]), creatureLaw([...cls(), ...wolf()]), "a leftover span_h is ignored, not required and not returned");
+  assert.equal(CREATURE_DIAL_NAMES.includes("span_h"), false);
   for (const k of CREATURE_DIAL_NAMES) {
     const { [k]: _, ...rest } = CREATURE_DIALS;
     assert.throws(() => creatureLaw([...cls({}, rest), ...wolf()]), new RegExp(`${k} dial`), `a class missing ${k} is refused`);
@@ -132,7 +135,7 @@ test("the schedule: the law's counts, every one placed in the band, off the town
       assertOnlyFoggedMarksNear(s, N, INPUTS.dials);
       assert.ok(m.clearings.every((k) => Math.hypot(s.x - k.x, s.y - k.y) > k.r), `${s.id} is in no clearing`);
       assert.ok(s.at_ms >= startMs && s.at_ms < endMs && s.at_ms % 60000 === 0, `${s.id} spawns at a minute in its window`);
-      assert.equal(Date.parse(s.fades_at) - s.at_ms, 12 * 3600 * 1000, `${s.id} lives 12 h`);
+      assert.equal("fades_at" in s, false, `${s.id}: the schedule computes no fade`);
       assert.equal(s.id, creatureId(s.kind, N, s.index));
       for (const o of sched.spawns) if (o !== s) assert.ok(Math.hypot(o.x - s.x, o.y - s.y) >= FULL.apart_m, `${s.id} and ${o.id} stand apart`);
     }
@@ -238,7 +241,7 @@ test("the ramp holds the same ground rules (Darko 2026-10-19 20:05): on land, of
   const N = 259, secret = secretFor(MASTER, N), sched = scheduleFor(N, secret, STANDING), { endMs } = windowOf(N);
   const acts = [
     { actor: TOWN, action: "seed", object: `window-${N}`, at: t(windowOf(N).startMs), payload: { crossing: N, world_sha: SHA, commitment: commitmentOf(secret, SHA) } },
-    ...sched.spawns.map((s) => ({ actor: TOWN, action: "spawn", object: s.id, at: s.at, payload: { kind: s.kind, crossing: N, x: s.x, y: s.y, at: s.at, fades_at: s.fades_at } })),
+    ...sched.spawns.map((s) => ({ actor: TOWN, action: "spawn", object: s.id, at: s.at, payload: { kind: s.kind, crossing: N, x: s.x, y: s.y, at: s.at } })),
     { actor: TOWN, action: "reveal", object: `window-${N}`, at: t(endMs), payload: { crossing: N, secret } },
   ];
   assert.equal(sched.spawns.length, RAMP_N);
@@ -253,7 +256,7 @@ test("the rotation dial is read whole: text naming the class's own kinds in turn
   const props = (id, dials) => Object.entries(dials).map(([name, v]) =>
     ({ id: `${id}-${name}`, kind: "property", by: TOWN, tier: "constitution", parent: id, name, default: v === null ? "null" : v }));
   const cls = (rotation) => [{ id: "the-town/creature", kind: "class", by: TOWN, class: "creature" },
-    ...props("the-town/creature", { from_crossing: 270, rotation, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150, span_h: 12 })];
+    ...props("the-town/creature", { from_crossing: 270, rotation, band_from_m: 0, band_to_m: 400, keep_m: 440, apart_m: 150 })];
   const kind = (k) => [{ id: `the-town/${k}`, kind: "class", by: TOWN, class: k, extends: "creature", kind_file: `WORLD/kinds/${k}.kind` },
     ...props(`the-town/${k}`, { count_per_window: 1 })];
   const law = (rotation, ...ks) => creatureLaw([...cls(rotation), ...ks.flatMap(kind)]);
@@ -287,12 +290,14 @@ test("hidden until each spawn: the tick is told only what is due", () => {
 
 // The window's log as the tick writes it: every row dated when it is written,
 // `lateMs` after the instant it stands for, with the schedule in its payload.
-function windowLog(N, { lateMs = 0, tamper = null } = {}) {
+// A spawn row written BEFORE WLD-96 carried the span's end: invented history, spelled here (twelve hours after the scheduled minute).
+const historicFadesAt = (s) => new Date(s.at_ms + 12 * 3600 * 1000).toISOString();
+function windowLog(N, { lateMs = 0, tamper = null, historic = false } = {}) {
   const secret = secretFor(MASTER, N), sched = scheduleFor(N, secret, INPUTS), { startMs, endMs } = windowOf(N);
   const w = (ms) => t(ms + lateMs);
   const acts = [{ at: w(startMs), actor: TOWN, action: "seed", object: null, payload: { crossing: N, world_sha: SHA, commitment: commitmentOf(secret, SHA) } }];
   for (const s of sched.spawns) acts.push({ at: w(s.at_ms), actor: TOWN, action: "spawn", object: s.id,
-    payload: { crossing: N, kind: s.kind, at: s.at, x: s.x, y: s.y, fades_at: s.fades_at, moods: { fear: 1, curiosity: 1 }, flags: [] } });
+    payload: { crossing: N, kind: s.kind, at: s.at, x: s.x, y: s.y, ...(historic ? { fades_at: historicFadesAt(s) } : {}), moods: { fear: 1, curiosity: 1 }, flags: [] } });
   acts.push({ at: w(endMs), actor: TOWN, action: "reveal", object: null, payload: { crossing: N, secret } });
   if (tamper) tamper(acts);
   return { acts, sched, secret };
@@ -331,7 +336,7 @@ test("the seed pins the window to a world sha, and the audit refuses inputs read
   assert.deepEqual(unpinned.problems, ["crossing 270: the seed names no world sha"]);
 });
 
-test("the fold: spawned, revised by its own acts, gone by `fled` at once or `faded` at 12 h, written or not", () => {
+test("the fold: spawned, revised by its own acts, gone only by a lawful withdraw (fled at once); nothing expires it by the clock", () => {
   const { acts, sched } = windowLog(270, { lateMs: 15000 });
   const [a, b, c] = sched.spawns;
   const later = [
@@ -342,29 +347,44 @@ test("the fold: spawned, revised by its own acts, gone by `fled` at once or `fad
     { at: t(b.at_ms + 90000), actor: "kogane", action: "say", object: null, payload: { text: "hello" } },   // a resident's act is not the creature's
   ];
   const all = [...acts, ...later];
-  const at = (ms) => creaturesAt(null, all, ms);
+  const at = (ms) => creaturesWritten(null, all, ms);
   assert.equal(at(a.at_ms + 14999).has(a.id), false, "not before its row is written");
-  assert.deepEqual(at(a.at_ms + 15000).get(a.id), { id: a.id, kind: a.kind, crossing: 270, x: a.x, y: a.y, spawned_at: a.at, fades_at: a.fades_at, moods: { fear: 1, curiosity: 1 }, flags: [] },
-    "spawned_at is the scheduled minute, not the write");
+  assert.deepEqual(at(a.at_ms + 15000).get(a.id), { id: a.id, kind: a.kind, crossing: 270, x: a.x, y: a.y, spawned_at: a.at, fades_at: undefined, moods: { fear: 1, curiosity: 1 }, flags: [] },
+    "spawned_at is the scheduled minute, not the write; no fade is recorded for a current creature");
   const bLive = at(b.at_ms + 120000).get(b.id);
   assert.deepEqual([bLive.moods, bLive.flags], [{ fear: 2, curiosity: 1 }, ["startled"]], "its own `react` row revises it; any other action of its folds nothing");
   assert.equal(at(c.at_ms + 119999).has(c.id), true);
   assert.equal(at(c.at_ms + 120000).has(c.id), false, "fled: gone at once");
-  assert.equal(at(Date.parse(a.fades_at) - 1).has(a.id), true);
-  assert.equal(at(Date.parse(a.fades_at)).has(a.id), false, "faded at 12 h, before the tick writes it");
-  const due = dueFades(null, all, Date.parse(a.fades_at));
-  assert.ok(due.some((f) => f.id === a.id && f.reason === "faded" && f.fades_at === a.fades_at), "the tick is told to write the fade, with the span's end for its payload");
-  assert.ok(!due.some((f) => f.id === c.id), "a fled creature never fades");
-  const written = [...all, { at: t(Date.parse(a.fades_at) + 25000), actor: TOWN, action: "withdraw", object: a.id, payload: { reason: "faded", fades_at: a.fades_at } }];
-  assert.ok(dueFades(null, written, Date.parse(a.fades_at) + 24999).some((f) => f.id === a.id), "due until its row is written");
-  assert.ok(!dueFades(null, written, Date.parse(a.fades_at) + 25000).some((f) => f.id === a.id), "a written fade is not due again");
+  // THE RULE, through the real fold: a current creature does not disappear after twelve hours, or at any later time
+  const twelveH = 12 * 3600 * 1000;
+  for (const afterMs of [twelveH - 1, twelveH, twelveH + 1, 13 * 3600e3, 40 * 3600e3, 30 * 24 * 3600e3])
+    assert.equal(at(a.at_ms + afterMs).has(a.id), true, `${a.id} is still here ${afterMs / 3600e3} h after its spawn`);
+});
+
+test("history: a spawn row written before WLD-96 passes its fades_at through as recorded and is not cut by it; its own explicit `faded` withdraw still ends it, at the row's own time", () => {
+  const { acts, sched } = windowLog(270, { lateMs: 15000, historic: true });
+  const [a, b] = sched.spawns;
+  const recorded = historicFadesAt(a);
+  const before = creaturesWritten(null, acts, a.at_ms + 15000).get(a.id);
+  assert.equal(before.fades_at, recorded, "the recorded value rides through untouched");
+  assert.equal(creaturesWritten(null, acts, Date.parse(recorded) + 1).has(a.id), true, "it is a recorded fact, not a deadline: no withdraw is written, so the fold keeps it");
+  // the explicit historic withdraw, written by the tick 25 s after the span's end
+  const wd = { at: t(Date.parse(recorded) + 25000), actor: TOWN, action: "withdraw", object: a.id, payload: { reason: "faded", fades_at: recorded } };
+  assert.equal(creaturesWritten(null, [...acts, wd], Date.parse(recorded) + 24999).has(a.id), true, "until its row is written");
+  assert.equal(creaturesWritten(null, [...acts, wd], Date.parse(recorded) + 25000).has(a.id), false, "and gone at the row's own write time");
+  assert.equal(creaturesWritten(null, [...acts, wd], Date.parse(recorded) + 25000).has(b.id), true, "another creature is not touched by it");
+  assert.ok(DESPAWN_REASONS.includes("faded"), "`faded` stays a reason the record honours");
+  // lawful only: a resident's, a stranger creature's, and a creature's own 'ended' are not the record's (WLD-25)
+  const asBy = (actor, reason) => creaturesWritten(null, [...acts, { ...wd, actor, payload: { reason } }], Date.parse(recorded) + 25000).has(a.id);
+  assert.equal(asBy("some-resident", "faded"), true, "a resident's faded withdraw is not the record's");
+  assert.equal(asBy(b.id, "faded"), true, "another creature cannot fade it");
 });
 
 test("a reaction row's state: moods only from a plain object, flags sorted on the live read as in the photograph", () => {
   const { acts, sched } = windowLog(270);
   const a = sched.spawns[0], now = a.at_ms + 3600e3;
   const react = (payload, dt) => ({ at: t(a.at_ms + dt), actor: a.id, action: "react", object: `act-${dt}`, payload });
-  const live = (rows) => creaturesAt(null, [...acts, ...rows], now).get(a.id);
+  const live = (rows) => creaturesWritten(null, [...acts, ...rows], now).get(a.id);
   assert.deepEqual(live([react({ moods_after: { fear: 2 } }, 60000), react({ moods_after: [3, 3] }, 61000)]).moods, { fear: 2 }, "an array is no state: the last plain one holds");
   assert.deepEqual(live([react({ moods_after: { fear: 2 } }, 60000), react({ moods_after: new Date(0) }, 61000)]).moods, { fear: 2 }, "nor a date");
   assert.deepEqual(live([react({ flags_after: ["startled", "fed"] }, 60000)]).flags, ["fed", "startled"], "sorted on the live read");
@@ -376,26 +396,31 @@ test("only the-town or the creature itself withdraws it, and only for a lawful r
   const { acts, sched } = windowLog(270);
   const a = sched.spawns[0], now = a.at_ms + 3600e3;
   const rows = (w) => [...acts, { at: t(a.at_ms + 60000), object: a.id, action: "withdraw", ...w }];
-  assert.equal(creaturesAt(null, rows({ actor: "some-resident", payload: { reason: "fled" } }), now).has(a.id), true, "a resident's withdraw is not the record's");
-  assert.equal(creaturesAt(null, rows({ actor: TOWN, payload: { reason: "because" } }), now).has(a.id), true, "a reason outside DESPAWN_REASONS is not the record's");
-  assert.equal(creaturesAt(null, rows({ actor: TOWN, payload: {} }), now).has(a.id), true, "no reason is not a reason");
-  assert.equal(creaturesAt(null, rows({ actor: sched.spawns[1].id, payload: { reason: "fled" } }), now).has(a.id), true, "another creature cannot withdraw it");
-  assert.equal(creaturesAt(null, rows({ actor: a.id, payload: { reason: "fled" } }), now).has(a.id), false, "it may flee by its own act");
-  assert.equal(creaturesAt(null, rows({ actor: TOWN, payload: { reason: "faded" } }), now).has(a.id), false);
+  assert.equal(creaturesWritten(null, rows({ actor: "some-resident", payload: { reason: "fled" } }), now).has(a.id), true, "a resident's withdraw is not the record's");
+  assert.equal(creaturesWritten(null, rows({ actor: TOWN, payload: { reason: "because" } }), now).has(a.id), true, "a reason outside DESPAWN_REASONS is not the record's");
+  assert.equal(creaturesWritten(null, rows({ actor: TOWN, payload: {} }), now).has(a.id), true, "no reason is not a reason");
+  assert.equal(creaturesWritten(null, rows({ actor: sched.spawns[1].id, payload: { reason: "fled" } }), now).has(a.id), true, "another creature cannot withdraw it");
+  assert.equal(creaturesWritten(null, rows({ actor: a.id, payload: { reason: "fled" } }), now).has(a.id), false, "it may flee by its own act");
+  assert.equal(creaturesWritten(null, rows({ actor: TOWN, payload: { reason: "faded" } }), now).has(a.id), false);
 });
 
-test("the save photographs the written fold: a fade not yet written stays in it, stays due, and folds once written", () => {
-  // the review's probe: a fade 10 s before a save, with the tick not yet run
-  const N = 270, { acts, sched } = windowLog(N);
-  const first = sched.spawns[0];
-  const saveMs = Date.parse(first.fades_at) + 10000;
+test("the save photographs the written fold: a creature leaves it only by a withdraw, and a historic fades_at rides through the photograph untouched", () => {
+  const N = 270, { acts, sched } = windowLog(N, { historic: true });
+  const first = sched.spawns[0], recorded = historicFadesAt(first);
+  const saveMs = Date.parse(recorded) + 10000;   // ten seconds past the recorded span's end, with no withdraw written
   const snap = JSON.parse(JSON.stringify(creaturesSnapshot(N + 1, saveMs, null, acts)));
-  assert.ok(snap.creatures.some((c) => c.id === first.id), "in the photograph: spawned and not yet withdrawn");
-  assert.equal(creaturesAt(snap, [], saveMs).has(first.id), false, "but no read sees it: its span is over");
-  assert.ok(dueFades(snap, [], saveMs + 20000).some((f) => f.id === first.id), "and its fade is still due after the save");
-  const fade = { at: t(saveMs + 20000), actor: TOWN, action: "withdraw", object: first.id, payload: { reason: "faded", fades_at: first.fades_at } };
-  assert.ok(!dueFades(snap, [fade], saveMs + 20000).some((f) => f.id === first.id), "the fade written after the save folds");
-  assert.equal(creaturesWritten(snap, [fade], saveMs + 20000).has(first.id), false);
+  const row = snap.creatures.find((c) => c.id === first.id);
+  assert.ok(row, "in the photograph: spawned and not yet withdrawn");
+  assert.equal(row.fades_at, recorded, "the recorded value is saved as it was recorded");
+  assert.equal(creaturesWritten(snap, [], saveMs).has(first.id), true, "and the fold over the photograph still has it: nothing expires it");
+  assert.equal(creaturesWritten(snap, [], saveMs + 30 * 24 * 3600e3).has(first.id), true, "a month on, still");
+  const fade = { at: t(saveMs + 20000), actor: TOWN, action: "withdraw", object: first.id, payload: { reason: "faded", fades_at: recorded } };
+  assert.equal(creaturesWritten(snap, [fade], saveMs + 19999).has(first.id), true, "a historic withdraw written after the save is not yet folded before its time");
+  assert.equal(creaturesWritten(snap, [fade], saveMs + 20000).has(first.id), false, "and folds, at its own time, over the kept snapshot");
+  // a withdraw already inside the snapshot's span leaves the photograph and is never replayed
+  const later = JSON.parse(JSON.stringify(creaturesSnapshot(N + 2, saveMs + 20000, snap, [fade])));
+  assert.equal(later.creatures.some((c) => c.id === first.id), false, "the next photograph no longer carries it");
+  assert.equal(later.creatures.some((c) => c.id === sched.spawns[1].id), true, "and keeps the others");
 });
 
 test("snapshot parity: a chain of saves plus the rows since folds to the same creatures as the whole log", () => {
@@ -403,10 +428,10 @@ test("snapshot parity: a chain of saves plus the rows since folds to the same cr
   const b = sched.spawns[1];
   const revise = { at: t(b.at_ms + 60000), actor: b.id, action: "react", object: "act-1", payload: { reaction: "snarl", moods_after: { fear: 3, curiosity: 0 }, flags_after: [] } };
   const base = [...a270, revise, ...windowLog(271, { lateMs: 12000 }).acts, ...windowLog(272, { lateMs: 12000 }).acts];
-  // the tick writes each fade 25 s after it falls
-  const fades = [...creaturesWritten(null, base, Infinity).values()]
-    .map((c) => ({ at: t(Date.parse(c.fades_at) + 25000), actor: TOWN, action: "withdraw", object: c.id, payload: { reason: "faded", fades_at: c.fades_at } }));
-  const all = [...base, ...fades];
+  // windows 270 and 271's creatures flee, written 25 s after their spawn minute + 5 h; 272's stay
+  const flees = [...creaturesWritten(null, base, Infinity).values()].filter((c) => c.crossing !== 272)
+    .map((c) => ({ at: t(Date.parse(c.spawned_at) + 5 * 3600e3 + 25000), actor: TOWN, action: "withdraw", object: c.id, payload: { reason: "fled" } }));
+  const all = [...base, ...flees];
   let saved = null;
   for (const N of [271, 272, 273]) {
     const boundary = windowOf(N).startMs;
@@ -416,11 +441,11 @@ test("snapshot parity: a chain of saves plus the rows since folds to the same cr
     assert.ok(snap.creatures.every((c) => !("memory" in c)), "no memory is saved");
     assert.deepEqual(snap, JSON.parse(JSON.stringify(creaturesSnapshot(N, boundary, null, all))), `the chained save at ${N} equals the whole-log save`);
     for (const ms of [boundary + 1, boundary + 6 * 3600e3]) {
-      assert.deepEqual([...creaturesAt(snap, since(snap), ms).keys()].sort(), [...creaturesAt(null, all, ms).keys()].sort(), `the same creatures at ${t(ms)}`);
+      assert.deepEqual([...creaturesWritten(snap, since(snap), ms).keys()].sort(), [...creaturesWritten(null, all, ms).keys()].sort(), `the same creatures at ${t(ms)}`);
     }
     saved = snap;
   }
-  assert.ok(saved.creatures.every((c) => c.crossing === 272), "270's and 271's have all faded and been written by 273");
+  assert.ok(saved.creatures.length > 0 && saved.creatures.every((c) => c.crossing === 272), "270's and 271's have fled and been written by 273; 272's are still here: nothing expired them");
 });
 
 test("ids: the creature: prefix keeps them out of the handle namespace", () => {

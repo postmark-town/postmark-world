@@ -35,7 +35,7 @@ test("the creature class: a living node, live canon, its ways to leave (ended on
   assert.equal(dial("creature", "rotation"), null, "the ramp: no rotation, every kind every window (Darko 2026-10-19 20:05)");
   assert.deepEqual(Object.fromEntries(KINDS.map((k) => [k, dial(k, "count_per_window")])), { wolf: 1, raven: 3, bat: 2 },
     "the ramp's counts: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
-  assert.equal(dial("creature", "span_h"), 12, "a creature lasts 12 h (ruled), the span's one home");
+  assert.equal(dial("creature", "span_h"), undefined, "no span dial: a creature does not fade (WLD-96), and the dial is retired (WLD-131)");
 });
 
 test("the three kinds: each a class extending creature, whose kind file is its law and names it", () => {

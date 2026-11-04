@@ -79,8 +79,8 @@
 //
 // A `#` after a space ends a line's comment, except on a reaction line, which may
 // not carry one (it would cut what the reaction says); no line is longer than
-// MAX_LINE. How long a creature lives is not here: it is the creature class's
-// `span_h` dial, its one home (ruled: twelve hours for every kind, § 7).
+// MAX_LINE. How long a creature lives is not here either: a creature does not fade (WLD-96);
+// it leaves by fleeing or when its season ends.
 //
 // A FINISHABLE KIND (an encounter: Darko 2026-10-20 22:47 and 2026-10-21 08:34).
 // Some creatures are not decorations: they are encountered, and either road
