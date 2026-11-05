@@ -86,6 +86,14 @@ const READ = {
   actions: [{ action: "say", blurb: "Speak where you stand.", from: "the-town/resident", class: "resident", grant: "yours", fields: { text: "string" }, dispatches_to: "world_say" }],
   telling: "The rig's yard is quiet.",
 };
+// lineages the office never sends (its entries carry a string `class`); each must stay NO ANSWER on the page (R1 FIX3)
+const BAD_LINEAGES = {
+  classless: [{}],                               // an entry with no class at all
+  "null-entry": [null],
+  "non-string": [{ class: 5 }],
+  "empty-token": [{ class: "  " }],
+  "partial": [{ class: "sited" }, {}, { class: "mark" }],   // one good entry beside a bad one is not a partial fact
+};
 // the office's word on a kind: how the page learns a bowl is a thing (its own lineage source, thingClasses)
 const EXPLAIN = {
   "halloween-candy-bowl": { explains: "halloween-candy-bowl", class: "the-town/halloween-candy-bowl", what: "A Halloween Candy Bowl is a thing that holds.",
@@ -123,6 +131,10 @@ async function bootStubOffice() {
         const answer = () => {
           if (failing.get(kind) === "500") { res.writeHead(500, { "content-type": "application/json" }); return res.end("{}"); }
           if (failing.get(kind) === "malformed") return send({ explains: kind, what: "no lineage in this reply" });
+          // a lineage whose entries break the office's contract (class-read.mjs: each entry's `class` is a string): no answer
+          if (BAD_LINEAGES[failing.get(kind)]) return send({ explains: kind, what: "a lineage that is not one", extends: BAD_LINEAGES[failing.get(kind)] });
+          // a VALID empty lineage (a root class) is an answer: no thing
+          if (failing.get(kind) === "root") return send({ explains: kind, what: "a class with no ancestors", extends: [] });
           return send(EXPLAIN[kind] ?? { error: "bounce", defect: "no class by that name" });
         };
         const gate = gates.get(kind);
@@ -326,7 +338,7 @@ test("R1 · THE NAMED EXCEPTION: an unentered ROOM whose class is unanswered is 
   } finally { office.reset(); await page.close(); }
 });
 
-for (const how of ["500", "malformed"]) {
+for (const how of ["500", "malformed", ...Object.keys(BAD_LINEAGES)]) {
   test(`R1 · A FAILED CLASS REPLY (${how}) stays silent for the page session, asks once, and a reload with an accepted reply resolves it`, async (t) => {
     if (!chromium) return t.skip(skipReason);
     arm = "unentered"; office.reset(); office.asked.length = 0;
@@ -354,3 +366,18 @@ for (const how of ["500", "malformed"]) {
     } finally { office.reset(); await page.close(); }
   });
 }
+
+test("R1 · A VALID EMPTY LINEAGE is an answer (a root class): no thing, so the unentered room under her feet says \"you are inside\" after it, on both surfaces", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  arm = "unentered"; office.reset(); office.asked.length = 0;
+  office.failing.set("glass-greenhouse", "root");
+  const { page, errors } = await openPage({ signedIn: true });
+  try {
+    await residentSettled(page);
+    assert.equal(explainsOf("glass-greenhouse"), 1, "asked once");
+    assert.ok((await cardWheres(page, GREEN)).drawn > 0, "the greenhouse's card is drawn");
+    await columnOf(page, GREEN, "greenhouse");
+    await bothSay(page, GREEN, "you are inside");
+    assert.deepEqual(errors, [], "no page errors");
+  } finally { office.reset(); await page.close(); }
+});

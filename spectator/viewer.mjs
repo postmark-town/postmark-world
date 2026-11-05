@@ -14693,8 +14693,12 @@ export function mountViewer(appEl) {
     fetch(officeUrl(`/world/apex?explain=${encodeURIComponent(cls)}`), { headers: { accept: "application/json" }, credentials: "same-origin" })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
-        if (!Array.isArray(j?.extends)) return;
-        thingKinds.fromChain(cls, j.extends.map((c) => classToken(c?.class)));
+        // an ACCEPTED answer is the office's lineage: a list whose every entry carries a string class (class-read.mjs),
+        // however short (a root class has none). Anything else is malformed, so it is no answer (R1): the kind stays
+        // unanswered and silent, and nothing is learned from the part of it that reads.
+        const chain = j?.extends;
+        if (!Array.isArray(chain) || chain.some((c) => typeof c?.class !== "string" || !classToken(c.class))) return;
+        thingKinds.fromChain(cls, chain.map((c) => classToken(c.class)));
         if (lastRadial && mapCtx) drawOverlay(lastRadial);
         syncMarkInteractionViews();
         reRender();   // the telling and the column say what the answer made true (R1): the page's own repaint, no manual one
