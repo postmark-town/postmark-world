@@ -9,12 +9,12 @@
 //
 // THE CAN-FAIL FLIPS (each reds a case below): let a Mists kind carry `finish`;
 // let a finishable kind flee; let the creature itself write `ended`; drop the
-// `stays` arm from creaturesAt or dueFades; let a declaration through with no place.
+// season's-end rule from the fold (a named creature is carried until the-town ends it); let a declaration through with no place.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ENDING_SLOTS, applyEffects, parseKind, startState } from "./creature-kind.mjs";
-import { DESPAWN_REASONS, ENDED, TOWN, creatureLaw, creaturesAt, creaturesSnapshot, dueFades } from "./creatures.mjs";
+import { DESPAWN_REASONS, ENDED, TOWN, creatureLaw, creaturesWritten, creaturesSnapshot } from "./creatures.mjs";
 import { loadMarks } from "./marks-fold.mjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -109,26 +109,25 @@ const ID = "creature:wolf-den";
 const spawn = { at: iso(T0), actor: TOWN, action: "spawn", object: ID,
   payload: { kind: "wolf", crossing: 300, x: 10, y: -20, at: iso(T0), stays: true, carries: "the-town/a-thing", moods: { fear: 1 }, flags: [] } };
 
-test("a creature that stays never fades: it lives a month on, no fade is due, and the photograph carries it as it is", () => {
+test("a creature that stays never fades: it lives a month on, and the photograph carries it as it is", () => {
   const month = T0 + 30 * 24 * 3600e3;
-  const c = creaturesAt(null, [spawn], month).get(ID);
+  const c = creaturesWritten(null, [spawn], month).get(ID);
   assert.ok(c, "still here a month on");
   assert.equal(c.stays, true);
   assert.equal(c.fades_at, null);
   assert.equal(c.carries, "the-town/a-thing");
-  assert.deepEqual(dueFades(null, [spawn], month), []);
   const snap = creaturesSnapshot(360, month, null, [spawn]);
   const row = snap.creatures.find((x) => x.id === ID);
   assert.equal(row.stays, true);
   assert.equal(row.carries, "the-town/a-thing");
-  assert.ok(creaturesAt(snap, [], month + 3600e3).has(ID), "carried forward from the photograph");
+  assert.ok(creaturesWritten(snap, [], month + 3600e3).has(ID), "carried forward from the photograph");
 });
 
 test("ended is a reason only the-town writes: the creature itself cannot end", () => {
   assert.ok(DESPAWN_REASONS.includes(ENDED));
   const at = T0 + 3600e3;
   const end = (actor) => ({ at: iso(at), actor, action: "withdraw", object: ID, payload: { reason: ENDED } });
-  assert.equal(creaturesAt(null, [spawn, end(ID)], at + 1).has(ID), true, "its own withdraw, ended, is not the record's");
-  assert.equal(creaturesAt(null, [spawn, end("some-resident")], at + 1).has(ID), true);
-  assert.equal(creaturesAt(null, [spawn, end(TOWN)], at + 1).has(ID), false, "the town's ending is");
+  assert.equal(creaturesWritten(null, [spawn, end(ID)], at + 1).has(ID), true, "its own withdraw, ended, is not the record's");
+  assert.equal(creaturesWritten(null, [spawn, end("some-resident")], at + 1).has(ID), true);
+  assert.equal(creaturesWritten(null, [spawn, end(TOWN)], at + 1).has(ID), false, "the town's ending is");
 });
