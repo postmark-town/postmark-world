@@ -1,7 +1,11 @@
 // mists-render.mjs — the Mists as the page paints them (POS-553): banks and
 // wisps of a cold fog, never white and never a rectangle, over the engine's
-// wall. Browser-pure except bakeMistsLayer and the bell, which need a canvas
-// and an AudioContext; everything a test asks about is pure.
+// wall. It holds the paint rule and its bake (the layers, the town's keep-out,
+// the colour), the creatures half-seen in the fog, the bell, the feathered
+// sheet edge and the fog around a room. Browser-pure: it is pure except where
+// it needs a canvas (mistsBaker, bakeMistsLayer, bakeSheetFeather,
+// bakeRoomSurround) or is handed an AudioContext (strikeBell, ringBell);
+// everything a test asks about is pure.
 //
 // THE FACE IS CENTRED ON THE WALL (WLD-81, RULED by Darko 2026-10-19 18:53:
 // "it looks spectacular, I don't want to change that"). The render is POS-553's,
@@ -77,9 +81,9 @@ function vnoise(x, y, seed) {
   const a = hash(ix, iy, seed), b = hash(ix + 1, iy, seed), c = hash(ix, iy + 1, seed), d = hash(ix + 1, iy + 1, seed);
   return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
 }
-/** fractal value noise in [0, 1). */
 // each octave turned by ~37°, so value noise's grid never lines up into steps
 const ROT_C = Math.cos(0.65), ROT_S = Math.sin(0.65);
+/** fractal value noise in [0, 1). */
 export function mistsFbm(x, y, seed, octaves = 3) {
   let sum = 0, amp = 0.5, norm = 0, px = x, py = y;
   for (let i = 0; i < octaves; i++) {
@@ -135,8 +139,17 @@ export function mistsReachM(m) {
 /**
  * The paint at a point (metres, the engine's frame) for one layer, at rest:
  * `alpha` 0..1 (1 is opaque fog) and `depth` 0..1 (0 at the visible face, 1 at
- * the core). Pure. The rule: for the back layer, alpha is 1 wherever
- * mistsTrueDistance > 0.
+ * the core). Pure. The rule (WLD-81): the back layer's alpha is 1 from the
+ * ragged face inward. That face is the noise's, centred on the true face, so it
+ * wanders both ways about it: it can stand on the clear side, and a pocket just
+ * behind the true face (up to mistsBackM) can stand short of it, ramping up over
+ * softM. All of that holds before the town's keep-out: the keep-out thins the
+ * back layer only on the clear side of the true face (a point not behind it,
+ * toward keepHaze, less the bank the margin lets stand out from the face), never
+ * behind it, so everything further behind the true face than mistsBackM + softM
+ * is opaque, even over the town's margin. The front layers are weather and never
+ * reach 1 (their alpha is capped at the layer's `alpha`); the keep-out thins
+ * them wherever it reaches, past the face too.
  */
 export function mistsRenderAt(m, x, y, layer = 0, keep = null) {
   const L = MISTS_PAINT.layers[layer], reach = mistsReachM(m) * L.reach;
@@ -246,13 +259,15 @@ export function mistsBakeFar(m, layer) {
 // definition shared with the creatures' spawn (WLD-56); the paint re-exports it and
 // adds only the margin's soft edge and its ragged noise, below.
 export { mistsOpenCountry, mistsKeepRects } from "../tools/mists-keep.mjs";
-/** How kept-clear a point is, 0..1: 1 within a mark's margin less the soft
- *  band, 0 outside every rectangle. Pure (the tests' instrument); the bake uses
- *  a raster of the same rule. */
 // two scales stretched apart (as the banks' edge is), so the margin's edge wanders well clear of a straight line;
 // stretched only so far that it seldom saturates (a saturated wobble is a flat margin: a ruled edge, Darko 10-11)
 const keepWobble = (x, y) => MISTS_PAINT.keepNoiseM * Math.max(0, Math.min(1, 0.5 + 2.4 * (0.45 * mistsFbm(x / 650, y / 650, 71, 3) + 0.55 * mistsFbm(x / 190, y / 190, 73, 2) - 0.5)));
 const KEEP_CELL = 1000;
+/** The town's keep-out as a function of a point: `keep(x, y)` is how kept-clear
+ *  that point is, 0..1 (1 within a mark's margin less the soft band, 0 outside
+ *  every rectangle), and `keep.dist(x, y)` is how far the nearest mark's own
+ *  extent stands. Pure (the tests' instrument); the bake uses a raster of the
+ *  same rule. */
 export function mistsKeepAt(rects) {
   const soft = MISTS_PAINT.keepSoftM, pad = MISTS_PAINT.keepNoiseM;
   // bucket the rectangles (each with its ragged pad) by 1 km cell
@@ -319,9 +334,9 @@ export function mistsKeepRaster(rects, box, pxM) {
 
 // ── colour ──────────────────────────────────────────────────────────────────
 function rgbOf(hex) { return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)); }
+const rgbCache = new Map();
 /** The fog's colour at a depth for this veil: the tint at the face, toward
  *  near-black at the core, all of it dimmed by the veil. */
-const rgbCache = new Map();
 export function mistsColourAt(m, depth, tint = MISTS_TINT) {
   let c = rgbCache.get(tint); if (!c) rgbCache.set(tint, (c = rgbOf(tint)));
   const [r, g, b] = c, veil = m?.veil ?? 0;
@@ -405,6 +420,14 @@ export function mistsBaker(m, layer, box, { tint = MISTS_TINT, pxM = MISTS_PAINT
 // between that edge and the face.
 export const MISTS_CREATURES = {
   full: 284,
+  // THE PAINTED CREATURES END WITH HALLOWEEN (WLD-142, Darko 2026-10-31 23:01 EDT: "keep the mist as is, but
+  // we should probably remove all like the Halloween creatures and the decorations."). `last` is the last
+  // crossing that still paints them: mistsCreatures gives none after it, and a dial turned back to `last` or
+  // earlier shows what stood then. 284 is the last crossing that STARTS at or before Halloween's end,
+  // 2026-11-01T07:00:00Z (postmark-site src/lib/halloween-frame.mjs, HALLOWEEN_FRAME.until; the town's own
+  // end, 06:00Z, gives the same). Crossing N starts at CROSSING_EPOCH_UTC + N * CROSSING_MS, from tools/walk.mjs
+  // (2026-06-12T00:00Z and 12 h), so 284 starts 2026-11-01T00:00Z and 285 starts 2026-11-01T12:00Z.
+  last: 284,
   wolves: [2, 9], ravens: [3, 16], bats: [2, 10],         // at the first crossing and from `full`
   sizeM: { wolf: 620, raven: 320, bat: 230 },
   // how far behind the wall's true face each silhouette's nearest edge stands, metres (> 0: wholly in the wall)
@@ -415,9 +438,10 @@ function seeded(seed) {
   return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 /** Where the creatures stand at this crossing (metres, the engine's frame):
- *  [{ kind: "wolf"|"raven"|"bat", x, y, sizeM, flip, pose, eyes, phase }]. Pure. */
+ *  [{ kind: "wolf"|"raven"|"bat", x, y, sizeM, flip, pose, eyes, phase }]. None
+ *  after `MISTS_CREATURES.last` (WLD-142). Pure. */
 export function mistsCreatures(m, { first = 244, keep = null } = {}) {
-  if (!m?.clear) return [];
+  if (!m?.clear || m.crossing > MISTS_CREATURES.last) return [];
   const C = MISTS_CREATURES, t = Math.max(0, Math.min(1, (m.crossing - first) / (C.full - first)));
   const count = ([a, b]) => Math.round(a + (b - a) * t);
   const r = seeded(Math.imul((m.crossing | 0) + 1, 2654435761));
@@ -471,12 +495,10 @@ export function mistsCreatures(m, { first = 244, keep = null } = {}) {
   }
   return out;
 }
-// the silhouettes, drawn for this (no clip-art), in a 100-wide box with the
-// feet (or the body's centre, for a flier) at the origin
-// Rei's originals (2026-10-10; motifs-rei/README.md: original vector drawings,
-// no external source or licence), as drawn: one path each in a 100-unit box,
-// and the offset that puts the feet (or a flier's middle) at the creature's
-// point. The site's motifs are the same four shapes.
+// The silhouettes: Rei's originals (2026-10-10; motifs-rei/README.md: original
+// vector drawings, no external source or licence), as drawn: one path each in a
+// 100-unit box, and the offset `at` that puts the feet (or a flier's middle) at
+// the creature's point. The site's motifs are the same four shapes.
 const CREATURE_PATHS = {
   wolf: { d: "M8 91 C12 83 22 79 32 81 C28 72 30 61 38 53 C44 47 47 38 47 31 L43 18 L54 24 L58 17 L63 20 L74 8 L82 7 L84 12 L73 21 L81 17 L82 22 L69 33 C66 38 67 43 70 48 L66 46 L70 57 L65 54 L65 83 L70 88 L70 92 L57 92 L55 62 C51 66 48 72 48 77 C49 82 51 86 55 88 L54 92 L35 92 C25 96 14 96 8 91 Z", at: [-50, -92] },
   ravenperch: { d: "M8 80 L25 59 C30 52 36 49 42 44 C47 40 48 31 53 25 C58 18 68 17 75 22 L79 27 L94 32 L94 35 L78 36 C79 43 75 48 74 53 L78 55 L73 57 L75 60 L69 60 C65 66 60 70 53 73 L54 83 L63 86 L62 89 L49 88 L48 76 L41 77 L39 86 L45 89 L43 92 L34 88 L35 77 L13 87 Z", at: [-50, -89] },
@@ -601,7 +623,8 @@ export function ringBell(ctx, dest, when, bell) {
 // The painted sheet is a rectangle, and where the fog thins over the town's
 // margin its straight sides would show. So its edge is feathered into the open
 // country's own colour: a ragged band under the record (the marks stay on top),
-// opaque at the sheet's edge and gone sheetFeatherM inside it. It lies on the
+// opaque at the sheet's edge and gone MISTS_SHEET.featherM inside it (the
+// wobble moves that line inward by up to 2·wobbleM more). It lies on the
 // sheet's ground, under the regions and their art, so nothing a resident made
 // is cut by it.
 export const MISTS_SHEET = { featherM: 560, wobbleM: 420, pxM: 60 };   // the feather is soft: a coarse bake, upscaled smooth (fine enough for its shortest wobble)
@@ -614,8 +637,8 @@ export function mistsSheetFeatherAt(frame, x, y) {
   const d = sdBox(x, y, frame) + MISTS_SHEET.wobbleM * (1 + Math.max(-1, Math.min(1, (wob - 0.5) * 3.2)));
   return smooth(-MISTS_SHEET.featherM, 0, d);
 }
-/** The feather baked over the sheet's border, in the open country's colour. */
-/** `invert`: the same feather as a mask, white where the sheet shows (alpha
+/** The feather baked over the sheet's border, in the open country's colour.
+ *  `invert`: the same feather as a mask, white where the sheet shows (alpha
  *  1 - feather), for the sheet-sized washes drawn over the record's ground. */
 export function bakeSheetFeather(frame, colour, { canvas = null, pxM = MISTS_SHEET.pxM, invert = false } = {}) {
   const pad = MISTS_SHEET.wobbleM + 2 * pxM;

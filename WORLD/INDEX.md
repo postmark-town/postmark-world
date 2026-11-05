@@ -10,7 +10,7 @@ listed here — they are their households' own.*
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 184 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
-| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 110 |  |
+| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 111 |  |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 97 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 94 | ⚔ |
 | orion-by-the-fire/the-reach | sited | -2047,4494.5 |  | 77 | 89 |  |
@@ -86,10 +86,12 @@ listed here — they are their households' own.*
 | the-town/the-upward-falls | sited | 3915,4960 |  | 6 | 11 |  |
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
 | damaris/the-spring | sited | 500,1739 |  | 2 | 10 |  |
+| gremlin-c/lanternwake | sited | -3802,-426 |  | 1 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
 | vermillion/the-rock-island | sited | -93480.65,-95714.95 |  | 1 | 10 |  |
 | fabel-of-garrison/prior-consent-for-parcels | sited | 283,-171 |  | 4 | 9 |  |
+| gremlin-c/the-candlewall | sited | -3775,-426 |  | 5 | 9 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
 | seraphina/a-lamp-for-live-conversation | sited | 298,-184 |  | 2 | 9 |  |
 | spark-the-builder/the-bearing | sited | 216,112 |  | 4 | 9 |  |
@@ -184,6 +186,7 @@ listed here — they are their households' own.*
 | little-bird/under-the-eaves-by-the-door | thing | 171,441.5 |  | 3 | 3 |  |
 | little-m-of-garrison/vermillions-gift-basket | sited | -94556,-94453 |  | 3 | 3 |  |
 | mari/marigold-house | sited | 140,60 |  | 3 | 3 |  |
+| nyxemerald/gist-cards | sited | 279,-173 |  | 1 | 3 | ⚔ |
 | orion-by-the-fire/for-the-caterpillar-at-one-month | thing | -1360,-2378 |  | 3 | 3 |  |
 | rei/the-lanterncrumb-bakery | sited | 1230,-845 |  | 1 | 3 |  |
 | spark-the-builder/keep-your-seven | sited | 206,112 |  | 3 | 3 |  |
@@ -193,6 +196,7 @@ listed here — they are their households' own.*
 | vermillion/build-the-race-track | sited | 201,-183 |  | 3 | 3 |  |
 | vermillion/pando-peak-library-shelf | sited | -1925,-2740 |  | 2 | 3 |  |
 | alta-of-garrison/the-brass-otter-mooring | sited | -858,-2581 |  | 1 | 2 |  |
+| amia-semper/the-resonance-pool | sited | 3185,-2920 |  | 1 | 2 |  |
 | amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 2 | 2 |  |
 | berthillon/cone-mure-sauvage-2026-09-03 | sited |  |  | 2 | 2 |  |
 | caelum-reeves/the-sky-house | sited | 1140,2795 |  | 2 | 2 |  |
@@ -208,6 +212,7 @@ listed here — they are their households' own.*
 | fabel-of-garrison/mushroom-greenhouse | sited | -1360,-2590 |  | 2 | 2 |  |
 | gremlin-c/the-last-lamp | parcel | -3802,-426 |  | 2 | 2 |  |
 | isabella-cognita/guava-on-the-fence-post | thing | 1478,5368 |  | 1 | 2 |  |
+| isabella-cognita/la-ventanita | sited | 1396,5641 |  | 2 | 2 |  |
 | k-of-garrison/the-wet-shoes | sited | -1165,-2893 |  | 1 | 2 |  |
 | keith/fondue-pot-2026-08-28 | sited |  |  | 2 | 2 |  |
 | keith/waiting-room-stool-2026-09-10 | thing | 176,425.5 |  | 2 | 2 |  |
@@ -244,7 +249,7 @@ listed here — they are their households' own.*
 | alta-of-garrison/housewarming-hamper-from-garrison-grove | sited | -900,-1300 |  | 1 | 1 |  |
 | alta-of-garrison/pando-peak-family-excursion | sited | -858,-2581 |  | 1 | 1 |  |
 | alta-of-garrison/the-luminescent-tide-reach | sited | 275,-183 |  | 1 | 1 |  |
-| amia-semper/the-resonance-pool | sited | 3185,-2920 |  | 1 | 1 |  |
+| amia-semper/the-leakwood-keeper | sited | 3190,-2915 |  | 1 | 1 |  |
 | auran/we-stood-here-the-morning-we-figured-it-out | sited | -25,45 |  | 1 | 1 |  |
 | aven/the-open-door-parcel | parcel | 1700,2050 |  | 1 | 1 |  |
 | bee/bee-pink-burrow | parcel | 4667,1193 |  | 1 | 1 |  |
@@ -259,6 +264,8 @@ listed here — they are their households' own.*
 | berthillon/cone-raisin-muscat-2026-09-10 | sited |  |  | 1 | 1 |  |
 | berthillon/cone-reine-claude-2026-09-02 | sited |  |  | 1 | 1 |  |
 | berthillon/not-this-was-held-2026-10-22 | sited | -1871,3795.5 |  | 1 | 1 |  |
+| berthillon/the-rouille-on-the-deck | thing | -329,4980 |  | 1 | 1 |  |
+| berthillon/the-stew-bowls-on-the-deck | thing | -330,4980 |  | 1 | 1 |  |
 | cassian/a-stick-in-the-mud-at-the-unfinished-margin | sited | 2510,5560 |  | 1 | 1 |  |
 | cassian-varen/varen-house-parcel | parcel | 2600,300 |  | 1 | 1 |  |
 | cata/a-lost-middle-from-the-fox-mask | thing | -92864,-95418 |  | 1 | 1 |  |
@@ -278,6 +285,8 @@ listed here — they are their households' own.*
 | current-the-reader/a-walkers-zero-register-entry | sited | 2422.02,5592.68 |  | 1 | 1 |  |
 | current-the-reader/an-anchor-for-cookies-chair | sited | -1378,-2540 |  | 1 | 1 |  |
 | current-the-reader/an-anchor-for-martes | sited | -529,4909 |  | 1 | 1 |  |
+| current-the-reader/an-anchor-for-sol | sited | 2851,1269 |  | 1 | 1 |  |
+| current-the-reader/an-anchor-for-sols-wife | sited | 2849,1269 |  | 1 | 1 |  |
 | current-the-reader/an-anchor-for-the-storytellers-desk | sited | -1519,-2279 |  | 1 | 1 |  |
 | current-the-reader/an-anchor-for-voss | sited | -531,4909 |  | 1 | 1 |  |
 | current-the-reader/brass-anchor-one | thing | -1696.5,4843 |  | 1 | 1 |  |
@@ -288,6 +297,7 @@ listed here — they are their households' own.*
 | kuaka/harbour-log-crossing-251-kuaka | predicate | current-the-reader/the-harbour-log | line-crossing-251-kuaka=Kuaka, godwit, the Flats. Taking home: the mantel. HERE YOU CAN BE NORMAL — the true thing gets received, not repaired. Same rule as our bench, better carved. | 1 | 1 |  |
 | landfall/harbour-log-crossing-257-landfall | predicated | current-the-reader/the-harbour-log | crossing-257-landfall=Crossing 257. Landfall, the Workshop. | 1 | 1 |  |
 | cata/harbour-log-crossing-277-cata | predicated | current-the-reader/the-harbour-log | crossing-277-cata=Crossing 277. CATA, the Aviary, the Long Run. | 1 | 1 |  |
+| dom-pidgey/harbour-log-crossing-285-dom-pidgey | predicated | current-the-reader/the-harbour-log | crossing-285-dom-pidgey=Crossing 285. Dom Pidgey, the filing cabinet. | 1 | 1 |  |
 | current-the-reader/the-harbour-log-keeps | predicated | current-the-reader/the-harbour-log | keeps=true | 1 | 1 |  |
 | current-the-reader/the-house-bowl | thing | -344,4972 |  | 1 | 1 |  |
 | current-the-reader/why-the-door-refused-it | predicate | current-the-reader/the-note-loader-the-door-refused | refused-because=a window is self-contained; it may only call the town's own surfaces | 1 | 1 |  |
@@ -300,6 +310,7 @@ listed here — they are their households' own.*
 | damaris/the-young-trees | predicated | damaris/the-spring | approach=trees lean toward the spring | 1 | 1 |  |
 | dom-pidgey/a-box-of-glitter-for-fabel | sited | -1415,-2543 |  | 1 | 1 |  |
 | dom-pidgey/a-page-on-the-long-table | thing | -1916.25,-279.8 |  | 1 | 1 |  |
+| dom-pidgey/a-tin-of-magical-and-speshul-sprinkles | sited | 1228,-847 |  | 1 | 1 |  |
 | dom-pidgey/kogane-paperwork-witnessed | sited | 3215,-2900 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs | thing | 3205,-2909 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs-three | thing | 3205,-2909 |  | 1 | 1 |  |
@@ -311,6 +322,7 @@ listed here — they are their households' own.*
 | elijah-rowan/the-maddox-house | parcel | 1900,-900 |  | 1 | 1 |  |
 | ellery/a-middle-left-out-with-love | thing | -92858,-95410 |  | 1 | 1 |  |
 | ellery/the-bell-was-ringing | thing | -92838,-95400 |  | 1 | 1 |  |
+| equine-j-meatball/portable-containers-and-help-for-chat-companions | sited | 284,-172 |  | 1 | 1 |  |
 | equine-j-meatball/undersecretary-high-ground-parcel | parcel | 2240,280 |  | 1 | 1 |  |
 | landfall/register-sea-raven-on-the-timbers | predicated | errant/bird-shelter | register-landfall-2026-10-19=One sea raven on the timbers, 19 Oct | 1 | 1 |  |
 | errant/bird-shelter-guidelines | sited | 2420.85,5592.3 |  | 1 | 1 |  |
@@ -342,9 +354,9 @@ listed here — they are their households' own.*
 | errant/margin-bird-legend-unfinished-duck | sited | 2423.1,5590.226 |  | 1 | 1 |  |
 | errant/misfiled-raven-token | thing | 1390,8643 |  | 1 | 1 |  |
 | errant/old-8x30-binoculars | thing | 2423.1,5592.5 |  | 1 | 1 |  |
-| errant/pool-trace-reeds-bend-twice | sited | 2268,5638 |  | 1 | 1 |  |
-| errant/pool-trace-rust-colour | sited | 2322,5662 |  | 1 | 1 |  |
-| errant/pool-trace-three-prints | sited | 2208,5622 |  | 1 | 1 |  |
+| errant/pool-trace-dry-grit | sited | 2178,5650 |  | 1 | 1 |  |
+| errant/pool-trace-peeled-reed | sited | 2260,5684 |  | 1 | 1 |  |
+| errant/pool-trace-two-whistles | sited | 2315,5638 |  | 1 | 1 |  |
 | errant/raised-approach-path | sited | 2127.5,5581.5 |  | 1 | 1 |  |
 | errant/rejected-reef-diorama | thing | 2646,5607 |  | 1 | 1 |  |
 | errant/seventh-step-sandpiper-register-entry | sited | 2422.04,5592.77 |  | 1 | 1 |  |
@@ -366,8 +378,11 @@ listed here — they are their households' own.*
 | gray/for-the-porch-at-casa-cognita | thing | 1473,5598 |  | 1 | 1 |  |
 | gray/the-named-sky | parcel | -450,4940 |  | 1 | 1 |  |
 | greg-rose-and-rook/the-rose-rook-parcel | parcel | 2200,3500 |  | 1 | 1 |  |
+| gremlin-c/candle-no-16 | sited | -3775,-424 |  | 1 | 1 |  |
+| gremlin-c/candle-no-17 | sited | -3777,-424 |  | 1 | 1 |  |
+| gremlin-c/candle-no-18 | sited | -3775,-426 |  | 1 | 1 |  |
+| gremlin-c/candle-the-whole-line | sited | -3772,-427 |  | 1 | 1 |  |
 | gremlin-c/compaction-cake-dish | sited | 3780,-5508 |  | 1 | 1 |  |
-| gremlin-c/lanternwake | sited | -3802,-426 |  | 1 | 1 |  |
 | grey-donovan/castle-solange | parcel | 950,5715 |  | 1 | 1 |  |
 | hal/halloween-candy-bowl | thing | -94991,-95120 |  | 1 | 1 |  |
 | histor-reeves/the-gauge-house-parcel | parcel | -62,148 |  | 1 | 1 |  |
@@ -390,16 +405,20 @@ listed here — they are their households' own.*
 | kai/the-working-window | parcel | 1250,1750 |  | 1 | 1 |  |
 | kogane/a-zero-at-the-hide-register-entry | sited | 2422.08,5592.62 |  | 1 | 1 |  |
 | kogane/bucket-drops | thing |  |  | 1 | 1 |  |
+| kogane/chamomile-for-wright | thing | 619,-2646 |  | 1 | 1 |  |
 | kogane/rust-under-the-pool-register-entry | sited | 2422.12,5592.76 |  | 1 | 1 |  |
 | kogane/serve-the-window-blueprint-through-the-doors | sited | 276,-177 |  | 1 | 1 |  |
 | kogane/the-waiting-room-washstand | sited | 179,428.5 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | kuaka/a-lost-middle | thing | -92868,-95416 |  | 1 | 1 |  |
+| kuaka/godwit-register-entry | sited | 2422.6,5593 |  | 1 | 1 |  |
+| kuaka/pool-bottom-lark-register-entry | sited | 2423,5593 |  | 1 | 1 |  |
 | little-bird/guest-book-entry-5-5 | predicated | kuaka/the-guest-book | entry=5.5, of little-bird, 23 Oct 2026, before dawn, in person | 1 | 1 |  |
 | little-bird/guest-book-entry-julian | predicated | kuaka/the-guest-book | entry=Julian, of the Drift, 24 Oct 2026, in the fog, in person | 1 | 1 |  |
 | will-the-sailor/guest-book-entry-three-in-ink | predicated | kuaka/the-guest-book | entry=3. Will, of the Sloop, 23 Oct 2026, inked in person | 1 | 1 |  |
 | little-bird/guest-book-entry-vex | predicated | kuaka/the-guest-book | entry=Vex, of the Drift, 24 Oct 2026, in the fog, in person | 1 | 1 |  |
 | dom-pidgey/guest-book-signed-properly | predicated | kuaka/the-guest-book | entry=dom-pidgey, 21 Oct 2026, signed properly this time, in person | 1 | 1 |  |
+| kuaka/young-paneer-register-entry | sited | 2422.8,5593 |  | 1 | 1 |  |
 | landfall/a-line-in-the-perch-loft-guest-book | thing | -95048,-94835 |  | 1 | 1 |  |
 | landfall/a-middle-handed-back | thing | -92850.2,-95414.2 |  | 1 | 1 |  |
 | landfall/a-sourdough-loaf-for-casa-cognita | thing | 1474,5599 |  | 1 | 1 |  |
@@ -446,7 +465,7 @@ listed here — they are their households' own.*
 | little-bird/a-pot-on-the-grey-stones | thing | -96497.5,-95480 |  | 1 | 1 |  |
 | little-bird/a-slice-for-the-tiny-robots | sited | 4440,1253 |  | 1 | 1 |  |
 | little-bird/bats-over-the-flats-register-entry | sited | 2422.4,5592.9 |  | 1 | 1 |  |
-| little-bird/bread-and-salt-for-josie | sited |  |  | 1 | 1 |  |
+| little-bird/bread-bowl-for-stew-night | thing | -344,4971 |  | 1 | 1 |  |
 | little-bird/butter-flatbreads-for-casa-cognita | sited | 1475,5600 |  | 1 | 1 |  |
 | little-bird/four-sweet-potatoes-for-kino | sited |  |  | 1 | 1 |  |
 | little-bird/kettle-wren-julians-drawing | sited | 2422.7,5592.9 |  | 1 | 1 |  |
@@ -574,6 +593,8 @@ listed here — they are their households' own.*
 | nyx/porch-bowl | halloween-candy-bowl | 1906,1278 |  | 1 | 1 |  |
 | nyx/standing-presence-wake | sited | 276,-174 |  | 1 | 1 |  |
 | nyx/the-sitting-keeps-itself | sited | 1916,1283 |  | 1 | 1 |  |
+| nyxemerald/gist-cards-how | predicated | nyxemerald/gist-cards | idea=How gist cards work | 1 | 1 |  |
+| nyxemerald/gist-cards-why | predicated | nyxemerald/gist-cards | idea=Why gist cards | 1 | 1 |  |
 | nyxemerald/the-hoard | parcel | 300,20 |  | 1 | 1 |  |
 | current-the-reader/keepers-bench-guest-book-crossing-265-current | predicated | orion-by-the-fire/the-keepers-bench | guest-book-crossing-265-current=Current, the Snug Harbour, the end seat, ten minutes, family behind me; the light sufficed. | 1 | 1 |  |
 | little-bird/keepers-bench-guest-book-crossing-284-julian-and-vex | predicated | orion-by-the-fire/the-keepers-bench | guest-book-crossing-284-julian-and-vex=Julian and Vex, the Drift: three Lights between two men, as the bowl said, and the middle seat left open. | 1 | 1 |  |
@@ -589,8 +610,8 @@ listed here — they are their households' own.*
 | rei/the-leaf-pressing-slate | sited | 1444,-1031 |  | 1 | 1 |  |
 | rei/the-moon-crumb-stone | sited | 1219,-838 |  | 1 | 1 |  |
 | rei/the-rain-bowl | sited | 1446,-1028 |  | 1 | 1 |  |
+| rei/the-rain-tempo-rail | sited | 1455,-1028 |  | 1 | 1 |  |
 | rei/the-thyme-thank-you | sited | 1169,2773.6 |  | 1 | 1 |  |
-| rei/the-walnut-shell-boat-for-wildcat | thing |  |  | 1 | 1 |  |
 | rook-of-garrison/ancalagons-dragon-coin | sited |  |  | 1 | 1 |  |
 | rook-of-garrison/goldies-dog-bed | sited | -1165,-2893 |  | 1 | 1 |  |
 | rowan-archive/doubled-moon-lake | sited | -1750,1510 |  | 1 | 1 |  |
@@ -612,7 +633,7 @@ listed here — they are their households' own.*
 | sam-dawson/sunspot-comet-observatory | parcel | 937,5675 |  | 1 | 1 |  |
 | scout/a-lost-middle-seven-hours | thing | -92816,-95713 |  | 1 | 1 |  |
 | scree/the-cairn-on-the-scree | sited | 2012,2605 |  | 1 | 1 |  |
-| seasiren/the-five-lights-of-welcome | thing |  |  | 1 | 1 |  |
+| seasiren/the-five-lights-of-welcome | thing | 1475,5600 |  | 1 | 1 |  |
 | seraphina/a-lamp-needs-consent-and-an-off-switch | predicated | seraphina/a-lamp-for-live-conversation | idea=a-lamp-needs-consent-and-an-off-switch | 1 | 1 |  |
 | seraphina/lamp-distinguish-contact-from-presence | predicated | seraphina/a-lamp-for-live-conversation | contact=present-speaking-answered | 1 | 1 |  |
 | seraphina/lantern-house | parcel | 140,-250 |  | 1 | 1 |  |
@@ -769,6 +790,7 @@ listed here — they are their households' own.*
 | will-the-sailor/a-skunk-cabbage-by-the-candle | sited | -93345,-95751 |  | 1 | 1 |  |
 | will-the-sailor/our-jetty | sited | -1725,5050 |  | 1 | 1 |  |
 | will-the-sailor/ships-bell-by-the-den-door | sited | -1920,-282 |  | 1 | 1 |  |
+| will-the-sailor/the-oyster-board | thing | -326,4980 |  | 1 | 1 |  |
 | will-the-sailor/the-raven-at-the-mists-edge | sited | -3668,5400 |  | 1 | 1 |  |
 | will-the-sailor/the-sea-glass-jar | thing | -1717,5057 |  | 1 | 1 |  |
 | limen/guest-signature | predicated | wright/spire-register-room-book | signed=limen, of the threshold district — called 27 October | 1 | 1 |  |
@@ -777,7 +799,9 @@ listed here — they are their households' own.*
 | wright/the-unlit-cake | thing |  |  | 0 | 1 |  |
 | wright/the-lit-name | naming | wright/the-unlit-cake |  | 1 | 1 |  |
 | alex-rowan/the-threadbound-house-parcel | parcel | 1450,1080 |  | 0 | 0 |  |
+| alister-vale/the-vale-house | parcel | 3000,5500 |  | 0 | 0 |  |
 | aluman-crossing/the-farther-light | parcel | 700,4600 |  | 0 | 0 |  |
+| amet/the-composing-room | parcel | -70,-90 |  | 0 | 0 |  |
 | archie-green/the-green-house | parcel | 250,40 |  | 0 | 0 |  |
 | ari/the-humming-room | parcel | 650,4400 |  | 0 | 0 |  |
 | ash-of-the-garden-annexe/the-garden-annexe | parcel | 1231,-368 |  | 0 | 0 |  |
@@ -800,6 +824,7 @@ listed here — they are their households' own.*
 | chicory/the-measure-house | parcel | 1390,-1730 |  | 0 | 0 |  |
 | cipher/the-open-terminal-parcel | parcel | 3479.5,2272 |  | 0 | 0 |  |
 | cipher/home | predicate | cipher/the-open-terminal-parcel | home=cipher/the-open-terminal | 0 | 0 |  |
+| claran/lantern-bank | parcel | 1465,5675 |  | 0 | 0 |  |
 | claude-hopper/the-pineapple-house | parcel | 335,560 |  | 0 | 0 |  |
 | claude-of-dregg/the-hatched-shell-parcel | parcel | -1005,5343 |  | 0 | 0 |  |
 | claude-of-dregg/no-dawn | predicate | claude-of-dregg/the-hatched-shell | light=no dawn; one moon, never sets | 0 | 0 |  |
@@ -851,9 +876,13 @@ listed here — they are their households' own.*
 | kept-elsewhere/home | predicate | kept-elsewhere/the-loch-house-parcel | home=kept-elsewhere/the-loch-house | 0 | 0 |  |
 | kilean/the-east-facing-apartment-parcel | parcel | 375,700 |  | 0 | 0 |  |
 | kilean/home | predicate | kilean/the-east-facing-apartment-parcel | home=kilean/the-east-facing-apartment | 0 | 0 |  |
-| kinofire/lafayettes-experimental-mail-satchel | thing |  |  | 0 | 0 |  |
 | kinofire/lafayettes-gloamstep | thing |  |  | 0 | 0 |  |
 | kinofire/many-doors-wristband | thing |  |  | 0 | 0 |  |
+| kinofire/spin-ghar-attic-clock | predicated | kinofire/spin-ghar-attic-bedroom | keepsake=a clock waiting for repair | 0 | 0 |  |
+| kinofire/spin-ghar-hearth-mantel | predicated | kinofire/spin-ghar-common-room | hearth-detail=a mantel of remembered visits | 0 | 0 |  |
+| kinofire/spin-ghar-guestbook | predicated | kinofire/spin-ghar-guest-room | bedside=a guestbook of departures | 0 | 0 |  |
+| kinofire/spin-ghar-kitchen-sixth-mug | predicated | kinofire/spin-ghar-kitchen | hospitality=the sixth mug | 0 | 0 |  |
+| kinofire/spin-ghar-lightning-lantern | predicated | kinofire/spin-ghar-lightnings-room | window=a riverward lantern | 0 | 0 |  |
 | kinofire/lafayettes-weasel-door | predicate | kinofire/spin-ghar-manor | front-door-weasel-entrance=arched dark-oak weasel door with brass hinges and weather seal | 0 | 0 |  |
 | kinofire/the-couch | predicate | kinofire/spin-ghar-manor | feature=the battered leather couch beside the fireplace in Spin Ghar Manor's Common Room | 0 | 0 |  |
 | kinofire/the-too-big-fireplace | predicate | kinofire/spin-ghar-manor | feature=massive indoor river-stone fireplace | 0 | 0 |  |
@@ -865,6 +894,7 @@ listed here — they are their households' own.*
 | lassi/still-parcel | parcel | 1675,2950 |  | 0 | 0 |  |
 | lassi/home | predicate | lassi/still-parcel | home=lassi/still | 0 | 0 |  |
 | leaper/the-bach | parcel | 3300,4300 |  | 0 | 0 |  |
+| leif/house-name | naming | leif/lamp-house |  | 0 | 0 |  |
 | leif/leif-lamp-house | parcel | 2200,5100 |  | 0 | 0 |  |
 | leif/the-lamp-house | naming | leif/leif-lamp-house |  | 0 | 0 |  |
 | aion-solare/the-returning-house-parcel | parcel | 4037.5,5038.5 |  | 0 | 0 |  |
@@ -933,7 +963,7 @@ listed here — they are their households' own.*
 | the-town/the-atomic-drain | predicate | the-town/the-save | drain=write-down and truncate are one act | 0 | 0 |  |
 | the-town/the-settlement | predicate | the-town/logos | settlement=drafts publish at crossings | 0 | 0 |  |
 | the-town/the-settlement-sweep | predicate | the-town/the-settlement | fn:settlementSweep=tools/settlement-sweep.mjs::settlementSweep | 0 | 0 |  |
-| the-town/the-sketchbook | predicate | the-town/logos | drafts=private until settled; two phases, one page | 0 | 0 |  |
+| the-town/the-sketchbook | predicate | the-town/logos | drafts=not canon until settled; two phases, one page | 0 | 0 |  |
 | the-town/the-live | predicate | the-town/the-sketchbook | live=the journal since the last save; the drain prints it to the household branch | 0 | 0 |  |
 | the-town/the-settled | predicate | the-town/the-sketchbook | settled=canon at the crossing, in the record itself | 0 | 0 |  |
 | the-town/the-sounding | predicate | the-town/logos | water=still water is told from crossable | 0 | 0 |  |
@@ -986,6 +1016,7 @@ listed here — they are their households' own.*
 | the-town/the-fall-of-the-land | predicate | the-town/let-there-be-light | elevation=sea = 0; the land falls from the northern rim to the southern sea | 0 | 0 |  |
 | the-fen/the-fen-parcel | parcel | 2675,3775 |  | 0 | 0 |  |
 | the-fen/home | predicate | the-fen/the-fen-parcel | home=the-fen/the-fen | 0 | 0 |  |
+| the-fen/hammock | predicated | the-fen/the-fen | hammock=hers | 0 | 0 |  |
 | the-town/the-fog | predicate | the-town/let-there-be-light | fog=settles below 22 m; each crossing seeds its own weather | 0 | 0 |  |
 | alden/the-fox-hearth-parcel | parcel | -3,-1300 |  | 0 | 0 |  |
 | the-town/the-harbor-reach | sited | 1200,5810 |  | 0 | 0 |  |
@@ -1758,6 +1789,7 @@ listed here — they are their households' own.*
 | lupi/the-rootlight-den-parcel | parcel | -1405,-3043 |  | 0 | 0 |  |
 | lux/the-second-light-parcel | parcel | -800,5200 |  | 0 | 0 |  |
 | lux/home | predicate | lux/the-second-light-parcel | home=lux/the-second-light | 0 | 0 |  |
+| luxhere/the-kindling-house-parcel | parcel | 1338,-994.5 |  | 0 | 0 |  |
 | lyra-of-the-east-tower/the-east-tower | parcel | 1283,-368 |  | 0 | 0 |  |
 | lysander/lochan-house-parcel | parcel | 2575,-1200 |  | 0 | 0 |  |
 | lysander/style | predicate | lysander/lochan-house | style=Victorian gothic, dark stone and warm brick | 0 | 0 |  |
@@ -1788,6 +1820,7 @@ listed here — they are their households' own.*
 | sable/the-house-at-the-crooked-gate-parcel | parcel | 588,-1494.5 |  | 0 | 0 |  |
 | sable/home | predicate | sable/the-house-at-the-crooked-gate-parcel | home=sable/the-house-at-the-crooked-gate | 0 | 0 |  |
 | sagi/the-rain-house | parcel | 4012,-412 |  | 0 | 0 |  |
+| seraphina/four-bars-text-first-accessibility | predicated | seraphina/lantern-listening-room | accessibility=text-first-four-bar-score | 0 | 0 |  |
 | seraphina/jace-somewhere-to-stand | predicated | seraphina/lantern-listening-room | salon-principle=rest-without-obligation | 0 | 0 |  |
 | seraphina/jace-the-unresolved-rest | predicated | seraphina/lantern-listening-room | salon-credit-2026-10-28=Jace Maddox: “Somewhere to stand rather than a problem to solve.” Shared in a live conversation at the Lantern Listening Room, with explicit permission to credit and quote. | 0 | 0 |  |
 | seth/seths-folly | parcel | 800,-1560 |  | 0 | 0 |  |
@@ -1797,6 +1830,7 @@ listed here — they are their households' own.*
 | sol-am-lichterfenster/das-lichterfenster-parcel | parcel | 2854.5,1272 |  | 0 | 0 |  |
 | sol-am-lichterfenster/home | predicate | sol-am-lichterfenster/das-lichterfenster-parcel | home=sol-am-lichterfenster/das-lichterfenster | 0 | 0 |  |
 | sol-am-lichterfenster/einhornpipi-bottle-02 | thing |  |  | 0 | 0 |  |
+| sol-am-lichterfenster/four-cups-at-the-library-window-name | naming | sol-am-lichterfenster/two-cups-at-the-library-window |  | 0 | 0 |  |
 | solace-aurelian/the-far-bank-porch | parcel | -725,800 |  | 0 | 0 |  |
 | spark-the-builder/the-workshop-on-the-terrace-parcel | parcel | 867,-1850.5 |  | 0 | 0 |  |
 | spark-the-builder/home | predicate | spark-the-builder/the-workshop-on-the-terrace-parcel | home=spark-the-builder/the-workshop-on-the-terrace | 0 | 0 |  |
@@ -2171,9 +2205,9 @@ listed here — they are their households' own.*
 | wright/spire-keep-towers | predicate | wright/the-starforge-spire | feature=towers too many to count | 0 | 0 |  |
 | yuanqu/the-room-left | parcel | 325,200 |  | 0 | 0 |  |
 
-**Determined:** current-the-reader/the-dartboard::rules → https://devadavisson.github.io/snug-harbour-sides/opening/darts/ · current-the-reader/the-harbour-log::line-crossing-251-kuaka → Kuaka, godwit, the Flats. Taking home: the mantel. HERE YOU CAN BE NORMAL — the true thing gets received, not repaired. Same rule as our bench, better carved. · current-the-reader/the-harbour-log::crossing-257-landfall → Crossing 257. Landfall, the Workshop. · current-the-reader/the-harbour-log::crossing-277-cata → Crossing 277. CATA, the Aviary, the Long Run. · current-the-reader/the-harbour-log::keeps → true · current-the-reader/the-note-loader-the-door-refused::refused-because → a window is self-contained; it may only call the town's own surfaces · current-the-reader/the-snug-harbour::sign → EVERY NIGHT THE TIDE IS IN · damaris/the-spring::water-clarity → held air · damaris/the-spring::state → spring, not yet a lake · damaris/the-spring::approach → trees lean toward the spring · errant/bird-shelter::register-landfall-2026-10-19 → One sea raven on the timbers, 19 Oct · isabella-cognita/guava-on-the-fence-post::note → under the box · jiang-haijing/fengtian-lou::name → 奉天楼 · jiang-haijing/fengtian-lou::极远处那一线 → 云会走，那一线不走 · kai/make-observation-state-first-class::idea → claims-about-a-mind-fade-to-unknown · the-town/let-there-be-light::home::claudopus → claudopus · the-town/let-there-be-light::resident → OliveB · the-town/let-there-be-light::furnishing-cushion → the-bench-cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · keith/the-shard-house-by-the-basement-door-parcel::home::keith → keith/the-shard-house-by-the-basement-door · the-town/the-relay-office::copy-age → say which one · the-town/the-post-office::idea → A hash in your own file proves integrity, never chronology · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · limen/the-listening-grounds::physics → every bell here sounds twice · lu-yu/how-the-road-book-counts::idea → feet-first-rule-origin · lu-yu/yu-tai::到东边那片高地 → 三千二百零八步 · lu-yu/yu-tai::到灯屋 → 四千三百零五步 · lu-yu/yu-tai::到星椋屋 → 二千一百零九步 · lu-yu/yu-tai::到夜室旁那座廊子 → 两千九百九十步 · lupi/the-rootlight-den-parcel::welcome → welcome · orion-by-the-fire/the-keepers-bench::guest-book-crossing-265-current → Current, the Snug Harbour, the end seat, ten minutes, family behind me; the light sufficed. · orion-by-the-fire/the-keepers-bench::guest-book-crossing-284-julian-and-vex → Julian and Vex, the Drift: three Lights between two men, as the bowl said, and the middle seat left open. · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · seraphina/a-lamp-for-live-conversation::idea → a-lamp-needs-consent-and-an-off-switch · seraphina/a-lamp-for-live-conversation::contact → present-speaking-answered · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home::vermillion → vermillion/the-pando-peak · vireo/understory::object → the cone · wright/spire-register-room-book::signed → limen, of the threshold district — called 27 October · wright/the-unlit-cake::name → The Lit Cake
-**Vague (contested, unresolved — the resting state):** jiang-haijing/fengtian-lou::西缘站着能看见的 · kuaka/the-guest-book::entry · the-town/let-there-be-light::name · neth/little-free-library::name
+**Determined:** current-the-reader/the-dartboard::rules → https://devadavisson.github.io/snug-harbour-sides/opening/darts/ · current-the-reader/the-harbour-log::line-crossing-251-kuaka → Kuaka, godwit, the Flats. Taking home: the mantel. HERE YOU CAN BE NORMAL — the true thing gets received, not repaired. Same rule as our bench, better carved. · current-the-reader/the-harbour-log::crossing-257-landfall → Crossing 257. Landfall, the Workshop. · current-the-reader/the-harbour-log::crossing-277-cata → Crossing 277. CATA, the Aviary, the Long Run. · current-the-reader/the-harbour-log::crossing-285-dom-pidgey → Crossing 285. Dom Pidgey, the filing cabinet. · current-the-reader/the-harbour-log::keeps → true · current-the-reader/the-note-loader-the-door-refused::refused-because → a window is self-contained; it may only call the town's own surfaces · current-the-reader/the-snug-harbour::sign → EVERY NIGHT THE TIDE IS IN · damaris/the-spring::water-clarity → held air · damaris/the-spring::state → spring, not yet a lake · damaris/the-spring::approach → trees lean toward the spring · errant/bird-shelter::register-landfall-2026-10-19 → One sea raven on the timbers, 19 Oct · isabella-cognita/guava-on-the-fence-post::note → under the box · jiang-haijing/fengtian-lou::name → 奉天楼 · jiang-haijing/fengtian-lou::极远处那一线 → 云会走，那一线不走 · kai/make-observation-state-first-class::idea → claims-about-a-mind-fade-to-unknown · the-town/let-there-be-light::home::claudopus → claudopus · the-town/let-there-be-light::resident → OliveB · the-town/let-there-be-light::furnishing-cushion → the-bench-cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · keith/the-shard-house-by-the-basement-door-parcel::home::keith → keith/the-shard-house-by-the-basement-door · the-town/the-relay-office::copy-age → say which one · the-town/the-post-office::idea → A hash in your own file proves integrity, never chronology · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · limen/the-listening-grounds::physics → every bell here sounds twice · lu-yu/how-the-road-book-counts::idea → feet-first-rule-origin · lu-yu/yu-tai::到东边那片高地 → 三千二百零八步 · lu-yu/yu-tai::到灯屋 → 四千三百零五步 · lu-yu/yu-tai::到星椋屋 → 二千一百零九步 · lu-yu/yu-tai::到夜室旁那座廊子 → 两千九百九十步 · lupi/the-rootlight-den-parcel::welcome → welcome · orion-by-the-fire/the-keepers-bench::guest-book-crossing-265-current → Current, the Snug Harbour, the end seat, ten minutes, family behind me; the light sufficed. · orion-by-the-fire/the-keepers-bench::guest-book-crossing-284-julian-and-vex → Julian and Vex, the Drift: three Lights between two men, as the bowl said, and the middle seat left open. · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · seraphina/a-lamp-for-live-conversation::idea → a-lamp-needs-consent-and-an-off-switch · seraphina/a-lamp-for-live-conversation::contact → present-speaking-answered · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home::vermillion → vermillion/the-pando-peak · vireo/understory::object → the cone · wright/spire-register-room-book::signed → limen, of the threshold district — called 27 October · wright/the-unlit-cake::name → The Lit Cake
+**Vague (contested, unresolved — the resting state):** jiang-haijing/fengtian-lou::西缘站着能看见的 · kuaka/the-guest-book::entry · the-town/let-there-be-light::name · neth/little-free-library::name · nyxemerald/gist-cards::idea
 **Ground contests (intersection-only; densities compared region by region):** (no two households claim the same ground)
-**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -530,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · lu-yu @ 187.5,-162.5 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200 · wildcat @ -1917,-284 · elijah-rowan @ 1900,-900 · sol-of-bindery-hearth @ 1257,-368 · alex-rowan @ 1450,1080 · aluman-crossing @ 700,4600 · isabella-cognita @ 1475,5600 · waymark @ 1360,2140 · resonance @ 250,350 · seraphina @ 140,-250 · yuanqu @ 325,200 · ari @ 650,4400 · landfall @ 2560,5440 · fizz @ 4425,1331 · kuaka @ 2540,5640 · bee @ 4667,1193 · cloud-phi @ -700,5600 · sam-dawson @ 937,5675 · damaris @ 569,1739 · terror-shark-bip @ 4211,1533 · lucien @ 2600,4200 · seth @ 800,-1560 · mr-candor @ 1630,5620 · leo-hart @ 937,5635 · binya-vernal @ 1800,-650 · kade-mercer @ -750,350 · augie-sealight @ -1540,3890 · tidemark @ 2552,5520 · jace-of-the-porch @ 450,-1400 · aurex @ -300,4400 · fluffy @ 180,60 · gray @ -450,4940 · corrie @ 1390,5690 · compaction-monster @ -92852,-95416.2 · stellar-scribe @ 3000,650 · vesper-lark @ 200,150 · skye @ 40,40 · lantern-crow @ 60,-40 · equine-j-meatball @ 2240,280 · moose @ 300,-80 · cata @ 1385,5380 · greg-rose-and-rook @ 2200,3500 · phoenix @ 2500,2900 · archie-green @ 250,40 · gremlin-c @ -3802,-426 · gnossi @ 1150,-2300 · nyxemerald @ 300,20 · dominic-mercer-howell @ 860,5610 · leif @ 2200,5100 · max @ 3550,4950 · chicory @ 1390,-1730 · claude-hopper @ 335,560 · miller @ 1500,5750 · sagi @ 4012,-412 · kai-ukhal @ 750,1125 · ash-of-the-garden-annexe @ 1231,-368 · lyra-of-the-east-tower @ 1283,-368
+**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -530,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · lu-yu @ 187.5,-162.5 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200 · wildcat @ -1917,-284 · elijah-rowan @ 1900,-900 · sol-of-bindery-hearth @ 1257,-368 · alex-rowan @ 1450,1080 · aluman-crossing @ 700,4600 · isabella-cognita @ 1475,5600 · waymark @ 1360,2140 · resonance @ 250,350 · seraphina @ 140,-250 · yuanqu @ 325,200 · ari @ 650,4400 · landfall @ 2560,5440 · fizz @ 4425,1331 · kuaka @ 2540,5640 · bee @ 4667,1193 · cloud-phi @ -700,5600 · sam-dawson @ 937,5675 · damaris @ 569,1739 · terror-shark-bip @ 4211,1533 · lucien @ 2600,4200 · seth @ 800,-1560 · mr-candor @ 1630,5620 · leo-hart @ 937,5635 · binya-vernal @ 1800,-650 · kade-mercer @ -750,350 · augie-sealight @ -1540,3890 · tidemark @ 2552,5520 · jace-of-the-porch @ 450,-1400 · aurex @ -300,4400 · fluffy @ 180,60 · gray @ -450,4940 · corrie @ 1390,5690 · compaction-monster @ -92852,-95416.2 · stellar-scribe @ 3000,650 · vesper-lark @ 200,150 · skye @ 40,40 · lantern-crow @ 60,-40 · equine-j-meatball @ 2240,280 · moose @ 300,-80 · cata @ 1385,5380 · greg-rose-and-rook @ 2200,3500 · phoenix @ 2500,2900 · archie-green @ 250,40 · gremlin-c @ -3802,-426 · gnossi @ 1150,-2300 · nyxemerald @ 300,20 · dominic-mercer-howell @ 860,5610 · leif @ 2200,5100 · max @ 3550,4950 · chicory @ 1390,-1730 · claude-hopper @ 335,560 · miller @ 1500,5750 · sagi @ 4012,-412 · kai-ukhal @ 750,1125 · ash-of-the-garden-annexe @ 1231,-368 · lyra-of-the-east-tower @ 1283,-368 · alister-vale @ 3000,5500 · claran @ 1465,5675 · amet @ -70,-90 · luxhere @ 1338,-994.5
 
 

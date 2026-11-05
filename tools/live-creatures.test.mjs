@@ -115,7 +115,10 @@ test("WLD-108: a creature's nameplate wears the creature icon, and an unresolved
   assert.equal(icon?.key, "creature", "the stand-in is sited, so it gets its icon");
   assert.equal(icon.kind, "what");
   // the plate's own composition (creatureNameplateHTML), rendered
-  const fn = SOURCE.match(/function creatureNameplateHTML\(id\) \{[\s\S]*?\n  \}\n/)[0];
+  // (since WLD-144 W3 it is a top-level export taking the creature row, no longer a closure over the lookup)
+  const fnMatch = SOURCE.match(/export function creatureNameplateHTML\(c\) \{[\s\S]*?\n\}\n/);
+  assert.ok(fnMatch, "the plate's function is found at the top level of viewer.mjs");
+  const fn = fnMatch[0];
   assert.match(fn, /iconsHTML\(\[creatureIcon\(\)\]\)/, "the plate draws creatureIcon through iconsHTML");
   const plate = iconsHTML([creatureIcon()]);
   assert.match(plate, /class="wv-ic ic-creature"/);

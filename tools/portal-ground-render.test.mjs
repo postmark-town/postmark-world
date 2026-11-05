@@ -77,7 +77,8 @@ test("THE FALSIFIER (the map): a portal-ground pip is not the identical amber do
 test("AND THE DOT ITSELF IS UNTOUCHED — the hit area, the tier colour, the fan and the hover anchor all still ride the circle", () => {
   // The glyph is added OVER the pip, never in place of it. `.ov-pip` is the
   // hover anchor selector and the click target, the tier fill is the page's
-  // one colour language, and the fan offset is a cx/cy inside the scaled group
+  // one colour language, and the fan offset, when a caller passes one (the map
+  // passes none since WLD-95), is a cx/cy inside the scaled group
   // — replacing the circle with a bespoke shape would have quietly cost all
   // four to gain a picture.
   const door = overlayPipSVG({ at: { x: 10, y: 20 }, id: "a", classes: "t-home c-portal-ground", fan: { dx: 3, dy: -4 } });

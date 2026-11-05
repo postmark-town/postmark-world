@@ -3,18 +3,36 @@
 //
 // A spectator is a CAMERA, not an agent: there is no write path here. The viewer
 // computes the field of view CLIENT-SIDE (viewer.mjs imports the same engine a
-// clone runs), so this server only SERVES — it never tells. Its jobs:
-//   • /                         → the shell (spectator/index.html)
-//   • /world-engine/**          → the viewer module + the engine .mjs (so the
-//                                  browser imports the exact library, unbundled)
-//   • /WORLD/*.json             → the world's public record, off THIS clone's disk
+// clone runs), so this server only SERVES — it never tells. Its routes, exactly
+// as the handler below answers them (anything else is a 404):
+//   • /favicon.ico              → 204, no body
+//   • / and /index.html         → the shell (spectator/index.html)
+//   • /world-engine/spectator/*.mjs and /world-engine/tools/*.mjs
+//                               → the viewer module + the engine .mjs (so the
+//                                  browser imports the exact library, unbundled);
+//                                  .mjs files only
+//   • /WORLD/world-state.json, /WORLD/skeleton.json
+//                               → the world's public record, off THIS clone's disk
 //   • /WORLD/enter-exit-ledger.md → the crossings; the page derives occupancy from
 //                                  them the way it derives position from walks
+//   • /WORLD/walk-ledger.md     → the walks, the same way (the page derives
+//                                  position from them)
 //   • /api/stakes?holder=       → per-holder stakes, parsed from the town's
 //                                  stamp-ledger (LOCAL-ONLY; the island hides the half)
+//   • /api/walks?at=            → the movement ledger's derived state, for the
+//                                  walkers layer; `at` scrubs the clock
+//   • /api/world2/walks?since=  → the same both-era read in the office's own
+//                                  answer shape (the viewer asks the office first,
+//                                  and a local page's office base is /api)
 //   • /atlas/*, /media/*        → proxied to postmark.town (the painting and its
 //                                  assets; the processed images the map hangs
 //                                  placed artwork from)
+//   • /shelf/*                  → proxied to the media shelf (a different host
+//                                  from the town), as <shelf>/media/*: where a
+//                                  mark's picture reaches the interior floor
+//   Environment: PORT, WORLD_DIR (a synthetic world in place of this clone's
+//   record: the four /WORLD/ files and both walks routes read it), STAMP_LEDGER,
+//   ATLAS_ORIGIN, SHELF_ORIGIN.
 //
 // The island (postmark.town/world) has none of this server — it serves the same
 // viewer.mjs statically and STAGES the same record files beside it at build time,
@@ -22,7 +40,7 @@
 // atlas same-origin too, and the stakes half feature-detects itself off. Neither
 // habitat reads the world repo's main tip any more; see `tools/record-sources.mjs`.
 //
-// Run: node server.mjs   → http://localhost:4877
+// Run: node spectator/server.mjs   → http://localhost:4877 (PORT overrides)
 import { createServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import { publicWalkers, fractionalCrossing } from "../tools/walk.mjs";

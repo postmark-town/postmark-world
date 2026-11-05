@@ -35,7 +35,8 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -99,36 +100,91 @@ const freePort = () => new Promise((resolve, reject) => {
 const CLEANUP = [];
 after(() => { for (const stop of CLEANUP.reverse()) { try { stop(); } catch { /* already gone */ } } });
 
-const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
-const markOf = (id) => SERVED.marks.find((m) => m?.id === id);
-// two readers with real homes on the record: one whose read stands where the
-// founder found jetto, one whose read stands on their own parcel
-const HOME_OF = {
-  "far-reader": "jetto-of-starforge/the-waystation-parcel",
-  "near-reader": "berthillon/chez-antoine",
-};
+// ── THE WORLD IS INVENTED, AND FIXED (WLD-119 B1) ──────────────────────────
+//
+// The page half used to take its two readers' homes and four neighbours from the
+// committed record (real parcels, one reader standing at a real resident's exact
+// coordinates) and to DROP any that had gone missing with .filter(Boolean). The
+// rule under test ("a body that was not drawn is not a marker") has nothing to do
+// with which house stands where today, and a withdrawn neighbour would have shrunk
+// the fixture silently. So the rig serves a SYNTHETIC world through the server's
+// own WORLD_DIR seam (WLD-29; the one resident-middle-on-the-page.test.mjs and
+// placed-art.test.mjs use): a frame, one region ring, and the parcels invented
+// below. Every member the page is told about is REQUIRED BY NAME (see must).
+const TOWN_AT = { x: 0, y: 0 };
+const plot = (who, at) => ({ id: `${who}/the-plot`, kind: "parcel", tier: "home", by: who, household: who, at, extent: { w: 25, h: 25 }, body: `${who}'s plot` });
+// two readers with homes in the invented world: one whose read stands where the
+// founder found jetto (139 km off the canvas), one whose read stands on their own parcel
+const FAR_HOME = plot("rig-far-reader", { x: 1539, y: 4316.5 });
+const NEAR_HOME = plot("rig-near-reader", { x: 200, y: 100 });
+const HOME_OF = { "far-reader": FAR_HOME.id, "near-reader": NEAR_HOME.id };
 const STANDPOINT_OF = {
   "far-reader": { x: -95120, y: -95120 },
-  "near-reader": { x: 221, y: 95.5 },
+  "near-reader": { ...NEAR_HOME.at },    // on their own parcel, the way the real read had it
 };
-const NEIGHBOURS = ["berthillon/chez-antoine", "jetto-of-starforge/the-waystation-parcel", "postmaster/the-waiting-room-parcel", "illuminator/the-looking-room-parcel"];
+const OTHER_PLOTS = [plot("rig-neighbour-1", { x: -240, y: -130 }), plot("rig-neighbour-2", { x: 380, y: 260 })];
+const NEIGHBOURS = [NEAR_HOME.id, FAR_HOME.id, ...OTHER_PLOTS.map((m) => m.id)];
+const REGION = { id: "rig-town/the-town-centre", kind: "sited", tier: "constitution", by: "rig-town", at: TOWN_AT, extent: { w: 1400, h: 1400 }, body: "a synthetic region",
+  points: [{ x: -700, y: -700 }, { x: 700, y: -700 }, { x: 700, y: 700 }, { x: -700, y: 700 }] };
+const FRAME = { id: "rig-town/let-there-be-light", kind: "sited", tier: "constitution", by: "rig-town", at: TOWN_AT, extent: { w: 40000, h: 40000 }, body: "the world frame" };
+const MARKS = [FRAME, REGION, NEAR_HOME, FAR_HOME, ...OTHER_PLOTS];
+const FOLD = {
+  tick: 0, dials: {}, marks: MARKS,
+  parcels: [NEAR_HOME, FAR_HOME, ...OTHER_PLOTS].map((p) => ({ id: p.id, household: p.household, at: p.at, extent: p.extent })),
+  determined: {}, vague: [], rivalries: [], portfolios: {}, terrain_weight: {}, errors: [],
+};
+const SKELETON = {
+  _grid: { cell_m: 1, scale: "5 m per atlas px", origin: "the Origin, synthetic: atlas (485,760)" },
+  // what the fold path assembles a world from (assembleWorld reads these two); the town's own dials, invented here as constants
+  elevation: { fog_ceiling_m: 22, quay_m: 5 },
+  light: { dawn_pole_m: { x: 5075, y: 450 }, dark_pole_m: { x: -1900, y: 2150 } },
+  features: [], far_features: [], physics_registry: {},
+};
+const byId = new Map(MARKS.map((m) => [m.id, m]));
+/** a required member of the world, or a failure that names it: nothing is dropped silently */
+const must = (id) => {
+  const m = byId.get(id);
+  if (!m) throw new Error(`fixture member "${id}" is required by this file and is not in the invented world`);
+  return m;
+};
+function syntheticWorld() {
+  const dir = mkdtempSync(join(tmpdir(), "wld119-dot-world-"));
+  CLEANUP.push(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, "world-state.json"), JSON.stringify(FOLD));
+  writeFileSync(join(dir, "skeleton.json"), JSON.stringify(SKELETON));
+  writeFileSync(join(dir, "walk-ledger.md"), "# walks\n\nsynthetic: nobody has walked in the rig\n");
+  writeFileSync(join(dir, "enter-exit-ledger.md"), "# crossings\n\nsynthetic: nobody has entered anything in the rig\n");
+  return dir;
+}
+test("THE INVENTED WORLD IS WHOLE: every member the page is told about is in it, by name, and none was dropped to make it fit", () => {
+  const required = [...Object.values(HOME_OF), ...NEIGHBOURS, REGION.id, FRAME.id];
+  const missing = required.filter((id) => !byId.has(id));
+  assert.deepEqual(missing, [], "required fixture members absent from the invented world: " + missing.join(", "));
+  assert.equal(NEIGHBOURS.length, 4, "four neighbours: both homes and two more");
+  assert.equal(new Set(NEIGHBOURS).size, NEIGHBOURS.length, "no member listed twice");
+  for (const h of Object.keys(HOME_OF)) assert.equal(must(HOME_OF[h]).kind, "parcel", h + "'s home is a parcel");
+});
 const readFor = (handle) => {
   const at = STANDPOINT_OF[handle] ?? { x: 0, y: 0 };
   return {
     handle,
     standpoint: { ...at, stance: "embodied", name: "the rig's standpoint" },
     within: [],
-    nearby: NEIGHBOURS.map((id) => markOf(id)).filter(Boolean).map((m) => ({
+    nearby: NEIGHBOURS.map((id) => must(id)).map((m) => ({
       id: m.id, at: m.at, kind: m.kind, tier: m.tier, bearing: "N",
       distance_m: Math.round(Math.hypot(m.at.x - at.x, m.at.y - at.y)),
     })),
     // the ground set, because townGround refuses a record with no region rings
-    records: Object.fromEntries([...townRegionMarks(SERVED.marks), ...NEIGHBOURS.map((id) => markOf(id))]
-      .filter(Boolean).map((m) => [m.id, m])),
+    records: Object.fromEntries([...townRegionMarks(MARKS), ...NEIGHBOURS.map((id) => must(id))]
+      .map((m) => [m.id, m])),
     telling: "The rig's air is clear.",
     present: { residents: [] },
   };
 };
+
+// built eagerly, so a required member that is missing fails THIS FILE at once and by name, not as a page timeout later
+const READS = Object.fromEntries(Object.keys(HOME_OF).map((h) => [h, readFor(h)]));
+const HOMES = Object.fromEntries(Object.entries(HOME_OF).map(([h, id]) => [h, must(id)]));
 
 async function bootStubOffice() {
   const port = await freePort();
@@ -142,10 +198,12 @@ async function bootStubOffice() {
     if (url.pathname === "/ops/whoami") return send({ principal: "rig", handles: Object.keys(HOME_OF) });
     if (url.pathname === "/world/my-marks")
       return send({ drafts: [], docket: [], published: [], backed: [], counts: { drafts: 0, docket: 0, published: 0, backed: 0 }, complete: true });
-    if (url.pathname === "/world/apex") return send(readFor(url.searchParams.get("handle") ?? ""));
+    if (url.pathname === "/world/apex") return send(READS[url.searchParams.get("handle") ?? ""] ?? readFor(""));
     if (url.pathname.startsWith("/homes/")) {
-      const home = markOf(HOME_OF[decodeURIComponent(url.pathname.slice("/homes/".length))]);
-      return send(home ? { world: { sited: true, x: home.at.x, y: home.at.y, mark_id: home.id } } : { world: null });
+      const handle = decodeURIComponent(url.pathname.slice("/homes/".length));
+      const home = HOMES[handle];                                // a known handle's home is REQUIRED (HOMES, above)
+      if (!home) return send({ world: null });                   // a handle the rig does not know has no home
+      return send({ world: { sited: true, x: home.at.x, y: home.at.y, mark_id: home.id } });
     }
     // who ELSE is about: nobody — the reader's own body comes from the read
     if (url.pathname === "/world/present") return send({ at: 200, residents: [] });
@@ -173,7 +231,7 @@ async function bootStubAtlas() {
 async function bootRig(atlasPort) {
   const port = await freePort();
   const proc = spawn(process.execPath, [join(ROOT, "spectator", "server.mjs")], {
-    cwd: ROOT, env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:" + atlasPort },
+    cwd: ROOT, env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:" + atlasPort, WORLD_DIR: syntheticWorld() },
     stdio: ["ignore", "pipe", "pipe"],
   });
   CLEANUP.push(() => proc.kill());

@@ -69,6 +69,33 @@ before(async () => {
   try { chromium = (await import("playwright")).chromium; const b = await chromium.launch(); await b.close(); } catch { chromium = null; }
 });
 
+// WLD-150 D1b: THE LITE-STATE DIAGNOSTIC, DELIVERED TO ITS ACTUAL CONSUMER. tools/lite-mode.test.mjs prints one
+// `# {"lite_state": …}` TAP line (a t.diagnostic) when its slow-bake wait resolves or times out. The two CI failures
+// seen so far were THIS wrapper's, and the wrapper kept only counts, failing names and errors, so the line vanished
+// with the child. This forwards ONLY lines of that shape, bounded and checked, and only as information: it is
+// computed from the child's output, printed before the assertions, and read by none of them. It never dumps the
+// child's output, never decides an outcome, and a missing, oversized or malformed line is labelled unavailable.
+const LITE_STATE_CHILD = "tools/lite-mode.test.mjs";   // the only child that is expected to print a lite_state line
+const LITE_STATE_MAX = { records: 3, bytes: 2048, text: 300 };
+const LITE_STATE_KEYS = ["lite_state", "waited_ms", "waited_ms_is", "page_errors", "lite", "slowKey", "storedChoice", "toggleLabel", "toggleTitle", "wall", "paint", "feather", "unknown"];
+function liteStatesOf(out) {
+  const lines = [...out.matchAll(/^[ \t]*# (\{"lite_state".*)$/gm)].map((m) => m[1]);
+  const records = [];
+  for (const line of lines.slice(0, LITE_STATE_MAX.records)) {
+    if (Buffer.byteLength(line) > LITE_STATE_MAX.bytes) { records.push({ unavailable: "oversized, not parsed" }); continue; }
+    let rec;
+    try { rec = JSON.parse(line); } catch { records.push({ unavailable: "not valid JSON (truncated or malformed), not forwarded" }); continue; }
+    const safe = {};
+    for (const k of LITE_STATE_KEYS) {
+      const v = rec?.[k];
+      if (v === undefined) continue;
+      safe[k] = v === null || typeof v === "boolean" || typeof v === "number" || (typeof v === "string" && v.length <= LITE_STATE_MAX.text) ? v : "(dropped: not a short value)";
+    }
+    records.push(safe);
+  }
+  return { records, seen: lines.length };
+}
+
 /** one page test in a child, throttled; its TAP and the machine receipt */
 function runThrottled(rel) {
   const log = join(mkdtempSync(join(tmpdir(), "wld71-sweep-")), "machine.jsonl");
@@ -96,6 +123,7 @@ function runThrottled(rel) {
           .map((m) => (m[3] ?? m[2] ?? "").replace(/\s+/g, " ").trim().slice(0, 300)).slice(0, 6),
         browserSkips: [...out.matchAll(/# SKIP.*(playwright is absent|NO PLAYWRIGHT).*$/gm)].map((m) => m[0].slice(0, 160)),
         skips: [...out.matchAll(/# SKIP(.*)$/gm)].map((m) => m[1].trim().slice(0, 120)),
+        liteStates: liteStatesOf(out),
       });
     });
   });
@@ -112,6 +140,11 @@ for (const rel of SWEPT) {
     t.diagnostic(`${rel}: pass ${r.pass} · fail ${r.fail} · skipped ${r.skipped} · pages ${r.pages.length} (${atRate} at ${RATE}× held clock`
       + (own ? `, ${atOwn} at its own ${own.throttle}× ${own.clock} clock` : "") + `) · exit ${r.code ?? r.signal}`
       + (r.skips.length ? ` · skips: ${r.skips.join(" | ")}` : ""));
+    // WLD-150 D1b: the child's lite-state lines, forwarded BEFORE any assertion so a red child cannot cut them off;
+    // informational only (nothing below reads it), and labelled as the CHILD's, not the direct run's
+    if (r.liteStates.seen) t.diagnostic(`lite-state forwarded by this sweep from the CHILD run of ${rel} under the ${RATE}× sweep (not the direct run): `
+      + JSON.stringify(r.liteStates.records) + (r.liteStates.seen > r.liteStates.records.length ? ` · ${r.liteStates.seen - r.liteStates.records.length} more not forwarded` : ""));
+    else if (rel === LITE_STATE_CHILD) t.diagnostic(`lite-state UNAVAILABLE: the CHILD run of ${rel} under the ${RATE}× sweep printed no lite-state line (it may have failed before the slow case, or the line is missing); no cause is implied`);
     assert.deepEqual(r.failing, [], `red at ${RATE}× CPU: ${r.failing.join(" | ")} — ${r.errors.join(" | ")}`);
     assert.deepEqual(r.browserSkips, [], "a page test skipped for want of the browser, so nothing was proved");
     assert.equal(r.code, 0, `the child exited ${r.code ?? r.signal}`);
