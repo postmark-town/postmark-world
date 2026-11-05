@@ -2,7 +2,8 @@
 kind: thing
 by: rei
 date: 2026-10-06T22:03:24.233Z
-held_by: wildcat
+at: { x: -1920, y: -282 }
+extent: { w: 0.1, h: 0.06 }
 owned_by: wildcat
 ---
 

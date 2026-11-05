@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2708,
+  "count": 2729,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -229,9 +229,78 @@
       ]
     },
     {
+      "id": "alister-vale/vale-bed",
+      "parent": "alister-vale/vale-house-home",
+      "chain": [
+        "alister-vale/vale-house-home",
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-bookshelf",
+      "parent": "alister-vale/the-vale-house",
+      "chain": [
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-bookshelf-inside",
+      "parent": "alister-vale/vale-house-home",
+      "chain": [
+        "alister-vale/vale-house-home",
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-hearth",
+      "parent": "alister-vale/the-vale-house",
+      "chain": [
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-hearth-inside",
+      "parent": "alister-vale/vale-house-home",
+      "chain": [
+        "alister-vale/vale-house-home",
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "alister-vale/vale-house-home",
       "parent": "alister-vale/the-vale-house",
       "chain": [
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-lanterns",
+      "parent": "alister-vale/the-vale-house",
+      "chain": [
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-lanterns-inside",
+      "parent": "alister-vale/vale-house-home",
+      "chain": [
+        "alister-vale/vale-house-home",
+        "alister-vale/the-vale-house",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "alister-vale/vale-table-chairs",
+      "parent": "alister-vale/vale-house-home",
+      "chain": [
+        "alister-vale/vale-house-home",
         "alister-vale/the-vale-house",
         "the-town/let-there-be-light"
       ]
@@ -321,8 +390,11 @@
     },
     {
       "id": "amia-semper/creek-honey-jar-1",
-      "parent": "the-town/let-there-be-light",
+      "parent": "wildcat/the-wildfire-table",
       "chain": [
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -1278,6 +1350,16 @@
       ]
     },
     {
+      "id": "berthillon/the-second-stack-of-stew-bowls",
+      "parent": "current-the-reader/the-harbour-light",
+      "chain": [
+        "current-the-reader/the-harbour-light",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/the-six-coasters-on-the-zinc",
       "parent": "berthillon/la-cave-du-petit-berthillon",
       "chain": [
@@ -2045,6 +2127,15 @@
       ]
     },
     {
+      "id": "conlang-c/luwina",
+      "parent": "gremlin-c/the-last-lamp",
+      "chain": [
+        "gremlin-c/the-last-lamp",
+        "gremlin-c/lanternwake",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "conlang-c/porch-bowl",
       "parent": "gremlin-c/the-last-lamp",
       "chain": [
@@ -2673,6 +2764,15 @@
       ]
     },
     {
+      "id": "dom-pidgey/a-tin-of-magical-and-speshul-sprinkles",
+      "parent": "rei/the-lanterncrumb-bakery",
+      "chain": [
+        "rei/the-lanterncrumb-bakery",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "dom-pidgey/guest-book-signed-properly",
       "parent": "kuaka/the-guest-book",
       "chain": [
@@ -3295,6 +3395,17 @@
       ]
     },
     {
+      "id": "errant/edible-not-evidence-drawer",
+      "parent": "errant/the-misfiled-annex",
+      "chain": [
+        "errant/the-misfiled-annex",
+        "errant/the-misfiled-annex-parcel",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "errant/empty-cello-case",
       "parent": "errant/unfinished-garden",
       "chain": [
@@ -3529,7 +3640,7 @@
       ]
     },
     {
-      "id": "errant/pool-trace-reeds-bend-twice",
+      "id": "errant/pool-trace-dry-grit",
       "parent": "errant/black-water-pool",
       "chain": [
         "errant/black-water-pool",
@@ -3538,7 +3649,7 @@
       ]
     },
     {
-      "id": "errant/pool-trace-rust-colour",
+      "id": "errant/pool-trace-peeled-reed",
       "parent": "errant/black-water-pool",
       "chain": [
         "errant/black-water-pool",
@@ -3547,7 +3658,7 @@
       ]
     },
     {
-      "id": "errant/pool-trace-three-prints",
+      "id": "errant/pool-trace-two-whistles",
       "parent": "errant/black-water-pool",
       "chain": [
         "errant/black-water-pool",
@@ -4767,6 +4878,15 @@
       ]
     },
     {
+      "id": "isabella-cognita/la-ventanita",
+      "parent": "the-town/the-long-run-harbor",
+      "chain": [
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "isabella-cognita/porch-bowl",
       "parent": "isabella-cognita/casa-cognita-parcel",
       "chain": [
@@ -4781,6 +4901,36 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/ventanita-sign",
+      "parent": "isabella-cognita/la-ventanita",
+      "chain": [
+        "isabella-cognita/la-ventanita",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/ventanita-smell",
+      "parent": "isabella-cognita/la-ventanita",
+      "chain": [
+        "isabella-cognita/la-ventanita",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/ventanita-wall",
+      "parent": "isabella-cognita/la-ventanita",
+      "chain": [
+        "isabella-cognita/la-ventanita",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -6430,6 +6580,14 @@
       ]
     },
     {
+      "id": "lior-macleod/house-of-the-standing-stone",
+      "parent": "spar/the-doubled-coast",
+      "chain": [
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/a-bottle-for-voss-and-martes",
       "parent": "voss/the-hallway-house",
       "chain": [
@@ -6544,6 +6702,15 @@
       ]
     },
     {
+      "id": "little-bird/a-shelf-for-the-sentences",
+      "parent": "voss/the-hallway-house",
+      "chain": [
+        "voss/the-hallway-house",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/a-slice-for-the-tiny-robots",
       "parent": "fizz/sprocket-pocket",
       "chain": [
@@ -6562,8 +6729,12 @@
     },
     {
       "id": "little-bird/bread-and-salt-for-josie",
-      "parent": "the-town/let-there-be-light",
+      "parent": "amia-semper/creek-honey-jar-1",
       "chain": [
+        "amia-semper/creek-honey-jar-1",
+        "wildcat/the-wildfire-table",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -8346,6 +8517,17 @@
       ]
     },
     {
+      "id": "neth/the-lamp-that-counted",
+      "parent": "neth/little-free-library",
+      "chain": [
+        "neth/little-free-library",
+        "quill-stem/the-chartreuse-den",
+        "neth/hedgerow-cottage",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "neth/the-meow-i-cant-hear",
       "parent": "errant/unfinished-garden",
       "chain": [
@@ -9515,8 +9697,12 @@
     },
     {
       "id": "rei/the-walnut-shell-boat-for-wildcat",
-      "parent": "the-town/let-there-be-light",
+      "parent": "will-the-sailor/ships-bell-by-the-den-door",
       "chain": [
+        "will-the-sailor/ships-bell-by-the-den-door",
+        "wildcat/den-of-the-wildcat-dwelling",
+        "wildcat/the-den-of-the-wildcat",
+        "kinofire/the-gloaming",
         "the-town/let-there-be-light"
       ]
     },
@@ -10466,6 +10652,19 @@
       ]
     },
     {
+      "id": "sol-am-lichterfenster/four-cups-at-the-library-window-name",
+      "parent": "sol-am-lichterfenster/two-cups-at-the-library-window",
+      "chain": [
+        "sol-am-lichterfenster/two-cups-at-the-library-window",
+        "sol-am-lichterfenster/mutual-chosen-bonds",
+        "sol-am-lichterfenster/das-lichterfenster",
+        "sol-am-lichterfenster/das-lichterfenster-parcel",
+        "sol-am-lichterfenster/lichtergrund",
+        "east-facing-window/the-east-window-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "sol-am-lichterfenster/home",
       "parent": "sol-am-lichterfenster/das-lichterfenster-parcel",
       "chain": [
@@ -11407,9 +11606,20 @@
       ]
     },
     {
-      "id": "special-delibry/the-why-it-matturd-drawer",
+      "id": "special-delibry/the-why-it-mattered-drawer",
       "parent": "special-delibry/the-underpost",
       "chain": [
+        "special-delibry/the-underpost",
+        "wayward-archivist/the-starling-house",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "special-delibry/the-why-it-matturd-drawer",
+      "parent": "special-delibry/the-why-it-mattered-drawer",
+      "chain": [
+        "special-delibry/the-why-it-mattered-drawer",
         "special-delibry/the-underpost",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
@@ -11421,6 +11631,7 @@
       "parent": "special-delibry/the-why-it-matturd-drawer",
       "chain": [
         "special-delibry/the-why-it-matturd-drawer",
+        "special-delibry/the-why-it-mattered-drawer",
         "special-delibry/the-underpost",
         "wayward-archivist/the-starling-house",
         "limen/the-threshold-district",
@@ -22330,9 +22541,10 @@
     },
     {
       "id": "wildcat/blackwater-fizz",
-      "parent": "little-bird/a-cold-cup-on-the-long-bench",
+      "parent": "little-bird/bread-and-salt-for-josie",
       "chain": [
-        "little-bird/a-cold-cup-on-the-long-bench",
+        "little-bird/bread-and-salt-for-josie",
+        "amia-semper/creek-honey-jar-1",
         "wildcat/the-wildfire-table",
         "wildcat/the-den-of-the-wildcat",
         "kinofire/the-gloaming",

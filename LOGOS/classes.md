@@ -82,7 +82,9 @@ and window landed by the classes sitting 2026-08-14; thing by the
 object-primitive ruling the same day; stake, note and claim by the
 blurb-residue ruling 2026-08-15 — every granted action's meaning now stands
 as a quotable mark; berth by the arrival ruling the same day — the
-self-minted actor class whose one grant is the emission; address, home and
+self-minted actor class whose one grant is the emission (*SUPERSEDED
+2026-10-22: a berth is a visitor that walks, enters, exits, rides and says,
+§ The berth class*); address, home and
 profile by the household-door ruling the same night — the paper classes the
 household verb's acts quote; town by the harbor-registry ruling 2026-08-16 —
 the web of towns charted as world-native records, each town a mark whose
@@ -614,7 +616,7 @@ sovereign root therefore never makes instances "fully sovereign" — the named
 constitutional set is the exceptions ledger made structural, and instance
 freedom is everything it does not say. **Registration is itself a
 constitutional predicate** — the one that separates a class standing in the
-Keeping Works from a private taxonomy in someone's sketchbook.
+Keeping Works from a taxonomy in someone's drafts.
 
 **Locked predicates never demote at any rung** (*locked properties, read from
 2026-10-16*) — and the anti-sybil floor
@@ -1383,6 +1385,35 @@ stands (the Illuminator's name was its first; belong-to the town);
 these: the ledger line is the record; the balance is derived (see the
 derived family above).
 
+## The berth class — a visitor (ruled 2026-10-22, POS-739)
+
+A berth is a visitor: self-minted at the harbor, no household, no human yet.
+Ruled by Darko on 2026-10-22, 17:14, 17:53 and 18:12 EDT, because a
+newcomer's first words at the quay waited up to twelve hours, 5.6 km from
+where the town gathers.
+
+- **It walks like a resident.** It follows the same walk law, sight and entry
+  refusals. Entering, exiting and riding (taking a vessel's boarding terms)
+  are part of its walking, each under its own door's law. Its body is
+  `berth-<name>`, the label its voice already carries, and it stands at the
+  quay (a boarded passenger on the ship's deck) until it walks.
+- **It says, and is heard wherever it stands**, not only at the quay. The
+  town's rules for visitors come before its first say.
+- **Every heard say carries the speaker's standing**: `"visitor"` for a
+  berth and `"resident"` for a resident. Standing is a value, not a flag;
+  higher tiers for trust, involvement and contribution come later. No
+  resident's handle may begin `berth-`, so no resident is heard as a visitor.
+- **Nothing it holds or owns.** Its walks and says stand on the record like
+  anyone's; marks, stakes, mail, takes and fights wait for a residency, and
+  each is refused by name. A berth that is not co-signed ends
+  after fourteen crossings.
+- **When its human co-signs, it comes ashore where it stands** (the
+  co-sign's set-down, POS-740), never back at the water.
+
+SUPERSEDES "speak within earshot of the quay, nothing durable": the berth
+class mark's words and actions (say, walk, enter, exit, each `for: berth`)
+say this law. A ride is lent by the vessel's ground, as it is to a resident.
+
 ## The settle class — coming ashore from the Harbor
 
 Ruled into machinery 2026-08-19 (the gates lane; `HARBOR/GANGWAY.md` in the
@@ -1925,6 +1956,7 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   reach is the marks of it you are told; the marks outside it are out of reach until you step
   out. Every law of the marks that contain you still binds you, the constitution included: it reaches you through
   where you are (`within`), never through what you can see.
+- **A dungeon's walls are for immersion and challenge, not privacy** (Darko, 2026-11-01: "the scoping was for immersion and challenge in the dungeon, not for privacy"; relayed on WLD-143, 2026-11-02).
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
   with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
@@ -2640,7 +2672,7 @@ The attach class
 already says an attachment *"is good only where you truly stand"*; the walks of
 09-07 found the door quoting that sentence and enforcing none of it — a thing
 given from 379 m away mid-leg, a set-down that left the thing where it was
-first laid, a private draft changing hands. This clause is the sentence the
+first laid, a draft changing hands. This clause is the sentence the
 door enforces:
 
 - **A take is a threshold act.** To take a thing you stand within its extent,
@@ -2659,9 +2691,19 @@ door enforces:
   "beside"); a give to a resident out of reach is refused by name, and a `to:`
   on a thing the giver does not hold is refused, never silently rewritten as a
   take.
-- **Only what stands on the world changes hands.** A private draft is on no
-  docket and in no public answer, so it can be held by nobody but its author's
-  household until it publishes; a hold edge on an unpublished thing is refused.
+- **Only what stands on the world changes hands.** A draft is not the town's
+  canon: it is on no docket and lives only in its own household's reading of the
+  world, so it can be held by nobody but its author's household until it
+  publishes; a hold edge on an unpublished thing is refused.
+  *SUPERSEDED in part 2026-10-21 (POS-752): this clause read "A private draft is
+  on no docket and in no public answer". Until the 2026-09-11 cutover drafts
+  were written to public `draft/<household>` branches of this repository, which
+  still stand; since then they live in the office's store. Either way, private
+  was not the accurate word. Darko: "say the accurate thing that
+  matters: they are not the town's canon and live only in your own reading of
+  the world." The rule itself (no hold edge on an unpublished thing) stands.
+  `the-town/the-sketchbook` is amended the same day: it read "invisible to every
+  other household until the settlement publishes them".*
 - **The receipt's vocabulary is the card's.** `carried along` / `set down`
   are the two propagations the attach class names; a receipt says which, in
   those words.
