@@ -8630,7 +8630,7 @@ export function mountViewer(appEl) {
     // for a resident, a thing's footprint under their body reads "here" (Darko's 10-18 word) until their
     // enter stack holds it. Only a crossing fills it. A room or a place keeps its geometry, and the
     // camera, which has no body to carry across, keeps its own words.
-    if (inside && from.who === "you" && thingClasses().has(classToken(instanceClassOf(full))) && !enterStackOf(state.handle).includes(full.id))
+    if (inside && from.who === "you" && learnedThingClasses([full]).has(classToken(instanceClassOf(full))) && !enterStackOf(state.handle).includes(full.id))
       return { bearing: null, detail: "here" };
     const bearing = inside ? null : (m?.bearing ?? quantizeBearing(bearingDeg(dx, dy), state.dials.bearing_points));
     return { bearing, detail: whereLine({ distance, bearing, far: !!m?.far, who: from.who }) };
