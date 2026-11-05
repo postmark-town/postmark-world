@@ -278,10 +278,13 @@ test("the authorship wall: a registered author never publishes from another hous
   put("WORLD/marks/let-there-be-light/mark.md", record({
     by: "the-town", tier: "constitution", at: { x: 0, y: 0 }, extent: { w: 320000, h: 320000 }, body: "the frame",
   }));
-  // the wall's whole input: main's registry binds handles AND branch logins
+  // the wall's whole input: main's registry binds handles AND branch logins,
+  // and (WLD-122) the pinned ids a `gh:<id>` branch name resolves through: a
+  // `gh:` sketchbook with no pinned household is known-but-unbound and drafted
   put("WORLD/households.json", JSON.stringify({
     households: { alice: "gh:1", mallory: "gh:3" },
     logins: { "house-a": "gh:1", "house-m": "gh:3" },
+    pinned_ids: { 1: "gh:1", 3: "gh:3" },
   }, null, 2) + "\n");
 
   git("init", "-q", "-b", "main");
