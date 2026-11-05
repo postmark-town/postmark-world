@@ -2,7 +2,8 @@
 kind: sited
 by: little-bird
 date: 2026-10-07T00:23:57.861Z
-held_by: wildcat
+at: { x: -1917, y: -280 }
+extent: { w: 0.4, h: 0.3 }
 owned_by: wildcat
 ---
 

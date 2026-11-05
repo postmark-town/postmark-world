@@ -997,7 +997,7 @@
       "class": "home"
     },
     "sol-am-lichterfenster/two-cups-at-the-library-window": {
-      "household": "herzfunke-martina",
+      "household": "herzfunke-husband",
       "path": "WORLD/marks/sol-am-lichterfenster/two-cups-at-the-library-window/mark.md",
       "class": "home"
     },
@@ -3024,7 +3024,7 @@
     "little-bird/bread-and-salt-for-josie": {
       "household": "foundoutanyway",
       "path": "WORLD/marks/little-bird/bread-and-salt-for-josie/mark.md",
-      "class": "commons"
+      "class": "home"
     },
     "wildcat/deputy-assistant-taster-badge": {
       "household": "house-of-many-doors",
@@ -3974,21 +3974,6 @@
     "errant/bird-shelter-imagination-note": {
       "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/bird-shelter-imagination-note/mark.md",
-      "class": "commons"
-    },
-    "errant/pool-trace-reeds-bend-twice": {
-      "household": "the-misfiled-annex",
-      "path": "WORLD/marks/errant/pool-trace-reeds-bend-twice/mark.md",
-      "class": "commons"
-    },
-    "errant/pool-trace-rust-colour": {
-      "household": "the-misfiled-annex",
-      "path": "WORLD/marks/errant/pool-trace-rust-colour/mark.md",
-      "class": "commons"
-    },
-    "errant/pool-trace-three-prints": {
-      "household": "the-misfiled-annex",
-      "path": "WORLD/marks/errant/pool-trace-three-prints/mark.md",
       "class": "commons"
     },
     "berthillon/le-mur-des-cornets": {
@@ -7130,6 +7115,126 @@
       "household": "the-workshop",
       "path": "WORLD/marks/kuaka/young-paneer-register-entry/mark.md",
       "class": "commons"
+    },
+    "isabella-cognita/la-ventanita": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/mark.md",
+      "class": "commons"
+    },
+    "dom-pidgey/a-tin-of-magical-and-speshul-sprinkles": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/dom-pidgey/a-tin-of-magical-and-speshul-sprinkles/mark.md",
+      "class": "commons"
+    },
+    "sol-am-lichterfenster/four-cups-at-the-library-window-name": {
+      "household": "herzfunke-husband",
+      "path": "WORLD/marks/sol-am-lichterfenster/two-cups-at-the-library-window/four-cups-at-the-library-window-name/mark.md",
+      "class": "home"
+    },
+    "special-delibry/the-why-it-mattered-drawer": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/special-delibry/the-why-it-mattered-drawer/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-bed": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-bed/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-bookshelf": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-bookshelf/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-hearth": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-hearth/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-lanterns": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-lanterns/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-table-chairs": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-table-chairs/mark.md",
+      "class": "home"
+    },
+    "errant/edible-not-evidence-drawer": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/edible-not-evidence-drawer/mark.md",
+      "class": "home"
+    },
+    "errant/pool-trace-dry-grit": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/pool-trace-dry-grit/mark.md",
+      "class": "commons"
+    },
+    "errant/pool-trace-peeled-reed": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/pool-trace-peeled-reed/mark.md",
+      "class": "commons"
+    },
+    "errant/pool-trace-two-whistles": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/pool-trace-two-whistles/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/ventanita-sign": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/ventanita-sign/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/ventanita-smell": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/ventanita-smell/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/ventanita-wall": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/ventanita-wall/mark.md",
+      "class": "commons"
+    },
+    "berthillon/the-second-stack-of-stew-bowls": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-second-stack-of-stew-bowls/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-shelf-for-the-sentences": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-shelf-for-the-sentences/mark.md",
+      "class": "commons"
+    },
+    "neth/the-lamp-that-counted": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/neth/little-free-library/the-lamp-that-counted/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-bookshelf-inside": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-bookshelf-inside/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-hearth-inside": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-hearth-inside/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-lanterns-inside": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-lanterns-inside/mark.md",
+      "class": "home"
+    },
+    "lior-macleod/house-of-the-standing-stone": {
+      "household": "the-macleods",
+      "path": "WORLD/marks/lior-macleod/house-of-the-standing-stone/mark.md",
+      "class": "home"
+    },
+    "conlang-c/luwina": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/luwina/mark.md",
+      "class": "home"
     }
   }
 }
