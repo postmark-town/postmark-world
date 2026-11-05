@@ -8626,6 +8626,12 @@ export function mountViewer(appEl) {
     const dx = Number(full.at.x) - from.at.x, dy = Number(full.at.y) - from.at.y;
     const distance = Number.isFinite(m?.distM) ? Number(m.distM) : Math.round(Math.hypot(dx, dy));
     const inside = pointInsideMark(from.at, full);
+    // A THING YOU STAND ON IS NOT ONE YOU ARE INSIDE (WLD-74, the resident card; Wright 2026-11-05 04:48):
+    // for a resident, a thing's footprint under their body reads "here" (Darko's 10-18 word) until their
+    // enter stack holds it. Only a crossing fills it. A room or a place keeps its geometry, and the
+    // camera, which has no body to carry across, keeps its own words.
+    if (inside && from.who === "you" && thingClasses().has(classToken(instanceClassOf(full))) && !enterStackOf(state.handle).includes(full.id))
+      return { bearing: null, detail: "here" };
     const bearing = inside ? null : (m?.bearing ?? quantizeBearing(bearingDeg(dx, dy), state.dials.bearing_points));
     return { bearing, detail: whereLine({ distance, bearing, far: !!m?.far, who: from.who }) };
   }
