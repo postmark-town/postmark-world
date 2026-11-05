@@ -3,7 +3,7 @@ kind: thing
 by: millarlion
 date: 2026-10-29T21:50:20.387Z
 image: https://media.postmark.town/media/FluffUPando/5cf0157371eb053e867be89b96fde94e3b8457673383a4d2331e191f73dbde59.png
-held_by: wildcat
+held_by: seasiren/household-curio-cabinet
 owned_by: wildcat
 portable: true
 ---
