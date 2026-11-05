@@ -17,6 +17,14 @@
 // inside" by the card, while the page's own eyes (the engine, B) no longer put the
 // bowl in the ladder of where the camera stands.
 //
+// THE CLASS ANSWER IS ASYNCHRONOUS (R1, Wright 2026-11-05 11:5x EST, option 1: "silence before a wrong inside").
+// The page learns a subclass from the office's own `explain` reply. Until that reply is ACCEPTED the resident's
+// where-clause for an unentered mark under her feet is empty (a moment of silence is true; "inside" before she
+// entered is false), on the telling's card AND on the column, and the accepted reply repaints both by the page's
+// own existing repaint: no test ever calls a rerender. The named cost, ruled: an unentered room, place or dungeon
+// whose class is still unanswered is silent for that interval too, and a failed or malformed reply leaves any
+// such mark silent for the page session (no polling, no second ask, no invented "not a thing").
+//
 // Every record is invented. Run: node --test tools/wld74-card-on-the-page.test.mjs
 
 import { test, after, before } from "node:test";
@@ -54,10 +62,14 @@ const HERE = { x: 221, y: 95.5 };   // in the Town Centre, where the record's ow
 const BOWL = "rig-wren/a-door-bowl";      // a halloween-candy-bowl (a subclass thing) centred under her
 const OUT = "rig-wren/a-far-lamp";        // a thing 30 m east, in her view: the true outside case
 const SHED = "rig-wren/the-shed";         // an untyped room under her feet: geometry, as ever
+const GREEN = "rig-wren/the-greenhouse";  // a SUBCLASS room under her feet whose class the page must ask (R1: not a thing)
+const LAMP2 = "rig-wren/a-second-lamp";   // a thing whose class reply fails (R1: failure limit)
 const RECORDS = {
   [BOWL]: { id: BOWL, by: ACTOR, household: ACTOR, kind: "halloween-candy-bowl", tier: "market", at: { ...HERE }, extent: { w: 2, h: 2 }, body: "A carved pumpkin bowl." },
   [OUT]: { id: OUT, by: ACTOR, household: ACTOR, kind: "thing", tier: "market", at: { x: HERE.x + 30, y: HERE.y }, extent: { w: 1, h: 1 }, body: "A lamp on a post." },
   [SHED]: { id: SHED, by: ACTOR, household: ACTOR, kind: "sited", tier: "market", at: { ...HERE }, extent: { w: 20, h: 20 }, body: "A garden shed." },
+  [GREEN]: { id: GREEN, by: ACTOR, household: ACTOR, kind: "glass-greenhouse", tier: "market", at: { ...HERE }, extent: { w: 12, h: 12 }, body: "A glass greenhouse." },
+  [LAMP2]: { id: LAMP2, by: ACTOR, household: ACTOR, kind: "lantern-post", tier: "market", at: { ...HERE }, extent: { w: 2, h: 2 }, body: "A lantern post." },
 };
 const READ = {
   handle: ACTOR,
@@ -66,6 +78,8 @@ const READ = {
   nearby: [
     { id: BOWL, at: { ...HERE }, bearing: "N", distance_m: 0, kind: "halloween-candy-bowl", tier: "market" },
     { id: OUT, at: { x: HERE.x + 30, y: HERE.y }, bearing: "E", distance_m: 30, kind: "thing", tier: "market" },
+    { id: GREEN, at: { ...HERE }, bearing: "N", distance_m: 0, kind: "glass-greenhouse", tier: "market" },
+    { id: LAMP2, at: { ...HERE }, bearing: "N", distance_m: 0, kind: "lantern-post", tier: "market" },
   ],
   records: { ...Object.fromEntries(townRegionMarks(SERVED.marks).map((m) => [m.id, m])), ...RECORDS },
   present: { radius_m: 120, residents: [] },
@@ -77,6 +91,9 @@ const EXPLAIN = {
   "halloween-candy-bowl": { explains: "halloween-candy-bowl", class: "the-town/halloween-candy-bowl", what: "A Halloween Candy Bowl is a thing that holds.",
     extends: [{ class: "thing" }, { class: "sited" }, { class: "mark" }, { class: "postmark-node" }] },
   thing: { explains: "thing", class: "the-town/thing", what: "A thing.", extends: [{ class: "sited" }, { class: "mark" }, { class: "postmark-node" }] },
+  // a subclass of a PLACE: the office answers it, and it is no thing
+  "glass-greenhouse": { explains: "glass-greenhouse", class: "the-town/glass-greenhouse", what: "A glass greenhouse is a place.", extends: [{ class: "sited" }, { class: "mark" }, { class: "postmark-node" }] },
+  "lantern-post": { explains: "lantern-post", class: "the-town/lantern-post", what: "A lantern post is a thing.", extends: [{ class: "thing" }, { class: "sited" }, { class: "mark" }, { class: "postmark-node" }] },
 };
 // the enter ledger, per arm: the page reads it as the resident's enter stack
 const ENTERS = formatEnterExit({ handle: ACTOR, act: "enters", mark: BOWL, at: 1, iso: "2026-10-01T00:00:00.000Z" });
@@ -88,6 +105,8 @@ const ledgerText = () => `# enter-exit ledger (an invented rig)\n\n${LEDGERS[arm
 async function bootStubOffice() {
   const port = await freePort();
   const asked = [];
+  // the class reply, per kind: HELD until released, or made to FAIL ("500", or "malformed": a 200 with no lineage)
+  const gates = new Map(), failing = new Map();
   const srv = createHttp((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1:" + port);
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -99,7 +118,16 @@ async function bootStubOffice() {
     const q = url.searchParams;
     if (url.pathname === "/ops/whoami") return send({ principal: false, household: "rig-house", handles: [ACTOR] });
     if (url.pathname === "/world/apex") {
-      if (q.get("explain")) return send(EXPLAIN[q.get("explain")] ?? { error: "bounce", defect: "no class by that name" });
+      if (q.get("explain")) {
+        const kind = q.get("explain");
+        const answer = () => {
+          if (failing.get(kind) === "500") { res.writeHead(500, { "content-type": "application/json" }); return res.end("{}"); }
+          if (failing.get(kind) === "malformed") return send({ explains: kind, what: "no lineage in this reply" });
+          return send(EXPLAIN[kind] ?? { error: "bounce", defect: "no class by that name" });
+        };
+        const gate = gates.get(kind);
+        return gate ? gate.promise.then(answer) : answer();
+      }
       if (q.get("mark")) return send({ ...READ, focus: { id: q.get("mark"), body: RECORDS[q.get("mark")]?.body ?? "", can: [] } });
       if (q.get("read") === "walk") return send({ read: "walk", walkers: { walkers: [] } });
       return send(READ);
@@ -114,7 +142,8 @@ async function bootStubOffice() {
   });
   await new Promise((resolve) => srv.listen(port, "127.0.0.1", resolve));
   CLEANUP.push(() => srv.close());
-  return { port, asked };
+  const hold = (kind) => { let release; const promise = new Promise((r) => { release = r; }); gates.set(kind, { promise, release }); return () => release(); };
+  return { port, asked, hold, failing, reset: () => { for (const g of gates.values()) g.release(); gates.clear(); failing.clear(); } };
 }
 
 async function bootRig() {
@@ -198,11 +227,10 @@ for (const [name, want] of [["unentered", "here"], ["entered", "you are inside"]
       await residentSettled(page);
       const bowlWhere = await whereOf(page, BOWL);
       assert.equal(bowlWhere, want, `the bowl's where-line (${name}); the page: ${bowlWhere === want ? "" : JSON.stringify(await pageState(page))}`);
-      // the telling's card carries the same line at the page's next render: the bowl's lineage is the office's
-      // answer to the page's own ask (thingClasses, learned), and a card drawn before it landed is redrawn by
-      // the next render as every card is (the handle's rerender is renderCurrent itself)
-      await page.evaluate(() => window.__pmViewer.rerender());
-      await page.waitForTimeout(400);
+      // the telling's card carries the same line, with NO manual rerender: the bowl's lineage is the office's answer
+      // to the page's own ask, and the accepted answer repaints the telling by the page's own repaint (R1)
+      if (name !== "entered") await page.waitForFunction(([x, w]) => [...document.querySelectorAll(`.wv-card[data-id="${x}"] .wv-detail-where`)].some((e) => e.textContent.trim() === w),
+        [BOWL, want], { timeout: 10_000 }).catch(() => {});
       const cards = await page.evaluate((x) => [...document.querySelectorAll(`.wv-card[data-id="${x}"] .wv-detail-where`)].map((e) => e.textContent.trim()), BOWL);
       if (name === "entered") assert.ok(cards.every((c) => c === "you are inside"), `entered, the bowl is the scene she is inside, never a card that says here: ${cards}`);
       else assert.ok(cards.length > 0 && cards.every((c) => c === want), `the bowl's card (${name}): ${JSON.stringify(cards)}`);
@@ -229,3 +257,100 @@ test("SPECTATOR · the camera keeps its words over a bowl (\"the camera is insid
     assert.deepEqual(errors, [], "no page errors");
   } finally { await page.close(); }
 });
+
+// ── R1 · THE CLASS ANSWER IS ASYNC: silence before a wrong "inside" (Wright 2026-11-05 11:5x EST, option 1) ──────────
+
+/** the telling card(s) drawn for a mark, and their where-clauses ("" when the clause is empty) */
+const cardWheres = (page, id) => page.evaluate((x) => {
+  const cards = [...document.querySelectorAll(`.wv-card[data-id="${x}"]`)];
+  return { drawn: cards.length, wheres: cards.map((c) => c.querySelector(".wv-detail-where")?.textContent.trim() ?? "") };
+}, id);
+/** open the column on a mark and say it is up FOR THAT MARK (its title), with its where-line (null: the clause is empty and the line is not drawn) */
+async function columnOf(page, id, titleHas) {
+  await page.evaluate((x) => window.__pmViewer.select(x), id);
+  await page.waitForFunction((t) => {
+    const col = document.querySelector(".wv-homecol");
+    return !!col && !col.hidden && (col.querySelector(".wv-homecol-title")?.textContent ?? "").toLowerCase().includes(t);
+  }, titleHas, { timeout: 30_000 });
+  await page.waitForTimeout(300);
+  return page.evaluate(() => ({ title: document.querySelector(".wv-homecol .wv-homecol-title")?.textContent.trim() ?? null,
+    meta: document.querySelector(".wv-homecol .wv-homecol-meta")?.textContent.trim() ?? null }));
+}
+/** wait, with NO rerender and NO reselect, until the card(s) and the open column both say `want` */
+const bothSay = (page, id, want) => page.waitForFunction(([x, w]) => {
+  const cards = [...document.querySelectorAll(`.wv-card[data-id="${x}"] .wv-detail-where`)];
+  return cards.length > 0 && cards.every((e) => e.textContent.trim() === w) && document.querySelector(".wv-homecol .wv-homecol-meta")?.textContent.trim() === w;
+}, [id, want], { timeout: 15_000 }).catch(async (e) => {
+  throw new Error(`the card and the column never both said "${want}" with no repaint from the test: ${JSON.stringify(await cardWheres(page, id))}, column ${JSON.stringify(await page.evaluate(() => document.querySelector(".wv-homecol .wv-homecol-meta")?.textContent.trim() ?? null))} (${e.message.slice(0, 60)})`);
+});
+const explainsOf = (kind) => office.asked.filter((p) => p === `/world/apex?explain=${kind}`).length;
+
+test("R1 · A THING SUBCLASS, its class reply held: the first telling card AND the open column are silent; the accepted reply says \"here\" on both with no rerender", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  arm = "unentered"; office.reset(); office.asked.length = 0;
+  const release = office.hold("halloween-candy-bowl");
+  const { page, errors } = await openPage({ signedIn: true });
+  try {
+    await residentSettled(page);
+    assert.equal(explainsOf("halloween-candy-bowl"), 1, "the page asked the office what a halloween-candy-bowl is, once, and the reply is held");
+    const first = await cardWheres(page, BOWL);
+    assert.ok(first.drawn > 0, "the bowl's card is drawn (a missing card cannot pass)");
+    assert.deepEqual(first.wheres, first.wheres.map(() => ""), `the first telling says nothing of where she is: ${JSON.stringify(first.wheres)}`);
+    const col = await columnOf(page, BOWL, "door bowl");
+    assert.ok(/door bowl/i.test(col.title), "the column is up for the bowl");
+    assert.equal(col.meta, null, "the column's where-line is empty (not here, not inside)");
+    release();
+    await bothSay(page, BOWL, "here");
+    assert.equal(explainsOf("halloween-candy-bowl"), 1, "no second ask");
+    assert.deepEqual(errors, [], "no page errors");
+  } finally { office.reset(); await page.close(); }
+});
+
+test("R1 · THE NAMED EXCEPTION: an unentered ROOM whose class is unanswered is silent too, then \"you are inside\" when the office says it is no thing", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  arm = "unentered"; office.reset(); office.asked.length = 0;
+  const release = office.hold("glass-greenhouse");
+  const { page, errors } = await openPage({ signedIn: true });
+  try {
+    await residentSettled(page);
+    assert.equal(explainsOf("glass-greenhouse"), 1, "asked once, reply held");
+    const first = await cardWheres(page, GREEN);
+    assert.ok(first.drawn > 0, "the greenhouse's card is drawn");
+    assert.deepEqual(first.wheres, first.wheres.map(() => ""), `silent while unanswered: ${JSON.stringify(first.wheres)}`);
+    const col = await columnOf(page, GREEN, "greenhouse");
+    assert.equal(col.meta, null, "the column is silent too");
+    release();
+    await bothSay(page, GREEN, "you are inside");
+    assert.equal(explainsOf("glass-greenhouse"), 1, "no second ask");
+    assert.deepEqual(errors, [], "no page errors");
+  } finally { office.reset(); await page.close(); }
+});
+
+for (const how of ["500", "malformed"]) {
+  test(`R1 · A FAILED CLASS REPLY (${how}) stays silent for the page session, asks once, and a reload with an accepted reply resolves it`, async (t) => {
+    if (!chromium) return t.skip(skipReason);
+    arm = "unentered"; office.reset(); office.asked.length = 0;
+    office.failing.set("lantern-post", how);
+    const { page, errors } = await openPage({ signedIn: true });
+    try {
+      await residentSettled(page);
+      await page.waitForTimeout(2500);
+      assert.equal(explainsOf("lantern-post"), 1, "asked once");
+      const failed = await cardWheres(page, LAMP2);
+      assert.ok(failed.drawn > 0, "the lamp post's card is drawn");
+      assert.deepEqual(failed.wheres, failed.wheres.map(() => ""), `silent after the failure: ${JSON.stringify(failed.wheres)}`);
+      assert.equal((await columnOf(page, LAMP2, "second lamp")).meta, null, "the column is silent too");
+      await page.waitForTimeout(2500);
+      assert.equal(explainsOf("lantern-post"), 1, "no polling, no retry: still the one ask");
+      assert.deepEqual((await cardWheres(page, LAMP2)).wheres, failed.wheres.map(() => ""), "and still silent");
+      // the other way out the ruling names: the page reloaded, the office now accepting the ask
+      office.failing.clear();
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await page.waitForFunction(() => !!window.__pmViewer, null, { timeout: 60_000 });
+      await residentSettled(page);
+      await columnOf(page, LAMP2, "second lamp");
+      await bothSay(page, LAMP2, "here");
+      assert.deepEqual(errors, [], "no page errors");
+    } finally { office.reset(); await page.close(); }
+  });
+}
