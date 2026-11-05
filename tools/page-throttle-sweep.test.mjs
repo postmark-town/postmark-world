@@ -40,7 +40,7 @@ const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "tools/page-throttle-sweep.test.mjs";
 const RATE = 4;
-// the 22 page tests at WLD-71
+// the 22 page tests at WLD-71, and WLD-74's resident card
 const SWEPT = [
   "tools/act-as-town-bodies.test.mjs", "tools/backdrop-without-text.test.mjs", "tools/dungeon-page.test.mjs",
   "tools/first-paint-boot-shape.test.mjs", "tools/lately-more-on-the-page.test.mjs", "tools/lately-on-the-resident-path.test.mjs",
@@ -49,6 +49,7 @@ const SWEPT = [
   "tools/region-column-reads-the-door.test.mjs", "tools/resident-middle-on-the-page.test.mjs", "tools/room-feather.test.mjs",
   "tools/search-the-town.test.mjs", "tools/standpoint-dot-culled.test.mjs", "tools/thumbnails-follow-the-drawn-size.test.mjs",
   "tools/town-ground-page.test.mjs", "tools/walk-enter-terms-page.test.mjs", "tools/walk-layer-once.test.mjs",
+  "tools/wld74-card-on-the-page.test.mjs",
 ];
 // the one deliberate exception, by name: lite-mode's slow machine is measured at its own rate
 const OWN_RATE = { "tools/lite-mode.test.mjs": { clock: "real", throttle: 6 } };
