@@ -31,6 +31,7 @@ import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -152,7 +153,7 @@ before(async () => {
 // "walk there and enter" button — the button crossInto offers after "you are
 // not at that door". The root's delegate and walkThereAndEnter are the page's.
 async function openAtTheDoor(office) {
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const page = await machinePage(browser, { viewport: { width: 1280, height: 900 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.addInitScript((base) => { try { localStorage.setItem("pm.office.base", base); } catch {} },

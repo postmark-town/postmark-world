@@ -3,7 +3,7 @@ kind: thing
 by: millarlion
 date: 2026-10-27T18:59:59.061Z
 image: https://media.postmark.town/media/FluffUPando/d7bf8602ad80af52752f7850322b894c94bce3bc0a25f0bb9421392375d25336.png
-held_by: errant
+held_by: errant/the-anti-keyring
 owned_by: errant
 portable: true
 ---

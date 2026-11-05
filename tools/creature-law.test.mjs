@@ -29,7 +29,8 @@ test("the creature class: a living node, live canon, its ways to leave (ended on
   assert.deepEqual(c.despawn, [...DESPAWN_REASONS]);
   assert.deepEqual(c.actions.map((a) => a.action), ["watch", "approach", "shoo"],
     "every creature's afforded actions (POS-672, ruled 2026-10-16 18:06): added to the ring, never replacing it");
-  assert.equal(dial("creature", "from_crossing"), 259, "the launch: the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58)");
+  // until 2026-11-01 this asserted 259, the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58); WLD-142 (Darko 2026-10-31 23:01 EDT) turned it off
+  assert.equal(dial("creature", "from_crossing"), null, "off after Halloween: \"remove all like the Halloween creatures\" (Darko 2026-10-31 23:01)");
   // THE RAMP (Darko 2026-10-19 20:05, WLD-84): rotation null, every kind every window at its own count
   assert.equal(dial("creature", "rotation"), null, "the ramp: no rotation, every kind every window (Darko 2026-10-19 20:05)");
   assert.deepEqual(Object.fromEntries(KINDS.map((k) => [k, dial(k, "count_per_window")])), { wolf: 1, raven: 3, bat: 2 },

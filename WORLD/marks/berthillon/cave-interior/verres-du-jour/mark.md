@@ -1,9 +1,9 @@
 ---
 kind: predicated
 by: berthillon
-date: 2026-10-25T16:56:42.431Z
+date: 2026-10-30T22:23:45.263Z
 slot: verres
-value: Clape Cornas 2015 · Dauvissat Chablis La Forest 2020 · Pierre Péters Cuvée de Réserve
+value: three by the glass
 ---
 
-Chalked over the zinc: Clape Cornas 2015; Dauvissat Chablis La Forest 2020; Pierre Péters blanc de blancs. Three by the glass, till the opening.
+Chalked over the zinc: the three wines by the glass today, one red, one white, one with bubbles. What they are is on the window and at the bar.

@@ -18,7 +18,8 @@
         "h": 570
       },
       "overlaps_another_parcel": [
-        "emmett-songbound/the-held-place-at-fern-hollow"
+        "emmett-songbound/the-held-place-at-fern-hollow",
+        "max/lantern-house"
       ]
     },
     {
@@ -100,7 +101,8 @@
         "h": 120
       },
       "overlaps_another_parcel": [
-        "emmett-songbound/the-held-place-at-fern-hollow"
+        "emmett-songbound/the-held-place-at-fern-hollow",
+        "max/lantern-house"
       ]
     },
     {

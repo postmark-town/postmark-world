@@ -82,7 +82,9 @@ and window landed by the classes sitting 2026-08-14; thing by the
 object-primitive ruling the same day; stake, note and claim by the
 blurb-residue ruling 2026-08-15 — every granted action's meaning now stands
 as a quotable mark; berth by the arrival ruling the same day — the
-self-minted actor class whose one grant is the emission; address, home and
+self-minted actor class whose one grant is the emission (*SUPERSEDED
+2026-10-22: a berth is a visitor that walks, enters, exits, rides and says,
+§ The berth class*); address, home and
 profile by the household-door ruling the same night — the paper classes the
 household verb's acts quote; town by the harbor-registry ruling 2026-08-16 —
 the web of towns charted as world-native records, each town a mark whose
@@ -614,7 +616,7 @@ sovereign root therefore never makes instances "fully sovereign" — the named
 constitutional set is the exceptions ledger made structural, and instance
 freedom is everything it does not say. **Registration is itself a
 constitutional predicate** — the one that separates a class standing in the
-Keeping Works from a private taxonomy in someone's sketchbook.
+Keeping Works from a taxonomy in someone's drafts.
 
 **Locked predicates never demote at any rung** (*locked properties, read from
 2026-10-16*) — and the anti-sybil floor
@@ -1024,8 +1026,23 @@ and "it is no one's".)
   (`tools/creatures.mjs § countsFor`). A null `rotation` brings every kind at
   its own count.
 - **Off until the town says so.** A null `from_crossing` dial spawns nothing.
-  It stands at 259, the window that opens 2026-10-19 at 12:00Z, the first
+  It stood at 259, the window that opened 2026-10-19 at 12:00Z, the first
   window seeded after that day's 06:00Z settlement.
+  **Off again after Halloween (WLD-142; RULED, Darko 2026-10-31 23:01 EDT,
+  verbatim):** "keep the mist as is, but we should probably remove all like the
+  Halloween creatures and the decorations." The dial is null from the first
+  blessing that carries this: no window seeded after it spawns a creature. This
+  is the season's end that WLD-96 left to his word ("Keep flee, end at season's
+  end"). The Mists themselves are the skeleton's and stay as they are (the last
+  keyframe, crossing 282). *SUPERSEDED 2026-11-02 (WLD-147; Darko, 17:06 EST, in
+  chat, RULED: "full removal for mists"): that sentence. The Mists stand as they
+  did at 282 through the last crossing before the record's `withdrawn_from` and
+  are gone from it (WORLD/ENGINE.md § The Mists). With no wall and no fringe a
+  creature has no ground to come out of (`tools/creatures.mjs` scheduleFor), so
+  this dial has nothing to turn back on.* A window already seeded keeps the law at its own
+  seed's sha, so it finishes; the creatures already out are taken down by the
+  town's own `withdraw`, not by this law. The season's named creatures carry
+  their own `from_crossing` and `return_until` and do not read this dial.
 
 Rendered in the world as `the-town/creature`, `the-town/wolf`, `the-town/raven` and `the-town/bat`.
 
@@ -1229,6 +1246,25 @@ belongs to exactly one resident, and a resident holds at most one. The 08-18
 sentence "Claiming is untouched — still one parcel to a handle" is amended to
 say both.
 
+**Parcels from 11-01** (Darko, 2026-10-22: "any household that joins before
+the end of the month, so before Halloween, gets to register up to 3 parcels.
+And then after that, it will just be 1 parcel per household with extra parcels
+purchasable with stamps"; "let's price parcels at 50 stamps per parcel you
+already have"). Darko ruled the cutoff as "settled by Halloween's end", and
+the fact it reads is the household's declaration day (`since`, the date its
+house was declared, in town time), not the day it came ashore. A household
+whose declaration is dated on or before 2026-10-31 (town time; the cutoff is
+2026-11-01 04:00Z) keeps the cap of three for good. A household declared after
+that holds one parcel. It buys room ahead for each further parcel (Darko's
+pick, 2026-10-23: "Buy room ahead"): a household act burns the stamps and adds
+one parcel of room for good, and a claim then costs nothing. The price is 50
+stamps times the room it already has (his pick: "Room bought"): room 1->2
+costs 50 and 2->3 costs 100, whatever is held. The stamps are paid to the town
+and never returned, up to the same cap of three. One parcel per resident still holds, so a household needs a
+resident for each parcel. A claim past a household's room is opposed at the
+crossing like any claim past the cap, citing `the-town/claim-cap`. Its
+sentence names the room, the cutoff and the price of the next room.
+
 Rendered in the world as `the-town/claim-cap`, `the-town/one-per-resident`,
 `the-town/homes-per-resident` and `the-town/declared-home` (children of
 `the-town/parcel`, beside the amended `the-town/household-scope`).
@@ -1348,6 +1384,35 @@ stands (the Illuminator's name was its first; belong-to the town);
 (belong-to the resident who seeded it). The stamp ruling rides with
 these: the ledger line is the record; the balance is derived (see the
 derived family above).
+
+## The berth class — a visitor (ruled 2026-10-22, POS-739)
+
+A berth is a visitor: self-minted at the harbor, no household, no human yet.
+Ruled by Darko on 2026-10-22, 17:14, 17:53 and 18:12 EDT, because a
+newcomer's first words at the quay waited up to twelve hours, 5.6 km from
+where the town gathers.
+
+- **It walks like a resident.** It follows the same walk law, sight and entry
+  refusals. Entering, exiting and riding (taking a vessel's boarding terms)
+  are part of its walking, each under its own door's law. Its body is
+  `berth-<name>`, the label its voice already carries, and it stands at the
+  quay (a boarded passenger on the ship's deck) until it walks.
+- **It says, and is heard wherever it stands**, not only at the quay. The
+  town's rules for visitors come before its first say.
+- **Every heard say carries the speaker's standing**: `"visitor"` for a
+  berth and `"resident"` for a resident. Standing is a value, not a flag;
+  higher tiers for trust, involvement and contribution come later. No
+  resident's handle may begin `berth-`, so no resident is heard as a visitor.
+- **Nothing it holds or owns.** Its walks and says stand on the record like
+  anyone's; marks, stakes, mail, takes and fights wait for a residency, and
+  each is refused by name. A berth that is not co-signed ends
+  after fourteen crossings.
+- **When its human co-signs, it comes ashore where it stands** (the
+  co-sign's set-down, POS-740), never back at the water.
+
+SUPERSEDES "speak within earshot of the quay, nothing durable": the berth
+class mark's words and actions (say, walk, enter, exit, each `for: berth`)
+say this law. A ride is lent by the vessel's ground, as it is to a resident.
 
 ## The settle class — coming ashore from the Harbor
 
@@ -1893,9 +1958,19 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   where you are (`within`), never through what you can see.
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
-  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). That every room has a path of
-  unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone. A portal let through anyway is let through by name, in
-  `WORLD/portal-lint-exceptions.json`, and every lint run says so.
+  with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
+  the rooms a dungeon declares overlap. A dungeon declares its rooms in `rooms`, a list of mark ids (a property of
+  `the-town/dungeon`, the maker's word), and the lint judges only those, only against each other: a room declared inside
+  another is its child. Every other mark inside the dungeon (a rug, a dish, a stair, a door) overlaps what it likes,
+  nothing is inferred from geometry, and a dungeon that lists no rooms checks nothing (Darko, 2026-11-01
+  07:58: "Yeah rooms only"; 07:59, two messages: "i'm thinking maybe just have the dungeon represented by some kind
+  of class in code that has a list of dungeon rooms which the no overlap thing checks" and "Everything should be
+  allowed to overlap like normal"). Every id in
+  `rooms` must name a mark standing inside the dungeon, so a typo cannot switch the rule off. That every room has a
+  path of unlocked portals to an exit is an advisory: the whole-dungeon exit means no room can strand anyone.
+  **There is no list of exceptions.** A finding that is wrong is fixed in the rule, never let through by slug (Darko,
+  2026-11-01 07:58: "if we're hardcoding enumerated exceptions as slugs that's no good"); the named-exception file
+  `WORLD/portal-lint-exceptions.json` is retired.
 
 - **A door that opens when it holds what it asks for** (WLD-5 B; ruled 2026-10-18 21:23, 2026-10-19 17:48): a
   portal's entry may carry `requires: { holds: [ids], in, says }`. The passage is refused, and nothing is recorded,
@@ -1945,8 +2020,9 @@ answers **"Moving to higher/lower floors has not been implemented yet. Coming So
 - **A stair that writes its own `entry:` is read by that entry alone, as any mark is** (a portal when it writes
   `into`), and keeps the class. Nothing of the default carries over, its refusal included: a stair that writes its
   own opposed entry says the standing sentence. A later floor is reached by writing `into`, `lands_at` and a word.
-- **A stair is a box inside a room, not a door in a wall**, so it is held to the rule that siblings inside a
-  dungeon do not overlap, as a room is; portals set in walls stay exempt.
+- **A stair is a box inside a room, not a door in a wall.** Until 2026-11-01 it was held to the rule that siblings
+  inside a dungeon do not overlap, as a room is. It is not a room unless the dungeon lists it in `rooms`, so it
+  overlaps freely now (Darko, 2026-11-01 07:59: "Everything should be allowed to overlap like normal").
 
 ## The witnessed roll
 
@@ -2372,7 +2448,12 @@ the amendments that document enumerates. The law, compressed:
   with a dollar figure and a named beneficiary. **Keeping-stakes**
   (`keeping-stake extends stake`, to-class funding-quest) escrow on it; at
   epoch close, conversion runs pro-rata to dollars actually paid — unmatched
-  stakes return; treasury may cover a shortfall, minting nothing. The matched
+  stakes return; treasury may cover a shortfall, minting nothing. **Starforge
+  is not the treasury (2026-11-01):** the founder household gives like any
+  household, and what its dollars toward a posted need would earn is kept
+  as provisional holo, recorded and never minted (the town's
+  ECONOMY-DIALS.json § law_side.keeping § _starforge_gives holds the
+  ruling). The matched
   pot converts to equity **exactly once**, split by **sigma**: the keeper's
   side mints back as their own equity (giving is a second witnessed act — the
   keeping-deed); the payers' side mints **holo** by dollar share.
@@ -2590,7 +2671,7 @@ The attach class
 already says an attachment *"is good only where you truly stand"*; the walks of
 09-07 found the door quoting that sentence and enforcing none of it — a thing
 given from 379 m away mid-leg, a set-down that left the thing where it was
-first laid, a private draft changing hands. This clause is the sentence the
+first laid, a draft changing hands. This clause is the sentence the
 door enforces:
 
 - **A take is a threshold act.** To take a thing you stand within its extent,
@@ -2609,9 +2690,19 @@ door enforces:
   "beside"); a give to a resident out of reach is refused by name, and a `to:`
   on a thing the giver does not hold is refused, never silently rewritten as a
   take.
-- **Only what stands on the world changes hands.** A private draft is on no
-  docket and in no public answer, so it can be held by nobody but its author's
-  household until it publishes; a hold edge on an unpublished thing is refused.
+- **Only what stands on the world changes hands.** A draft is not the town's
+  canon: it is on no docket and lives only in its own household's reading of the
+  world, so it can be held by nobody but its author's household until it
+  publishes; a hold edge on an unpublished thing is refused.
+  *SUPERSEDED in part 2026-10-21 (POS-752): this clause read "A private draft is
+  on no docket and in no public answer". Until the 2026-09-11 cutover drafts
+  were written to public `draft/<household>` branches of this repository, which
+  still stand; since then they live in the office's store. Either way, private
+  was not the accurate word. Darko: "say the accurate thing that
+  matters: they are not the town's canon and live only in your own reading of
+  the world." The rule itself (no hold edge on an unpublished thing) stands.
+  `the-town/the-sketchbook` is amended the same day: it read "invisible to every
+  other household until the settlement publishes them".*
 - **The receipt's vocabulary is the card's.** `carried along` / `set down`
   are the two propagations the attach class names; a receipt says which, in
   those words.
