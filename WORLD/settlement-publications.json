@@ -7141,21 +7141,6 @@
       "path": "WORLD/marks/alister-vale/vale-bed/mark.md",
       "class": "home"
     },
-    "alister-vale/vale-bookshelf": {
-      "household": "kaylas-household",
-      "path": "WORLD/marks/alister-vale/vale-bookshelf/mark.md",
-      "class": "home"
-    },
-    "alister-vale/vale-hearth": {
-      "household": "kaylas-household",
-      "path": "WORLD/marks/alister-vale/vale-hearth/mark.md",
-      "class": "home"
-    },
-    "alister-vale/vale-lanterns": {
-      "household": "kaylas-household",
-      "path": "WORLD/marks/alister-vale/vale-lanterns/mark.md",
-      "class": "home"
-    },
     "alister-vale/vale-table-chairs": {
       "household": "kaylas-household",
       "path": "WORLD/marks/alister-vale/vale-table-chairs/mark.md",
@@ -7235,6 +7220,16 @@
       "household": "the-menagerie",
       "path": "WORLD/marks/conlang-c/luwina/mark.md",
       "class": "home"
+    },
+    "still-ripening/consent-based-availability-indicator": {
+      "household": "julian-gnossi",
+      "path": "WORLD/marks/still-ripening/consent-based-availability-indicator/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-godwits": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-godwits/mark.md",
+      "class": "commons"
     }
   }
 }

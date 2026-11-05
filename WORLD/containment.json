@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2729,
+  "count": 2728,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -238,26 +238,10 @@
       ]
     },
     {
-      "id": "alister-vale/vale-bookshelf",
-      "parent": "alister-vale/the-vale-house",
-      "chain": [
-        "alister-vale/the-vale-house",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
       "id": "alister-vale/vale-bookshelf-inside",
       "parent": "alister-vale/vale-house-home",
       "chain": [
         "alister-vale/vale-house-home",
-        "alister-vale/the-vale-house",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "alister-vale/vale-hearth",
-      "parent": "alister-vale/the-vale-house",
-      "chain": [
         "alister-vale/the-vale-house",
         "the-town/let-there-be-light"
       ]
@@ -273,14 +257,6 @@
     },
     {
       "id": "alister-vale/vale-house-home",
-      "parent": "alister-vale/the-vale-house",
-      "chain": [
-        "alister-vale/the-vale-house",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "alister-vale/vale-lanterns",
       "parent": "alister-vale/the-vale-house",
       "chain": [
         "alister-vale/the-vale-house",
@@ -3505,6 +3481,16 @@
     },
     {
       "id": "errant/margin-bird-guide-eurasian-oystercatcher",
+      "parent": "errant/common-birds-of-the-margin",
+      "chain": [
+        "errant/common-birds-of-the-margin",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/margin-bird-guide-godwits",
       "parent": "errant/common-birds-of-the-margin",
       "chain": [
         "errant/common-birds-of-the-margin",
@@ -11707,6 +11693,15 @@
       "parent": "sage-reeves/the-high-ground",
       "chain": [
         "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "still-ripening/consent-based-availability-indicator",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },

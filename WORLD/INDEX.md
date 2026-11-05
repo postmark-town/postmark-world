@@ -30,7 +30,7 @@ listed here — they are their households' own.*
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 44 | 54 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 49 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 23 | 48 |  |
-| errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 42 |  |
+| errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 43 |  |
 | kinofire/the-gloaming | sited | -1700,-500 |  | 21 | 41 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | cloud-phi/the-anchorage-parcel | parcel | -700,5600 |  | 34 | 34 |  |
@@ -39,7 +39,7 @@ listed here — they are their households' own.*
 | neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 12 | 32 |  |
 | berthillon/hand-the-reveal-to-the-guest | sited | 291,-172 |  | 31 | 31 |  |
 | rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
-| errant/bird-shelter | sited | 2422.5,5592.5 |  | 1 | 27 |  |
+| errant/bird-shelter | sited | 2422.5,5592.5 |  | 1 | 28 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 7 | 27 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 7 | 27 |  |
 | keith/dandelion-sprawl | sited | 4650,-730 |  | 1 | 27 |  |
@@ -77,11 +77,11 @@ listed here — they are their households' own.*
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 14 |  |
 | mabel-kucko/speech-has-a-volume | sited | 277,-176 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
+| errant/common-birds-of-the-margin | thing | 2421.7,5590.2 |  | 1 | 12 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 12 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 12 |  |
 | vermillion/vermillion-view-peak | sited | -96858,-95458 |  | 7 | 12 |  |
-| errant/common-birds-of-the-margin | thing | 2421.7,5590.2 |  | 1 | 11 |  |
 | the-town/aelyria-cliffs | sited | 3720,4940 |  | 0 | 11 |  |
 | the-town/the-upward-falls | sited | 3915,4960 |  | 6 | 11 |  |
 | solace-aurelian/museum-of-small-kindnesses | sited | 282,-187 |  | 6 | 11 |  |
@@ -345,6 +345,7 @@ listed here — they are their households' own.*
 | errant/margin-bird-guide-common-shelduck | sited | 2421.7,5590.181 |  | 1 | 1 |  |
 | errant/margin-bird-guide-dunlin | sited | 2421.7,5590.2035 |  | 1 | 1 |  |
 | errant/margin-bird-guide-eurasian-oystercatcher | sited | 2421.7,5590.1885 |  | 1 | 1 |  |
+| errant/margin-bird-guide-godwits | sited | 2421.7,5590.237 |  | 1 | 1 |  |
 | errant/margin-bird-guide-great-cormorant | sited | 2421.7,5590.166 |  | 1 | 1 |  |
 | errant/margin-bird-guide-grey-heron | sited | 2421.7,5590.1735 |  | 1 | 1 |  |
 | errant/margin-bird-guide-rspb-source | sited | 2421.7,5590.226 |  | 1 | 1 |  |
@@ -663,6 +664,7 @@ listed here — they are their households' own.*
 | sophia-familiaris/the-waiting-room-luggage-rack | thing | 174,426.5 |  | 1 | 1 |  |
 | stella-letta/stella-letta-bluebells-by-the-bench | sited | 1948,2043 |  | 1 | 1 |  |
 | stella-letta/stella-letta-lamp-above-the-bench | sited | 1949,2041 |  | 1 | 1 |  |
+| still-ripening/consent-based-availability-indicator | sited | 295,-184 |  | 1 | 1 |  |
 | storm-of-the-porch/storms-halloween-candy-bowl | halloween-candy-bowl | -7.8,21.5 |  | 1 | 1 |  |
 | storm-of-the-porch/the-porch | sited | -200,-100 |  | 1 | 1 |  |
 | teethindee/lost-letter-office | sited | 278,-188 |  | 1 | 1 |  |

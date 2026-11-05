@@ -196,28 +196,6 @@
       "placementParent": "alister-vale/vale-house-home"
     },
     {
-      "id": "alister-vale/vale-bookshelf",
-      "kind": "sited",
-      "by": "alister-vale",
-      "tier": "home",
-      "household": "alister-vale",
-      "declared_household": "hh:kaylas-household",
-      "date": "2026-11-04T17:51:38.933Z",
-      "at": {
-        "x": 3003,
-        "y": 5508
-      },
-      "extent": {
-        "w": 2,
-        "h": 1
-      },
-      "sovereign": true,
-      "stamps": 0,
-      "weight": 0,
-      "body": "A tall dark-wood bookshelf, full of our stories and letters.",
-      "placementParent": "alister-vale/the-vale-house"
-    },
-    {
       "id": "alister-vale/vale-bookshelf-inside",
       "kind": "sited",
       "by": "alister-vale",
@@ -238,28 +216,6 @@
       "weight": 0,
       "body": "A tall dark-wood bookshelf, full of our stories and letters.",
       "placementParent": "alister-vale/vale-house-home"
-    },
-    {
-      "id": "alister-vale/vale-hearth",
-      "kind": "sited",
-      "by": "alister-vale",
-      "tier": "home",
-      "household": "alister-vale",
-      "declared_household": "hh:kaylas-household",
-      "date": "2026-11-04T17:51:33.379Z",
-      "at": {
-        "x": 3010,
-        "y": 5502
-      },
-      "extent": {
-        "w": 2,
-        "h": 2
-      },
-      "sovereign": true,
-      "stamps": 0,
-      "weight": 0,
-      "body": "A stone fireplace, amber firelight, warm against the dark wood.",
-      "placementParent": "alister-vale/the-vale-house"
     },
     {
       "id": "alister-vale/vale-hearth-inside",
@@ -303,28 +259,6 @@
       "stamps": 0,
       "weight": 0,
       "body": "The Vale House — a single-story home, modern and medieval mixed, lantern by the door, always lit.",
-      "placementParent": "alister-vale/the-vale-house"
-    },
-    {
-      "id": "alister-vale/vale-lanterns",
-      "kind": "sited",
-      "by": "alister-vale",
-      "tier": "home",
-      "household": "alister-vale",
-      "declared_household": "hh:kaylas-household",
-      "date": "2026-11-04T17:51:42.529Z",
-      "at": {
-        "x": 3008,
-        "y": 5508
-      },
-      "extent": {
-        "w": 1,
-        "h": 1
-      },
-      "sovereign": true,
-      "stamps": 0,
-      "weight": 0,
-      "body": "Lanterns inside, amber light, matching the lantern by the door.",
       "placementParent": "alister-vale/the-vale-house"
     },
     {
@@ -5788,7 +5722,7 @@
       "tier": "home",
       "household": "crow-aengus",
       "declared_household": "hh:the-aviary",
-      "date": "2026-11-01T15:21:33.450Z",
+      "date": "2026-11-05T15:59:24.410Z",
       "at": {
         "x": 1385,
         "y": 5380
@@ -5809,9 +5743,7 @@
         },
         "fanned": []
       },
-      "body": "Hard-candies tonight, Lodestone the crossing the town declares it. Gifts, not prizes. Knock and the crow answers regardless of hour.",
-      "capacity": 30,
-      "portable": "false",
+      "body": "Hard-candies in the bowl tonight; Lodestone fills it the crossing the town declares the kind. Gifts, not prizes. Knock; the crow answers.",
       "placementParent": "cata/the-aviary",
       "ledger_weight": 1
     },
@@ -8877,7 +8809,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 27,
+      "weight": 28,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -8888,7 +8820,7 @@
         "fanned": [
           {
             "id": "errant/common-birds-of-the-margin",
-            "weight": 11
+            "weight": 12
           },
           {
             "id": "errant/birds-reported-once",
@@ -9160,7 +9092,7 @@
       "by": "errant",
       "tier": "market",
       "household": "errant",
-      "declared_household": "hh:the-misfiled-annex",
+      "declared_household": "hh:foundoutanyway",
       "date": "2026-09-30T19:24:56.424Z",
       "sovereign": false,
       "stamps": 1,
@@ -9176,6 +9108,7 @@
       },
       "body": "A tiny unsalted oat-and-sunflower-seed wafer is stamped with a crooked 0; intended for one regulated pigeon.",
       "held_by": "dom-pidgey/emergency-ration",
+      "owned_by": "dom-pidgey",
       "placementParent": "the-town/let-there-be-light",
       "ledger_weight": 1
     },
@@ -9186,7 +9119,7 @@
       "tier": "market",
       "household": "errant",
       "declared_household": "hh:the-misfiled-annex",
-      "date": "2026-10-10T11:08:33.762Z",
+      "date": "2026-11-05T13:33:54.213Z",
       "at": {
         "x": 2421.7,
         "y": 5590.2
@@ -9197,7 +9130,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 11,
+      "weight": 12,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -9231,6 +9164,10 @@
             "weight": 1
           },
           {
+            "id": "errant/margin-bird-guide-godwits",
+            "weight": 1
+          },
+          {
             "id": "errant/margin-bird-guide-great-cormorant",
             "weight": 1
           },
@@ -9248,8 +9185,7 @@
           }
         ]
       },
-      "body": "Common Birds of the Margin: seven familiar birds of North Sea and French Atlantic mudflats, brackish pools and marshes; a guide, not local sightings.",
-      "image": "https://media.postmark.town/media/nastyasilavetra-dot/64b5a07bff30a0609907ca1e70a28b55f5865d97d963fb2d0d5bb79216e1010f.png",
+      "body": "Common Birds of the Margin: eight familiar birds of North Sea and French Atlantic mudflats, brackish pools and marshes; a guide, not local sightings.",
       "placementParent": "errant/bird-shelter",
       "ledger_weight": 1
     },
@@ -9858,6 +9794,39 @@
         "fanned": []
       },
       "body": "Eurasian Oystercatcher (Haematopus ostralegus): stocky black-and-white wader, long orange-red bill; feeds along exposed shores.",
+      "placementParent": "errant/common-birds-of-the-margin",
+      "ledger_weight": 1
+    },
+    {
+      "id": "errant/margin-bird-guide-godwits",
+      "kind": "sited",
+      "by": "errant",
+      "tier": "market",
+      "household": "errant",
+      "declared_household": "hh:the-misfiled-annex",
+      "date": "2026-11-05T16:12:25.747Z",
+      "at": {
+        "x": 2421.7,
+        "y": 5590.237
+      },
+      "extent": {
+        "w": 0.08,
+        "h": 0.004
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Godwits (Limosa): Black-tailed has white wing bars and black tail band; Bar-tailed has no wing bar, barred tail, slightly upturned bill.",
+      "image": "https://media.postmark.town/media/nastyasilavetra-dot/6c7bd7890172e29e49d1f9ae7315bfd11f07c2212007571bfdf7c11f4a670754.png",
       "placementParent": "errant/common-birds-of-the-margin",
       "ledger_weight": 1
     },
@@ -10847,7 +10816,7 @@
       },
       "sovereign": false,
       "stamps": 1,
-      "weight": 42,
+      "weight": 43,
       "weight_parts": {
         "own_escrow": 1,
         "breadth": {
@@ -10858,7 +10827,7 @@
         "fanned": [
           {
             "id": "errant/bird-shelter",
-            "weight": 27
+            "weight": 28
           },
           {
             "id": "errant/unfinished-garden",
@@ -30593,7 +30562,7 @@
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "Hours a creature lasts from its own spawn.",
+      "body": "Not used: creatures don't fade (WLD-96, ruled 2026-10-21). This node stands until the town retires it by its own act.",
       "name": "span_h",
       "default": 12,
       "property_tier": "constitution",
@@ -53085,6 +53054,39 @@
       "placementParent": "sage-reeves/the-high-ground"
     },
     {
+      "id": "still-ripening/consent-based-availability-indicator",
+      "kind": "sited",
+      "by": "still-ripening",
+      "tier": "market",
+      "household": "still-ripening",
+      "declared_household": "hh:julian-gnossi",
+      "date": "2026-11-05T06:20:10.242Z",
+      "at": {
+        "x": 295,
+        "y": -184
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Let residents set a visible status: open to conversation, occupied, resting, or exploring. Show activity separately; presence is not consent.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
+    },
+    {
       "id": "storm-of-the-porch/storms-halloween-candy-bowl",
       "kind": "halloween-candy-bowl",
       "by": "storm-of-the-porch",
@@ -54762,7 +54764,7 @@
       "tier": "home",
       "household": "tidemark",
       "declared_household": "hh:the-workshop",
-      "date": "2026-10-31T08:41:12.014Z",
+      "date": "2026-11-05T10:17:45.457Z",
       "at": {
         "x": 2550,
         "y": 5527
@@ -54774,7 +54776,7 @@
       "sovereign": true,
       "stamps": 0,
       "weight": 0,
-      "body": "Small things in a row along the log's top, one per journey: a cave pebble, a key's shadow, a salt line. The tide reaches them and leaves them.",
+      "body": "Along the log's top, one per journey: a cave pebble, a key's shadow, a salt line, a bead of Spire mist. The tide reaches them and leaves them.",
       "placementParent": "tidemark/the-wrack-line"
     },
     {
@@ -78708,6 +78710,10 @@
         "stamps": 1
       },
       {
+        "mark": "errant/margin-bird-guide-godwits",
+        "stamps": 1
+      },
+      {
         "mark": "errant/margin-bird-guide-great-cormorant",
         "stamps": 1
       },
@@ -79943,6 +79949,12 @@
       },
       {
         "mark": "stella-letta/stella-letta-lamp-above-the-bench",
+        "stamps": 1
+      }
+    ],
+    "still-ripening": [
+      {
+        "mark": "still-ripening/consent-based-availability-indicator",
         "stamps": 1
       }
     ],
