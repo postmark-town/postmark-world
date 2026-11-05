@@ -1,7 +1,8 @@
-# canon-review.yml — a PR that touches canon waits for a founder's review at its head (WLD-159, 2026-11-05).
+# canon-review.yml — a PR that touches canon waits for Darko's look, recorded as an approval at its head (his, or
+# Wright's recording it; WLD-159, 2026-11-05).
 # tools/canon-review.mjs is the rule and says why; this only runs it. pull_request_target, so the BASE's copy of this
 # file and of the script judge the PR: nothing from the PR is checked out or run, only its files and reviews are read
-# through the API. A PR that touches no canon passes at once. After a founder approves, re-run this check
+# through the API. A PR that touches no canon passes at once. After the approval, re-run this check
 # (pull_request_target doesn't fire on a review).
 
 name: canon-review
@@ -14,7 +15,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  founder-review:
+  darkos-look:
     if: github.repository == 'postmark-town/postmark-world'
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +28,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: canon waits for a founder's review
+      - name: canon waits for Darko's look (an approval at the head, his or Wright's)
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
