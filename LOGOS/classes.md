@@ -1956,6 +1956,7 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   reach is the marks of it you are told; the marks outside it are out of reach until you step
   out. Every law of the marks that contain you still binds you, the constitution included: it reaches you through
   where you are (`within`), never through what you can see.
+- **A dungeon's walls are for immersion and challenge, not privacy** (Darko, 2026-11-01: "the scoping was for immersion and challenge in the dungeon, not for privacy"; relayed on WLD-143, 2026-11-02).
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
   with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
@@ -2190,6 +2191,29 @@ Rendered as `the-town/downed-not-dead`. Ruled by the founder 2026-08-26.
   published live."*). Making marks into a holder, or giving into one, is
   live: what a published holder holds (a published chest, a resident) is
   published, and what a pending holder holds shares its pending state.
+- **A full holder set down travels with what it holds, and withdrawn before
+  it publishes it comes back whole** (WLD-138; Darko 2026-11-03, *"Yes, at
+  settlement"*; Wright, AUTHORITY 2026-11-04 12:01 and 16:00 UTC). A holder
+  made in hand may be set down with things in it. What it holds stays its
+  contents, by its id: pending with it, reached by nobody until it
+  publishes, and printed inside it at the settlement, never loose. If its
+  maker withdraws its draft before it publishes, the same holder comes back
+  to the hands it was set down from, with everything it holds, in the
+  withdrawal's one act, exactly once, and under the carry cap (hands that
+  are full refuse the withdrawal, and nothing moves). This is a
+  restoration, not a creation: the hold record gains one face, `put-back`,
+  beside give, drop, take, make, consume and set-down. It keeps the original
+  id, record and quantities, never makes a second thing or takes a name,
+  and costs its resident no act or stamp of its own; its only writer is the
+  withdrawal itself, under the withdrawal's own owner, escrow and replay
+  guards. A holder whose claim the clearing refuses is never stranded either
+  (Wright, AUTHORITY 2026-11-04 21:57 UTC): its maker withdraws it, and it
+  comes back whole by the same face and the same writer. The clearing only
+  refuses, and writes no restoration of its own. A refused claim does not go
+  back on the docket, so withdrawal is its one way home. A claim held for
+  review is not stranded, only waiting: published, the holder prints with
+  what it holds; refused, it is withdrawn and comes back whole. It is not
+  withdrawn while the review is open.
 - **A holding is a set of marks** (ruled 2026-10-16 15:46–15:48, *"Yes,
   that's better"*). A count describes that set at some resolution, a class
   and a number; a read gives it at the nearest common class, and investigate

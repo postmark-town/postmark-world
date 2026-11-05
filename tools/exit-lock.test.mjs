@@ -75,6 +75,73 @@ test("LOCKED OUT, every way in is refused with a line naming when, and nothing i
   assert.equal(e.rows, undefined, "no rows at all");
 });
 
+// WLD-132 (Yew's phantom exit): a lock the office made because the resident's nerve ran out says so. The cause is the
+// exit act's own recorded `fled: "nerve"`, carried on the lock the office hands in; an exit the resident made carries
+// none and keeps the words above byte for byte. Nothing else about the lock moves.
+const FLED_LINE = "Your nerve ran out at 17:12Z, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.";
+const EXIT_LINE = "You left the Spire by exit at 17:12Z, so you can't come back in until the next settlement (18:00Z). Nothing was recorded.";
+const FLED = { [SPIRE]: { until: UNTIL, left_at: LEFT, fled: "nerve" } };
+
+test("WLD-132 · A FLEE SAYS WHY, through the real passage: nerve, when, and when you may return; the lock itself is the same lock", () => {
+  const w = world({ determined: { [`${SPIRE}::name`]: "the Spire" } });
+  const e = enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: FLED });
+  assert.equal(e.refused, "dungeon-locked");
+  assert.equal(e.error, FLED_LINE);
+  assert.equal(e.dungeon, SPIRE);
+  assert.equal(e.locked_until, UNTIL, "the same lock, the same instant");
+  assert.equal(e.rows, undefined, "nothing is written");
+  // the dungeon itself, from its outline, is the same lock with the same words
+  assert.equal(enter(AT(1100, 1100), SPIRE, w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: FLED }).error, FLED_LINE);
+});
+
+test("WLD-132 · AN EXIT THE RESIDENT MADE KEEPS ITS WORDS BYTE FOR BYTE, and so does a lock with no cause, an unknown cause, or no time", () => {
+  const w = world({ determined: { [`${SPIRE}::name`]: "the Spire" } });
+  const ask = (lock) => enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: { [SPIRE]: lock } }).error;
+  assert.equal(ask({ until: UNTIL, left_at: LEFT }), EXIT_LINE, "no cause recorded (every lock before this change)");
+  assert.equal(ask({ until: UNTIL, left_at: LEFT, fled: null }), EXIT_LINE, "a null cause");
+  assert.equal(ask({ until: UNTIL, left_at: LEFT, fled: "" }), EXIT_LINE, "an empty cause");
+  assert.equal(ask({ until: UNTIL, left_at: LEFT, fled: "hunger" }), EXIT_LINE, "a cause this word does not know is not guessed");
+  assert.equal(ask({ until: UNTIL, left_at: null, fled: "nerve" }), "Your nerve ran out, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.", "a fled lock with no recorded time still says why");
+  assert.equal(lockedOutWords({ dungeon: SPIRE, until: UNTIL, left_at: LEFT }), "You left the Spire by exit at 17:12Z, so you can't come back in until the next settlement (18:00Z). Nothing was recorded.", "the words function alone, no cause (its default determined names the dungeon from its id)");
+});
+
+test("WLD-132 · A FLEE LOCKS ONLY THE DUNGEON IT FLED: another dungeon's flee, or none, lets the same passage through", () => {
+  const ask = (lockedOut) => enter(AT(845, 1000), "spire/doors-outside", world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut });
+  assert.equal(ask({ "elsewhere/crypt": { until: UNTIL, left_at: LEFT, fled: "nerve" } }).error, undefined);
+  assert.equal(ask(null).error, undefined);
+  assert.ok(ask({}).entered.includes(SPIRE));
+});
+
+// WLD-132, the creature (Wright 2026-11-04 14:06Z, A/generic): the exit act may record `fled_by`, the id of the creature whose
+// encounter took the nerve. The refusal does NOT name it: the cause, the known time and the return, nothing about a creature.
+// Invented ids and invented kind class marks, so a name built from either would show.
+const KINDS = [
+  { id: "the-town/wolf", kind: "class", by: "the-town", extends: "creature", class: "wolf" },
+  { id: "the-town/bat", kind: "class", by: "the-town", extends: "creature", class: "bat" },
+];
+const WOLF = "creature:wolf-291-3", BAT = "creature:bat-291-7";
+const ringWorld = (kinds = KINDS) => { const w = world({ determined: { [`${SPIRE}::name`]: "the Spire" } }); return { ...w, marks: [...w.marks, ...kinds] }; };
+const askBy = (fled_by, lock = { until: UNTIL, left_at: LEFT, fled: "nerve" }, w = ringWorld()) =>
+  enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: { [SPIRE]: { ...lock, ...(fled_by === undefined ? {} : { fled_by }) } } });
+
+test("WLD-132 · A RECORDED CREATURE ID IS NOT A NAME: the refusal is the generic cause, time and return, whichever id and whichever kind marks the world holds", () => {
+  for (const [label, by] of [["a recorded creature of a declared kind", WOLF], ["another", BAT], ["a kind nobody declares", "creature:hound-291-1"], ["not a creature id", "ann"], ["null", null], ["empty", ""], ["a number", 7], ["none", undefined]]) {
+    const e = askBy(by);
+    assert.equal(e.refused, "dungeon-locked", label);
+    assert.equal(e.error, FLED_LINE, label);
+    assert.ok(!/wolf|bat|hound|creature|ring/i.test(e.error), `${label}: no creature name in the words`);
+    assert.equal(e.dungeon, SPIRE, label);
+    assert.equal(e.locked_until, UNTIL, `${label}: the same lock, the same instant`);
+  }
+  assert.equal(askBy(WOLF, { until: UNTIL, left_at: null, fled: "nerve" }).error,
+    "Your nerve ran out, so you fled the Spire and can't come back in until the next settlement (18:00Z). Nothing was recorded.", "no recorded time: the clause is omitted, nothing else changes");
+});
+
+test("WLD-132 · A CREATURE ID IS NOT A CAUSE: without `fled: nerve` the words are the exit's, whatever fled_by holds", () => {
+  assert.equal(askBy(WOLF, { until: UNTIL, left_at: LEFT }).error, EXIT_LINE);
+  assert.equal(askBy(WOLF, { until: UNTIL, left_at: LEFT, fled: "hunger" }).error, EXIT_LINE);
+});
+
 test("LOCKED OUT: the dungeon itself, entered from anywhere in its outline", () => {
   const e = enter(AT(1100, 1100), SPIRE, world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: LOCKED });
   assert.equal(e.refused, "dungeon-locked");
