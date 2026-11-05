@@ -1004,8 +1004,9 @@ function seatsOf(ranked, { keep, budget, dials, count, atFeet = null }) {
   for (const s of ranked) {
     const far = s.distM > dials.cluster_beyond_m;
     // the acting home is never folded into (or made the rep of) its household's cluster: it
-    // is carried alone below, and the rest of the household clusters without it (WLD-9)
-    if (far && s.household && !s.signal && s.id !== keep) {
+    // is carried alone below, and the rest of the household clusters without it (WLD-9). A thing at
+    // your feet is not far, whatever its centre's distance: it goes on to the seats below (WLD-74 E5)
+    if (far && s.household && !s.signal && s.id !== keep && !atFeet?.has(s.id)) {
       const rep = repByHh.get(s.household);
       if (rep) { if (count) rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
       repByHh.set(s.household, s);

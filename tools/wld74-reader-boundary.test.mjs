@@ -158,6 +158,46 @@ test("E5 · a small budget: overflow is bounded and counted in the existing tail
   assert.ok(openYourEyes(P, w).fov.carried.length > fov.carried.length);
 });
 
+// F3 (Bevel's FIX1 counterexample): at-feet is footprint containment, but a far household folds by CENTRE
+// distance (cluster_beyond_m). Two wide nested things of one household whose footprints both hold the point and
+// whose centres stand ~700 m off; and, as the control, two small far things of the same household not at your feet
+const WIDE = [["sbx-bea/a-long-awning", -700, 1404], ["sbx-bea/a-longer-awning", -701, 1406]].map(([id, x, w]) => ({
+  id, by: "sbx-bea", household: "sbx-bea", kind: "thing", tier: "market", at: { x, y: -1 }, extent: { w, h: 4 }, body: "A long awning.",
+}));
+const AFAR = [["sbx-bea/a-far-crate", -1500], ["sbx-bea/a-far-barrel", -1510]].map(([id, x]) => ({
+  id, by: "sbx-bea", household: "sbx-bea", kind: "thing", tier: "market", at: { x, y: 0 }, extent: { w: 2, h: 2 }, body: "A crate.",
+}));
+
+test("F3 · two things at your feet whose centres stand past cluster_beyond_m are both seated, not folded into one", () => {
+  // a flat world with the eye above the fog line: nothing here is cut by weather, light or ground
+  const w = { ...worldOf([...WIDE, ...AFAR]), fogCeilingM: 0 };
+  const idx = kindIndexOf(w.marks);
+  // THE PREMISES, measured: canonical sited things (numeric at/extent, mark-lint's gate; under the world-scale
+  // frame; the class chain says thing), both footprints hold the point, both centres past the cluster distance
+  for (const t of WIDE) {
+    assert.ok([t.at.x, t.at.y, t.extent.w, t.extent.h].every(Number.isFinite), `${t.id}: numeric at/extent`);
+    assert.ok(Math.max(t.extent.w, t.extent.h) < DIALS.world_scale_extent_m, `${t.id}: not the world frame`);
+    assert.equal(isThingIn(t, idx), true, `${t.id} is a thing`);
+    assert.ok(withinIds(containmentChain(P, [t])).includes(t.id), `${t.id}'s footprint holds the point`);
+    assert.ok(Math.hypot(t.at.x - P.x, t.at.y - P.y) > DIALS.cluster_beyond_m, `${t.id}'s centre is past cluster_beyond_m`);
+  }
+  const fov = openYourEyes(P, w).fov;
+  assert.equal(fov.counts.candidates, 4, "the two awnings and the two far things are candidates");
+  assert.equal(fov.counts.visible, 4, "and all four are visible: no other cull is in play");
+  for (const t of WIDE) assert.ok(carriedIds(fov).includes(t.id), `${t.id}, at your feet, is seated (budget ${DIALS.context_budget})`);
+  for (const t of WIDE) assert.match(lineOf(openYourEyes(P, w).tell(), t.id) ?? "", /^ {2}· here — /, `${t.id} reads here`);
+  // CONTROL: the far household still folds what is not at your feet, to one rep that is not an awning
+  const far = carriedIds(fov).filter((id) => AFAR.some((t) => t.id === id));
+  assert.equal(far.length, 1, `the two far things fold to one: ${far.join(", ")}`);
+  assert.equal(fov.carried.find((c) => c.id === far[0])?.clusteredCount, 1, "the other is its clusteredCount");
+  assert.equal(fov.carried.filter((c) => WIDE.some((t) => t.id === c.id)).some((c) => c.clusteredCount), false, "an awning is never the household's rep");
+  // the budget still bounds them: one seat, one awning; the other goes to the existing tail, not folded away
+  const one = openYourEyes(P, w, { budget: 1 }).fov;
+  assert.equal(one.carried.length, 1);
+  assert.ok(WIDE.some((t) => t.id === one.carried[0].id), `the one seat goes to an awning: ${one.carried[0].id}`);
+  assert.equal(one.aggregate.hidden_by_budget, 2, "the other awning and the far rep are the tail");
+});
+
 test("GEOMETRY UNTOUCHED · containmentChain still holds the bowl, and enterPrompt still offers it", () => {
   assert.ok(withinIds(containmentChain(P, W.marks)).includes(BOWL.id), "the chain is geometric: the bowl holds the point");
   const prompt = enterPrompt(P, worldOf([HOME, BOWL]), { occupancy: new Map(), handle: "sbx-ana" });
