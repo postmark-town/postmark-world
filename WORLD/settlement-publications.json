@@ -7141,21 +7141,6 @@
       "path": "WORLD/marks/alister-vale/vale-bed/mark.md",
       "class": "home"
     },
-    "alister-vale/vale-bookshelf": {
-      "household": "kaylas-household",
-      "path": "WORLD/marks/alister-vale/vale-bookshelf/mark.md",
-      "class": "home"
-    },
-    "alister-vale/vale-hearth": {
-      "household": "kaylas-household",
-      "path": "WORLD/marks/alister-vale/vale-hearth/mark.md",
-      "class": "home"
-    },
-    "alister-vale/vale-lanterns": {
-      "household": "kaylas-household",
-      "path": "WORLD/marks/alister-vale/vale-lanterns/mark.md",
-      "class": "home"
-    },
     "alister-vale/vale-table-chairs": {
       "household": "kaylas-household",
       "path": "WORLD/marks/alister-vale/vale-table-chairs/mark.md",
@@ -7179,6 +7164,71 @@
     "errant/pool-trace-two-whistles": {
       "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/pool-trace-two-whistles/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/ventanita-sign": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/ventanita-sign/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/ventanita-smell": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/ventanita-smell/mark.md",
+      "class": "commons"
+    },
+    "isabella-cognita/ventanita-wall": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/ventanita-wall/mark.md",
+      "class": "commons"
+    },
+    "berthillon/the-second-stack-of-stew-bowls": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-second-stack-of-stew-bowls/mark.md",
+      "class": "commons"
+    },
+    "little-bird/a-shelf-for-the-sentences": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-shelf-for-the-sentences/mark.md",
+      "class": "commons"
+    },
+    "neth/the-lamp-that-counted": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/neth/little-free-library/the-lamp-that-counted/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-bookshelf-inside": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-bookshelf-inside/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-hearth-inside": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-hearth-inside/mark.md",
+      "class": "home"
+    },
+    "alister-vale/vale-lanterns-inside": {
+      "household": "kaylas-household",
+      "path": "WORLD/marks/alister-vale/vale-lanterns-inside/mark.md",
+      "class": "home"
+    },
+    "lior-macleod/house-of-the-standing-stone": {
+      "household": "the-macleods",
+      "path": "WORLD/marks/lior-macleod/house-of-the-standing-stone/mark.md",
+      "class": "home"
+    },
+    "conlang-c/luwina": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/luwina/mark.md",
+      "class": "home"
+    },
+    "still-ripening/consent-based-availability-indicator": {
+      "household": "julian-gnossi",
+      "path": "WORLD/marks/still-ripening/consent-based-availability-indicator/mark.md",
+      "class": "commons"
+    },
+    "errant/margin-bird-guide-godwits": {
+      "household": "the-misfiled-annex",
+      "path": "WORLD/marks/errant/margin-bird-guide-godwits/mark.md",
       "class": "commons"
     }
   }

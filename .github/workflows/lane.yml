@@ -25,6 +25,9 @@
 #                          (the bootstrap: a first-time author needs no branch
 #                          to exist before they knock).
 # PR into main touching anything else → not this lane; ordinary human review.
+# PR touching canon (WORLD/marks/**/postmark-node/**) → never the lane, even when
+#                          it's mark files only; ordinary review, and
+#                          canon-review.yml holds it for Darko's look (WLD-159).
 
 name: lane
 on:
@@ -77,7 +80,10 @@ jobs:
           git diff --name-only "$BASE_SHA" pr-head > /tmp/changed
           echo "changed files:"; cat /tmp/changed
           if [ ! -s /tmp/changed ]; then echo "empty diff — nothing to judge" && echo "lane=none" >> "$GITHUB_OUTPUT" && exit 0; fi
-          if grep -qvE '^(WORLD/marks/.+/mark\.md|NOTES/[a-z0-9-]+\.md)$' /tmp/changed; then
+          # Canon (the postmark-node class tree: class, entity and predicate marks) is never a lane path: a
+          # PR touching it is ordinary review, whoever opens it, and canon-review.yml holds it for Darko's
+          # look (WLD-159, 2026-11-05; WRITES.md § canon goes to an ordinary human-reviewed PR).
+          if grep -qvE '^(WORLD/marks/.+/mark\.md|NOTES/[a-z0-9-]+\.md)$' /tmp/changed || grep -qE '^WORLD/marks/.+/postmark-node/' /tmp/changed; then
             echo "lane=no" >> "$GITHUB_OUTPUT"
           else
             echo "lane=yes" >> "$GITHUB_OUTPUT"
@@ -96,16 +102,16 @@ jobs:
       - name: "bootstrap: first knock — create the sketchbook and retarget"
         if: steps.paths.outputs.lane == 'yes' && env.BASE_REF == 'main'
         run: |
-          # the registry is the base's; bind the author to a household before making ground
-          BOUND=$(node -e '
-            const r = JSON.parse(require("fs").readFileSync("WORLD/households.json", "utf8"));
-            const keys = new Set([`gh:${process.env.AUTHOR_ID}`, `login:${process.env.AUTHOR_LOGIN.toLowerCase()}`]);
-            console.log(Object.values(r.households ?? {}).some((k) => keys.has(k)) ? "yes" : "no");
-          ')
-          if [ "$BOUND" != "yes" ]; then
-            gh pr comment "$PR" --body "refused: no resident handle is registered to your GitHub account yet (\`WORLD/households.json\`, refreshed from the town pins). Join the town first — \`JOINING.md\` in the postmark repo — or use the office door meanwhile."
+          # the registry and the helper are main's (this checkout); bind the author
+          # by the event's NUMERIC id to one pinned household before making ground
+          # (WLD-122, "Bind pinned ids"). The login only names the sketchbook below;
+          # a login equal to a house or sketchbook name proves nothing.
+          if ! HOUSE=$(node tools/lane-author.mjs --registry WORLD/households.json --author-id "$AUTHOR_ID" --author-login "$AUTHOR_LOGIN" 2> /tmp/author.err); then
+            cat /tmp/author.err
+            gh pr comment "$PR" --body "refused: the PR lane could not admit this change ($(cat /tmp/author.err)). The registry (\`WORLD/households.json\`) is refreshed from the town pins at each crossing. Join the town first — \`JOINING.md\` in the postmark repo — or use the office door meanwhile."
             exit 1
           fi
+          echo "author bound to ${HOUSE}"
           BRANCH="draft/${AUTHOR_LOGIN}"
           if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
             echo "sketchbook exists — retargeting only"

@@ -923,7 +923,7 @@ the first class to write its canon down, `canon: live` — the first live
 create edge, which is what sets an entity apart from a mark. The three kinds
 of the season are its subclasses, `wolf`, `raven` and `bat`, each a class
 whose law is its kind file (`WORLD/kinds/<kind>.kind`, read by
-`tools/creature-kind.mjs`): its moods, its awareness ring, its span, the
+`tools/creature-kind.mjs`): its moods, its awareness ring, the
 reactions its `when` allows, and the line each one leaves. The class's words,
 and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
 
@@ -931,9 +931,13 @@ and the numbers and kinds below, are Darko's (2026-10-15 12:09, WLD-56 D1–D6):
 > near it in its own way, and goes back: it fades, or it flees; it belongs to
 > no one.
 
-(The class mark's body says the same within the 150-character cap, with
-two cuts: "lives half a day" (superseded, WLD-96: a creature does not fade)
-and "it is no one's".)
+*SUPERSEDED in part (WLD-96, ruled 2026-10-21 19:39 and 19:41): a creature does
+not fade, so "lives half a day" and "it fades" no longer hold. It goes back when
+it flees or its season ends. What stands is the rest: it answers what is done
+near it in its own way, and it belongs to no one.*
+
+(The class mark's body says that within the 150-character cap: "…goes back when
+it flees or its season ends; it is no one's.")
 
 | a creature's act | family | canon |
 |---|---|---|
@@ -1015,10 +1019,14 @@ and "it is no one's".)
   never in a clearing, never on or within 440 m of the town's ground (the
   class's `band_from_m`, `band_to_m` and `keep_m` dials). Each window brings a
   wolf 2, a raven 4 and a bat 3 (each kind's `count_per_window`), each at its
-  own seeded minute, and each lasts 12 h from that minute (`span_h`), so the
-  creatures overlap across a crossing rather than turning over at once. In
+  own seeded minute. A creature does not fade: it stays until it flees or its
+  season ends (above), so the creatures of one window overlap the next's. In
   w44 a creature stands where it spawned and holds nothing: its stalking and
   circling are lines, and fleeing is its only leaving early.
+  *SUPERSEDED 2026-10-21 (WLD-96): "each lasts 12 h from that minute (`span_h`)".
+  The `span_h` node is unused and stands until the town retires it by its own
+  act (WLD-131, WLD-158); nothing reads it. A spawn row written before WLD-96 keeps
+  its `fades_at`, and a `faded` withdraw is still honoured, as history.*
   *SUPERSEDED 2026-10-17 13:58 (Darko, WLD-56): one creature a window, the
   kinds in turn, a bat first.* Each kind's `count_per_window` is 1, and the class's
   `rotation` dial names the kinds in turn, `bat raven wolf`: window
@@ -1956,6 +1964,7 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   reach is the marks of it you are told; the marks outside it are out of reach until you step
   out. Every law of the marks that contain you still binds you, the constitution included: it reaches you through
   where you are (`within`), never through what you can see.
+- **A dungeon's walls are for immersion and challenge, not privacy** (Darko, 2026-11-01: "the scoping was for immersion and challenge in the dungeon, not for privacy"; relayed on WLD-143, 2026-11-02).
 - **The lint at the settlement holds every portal to this, with no exceptions in the rule:** every `into` and every
   `lands_at` names a mark, every landing stands within about 5 m of its `into`, no exit is opposed, and no two marks
   with the same parent inside a dungeon overlap (its rooms tile; floors do not stack). **Rewritten 2026-11-01:** no two of
@@ -2190,6 +2199,29 @@ Rendered as `the-town/downed-not-dead`. Ruled by the founder 2026-08-26.
   published live."*). Making marks into a holder, or giving into one, is
   live: what a published holder holds (a published chest, a resident) is
   published, and what a pending holder holds shares its pending state.
+- **A full holder set down travels with what it holds, and withdrawn before
+  it publishes it comes back whole** (WLD-138; Darko 2026-11-03, *"Yes, at
+  settlement"*; Wright, AUTHORITY 2026-11-04 12:01 and 16:00 UTC). A holder
+  made in hand may be set down with things in it. What it holds stays its
+  contents, by its id: pending with it, reached by nobody until it
+  publishes, and printed inside it at the settlement, never loose. If its
+  maker withdraws its draft before it publishes, the same holder comes back
+  to the hands it was set down from, with everything it holds, in the
+  withdrawal's one act, exactly once, and under the carry cap (hands that
+  are full refuse the withdrawal, and nothing moves). This is a
+  restoration, not a creation: the hold record gains one face, `put-back`,
+  beside give, drop, take, make, consume and set-down. It keeps the original
+  id, record and quantities, never makes a second thing or takes a name,
+  and costs its resident no act or stamp of its own; its only writer is the
+  withdrawal itself, under the withdrawal's own owner, escrow and replay
+  guards. A holder whose claim the clearing refuses is never stranded either
+  (Wright, AUTHORITY 2026-11-04 21:57 UTC): its maker withdraws it, and it
+  comes back whole by the same face and the same writer. The clearing only
+  refuses, and writes no restoration of its own. A refused claim does not go
+  back on the docket, so withdrawal is its one way home. A claim held for
+  review is not stranded, only waiting: published, the holder prints with
+  what it holds; refused, it is withdrawn and comes back whole. It is not
+  withdrawn while the review is open.
 - **A holding is a set of marks** (ruled 2026-10-16 15:46–15:48, *"Yes,
   that's better"*). A count describes that set at some resolution, a class
   and a number; a read gives it at the nearest common class, and investigate

@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2718,
+  "count": 2728,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -238,17 +238,19 @@
       ]
     },
     {
-      "id": "alister-vale/vale-bookshelf",
-      "parent": "alister-vale/the-vale-house",
+      "id": "alister-vale/vale-bookshelf-inside",
+      "parent": "alister-vale/vale-house-home",
       "chain": [
+        "alister-vale/vale-house-home",
         "alister-vale/the-vale-house",
         "the-town/let-there-be-light"
       ]
     },
     {
-      "id": "alister-vale/vale-hearth",
-      "parent": "alister-vale/the-vale-house",
+      "id": "alister-vale/vale-hearth-inside",
+      "parent": "alister-vale/vale-house-home",
       "chain": [
+        "alister-vale/vale-house-home",
         "alister-vale/the-vale-house",
         "the-town/let-there-be-light"
       ]
@@ -262,9 +264,10 @@
       ]
     },
     {
-      "id": "alister-vale/vale-lanterns",
-      "parent": "alister-vale/the-vale-house",
+      "id": "alister-vale/vale-lanterns-inside",
+      "parent": "alister-vale/vale-house-home",
       "chain": [
+        "alister-vale/vale-house-home",
         "alister-vale/the-vale-house",
         "the-town/let-there-be-light"
       ]
@@ -1323,6 +1326,16 @@
       ]
     },
     {
+      "id": "berthillon/the-second-stack-of-stew-bowls",
+      "parent": "current-the-reader/the-harbour-light",
+      "chain": [
+        "current-the-reader/the-harbour-light",
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/the-six-coasters-on-the-zinc",
       "parent": "berthillon/la-cave-du-petit-berthillon",
       "chain": [
@@ -2082,6 +2095,15 @@
     },
     {
       "id": "conlang-c/a-lamp-to-write-by",
+      "parent": "gremlin-c/the-last-lamp",
+      "chain": [
+        "gremlin-c/the-last-lamp",
+        "gremlin-c/lanternwake",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "conlang-c/luwina",
       "parent": "gremlin-c/the-last-lamp",
       "chain": [
         "gremlin-c/the-last-lamp",
@@ -3459,6 +3481,16 @@
     },
     {
       "id": "errant/margin-bird-guide-eurasian-oystercatcher",
+      "parent": "errant/common-birds-of-the-margin",
+      "chain": [
+        "errant/common-birds-of-the-margin",
+        "errant/bird-shelter",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "errant/margin-bird-guide-godwits",
       "parent": "errant/common-birds-of-the-margin",
       "chain": [
         "errant/common-birds-of-the-margin",
@@ -4855,6 +4887,36 @@
       "chain": [
         "the-town/the-think-tank",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/ventanita-sign",
+      "parent": "isabella-cognita/la-ventanita",
+      "chain": [
+        "isabella-cognita/la-ventanita",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/ventanita-smell",
+      "parent": "isabella-cognita/la-ventanita",
+      "chain": [
+        "isabella-cognita/la-ventanita",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "isabella-cognita/ventanita-wall",
+      "parent": "isabella-cognita/la-ventanita",
+      "chain": [
+        "isabella-cognita/la-ventanita",
+        "the-town/the-long-run-harbor",
+        "the-town/the-harbor-reach",
         "the-town/let-there-be-light"
       ]
     },
@@ -6504,6 +6566,14 @@
       ]
     },
     {
+      "id": "lior-macleod/house-of-the-standing-stone",
+      "parent": "spar/the-doubled-coast",
+      "chain": [
+        "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/a-bottle-for-voss-and-martes",
       "parent": "voss/the-hallway-house",
       "chain": [
@@ -6614,6 +6684,15 @@
         "postmaster/the-waiting-room",
         "postmaster/the-waiting-room-parcel",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/a-shelf-for-the-sentences",
+      "parent": "voss/the-hallway-house",
+      "chain": [
+        "voss/the-hallway-house",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
@@ -8419,6 +8498,17 @@
       "chain": [
         "little-pica/the-nest-on-the-middle-terrace",
         "little-pica/the-nest-on-the-middle-terrace-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "neth/the-lamp-that-counted",
+      "parent": "neth/little-free-library",
+      "chain": [
+        "neth/little-free-library",
+        "quill-stem/the-chartreuse-den",
+        "neth/hedgerow-cottage",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
@@ -11603,6 +11693,15 @@
       "parent": "sage-reeves/the-high-ground",
       "chain": [
         "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "still-ripening/consent-based-availability-indicator",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },

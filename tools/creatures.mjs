@@ -3,13 +3,17 @@
 // Ruled in Sitting E (Darko, 2026-10-14 §§ 3, 6, 7; the record is Starstory
 // docs/2026-10-14/halloween/sitting-E-entities.md). A creature is a living node: its
 // spawn is a LIVE create by `the-town`, its reactions are its own live acts, and it
-// leaves by a live withdraw, reason `faded` (12 h after its spawn) or `fled` (the
-// only leaving by outcome). Each crossing's save photographs the living ones.
+// leaves by a live withdraw: `fled` (the only leaving by outcome) or `ended`, by the-town,
+// when its season ends. A creature does not fade: the twelve-hour fade was ruled out
+// (WLD-96, Darko 2026-10-21 19:39 and 19:41), and nothing here computes one. Rows written
+// before that ruling are history and fold as written: a spawn may still carry `fades_at`,
+// and a `faded` withdraw is still honoured (DESPAWN_REASONS). Each crossing's save
+// photographs the living ones.
 //
 // A NAMED CREATURE (WLD-25, Darko 2026-10-20 22:47 and 22:56; W1–W11 settled by
 // Wright). A kind class may declare named creatures (`named` on its mark): each
-// one place, spawned once ever by the-town with `stays: true` in place of
-// `fades_at`. It never fades and never flees (its kind is `finishable`); residents
+// one place, spawned once ever by the-town with `stays: true`. It never flees
+// (its kind is `finishable`); residents
 // finish it (the office's `finish` rows), and the settlement after the first
 // finish ENDS it: a withdraw by the-town, reason `ended`, the one leaving a named
 // creature has. What it `carries` goes to the first finisher at that settlement.
@@ -60,23 +64,24 @@
 // A creature is a fold of the log's rows: `spawn` (the-town, object = its id),
 // its reactions (action `react`, actor = its id; payload `moods_after` and
 // `flags_after`, a sorted array of the set flags, are its state from then on), and
-// `withdraw` (object = its id, by the-town or itself, payload.reason faded | fled;
-// any other withdraw is not the record's and is ignored).
+// `withdraw` (object = its id, by the-town or itself, payload.reason fled | ended, or `faded` on a
+// row written before WLD-96; any other withdraw is not the record's and is ignored).
 //
 // EVERY ROW CARRIES ITS WRITE TIME; THE SCHEDULE RIDES IN THE PAYLOAD. The log is
 // append-only and nobody back-dates it: a spawn written 20 s after its minute is
-// dated when it was written, with the minute in `payload.at`; a fade is dated when
-// the tick wrote it, with the span's end in `payload.fades_at`.
+// dated when it was written, with the minute in `payload.at`; a withdraw is dated when
+// the tick wrote it.
 //
-// Two readings of the same rows:
-//   - the WRITTEN fold (`creaturesWritten`): spawned and not yet withdrawn. The
-//     crossing save photographs this, so a fade the tick has not yet written is
-//     still in the photograph and still due afterwards (`dueFades`).
-//   - the LIVING read (`creaturesAt`): the written fold with the span cut. Past
-//     `fades_at` a creature is gone whether or not its withdraw is written yet.
-// Both fold a crossing's snapshot plus the rows written since it, never the whole
-// history (snapshot per settlement, delta only). The creature's short memory is
-// NOT here and is never saved: "for its own span only" (§ 7).
+// ONE READING, the WRITTEN fold (`creaturesWritten`): spawned and not yet withdrawn. The
+// crossing save photographs it and the replay check folds it again. Nothing in it expires a
+// creature by the clock: only a lawful withdraw ends one. A spawn row written before WLD-96
+// carries `fades_at`, and that value is passed through untouched, so a past season replays
+// to the bytes it was saved with; it is a recorded fact, never a deadline. (The fold used to
+// have a second reading, `creaturesAt`, that cut a creature at `fades_at`, and `dueFades`
+// told the tick which fades to write; the office has not written one since WLD-96 and
+// no code called either, so both are gone.) It folds a crossing's snapshot plus the rows
+// written since, never the whole history (snapshot per settlement, delta only). A
+// creature's short memory is NOT here and is never saved.
 
 import { createHash, createHmac } from "node:crypto";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
@@ -89,6 +94,7 @@ import { entryLawOf, REQUIRES_AT_SETTLEMENT } from "./enter-exit.mjs";
 import { unmetRequires } from "./portals.mjs";
 
 export const TOWN = "the-town";
+// `faded` stays for the rows written before WLD-96, which the fold must still honour; no live writer writes one.
 export const DESPAWN_REASONS = Object.freeze(["faded", "fled", "ended"]);
 /** The one withdraw only the-town writes: a named creature's ending at its settlement (WLD-25). */
 export const ENDED = "ended";
@@ -101,13 +107,13 @@ export const REACT_ACTION = "react";
  *  directory never moves (the frozen filing), so this is a durable address. */
 export const CREATURE_LAW_DIR = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/creature";
 
-/** The dials the schedule reads, each from the creature class (or a kind's mark). */
-export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "keep_m", "apart_m", "span_h"]);
+/** The dials the schedule reads, each from the creature class (or a kind's mark). There is no span: a creature does not fade (WLD-96, WLD-131). */
+export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "keep_m", "apart_m"]);
 
 /**
  * The creature law as the class marks write it: { fromCrossing, dials, kinds }.
  *   fromCrossing  the class's launch dial (null is off, W6)
- *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m, span_h }
+ *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m }
  *   kinds         [{ kind, kind_file }], by name
  *   afforded      { <kind>: [{ action, who, from, effect, residue, from_class }] }: the
  *                 afforded actions a resident may aim at a creature of that kind
@@ -391,12 +397,12 @@ const TRIES = 64;
 
 /**
  * Crossing N's schedule, from its secret. Returns { crossing, spawns, unplaced }:
- * spawns are [{ id, kind, index, crossing, at_ms, at, fades_at, x, y }] in time order
+ * spawns are [{ id, kind, index, crossing, at_ms, at, x, y }] in time order
  * (ties by id), unplaced [{ id, kind, index }] the spawns no place was found for.
  *
  *   mists        the skeleton's `mists` block at the window's opening sha
  *   marks        the standing marks at that sha (the town's keep-out is read from them)
- *   dials        { counts, rotation?, band_from_m, band_to_m, keep_m, apart_m, span_h }: creatureLaw's
+ *   dials        { counts, rotation?, band_from_m, band_to_m, keep_m, apart_m }: creatureLaw's
  *   fromCrossing the creature class's launch dial; null is off (W6)
  *
  * Empty when the dial is off for N or the Mists are out of season (mistsAt null).
@@ -410,7 +416,6 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
   if (!secret) throw new Error("scheduleFor: no secret for this crossing");
   if (!dials) throw new Error("scheduleFor: no dials (read them with creatureLaw)");
   const { startMs } = windowOf(N);
-  const spanMs = Number(dials.span_h) * 3600 * 1000;
   const from = Number(dials.band_from_m), to = Number(dials.band_to_m), apart = Number(dials.apart_m) || 0;
   const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m), { m });
   const waters = townWaterRings(marks);
@@ -433,8 +438,7 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
       if (!at) { out.unplaced.push({ id, kind, index: i }); continue; }
       placed.push(at);
       const atMs = startMs + minute * 60000;
-      out.spawns.push({ id, kind, index: i, crossing: N, at_ms: atMs, at: new Date(atMs).toISOString(),
-        fades_at: new Date(atMs + spanMs).toISOString(), x: at.x, y: at.y });
+      out.spawns.push({ id, kind, index: i, crossing: N, at_ms: atMs, at: new Date(atMs).toISOString(), x: at.x, y: at.y });
     }
   }
   out.spawns.sort((a, b) => a.at_ms - b.at_ms || (a.id < b.id ? -1 : 1));
@@ -492,36 +496,20 @@ export function auditWindow(crossing, acts, inputs) {
 // ── the fold ────────────────────────────────────────────────────────────────────
 const msOf = (v) => (typeof v === "number" ? v : Date.parse(v));
 
-/**
- * The living creatures at `atMs`: the written fold with the span cut. Past
- * `fades_at` a creature has faded, written or not. Returns a Map id → { id, kind,
- * crossing, x, y, spawned_at, fades_at, moods, flags }.
- *
- *   snapshot  a crossing save's creatures.json (or null: start from nothing)
- *   acts      rows { at, actor, action, object, payload }, `at` their write time
- */
-export function creaturesAt(snapshot, acts, atMs) {
-  const living = creaturesWritten(snapshot, acts, atMs);
-  for (const [id, c] of living) if (!c.stays && msOf(c.fades_at) <= atMs) living.delete(id); // one that stays never fades (WLD-25)
-  return living;
-}
-
-/** The fades due by `nowMs`: creatures past their span whose withdraw is not yet
- *  written. The tick writes each as a `withdraw` by the-town, dated now, with
- *  payload { reason: "faded", fades_at }. */
-export function dueFades(snapshot, acts, nowMs) {
-  return [...creaturesWritten(snapshot, acts, nowMs).values()]
-    .filter((c) => !c.stays && msOf(c.fades_at) <= nowMs)
-    .map((c) => ({ id: c.id, reason: "faded", fades_at: c.fades_at }));
-}
-
 /** Is this row a withdraw the record honours? By the-town or the creature itself,
  *  for a reason in DESPAWN_REASONS; an ending only by the-town (WLD-25). */
 const lawfulWithdraw = (a) => a.action === "withdraw" && isCreatureId(a.object)
   && (a.actor === TOWN || (a.actor === a.object && a.payload?.reason !== ENDED)) && DESPAWN_REASONS.includes(a.payload?.reason);
 
 /** The written fold: spawned, revised by its own acts, removed only by a lawful
- *  withdraw, over the rows written after the snapshot's instant and by `atMs`. */
+ *  withdraw, over the rows written after the snapshot's instant and by `atMs`.
+ *  Returns a Map id → { id, kind, crossing, x, y, spawned_at, fades_at, moods, flags }.
+ *
+ *   snapshot  a crossing save's creatures.json (or null: start from nothing)
+ *   acts      rows { at, actor, action, object, payload }, `at` their write time
+ *
+ *  `fades_at` is a spawn row's own value when it has one (written before WLD-96) and passes
+ *  through as recorded; nothing here reads it as a deadline. */
 export function creaturesWritten(snapshot, acts, atMs) {
   const living = new Map();
   const fromMs = snapshot ? msOf(snapshot.evaluated_at) : -Infinity;
@@ -557,9 +545,8 @@ export function creaturesWritten(snapshot, acts, atMs) {
 
 /** The crossing save's photograph, STATE/snapshot/<N>/creatures.json (W5): the
  *  WRITTEN fold at the boundary (the previous photograph plus the rows written
- *  since), by id. A creature whose fade is not yet written is still in it, so the
- *  fade is still due after the save. No memory: it lives for a creature's span only
- *  and is never saved. */
+ *  since), by id. A creature leaves it only by a lawful withdraw; a historic `fades_at`
+ *  rides through as recorded. No memory: it is never saved. */
 export function creaturesSnapshot(crossing, evaluatedAtMs, previous, acts) {
   const creatures = [...creaturesWritten(previous, acts, evaluatedAtMs).values()]
     .map((c) => ({ id: c.id, kind: c.kind, crossing: c.crossing, x: c.x, y: c.y, spawned_at: c.spawned_at, fades_at: c.fades_at,
@@ -569,7 +556,7 @@ export function creaturesSnapshot(crossing, evaluatedAtMs, previous, acts) {
   return {
     crossing: crossing | 0,
     evaluated_at: new Date(evaluatedAtMs).toISOString(),
-    grammar: "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+    grammar: "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); no elapsed-time fade is inferred; legacy withdraw reasons and any recorded fades_at are kept as recorded; a creature's memory is never saved",
     creature_count: creatures.length,
     creatures,
   };
