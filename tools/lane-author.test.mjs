@@ -79,9 +79,11 @@ test("sketchbookRefusal names the TRUE cause: another household's sketchbook is 
 
 // ── THE ACTUAL WORKFLOW STEP ─────────────────────────────────────────────────
 
-/** The bootstrap step's `run:` script, as lane.yml has it. */
+/** The bootstrap step's `run:` script, as lane.yml has it. The lane is retired
+ *  (WLD-161): lane.yml sits at _archived/.github/workflows/, bytes unchanged,
+ *  outside workflow discovery, and these cases still read it there. */
 function bootstrapScript() {
-  const lines = readFileSync(join(ROOT, ".github", "workflows", "lane.yml"), "utf8").split("\n");
+  const lines = readFileSync(join(ROOT, "_archived", ".github", "workflows", "lane.yml"), "utf8").split("\n");
   const at = lines.findIndex((l) => /- name: "bootstrap: first knock/.test(l));
   assert.ok(at >= 0, "source extraction: the bootstrap step");
   const runAt = lines.findIndex((l, i) => i > at && /^\s+run: \|\s*$/.test(l));
