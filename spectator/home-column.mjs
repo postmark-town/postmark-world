@@ -72,6 +72,13 @@ export function safeLinkHref(raw) {
   return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
 }
 
+/** A same-origin path (`/conversations/#t1`) this column will hang on a footer anchor, or null: one slash, then not another slash or a
+ *  backslash, no control characters. A scheme, a `//host` and a bare relative path are all refused. */
+export function safeSitePath(raw) {
+  const s = String(raw ?? "").trim();
+  return /^\/(?![\/\\])[^\u0000-\u001f\s]*$/.test(s) ? s : null;
+}
+
 /** A colour this column will paint as a swatch, or null. A `#` and three or six
  *  hex digits and nothing else, lowercased: it becomes a `style`, so it is
  *  checked as a colour rather than escaped as a string (WLD-145). */
@@ -231,7 +238,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null, footerLink = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -248,7 +255,10 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     door = { description: typeof ownWords === "string" ? ownWords : "" };
   }
   const text = typeof door?.description === "string" ? door.description.trim() : "";
-  const blocks = text ? parseHomeMarkdown(text) : [];
+  // A VIEW MAY HAND IN PLAIN-DATA BLOCKS INSTEAD OF MARKDOWN (POS-779, the conversation view): what residents said is CONTENT, and
+  // parsing it as markdown would let a speaker's `#` or `[x](y)` dress itself as the column's own headings and links. The blocks
+  // are the same plain data `parseHomeMarkdown` produces (paragraph / spans / text); nothing in them is ever markup.
+  const blocks = Array.isArray(door?.blocks) ? door.blocks : text ? parseHomeMarkdown(text) : [];
   return {
     handle: who,
     kicker: String(kicker ?? who ?? "").trim(),
@@ -317,6 +327,9 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // A RESIDENT'S PRONOUNS, beside the name (WLD-83, Darko 2026-10-20 08:44): their own
     // word from their appearance tree, shown only when written, never guessed
     pronouns: typeof pronouns === "string" && pronouns.trim() ? pronouns.trim() : null,
+    // A LINK OUT AT THE FOOT, for a view whose whole is elsewhere (POS-779: "all conversations" → /conversations/#<thread>). Only a
+    // same-origin path is hung (`safeSitePath`); anything else is no link at all rather than a cleaned one.
+    footerLink: footerLink && safeSitePath(footerLink.href) ? { href: safeSitePath(footerLink.href), text: String(footerLink.text ?? "").trim() || "more" } : null,
     // the way back to the mark this column was reached from, named
     back: back && String(back.id ?? "").trim()
       ? { id: String(back.id).trim(), name: String(back.name ?? back.id).trim() } : null,
@@ -811,6 +824,16 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
     scroll.appendChild(copy);
   }
 
+  if (model.footerLink) {
+    const all = el(doc, "a", "wv-homecol-all");
+    all.setAttribute("href", model.footerLink.href);
+    // beside the map, never over it: the reader is mid-world with a lens up and a camera aimed (as the badge's own link always did)
+    all.setAttribute("target", "_blank");
+    all.setAttribute("rel", "noopener noreferrer");
+    all.textContent = model.footerLink.text;
+    scroll.appendChild(all);
+  }
+
   host.appendChild(scroll);
   return host;
 }
@@ -868,6 +891,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       tokens: view.tokens ?? [],
       copyId: view.copyId ?? null,
       pronouns: view.pronouns ?? null,
+      footerLink: view.footerLink ?? null,
     }), { imagePath });
   };
 
@@ -1040,6 +1064,8 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-resident { display:inline-block; margin-top:1.2rem; color:var(--amber);
   font-size:.8rem; text-decoration:none; border-bottom:1px solid rgba(232,197,106,.4); }
 .wv-homecol-resident:hover, .wv-homecol-resident:focus-visible { color:var(--paper); border-bottom-color:var(--paper); }
+.wv-homecol-all { display:inline-block; margin-top:1.2rem; color:var(--amber); font-size:.8rem; text-decoration:none; border-bottom:1px solid transparent; }
+.wv-homecol-all:hover, .wv-homecol-all:focus-visible { color:var(--paper); border-bottom-color:var(--paper); }
 @media (min-width:820px) {
   .wv-minimap.has-homecol .wv-mapctl { right:calc(var(--wv-homecol-w, min(26rem, 92%)) + 10px); }
   .wv-minimap.has-homecol .wv-walkdesk { right:calc(var(--wv-homecol-w, min(26rem, 92%)) + 10px); }
