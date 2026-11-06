@@ -8,6 +8,10 @@ import { fileURLToPath } from "node:url";
 import { withTool } from "./engine-files.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+// The lane is retired (WLD-161, Darko: "Retire it"): the wall lives at
+// _archived/tools/lane-wall.mjs, bytes unchanged, and these cases still judge it,
+// copied into each fixture's tools/ beside the live engine it imports.
+const WALL = join(HERE, "..", "_archived", "tools", "lane-wall.mjs");
 
 // lane-wall answers ONE question — is every change in this diff the PR
 // author's to make? — so each case below is one way the answer can be no,
@@ -43,8 +47,9 @@ function fixture(t, registry = REGISTRY()) {
     writeFileSync(full, text);
   };
   mkdirSync(join(repo, "tools"), { recursive: true });
-  for (const file of withTool("lane-wall.mjs", "admin-makers.mjs", "lane-author.mjs"))
+  for (const file of withTool("admin-makers.mjs", "lane-author.mjs"))
     cpSync(join(HERE, file), join(repo, "tools", file));
+  cpSync(WALL, join(repo, "tools", "lane-wall.mjs"));
   put("WORLD/skeleton.json", JSON.stringify({ features: [], physics_registry: {} }, null, 2));
   put("WORLD/marks/let-there-be-light/mark.md", record({
     by: "the-town", tier: "constitution", at: { x: 0, y: 0 }, extent: { w: 320000, h: 320000 }, body: "the frame",
