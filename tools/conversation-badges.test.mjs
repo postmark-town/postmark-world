@@ -99,3 +99,24 @@ test("W1 · deck ON: a thread on the deck is dashed whether it is live or coolin
 test("W1 · the retired selector is gone: no rule names `.wv-convo.is-aboard`", () => {
   assert.doesNotMatch(SOURCE, /\.wv-convo\.is-aboard/);
 });
+
+// ── POS-779, Darko 2026-11-06: the extent wash on hover and selection, and the column in place of a new tab ────────────────────
+// Text pins, labelled: the behaviour itself is run in a browser by tools/conversation-pages.test.mjs (tests 4–8), on the real pointer path.
+
+test("a click on a badge or on its chooser row selects the thread (the column opens from the selection): nothing opens a new tab any more", () => {
+  const code = SOURCE.replace(/\/\/[^\n]*/g, "");
+  assert.doesNotMatch(code, /window\.open\(convoHref/, "the new-tab path is gone");
+  assert.match(code, /if \(hit\) \{ selectMark\(convoChoiceId\(hit\.id\)\); return; \}/, "the badge click selects");
+  assert.match(code, /if \(chosen && isConvoChoiceId\(chosen\.dataset\.choose\)\) \{ selectMark\(chosen\.dataset\.choose\); return; \}/, "and so does the chooser row");
+  assert.match(code, /convoColumnView\(selected\) \?\? parcelColumnView\(selected\)/, "the column dispatcher asks for a conversation first");
+});
+
+test("the wash is drawn for the hovered and the selected thread only, from its extent grown by half an earshot, and by default for none", () => {
+  const fn = SOURCE.slice(SOURCE.indexOf("function renderConvoWash()"), SOURCE.indexOf("// ── A CONVERSATION'S COLUMN"));
+  assert.match(fn, /new Set\(\[selected, convoHoverId\]\.filter\(\(x\) => x != null\)\)/, "exactly the selected and the hovered");
+  assert.doesNotMatch(fn, /convoState\.(live|closed)\.map\(\(t\) => t\.id\)/, "never every thread");
+  const geom = SOURCE.slice(SOURCE.indexOf("function convoWashOf(t)"), SOURCE.indexOf("function renderConvoWash()"));
+  assert.match(geom, /earshot_m/);
+  assert.match(geom, /\) \/ 2;/, "half an earshot");
+  assert.match(geom, /t\.aboard \|\| !t\.extent/, "a deck thread, or one with no extent, from its own point, as the old layer did");
+});
