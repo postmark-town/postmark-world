@@ -72,19 +72,10 @@ test("the Mists held the last standing keyframe until the withdrawal (WLD-142, t
   assert.ok(MISTS.border_m && MISTS.clearings_m.length > 0, "the wall's border and the clearings are still the skeleton's");
 });
 
-test("the named candied creatures stand on their own: each has its own crossing, and nothing returns past the 06:00Z cutoff", () => {
-  const CUTOFF = Date.parse("2026-11-01T06:00:00Z");
-  const named = LAW.named.map((d) => d.id).sort();
-  assert.deepEqual(named, [
-    "creature:candied-bat-lumber-room", "creature:candied-jetto-the-star-chapel", "creature:candied-raven-mirror-room",
-    "creature:candied-wolf-hall-of-keepers", "creature:candied-wolf-hall-of-keepers-again",
-  ], "the season's five declarations");
-  for (const d of LAW.named) {
-    assert.ok(Number.isInteger(d.from_crossing), `${d.id} names its own from_crossing, so the class's off dial neither moves nor needs it`);
-    assert.ok(d.return_until == null || Date.parse(d.return_until) <= CUTOFF,
-      `${d.id}: a returning declaration ends no later than 2026-11-01T06:00Z (strictly-before settlements only); the rest are written once and never return`);
-  }
-  const returning = LAW.named.filter((d) => d.return_until != null).map((d) => d.id).sort();
-  assert.deepEqual(returning, ["creature:candied-bat-lumber-room", "creature:candied-raven-mirror-room", "creature:candied-wolf-hall-of-keepers-again"],
-    "the three that came back each week; the original wolf and Jetto were declared once and ended");
+// UNTIL WLD-135 this asserted the season's five named declarations (bat, raven, two wolves, Jetto): each with its own
+// from_crossing, none returning past the 06:00Z 11-01 cutoff, three returning weekly. All five are retired, so the law
+// declares no named creature at all; a later declaration must edit this test, deliberately.
+test("the season's named candied creatures are retired: the creature law declares none, and none returns", () => {
+  assert.deepEqual(LAW.named.map((d) => d.id).sort(), [], "no named declaration remains: the season's five are retired");
+  assert.deepEqual(LAW.named.filter((d) => d.return_until != null).map((d) => d.id), [], "and none returns: the three that came back each week are retired with the rest");
 });

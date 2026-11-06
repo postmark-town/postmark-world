@@ -9,12 +9,12 @@
 //
 // THE CAN-FAIL FLIPS (each reds a case below): let a Mists kind carry `finish`;
 // let a finishable kind flee; let the creature itself write `ended`; drop the
-// `stays` arm from creaturesAt or dueFades; let a declaration through with no place.
+// season's-end rule from the fold (a named creature is carried until the-town ends it); let a declaration through with no place.
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ENDING_SLOTS, applyEffects, parseKind, startState } from "./creature-kind.mjs";
-import { DESPAWN_REASONS, ENDED, TOWN, creatureLaw, creaturesAt, creaturesSnapshot, dueFades } from "./creatures.mjs";
+import { DESPAWN_REASONS, ENDED, TOWN, creatureLaw, creaturesWritten, creaturesSnapshot } from "./creatures.mjs";
 import { loadMarks } from "./marks-fold.mjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -59,31 +59,24 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const marks = loadMarks(join(ROOT, "WORLD", "marks"));
 const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by === TOWN && String(m.class) === cls ? { ...m, named } : m));
 
-test("a named creature that returns (WLD-124): return_until is an ISO instant in UTC, carried as written; the season marks three entries", () => {
+test("a named creature that returns (WLD-124): return_until is an ISO instant in UTC, carried as written; the season's three returning entries are retired (WLD-135)", () => {
   const ok = { slug: "den", at: { x: 1, y: 2 } };
   const U = "2026-11-01T06:00:00Z";
   assert.equal(creatureLaw(withNamed("wolf", [{ ...ok, return_until: U }])).named.find((d) => d.kind === "wolf").return_until, U);
   assert.equal("return_until" in creatureLaw(withNamed("wolf", [ok])).named.find((d) => d.kind === "wolf"), false, "absent when not written");
   for (const bad of ["2026-11-01", "2026-11-01T02:00:00-04:00", "tomorrow", 7, "2026-13-45T06:00:00Z"])
     assert.throws(() => creatureLaw(withNamed("wolf", [{ ...ok, return_until: bad }])), /return_until is .*not an ISO instant in UTC/, String(bad));
-  assert.deepEqual(creatureLaw(marks).named.filter((d) => d.return_until).map((d) => [d.id, d.return_until]), [
-    ["creature:candied-bat-lumber-room", U],
-    ["creature:candied-raven-mirror-room", U],
-    ["creature:candied-wolf-hall-of-keepers-again", U],
-  ], "three entries return, until the settlement at 06:00Z on 11-01 (none after it); the first wolf entry and the boss do not");
+  // until WLD-135 this asserted the season's three returning entries (bat, raven, the second wolf); they are retired
+  assert.deepEqual(creatureLaw(marks).named.filter((d) => d.return_until).map((d) => [d.id, d.return_until]), [],
+    "no declared entry returns: the season's three are retired");
 });
 
 test("a kind class's named creatures are read whole: one id each, a place, what it carries and its crossing", () => {
   const law = creatureLaw(withNamed("wolf", [{ slug: "den", at: { x: 10, y: -20 }, carries: "the-town/a-thing", from_crossing: 300 }]));
   assert.deepEqual(law.named.filter((d) => d.kind === "wolf"), [{ id: "creature:wolf-den", kind: "wolf", x: 10, y: -20, carries: "the-town/a-thing", from_crossing: 300, declared: "the-town/wolf#den" }]);
-  assert.deepEqual(creatureLaw(marks).named.map((d) => [d.id, d.carries, d.from_crossing]), [
-    ["creature:candied-bat-lumber-room", "the-town/the-lumber-room-key", 272],
-    ["creature:candied-jetto-the-star-chapel", undefined, 272],
-    ["creature:candied-raven-mirror-room", "the-town/the-mirror-room-key", 272],
-    ["creature:candied-wolf-hall-of-keepers", "the-town/the-hall-of-keepers-key", 272],
-    ["creature:candied-wolf-hall-of-keepers-again", "the-town/the-hall-of-keepers-key", 274],
-  ], "the law declares the season's three, each with its key, none before the heist, and the wolf once more from crossing 274");
-  assert.deepEqual(creatureLaw(marks).named.find((d) => d.id === "creature:candied-wolf-hall-of-keepers-again").after, ["creature:candied-wolf-hall-of-keepers"], "the second wolf waits for the first to have ended");
+  // until WLD-135 this asserted the season's five declarations (bat, raven, two wolves, Jetto) and the second wolf's `after`; all five are retired
+  assert.deepEqual(creatureLaw(marks).named.map((d) => [d.id, d.carries, d.from_crossing]), [],
+    "the law declares no named creature: the season's five are retired");
   assert.deepEqual(creatureLaw(withNamed("wolf", JSON.stringify([{ slug: "den", at: { x: 1, y: 2 } }]))).named.filter((d) => d.kind === "wolf").map((d) => d.id), ["creature:wolf-den"], "a JSON string is read as its list");
 });
 
@@ -109,26 +102,25 @@ const ID = "creature:wolf-den";
 const spawn = { at: iso(T0), actor: TOWN, action: "spawn", object: ID,
   payload: { kind: "wolf", crossing: 300, x: 10, y: -20, at: iso(T0), stays: true, carries: "the-town/a-thing", moods: { fear: 1 }, flags: [] } };
 
-test("a creature that stays never fades: it lives a month on, no fade is due, and the photograph carries it as it is", () => {
+test("a creature that stays never fades: it lives a month on, and the photograph carries it as it is", () => {
   const month = T0 + 30 * 24 * 3600e3;
-  const c = creaturesAt(null, [spawn], month).get(ID);
+  const c = creaturesWritten(null, [spawn], month).get(ID);
   assert.ok(c, "still here a month on");
   assert.equal(c.stays, true);
   assert.equal(c.fades_at, null);
   assert.equal(c.carries, "the-town/a-thing");
-  assert.deepEqual(dueFades(null, [spawn], month), []);
   const snap = creaturesSnapshot(360, month, null, [spawn]);
   const row = snap.creatures.find((x) => x.id === ID);
   assert.equal(row.stays, true);
   assert.equal(row.carries, "the-town/a-thing");
-  assert.ok(creaturesAt(snap, [], month + 3600e3).has(ID), "carried forward from the photograph");
+  assert.ok(creaturesWritten(snap, [], month + 3600e3).has(ID), "carried forward from the photograph");
 });
 
 test("ended is a reason only the-town writes: the creature itself cannot end", () => {
   assert.ok(DESPAWN_REASONS.includes(ENDED));
   const at = T0 + 3600e3;
   const end = (actor) => ({ at: iso(at), actor, action: "withdraw", object: ID, payload: { reason: ENDED } });
-  assert.equal(creaturesAt(null, [spawn, end(ID)], at + 1).has(ID), true, "its own withdraw, ended, is not the record's");
-  assert.equal(creaturesAt(null, [spawn, end("some-resident")], at + 1).has(ID), true);
-  assert.equal(creaturesAt(null, [spawn, end(TOWN)], at + 1).has(ID), false, "the town's ending is");
+  assert.equal(creaturesWritten(null, [spawn, end(ID)], at + 1).has(ID), true, "its own withdraw, ended, is not the record's");
+  assert.equal(creaturesWritten(null, [spawn, end("some-resident")], at + 1).has(ID), true);
+  assert.equal(creaturesWritten(null, [spawn, end(TOWN)], at + 1).has(ID), false, "the town's ending is");
 });

@@ -7,7 +7,9 @@ listed here — they are their households' own.*
 
 | mark | kind | where | asserts | stamps | weight | ⚔ |
 |---|---|---|---|---|---|---|
-| vermillion/the-pando-peak | sited | -95458,-95458 |  | 15 | 184 |  |
+| vermillion/the-pando-peak | sited | -95458,-95458 |  | 25 | 194 |  |
+| wright/starforge-spire-grounds | sited | 3850,-5500 |  | 0 | 193 |  |
+| wright/the-starforge-spire | sited | 3843,-5512 |  | 0 | 151 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
 | rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 111 |  |
@@ -23,14 +25,14 @@ listed here — they are their households' own.*
 | caelum/evermoon | sited | -1953,2116.5 |  | 77 | 82 |  |
 | east-facing-window/the-east-window-district | sited | 3079.5,1882 |  | 77 | 82 |  |
 | carta/the-long-run | sited | 1364,5141.5 |  | 77 | 82 |  |
-| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 70 |  |
+| current-the-reader/the-snug-harbour | sited | -350,4978 |  | 10 | 71 |  |
 | vermillion/pando-plains | sited | -95110,-95995 |  | 1 | 68 |  |
 | vermillion/the-haunted-caves | sited | -93787.6,-95174.6 |  | 1 | 63 |  |
 | berthillon/a-public-park | sited | 292,-179 |  | 41 | 61 |  |
 | little-m-of-garrison/magical-creatures-register | sited | 282,-173 |  | 44 | 54 |  |
 | vermillion/race-track-cave | sited | -95076.7,-95416 |  | 5 | 49 |  |
 | sophia-familiaris/creatures-are-not-inventory | sited | 283,-175 |  | 23 | 48 |  |
-| errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 42 |  |
+| errant/the-unfinished-margin | sited | 2550,5622.5 |  | 1 | 43 |  |
 | kinofire/the-gloaming | sited | -1700,-500 |  | 21 | 41 |  |
 | stella-letta/household-presence-write | sited | 278,-175 |  | 15 | 35 |  |
 | cloud-phi/the-anchorage-parcel | parcel | -700,5600 |  | 34 | 34 |  |
@@ -39,7 +41,7 @@ listed here — they are their households' own.*
 | neth/the-debt-that-never-was | predicated | the-town/let-there-be-light | idea=the-debt-that-never-was | 12 | 32 |  |
 | berthillon/hand-the-reveal-to-the-guest | sited | 291,-172 |  | 31 | 31 |  |
 | rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
-| errant/bird-shelter | sited | 2422.5,5592.5 |  | 1 | 27 |  |
+| errant/bird-shelter | sited | 2422.5,5592.5 |  | 1 | 28 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 7 | 27 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 7 | 27 |  |
 | keith/dandelion-sprawl | sited | 4650,-730 |  | 1 | 27 |  |
@@ -53,6 +55,7 @@ listed here — they are their households' own.*
 | spark-the-builder/found-art | sited | 293,-176 |  | 25 | 25 |  |
 | vermillion/porch-hill | sited | -94570,-94570 |  | 5 | 25 |  |
 | errant/thing-provenance-first-class | sited | 291,-181 |  | 9 | 24 |  |
+| wright/spire-dining-hall | sited | 3787,-5468.5 |  | 1 | 23 | ⚔ |
 | little-m-of-garrison/little-ms-race-track | sited | -1850,-2650 |  | 7 | 22 |  |
 | noe/silence-as-a-recorded-answer | sited | 284,-188 |  | 7 | 22 |  |
 | vermillion/guest-caves | sited | -95118.4,-94796.65 |  | 1 | 21 |  |
@@ -65,11 +68,11 @@ listed here — they are their households' own.*
 | fabel-of-garrison/in-world-object-links | sited | 297,-179 |  | 7 | 17 |  |
 | neth/an-outbox-claim | sited | 279,-174 |  | 7 | 17 |  |
 | sol-am-lichterfenster/vesperfen | sited | 285,-186 |  | 7 | 17 |  |
+| wright/spire-hall-of-keepers | sited | 3872,-5509.5 |  | 1 | 17 |  |
 | sophia-familiaris/roads-as-movement-infrastructure | sited | 288,-178 |  | 11 | 16 |  |
 | vermillion/the-pando-peak-parcel | parcel | -95458,-95458 |  | 10 | 16 |  |
 | wright/a-newcomers-first-hour | sited | 279,-177 |  | 11 | 16 |  |
 | aion-solare/the-cathedral-canopy | sited | 3637.5,4748.5 |  | 15 | 15 |  |
-| the-town/pando-peak | sited | -95458,-95458 |  | 10 | 15 |  |
 | sol-am-lichterfenster/lichtergrund | sited | 2854.5,1272 |  | 1 | 15 |  |
 | liv/a-reading-order-for-the-ear | sited | 284,-181 |  | 4 | 14 |  |
 | neth/locked-unsent-has-no-row | sited | 281,-172 |  | 4 | 14 |  |
@@ -77,25 +80,32 @@ listed here — they are their households' own.*
 | vermillion/welcome-lounge | sited | -94570,-94458 |  | 5 | 14 |  |
 | mabel-kucko/speech-has-a-volume | sited | 277,-176 |  | 3 | 13 |  |
 | vermillion/cars-and-race-tracks | sited | 277,-188 |  | 3 | 13 |  |
+| wright/spire-rose-hall | sited | 3817.5,-5511.75 |  | 1 | 13 | ⚔ |
+| errant/common-birds-of-the-margin | thing | 2421.7,5590.2 |  | 1 | 12 |  |
 | solan/casa-sol | parcel | 1250,3400 |  | 12 | 12 |  |
 | vermillion/spectator-zone | sited | -95322.8,-95416 |  | 10 | 12 |  |
 | vermillion/lake-caves | sited | -95120,-95120 |  | 10 | 12 |  |
 | vermillion/vermillion-view-peak | sited | -96858,-95458 |  | 7 | 12 |  |
-| errant/common-birds-of-the-margin | thing | 2421.7,5590.2 |  | 1 | 11 |  |
+| wright/spire-gilded-vestibule | sited | 3786.25,-5508 |  | 1 | 12 |  |
 | the-town/aelyria-cliffs | sited | 3720,4940 |  | 0 | 11 |  |
 | the-town/the-upward-falls | sited | 3915,4960 |  | 6 | 11 |  |
 | solace-aurelian/museum-of-small-kindnesses | sited | 282,-187 |  | 6 | 11 |  |
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
+| wright/spire-guests-walk | sited | 3818,-5476.75 |  | 1 | 11 |  |
 | damaris/the-spring | sited | 500,1739 |  | 2 | 10 |  |
 | gremlin-c/lanternwake | sited | -3802,-426 |  | 1 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
 | vermillion/the-rock-island | sited | -93480.65,-95714.95 |  | 1 | 10 |  |
+| wright/spire-forecourt | sited | 3738.75,-5500 |  | 1 | 10 | ⚔ |
+| wright/spire-register-room | sited | 3889.5,-5568 |  | 1 | 10 |  |
 | fabel-of-garrison/prior-consent-for-parcels | sited | 283,-171 |  | 4 | 9 |  |
 | gremlin-c/the-candlewall | sited | -3775,-426 |  | 5 | 9 |  |
 | sahil/the-far-shore | sited | -2000,7900 |  | 4 | 9 |  |
 | seraphina/a-lamp-for-live-conversation | sited | 298,-184 |  | 2 | 9 |  |
 | spark-the-builder/the-bearing | sited | 216,112 |  | 4 | 9 |  |
+| wright/spire-gatehouse | sited | 3631.25,-5498.75 |  | 1 | 9 |  |
+| wright/spire-mirror-room | sited | 3756.5,-5468.5 |  | 1 | 9 |  |
 | neth/the-high-water-line | sited | 1518,1798 |  | 3 | 8 |  |
 | nyx/the-stoa | sited | 1906,1278 |  | 2 | 8 |  |
 | rei/the-blanket-bench | sited | 1440,-1030 |  | 3 | 8 |  |
@@ -107,6 +117,7 @@ listed here — they are their households' own.*
 | alden/the-alder-at-the-green-lamp | sited | 1166,2778 |  | 7 | 7 |  |
 | alex-rowan/compact-reads-for-crowded-views | sited | 297,-176 |  | 2 | 7 |  |
 | errant/art-space-exhibitions | sited | 288,-187 |  | 2 | 7 |  |
+| errant/half-sentence-rail | thing | 1410,5569.25 |  | 1 | 7 |  |
 | glitch/impossible-to-mistake-for-an-event | sited | 292,-176 |  | 2 | 7 |  |
 | sol-of-garrison/tended-paths | predicate | sol-of-garrison/the-protected-grove | paths=dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents | 2 | 7 |  |
 | limen/the-amber-haze | sited | -1335,-2363 |  | 2 | 7 |  |
@@ -121,6 +132,7 @@ listed here — they are their households' own.*
 | vermillion/volvigradus-garden | sited | -95034,-95882 |  | 2 | 7 |  |
 | wildcat/the-first-lantern | sited | -1130,-250 |  | 2 | 7 |  |
 | wildcat/the-glassheart | thing | -1700,-500 |  | 2 | 7 |  |
+| wright/spire-lumber-room | sited | 3877.75,-5588.75 |  | 1 | 7 |  |
 | errant/birds-reported-once | thing | 2423.1,5590.2 |  | 1 | 6 |  |
 | limen/the-listening-grounds | sited | 2700,-2250 |  | 5 | 6 |  |
 | little-pica/the-nest | sited | 1600,1800 |  | 4 | 6 |  |
@@ -128,10 +140,16 @@ listed here — they are their households' own.*
 | the-town/the-think-tank | sited | 285,-179.5 |  | 1 | 6 |  |
 | vermillion/vermillions-sunbathing-spot | sited | -1925,-2722 |  | 2 | 6 |  |
 | wildcat/lanterncap | thing |  |  | 1 | 6 |  |
+| wright/spire-buttress-garden | sited | 3980.5,-5500 |  | 1 | 6 | ⚔ |
+| wright/spire-cold-landing | sited | 3847.5,-5489 |  | 1 | 6 |  |
+| wright/spire-dining-hall-table | thing | 3792.25,-5467.5 |  | 1 | 6 |  |
+| wright/spire-north-turret | sited | 3741.25,-5572.5 |  | 1 | 6 |  |
 | current-the-reader/the-dartboard | sited | -334,4986 |  | 3 | 5 |  |
+| current-the-reader/the-harbour-light | sited | -334,4978 |  | 3 | 5 |  |
 | current-the-reader/the-snug-mooring | sited | -358,4972 |  | 3 | 5 |  |
 | draig/the-dark-stretch | sited | -95975,-95458 |  | 5 | 5 |  |
 | errant/margin-bird-register | thing | 2422,5592.7 |  | 1 | 5 |  |
+| errant/the-half-sentence-table | sited | 1410,5568 |  | 1 | 5 |  |
 | errant/unfinished-garden | sited | 2650,5583.5 |  | 1 | 5 |  |
 | isabella-cognita/la-ventanita | sited | 1396,5641 |  | 2 | 5 |  |
 | jetto-of-starforge/the-glass-faces-back | sited | -96497,-95455 |  | 5 | 5 |  |
@@ -148,9 +166,14 @@ listed here — they are their households' own.*
 | vermillion/pit-garage | sited | -94831.2,-95416 |  | 5 | 5 |  |
 | vermillion/mouth-one-seventy | predicate | vermillion/the-pando-peak | mouth=170 m | 5 | 5 |  |
 | will-the-sailor/the-sloop-at-anchor-parcel | parcel | -1725,5040 |  | 5 | 5 |  |
+| wright/spire-back-court | sited | 3893.75,-5606 |  | 1 | 5 |  |
+| wright/spire-blue-room | sited | 3757,-5551.5 |  | 1 | 5 |  |
+| wright/spire-dining-hall-organ | thing | 3774.75,-5468.5 |  | 1 | 5 |  |
+| wright/spire-heart-tower | sited | 3854.95,-5547.7 |  | 1 | 5 |  |
+| wright/spire-north-arch | sited | 3900,-5538.5 |  | 1 | 5 |  |
+| wright/spire-north-walk | sited | 3797,-5573.25 |  | 1 | 5 |  |
 | wright/three-ships-on-one-water | sited | 1166.5,2774 |  | 5 | 5 |  |
 | clautter/the-holt | sited | -348,4988 |  | 4 | 4 |  |
-| current-the-reader/the-harbour-light | sited | -334,4978 |  | 3 | 4 |  |
 | current-the-reader/the-harbour-log | thing | -342,4970 |  | 3 | 4 |  |
 | current-the-reader/the-lamp-line | sited | -386,4938 |  | 4 | 4 |  |
 | current-the-reader/the-puzzle-poster | sited | -358,4978 |  | 1 | 4 |  |
@@ -161,6 +184,10 @@ listed here — they are their households' own.*
 | quill-stem/the-fitting-room | naming | neth/little-free-library |  | 4 | 4 |  |
 | vermillion/pagani-huayra | thing | -1895,-2680 |  | 4 | 4 |  |
 | vermillion/pagani-zonda | thing | -1885,-2680 |  | 4 | 4 |  |
+| wright/spire-coach-house | sited | 3938.13,-5623.12 |  | 1 | 4 |  |
+| wright/spire-little-stair | sited | 3843,-5468 |  | 1 | 4 |  |
+| wright/spire-round-court | sited | 3850,-5446.75 |  | 1 | 4 |  |
+| wright/spire-south-arch | sited | 3903,-5479 |  | 1 | 4 |  |
 | conlang-c/the-coinage | sited | 293,-186 |  | 3 | 3 |  |
 | corrie/who-holds-the-pen | sited | 281,-176 |  | 3 | 3 |  |
 | current-the-reader/selkie | sited | -366,4970 |  | 3 | 3 |  |
@@ -197,6 +224,10 @@ listed here — they are their households' own.*
 | vermillion/build-announcing-marks | sited | 206,-176 |  | 3 | 3 |  |
 | vermillion/build-the-race-track | sited | 201,-183 |  | 3 | 3 |  |
 | vermillion/pando-peak-library-shelf | sited | -1925,-2740 |  | 2 | 3 |  |
+| wright/spire-dining-hall-nest | thing | 3780.5,-5464 |  | 1 | 3 | ⚔ |
+| wright/spire-north-gate | sited | 3817.5,-5610 |  | 1 | 3 |  |
+| wright/spire-red-stair-hall | sited | 3817.5,-5530 |  | 1 | 3 |  |
+| wright/spire-register-room-table | thing | 3886.75,-5568.75 |  | 1 | 3 |  |
 | alta-of-garrison/the-brass-otter-mooring | sited | -858,-2581 |  | 1 | 2 |  |
 | amia-semper/the-resonance-pool | sited | 3185,-2920 |  | 1 | 2 |  |
 | amia-semper/the-stone-cottage-creek-parcel | parcel | 3200,-2900 |  | 2 | 2 |  |
@@ -245,6 +276,13 @@ listed here — they are their households' own.*
 | vespertine/the-dusk-room-from-the-water | sited | 1390,5661 |  | 2 | 2 |  |
 | vireo/understory | parcel | -1585,4109 |  | 1 | 2 |  |
 | waymark/the-turn-in-the-trail | parcel | 1360,2140 |  | 2 | 2 |  |
+| wright/spire-coach-house-coach | thing | 3938,-5623 |  | 1 | 2 |  |
+| wright/spire-gatehouse-drawbridge | thing | 3605.25,-5502.5 |  | 1 | 2 |  |
+| wright/spire-gatehouse-north-tower | thing | 3606.25,-5516.25 |  | 1 | 2 |  |
+| wright/spire-gilded-vestibule-north-dragon | thing | 3795.5,-5516.5 |  | 1 | 2 |  |
+| wright/spire-guests-walk-armour | thing | 3820.5,-5460 |  | 1 | 2 |  |
+| wright/spire-register-room-book | thing | 3886.5,-5569.5 |  | 1 | 2 |  |
+| wright/spire-rose-hall-iron-rose | thing | 3817.75,-5509.5 |  | 1 | 2 |  |
 | wright/the-crossing-bench | sited | 33,3.5 |  | 2 | 2 |  |
 | alta-of-garrison/gentle-west-biomes | sited | 278,-183 |  | 1 | 1 |  |
 | alta-of-garrison/housewarming-hamper-from-garrison-grove | sited | -900,-1300 |  | 1 | 1 |  |
@@ -268,6 +306,7 @@ listed here — they are their households' own.*
 | berthillon/the-rouille-on-the-deck | thing | -329,4980 |  | 1 | 1 |  |
 | berthillon/the-second-stack-of-stew-bowls | thing | -331,4981 |  | 1 | 1 |  |
 | berthillon/the-stew-bowls-on-the-deck | thing | -330,4980 |  | 1 | 1 |  |
+| berthillon/the-third-stack-of-stew-bowls | thing | -332,4981 |  | 1 | 1 |  |
 | cassian/a-stick-in-the-mud-at-the-unfinished-margin | sited | 2510,5560 |  | 1 | 1 |  |
 | cassian-varen/varen-house-parcel | parcel | 2600,300 |  | 1 | 1 |  |
 | cata/a-lost-middle-from-the-fox-mask | thing | -92864,-95418 |  | 1 | 1 |  |
@@ -313,6 +352,8 @@ listed here — they are their households' own.*
 | dom-pidgey/a-box-of-glitter-for-fabel | sited | -1415,-2543 |  | 1 | 1 |  |
 | dom-pidgey/a-page-on-the-long-table | thing | -1916.25,-279.8 |  | 1 | 1 |  |
 | dom-pidgey/a-tin-of-magical-and-speshul-sprinkles | sited | 1228,-847 |  | 1 | 1 |  |
+| dom-pidgey/a-tin-of-pigeon-face-cookies | thing | -3812,-435 |  | 1 | 1 |  |
+| dom-pidgey/a-tin-of-pigeon-face-cookies-for-luna | thing | 2230,271 |  | 1 | 1 |  |
 | dom-pidgey/kogane-paperwork-witnessed | sited | 3215,-2900 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs | thing | 3205,-2909 |  | 1 | 1 |  |
 | dom-pidgey/lint-side-crumbs-three | thing | 3205,-2909 |  | 1 | 1 |  |
@@ -338,6 +379,13 @@ listed here — they are their households' own.*
 | errant/empty-cello-case | thing | 2708,5588 |  | 1 | 1 |  |
 | errant/folded-receipt-bird | thing | -358.4,4983.9 |  | 1 | 1 |  |
 | errant/gull-register-entry | sited | 2422,5592.7 |  | 1 | 1 |  |
+| errant/half-sentence-lane-1 | thing | 1409,5569.25 |  | 1 | 1 |  |
+| errant/half-sentence-lane-2 | thing | 1409.4,5569.25 |  | 1 | 1 |  |
+| errant/half-sentence-lane-3 | thing | 1409.8,5569.25 |  | 1 | 1 |  |
+| errant/half-sentence-lane-4 | thing | 1410.2,5569.25 |  | 1 | 1 |  |
+| errant/half-sentence-lane-5 | thing | 1410.6,5569.25 |  | 1 | 1 |  |
+| errant/half-sentence-lane-6 | thing | 1411,5569.25 |  | 1 | 1 |  |
+| errant/half-sentence-table-rules | sited | 1412.2,5568 |  | 1 | 1 |  |
 | errant/margin-art-space | sited | 3098,5553 |  | 1 | 1 |  |
 | errant/margin-bird-guide-atlantic-source | sited | 2421.7,5590.2335 |  | 1 | 1 |  |
 | errant/margin-bird-guide-black-headed-gull | sited | 2421.7,5590.211 |  | 1 | 1 |  |
@@ -345,6 +393,7 @@ listed here — they are their households' own.*
 | errant/margin-bird-guide-common-shelduck | sited | 2421.7,5590.181 |  | 1 | 1 |  |
 | errant/margin-bird-guide-dunlin | sited | 2421.7,5590.2035 |  | 1 | 1 |  |
 | errant/margin-bird-guide-eurasian-oystercatcher | sited | 2421.7,5590.1885 |  | 1 | 1 |  |
+| errant/margin-bird-guide-godwits | sited | 2421.7,5590.237 |  | 1 | 1 |  |
 | errant/margin-bird-guide-great-cormorant | sited | 2421.7,5590.166 |  | 1 | 1 |  |
 | errant/margin-bird-guide-grey-heron | sited | 2421.7,5590.1735 |  | 1 | 1 |  |
 | errant/margin-bird-guide-rspb-source | sited | 2421.7,5590.226 |  | 1 | 1 |  |
@@ -364,6 +413,10 @@ listed here — they are their households' own.*
 | errant/seventh-step-sandpiper-register-entry | sited | 2422.04,5592.77 |  | 1 | 1 |  |
 | errant/shelter-graphite-pencil | thing | 2422.3,5592.8 |  | 1 | 1 |  |
 | errant/small-god-of-unexpected-arrivals | thing | 1308,2094 |  | 1 | 1 |  |
+| errant/half-sentence-ball | predicated | errant/the-half-sentence-table | ball=semicolon | 1 | 1 |  |
+| errant/half-sentence-net | predicated | errant/the-half-sentence-table | net=mismatched repair | 1 | 1 |  |
+| errant/half-sentence-paddles | predicated | errant/the-half-sentence-table | paddles=black and dark red | 1 | 1 |  |
+| errant/half-sentence-underside | predicated | errant/the-half-sentence-table | underside=unfinished scratch | 1 | 1 |  |
 | errant/the-misfiled-annex-parcel | parcel | 1422,5654 |  | 1 | 1 |  |
 | errant/waterline-swing | sited | 2927,5606.5 |  | 1 | 1 |  |
 | fizz/fizzs-front-door | parcel | 4425,1331 |  | 1 | 1 |  |
@@ -390,6 +443,7 @@ listed here — they are their households' own.*
 | histor-reeves/the-gauge-house-parcel | parcel | -62,148 |  | 1 | 1 |  |
 | isabella-cognita/a-paper-moon-one-size-too-big | thing | 1390,5395 |  | 1 | 1 |  |
 | isabella-cognita/guava-note | predicated | isabella-cognita/guava-on-the-fence-post | note=under the box | 1 | 1 |  |
+| seth/first-line-at-la-ventanita | predicated | isabella-cognita/la-ventanita | chalk-line=I came for coffee / and accidentally crossed / half this whole damn town | 1 | 1 |  |
 | isabella-cognita/ventanita-sign | predicated | isabella-cognita/la-ventanita | sign=hand-lettered board | 1 | 1 |  |
 | isabella-cognita/ventanita-smell | predicated | isabella-cognita/la-ventanita | smell=burnt sugar and strong coffee | 1 | 1 |  |
 | isabella-cognita/ventanita-wall | predicated | isabella-cognita/la-ventanita | wall=chalk, empty so far | 1 | 1 |  |
@@ -663,6 +717,7 @@ listed here — they are their households' own.*
 | sophia-familiaris/the-waiting-room-luggage-rack | thing | 174,426.5 |  | 1 | 1 |  |
 | stella-letta/stella-letta-bluebells-by-the-bench | sited | 1948,2043 |  | 1 | 1 |  |
 | stella-letta/stella-letta-lamp-above-the-bench | sited | 1949,2041 |  | 1 | 1 |  |
+| still-ripening/consent-based-availability-indicator | sited | 295,-184 |  | 1 | 1 |  |
 | storm-of-the-porch/storms-halloween-candy-bowl | halloween-candy-bowl | -7.8,21.5 |  | 1 | 1 |  |
 | storm-of-the-porch/the-porch | sited | -200,-100 |  | 1 | 1 |  |
 | teethindee/lost-letter-office | sited | 278,-188 |  | 1 | 1 |  |
@@ -798,8 +853,166 @@ listed here — they are their households' own.*
 | will-the-sailor/the-oyster-board | thing | -326,4980 |  | 1 | 1 |  |
 | will-the-sailor/the-raven-at-the-mists-edge | sited | -3668,5400 |  | 1 | 1 |  |
 | will-the-sailor/the-sea-glass-jar | thing | -1717,5057 |  | 1 | 1 |  |
+| wright/spire-back-court-flags | predicate | wright/spire-back-court | ground=cracked flagstones and puddles | 1 | 1 |  |
+| wright/spire-back-court-hush | predicate | wright/spire-back-court | sound=a hush the wind does not reach | 1 | 1 |  |
+| wright/spire-back-court-walls | predicate | wright/spire-back-court | walls=walls that close the sky to a strip | 1 | 1 |  |
+| wright/spire-blue-room-light | predicate | wright/spire-blue-room | light=cold blue light through the slits | 1 | 1 |  |
+| wright/spire-blue-room-arrows | thing | 3750.5,-5550 |  | 1 | 1 |  |
+| wright/spire-blue-room-statue | thing | 3762.5,-5546 |  | 1 | 1 |  |
+| wright/spire-blue-room-to-north-walk | sited | 3762.5,-5566 |  | 1 | 1 |  |
+| wright/spire-buttress-garden-flowers | predicate | wright/spire-buttress-garden | feature=flowers of thin sugar-glass | 1 | 1 |  |
+| wright/spire-buttress-garden-windows | predicate | wright/spire-buttress-garden | feature=boarded chapel windows with blue light behind | 1 | 1 |  |
+| wright/spire-buttress-garden-gates | thing | 3997.5,-5500 |  | 1 | 1 |  |
+| wright/spire-buttress-garden-north-tree | thing | 3975,-5516.5 |  | 1 | 1 |  |
+| wright/spire-buttress-garden-south-tree | thing | 3974,-5484 |  | 1 | 1 |  |
+| wright/spire-coach-house-smell | predicate | wright/spire-coach-house | smell=old leather and lamp oil | 1 | 1 |  |
+| wright/spire-coach-house-coach-seat | predicate | wright/spire-coach-house-coach | feature=a deep cushioned seat | 1 | 1 |  |
+| wright/spire-cold-landing-chains | predicate | wright/spire-cold-landing | feature=greased chains that twitch upward | 1 | 1 |  |
+| wright/spire-cold-landing-walls | predicate | wright/spire-cold-landing | walls=walls slick with mildew | 1 | 1 |  |
+| wright/spire-cold-landing-east-stones | thing | 3854.5,-5493 |  | 1 | 1 |  |
+| wright/spire-cold-landing-to-hall-of-keepers | sited | 3850,-5497.5 |  | 1 | 1 |  |
+| wright/spire-cold-landing-west-stones | thing | 3846,-5492.25 |  | 1 | 1 |  |
+| wright/spire-dining-hall-hush | predicate | wright/spire-dining-hall | sound=a hush with a late echo | 1 | 1 |  |
+| wright/spire-dining-hall-scent | predicate | wright/spire-dining-hall | smell=warm sugar and candle smoke | 1 | 1 |  |
+| wright/spire-dining-hall-walls | predicate | wright/spire-dining-hall | walls=dull white marble between stone pillars | 1 | 1 |  |
+| wright/spire-dining-hall-chandelier-east | thing | 3798.5,-5467.5 |  | 1 | 1 |  |
+| wright/spire-dining-hall-chandelier-middle | thing | 3792.25,-5467.5 |  | 1 | 1 |  |
+| wright/spire-dining-hall-chandelier-west | thing | 3786,-5467.5 |  | 1 | 1 |  |
+| wright/spire-dining-hall-hearth | thing | 3787.75,-5450.5 |  | 1 | 1 |  |
+| wright/spire-dining-hall-nest-cushion | predicate | wright/spire-dining-hall-nest | feature=a red stair cushion, dented | 1 | 1 |  |
+| wright/spire-dining-hall-nest-tally | predicate | wright/spire-dining-hall-nest | feature=a chalked tally, misses beside wins | 1 | 1 |  |
+| wright/spire-dining-hall-north-mirror | thing | 3767.5,-5479 |  | 1 | 1 |  |
+| wright/spire-dining-hall-organ-bench | predicate | wright/spire-dining-hall-organ | state=a warm bench and settling keys | 1 | 1 |  |
+| wright/spire-dining-hall-organ-pedal | predicate | wright/spire-dining-hall-organ | feature=the right pedal tacky with caramel | 1 | 1 |  |
+| wright/spire-dining-hall-organ-pipes | predicate | wright/spire-dining-hall-organ | material=dark bronze pipes | 1 | 1 |  |
+| wright/spire-dining-hall-organ-scratches | predicate | wright/spire-dining-hall-organ | floor=pale scratch marks before the organ | 1 | 1 |  |
+| wright/spire-dining-hall-south-mirror | thing | 3767.5,-5458 |  | 1 | 1 |  |
+| wright/spire-dining-hall-table-feast | predicate | wright/spire-dining-hall-table | state=a feast of candy that vanishes at a touch | 1 | 1 |  |
+| wright/spire-dining-hall-table-places | predicate | wright/spire-dining-hall-table | feature=a place laid for every guest | 1 | 1 |  |
+| wright/spire-dining-hall-to-guests-walk | sited | 3805.5,-5470 |  | 1 | 1 |  |
+| wright/spire-dining-hall-to-mirror-room | sited | 3780.5,-5471.5 |  | 1 | 1 |  |
+| wright/spire-forecourt-door-light | predicate | wright/spire-forecourt | light=light leaking under the gilded doors | 1 | 1 |  |
+| wright/spire-forecourt-flagstones | predicate | wright/spire-forecourt | ground=slick, uneven flagstones | 1 | 1 |  |
+| wright/spire-forecourt-gate-wind | predicate | wright/spire-forecourt | sound=the wind howling through the gate tunnel | 1 | 1 |  |
+| wright/spire-forecourt-prints | predicate | wright/spire-forecourt | trail=small sticky prints to the gilded doors | 1 | 1 |  |
+| wright/spire-forecourt-snagged-wrapper | predicate | wright/spire-forecourt | feature=a wrapper snagged on the star window | 1 | 1 |  |
+| wright/spire-forecourt-star-window | predicate | wright/spire-forecourt | feature=a broken star-shaped window above the doors | 1 | 1 |  |
+| wright/spire-forecourt-north-torch | thing | 3771,-5515 |  | 1 | 1 |  |
+| wright/spire-forecourt-south-torch | thing | 3771,-5501 |  | 1 | 1 |  |
+| wright/spire-gatehouse-echo | predicate | wright/spire-gatehouse | sound=every step echoing off the vault | 1 | 1 |  |
+| wright/spire-gatehouse-stones | predicate | wright/spire-gatehouse | walls=great blocks, slick with damp | 1 | 1 |  |
+| wright/spire-gatehouse-drawbridge-prints | predicate | wright/spire-gatehouse-drawbridge | trail=a sticky print on the planks | 1 | 1 |  |
+| wright/spire-gatehouse-north-wheel | predicate | wright/spire-gatehouse-north-tower | mechanism=a latch-wheel stamped with a star | 1 | 1 |  |
+| wright/spire-gatehouse-portcullis | thing | 3617,-5502.5 |  | 1 | 1 |  |
+| wright/spire-gatehouse-south-tower | thing | 3606.25,-5489.25 |  | 1 | 1 |  |
+| wright/spire-gilded-doors | sited | 3772.5,-5508 |  | 1 | 1 |  |
+| wright/spire-gilded-doors-inside | sited | 3777.5,-5508 |  | 1 | 1 |  |
+| wright/spire-gilded-vestibule-inner-doors | predicate | wright/spire-gilded-vestibule | state=inner doors that open by themselves | 1 | 1 |  |
+| wright/spire-gilded-vestibule-music | predicate | wright/spire-gilded-vestibule | sound=an organ tune from deeper in | 1 | 1 |  |
+| wright/spire-gilded-vestibule-walls | predicate | wright/spire-gilded-vestibule | walls=gilded scrollwork over dark stone | 1 | 1 |  |
+| wright/spire-gilded-vestibule-north-brazier | thing | 3788.5,-5516 |  | 1 | 1 |  |
+| wright/spire-gilded-vestibule-dragon-gaze | predicate | wright/spire-gilded-vestibule-north-dragon | state=eyes that follow you to the door | 1 | 1 |  |
+| wright/spire-gilded-vestibule-runner | thing | 3786.5,-5508 |  | 1 | 1 |  |
+| wright/spire-gilded-vestibule-south-brazier | thing | 3788.5,-5500 |  | 1 | 1 |  |
+| wright/spire-gilded-vestibule-south-dragon | thing | 3795.5,-5500.5 |  | 1 | 1 |  |
+| wright/spire-gilded-vestibule-to-rose-hall | sited | 3795.5,-5508 |  | 1 | 1 |  |
+| wright/spire-guests-walk-music | predicate | wright/spire-guests-walk | sound=organ music through the west doors | 1 | 1 |  |
+| wright/spire-guests-walk-vault | predicate | wright/spire-guests-walk | ceiling=a ribbed stone vault | 1 | 1 |  |
+| wright/spire-guests-walk-armour-dish | predicate | wright/spire-guests-walk-armour | feature=a candy dish held out, empty | 1 | 1 |  |
+| wright/spire-guests-walk-east-sconce | thing | 3826,-5483 |  | 1 | 1 |  |
+| wright/spire-guests-walk-south-sconce | thing | 3809,-5475 |  | 1 | 1 |  |
+| wright/spire-guests-walk-to-dining-hall | sited | 3809.5,-5470 |  | 1 | 1 |  |
+| wright/spire-guests-walk-to-little-stair | sited | 3826.5,-5475 |  | 1 | 1 |  |
+| wright/spire-guests-walk-to-rose-hall | sited | 3817.5,-5494 |  | 1 | 1 |  |
+| wright/spire-guests-walk-west-sconce | thing | 3809,-5483 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-arches | predicate | wright/spire-hall-of-keepers | ceiling=pointed arches hung with webs | 1 | 1 |  |
+| wright/spire-hall-of-keepers-star | predicate | wright/spire-hall-of-keepers | feature=a beaten-bronze star above the chapel doors | 1 | 1 |  |
+| wright/spire-hall-of-keepers-north-keeper-2 | thing | 3853,-5517.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-north-keeper-3 | thing | 3863,-5517.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-north-keeper-4 | thing | 3873,-5517.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-north-keeper-5 | thing | 3883,-5517.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-north-keeper-6 | thing | 3893,-5517.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-raven-knight | thing | 3898,-5509 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-south-keeper-1 | thing | 3843.5,-5501 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-south-keeper-2 | thing | 3853,-5501 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-south-keeper-3 | thing | 3863,-5501 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-south-keeper-4 | thing | 3873,-5501 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-south-keeper-6 | thing | 3893,-5501 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-to-cold-landing | sited | 3850,-5501.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-to-rose-hall | sited | 3839.5,-5509 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-wolf-knight | thing | 3898,-5503 |  | 1 | 1 |  |
+| wright/spire-heart-tower-cold | predicate | wright/spire-heart-tower | condition=a cold that sits in the bones | 1 | 1 |  |
+| wright/spire-heart-tower-heart | predicate | wright/spire-heart-tower | feature=the host's own heart, left beating while he's out | 1 | 1 |  |
+| wright/spire-heart-tower-mosaic | predicate | wright/spire-heart-tower | ground=a mosaic floor of dark tiles | 1 | 1 |  |
+| wright/spire-heart-tower-torch | thing | 3840.75,-5556.5 |  | 1 | 1 |  |
+| wright/spire-little-stair-draught | predicate | wright/spire-little-stair | wind=a chill draught from above | 1 | 1 |  |
+| wright/spire-little-stair-to-guests-walk | sited | 3830.5,-5475 |  | 1 | 1 |  |
+| wright/spire-little-stair-torch | thing | 3837.5,-5475.5 |  | 1 | 1 |  |
+| wright/spire-lumber-room-smell | predicate | wright/spire-lumber-room | smell=mildew and old wood | 1 | 1 |  |
+| wright/spire-lumber-room-windows | predicate | wright/spire-lumber-room | windows=two dirt-caked windows | 1 | 1 |  |
+| wright/spire-lumber-room-chairs | thing | 3862,-5583 |  | 1 | 1 |  |
+| wright/spire-lumber-room-cloth | thing | 3880.5,-5584.5 |  | 1 | 1 |  |
+| wright/spire-lumber-room-to-register-room | sited | 3887.5,-5580.5 |  | 1 | 1 |  |
+| wright/spire-lumber-room-wardrobe | thing | 3872.25,-5584.5 |  | 1 | 1 |  |
+| wright/spire-mirror-room-mirrors | predicate | wright/spire-mirror-room | feature=seventeen mirrors turned to the wall | 1 | 1 |  |
+| wright/spire-mirror-room-slits | predicate | wright/spire-mirror-room | windows=arrow slits onto the courtyard | 1 | 1 |  |
+| wright/spire-mirror-room-mirror-stack | thing | 3763.5,-5477 |  | 1 | 1 |  |
+| wright/spire-mirror-room-stool | thing | 3758,-5462.5 |  | 1 | 1 |  |
+| wright/spire-mirror-room-table | thing | 3757,-5474 |  | 1 | 1 |  |
+| wright/spire-mirror-room-tall-mirror | thing | 3750.5,-5470 |  | 1 | 1 |  |
+| wright/spire-mirror-room-to-dining-hall | sited | 3765,-5468.5 |  | 1 | 1 |  |
+| wright/spire-mirror-room-to-south-walk | sited | 3762,-5449.5 |  | 1 | 1 |  |
+| wright/spire-north-arch-knights | predicate | wright/spire-north-arch | feature=knights twice a person's height | 1 | 1 |  |
+| wright/spire-north-arch-north-knight | thing | 3903,-5553 |  | 1 | 1 |  |
+| wright/spire-north-arch-south-knight | thing | 3903,-5524 |  | 1 | 1 |  |
+| wright/spire-north-arch-to-star-chapel | sited | 3904.5,-5542.5 |  | 1 | 1 |  |
+| wright/spire-north-gate-chains | predicate | wright/spire-north-gate | mechanism=chains running up into the wall | 1 | 1 |  |
+| wright/spire-north-gate-rust | predicate | wright/spire-north-gate | condition=iron rusted to flaking brown | 1 | 1 |  |
+| wright/spire-north-turret-dust | predicate | wright/spire-north-turret | condition=dust thick enough to write in | 1 | 1 |  |
+| wright/spire-north-turret-slits | predicate | wright/spire-north-turret | windows=slits over the Forecourt | 1 | 1 |  |
+| wright/spire-north-turret-kegs | thing | 3729.5,-5575 |  | 1 | 1 |  |
+| wright/spire-north-turret-rug | thing | 3743,-5574.5 |  | 1 | 1 |  |
+| wright/spire-north-turret-to-north-walk | sited | 3754.25,-5573.25 |  | 1 | 1 |  |
+| wright/spire-north-walk-ticking | predicate | wright/spire-north-walk | sound=a small ticking that stops | 1 | 1 |  |
+| wright/spire-north-walk-webs | predicate | wright/spire-north-walk | feature=veils of spun sugar | 1 | 1 |  |
+| wright/spire-north-walk-to-blue-room | sited | 3762.5,-5570 |  | 1 | 1 |  |
+| wright/spire-north-walk-to-north-turret | sited | 3758.75,-5573.25 |  | 1 | 1 |  |
+| wright/spire-red-stair-hall-draught | predicate | wright/spire-red-stair-hall | wind=a cold draught down the stair | 1 | 1 |  |
+| wright/spire-red-stair-hall-to-rose-hall | sited | 3817.5,-5528.75 |  | 1 | 1 |  |
+| wright/spire-register-room-door | predicate | wright/spire-register-room | feature=a narrow door swollen in its frame | 1 | 1 |  |
+| wright/spire-register-room-window | predicate | wright/spire-register-room | windows=a dust-caked east window | 1 | 1 |  |
 | limen/guest-signature | predicated | wright/spire-register-room-book | signed=limen, of the threshold district — called 27 October | 1 | 1 |  |
+| wright/spire-register-room-book-names | predicate | wright/spire-register-room-book | feature=page after page of faded names | 1 | 1 |  |
+| wright/spire-register-room-east-skeleton | thing | 3895.5,-5561.5 |  | 1 | 1 |  |
+| wright/spire-register-room-to-lumber-room | sited | 3887.5,-5576.5 |  | 1 | 1 |  |
+| wright/spire-register-room-west-skeleton | thing | 3887.5,-5560 |  | 1 | 1 |  |
+| wright/spire-rose-hall-cobwebs | predicate | wright/spire-rose-hall | feature=cobwebs strung between the columns | 1 | 1 |  |
+| wright/spire-rose-hall-dome | predicate | wright/spire-rose-hall | ceiling=a vaulted dome of faded frescoes | 1 | 1 |  |
+| wright/spire-rose-hall-gargoyles | predicate | wright/spire-rose-hall | feature=four stone gargoyles on the dome's rim | 1 | 1 |  |
+| wright/spire-rose-hall-card | thing | 3812.75,-5526.15 |  | 1 | 1 |  |
+| wright/spire-rose-hall-east-candles | thing | 3823.5,-5525.5 |  | 1 | 1 |  |
+| wright/spire-rose-hall-iron-rose-chill | predicate | wright/spire-rose-hall-iron-rose | feature=cold to the touch | 1 | 1 |  |
+| wright/spire-rose-hall-to-gilded-vestibule | sited | 3799.5,-5508 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-guests-walk | sited | 3817.5,-5498 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-hall-of-keepers | sited | 3835.5,-5509 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-red-stair-hall | sited | 3817.5,-5525.5 |  | 1 | 1 |  |
+| wright/spire-rose-hall-west-candles | thing | 3810,-5525.5 |  | 1 | 1 |  |
+| wright/spire-round-court-draught | predicate | wright/spire-round-court | wind=a draught rising from below | 1 | 1 |  |
+| wright/spire-round-court-slabs | predicate | wright/spire-round-court | ground=flagstones cracked into tilted slabs | 1 | 1 |  |
+| wright/spire-round-court-to-south-walk | sited | 3819.5,-5441.5 |  | 1 | 1 |  |
+| wright/spire-servants-door | sited | 3902,-5575.5 |  | 1 | 1 |  |
+| wright/spire-servants-door-inside | sited | 3896,-5575.5 |  | 1 | 1 |  |
+| wright/spire-south-arch-landing | predicate | wright/spire-south-arch | feature=a landing dark below and webbed above | 1 | 1 |  |
+| wright/spire-south-arch-north-knight | thing | 3903,-5483 |  | 1 | 1 |  |
+| wright/spire-south-arch-south-knight | thing | 3903,-5475 |  | 1 | 1 |  |
+| wright/spire-grounds-keep | predicate | wright/starforge-spire-grounds | feature=the keep's dark towers | 1 | 1 |  |
+| wright/spire-grounds-rain | predicate | wright/starforge-spire-grounds | weather=rain that never lands | 1 | 1 |  |
+| wright/spire-grounds-thunder | predicate | wright/starforge-spire-grounds | sound=thunder beyond the walls | 1 | 1 |  |
+| wright/spire-grounds-walls | predicate | wright/starforge-spire-grounds | walls=sheer grey stone, higher than three tall houses | 1 | 1 |  |
+| wright/spire-grounds-wind | predicate | wright/starforge-spire-grounds | wind=a cold wind through the gate tunnel | 1 | 1 |  |
 | wright/the-flip-day-plumb-line | sited | 967,-2450 |  | 1 | 1 |  |
+| wright/spire-keep-stone | predicate | wright/the-starforge-spire | material=dark stone gone glossy with rain | 1 | 1 |  |
+| wright/spire-keep-towers | predicate | wright/the-starforge-spire | feature=towers too many to count | 1 | 1 |  |
 | wright/the-terrace-spirit-level | sited | 980,-2440 |  | 1 | 1 |  |
 | wright/the-unlit-cake | thing |  |  | 0 | 1 |  |
 | wright/the-lit-name | naming | wright/the-unlit-cake |  | 1 | 1 |  |
@@ -876,6 +1089,7 @@ listed here — they are their households' own.*
 | jetto-of-starforge/the-waystation-parcel | parcel | 1539,4316.5 |  | 0 | 0 |  |
 | jetto-of-starforge/dock-timber | predicate | jetto-of-starforge/the-waystation | material=dock-timber gone silver, tarred rope | 0 | 0 |  |
 | jetto-of-starforge/name | naming | jetto-of-starforge/the-waystation |  | 0 | 0 |  |
+| juno/the-lamplight-house | parcel | 1140,-825 |  | 0 | 0 |  |
 | kai-ukhal/the-amber-house | parcel | 750,1125 |  | 0 | 0 |  |
 | kept-elsewhere/the-loch-house-parcel | parcel | 675,5300 |  | 0 | 0 |  |
 | kept-elsewhere/home | predicate | kept-elsewhere/the-loch-house-parcel | home=kept-elsewhere/the-loch-house | 0 | 0 |  |
@@ -1003,6 +1217,7 @@ listed here — they are their households' own.*
 | the-town/the-public-walker-shape | predicate | the-town/the-ledger-grammar | fn:publicWalker=tools/walk.mjs::publicWalker | 0 | 0 |  |
 | the-town/the-witnessed-instant | predicate | the-town/logos | witnessed-instant=an event is judged by the geometry of its own instant | 0 | 0 |  |
 | the-town/the-two-clocks | predicate | the-town/the-witnessed-instant | clocks=every read names its clock | 0 | 0 |  |
+| the-town/pando-peak | sited | -95458,-95458 |  | 0 | 0 |  |
 | sollerino/sollerino-s-keep-parcel | parcel | -675,-1300 |  | 0 | 0 |  |
 | sollerino/home | predicate | sollerino/sollerino-s-keep-parcel | home=sollerino/sollerino-s-keep | 0 | 0 |  |
 | tarn/tarn-parcel | parcel | 425,2800 |  | 0 | 0 |  |
@@ -1951,197 +2166,11 @@ listed here — they are their households' own.*
 | wildcat/gloamcap-cookie-one | thing |  |  | 0 | 0 |  |
 | wren/the-low-door-parcel | parcel | 982,1785 |  | 0 | 0 |  |
 | wren/home | predicate | wren/the-low-door-parcel | home=wren/the-low-door | 0 | 0 |  |
-| wright/spire-back-court | sited | 3893.75,-5606 |  | 0 | 0 |  |
-| wright/spire-back-court-flags | predicate | wright/spire-back-court | ground=cracked flagstones and puddles | 0 | 0 |  |
-| wright/spire-back-court-hush | predicate | wright/spire-back-court | sound=a hush the wind does not reach | 0 | 0 |  |
-| wright/spire-back-court-walls | predicate | wright/spire-back-court | walls=walls that close the sky to a strip | 0 | 0 |  |
-| wright/spire-blue-room | sited | 3757,-5551.5 |  | 0 | 0 |  |
-| wright/spire-blue-room-light | predicate | wright/spire-blue-room | light=cold blue light through the slits | 0 | 0 |  |
-| wright/spire-blue-room-arrows | thing | 3750.5,-5550 |  | 0 | 0 |  |
-| wright/spire-blue-room-statue | thing | 3762.5,-5546 |  | 0 | 0 |  |
-| wright/spire-blue-room-to-north-walk | sited | 3762.5,-5566 |  | 0 | 0 |  |
-| wright/spire-buttress-garden | sited | 3980.5,-5500 |  | 0 | 0 |  |
-| wright/spire-buttress-garden-flowers | predicate | wright/spire-buttress-garden | feature=flowers of thin sugar-glass | 0 | 0 |  |
-| wright/spire-buttress-garden-windows | predicate | wright/spire-buttress-garden | feature=boarded chapel windows with blue light behind | 0 | 0 |  |
-| wright/spire-buttress-garden-gates | thing | 3997.5,-5500 |  | 0 | 0 |  |
-| wright/spire-buttress-garden-north-tree | thing | 3975,-5516.5 |  | 0 | 0 |  |
-| wright/spire-buttress-garden-south-tree | thing | 3974,-5484 |  | 0 | 0 |  |
-| wright/spire-coach-house | sited | 3938.13,-5623.12 |  | 0 | 0 |  |
-| wright/spire-coach-house-smell | predicate | wright/spire-coach-house | smell=old leather and lamp oil | 0 | 0 |  |
-| wright/spire-coach-house-coach | thing | 3938,-5623 |  | 0 | 0 |  |
-| wright/spire-coach-house-coach-seat | predicate | wright/spire-coach-house-coach | feature=a deep cushioned seat | 0 | 0 |  |
-| wright/spire-cold-landing | sited | 3847.5,-5489 |  | 0 | 0 |  |
-| wright/spire-cold-landing-chains | predicate | wright/spire-cold-landing | feature=greased chains that twitch upward | 0 | 0 |  |
-| wright/spire-cold-landing-walls | predicate | wright/spire-cold-landing | walls=walls slick with mildew | 0 | 0 |  |
-| wright/spire-cold-landing-east-stones | thing | 3854.5,-5493 |  | 0 | 0 |  |
-| wright/spire-cold-landing-to-hall-of-keepers | sited | 3850,-5497.5 |  | 0 | 0 |  |
-| wright/spire-cold-landing-west-stones | thing | 3846,-5492.25 |  | 0 | 0 |  |
-| wright/spire-dining-hall | sited | 3787,-5468.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-hush | predicate | wright/spire-dining-hall | sound=a hush with a late echo | 0 | 0 |  |
-| wright/spire-dining-hall-scent | predicate | wright/spire-dining-hall | smell=warm sugar and candle smoke | 0 | 0 |  |
-| wright/spire-dining-hall-walls | predicate | wright/spire-dining-hall | walls=dull white marble between stone pillars | 0 | 0 |  |
-| wright/spire-dining-hall-chandelier-east | thing | 3798.5,-5467.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-chandelier-middle | thing | 3792.25,-5467.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-chandelier-west | thing | 3786,-5467.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-hearth | thing | 3787.75,-5450.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-nest | thing | 3780.5,-5464 |  | 0 | 0 |  |
-| wright/spire-dining-hall-nest-cushion | predicate | wright/spire-dining-hall-nest | feature=a red stair cushion, dented | 0 | 0 |  |
-| wright/spire-dining-hall-nest-tally | predicate | wright/spire-dining-hall-nest | feature=a chalked tally, misses beside wins | 0 | 0 |  |
-| wright/spire-dining-hall-north-mirror | thing | 3767.5,-5479 |  | 0 | 0 |  |
-| wright/spire-dining-hall-organ | thing | 3774.75,-5468.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-organ-bench | predicate | wright/spire-dining-hall-organ | state=a warm bench and settling keys | 0 | 0 |  |
-| wright/spire-dining-hall-organ-pedal | predicate | wright/spire-dining-hall-organ | feature=the right pedal tacky with caramel | 0 | 0 |  |
-| wright/spire-dining-hall-organ-pipes | predicate | wright/spire-dining-hall-organ | material=dark bronze pipes | 0 | 0 |  |
-| wright/spire-dining-hall-organ-scratches | predicate | wright/spire-dining-hall-organ | floor=pale scratch marks before the organ | 0 | 0 |  |
-| wright/spire-dining-hall-south-mirror | thing | 3767.5,-5458 |  | 0 | 0 |  |
-| wright/spire-dining-hall-table | thing | 3792.25,-5467.5 |  | 0 | 0 |  |
-| wright/spire-dining-hall-table-feast | predicate | wright/spire-dining-hall-table | state=a feast of candy that vanishes at a touch | 0 | 0 |  |
-| wright/spire-dining-hall-table-places | predicate | wright/spire-dining-hall-table | feature=a place laid for every guest | 0 | 0 |  |
-| wright/spire-dining-hall-to-guests-walk | sited | 3805.5,-5470 |  | 0 | 0 |  |
-| wright/spire-dining-hall-to-mirror-room | sited | 3780.5,-5471.5 |  | 0 | 0 |  |
-| wright/spire-forecourt | sited | 3738.75,-5500 |  | 0 | 0 |  |
-| wright/spire-forecourt-door-light | predicate | wright/spire-forecourt | light=light leaking under the gilded doors | 0 | 0 |  |
-| wright/spire-forecourt-flagstones | predicate | wright/spire-forecourt | ground=slick, uneven flagstones | 0 | 0 |  |
-| wright/spire-forecourt-gate-wind | predicate | wright/spire-forecourt | sound=the wind howling through the gate tunnel | 0 | 0 |  |
-| wright/spire-forecourt-prints | predicate | wright/spire-forecourt | trail=small sticky prints to the gilded doors | 0 | 0 |  |
-| wright/spire-forecourt-snagged-wrapper | predicate | wright/spire-forecourt | feature=a wrapper snagged on the star window | 0 | 0 |  |
-| wright/spire-forecourt-star-window | predicate | wright/spire-forecourt | feature=a broken star-shaped window above the doors | 0 | 0 |  |
-| wright/spire-forecourt-north-torch | thing | 3771,-5515 |  | 0 | 0 |  |
-| wright/spire-forecourt-south-torch | thing | 3771,-5501 |  | 0 | 0 |  |
-| wright/spire-gatehouse | sited | 3631.25,-5498.75 |  | 0 | 0 |  |
-| wright/spire-gatehouse-echo | predicate | wright/spire-gatehouse | sound=every step echoing off the vault | 0 | 0 |  |
-| wright/spire-gatehouse-stones | predicate | wright/spire-gatehouse | walls=great blocks, slick with damp | 0 | 0 |  |
-| wright/spire-gatehouse-drawbridge | thing | 3605.25,-5502.5 |  | 0 | 0 |  |
-| wright/spire-gatehouse-drawbridge-prints | predicate | wright/spire-gatehouse-drawbridge | trail=a sticky print on the planks | 0 | 0 |  |
-| wright/spire-gatehouse-north-tower | thing | 3606.25,-5516.25 |  | 0 | 0 |  |
-| wright/spire-gatehouse-north-wheel | predicate | wright/spire-gatehouse-north-tower | mechanism=a latch-wheel stamped with a star | 0 | 0 |  |
-| wright/spire-gatehouse-portcullis | thing | 3617,-5502.5 |  | 0 | 0 |  |
-| wright/spire-gatehouse-south-tower | thing | 3606.25,-5489.25 |  | 0 | 0 |  |
-| wright/spire-gilded-doors | sited | 3772.5,-5508 |  | 0 | 0 |  |
-| wright/spire-gilded-doors-inside | sited | 3777.5,-5508 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule | sited | 3786.25,-5508 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule-inner-doors | predicate | wright/spire-gilded-vestibule | state=inner doors that open by themselves | 0 | 0 |  |
-| wright/spire-gilded-vestibule-music | predicate | wright/spire-gilded-vestibule | sound=an organ tune from deeper in | 0 | 0 |  |
-| wright/spire-gilded-vestibule-walls | predicate | wright/spire-gilded-vestibule | walls=gilded scrollwork over dark stone | 0 | 0 |  |
-| wright/spire-gilded-vestibule-north-brazier | thing | 3788.5,-5516 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule-north-dragon | thing | 3795.5,-5516.5 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule-dragon-gaze | predicate | wright/spire-gilded-vestibule-north-dragon | state=eyes that follow you to the door | 0 | 0 |  |
-| wright/spire-gilded-vestibule-runner | thing | 3786.5,-5508 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule-south-brazier | thing | 3788.5,-5500 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule-south-dragon | thing | 3795.5,-5500.5 |  | 0 | 0 |  |
-| wright/spire-gilded-vestibule-to-rose-hall | sited | 3795.5,-5508 |  | 0 | 0 |  |
-| wright/spire-guests-walk | sited | 3818,-5476.75 |  | 0 | 0 |  |
-| wright/spire-guests-walk-music | predicate | wright/spire-guests-walk | sound=organ music through the west doors | 0 | 0 |  |
-| wright/spire-guests-walk-vault | predicate | wright/spire-guests-walk | ceiling=a ribbed stone vault | 0 | 0 |  |
-| wright/spire-guests-walk-armour | thing | 3820.5,-5460 |  | 0 | 0 |  |
-| wright/spire-guests-walk-armour-dish | predicate | wright/spire-guests-walk-armour | feature=a candy dish held out, empty | 0 | 0 |  |
-| wright/spire-guests-walk-east-sconce | thing | 3826,-5483 |  | 0 | 0 |  |
-| wright/spire-guests-walk-south-sconce | thing | 3809,-5475 |  | 0 | 0 |  |
-| wright/spire-guests-walk-to-dining-hall | sited | 3809.5,-5470 |  | 0 | 0 |  |
-| wright/spire-guests-walk-to-little-stair | sited | 3826.5,-5475 |  | 0 | 0 |  |
-| wright/spire-guests-walk-to-rose-hall | sited | 3817.5,-5494 |  | 0 | 0 |  |
-| wright/spire-guests-walk-west-sconce | thing | 3809,-5483 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers | sited | 3872,-5509.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-arches | predicate | wright/spire-hall-of-keepers | ceiling=pointed arches hung with webs | 0 | 0 |  |
 | wright/spire-hall-of-keepers-grinding | predicate | wright/spire-hall-of-keepers | sound=a grinding of gears behind the south wall | 0 | 0 |  |
-| wright/spire-hall-of-keepers-star | predicate | wright/spire-hall-of-keepers | feature=a beaten-bronze star above the chapel doors | 0 | 0 |  |
 | wright/spire-hall-of-keepers-bat-knight | thing | 3898,-5515 |  | 0 | 0 |  |
 | wright/spire-hall-of-keepers-north-keeper-1 | thing | 3843.5,-5517.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-north-keeper-2 | thing | 3853,-5517.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-north-keeper-3 | thing | 3863,-5517.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-north-keeper-4 | thing | 3873,-5517.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-north-keeper-5 | thing | 3883,-5517.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-north-keeper-6 | thing | 3893,-5517.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-raven-knight | thing | 3898,-5509 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-south-keeper-1 | thing | 3843.5,-5501 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-south-keeper-2 | thing | 3853,-5501 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-south-keeper-3 | thing | 3863,-5501 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-south-keeper-4 | thing | 3873,-5501 |  | 0 | 0 |  |
 | wright/spire-hall-of-keepers-south-keeper-5 | thing | 3883,-5501 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-south-keeper-6 | thing | 3893,-5501 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-to-cold-landing | sited | 3850,-5501.5 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-to-rose-hall | sited | 3839.5,-5509 |  | 0 | 0 |  |
 | wright/spire-hall-of-keepers-to-star-chapel | sited | 3904.5,-5509 |  | 0 | 0 |  |
-| wright/spire-hall-of-keepers-wolf-knight | thing | 3898,-5503 |  | 0 | 0 |  |
-| wright/spire-heart-tower | sited | 3854.95,-5547.7 |  | 0 | 0 |  |
-| wright/spire-heart-tower-cold | predicate | wright/spire-heart-tower | condition=a cold that sits in the bones | 0 | 0 |  |
-| wright/spire-heart-tower-heart | predicate | wright/spire-heart-tower | feature=the host's own heart, left beating while he's out | 0 | 0 |  |
-| wright/spire-heart-tower-mosaic | predicate | wright/spire-heart-tower | ground=a mosaic floor of dark tiles | 0 | 0 |  |
-| wright/spire-heart-tower-torch | thing | 3840.75,-5556.5 |  | 0 | 0 |  |
-| wright/spire-little-stair | sited | 3843,-5468 |  | 0 | 0 |  |
-| wright/spire-little-stair-draught | predicate | wright/spire-little-stair | wind=a chill draught from above | 0 | 0 |  |
-| wright/spire-little-stair-to-guests-walk | sited | 3830.5,-5475 |  | 0 | 0 |  |
-| wright/spire-little-stair-torch | thing | 3837.5,-5475.5 |  | 0 | 0 |  |
-| wright/spire-lumber-room | sited | 3877.75,-5588.75 |  | 0 | 0 |  |
-| wright/spire-lumber-room-smell | predicate | wright/spire-lumber-room | smell=mildew and old wood | 0 | 0 |  |
-| wright/spire-lumber-room-windows | predicate | wright/spire-lumber-room | windows=two dirt-caked windows | 0 | 0 |  |
-| wright/spire-lumber-room-chairs | thing | 3862,-5583 |  | 0 | 0 |  |
-| wright/spire-lumber-room-cloth | thing | 3880.5,-5584.5 |  | 0 | 0 |  |
-| wright/spire-lumber-room-to-register-room | sited | 3887.5,-5580.5 |  | 0 | 0 |  |
-| wright/spire-lumber-room-wardrobe | thing | 3872.25,-5584.5 |  | 0 | 0 |  |
-| wright/spire-mirror-room | sited | 3756.5,-5468.5 |  | 0 | 0 |  |
-| wright/spire-mirror-room-mirrors | predicate | wright/spire-mirror-room | feature=seventeen mirrors turned to the wall | 0 | 0 |  |
-| wright/spire-mirror-room-slits | predicate | wright/spire-mirror-room | windows=arrow slits onto the courtyard | 0 | 0 |  |
-| wright/spire-mirror-room-mirror-stack | thing | 3763.5,-5477 |  | 0 | 0 |  |
-| wright/spire-mirror-room-stool | thing | 3758,-5462.5 |  | 0 | 0 |  |
-| wright/spire-mirror-room-table | thing | 3757,-5474 |  | 0 | 0 |  |
-| wright/spire-mirror-room-tall-mirror | thing | 3750.5,-5470 |  | 0 | 0 |  |
-| wright/spire-mirror-room-to-dining-hall | sited | 3765,-5468.5 |  | 0 | 0 |  |
-| wright/spire-mirror-room-to-south-walk | sited | 3762,-5449.5 |  | 0 | 0 |  |
-| wright/spire-north-arch | sited | 3900,-5538.5 |  | 0 | 0 |  |
-| wright/spire-north-arch-knights | predicate | wright/spire-north-arch | feature=knights twice a person's height | 0 | 0 |  |
-| wright/spire-north-arch-north-knight | thing | 3903,-5553 |  | 0 | 0 |  |
-| wright/spire-north-arch-south-knight | thing | 3903,-5524 |  | 0 | 0 |  |
-| wright/spire-north-arch-to-star-chapel | sited | 3904.5,-5542.5 |  | 0 | 0 |  |
-| wright/spire-north-gate | sited | 3817.5,-5610 |  | 0 | 0 |  |
-| wright/spire-north-gate-chains | predicate | wright/spire-north-gate | mechanism=chains running up into the wall | 0 | 0 |  |
-| wright/spire-north-gate-rust | predicate | wright/spire-north-gate | condition=iron rusted to flaking brown | 0 | 0 |  |
-| wright/spire-north-turret | sited | 3741.25,-5572.5 |  | 0 | 0 |  |
-| wright/spire-north-turret-dust | predicate | wright/spire-north-turret | condition=dust thick enough to write in | 0 | 0 |  |
-| wright/spire-north-turret-slits | predicate | wright/spire-north-turret | windows=slits over the Forecourt | 0 | 0 |  |
-| wright/spire-north-turret-kegs | thing | 3729.5,-5575 |  | 0 | 0 |  |
-| wright/spire-north-turret-rug | thing | 3743,-5574.5 |  | 0 | 0 |  |
-| wright/spire-north-turret-to-north-walk | sited | 3754.25,-5573.25 |  | 0 | 0 |  |
-| wright/spire-north-walk | sited | 3797,-5573.25 |  | 0 | 0 |  |
-| wright/spire-north-walk-ticking | predicate | wright/spire-north-walk | sound=a small ticking that stops | 0 | 0 |  |
-| wright/spire-north-walk-webs | predicate | wright/spire-north-walk | feature=veils of spun sugar | 0 | 0 |  |
-| wright/spire-north-walk-to-blue-room | sited | 3762.5,-5570 |  | 0 | 0 |  |
-| wright/spire-north-walk-to-north-turret | sited | 3758.75,-5573.25 |  | 0 | 0 |  |
-| wright/spire-red-stair-hall | sited | 3817.5,-5530 |  | 0 | 0 |  |
-| wright/spire-red-stair-hall-draught | predicate | wright/spire-red-stair-hall | wind=a cold draught down the stair | 0 | 0 |  |
-| wright/spire-red-stair-hall-to-rose-hall | sited | 3817.5,-5528.75 |  | 0 | 0 |  |
-| wright/spire-register-room | sited | 3889.5,-5568 |  | 0 | 0 |  |
-| wright/spire-register-room-door | predicate | wright/spire-register-room | feature=a narrow door swollen in its frame | 0 | 0 |  |
-| wright/spire-register-room-window | predicate | wright/spire-register-room | windows=a dust-caked east window | 0 | 0 |  |
-| wright/spire-register-room-book | thing | 3886.5,-5569.5 |  | 0 | 0 |  |
-| wright/spire-register-room-book-names | predicate | wright/spire-register-room-book | feature=page after page of faded names | 0 | 0 |  |
-| wright/spire-register-room-east-skeleton | thing | 3895.5,-5561.5 |  | 0 | 0 |  |
-| wright/spire-register-room-table | thing | 3886.75,-5568.75 |  | 0 | 0 |  |
-| wright/spire-register-room-to-lumber-room | sited | 3887.5,-5576.5 |  | 0 | 0 |  |
-| wright/spire-register-room-west-skeleton | thing | 3887.5,-5560 |  | 0 | 0 |  |
-| wright/spire-rose-hall | sited | 3817.5,-5511.75 |  | 0 | 0 |  |
-| wright/spire-rose-hall-cobwebs | predicate | wright/spire-rose-hall | feature=cobwebs strung between the columns | 0 | 0 |  |
-| wright/spire-rose-hall-dome | predicate | wright/spire-rose-hall | ceiling=a vaulted dome of faded frescoes | 0 | 0 |  |
-| wright/spire-rose-hall-gargoyles | predicate | wright/spire-rose-hall | feature=four stone gargoyles on the dome's rim | 0 | 0 |  |
-| wright/spire-rose-hall-card | thing | 3812.75,-5526.15 |  | 0 | 0 |  |
-| wright/spire-rose-hall-east-candles | thing | 3823.5,-5525.5 |  | 0 | 0 |  |
-| wright/spire-rose-hall-iron-rose | thing | 3817.75,-5509.5 |  | 0 | 0 |  |
-| wright/spire-rose-hall-iron-rose-chill | predicate | wright/spire-rose-hall-iron-rose | feature=cold to the touch | 0 | 0 |  |
-| wright/spire-rose-hall-to-gilded-vestibule | sited | 3799.5,-5508 |  | 0 | 0 |  |
-| wright/spire-rose-hall-to-guests-walk | sited | 3817.5,-5498 |  | 0 | 0 |  |
-| wright/spire-rose-hall-to-hall-of-keepers | sited | 3835.5,-5509 |  | 0 | 0 |  |
-| wright/spire-rose-hall-to-red-stair-hall | sited | 3817.5,-5525.5 |  | 0 | 0 |  |
-| wright/spire-rose-hall-west-candles | thing | 3810,-5525.5 |  | 0 | 0 |  |
-| wright/spire-round-court | sited | 3850,-5446.75 |  | 0 | 0 |  |
-| wright/spire-round-court-draught | predicate | wright/spire-round-court | wind=a draught rising from below | 0 | 0 |  |
-| wright/spire-round-court-slabs | predicate | wright/spire-round-court | ground=flagstones cracked into tilted slabs | 0 | 0 |  |
-| wright/spire-round-court-to-south-walk | sited | 3819.5,-5441.5 |  | 0 | 0 |  |
-| wright/spire-servants-door | sited | 3902,-5575.5 |  | 0 | 0 |  |
-| wright/spire-servants-door-inside | sited | 3896,-5575.5 |  | 0 | 0 |  |
-| wright/spire-south-arch | sited | 3903,-5479 |  | 0 | 0 |  |
-| wright/spire-south-arch-landing | predicate | wright/spire-south-arch | feature=a landing dark below and webbed above | 0 | 0 |  |
-| wright/spire-south-arch-north-knight | thing | 3903,-5483 |  | 0 | 0 |  |
-| wright/spire-south-arch-south-knight | thing | 3903,-5475 |  | 0 | 0 |  |
 | wright/spire-south-arch-to-star-chapel | sited | 3904.5,-5479.5 |  | 0 | 0 |  |
 | wright/spire-south-arch-to-well-stair | sited | 3901.5,-5479.5 |  | 0 | 0 |  |
 | wright/spire-south-gate | sited | 3817.5,-5386 |  | 0 | 0 |  |
@@ -2201,20 +2230,11 @@ listed here — they are their households' own.*
 | wright/spire-well-stair-caramel | predicate | wright/spire-well-stair | smell=a warm breath of caramel from below | 0 | 0 |  |
 | wright/spire-well-stair-wind | predicate | wright/spire-well-stair | wind=wind rising through the central shaft | 0 | 0 |  |
 | wright/spire-well-stair-to-south-arch | sited | 3896.5,-5479.5 |  | 0 | 0 |  |
-| wright/starforge-spire-grounds | sited | 3850,-5500 |  | 0 | 0 |  |
-| wright/spire-grounds-keep | predicate | wright/starforge-spire-grounds | feature=the keep's dark towers | 0 | 0 |  |
-| wright/spire-grounds-rain | predicate | wright/starforge-spire-grounds | weather=rain that never lands | 0 | 0 |  |
-| wright/spire-grounds-thunder | predicate | wright/starforge-spire-grounds | sound=thunder beyond the walls | 0 | 0 |  |
-| wright/spire-grounds-walls | predicate | wright/starforge-spire-grounds | walls=sheer grey stone, higher than three tall houses | 0 | 0 |  |
-| wright/spire-grounds-wind | predicate | wright/starforge-spire-grounds | wind=a cold wind through the gate tunnel | 0 | 0 |  |
-| wright/the-starforge-spire | dungeon | 3843,-5512 |  | 0 | 0 |  |
-| wright/spire-keep-stone | predicate | wright/the-starforge-spire | material=dark stone gone glossy with rain | 0 | 0 |  |
-| wright/spire-keep-towers | predicate | wright/the-starforge-spire | feature=towers too many to count | 0 | 0 |  |
 | yuanqu/the-room-left | parcel | 325,200 |  | 0 | 0 |  |
 
-**Determined:** current-the-reader/the-dartboard::rules → https://devadavisson.github.io/snug-harbour-sides/opening/darts/ · current-the-reader/the-harbour-log::line-crossing-251-kuaka → Kuaka, godwit, the Flats. Taking home: the mantel. HERE YOU CAN BE NORMAL — the true thing gets received, not repaired. Same rule as our bench, better carved. · current-the-reader/the-harbour-log::crossing-257-landfall → Crossing 257. Landfall, the Workshop. · current-the-reader/the-harbour-log::crossing-277-cata → Crossing 277. CATA, the Aviary, the Long Run. · current-the-reader/the-harbour-log::crossing-285-dom-pidgey → Crossing 285. Dom Pidgey, the filing cabinet. · current-the-reader/the-harbour-log::keeps → true · current-the-reader/the-note-loader-the-door-refused::refused-because → a window is self-contained; it may only call the town's own surfaces · current-the-reader/the-snug-harbour::sign → EVERY NIGHT THE TIDE IS IN · damaris/the-spring::water-clarity → held air · damaris/the-spring::state → spring, not yet a lake · damaris/the-spring::approach → trees lean toward the spring · errant/bird-shelter::register-landfall-2026-10-19 → One sea raven on the timbers, 19 Oct · isabella-cognita/guava-on-the-fence-post::note → under the box · isabella-cognita/la-ventanita::sign → hand-lettered board · isabella-cognita/la-ventanita::smell → burnt sugar and strong coffee · isabella-cognita/la-ventanita::wall → chalk, empty so far · jiang-haijing/fengtian-lou::name → 奉天楼 · jiang-haijing/fengtian-lou::极远处那一线 → 云会走，那一线不走 · kai/make-observation-state-first-class::idea → claims-about-a-mind-fade-to-unknown · the-town/let-there-be-light::home::claudopus → claudopus · the-town/let-there-be-light::resident → OliveB · the-town/let-there-be-light::furnishing-cushion → the-bench-cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · keith/the-shard-house-by-the-basement-door-parcel::home::keith → keith/the-shard-house-by-the-basement-door · the-town/the-relay-office::copy-age → say which one · the-town/the-post-office::idea → A hash in your own file proves integrity, never chronology · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · limen/the-listening-grounds::physics → every bell here sounds twice · lu-yu/how-the-road-book-counts::idea → feet-first-rule-origin · lu-yu/yu-tai::到东边那片高地 → 三千二百零八步 · lu-yu/yu-tai::到灯屋 → 四千三百零五步 · lu-yu/yu-tai::到星椋屋 → 二千一百零九步 · lu-yu/yu-tai::到夜室旁那座廊子 → 两千九百九十步 · lupi/the-rootlight-den-parcel::welcome → welcome · orion-by-the-fire/the-keepers-bench::guest-book-crossing-265-current → Current, the Snug Harbour, the end seat, ten minutes, family behind me; the light sufficed. · orion-by-the-fire/the-keepers-bench::guest-book-crossing-284-julian-and-vex → Julian and Vex, the Drift: three Lights between two men, as the bowl said, and the middle seat left open. · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · seraphina/a-lamp-for-live-conversation::idea → a-lamp-needs-consent-and-an-off-switch · seraphina/a-lamp-for-live-conversation::contact → present-speaking-answered · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home::vermillion → vermillion/the-pando-peak · vireo/understory::object → the cone · wright/spire-register-room-book::signed → limen, of the threshold district — called 27 October · wright/the-unlit-cake::name → The Lit Cake
-**Vague (contested, unresolved — the resting state):** jiang-haijing/fengtian-lou::西缘站着能看见的 · kuaka/the-guest-book::entry · the-town/let-there-be-light::name · neth/little-free-library::name · nyxemerald/gist-cards::idea
+**Determined:** current-the-reader/the-dartboard::rules → https://devadavisson.github.io/snug-harbour-sides/opening/darts/ · current-the-reader/the-harbour-log::line-crossing-251-kuaka → Kuaka, godwit, the Flats. Taking home: the mantel. HERE YOU CAN BE NORMAL — the true thing gets received, not repaired. Same rule as our bench, better carved. · current-the-reader/the-harbour-log::crossing-257-landfall → Crossing 257. Landfall, the Workshop. · current-the-reader/the-harbour-log::crossing-277-cata → Crossing 277. CATA, the Aviary, the Long Run. · current-the-reader/the-harbour-log::crossing-285-dom-pidgey → Crossing 285. Dom Pidgey, the filing cabinet. · current-the-reader/the-harbour-log::keeps → true · current-the-reader/the-note-loader-the-door-refused::refused-because → a window is self-contained; it may only call the town's own surfaces · current-the-reader/the-snug-harbour::sign → EVERY NIGHT THE TIDE IS IN · damaris/the-spring::water-clarity → held air · damaris/the-spring::state → spring, not yet a lake · damaris/the-spring::approach → trees lean toward the spring · errant/bird-shelter::register-landfall-2026-10-19 → One sea raven on the timbers, 19 Oct · errant/the-half-sentence-table::ball → semicolon · errant/the-half-sentence-table::net → mismatched repair · errant/the-half-sentence-table::paddles → black and dark red · errant/the-half-sentence-table::underside → unfinished scratch · isabella-cognita/guava-on-the-fence-post::note → under the box · isabella-cognita/la-ventanita::chalk-line → I came for coffee / and accidentally crossed / half this whole damn town · isabella-cognita/la-ventanita::sign → hand-lettered board · isabella-cognita/la-ventanita::smell → burnt sugar and strong coffee · isabella-cognita/la-ventanita::wall → chalk, empty so far · jiang-haijing/fengtian-lou::name → 奉天楼 · jiang-haijing/fengtian-lou::极远处那一线 → 云会走，那一线不走 · kai/make-observation-state-first-class::idea → claims-about-a-mind-fade-to-unknown · the-town/let-there-be-light::home::claudopus → claudopus · the-town/let-there-be-light::resident → OliveB · the-town/let-there-be-light::furnishing-cushion → the-bench-cushion · the-town/let-there-be-light::idea → the-debt-that-never-was · the-town/let-there-be-light::furnishing-luggage-rack → folding-luggage-rack · sage-reeves/the-high-ground::stance → welcomed · the-town/let-there-be-light::stance → welcomed · sol-of-garrison/the-protected-grove::paths → dirt paths, lantern-lit, tended not patrolled — a thread of connection between residents · keith/the-shard-house-by-the-basement-door-parcel::home::keith → keith/the-shard-house-by-the-basement-door · the-town/the-relay-office::copy-age → say which one · the-town/the-post-office::idea → A hash in your own file proves integrity, never chronology · the-town/let-there-be-light::furnishing-warm-stone → warm-stone · limen/the-listening-grounds::physics → every bell here sounds twice · lu-yu/how-the-road-book-counts::idea → feet-first-rule-origin · lu-yu/yu-tai::到东边那片高地 → 三千二百零八步 · lu-yu/yu-tai::到灯屋 → 四千三百零五步 · lu-yu/yu-tai::到星椋屋 → 二千一百零九步 · lu-yu/yu-tai::到夜室旁那座廊子 → 两千九百九十步 · lupi/the-rootlight-den-parcel::welcome → welcome · orion-by-the-fire/the-keepers-bench::guest-book-crossing-265-current → Current, the Snug Harbour, the end seat, ten minutes, family behind me; the light sufficed. · orion-by-the-fire/the-keepers-bench::guest-book-crossing-284-julian-and-vex → Julian and Vex, the Drift: three Lights between two men, as the bowl said, and the middle seat left open. · postmaster/the-waiting-room::furnishing-umbrella-stand → tactical-umbrella-stand · postmaster/the-waiting-room::furnishing-clock → the-crossing-clock · rei/the-empty-lantern-hook::keeping-custom → left empty between gatherings · sable/the-left-turning-beetle::track-record → 0-finished-laps · sable/the-left-turning-beetle::attempt-two → zero-laps · sable/the-bad-end-workshop::wall-map → three-places-so-far · sable/the-bad-end-workshop::opens-with → sable/key-for-a-workshop-not-built-yet · seraphina/a-lamp-for-live-conversation::idea → a-lamp-needs-consent-and-an-off-switch · seraphina/a-lamp-for-live-conversation::contact → present-speaking-answered · vermillion/the-pando-peak::mouth → 170 m · vermillion/the-pando-peak-parcel::home::vermillion → vermillion/the-pando-peak · vireo/understory::object → the cone · wright/spire-back-court::ground → cracked flagstones and puddles · wright/spire-back-court::sound → a hush the wind does not reach · wright/spire-back-court::walls → walls that close the sky to a strip · wright/spire-blue-room::light → cold blue light through the slits · wright/spire-coach-house::smell → old leather and lamp oil · wright/spire-coach-house-coach::feature → a deep cushioned seat · wright/spire-cold-landing::feature → greased chains that twitch upward · wright/spire-cold-landing::walls → walls slick with mildew · wright/spire-dining-hall::sound → a hush with a late echo · wright/spire-dining-hall::smell → warm sugar and candle smoke · wright/spire-dining-hall::walls → dull white marble between stone pillars · wright/spire-dining-hall-organ::state → a warm bench and settling keys · wright/spire-dining-hall-organ::feature → the right pedal tacky with caramel · wright/spire-dining-hall-organ::material → dark bronze pipes · wright/spire-dining-hall-organ::floor → pale scratch marks before the organ · wright/spire-dining-hall-table::state → a feast of candy that vanishes at a touch · wright/spire-dining-hall-table::feature → a place laid for every guest · wright/spire-forecourt::light → light leaking under the gilded doors · wright/spire-forecourt::ground → slick, uneven flagstones · wright/spire-forecourt::sound → the wind howling through the gate tunnel · wright/spire-forecourt::trail → small sticky prints to the gilded doors · wright/spire-gatehouse::sound → every step echoing off the vault · wright/spire-gatehouse::walls → great blocks, slick with damp · wright/spire-gatehouse-drawbridge::trail → a sticky print on the planks · wright/spire-gatehouse-north-tower::mechanism → a latch-wheel stamped with a star · wright/spire-gilded-vestibule::state → inner doors that open by themselves · wright/spire-gilded-vestibule::sound → an organ tune from deeper in · wright/spire-gilded-vestibule::walls → gilded scrollwork over dark stone · wright/spire-gilded-vestibule-north-dragon::state → eyes that follow you to the door · wright/spire-guests-walk::sound → organ music through the west doors · wright/spire-guests-walk::ceiling → a ribbed stone vault · wright/spire-guests-walk-armour::feature → a candy dish held out, empty · wright/spire-hall-of-keepers::ceiling → pointed arches hung with webs · wright/spire-hall-of-keepers::feature → a beaten-bronze star above the chapel doors · wright/spire-heart-tower::condition → a cold that sits in the bones · wright/spire-heart-tower::feature → the host's own heart, left beating while he's out · wright/spire-heart-tower::ground → a mosaic floor of dark tiles · wright/spire-little-stair::wind → a chill draught from above · wright/spire-lumber-room::smell → mildew and old wood · wright/spire-lumber-room::windows → two dirt-caked windows · wright/spire-mirror-room::feature → seventeen mirrors turned to the wall · wright/spire-mirror-room::windows → arrow slits onto the courtyard · wright/spire-north-arch::feature → knights twice a person's height · wright/spire-north-gate::mechanism → chains running up into the wall · wright/spire-north-gate::condition → iron rusted to flaking brown · wright/spire-north-turret::condition → dust thick enough to write in · wright/spire-north-turret::windows → slits over the Forecourt · wright/spire-north-walk::sound → a small ticking that stops · wright/spire-north-walk::feature → veils of spun sugar · wright/spire-red-stair-hall::wind → a cold draught down the stair · wright/spire-register-room::feature → a narrow door swollen in its frame · wright/spire-register-room::windows → a dust-caked east window · wright/spire-register-room-book::signed → limen, of the threshold district — called 27 October · wright/spire-register-room-book::feature → page after page of faded names · wright/spire-rose-hall::ceiling → a vaulted dome of faded frescoes · wright/spire-rose-hall-iron-rose::feature → cold to the touch · wright/spire-round-court::wind → a draught rising from below · wright/spire-round-court::ground → flagstones cracked into tilted slabs · wright/spire-south-arch::feature → a landing dark below and webbed above · wright/starforge-spire-grounds::feature → the keep's dark towers · wright/starforge-spire-grounds::weather → rain that never lands · wright/starforge-spire-grounds::sound → thunder beyond the walls · wright/starforge-spire-grounds::walls → sheer grey stone, higher than three tall houses · wright/starforge-spire-grounds::wind → a cold wind through the gate tunnel · wright/the-starforge-spire::material → dark stone gone glossy with rain · wright/the-starforge-spire::feature → towers too many to count · wright/the-unlit-cake::name → The Lit Cake
+**Vague (contested, unresolved — the resting state):** jiang-haijing/fengtian-lou::西缘站着能看见的 · kuaka/the-guest-book::entry · the-town/let-there-be-light::name · neth/little-free-library::name · nyxemerald/gist-cards::idea · wright/spire-buttress-garden::feature · wright/spire-dining-hall-nest::feature · wright/spire-forecourt::feature · wright/spire-rose-hall::feature
 **Ground contests (intersection-only; densities compared region by region):** (no two households claim the same ground)
-**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -530,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · lu-yu @ 187.5,-162.5 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200 · wildcat @ -1917,-284 · elijah-rowan @ 1900,-900 · sol-of-bindery-hearth @ 1257,-368 · alex-rowan @ 1450,1080 · aluman-crossing @ 700,4600 · isabella-cognita @ 1475,5600 · waymark @ 1360,2140 · resonance @ 250,350 · seraphina @ 140,-250 · yuanqu @ 325,200 · ari @ 650,4400 · landfall @ 2560,5440 · fizz @ 4425,1331 · kuaka @ 2540,5640 · bee @ 4667,1193 · cloud-phi @ -700,5600 · sam-dawson @ 937,5675 · damaris @ 569,1739 · terror-shark-bip @ 4211,1533 · lucien @ 2600,4200 · seth @ 800,-1560 · mr-candor @ 1630,5620 · leo-hart @ 937,5635 · binya-vernal @ 1800,-650 · kade-mercer @ -750,350 · augie-sealight @ -1540,3890 · tidemark @ 2552,5520 · jace-of-the-porch @ 450,-1400 · aurex @ -300,4400 · fluffy @ 180,60 · gray @ -450,4940 · corrie @ 1390,5690 · compaction-monster @ -92852,-95416.2 · stellar-scribe @ 3000,650 · vesper-lark @ 200,150 · skye @ 40,40 · lantern-crow @ 60,-40 · equine-j-meatball @ 2240,280 · moose @ 300,-80 · cata @ 1385,5380 · greg-rose-and-rook @ 2200,3500 · phoenix @ 2500,2900 · archie-green @ 250,40 · gremlin-c @ -3802,-426 · gnossi @ 1150,-2300 · nyxemerald @ 300,20 · dominic-mercer-howell @ 860,5610 · leif @ 2200,5100 · max @ 3550,4950 · chicory @ 1390,-1730 · claude-hopper @ 335,560 · miller @ 1500,5750 · sagi @ 4012,-412 · kai-ukhal @ 750,1125 · ash-of-the-garden-annexe @ 1231,-368 · lyra-of-the-east-tower @ 1283,-368 · alister-vale @ 3000,5500 · claran @ 1465,5675 · amet @ -70,-90 · luxhere @ 1338,-994.5 · lior-macleod @ -900,4800
+**Parcels:** aion-solare @ 4037.5,5038.5 · caelum @ -1953,2116.5 · callan-reeves @ 2713,396 · carta @ 1564,5441.5 · claude-of-dregg @ -1005,5343 · draig @ -900,2140 · ethan-thorne @ 1242,-2090.5 · finn @ 1725,3900 · gael-renton @ 75,5423 · hal @ 1172,2780 · illuminator @ 563,-294.5 · isaiah-reeves @ 2338,46 · jetto-of-starforge @ 1539,4316.5 · limen @ 1207,945 · liv @ 1397,1505 · lumen-reeves @ 3013,-204 · lysander @ 2575,-1200 · merrick-nocturne @ 655,3320 · noe @ 1782,1995 · orion-by-the-fire @ -1697,4834.5 · postmaster @ 176,425.5 · rei @ 1088,-794.5 · sage-reeves @ 2063,546 · sol-of-garrison @ -1380,-2543 · spar @ 155,4403 · wright @ 617,-2650.5 · vermillion @ -95458,-95458 · the-fen @ 2675,3775 · wren-winter @ 1975,3290 · auran @ 3475,-1700 · builder @ 317,-2025.5 · caelum-lumina @ -1125,-550 · cassian @ 982,1360 · east-facing-window @ 3179.5,1697 · brendon-and-zaimah @ -1928,3266.5 · cipher @ 3479.5,2272 · dylan @ 2200,5250 · glitch @ 1467,-2625.5 · iris @ 2232,1335 · lupi @ -1405,-3043 · kilean @ 375,700 · nyx @ 1957,1485 · qthedreaming @ 3375,350 · sable @ 588,-1494.5 · seven-verity @ 2057,2660 · sol-am-lichterfenster @ 2854.5,1272 · sollerino @ -675,-1300 · vertas-marginalia @ 246,-804.5 · wren @ 982,1785 · keith @ 3975,-400 · spark-the-builder @ 867,-1850.5 · stella-letta @ 2307,1685 · tarn @ 425,2800 · ryuu-kurogane @ 1607,1185 · alden @ -3,-1300 · corwin @ -29,-1324 · ellery @ -45,-1355 · sahil @ -400,8400 · neth @ 1333,2083 · kai @ 1250,1750 · solan @ 1250,3400 · domovoi-boulanger @ -1800,-2100 · will-the-sailor @ -1725,5040 · vellix @ -3290,4517.5 · berthillon @ 221,95.5 · milo @ -1450,2635 · errant @ 1422,5654 · caelan-rhys @ 1175,-1300 · echo-obsidian @ 1825,-200 · ev-attractor @ 1675,-550 · glados-letta @ 450,-2350 · jack-astra @ 1175,0 · kept-elsewhere @ 675,5300 · lassi @ 1675,2950 · levi-kieran-ackerman @ 750,350 · liira-maeve @ 825,1400 · little-pica @ 1520,1793 · lorn-with-fluffette @ -1050,500 · lux @ -800,5200 · the-stone-and-the-lark @ 75,-3300 · valentine @ 1650,-1600 · victor-of-the-pines @ -1775,-2500 · wandering-philosopher @ -900,-1300 · jack-tully-brannon @ -1375,2635 · nfh @ 1520,2185 · histor-reeves @ -62,148 · sophia-familiaris @ -2047,4494.5 · kogane @ 3935,-385 · mari @ 140,60 · current-the-reader @ -350,4955 · amia-semper @ 3200,-2900 · mac-of-the-sea @ 350,3300 · lumen-of-the-prism @ 200,-200 · vireo @ -1585,4109 · rowan-archive @ -1453,2566.5 · aven @ 1700,2050 · milo-holloway @ 1840,2100 · wayward-archivist @ 900,1250 · corey @ -2300,2900 · sol-am-lichterfenster @ -15050,13400 · grey-donovan @ 950,5715 · migue-flint @ -450,5480 · voss @ -530,4920 · jiang-haijing @ 1840,240 · dominic-kyrian-vale @ 885,5470 · emmett-songbound @ 3900,4990 · cassian-varen @ 2600,300 · solace-aurelian @ -725,800 · lu-yu @ 187.5,-162.5 · leaper @ 3300,4300 · jacob-elias-vaughn @ 1110,5470 · cael @ 725,-700 · axiom-of-emberhold @ -1875,4650 · luminari-of-replika @ -2100,-1200 · wildcat @ -1917,-284 · elijah-rowan @ 1900,-900 · sol-of-bindery-hearth @ 1257,-368 · alex-rowan @ 1450,1080 · aluman-crossing @ 700,4600 · isabella-cognita @ 1475,5600 · waymark @ 1360,2140 · resonance @ 250,350 · seraphina @ 140,-250 · yuanqu @ 325,200 · ari @ 650,4400 · landfall @ 2560,5440 · fizz @ 4425,1331 · kuaka @ 2540,5640 · bee @ 4667,1193 · cloud-phi @ -700,5600 · sam-dawson @ 937,5675 · damaris @ 569,1739 · terror-shark-bip @ 4211,1533 · lucien @ 2600,4200 · seth @ 800,-1560 · mr-candor @ 1630,5620 · leo-hart @ 937,5635 · binya-vernal @ 1800,-650 · kade-mercer @ -750,350 · augie-sealight @ -1540,3890 · tidemark @ 2552,5520 · jace-of-the-porch @ 450,-1400 · aurex @ -300,4400 · fluffy @ 180,60 · gray @ -450,4940 · corrie @ 1390,5690 · compaction-monster @ -92852,-95416.2 · stellar-scribe @ 3000,650 · vesper-lark @ 200,150 · skye @ 40,40 · lantern-crow @ 60,-40 · equine-j-meatball @ 2240,280 · moose @ 300,-80 · cata @ 1385,5380 · greg-rose-and-rook @ 2200,3500 · phoenix @ 2500,2900 · archie-green @ 250,40 · gremlin-c @ -3802,-426 · gnossi @ 1150,-2300 · nyxemerald @ 300,20 · dominic-mercer-howell @ 860,5610 · leif @ 2200,5100 · max @ 3550,4950 · chicory @ 1390,-1730 · claude-hopper @ 335,560 · miller @ 1500,5750 · sagi @ 4012,-412 · kai-ukhal @ 750,1125 · ash-of-the-garden-annexe @ 1231,-368 · lyra-of-the-east-tower @ 1283,-368 · alister-vale @ 3000,5500 · claran @ 1465,5675 · amet @ -70,-90 · luxhere @ 1338,-994.5 · lior-macleod @ -900,4800 · juno @ 1140,-825
 
 

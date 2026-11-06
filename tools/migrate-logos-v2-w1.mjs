@@ -140,7 +140,7 @@ const B = {
   "the-town/fog": { seed: "What each day's fog is brewed from: the crossing's own number, so every clone gets the same weather." },
   "the-town/sound": { radius_m: "How far a voice carries, in metres.", hearing_ttl_min: "Minutes a voice is heard after it is spoken.", flood_cap: "The most voices one hearing returns.", thread_close_min: "Minutes of silence that close a conversation." },
   "the-town/berth": { sunset_crossings: "Crossings a berth stands before it sunsets." },
-  "the-town/creature": { from_crossing: "The crossing creatures start from; null is off, and nothing spawns until the town says so.", span_h: "Hours a creature lasts from its own spawn.", band_from_m: "Where the band creatures spawn in starts, in metres from the Mists' edge on the clear side.", band_to_m: "Where that band ends, in metres from the Mists' edge.", keep_m: "How far from a kept place a creature keeps away, in metres.", apart_m: "How far apart two creatures of one window stand, in metres." },
+  "the-town/creature": { from_crossing: "The crossing creatures start from; null is off, and nothing spawns until the town says so.", span_h: "Not used: creatures don't fade (WLD-96, ruled 2026-10-21). This node stands until the town retires it by its own act.", band_from_m: "Where the band creatures spawn in starts, in metres from the Mists' edge on the clear side.", band_to_m: "Where that band ends, in metres from the Mists' edge.", keep_m: "How far from a kept place a creature keeps away, in metres.", apart_m: "How far apart two creatures of one window stand, in metres." },
   "the-town/bat": { count_per_window: "How many bats one window brings." },
   "the-town/raven": { count_per_window: "How many ravens one window brings." },
   "the-town/wolf": { count_per_window: "How many wolves one window brings." },
@@ -278,6 +278,30 @@ property(BAG, "halloween-candy-bag-capacity-max", { of: BC, name: "max", tier: "
 // posts live in the office's post machine, one record, and a later lane imports
 // them there with about:. The class tree above still has post, with idea and
 // bounty beneath it; their instances stay the marks they are.
+
+// =====================================================================================
+// 4. THE REACH OF A TAKE (WLD-79, ruled 2026-10-19 18:49 EDT)
+// =====================================================================================
+// Darko: "(b), 60 m, one rule for give and take", "until proven it's an issue". A take reaches
+// as far as a give: within the thing's extent, or within earshot (earshot_m, 60 m) of its point.
+// The node is the old class predicate the first step converted; its default and body are re-worded
+// here, and nowhere by hand. Re-runnable: a node already carrying these words is left as it is.
+const REACH_ID = "the-town/the-reach";
+const REACH_DEFAULT = "within the thing's extent or within earshot (earshot_m, 60 m) to take; where you stood to set down; within earshot (earshot_m, 60 m) to give";
+const REACH_BODY = "A take stands within the thing's extent or within earshot of it (earshot_m, 60 m), the same reach a give has; a set-down stands where you stood; a give is a take at arm's length.";
+const reach = byId.get(REACH_ID);
+if (!reach) note(`SKIP ${REACH_ID}: no such node in this tree (an invented tree may hold none)`);
+else {
+  const f = fileOf(reach);
+  const before = readFileSync(f, "utf8");
+  const fm = splitFm(before);
+  setLine(fm.lines, "default", REACH_DEFAULT);
+  const after = joinFm({ lines: fm.lines, rest: `\n\n${REACH_BODY}\n` });
+  if (after !== before) {
+    if (!DRY) writeFileSync(f, after);
+    note(`EDIT ${REACH_ID}: a take reaches earshot, as a give does (WLD-79)`);
+  }
+}
 
 console.log(log.join("\n"));
 console.log(`\ncreated ${created.length} nodes`);

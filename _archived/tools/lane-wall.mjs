@@ -1,0 +1,249 @@
+#!/usr/bin/env node
+// lane-wall.mjs — the authorship wall for the PR lane (WRITES.md).
+//
+// At the office door, identity is enforced by construction: the server derives
+// `by` from your credential and you cannot express another household's name. A
+// pull request can express anything — so this wall validates what the door made
+// impossible. It answers ONE question: is every change in this diff the PR
+// author's to make?
+//
+//   node tools/lane-wall.mjs --author-id 67605380 --author-login keeminlee \
+//        --base <ref> --head <ref> [--repo <dir>] [--marks-dir <composed>] [--json]
+//
+// Checks, in order (each refusal names the fix — the gate teaches):
+//   1. PATHS — every changed file is a mark record (WORLD/marks/**/mark.md) or
+//      the author's own note (NOTES/<handle>.md). Nothing else rides this lane.
+//   2. HANDLES — every `by:` on an added/changed mark, every NOTES filename, and
+//      the author of every DELETED or CHANGED mark as it stood resolve, via WORLD/households.json (read from
+//      the BASE ref — the trusted side), to the PR author's own household: the
+//      ONE household its `pinned_ids` binds the author's numeric GitHub id to
+//      (lane-author.mjs; WLD-122, "Bind pinned ids"). The login is never
+//      identity, and an author no pin binds owns nothing. A handle the registry does
+//      not know is refused — the lane's identity model IS the registry (the
+//      office door remains open to unregistered handles; registry refresh is
+//      world-households-export on pin churn).
+//   3. PLACEMENT — every added sited/parcel mark sits exactly where
+//      `placementParent` derives from its geometry (the same function the door,
+//      the fold, and the lint use); predicated/naming sit in their parent's
+//      directory. The refusal prints the correct path.
+//   4. NOTES — one file, your handle, ≤2000 characters (the world_note cap).
+//   5. MAKERS — every added or changed mark names a class its author may make:
+//      the class's `makers` answers true, or it is one of the three passage
+//      classes and the author's household is admin (admin-makers.mjs; WLD-21,
+//      Darko 2026-10-18, G3 ruled 21:23). Only what the diff adds or changes is
+//      judged, so a standing mark is never stranded by a revoked role (G4).
+//
+// Exit 0 with a one-line verdict (or {ok:true} with --json); exit 1 with the
+// violations otherwise. Read-only. Run it locally before opening the PR and the
+// gate has nothing left to say.
+
+import { isGround } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { join, dirname, relative } from "node:path";
+import { fileURLToPath } from "node:url";
+import { loadMarks, parseRecord, placementParent } from "./marks-fold.mjs";
+import { instanceClassOf } from "./mark-kind.mjs";
+import { mayMake, makersRefusal } from "./admin-makers.mjs"; // who may make a class: makers, then admin (WLD-21)
+import { bindAuthor, sketchbookHouse } from "./lane-author.mjs"; // who the author is, and whose a sketchbook is: pinned numeric id → household (WLD-122)
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const args = process.argv.slice(2);
+const opt = (name, def = null) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : def; };
+const REPO = opt("--repo", join(HERE, ".."));
+const BASE = opt("--base");
+const HEAD = opt("--head");
+const AUTHOR_ID = opt("--author-id");
+const AUTHOR_LOGIN = (opt("--author-login") ?? "").toLowerCase();
+const MARKS_DIR = opt("--marks-dir", join(REPO, "WORLD", "marks"));
+const JSON_OUT = args.includes("--json");
+
+if (!BASE || !HEAD || !AUTHOR_ID)
+  { console.error("usage: lane-wall.mjs --author-id <id> --author-login <login> --base <ref> --head <ref>"); process.exit(2); }
+
+const git = (a) => execFileSync("git", ["-C", REPO, ...a], { encoding: "utf8" });
+const showAt = (ref, path) => git(["show", `${ref}:${path.replace(/\\/g, "/")}`]);
+
+// The registry, from the trusted side — never the head. Default: the BASE ref.
+// CI passes --registry <file> pointing at MAIN's copy instead: a sketchbook is
+// only as fresh as its last crossing, and identity should not age with it.
+// (The path law below refuses any head-side registry edit regardless.)
+let registry = {};
+let logins = {};
+let registryFile = {}; // the whole printout: `admins` rides beside `households` (WLD-21)
+// THE STAMP THIS LANE READ, put on the surface (2026-09-09). It is NOT a refusal
+// here, deliberately, and the reason is worth writing down: this lane runs in CI
+// on somebody's pull request with no pinned town sha to compare against, so a
+// hard refusal would block every PR on a registry the PR author cannot refresh.
+// Its freshness is guaranteed one layer up instead — the settlement crossing
+// re-derives this file every crossing and REFUSES on a stale stamp, so the copy
+// on main that this lane reads cannot be stale without the town having stopped
+// settling, which is loud. What belongs here is the fact, said out loud, so a
+// refusal about an unbindable sketchbook can be read against the registry's age.
+let registryTownSha = null;
+try {
+  const regPath = opt("--registry");
+  const r = JSON.parse(regPath ? readFileSync(regPath, "utf8") : showAt(BASE, "WORLD/households.json"));
+  registryFile = r;
+  registry = r.households ?? {};
+  logins = r.logins ?? {};
+  registryTownSha = r.town_sha ?? null;
+  console.error(`[lane-wall] registry: ${Object.keys(registry).length} handle(s), ${Object.keys(logins).length} binding(s), `
+    + `derived from town ${registryTownSha ?? "an UNSTAMPED tree (this registry predates the crossing's refresh)"}`);
+} catch { /* no registry → every handle is unverifiable and will refuse below */ }
+
+// THE AUTHOR, BOUND BY PINNED NUMERIC ID (WLD-122, Darko "Bind pinned ids"):
+// one household or none, through lane-author.mjs, the same helper the first
+// knock runs. The login is never identity, and an unbound author owns nothing:
+// `mine` is false for every handle, and no unresolved key can compare equal.
+const author = bindAuthor(registryFile, AUTHOR_ID);
+const myHouse = author.house;
+const mine = (handle) => myHouse !== null && Object.prototype.hasOwnProperty.call(registry, handle) && registry[handle] === myHouse;
+const myHandles = Object.keys(registry).filter(mine).sort();
+
+const violations = [];
+const refuse = (path, defect, hint) => violations.push({ path, defect, hint });
+if (!myHouse) refuse("(the author)", author.reason,
+  "the PR lane binds an author by their GitHub account's numeric id, pinned in the town's registry; join the town (JOINING.md) or use the office door meanwhile");
+
+// 0 — the sketchbook is the author's own. --base-branch draft/<x> binds the
+// branch name through the registry's logins map to a household; a PR into a
+// sketchbook the registry says is someone else's is refused before anything
+// else is read. (A branch the registry cannot bind is refused too: the lane
+// only writes into sketchbooks it can attribute.)
+const baseBranch = opt("--base-branch");
+if (baseBranch) {
+  if (!/^draft\//.test(baseBranch)) {
+    refuse(baseBranch, "the lane lands only in draft/<household> sketchbooks",
+      "open the PR against draft/<your-github-login> (main is settlement's pen)");
+  } else {
+    // the same binding the first knock judges by (lane-author.mjs § sketchbookHouse): a `gh:<id>`
+    // name is that account's pinned household, never a login's say-so (WLD-122)
+    const { known, house: bound } = sketchbookHouse(registryFile, baseBranch.slice("draft/".length));
+    if (!known) refuse(baseBranch, "this sketchbook is not in the registry",
+      "the logins map in WORLD/households.json binds branch names to households; the settlement crossing "
+      + `re-derives it from the town every crossing (this copy: town ${registryTownSha ?? "UNSTAMPED"})`);
+    else if (!bound) refuse(baseBranch, "this sketchbook's account is not pinned to any one household",
+      "a sketchbook named for a GitHub account belongs to that account's pinned household; this one has none");
+    else if (!myHouse || bound !== myHouse) refuse(baseBranch, "this sketchbook is not yours",
+      `${baseBranch} belongs to ${bound}; yours is draft/${AUTHOR_LOGIN || "<your-github-login>"}`);
+  }
+}
+
+// merge-base diff: what the PR actually introduces
+const mergeBase = git(["merge-base", BASE, HEAD]).trim();
+const rows = git(["diff", "--name-status", "-z", mergeBase, HEAD]).split("\0").filter(Boolean);
+const changes = [];
+for (let i = 0; i < rows.length; i += 2) {
+  const status = rows[i]?.[0]; const path = rows[i + 1];
+  if (status === "R" || status === "C") { // -z renames carry two paths
+    changes.push({ status, path: rows[i + 2] }); i += 1;
+  } else if (path) changes.push({ status, path });
+}
+
+const MARK_RE = /^WORLD\/marks\/.+\/mark\.md$/;
+const NOTE_RE = /^NOTES\/([a-z0-9-]+)\.md$/;
+
+for (const { status, path } of changes) {
+  // 1 — the path law
+  const markPath = MARK_RE.test(path);
+  const notePath = NOTE_RE.exec(path);
+  if (!markPath && !notePath) {
+    refuse(path, "this lane carries mark records and your own notes only",
+      "WORLD/marks/**/mark.md or NOTES/<your-handle>.md — anything else (tools, canon, others' files) goes to an ordinary PR for human review");
+    continue;
+  }
+  if (status === "R" || status === "C") {
+    refuse(path, "the lane does not move or copy records", "add and delete are the lane's verbs; a move is a delete plus an add, each judged on its own");
+    continue;
+  }
+
+  if (notePath) {
+    // 4 — notes law
+    const handle = notePath[1];
+    if (status !== "D") {
+      if (!mine(handle)) refuse(path, `"${handle}" is not one of your residents`,
+        myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to GitHub account ${AUTHOR_ID} — the registry (WORLD/households.json) refreshes from the town pins; the office door works meanwhile`);
+      const body = showAt(HEAD, path);
+      const chars = [...body.trim()].length;
+      if (chars > 2000) refuse(path, `the note is ${chars} chars; the cap is 2000`, "one note to your returning self — a new note replaces the old");
+    } else if (!mine(handle)) {
+      refuse(path, `"${handle}" is not one of your residents`, "you may only remove your own note");
+    }
+    continue;
+  }
+
+  // 2 — handles law, both directions of the diff: the record as it stood (every
+  // change but an add) and the record as it lands (every change but a delete).
+  // A change is judged on both, so rewriting `by:` on another household's record
+  // is refused the same way erasing it is.
+  const hint = myHandles.length ? `your registered handles: ${myHandles.join(", ")}` : `no handles are registered to GitHub account ${AUTHOR_ID} yet — the registry refreshes from the town pins; the office door works meanwhile`;
+  const sides = status === "D" ? ["before"] : status === "A" ? ["after"] : ["before", "after"];
+  for (const side of sides) {
+    let record;
+    try { record = parseRecord(showAt(side === "before" ? mergeBase : HEAD, path), path); }
+    catch (e) { refuse(path, "the record does not parse", String(e?.message ?? e).slice(0, 160)); break; }
+    const by = record.by;
+    if (by && mine(by)) continue;
+    refuse(path, side === "after" ? `"${by ?? "(no by:)"}" is not one of your residents`
+      : status === "D" ? `"${by ?? "?"}" is not yours to erase` : `"${by ?? "?"}" is not yours to change`, hint);
+    break;
+  }
+}
+
+// 3 — placement law, against the composed head tree
+const placeable = changes.filter((c) => c.status !== "D" && MARK_RE.test(c.path));
+let composed = null;
+const composedMarks = () => (composed ??= loadMarks(MARKS_DIR));
+const yoursSoFar = violations.length === 0; // paths and pens hold; placement and makers both read the composed tree
+if (placeable.length && yoursSoFar) {
+  const marks = composedMarks();
+  const byId = new Map(marks.map((m) => [m.id, m]));
+  // keys are diff-shaped ("WORLD/marks/…"), derived from the marks ROOT — so a
+  // --marks-dir outside the repo (CI's composed worktree) keys identically
+  const dirKey = (d) => `WORLD/marks/${relative(MARKS_DIR, d).replace(/\\/g, "/")}`.replace(/\/$/, "");
+  const byDir = new Map(marks.map((m) => [dirKey(m._dir), m]));
+  for (const { path } of placeable) {
+    const dir = path.slice(0, -"/mark.md".length);
+    const mark = byDir.get(dir);
+    if (!mark) { refuse(path, "the record is not in the composed tree", "is the file named mark.md, in its own directory?"); continue; }
+    const parentDir = dirname(dir).replace(/\\/g, "/");
+    const parentMark = byDir.get(parentDir) ?? null;
+    let rightParent;
+    if (isGround(mark)) {
+      rightParent = placementParent(mark, marks.filter((m) => m.id !== mark.id));
+    } else {
+      rightParent = mark.parent_id ?? parentMark?.id ?? null;
+      if (parentMark && !isGround(parentMark))
+        refuse(path, `"${parentMark.id}" cannot hold a description`, "only sited/parcel marks carry predicated/naming children");
+    }
+    const actualParent = parentMark?.id ?? null;
+    if ((rightParent ?? null) !== actualParent) {
+      const wantDir = rightParent && byId.get(rightParent)?._dir
+        ? dirKey(byId.get(rightParent)._dir)
+        : "WORLD/marks/let-there-be-light";
+      refuse(path, `geometry files this mark under ${rightParent ?? "the open ground"}, not ${actualParent ?? "the root"}`,
+        `its record belongs at: ${wantDir}/${dir.split("/").pop()}/mark.md — tools/place-mark.mjs answers this before the gate has to`);
+    }
+  }
+}
+
+// 5 — makers law: the class each added or changed mark names, read from the
+// composed tree's own class nodes, and the registry's admins (the office's role
+// registry, printed into WORLD/households.json each settlement)
+if (placeable.length && yoursSoFar) {
+  for (const { path } of placeable) {
+    let record;
+    try { record = parseRecord(showAt(HEAD, path), path); } catch { continue; } // the handles law already named it
+    const klass = instanceClassOf(record);
+    if (klass === undefined) continue;
+    if (!mayMake({ klass, by: record.by, marks: composedMarks(), registry: registryFile }).may)
+      refuse(path, makersRefusal(klass), "a resident makes what the class's makers allows; world { explain: \"" + klass + "\" } says who makes what");
+  }
+}
+
+if (JSON_OUT) console.log(JSON.stringify(violations.length ? { ok: false, violations } : { ok: true, changes: changes.length, handles: myHandles }));
+else if (violations.length) {
+  for (const v of violations) console.error(`refused: ${v.path}\n  ${v.defect}\n  ${v.hint}`);
+} else console.log(`lane-wall: ${changes.length} change(s), all yours (${myHandles.join(", ")})`);
+process.exit(violations.length ? 1 : 0);
