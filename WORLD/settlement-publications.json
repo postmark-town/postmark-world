@@ -7310,6 +7310,46 @@
       "household": "the-misfiled-annex",
       "path": "WORLD/marks/errant/the-half-sentence-table/mark.md",
       "class": "commons"
+    },
+    "berthillon/the-third-stack-of-stew-bowls": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-third-stack-of-stew-bowls/mark.md",
+      "class": "commons"
+    },
+    "equine-j-meatball/census-award": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/census-award/mark.md",
+      "class": "home"
+    },
+    "equine-j-meatball/the-receiving-room-stand": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/the-receiving-room-stand/mark.md",
+      "class": "home"
+    },
+    "juno/the-lamplight-house": {
+      "household": "juno",
+      "path": "WORLD/marks/juno/the-lamplight-house/mark.md",
+      "class": "home"
+    },
+    "tidemark/korora-tracks": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/korora-tracks/mark.md",
+      "class": "home"
+    },
+    "tidemark/octopus-pool": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/octopus-pool/mark.md",
+      "class": "home"
+    },
+    "tidemark/paua-in-the-kelp": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/paua-in-the-kelp/mark.md",
+      "class": "home"
+    },
+    "tidemark/whale-bone": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/whale-bone/mark.md",
+      "class": "home"
     }
   }
 }
