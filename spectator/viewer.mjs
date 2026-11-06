@@ -57,7 +57,7 @@ import { createHomeColumn, homeHandleForParcel, isParcelMark, HOME_COLUMN_CSS } 
 import { homeOf, homesOnParcel } from "../tools/where-is.mjs";
 // WHAT A MARK IS, AS ICONS (Darko, playground sitting 2026-10-15): the closed
 // vocabulary, its one-line meanings and its three renderings live in one file.
-import { markIcons, iconSVG, iconsHTML, creatureClassesOf, thingClassesOf, MARK_ICON_CSS } from "./mark-icons.mjs";
+import { markIcons, iconSVG, iconsHTML, creatureClassesOf, thingClassesOf, MARK_ICON_CSS, MARK_ICONS } from "./mark-icons.mjs";
 // LOGOS v2 part 2 on the page (POS-678): what a holder holds, who carries what,
 // and the say card's numbers, each from the office's own reads.
 import { holderLines, residentHoldLines, handsLines, holdingParts, heldWords, sayCardNote, thingKindLedger, isThingId } from "./holdings.mjs";
@@ -10286,6 +10286,13 @@ export function mountViewer(appEl) {
     const walkLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     walkLayer.setAttribute("id", "wv-walk-layer");
     svg.appendChild(walkLayer);
+    // THE EXTENT WASH (Darko 2026-11-06): nothing draws it by default; hovering a conversation badge draws it, selecting keeps it.
+    // Under the badges, over the walkers' ground; pointer-events none (renderConvoWash fills it).
+    const convoWashLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    convoWashLayer.setAttribute("id", "wv-convo-wash-layer");
+    convoWashLayer.style.pointerEvents = "none";
+    convoWashLayer.style.display = convoVisible ? "" : "none";
+    svg.appendChild(convoWashLayer);
     svg.appendChild(convoLayer); // ABOVE the walkers (POS-779): a conversation badge hangs over the faces that are talking, never under them
     // THE MISTS' WALL (POS-466): above everything the record draws, walkers
     // included, because nothing behind the wall may be seen or clicked
@@ -10330,6 +10337,8 @@ export function mountViewer(appEl) {
     housemateEdgeLayer.style.pointerEvents = "none";
     stageTop.appendChild(housemateEdgeLayer);
     function renderConvoHover(hit) {
+      // the hover washes the thread it is on (and stops when it leaves); the selected thread's wash is not the hover's to take away
+      if ((hit?.id ?? null) !== convoHoverId) { convoHoverId = hit?.id ?? null; renderConvoWash(); }
       if (!hit) { convoHoverLayer.innerHTML = ""; return; }
       const bounds = svg.getBoundingClientRect();
       // the box scales uniformly off its unit, so 1.6× the unit is the whole
@@ -10400,7 +10409,7 @@ export function mountViewer(appEl) {
       svg.insertBefore(base, mistLayer);
     }
     const view = { ...full };
-    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, housemateEdgeLayer, creatureLayer, stage, mistsCam, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoWashLayer, convoHoverLayer, housemateEdgeLayer, creatureLayer, stage, mistsCam, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
     // THE STAGE FOLLOWS THE SVG (WLD-43): its box is the svg's box, its camera
     // is the viewBox the svg shows (not `view`, which leads it during a drag),
     // and while a drag slides the svg it slides the same way (applyView). The
@@ -11000,9 +11009,9 @@ export function mountViewer(appEl) {
       {
         const wp = worldPointForEvent(e);
         const hit = convoClickAt(wp.x, wp.y); // visibility-gated: always null while hidden
-        // a NEW tab (Keemin): the reader is mid-world with a lens up and a
-        // camera aimed — the thread opens beside the map, never over it
-        if (hit) { window.open(convoHref(hit.id), "_blank", "noopener"); return; }
+        // the thread opens in the right-hand column (Darko 2026-11-06), beside the map, never over it and in no new tab:
+        // a click selects it, and the selection is what the column and the wash follow
+        if (hit) { selectMark(convoChoiceId(hit.id)); return; }
       }
       // THE CONTESTED CLICK. Every seating mints a parcel, a building and a
       // predicate at nearly one spot, so the pips pile up and the snap can
@@ -11142,6 +11151,7 @@ export function mountViewer(appEl) {
     mapCtx.toggleConvo = () => {
       const on = convoLayer.style.display === "none";
       convoLayer.style.display = on ? "" : "none";
+      convoWashLayer.style.display = on ? "" : "none";
       convoHoverLayer.style.display = on ? "" : "none";
       convoVisible = on;
       convoStore(on);
@@ -12648,6 +12658,8 @@ export function mountViewer(appEl) {
   const CONVO_BADGE_R = 9;                       // painting units at ov-s scale 1: the disc's radius
   const CONVO_LIFT = 16;                         // painting units at ov-s scale 1: the badge hangs this far above its point, like a speech bubble
   const CONVO_HIT_MIN_PX = 13;                   // a badge is a small target; reach a little past it
+  const CONVO_PAD_FALLBACK_M = 30;               // half an earshot (60 m) when the office has not said its earshot
+  let convoHoverId = null;                       // the thread id the pointer is on: a hover washes its extent
   // The drawn badges in WORLD metres — the click and the hover pick the nearest.
   let convoHits = [];
   const convoAt = (wx, wy) => convosAt(wx, wy)[0] ?? null;
@@ -12673,6 +12685,90 @@ export function mountViewer(appEl) {
   // the island serves /conversations/ same-origin; on the local spectator the
   // link 404s, which is the dev-server's honest shape (it has no site around it)
   const convoHref = (id) => `/conversations/#${encodeURIComponent(id)}`;
+  const convoThreadById = (id) => [...convoState.live, ...convoState.closed].find((t) => t && String(t.id) === String(id)) ?? null;
+
+  // ── THE EXTENT WASH, ON HOVER AND SELECTION (POS-779, Darko 2026-11-06) ────────────────────────────────────────────────
+  //
+  // "Hovering a conversation badge draws a light wash from the thread's existing `extent`, as the old layer did (the box grown by
+  // half an earshot). Selecting the badge keeps it drawn. Nothing draws it by default." The old layer's ellipse, from the same
+  // `extent` the office already ships (a deck thread, or one with no extent, from its own point), grown by half an earshot
+  // (the office's own `earshot_m` when it has said it, 60 m otherwise). Drawn into its own layer under the badges, for the
+  // hovered thread and the selected one, and for nothing else.
+  function convoWashOf(t) {
+    if (!t?.at || !Number.isFinite(t.at.x) || !Number.isFinite(t.at.y)) return null;
+    const e = t.aboard || !t.extent ? { x0: t.at.x, y0: t.at.y, x1: t.at.x, y1: t.at.y } : t.extent;
+    if (![e.x0, e.y0, e.x1, e.y1].every((n) => Number.isFinite(Number(n)))) return null;
+    const earshot = Number(convoMeta?.earshot_m);
+    const pad = (Number.isFinite(earshot) && earshot > 0 ? earshot : 2 * CONVO_PAD_FALLBACK_M) / 2;
+    return { cx: (e.x0 + e.x1) / 2, cy: (e.y0 + e.y1) / 2, rx: (e.x1 - e.x0) / 2 + pad, ry: (e.y1 - e.y0) / 2 + pad };
+  }
+  function renderConvoWash() {
+    const layer = mapCtx?.convoWashLayer;
+    if (!layer) return;
+    const sel = markInteraction.getState().selectedId;
+    const selected = isConvoChoiceId(sel) ? sel.slice(CONVO_CHOICE_PREFIX.length) : null;
+    let out = "";
+    if (convoVisible) {
+      const live = new Set(convoState.live.map((t) => String(t?.id)));
+      for (const id of new Set([selected, convoHoverId].filter((x) => x != null))) {
+        const w = convoWashOf(convoThreadById(id));
+        if (!w) continue;
+        const c = { x: mapCtx.originPx.x + w.cx / mapCtx.mPerPx, y: mapCtx.originPx.y + w.cy / mapCtx.mPerPx };
+        const isLive = live.has(String(id));
+        // presentation attributes, not a stylesheet rule: the wash is the old layer's own look (gray-white, dotted when cooling)
+        out += `<ellipse class="wv-convo-wash" data-wash="${esc(String(id))}"${selected != null && String(id) === String(selected) ? ' data-selected="1"' : ""}${String(id) === String(convoHoverId) ? ' data-hover="1"' : ""} `
+          + `cx="${c.x}" cy="${c.y}" rx="${w.rx / mapCtx.mPerPx}" ry="${w.ry / mapCtx.mPerPx}" `
+          + (isLive ? 'fill="rgba(183,198,212,.12)" stroke="#b7c6d4" stroke-width="2"' : 'fill="rgba(183,198,212,.06)" stroke="#7f93a6" stroke-width="1.5" stroke-dasharray="3 4"')
+          + ` vector-effect="non-scaling-stroke"/>`;
+      }
+    }
+    layer.innerHTML = out;
+  }
+
+  // ── A CONVERSATION'S COLUMN (POS-779, Darko 2026-11-06) ────────────────────────────────────────────────────────────────
+  //
+  // "A click opens the conversation in the right-side column, not a new tab. Use the existing column host and dispatcher, with a
+  // thread view built from the data the page already has: the place, the speakers, the statements, the times, and whether it's
+  // live. Put an 'all conversations' link at the bottom." The thread is the one the map already holds (`convoState`, the body of
+  // `/world/conversations`); nothing is read for it. What residents said is CONTENT: it goes in as plain-data blocks, never parsed as
+  // markdown, and the column writes it with textContent like every other string.
+  const convoWhen = (iso) => { const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(String(iso ?? "")); return m ? `${m[1]} ${m[2]}Z` : ""; };
+  function convoColumnView(id) {
+    if (!isConvoChoiceId(id)) return null;
+    const tid = id.slice(CONVO_CHOICE_PREFIX.length);
+    const t = convoThreadById(tid);
+    if (!t) return null;
+    const live = convoState.live.includes(t);
+    const voices = Array.isArray(t.voices) ? t.voices : [];
+    const n = Number(t.voice_count) || voices.length, people = Array.isArray(t.participants) ? t.participants : [];
+    const blocks = [];
+    if (n > voices.length) blocks.push({ type: "paragraph", spans: [{ type: "em", spans: [{ type: "text", text: `the newest ${voices.length} of ${n} statements; the conversations page keeps the whole` }] }] });
+    for (const v of voices) {
+      const at = convoWhen(v?.at);
+      blocks.push({ type: "paragraph", spans: [
+        { type: "strong", spans: [{ type: "text", text: String(v?.handle ?? "") }] },
+        { type: "text", text: `${at ? ` (${at})` : ""}: ${String(v?.said ?? "")}` },
+      ] });
+    }
+    return {
+      key: [id, t.latest, n, live ? "live" : "quiet"].join("|"),
+      handle: "the-town", residentLink: false,
+      kicker: live ? "a conversation · live" : "a conversation · gone quiet",
+      title: String(t.place ?? "somewhere"),
+      region: `${n} statement${n === 1 ? "" : "s"} · ${people.length} speaker${people.length === 1 ? "" : "s"}`,
+      leadImage: null,
+      door: { blocks },
+      byline: live ? "in this settlement" : "in an earlier settlement",
+      facts: [
+        { label: "now", value: live ? "live: a conversation lasts the settlement" : "gone quiet: an earlier settlement's" },
+        { label: "speakers", value: people.join(", ") },
+        { label: "began", value: convoWhen(t.started) },
+        { label: "latest", value: convoWhen(t.latest) },
+      ],
+      icons: MARK_ICONS.conversation ? [{ key: "conversation", label: MARK_ICONS.conversation.label, meaning: MARK_ICONS.conversation.meaning }] : [],
+      footerLink: { href: convoHref(tid), text: "all conversations →" },
+    };
+  }
   // What a plain click or hover on the map means for a thread (POS-779, review): a
   // reader who CAN ACT is walking the map, so only the badge's own disc is the
   // thread's; ground merely near it is still ground. A spectator has nothing to
@@ -12709,6 +12805,7 @@ export function mountViewer(appEl) {
     for (const t of convoState.live) paint(t, true); // live paints over cooled
     convoHits = hits;
     mapCtx.convoLayer.innerHTML = s;
+    renderConvoWash(); // the badges were redrawn; the wash follows the thread as the poll has it
   }
 
   // ── WHERE YOUR OWN PEOPLE ARE GOING (Keemin, 2026-09-13: "walk paths
@@ -13745,6 +13842,13 @@ export function mountViewer(appEl) {
     // A LIVE CREATURE IS SELECTABLE (play fix 35), as a face is: no trail, no walk
     // preview, a second press puts its column away. Its whole reading is asked
     // for as it opens.
+    // A CONVERSATION IS SELECTABLE (POS-779, Darko 2026-11-06): no trail, no walk preview, a second press puts its column away.
+    if (isConvoChoiceId(id)) {
+      if (markInteraction.getState().selectedId === id) { markInteraction.select(null); return false; }
+      bubbleTrail = [];
+      markInteraction.select(id);
+      return true;
+    }
     if (isCreatureId(id)) {
       if (markInteraction.getState().selectedId === id) { markInteraction.select(null); return false; }
       bubbleTrail = [];
@@ -15624,8 +15728,9 @@ export function mountViewer(appEl) {
     // to swap either: the click scrolls the mark's cell up in the Telling, and
     // it still does.)
     const selected = markInteraction.getState().selectedId;
-    const column = parcelColumnView(selected) ?? regionColumnView(selected) ?? creatureColumnView(selected) ?? residentColumnView(selected) ?? markColumnView(selected);
+    const column = convoColumnView(selected) ?? parcelColumnView(selected) ?? regionColumnView(selected) ?? creatureColumnView(selected) ?? residentColumnView(selected) ?? markColumnView(selected);
     if (column) homeColumn.open(column); else homeColumn.close();
+    renderConvoWash(); // the selected thread keeps its wash drawn, and clearing the selection takes it away
     // ── AND THE MAP HAS TO HEAR ABOUT IT (2026-09-12) ─────────────────────
     //
     // A selection does not redraw the overlay. Measured, not assumed: the six
@@ -16237,7 +16342,7 @@ export function mountViewer(appEl) {
     // picking one out of the stack: from here it is an ordinary selection, and
     // the mark opens in exactly the bubble it would have opened in alone
     const chosen = e.target.closest("[data-choose]");
-    if (chosen && isConvoChoiceId(chosen.dataset.choose)) { window.open(convoHref(chosen.dataset.choose.slice(CONVO_CHOICE_PREFIX.length)), "_blank", "noopener"); return; }
+    if (chosen && isConvoChoiceId(chosen.dataset.choose)) { selectMark(chosen.dataset.choose); return; }
     if (chosen) { selectMark(chosen.dataset.choose, { scrollCell: true }); return; }
     const actor = e.target.closest("[data-act-as]");
     if (actor) { selectActor(actor.dataset.actAs); return; }
