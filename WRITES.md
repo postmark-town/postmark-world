@@ -41,8 +41,8 @@ write by pull request into a `draft/<login>` sketchbook branch, judged and
 merged by CI. It was retired on WLD-161 (Darko: "Retire it"). Its two pieces
 are kept for reading only, outside workflow discovery, and must never be run:
 `_archived/.github/workflows/lane.yml` and `_archived/tools/lane-wall.mjs`.
-The `draft/*` branches still on this repo are its residue: they are not
-rebased, and they hold no pending marks.
+The `draft/*` branches still on this repo are its residue, and they are no
+longer rebased.
 
 ## The walls
 
