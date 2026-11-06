@@ -2695,7 +2695,9 @@ behind it leaves the world at the settlement, as any commons mark does.
 
 **The reach of a hold (ruled 2026-09-07, the founder's word: "taking something
 should require moving into its coords extent (just like enter/exit), and you
-should be able to drop something right where you stand").**
+should be able to drop something right where you stand"; a take's reach widened
+to earshot 2026-10-19 18:49 EDT, WLD-79, Darko: "(b), 60 m, one rule for give and
+take", "until proven it's an issue").**
 
 Rendered in the world as `the-town/the-reach` (a child of `the-town/attach`).
 
@@ -2706,10 +2708,10 @@ given from 379 m away mid-leg, a set-down that left the thing where it was
 first laid, a draft changing hands. This clause is the sentence the
 door enforces:
 
-- **A take is a threshold act.** To take a thing you stand within its extent,
-  exactly as an entry stands *at a threshold you truly stand before*
-  (`the-town/enter`); a take from outside that extent is refused, and the
-  refusal names the distance and the walk that closes it. A thing is not ground
+- **A take reaches as far as a give.** To take a thing you stand within its
+  extent or within `earshot_m` of its point (60 m), the same measure a give
+  uses; a take from farther is refused, and the refusal names the distance, the
+  direction and the walk that closes it. A thing is not ground
   (`the-town/the-not-ground`), so standing "within" it is standing on what it
   stands on, at its footprint.
 - **A set-down stands where you stood.** A drop places the thing at the
@@ -2718,8 +2720,8 @@ door enforces:
   last place the thing was folded. Between the drop and the fold, the read
   derives it from the act, as position is always derived.
 - **A give is a take at arm's length.** Giver and receiver stand within reach
-  of each other (`earshot_m` of the say edge is the town's one measure of
-  "beside"); a give to a resident out of reach is refused by name, and a `to:`
+  of each other (`earshot_m` of the say edge, 60 m, is the town's one measure of
+  "beside", and the take's reach too); a give to a resident out of reach is refused by name, and a `to:`
   on a thing the giver does not hold is refused, never silently rewritten as a
   take.
 - **Only what stands on the world changes hands.** A draft is not the town's
