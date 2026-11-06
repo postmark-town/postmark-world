@@ -14,6 +14,8 @@
 //       kept home; past the budget they go to the tail like any mark
 //   E6  the telling says "here" for a thing at your feet, keyed on the at-feet
 //       relation and never on a rounded 0 m
+//   G1  a thing at your feet is admitted from the resident's own point: a rise,
+//       the Mists' wall, the weather or max_sight_m before its centre never drops it
 // and what B must leave alone: containmentChain is geometric (enterPrompt still
 // offers the bowl), a room or a place under the point stays within, and an
 // entered room still frames the sight.
@@ -21,7 +23,7 @@
 // Every record is invented. Run: node --test tools/wld74-reader-boundary.test.mjs
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildHeightfield, fieldOfView, DIALS } from "./world-engine.mjs";
+import { buildHeightfield, fieldOfView, fogModel, DIALS } from "./world-engine.mjs";
 import { orient, openYourEyes, containmentChain, enterPrompt } from "./world-verbs.mjs";
 import { isThingIn, kindIndexOf } from "./mark-kind.mjs";
 
@@ -196,6 +198,68 @@ test("F3 · two things at your feet whose centres stand past cluster_beyond_m ar
   assert.equal(one.carried.length, 1);
   assert.ok(WIDE.some((t) => t.id === one.carried[0].id), `the one seat goes to an awning: ${one.carried[0].id}`);
   assert.equal(one.aggregate.hidden_by_budget, 2, "the other awning and the far rep are the tail");
+});
+
+// G1 (Wright 2026-11-06 02:15Z: "for the at-feet ids only, max-sight, fog/Mists and line-of-sight admission use
+// the resident's own point"). THE AWNING is the canonical falsifier: a thing 400 m by 4 m whose footprint holds the
+// point and whose centre stands 190 m west. THE CRATE, its control, is the same household's small thing at the
+// awning's centre and not at your feet: whatever cuts the crate cuts what is seen at that centre.
+const AWNING = { id: "sbx-bea/a-market-awning", by: "sbx-bea", household: "sbx-bea", kind: "thing", tier: "market", at: { x: -190, y: 0 }, extent: { w: 400, h: 4 }, body: "A market awning." };
+const CRATE = { id: "sbx-bea/a-crate", by: "sbx-bea", household: "sbx-bea", kind: "thing", tier: "market", at: { x: -190, y: 1 }, extent: { w: 2, h: 2 }, body: "A crate." };
+// the long arms: the same shape stretched so its centre stands past the weather's reach, and past max_sight_m
+const LONG = (id, cx, w) => ({ ...AWNING, id, at: { x: cx, y: 0 }, extent: { w, h: 4 } });
+const RISE = { elevationAt: (x) => (x < -60 && x > -130 ? 60 : 5) }; // a 55 m rise between the point and x = -190
+const WALL = { border_m: { minX: -100, minY: -1000, maxX: 1000, maxY: 1000 }, fringe_m: 0, wall_sight_m: 20, density: { from: 0, to: 0 }, schedule: [{ crossing: 0, front_m: 0, veil: 0 }] };
+// the thickest weather among the first 5000 crossings, read off the engine's own fog model
+const THICK = Array.from({ length: 5000 }, (_, c) => c).reduce((a, c) => (fogModel(c).thickness > fogModel(a).thickness ? c : a), 0);
+
+function g1Arm(name, thing, crate, world, { crossing = 0 } = {}) {
+  const idx = kindIndexOf(world.marks);
+  // THE PREMISES, measured: a canonical thing (not the world frame), its footprint holds the point, its centre
+  // is off the point; and the cut under test is live, since the crate at that centre is not seen
+  assert.ok(Math.max(thing.extent.w, thing.extent.h) < DIALS.world_scale_extent_m, `${name}: ${thing.id} is not the world frame`);
+  assert.equal(isThingIn(thing, idx), true, `${name}: ${thing.id} is a thing`);
+  assert.ok(withinIds(containmentChain(P, [thing])).includes(thing.id), `${name}: ${thing.id}'s footprint holds the point`);
+  const eyes = openYourEyes(P, world, { crossing });
+  assert.ok(!carriedIds(eyes.fov).includes(crate.id), `${name}: the cut is live, the crate at the centre is not seen`);
+  // the same thing, NOT handed in as at your feet, is cut at its centre: the input is the only door
+  assert.ok(!carriedIds(fieldOfView(P, world, { crossing })).includes(thing.id), `${name}: judged at its centre, ${thing.id} is cut`);
+  // AT YOUR FEET it is admitted from where you stand: seen, told here, and not within
+  assert.ok(carriedIds(eyes.fov).includes(thing.id), `${name}: LAW "admission use[s] the resident's own point": ${thing.id} at your feet is seen`);
+  assert.match(lineOf(eyes.tell(), thing.id) ?? "", /^ {2}· here — /, `${name}: ${thing.id} reads here`);
+  assert.ok(!withinIds(eyes.radial.within).includes(thing.id), `${name}: unentered, ${thing.id} is not within`);
+  // its centre still places it: the distance it is told at is the centre's, never a rounded 0
+  assert.equal(eyes.fov.carried.find((c) => c.id === thing.id)?.distM, Math.round(Math.hypot(thing.at.x, thing.at.y)), `${name}: placed by its centre`);
+}
+
+test("G1 · a rise before the centre: the awning at your feet is still seen, here, from where you stand", () => {
+  g1Arm("rise", AWNING, CRATE, { ...worldOf([AWNING, CRATE]), heightfield: RISE, fogCeilingM: 0 });
+});
+
+test("G1 · the Mists' wall before the centre: the awning at your feet is still seen, here", () => {
+  const w = worldOf([AWNING, CRATE]);
+  g1Arm("mists", AWNING, CRATE, { ...w, terrain: { ...w.terrain, mists: WALL }, fogCeilingM: 0 });
+});
+
+test("G1 · the weather: a long thing at your feet whose centre is past the fog's reach is still seen, here", () => {
+  // the eye stands in the fog (the default world's ceiling, 22 m, over 5 m ground), on the thickest crossing found
+  const t = LONG("sbx-bea/a-long-awning", -3990, 8000);
+  g1Arm("fog", t, { ...CRATE, at: { x: -3990, y: 1 } }, worldOf([t, { ...CRATE, at: { x: -3990, y: 1 } }]), { crossing: THICK });
+});
+
+test("G1 · max_sight_m: a thing at your feet whose centre is past the candidate cull is still seen, here", () => {
+  const t = LONG("sbx-bea/a-very-long-awning", -20100, 40400);
+  const crate = { ...CRATE, at: { x: -20100, y: 1 } };
+  assert.ok(20100 > DIALS.max_sight_m, "the centre is past max_sight_m");
+  g1Arm("max-sight", t, crate, { ...worldOf([t, crate]), fogCeilingM: 0 });
+});
+
+test("G1 · CONTROL: every other mark is still admitted at its centre, and entered the awning frames, never a seat", () => {
+  const w = { ...worldOf([AWNING, CRATE]), heightfield: RISE, fogCeilingM: 0 };
+  const eyes = openYourEyes(P, w, { entered: [AWNING.id] });
+  assert.ok(withinIds(eyes.radial.within).includes(AWNING.id), "entered, the awning is within");
+  assert.ok(!carriedIds(eyes.fov).includes(AWNING.id), "entered, it is the frame, not a seat");
+  assert.ok(!carriedIds(eyes.fov).includes(CRATE.id), "the crate inside it, past the rise, is still cut at its centre");
 });
 
 test("GEOMETRY UNTOUCHED · containmentChain still holds the bowl, and enterPrompt still offers it", () => {

@@ -859,7 +859,13 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     if (markExtent(mk) >= dials.world_scale_extent_m) continue; // the world-root is the frame — establishing line, not a list item
     const dx = mk.at.x - observer.x, dy = mk.at.y - observer.y;
     const distM = Math.hypot(dx, dy);
-    if (distM > dials.max_sight_m) continue;                // compute cull (bounds cost)
+    // A THING AT YOUR FEET IS ADMITTED FROM WHERE YOU STAND (WLD-74 G1, Wright 2026-11-06 02:15Z: "for the
+    // at-feet ids only, max-sight, fog/Mists and line-of-sight admission use the resident's own point"): its
+    // footprint holds you, so its centre's distance or a rise before it never drops it. Its centre still
+    // places and ranks it (distM, bearing, score below); every other mark is admitted at its centre as ever.
+    const seenAt = atFeet?.has(mk.id) ? { x: observer.x, y: observer.y } : mk.at;
+    const seenM = seenAt === mk.at ? distM : 0;
+    if (seenM > dials.max_sight_m) continue;                // compute cull (bounds cost)
     // standing on it — orient() covers "here". The exceptions are the acting
     // resident's own home (`keep`): standing at its centre is being at home, and
     // the bare read must still carry it (WLD-9); and a thing at your feet
@@ -881,9 +887,9 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     // Mists, neither the wall nor the fringe's reach, for a reader standing inside it (`cover`, above the
     // loop: an entered mark you stand outside shelters nothing). `shelter` is the caller's test (the engine defines no
     // containment of its own): openYourEyes builds it from the reader's enter stack.
-    const mistHidden = !!mists && !cover?.(mk.at) && (mistsHide(observer, mk.at, mists)
-      || distM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
-    const fogHidden = distM > reach || mistHidden;
+    const mistHidden = !!mists && !cover?.(seenAt) && (mistsHide(observer, seenAt, mists)
+      || seenM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
+    const fogHidden = seenM > reach || mistHidden;
 
     // darkness dimming: a non-signal, non-luminous mark at the dark end is dim
     // the unveiled light ranks (it is the light there was before the Mists, bit
@@ -896,7 +902,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 
     // terrain occlusion (the FOV over the heightfield) — every lean honored from
     // `dials` so a dev-pane override changes the sightline too, not just the ranking
-    const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
+    const los = lineOfSight({ from: observer, to: seenAt, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
     const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
     bareScore.set(mk.id, lodScore({ extentM, distM, weight: 0, dials, dimming: rankDimming }));
