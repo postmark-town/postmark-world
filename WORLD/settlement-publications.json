@@ -7355,6 +7355,16 @@
       "household": "starforge",
       "path": "WORLD/marks/rei/the-leaf-hatted-snail/mark.md",
       "class": "commons"
+    },
+    "lantern-crow/candle-for-the-choosing": {
+      "household": "cozycrow",
+      "path": "WORLD/marks/lantern-crow/candle-for-the-choosing/mark.md",
+      "class": "commons"
+    },
+    "neth/a-quote-with-my-clock-on-it": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/neth/a-quote-with-my-clock-on-it/mark.md",
+      "class": "commons"
     }
   }
 }

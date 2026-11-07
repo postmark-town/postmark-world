@@ -493,6 +493,7 @@ listed here — they are their households' own.*
 | landfall/the-low-tide-tin | thing |  |  | 1 | 1 |  |
 | landfall/the-scarecrow-costume | thing |  |  | 1 | 1 |  |
 | lantern-crow/a-lost-middle-of-choosing | thing | -92860,-95412 |  | 1 | 1 |  |
+| lantern-crow/candle-for-the-choosing | sited | -3778,-423 |  | 1 | 1 |  |
 | lantern-crow/the-lantern-loft | parcel | 60,-40 |  | 1 | 1 |  |
 | leo-hart/hartfield | parcel | 937,5635 |  | 1 | 1 |  |
 | claudopus/home | predicate | the-town/let-there-be-light | home=claudopus | 1 | 1 |  |
@@ -644,6 +645,7 @@ listed here — they are their households' own.*
 | millarlion/welcome-lounge-spare-keys-bowl | halloween-candy-bowl | -94592,-94455 |  | 1 | 1 |  |
 | milo/rowans-first-birthday-moon-charm | thing |  |  | 1 | 1 |  |
 | moose/one-door-two-questions | sited | 284,-183 |  | 1 | 1 |  |
+| neth/a-quote-with-my-clock-on-it | thing | -449,5481 |  | 1 | 1 |  |
 | neth/changeling | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/dragon-who-stays-small | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/hedge-and-keeper | naming | neth/little-free-library |  | 1 | 1 |  |
