@@ -25,10 +25,10 @@ test("A REFUSAL FROM AFAR IS AN OFFER — from the body's own walk first, from t
 
 test("[pin] THE PAGE WIRES IT — crossInto offers on the refusal, the delegate sends the walk with entry on arrival, and nothing else about entering changed", () => {
   assert.match(SOURCE, /const offer = answer\.error === "bounce" \? walkThereOffer\(response\?\.status, answer, markId\) : null;/, "crossInto asks the pure rule");
-  assert.match(SOURCE, /apexAct\("walk", \{ mark_id: markId, enter_on_arrival: true, \.\.\.\(accept \? \{ accept: true \} : \{\}\) \}\)/, "one act: the walk door, entry on arrival, the walker's word only when asked");
+  assert.match(SOURCE, /apexAct\("walk", \{ mark_id: markId, enter_on_arrival: true, \.\.\.\(into \? \{ into \} : \{\}\), \.\.\.\(accept \? \{ accept: true \} : \{\}\) \}\)/, "one act: the walk door, entry on arrival, the walker's word only when asked");
   assert.match(SOURCE, /closest\("\[data-walk-enter\]"\)/, "the root delegate reads the button");
   assert.match(SOURCE, /closest\("\[data-walk-enter-accept\]"\)/, "and the terms accept for a walk");
-  assert.match(SOURCE, /apexAct\("enter", \{ mark: markId, \.\.\.\(accept \? \{ accept: true \} : \{\}\) \}\)/, "the enter act is untouched");
+  assert.match(SOURCE, /apexAct\("enter", \{ mark: markId, \.\.\.\(into \? \{ into \} : \{\}\), \.\.\.\(accept \? \{ accept: true \} : \{\}\) \}\)/, "the enter act is untouched");
   // ⚑ THE FLIP: drop the `[data-walk-enter]` branch from the delegate → the third line reds.
 });
 

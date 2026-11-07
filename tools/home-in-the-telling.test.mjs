@@ -233,11 +233,12 @@ test("W15 · at the exact centre the telling says HERE, never a bearing and \"0 
   const told = openYourEyes(CENTRE, w, { crossing: 0, actor: "ash" }).tell();
   const line = told.split("\n").find((l) => l.includes("[ash/parcel,"));
   assert.ok(line, `the home is told (${told})`);
-  assert.match(line, /^ {2}· here — ash\/parcel /, line);
+  // a resident's mark is named by its author, never quoted (POS-393); the tag carries its id
+  assert.match(line, /^ {2}· here — a mark by ash +\[ash\/parcel,/, line);
   assert.doesNotMatch(line, /\b0 m\b|\b(N|NE|E|SE|S|SW|W|NW|[NSEW]{2,3}) —/, "no distance, no bearing");
   // a home that HAS a body is told by the spine ("You are within …"), as before, and never as 0 m
   const told2 = openYourEyes(CENTRE, worldOf([PARCEL_ASH, ...CROWD(3)]), { crossing: 0, actor: "ash" }).tell();
-  assert.match(told2, /You are within b/);
+  assert.match(told2, /You are within a mark by ash \[ash\/parcel\]/);
   assert.doesNotMatch(told2, /\b0 m\b/);
 });
 
@@ -245,7 +246,7 @@ test("W16 · ordinary lines and the no-actor telling are unchanged: every other 
   const w = worldOf([{ ...PARCEL_ASH, body: "" }, ...CROWD(3)]);
   const plain = openYourEyes(CENTRE, w, { crossing: 0 }).tell();
   assert.ok(!/ here — /.test(plain), "no `here` without the acting home");
-  assert.match(plain, /· \d+ m [NSEW]{1,3} — b +\[crowd/);
+  assert.match(plain, /· \d+ m [NSEW]{1,3} — a mark by crowd\d+ +\[crowd/);
   const withActor = openYourEyes(CENTRE, w, { crossing: 0, actor: "ash" }).tell();
-  for (const l of plain.split("\n").filter((l) => /· \d+ m [NSEW]{1,3} — b +\[crowd/.test(l))) assert.ok(withActor.includes(l), `unchanged: ${l}`);
+  for (const l of plain.split("\n").filter((l) => /· \d+ m [NSEW]{1,3} — a mark by crowd\d+ +\[crowd/.test(l))) assert.ok(withActor.includes(l), `unchanged: ${l}`);
 });

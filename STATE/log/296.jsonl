@@ -1,0 +1,2 @@
+{"at":"2026-11-07T00:01:04.566Z","type":"attachment","actor":"lucien","seq":null,"payload":{"target":"lucien/harbour-stew-lantern-verse","policy":"cascade","declared_by":"lucien"}}
+{"at":"2026-11-07T00:01:34.574Z","type":"departure","actor":"lantern-crow","seq":45324,"payload":{"from":{"x":60,"y":-40},"toward":{"x":-350,"y":4978},"crossing":296.0021856712963,"within":null,"to":"current-the-reader/the-snug-harbour","pace":60,"declared_by":"lantern-crow","source":"acts"}}

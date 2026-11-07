@@ -76,6 +76,7 @@ import {
   TOUR_WALK_LEG,
   PRESETS,
   recentActivity,
+  activityFeed,
   actSubjectGone,
   activityDayLabel,
   activityDayKey,
@@ -1126,7 +1127,7 @@ test("a mark you cannot set out for is still not a destination", () => {
   assert.equal(isWalkableTarget(house), true);
   assert.equal(isWalkableTarget(parcel), true, "a parcel is ground you can stand on");
   assert.equal(isWalkableTarget(district), false, "2,325 m across is a region, not a destination");
-  assert.equal(isWalkableTarget(crossing), false, "the town's own furniture is not a destination");
+  assert.equal(isWalkableTarget(crossing), true, "POS-702: the town's own furniture is a destination too (Darko, 2026-10-19 13:58)");
   assert.equal(isWalkableTarget({ ...house, at: null }), false, "an unplaced mark is nowhere to go");
   assert.equal(isWalkableTarget({ ...house, kind: "predicated" }), false, "a property of a thing has no ground");
   assert.equal(isWalkableTarget({ ...house, extent: { w: WALK_TARGET_MAX_EXTENT_M, h: 1 } }), false, "the cap is exclusive");
@@ -1398,6 +1399,22 @@ test("the record of acts is newest-first, and admits that it knows two precision
   assert.equal(collapsed[0].subject, "the-town/the-locks", "and it is the LAST one, not the first");
   assert.equal(collapsed.filter((r) => r.kind === "mark").length, 1, "which leaves room for what else happened");
   assert.equal(collapsed.filter((r) => r.day === "2026-08-03").length, 1, "yesterday is its own day, and keeps its own walk");
+
+  // A DAY THAT HAS NOT COME IS NOT LATELY (S131): world#309's sweets are dated
+  // 2026-10-26, and the rail listed them by name above today's rows the evening
+  // before. Held back until their day (UTC), and counted nowhere until then.
+  const ahead = { departures: [{ iso: "2026-10-26T00:00:00.000Z", handle: "early" }],
+    marks: [{ id: "j/a-sweet", date: "2026-10-26T00:00:00.000Z", by: "j" }, { id: "b/today", date: "2026-10-25", by: "b" }],
+    stakes: [{ iso: "2026-10-27T09:00:00.000Z", handle: "k", mark: "b/today", n: 2 }],
+    blessings: [{ n: 132, date: "2026-10-26T00:00:00.000Z" }] };
+  const eve = activityFeed({ ...ahead, now: "2026-10-25T23:59:59.999Z", limit: 10 });
+  assert.deepEqual(eve.rows.map((r) => r.subject ?? r.kind), ["b/today"], "the evening before: today's mark only");
+  assert.equal(eve.total, 1, "and the count does not know the held rows either, so no \"more\" points at them");
+  const day = activityFeed({ ...ahead, now: "2026-10-26T00:00:00.000Z", limit: 10 });
+  assert.deepEqual(day.rows.filter((r) => r.day === "2026-10-26").map((r) => r.subject ?? r.kind).sort(), ["j/a-sweet", "settlement", "walk"],
+    "on the day, the day's rows arrive, labelled today");
+  assert.ok(day.rows.every((r) => r.day <= "2026-10-26"), "and the day after's stake still waits");
+  assert.equal(day.rows.find((r) => r.subject === "j/a-sweet").dayLabel, "today");
 });
 
 // ───────── the faces on the map ─────────
@@ -2083,7 +2100,7 @@ test("a verb reads as its own name, hyphens and all", () => {
   assert.equal(actionLabel(""), "");
 });
 
-// ───────── per-resident views, built ahead (step 6) ─────────
+// ───────── per-resident views, built on first selection and kept (step 6) ─────────
 
 test("a resident's read is observed BY THE RESIDENT; only a spectator is a spectator", () => {
   // O13: the engine ranks a field of view for an observer, and the telling and
@@ -2213,4 +2230,29 @@ test("a thing is not ground — a carried object never answers the walk desk's F
   ];
   assert.equal(smallestContainingMark({ x: 0, y: 0 }, sculpture), null,
     "inside a colossal sculpture you are still on open ground, not IN the object");
+});
+
+test("a nameplate stands BESIDE a mark's drawn ground, not over its middle (Darko, 2026-10-15)", () => {
+  const box = { w: 600, h: 300 }, size = { w: 120, h: 24 };
+  const anchor = { x: 200, y: 150 };
+  const bare = placeBubble({ anchor, size, box });
+  const beside = placeBubble({ anchor, size, box, reach: { left: 40, right: 60 } });
+  assert.equal(beside.side, "right");
+  assert.equal(beside.x, bare.x + 60, "it clears the ground's right-hand reach");
+  // no room on the right past the ground: it takes the left, clearing that reach
+  const left = placeBubble({ anchor: { x: 450, y: 150 }, size, box, reach: { left: 40, right: 100 } });
+  assert.equal(left.side, "left");
+  assert.ok(left.x + size.w <= 450 - 40, "and clears the left reach going the other way");
+  // a number reaches both ways; zero is the old rule exactly
+  assert.deepEqual(placeBubble({ anchor, size, box, reach: 0 }), bare);
+  assert.equal(placeBubble({ anchor, size, box, reach: 30 }).x, bare.x + 30);
+});
+
+test("FALSIFIER, POS-702: the town's deck and quay are walk targets; a law node with no place is not", () => {
+  const deck = { id: "the-town/the-deck", kind: "sited", tier: "constitution", at: { x: 1400, y: 5665 }, extent: { w: 40, h: 12 } };
+  const quay = { id: "the-town/the-quay", kind: "sited", tier: "constitution", at: { x: 1390, y: 5665 }, extent: { w: 80, h: 20 } };
+  const law = { id: "the-town/walk-verb", kind: "predicate", tier: "constitution" };
+  assert.equal(isWalkableTarget(deck), true);
+  assert.equal(isWalkableTarget(quay), true);
+  assert.equal(isWalkableTarget(law), false);
 });

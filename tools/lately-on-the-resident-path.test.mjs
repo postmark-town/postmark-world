@@ -74,6 +74,7 @@ import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -200,7 +201,7 @@ before(async () => {
 /** open the page, optionally signed in, and read the Lately pane off the DOM */
 async function openAndRead({ signedIn }) {
   const askedBefore = office.asked.length;   // this page's own doors, not the file's
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.addInitScript(
@@ -268,6 +269,24 @@ async function openAndRead({ signedIn }) {
   return { ...seen, errors, askedDuring: office.asked.slice(askedBefore) };
 }
 
+// The page's live creatures (play fix 35) are the town's own keyless read of its
+// apex, asked by every page, signed in or not; they are not the resident path.
+// Exactly those two forms: `find=creature`, and `investigate=` of a creature's own
+// id (the viewer encodes "creature:" as creature%3A). Any other keyless apex read
+// (an investigate of a resident or a mark) is still the resident path.
+const residentDoor = (p) => (p.startsWith("/world/apex") && !/^\/world\/apex\?(find=creature(&|$)|investigate=creature%3A[^&]+$)/.test(p))
+  || p.startsWith("/world/present");
+
+test("the keyless exemption is the creatures' two reads and nothing wider", () => {
+  assert.equal(residentDoor("/world/apex?find=creature"), false, "the living list");
+  assert.equal(residentDoor("/world/apex?investigate=creature%3Awolf-3"), false, "one creature read whole");
+  for (const p of ["/world/apex", "/world/apex?investigate=wright", "/world/apex?investigate=the-town%2Fthe-post-office",
+    "/world/apex?investigate=creature", "/world/apex?find=creatures", "/world/apex?find=creature-wright", "/world/present?x=10&y=10"]) {
+    assert.equal(residentDoor(p), true, `${p} is the resident path`);
+  }
+  // ⚑ THE FLIP: widen the exemption back to `investigate=` → the second loop row reds.
+});
+
 const skipReason = "playwright is absent, so the SIGNED-IN Lately pane goes unguarded: "
   + "no other test in this repo drives the resident path in a browser, and the unit tests of "
   + "`recentActivity` stay green on the broken build.";
@@ -281,7 +300,7 @@ test("A SIGNED-IN READER'S LATELY SHOWS WHAT THEY WROTE — and every row comes 
   // `/world/present` at THIS FIXTURE'S standpoint proves it landed in the cache
   // and was consumed, because that is the only thing that puts those numbers in
   // that URL.
-  assert.ok(seen.askedDuring.some((p) => p.startsWith("/world/apex")),
+  assert.ok(seen.askedDuring.some((p) => p.startsWith("/world/apex") && residentDoor(p)),
     "the page never asked for a resident read at all, so it was not signed in: "
     + JSON.stringify(seen.askedDuring));
   assert.ok(seen.askedDuring.includes("/world/present?x=10&y=10"),
@@ -306,7 +325,7 @@ test("THE SPECTATOR'S LATELY IS UNTOUCHED — the same pane, no key, still the f
   if (!chromium) return t.skip(skipReason);
   const seen = await openAndRead({ signedIn: false });
   // A page with no key must never take the resident path at all…
-  assert.deepEqual(seen.askedDuring.filter((p) => p.startsWith("/world/apex") || p.startsWith("/world/present")), [],
+  assert.deepEqual(seen.askedDuring.filter(residentDoor), [],
     "a spectator asked the resident doors: " + JSON.stringify(seen.askedDuring));
   // …so none of the rig's invented marks can reach it. This is the half of the
   // fix that must NOT change, asserted from the other side.

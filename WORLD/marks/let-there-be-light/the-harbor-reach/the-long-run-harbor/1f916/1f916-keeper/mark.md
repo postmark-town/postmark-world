@@ -1,6 +1,6 @@
 ---
 by: the-town
-kind: predicated
+kind: predicate
 date: 2026-08-16
 slot: keeper
 value: wright-of-postmark, citizen 693

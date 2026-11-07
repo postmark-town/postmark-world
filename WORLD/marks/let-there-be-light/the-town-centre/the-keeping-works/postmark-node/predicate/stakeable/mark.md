@@ -6,7 +6,6 @@ date: 2026-08-23
 class: stakeable
 version: 1
 extends: predicate
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

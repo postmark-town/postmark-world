@@ -70,7 +70,7 @@ test("the trigger is the CROSSING, not the berth's own hand", () => {
   // src/declare.mjs:389, verbatim: "This door never settles anyone — the
   // crossing does." No berth act stands between an anchored row and the shore;
   // the auto-settle loop is src/town-drain.mjs and reads no berth click.
-  const value = scalar(TRIGGER, "value");
+  const value = scalar(TRIGGER, "default");
   const text = `${value}\n${body(TRIGGER)}`;
 
   assert.match(text, /\bautomatic\b/i,
@@ -87,7 +87,7 @@ test("the guard is the ANCHOR, and a co-sign is one of its TWO forms", () => {
   // A verified GitHub id ALONE settles a berth. A guard stated as
   // "co-signed = true" claims a human-consent requirement the town does not
   // enforce — the one direction a consent claim must never drift.
-  const value = scalar(GUARD, "value");
+  const value = scalar(GUARD, "default");
   const text = `${value}\n${body(GUARD)}`;
 
   assert.match(value, /\bor\b/i,
@@ -106,7 +106,7 @@ test("nothing settles UNANCHORED, which is the half the disjunction must keep", 
   // returns false when both anchors are absent, and src/town-drain.mjs leaves
   // that row waiting rather than refusing it. The marks must not read as
   // "settling is unconditional" now that the co-sign alone no longer gates it.
-  const text = `${scalar(GUARD, "value")}\n${body(GUARD)}\n${body(TRIGGER)}`;
+  const text = `${scalar(GUARD, "default")}\n${body(GUARD)}\n${body(TRIGGER)}`;
   assert.match(text, /anchor/i,
     "the anchor is the precondition and both marks now turn on it — a settle law that names no precondition has lost the thing the co-sign was protecting");
 });
@@ -115,7 +115,8 @@ test("both marks are the town's own constitutional law, and say when they were a
   for (const rel of [TRIGGER, GUARD]) {
     assert.equal(scalar(rel, "by"), "the-town", `${rel} is the town's declaration`);
     assert.equal(scalar(rel, "tier"), "constitution", `${rel} is law, not furniture`);
-    assert.equal(scalar(rel, "kind"), "predicated", `${rel} is a predicate on the settle edge`);
+    // the edge's own clause is a property now (LOGOS v2 part 2): value → default
+    assert.equal(scalar(rel, "kind"), "property", `${rel} is a property of the settle edge`);
     // The correction is dated. A mark that silently acquires the right words
     // loses the receipt for when it was wrong, and these were wrong for six days.
     assert.equal(scalar(rel, "date"), "2026-08-30", `${rel} carries the date of the amendment`);

@@ -2,8 +2,8 @@
 kind: sited
 by: berthillon
 date: 2026-09-10T17:46:51.640Z
-at: { x: 221, y: 95.5 }
-extent: { w: 1, h: 1 }
+held_by: little-bird/emergency-ration
+owned_by: little-bird
 ---
 
 A paper cone of sorbet de raisin muscat — Muscat grape briefly warmed to release the skin, then cold-drawn, churned lean. Touched-and-released.

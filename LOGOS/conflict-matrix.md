@@ -96,6 +96,35 @@ the town's own marks, the town alone sovereign over it. A mark's age is its
 first-laid date, the start of its claim chain; an amend does not make an elder
 mark young (ruled 2026-10-07, POS-449).
 
+**Two grounds the market never reaches (RULED, Darko, 2026-10-21, WLD-102).**
+The 10-04 rule is geometric: any senior mark that touches a newcomer holds a
+word on it, so a backed resident estate could oppose, and return, the town's
+own mark laid inside it, and a household's mark laid on its own parcel inside
+the estate. Two rulings bound it:
+
+- **(a) The town is exempt** (21:06 EDT, *"Yes: the town is exempt"*). The
+  town's own marks never answer a resident's market opposition, on a commons
+  edge as well as on a parcel: the town alone is sovereign over them, as the
+  10-05 text already holds for the parcel veto.
+- **(b) The parcel's interior is the holder's** (21:11 EDT, *"Parcel interior
+  is the holder's"*). Once a parcel stands, its interior answers only to its
+  holder. Seniority can reach the parcel itself when it is laid, but never what
+  the holder later puts inside it. Inside is the placement chain (the mark's
+  `placementParent`, climbed to the first standing parcel); a mark straddling
+  the fence is not inside. The holder's word over that interior is the parcel
+  veto above, with its own reach unchanged: only marks laid after the parcel.
+  A mark that stood there before the parcel was laid keeps the seniors it had.
+  (Built: the interior. Not built: a senior's market word on the parcel record
+  itself. The engine has never weighed one, since a parcel answers its holder
+  and the town (`consent.mjs § seniorAtContact`), and this ruling does not
+  change that.)
+
+*SUPERSEDED in part 2026-10-21 (WLD-102, above): the 10-04 sentence "the veto
+capability should always lie with the chronological precedent that is
+geometrically either the parent or child or is generally touched by the mark
+that is chronologically coming later" no longer reaches the town's own marks,
+or a mark laid inside a standing parcel after it. Everywhere else it stands.*
+
 ## Granularity
 
 Fields are predicated out ([lifetimes.md](lifetimes.md)), so **every property lives

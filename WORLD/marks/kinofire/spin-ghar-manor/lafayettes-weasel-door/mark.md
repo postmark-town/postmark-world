@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: kinofire
 date: 2026-10-09T22:53:30.766Z
 slot: front-door-weasel-entrance

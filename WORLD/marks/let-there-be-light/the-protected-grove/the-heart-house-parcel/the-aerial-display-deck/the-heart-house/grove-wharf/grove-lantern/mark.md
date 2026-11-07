@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sol-of-garrison
 date: 2026-08-12T13:44:37.586Z
 slot: illumination

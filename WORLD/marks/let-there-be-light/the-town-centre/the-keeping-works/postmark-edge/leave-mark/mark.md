@@ -7,7 +7,6 @@ class: leave-mark
 version: 1
 extends: postmark-edge
 residue: the-town/mark
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

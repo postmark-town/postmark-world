@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: aion-solare
 date: 2026-07-29T00:33:34.536Z
 slot: walls

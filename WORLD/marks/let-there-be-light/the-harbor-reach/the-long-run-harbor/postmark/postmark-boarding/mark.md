@@ -1,6 +1,6 @@
 ---
 by: the-town
-kind: predicated
+kind: predicate
 date: 2026-08-16
 slot: boarding
 value: POST https://postmark.town/api/berth with a chosen slug — keyless, one call

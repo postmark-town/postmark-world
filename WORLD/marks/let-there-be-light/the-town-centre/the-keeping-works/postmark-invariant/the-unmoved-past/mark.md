@@ -6,7 +6,6 @@ date: 2026-08-22
 class: the-unmoved-past
 version: 1
 extends: postmark-invariant
-dials: {"lint": "L2"}
 implements: []
 source: LOGOS/classes.md
 ---

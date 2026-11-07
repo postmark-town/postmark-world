@@ -1,3 +1,4 @@
+import { isPredicate } from "./mark-kind.mjs"; // a predicate in either spelling (G10: kind: predicated → predicate)
 // region-outsiders.mjs — who is standing outside their region's ring, derived
 // from the tree and from nothing else.
 //
@@ -50,7 +51,7 @@ export const REGION_SLUGS = Object.freeze([
  *  carries no geometry"). One predicate, shared by the derivation and by the
  *  falsifiers, so a mark cannot be in scope for one and invisible to the other. */
 export const occupiesGround = (m) =>
-  !!m.at && !m.far && m.kind !== "predicated" && m.kind !== "naming" && m.kind !== "class";
+  !!m.at && !m.far && !isPredicate(m) && m.kind !== "naming" && m.kind !== "class";
 
 const rectOf = (m) => ({ x: m.at.x, y: m.at.y, w: m.extent?.w ?? 1, h: m.extent?.h ?? 1 });
 

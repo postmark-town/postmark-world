@@ -10,32 +10,35 @@
 //   { marks, terrain, heightfield, light, fogCeilingM, charter }
 // A `state` is the walker: { x, y, name, household? }.
 
+import { isSited, isGround, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
-  fieldOfView, radialSerialize, statusAt, lightLevelAt, fogModel,
+  fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
-  bearingDeg, quantizeBearing, distanceBand, DIALS,
+  DIALS,
 } from "./world-engine.mjs";
 import { homeOf } from "./where-is.mjs"; // the ONE home resolver (declared, own parcel, household)
+import { propertyOf } from "./class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
 import {
   marksContain, marksOverlapArea, overlapArea, rect,
 } from "./geometry.mjs"; // the ONE containment definition — pure, browser-safe (no node:*)
 import {
   adjudicate, containsEdges as containsEdgesOf, entityChild, entryLawOf, formatEnterExit,
   isMark, occupantsOf, termsAt, withinOf,
-} from "./enter-exit.mjs"; // DEMO SLICE — the enter-exit acts (step 5, jetto/enter-exit-demo)
+} from "./enter-exit.mjs"; // the enter-exit acts (production, planted as law 2026-08-22; see its header)
 import {
-  pointInMark, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
-  landingOf, enterTargetOf, portalsIn, portalsInto, dungeonLanding,
+  pointInMark, roomHolds, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
+  landingOf, passageTargetOf, portalsIn, portalsInto, dungeonLanding, exitLockWords, lockStandsWords, lockedPassage, hhmmZ,
+  unmetRequires, requiresHolderOf, requiresHoldersOf,
 } from "./portals.mjs"; // WLD-5: portals and the dungeon class, one home for the verbs and the lint
 // The office loads this file and enter-exit.mjs from the clone, and nothing else,
 // so the portal reads it needs ride out through here.
-export { dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence, portalsIn, portalsInto, dungeonLanding, isDungeon, pointInMark };
+export { dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence, portalsIn, portalsInto, dungeonLanding, isDungeon, pointInMark, hhmmZ, requiresHolderOf, requiresHoldersOf };
 
 // ───────────────────────── orient — charter + your state ────────────────────
 // The establishing line of every telling: the let-there-be-light root (light
 // from the NE, dying to the SW), the world's extent, and WHERE/HOW you stand —
 // region, elevation, and the fog/light status effects on you right now.
-export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
+export function orient(state, world, { crossing = 0, dials = DIALS, entered = null } = {}) {
   const { heightfield, light, fogCeilingM, terrain } = world;
   const fog = fogModel(crossing, dials);
   const mists = mistsAt(crossing, terrain?.mists); // POS-466: null before the schedule starts
@@ -60,12 +63,45 @@ export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
       // the Mists at your standpoint; absent (not null) before they arrive, so
       // the answer before the schedule's first crossing is the old one, bit for bit
       ...(mists ? { mists: mistsBlock(mists, mistsHere(state, mists), state) } : {}),
+      // AN ENTERED MARK IS SHELTER: standing within one, the Mists hide nothing it holds (airLine says so)
+      ...(mists && shelterOf(world, entered, state) ? { sheltered: true } : {}),
     },
-    // enter/exit are DEMO-SLICE verbs (step 5) — listed so a reader of the
-    // demo sees the pair, and pointedly listed apart from walk, which reaches
-    // coordinates and never an inside.
+    // enter/exit are listed so a reader sees the pair, and pointedly listed
+    // apart from walk, which reaches coordinates and never an inside.
     verbs: ["open-your-eyes", "investigate(mark)", "walk(dir, dist)", "enter(mark)", "exit(mark)"],
   };
+}
+
+/** AN ENTERED MARK IS SHELTER (Darko 2026-10-15): the test of a point the Mists leave alone for a walker whose enter
+ *  stack is `entered` (mark ids): inside any of those marks. With `standpoint`, only the entered marks that contain it
+ *  count: an entered mark you stand outside shelters nothing. null when nothing counts, so the Mists read as ever.
+ *  The office passes it to mistsRoad, and openYourEyes to fieldOfView. */
+export function shelterOf(world, entered, standpoint = null) {
+  const ids = new Set((entered ?? []).filter(Boolean));
+  if (!ids.size) return null;
+  const marks = (world?.marks ?? []).filter((m) => ids.has(m.id) && m.at && (!standpoint || pointWithinMark(standpoint, m)));
+  if (!marks.length) return null;
+  return (p) => marks.some((m) => pointWithinMark(p, m));
+}
+
+/** THE FRAME OF SIGHT (WLD-5, RULED by Darko 2026-10-16 19:52–19:53): "when you have
+ *  entered a mark … your line of sight [is] scoped to the interior of the mark you
+ *  are within." The test of a mark the reader may see: inside the innermost mark of
+ *  the enter stack `entered`, by portals.mjs § roomHolds (wholly inside it, or anchored
+ *  in it as its container), the same test hiddenFrom asks, so a door set in the room's
+ *  wall is the room's to see and to enter (review-233). The room's own ancestors never
+ *  count. With `standpoint`, as shelter's test has it, only an
+ *  entered mark that holds it counts: the frame is the innermost entered mark the
+ *  body stands in, and a stack the body has stepped out of entirely reads as nothing
+ *  entered. Null when nothing counts: then the whole world (Let There Be Light) is the
+ *  frame, as ever. A future "see out" property on a mark is deferred, not built. */
+export function sightFrameOf(world, entered, standpoint = null) {
+  const byId = new Map((world?.marks ?? []).map((m) => [m.id, m]));
+  const held = (entered ?? []).filter(Boolean).map((id) => byId.get(id)).filter((m) => m?.at && m.extent);
+  const room = [...held].reverse().find((m) => !standpoint || pointWithinMark(standpoint, m)) ?? null;
+  if (!room) return null;
+  const marks = world?.marks ?? [];
+  return (mk) => roomHolds(room, mk, marks);
 }
 
 // ───────────────────────── open-your-eyes — the FOV telling ──────────────────
@@ -77,9 +113,10 @@ export function orient(state, world, { crossing = 0, dials = DIALS } = {}) {
 // `actor` is the handle of the resident the eyes belong to (WLD-9): their home,
 // as tools/where-is.mjs § homeOf resolves it, is carried beyond the budget when
 // it is in view. No actor, or a home that resolves to nowhere, changes nothing.
-export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null } = {}) {
+export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null, entered = null } = {}) {
   const home = actor ? homeOf(actor, world) : null;
-  const fov = fieldOfView(state, world, { crossing, budget, dials, keep: home?.placed ? home.mark_id : null });
+  const fov = fieldOfView(state, world, { crossing, budget, dials, keep: home?.placed ? home.mark_id : null,
+    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state) });
   const radial = radialSerialize(fov);
   radial.within = containmentChain(state, world.marks); // the spine: root → inward, parents first
   fov.within = radial.within;
@@ -95,7 +132,7 @@ export function containmentChain(pos, marks) {
   // Marks whose TRUE footprint contains the point. A points: ring wins over its
   // at/extent bbox; otherwise a regular mark keeps the byte-identical rect path.
   const containing = marks
-    .filter((m) => m.at && (m.kind === "sited" || m.kind === "parcel") && pointWithinMark(pos, m))
+    .filter((m) => isGround(m) && pointWithinMark(pos, m))
     .sort((a, b) => extentArea(a) - extentArea(b)); // innermost (smallest) first
   // build the ANCESTRY nest from the innermost outward: a larger mark joins only
   // if its true shape CONTAINS the current nest tip — so sibling extents that
@@ -127,8 +164,9 @@ export const pointWithinMark = pointInMark;
 // The target additionally carries `weight_parts`, which is that ✦ number's
 // receipt (marks-fold.mjs § partsOf) — because a reader shown one figure built
 // out of three sources cannot otherwise tell which of them they are looking at.
-// `occupancy` (DEMO SLICE, step 5) is OPTIONAL and defaults to empty, so every
-// existing caller gets a byte-identical answer. Passed, the manifest grows its
+// `occupancy` (the enter-exit acts' derived occupants) is OPTIONAL and defaults
+// to empty, so every existing caller gets a byte-identical answer. Passed, the
+// manifest grows its
 // entity children — who is aboard is a child of the ship, and investigate is
 // the read that opens one mark, so it is where "who's here" belongs.
 export function investigate(markId, world, { depth = 1, budget = DIALS.context_budget, occupancy = null } = {}) {
@@ -140,8 +178,11 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
   if (asTerrain && !target) {
     return { id: markId, kind: "terrain", body: asTerrain.receipt, attaches: attachedTo(markId, world, budget) };
   }
-  const predicates = world.marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === markId)
-    .slice(0, budget).map((m) => ({ id: m.id, slot: m.slot ?? (m.kind === "naming" ? "name" : null), value: m.value, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body }));
+  // a class's properties list beside a mark's predicates, as they did while the
+  // class side was filed as predicates (LOGOS v2 part 2): the name is the slot,
+  // the default the value
+  const predicates = world.marks.filter((m) => describesBy(m) && m.parent === markId)
+    .slice(0, budget).map(predicateRow);
   // NEAREST FIRST, so the budget cuts the far ones rather than whichever the fold
   // happened to list last. Under fold order a child 212 m from the threshold
   // district lost its seat to five siblings 900 m out — and an arbitrary cut does
@@ -149,12 +190,8 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
   // the FULL set is kept for the alongside exclusion below — a grandchild is not
   // this mark's child, but it is certainly not its neighbour either
   const contained = childrenByGeometry(target, world);
-  const allChildren = directChildren(contained)
-    .map((m) => ({ m, away: Math.hypot(m.at.x - target.at.x, m.at.y - target.at.y) }))
-    .sort((a, b) => a.away - b.away || String(a.m.id).localeCompare(String(b.m.id)))
-    .map((entry) => entry.m);
-  const children = allChildren.slice(0, budget)
-    .map((m) => ({ id: m.id, kind: m.kind, at: m.at, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: firstLine(m.body) }));
+  const allChildren = nearestFirst(target, directChildren(contained));
+  const children = allChildren.slice(0, budget).map(childRow);
   // the entity children — the walkers who have crossed INTO this mark. They are
   // children of it (R14: one contains taxonomy, no new edge class), so they ride
   // the manifest; every consumer that means AREA reads `children.filter(isMark)`
@@ -186,7 +223,7 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
   // the world does not hold as a mark (a terrain feature, a mark gone) is not
   // invented.
   const geometric = ancestorsByGeometry(target, world);
-  const declares = target.kind === "predicated" || target.kind === "naming";
+  const declares = isPredicate(target) || target.kind === "naming" || target.kind === "property";
   const declared = geometric.length === 0 && declares && target.parent ? byId.get(target.parent) ?? null : null;
   const ancestry = declared ? [declared] : geometric;
   const parents = ancestry.slice(0, 1)
@@ -209,6 +246,12 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
   const parentIds = new Set(ancestry.map((m) => m.id));
   const alongside = householdNear(target, world).filter((m) => !childIds.has(m.id) && !parentIds.has(m.id)).slice(0, budget)
     .map((m) => ({ id: m.id, kind: m.kind, at: m.at, weight: m.weight ?? 0, stamps: m.stamps ?? 0, signal: !!m.signal, body: firstLine(m.body) }));
+  // THE DESCENT (WLD-83 P10, Darko 2026-10-19 19:42): `depth` past 1 reads on
+  // below what the look already shows, one cap on the bodies it adds, and names
+  // where to call again. `predicates` and `children` stay one step down (the
+  // 2026-08-04 ruling below `childrenByGeometry`); the levels under them ride in
+  // `beneath`. Depth 1 adds nothing, so its answer is the one it always was.
+  const descent = depth > 1 ? markDescent([...predicates, ...children].map((r) => r.id), world, byId, { depth, budget }) : null;
   return {
     id: target.id, kind: target.kind, household: target.household, at: target.at, extent: target.extent,
     sovereign: !!target.sovereign,
@@ -226,23 +269,93 @@ export function investigate(markId, world, { depth = 1, budget = DIALS.context_b
     children: entities.length ? [...entities, ...children] : children,
     ...(occupants.length ? { occupants } : {}),
     alongside,
-    more: { predicates: countPredicates(markId, world) - predicates.length, children: allChildren.length - children.length },
+    more: { predicates: countPredicates(markId, world) - predicates.length, children: allChildren.length - children.length,
+      ...(descent ? { beneath: descent.cut } : {}) },
     reinvoke: depth > 1 ? [...children, ...alongside].map((c) => c.id) : [],
+    ...(descent ? { beneath: descent.rows, descend: descent.descend } : {}),
   };
 }
 
+// ───────────────────────── descend — the progressive descent ─────────────────
+// A close look reads a tree to a depth under ONE cap on the bodies it adds, then
+// the reader calls again on the branches and leaves it wants (Darko, WLD-83 P10,
+// 2026-10-19 19:42: "Investigate should never show everything in one read just
+// because a tree exists"). Every tree a look opens descends through this one
+// function: a mark's predicates and the marks inside it (`investigate`), and an
+// entity's appearance tree (the office's entity-predicates fold), so the two
+// cannot read a tree two ways.
+//
+// Breadth-first, so the near levels fill before the far ones, and each node's
+// children in the order `childrenOf` gives them. `fromIds` are the nodes the look
+// already shows (level 1); the rows returned are levels 2..depth, each naming the
+// node it hangs `under` and its `depth`. `cut` counts the rows the cap left out,
+// and `descend` names every node whose children were cut or not reached: the ids
+// to call again. The cap is the telling's own dial, `context_budget`, not a new
+// number.
+export function descend(fromIds, childrenOf, { depth = 1, budget = DIALS.context_budget } = {}) {
+  const rows = [];
+  const again = new Set();
+  let cut = 0;
+  let level = [...fromIds];
+  for (let d = 2; d <= depth && level.length; d++) {
+    const next = [];
+    for (const id of level) {
+      for (const kid of childrenOf(id)) {
+        if (rows.length >= budget) { cut += 1; again.add(id); continue; }
+        rows.push({ ...kid, under: id, depth: d });
+        next.push(kid.id);
+      }
+    }
+    level = next;
+    if (rows.length >= budget) break;
+  }
+  // the edge of the read: a node shown last whose own children were not reached
+  for (const id of level) if (childrenOf(id).length) again.add(id);
+  return { rows, cut, descend: [...again] };
+}
+
+// A mark tree's children, for the descent: its predicates (the claims on it, as
+// `predicates` lists them), then the marks directly inside it, nearest first (as
+// `children` lists them). A predicate has no footprint, so it has no marks inside.
+function markDescent(fromIds, world, byId, opts) {
+  const claimsOn = new Map();
+  for (const m of world.marks) {
+    if (!describesBy(m) || m.parent == null) continue;
+    if (!claimsOn.has(m.parent)) claimsOn.set(m.parent, []);
+    claimsOn.get(m.parent).push(m);
+  }
+  const memo = new Map();
+  const childrenOf = (id) => {
+    if (memo.has(id)) return memo.get(id);
+    const node = byId.get(id);
+    const inside = node?.at && node?.extent ? nearestFirst(node, directChildren(childrenByGeometry(node, world))) : [];
+    const kids = [...(claimsOn.get(id) ?? []).map(predicateRow), ...inside.map(childRow)];
+    memo.set(id, kids);
+    return kids;
+  };
+  return descend(fromIds, childrenOf, opts);
+}
+
 // ───────────────────────── walk — the walk dial + anonymous wear ─────────────
-// Move `distM` metres in a compass `dir`. `walkSpeed` here is the skeleton's 60 km
-// per crossing (decision 008) — the LEGACY engine dial; the live resident stride is
-// 60 km per crossing (008b, 2026-08-16), read off `the-town/resident` by the office.
-// A walk here spends `distM / walkSpeed` crossings. The path lands
-// in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
+// Move `distM` metres in a compass `dir`. `walkSpeed` is read from the
+// skeleton's walk_speed_m_per_crossing, 60 km per crossing since e505ca95
+// (POS-223): the same number as the live resident stride (008b, 2026-08-16),
+// which the office reads off `the-town/resident`. Decision 008's original 15 km
+// survives only as the fossil fallback in this function (tools/walk.mjs keeps
+// 15 on purpose, for unstamped legs). A walk here spends `distM / walkSpeed`
+// crossings. The path lands in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
 // you wander is more intimate than who you wrote (epic § Paths are wear).
 export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } = {}) {
-  // the stride is the mover's: the resident class's dial (the node the founder
-  // moved it to, 2026-08-22) is the first word; terrain may override; 15000 is
-  // the pre-dial fossil, kept only for worlds folded before dials rode the store.
-  const residentPaceKm = Number((world.marks ?? []).find((m) => m.id === "the-town/resident")?.dials?.pace_km_per_crossing);
+  // the stride is the mover's: it lives on the resident class's dial (the node
+  // the founder moved it to, 2026-08-22), but the terrain's own
+  // walk_speed_m_per_crossing, when the world carries one, is read first (see
+  // the header); 15000 is the pre-dial fossil, kept only for worlds folded
+  // before dials rode the store.
+  // The dial is a property of resident now (LOGOS v2 part 2). A store folded
+  // before that change still carries it as the class row's dial, so a world
+  // read from the last crossing's store answers either way, the property first.
+  const residentPaceKm = Number(propertyOf(world.marks ?? [], "resident", "pace_km_per_crossing")?.value
+    ?? (world.marks ?? []).find((m) => m.id === "the-town/resident")?.dials?.pace_km_per_crossing);
   const walkSpeed = world.terrain?.elevation?.walk_speed_m_per_crossing
     ?? (Number.isFinite(residentPaceKm) && residentPaceKm > 0 ? residentPaceKm * 1000 : 15000);
   const unit = DIR_UNIT[dir?.toUpperCase?.()] ?? unitFromDeg(Number(dir));
@@ -272,7 +385,7 @@ export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } 
 
 // ───────────────────────── enter / exit(mark) — the crossings ───────────────
 //
-// DEMO SLICE (step 5). Walk and entry are fully decoupled axes (R15): the walk
+// Walk and entry are fully decoupled axes (R15): the walk
 // above moves you to coordinates and never puts you INSIDE anything —
 // geometrically-inside-legally-outside is a real state, and it is the visitor
 // standing on the deck who never stepped aboard. Entry is the other axis, and
@@ -326,7 +439,7 @@ export function enterExitPlan(state, targetId, world, { occupancy = new Map(), h
  *  a resident should not be asked to affirm a hallway).
  */
 export function enter(state, targetId, world, {
-  occupancy = new Map(), handle = null, at = 0, iso = null, accepted = false, into = null,
+  occupancy = new Map(), handle = null, at = 0, iso = null, accepted = false, into = null, lockedOut = null, holdings = null,
 } = {}) {
   // ── WLD-5: what a dungeon hides, a portal, and the dungeon's one way in ──
   const marks = world.marks ?? [];
@@ -335,9 +448,14 @@ export function enter(state, targetId, world, {
   // A mark a dungeon hides from you is no mark at all to you: the same answer
   // as an id that does not exist, so naming one from outside learns nothing.
   if (named && hiddenFrom(marks, held).has(targetId)) return { error: `no mark '${targetId}' to enter` };
-  if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into });
-  // Inside a dungeon, or into one, the only enter is through a portal: the cure
-  // for the Swiss-cheese exit must not leak on the way in.
+  // ENTERING A MARK ENTERS ITS `into` (WLD-5's ruling, restored by WLD-63): any
+  // mark carrying one is passed through it, the dungeon itself included. The
+  // Starforge Spire carries `into` its vestibule, so entering it from anywhere
+  // in its outline sets you down inside the Gilded Doors; a list asks which.
+  if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into, lockedOut, holdings });
+  // Inside a dungeon the only enter is through a portal (G3: the cure for the
+  // Swiss-cheese exit must not leak on the way in), and a dungeon that names no
+  // `into` of its own is entered by the portals that lead into it.
   if (named && dungeonIndex(marks).dungeons.length) {
     const inside = heldDungeon(held, marks);
     const governs = dungeonsOf(named, marks);
@@ -347,7 +465,7 @@ export function enter(state, targetId, world, {
       return {
         error: inside
           ? `you are inside ${d}, a dungeon — inside one, the only way to enter anything is a portal. The portals where you stand: ${ways.map((p) => p.id).join(", ") || "(none)"}`
-          : `${d} is a dungeon — it is entered through its portals, never directly. Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
+          : `${d} is a dungeon that names no way in of its own (no \`into\`), so it is entered through the portals that lead into it. Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
         refused: "dungeon", dungeon: d, portals: ways,
       };
     }
@@ -413,13 +531,30 @@ export function enter(state, targetId, world, {
  *     alone, as the Post Office's stops always did. Every row carries the
  *     portal's word; nothing above a dungeon is written.
  *
- *  `landing` is where he now stands (portals.mjs § landingOf, clamped into
- *  `into`); the office's pen writes it as the walk ledger's zero-length stop,
- *  the same write the Post Office's deposit makes. `portals` are the portals of
- *  the room he lands in: the next step is his to pick. */
-function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick }) {
+ *  `landing` is where he now stands (portals.mjs § landingOf: inside the room
+ *  entered, a step in from the door); the office's land pen writes it as a
+ *  landing (the-town/land), the same write the Post Office's deposit makes. `portals` are the portals of
+ *  the room he lands in: the next step is his to pick.
+ *
+ *  0. FIRST, THE EXIT LOCK (WLD-5, Darko 2026-10-18 20:27): a passage into a
+ *     dungeon this walker left by `exit` before the settlement now in force
+ *     (`lockedOut`, the office's record) is refused before any word, pick or
+ *     terms, and nothing is written. Every way into a dungeon passes here: its
+ *     portals, and the dungeon itself, which carries `into`.
+ *  0b. THEN WHAT THE DOOR ASKS FOR (WLD-5 B): a portal whose entry carries
+ *     `requires` passes no one until its holder holds every mark it names
+ *     (`holdings`, the office's record; or, for a door that writes `at:
+ *     "settlement"`, the world as the last settlement printed it), and then
+ *     everyone. Nothing is written. */
+function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick, lockedOut = null, holdings = null }) {
   const marks = world.marks ?? [];
   const byId = new Map(marks.map((m) => [m.id, m]));
+  const lock = lockedPassage(portal, { pick: pick == null ? null : String(pick), marks, held, lockedOut, determined: world.determined ?? {} });
+  if (lock) return { error: lock.words, refused: "dungeon-locked", dungeon: lock.dungeon, locked_until: lock.until, left_at: lock.left_at ?? null };
+  // A DOOR THAT ASKS (WLD-5 B): shut until its holder holds all it asks for, then
+  // open for everyone. Asked before any word, pick or terms, and nothing is written.
+  const unmet = unmetRequires(portal, { holdings, marks, determined: world.determined ?? {} });
+  if (unmet) return { error: unmet.words, refused: "requires", requires: unmet.requires };
   const law = entryLawOf(portal);
   const said = accepted === true ? null : new Set(Array.isArray(accepted) ? accepted : accepted ? [accepted] : []);
   const standing = portal.at ? pointWithinMark(state, portal) : false;
@@ -454,12 +589,13 @@ function enterThroughPortal(state, portal, world, { held, handle, at, iso, accep
   const intoMark = byId.get(chosen);
   if (!intoMark) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names no mark, so this portal leads nowhere`);
   if (!intoMark.at) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names a mark with no place in the world`);
-  const landing = landingOf(law, intoMark, byId);
+  // where it sets you down is measured in the room it enters (row 68 (a))
+  const target = passageTargetOf(portal, intoMark, marks);
+  const landing = landingOf(law, intoMark, byId, { room: target ?? intoMark, portal });
   if (!landing.ok) return broken(landing.field, landing.value, landing.because);
 
   if (verdict.effect === "terms") return { ...base, crossings: [verdict], stranded: portal.id, awaiting: verdict };
 
-  const target = enterTargetOf(intoMark, marks);
   const chain = target
     ? [...ancestorsByGeometry(target, world, { kinds: THRESHOLD_KINDS }).slice().reverse().map((m) => m.id), target.id]
     : [];
@@ -499,9 +635,15 @@ function enterThroughPortal(state, portal, world, { held, handle, at, iso, accep
  *  truncates everything inside), and you are set down outside, at the portal
  *  you entered by (`enteredVia`, the enter row's `via`, read by the office;
  *  portals.mjs § dungeonLanding). The Post Office's deposit rule, restated.
- *  `state` is only the fallback's: with no `via` on record, the nearest way in. */
+ *  `state` is only the fallback's: with no `via` on record, the nearest way in.
+ *
+ *  AND IT COSTS THE DUNGEON UNTIL THE NEXT SETTLEMENT (WLD-5, Darko 2026-10-18
+ *  20:27; words 2026-10-19 09:21). `locksUntil` is that settlement, read by the
+ *  office at this exit's own instant; the accept step says it in Darko's words
+ *  (`because`, which the World page prints), and the instruction to confirm is
+ *  its own field (`how`), for callers that are agents. */
 export function exit(targetId, world, {
-  occupancy = new Map(), handle = null, at = 0, iso = null, confirm = false, enteredVia = null, state = null,
+  occupancy = new Map(), handle = null, at = 0, iso = null, confirm = false, enteredVia = null, state = null, locksUntil = null,
 } = {}) {
   const held = occupancy.get(handle) ?? [];
   const i = held.indexOf(targetId);
@@ -513,17 +655,22 @@ export function exit(targetId, world, {
     const first = held.findIndex((id) => id === inside || dungeonsOf(marks.find((m) => m.id === id) ?? { id }, marks).includes(inside));
     const cut = first >= 0 ? Math.min(i, first) : i;
     const landing = dungeonLanding(inside, marks, { enteredVia, state });
-    const base = { target: held[cut], dungeon: inside, left: held.slice(cut), landing };
+    const determined = world.determined ?? {};
+    const lock = { dungeon: inside, until: locksUntil };
+    const base = { target: held[cut], dungeon: inside, left: held.slice(cut), landing, lock };
     if (confirm !== true)
       return {
         ...base, rows: [], within: [...held],
         awaiting: {
           effect: "confirm",
-          because: `exiting ${targetId} leaves the whole of ${inside}, a dungeon${landing ? `, and sets you down outside, at ${landing.via} (${landing.x}, ${landing.y})` : ""}. Call again with confirm: true to go; nothing was recorded.`,
+          because: exitLockWords({ dungeon: inside, until: locksUntil, setDownAt: landing?.via ?? null, determined }),
+          how: `exiting ${targetId} leaves the whole of ${inside}. Call again with confirm: true to go; nothing was recorded.`,
         },
       };
     return {
       ...base,
+      // the lock the office writes on this exit, and the time said again (Wright, W2)
+      lock: { ...lock, left_at: iso, ...(locksUntil ? { note: lockStandsWords({ dungeon: inside, until: locksUntil, determined }) } : {}) },
       rows: [formatEnterExit({ handle, act: "exits", mark: held[cut], at, iso })],
       within: held.slice(0, cut),
       into: cut > 0 ? held[cut - 1] : null,
@@ -666,19 +813,36 @@ export { withinOf };
 // The spine is CONTAINMENT, parents-first (Keemin, 2026-07-23): the root's body
 // opens as the establishing line; then you home inward through the marks you are
 // WITHIN (region → any containing mark); THEN the radial FOV listing.
+//
+// THE TELLING IS THE TOWN'S OWN VOICE (POS-393; Darko 2026-10-13 21:11 EDT,
+// ruling B, inside WLD-29's pointer model). A resident's mark is NAMED here, by
+// its author and its id, and never quoted: its body is read by focus
+// (investigate, or the apex's `mark:`), where it arrives in its own field,
+// beside its author — the reading law's named fields. The town's own marks (by
+// `the-town`) are the narration, and stay told. These are all five places a
+// body enters the telling: the establishing line, the "You are within" clause,
+// the band lines, the horizon lines and the lost-horizon lines (a far mark the
+// Mists' wall took, told where it stood).
+export const TELLING_TOWN = "the-town";
+const authorOf = (m) => String(m?.by ?? String(m?.id ?? "").split("/")[0] ?? "");
+const townsOwn = (m) => authorOf(m) === TELLING_TOWN;
+/** How the telling names a resident's mark: its author, and its id where the line carries none. */
+export function residentMarkNamed(m, { withId = true } = {}) {
+  return `a mark by ${authorOf(m) || "someone"}${withId ? ` [${m?.id}]` : ""}`;
+}
 function renderTelling(state, radial, fov) {
   const o = radial.observer;
   const within = radial.within ?? [];
   const L = [];
   // 1. the establishing line — the root's body (the frame; never a card)
   const root = within[0];
-  if (root?.body) { L.push(root.body); L.push(""); }
+  if (root?.body) { L.push(townsOwn(root) ? root.body : residentMarkNamed(root)); L.push(""); }
   const who = o.name ?? "You";
   const stands = who === "You" ? "stand" : "stands"; // verb agreement: "You stand" vs "an agent stands"
   L.push(`— ${who} ${stands} at (${o.at?.x ?? state.x}, ${o.at?.y ?? state.y}), ${o.groundElevM} m above the sea.`);
   // 2. the containment spine — home inward through what contains you (skip the root frame)
   const spine = within.slice(1).filter((m) => m.body);
-  if (spine.length) L.push(`You are within ${spine.map((m) => firstLine(m.body).replace(/[.·\s]+$/, "")).join(" · ")}.`);
+  if (spine.length) L.push(`You are within ${spine.map((m) => (townsOwn(m) ? firstLine(m.body).replace(/[.·\s]+$/, "") : residentMarkNamed(m))).join(" · ")}.`);
   const anySignalCarries = fov.carried.some((m) => m.signal); // don't promise lights that aren't there
   // in a season the fog keeps the crossing's own hour; before one, "tonight", as it always said
   const fogWhen = radial.mists ? `this ${hourOf(radial.crossing)}` : "tonight";
@@ -718,12 +882,14 @@ function renderTelling(state, radial, fov) {
       if (m.lost) { parts.push(`  · ${lostHorizonPhrase(m)}`); continue; }
       // the band heads the section, so a horizon line no longer restates it
       if (m.far) { parts.push(`  · ${horizonPhrase(m)}`); continue; }
+      // a resident's mark is named, never quoted (POS-393): the line's own tag carries its id
+      const told = townsOwn(m) ? (firstLine(m.body) || m.id) : residentMarkNamed(m, { withId: false });
       // under a veil a light still carries, but it gutters
       const lit = m.signal ? (radial.mists?.veil > 0 ? " (its light carries, guttering)" : " (its light carries)") : "";
       const occ = m.occluded && m.signal ? " — its footing is hidden, only the light shows" : "";
       const dim = m.dim < 0.5 ? " — dim, at the dark edge" : "";
       const more = m.clusteredCount ? ` (+${m.clusteredCount} more of ${m.household}'s — investigate)` : "";
-      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${firstLine(m.body) || m.id}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
+      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
     }
     if (parts.length) { L.push(`${bandHeading(bandName)}:`); L.push(...parts); }
   }
@@ -761,7 +927,9 @@ export function veilSentence(m) {
 function mistBase(m) { return seasonRung(m)?.mist ?? MIST_AT_THE_EDGES; }
 function mistLine(m, reach) {
   if (!m) return null;
+  if (m.in_wall && m.sheltered) return `You stand inside the mist, but within the mark you have entered it hides nothing from you.`;
   if (m.in_wall) return `You stand inside the mist. You can see about ${reach} m, and nothing past it.`;
+  if (m.thickness > 0 && m.sheltered) return `The mist's edge is ${m.wall_m} m off and its haze is on you, but within the mark you have entered it hides nothing from you.`;
   if (m.thickness > 0) return `The mist's edge is ${m.wall_m} m off and its haze is on you (thickness ${m.thickness}); it closes the view to about ${reach} m, and nothing past the mist can be seen.`;
   return null;
 }
@@ -854,7 +1022,9 @@ export function airLine(you, crossing) {
   const m = you?.mists;
   if (!m) return null;
   const when = hourOf(crossing);
-  const weather = m.in_wall ? "You stand inside the mist, and can see nothing past arm's reach."
+  const weather = m.in_wall && you.sheltered ? "You stand inside the mist, but within the mark you have entered it hides nothing from you."
+    : m.in_wall ? "You stand inside the mist, and can see nothing past arm's reach."
+    : m.thickness > 0 && you.sheltered ? `The mist's edge is ${m.wall_m} m off and its haze is on you, but within the mark you have entered it hides nothing from you.`
     : m.thickness > 0 ? `The mist's edge is ${m.wall_m} m off and its haze is on you (thickness ${m.thickness}).`
     : (you.fog?.aboveFog ? "You are above the fog."
       : you.fog?.inFog ? `Fog is in this ${when} (thickness ${you.fog.thickness}).`
@@ -905,7 +1075,25 @@ export function shortName(mark) {
       || String(mark?.id ?? "").split("/").pop().replace(/-/g, " ")
       || String(mark?.id ?? "");
 }
-function countPredicates(id, world) { return world.marks.filter((m) => (m.kind === "predicated" || m.kind === "naming") && m.parent === id).length; }
+function countPredicates(id, world) { return world.marks.filter((m) => describesBy(m) && m.parent === id).length; }
+// What `predicates` lists under a mark: its predicates and namings, and a class's
+// properties beside them (LOGOS v2 part 2). One test, so the list, its count and
+// the descent cannot disagree about what counts.
+function describesBy(m) { return isPredicate(m) || m.kind === "naming" || m.kind === "property"; }
+// a class's properties list beside a mark's predicates: the name is the slot, the default the value
+function predicateRow(m) {
+  return { id: m.id, slot: m.slot ?? m.name ?? (m.kind === "naming" ? "name" : null), value: m.value ?? m.default, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: m.body };
+}
+function childRow(m) {
+  return { id: m.id, kind: m.kind, at: m.at, weight: m.weight ?? 0, stamps: m.stamps ?? 0, body: firstLine(m.body) };
+}
+// NEAREST FIRST (see `investigate`): a budget cuts the far ones, never an arbitrary few.
+function nearestFirst(target, marks) {
+  return marks
+    .map((m) => ({ m, away: Math.hypot(m.at.x - target.at.x, m.at.y - target.at.y) }))
+    .sort((a, b) => a.away - b.away || String(a.m.id).localeCompare(String(b.m.id)))
+    .map((entry) => entry.m);
+}
 function attachedTo(id, world, budget) { return world.marks.filter((m) => m.parent === id).slice(0, budget).map((m) => ({ id: m.id, slot: m.slot, value: m.value })); }
 function householdNear(target, world, radius = DIALS.cluster_beyond_m) {
   if (!target.at || !target.household) return [];
@@ -955,7 +1143,7 @@ function admitsAsFurniture(outer, inner) {
 
 function childrenByGeometry(parent, world) {
   if (!parent.at || !parent.extent) return [];
-  return world.marks.filter((m) => m !== parent && m.at && m.extent && m.kind === "sited" && admitsAsFurniture(parent, m));
+  return world.marks.filter((m) => m !== parent && m.extent && isSited(m) && admitsAsFurniture(parent, m));
 }
 // ONE STEP DOWN ONLY (Keemin, 2026-08-04: parents and children should show their
 // direct relations, no grandchildren and no grandparents).
@@ -992,13 +1180,14 @@ function directChildren(contained) {
 // rei/the-lanternseed-gardens: a door in a field.
 //
 // THRESHOLD_KINDS answers "what must I CROSS?" and deliberately stays sited.
-// A crossing is an authored consent act that appends a row to the threshold
+// A crossing is an authored consent act that appends a row to the enter-exit
 // ledger, and a parcel is a land title, not a room — "wright enters
 // rei/the-lanternstep-house-parcel" would put a claim in the permanent record
 // that nobody made. It would also part the derivation from the record already
 // written: occupancy is derived from the ledger's own rows, and every crossing
-// in WORLD/threshold-ledger.md was recorded under the sited-only chain. That
-// this is a bound and not an oversight is pinned by its own test below.
+// in the enter-exit ledger (enter-exit.mjs § LEDGER_HEADER) was recorded under
+// the sited-only chain. That this is a bound and not an oversight is pinned by
+// tools/parcel-parents.test.mjs ("THE BOUND, PINNED").
 // Whether a title is a threshold is the founder's call, and it is one list away.
 const CONTAINER_KINDS = ["sited", "parcel"];
 const THRESHOLD_KINDS = ["sited"];
@@ -1008,7 +1197,7 @@ function ancestorsByGeometry(target, world, { kinds = CONTAINER_KINDS } = {}) {
   const tr = rect(target), ta = tr.w * tr.h;
   const containing = world.marks
     .filter((m) => {
-      if (m === target || !kinds.includes(m.kind) || !m.at || !m.extent) return false;
+      if (m === target || !kinds.includes(isSited(m) ? "sited" : m.kind) || !m.at || !m.extent) return false;
       const mr = rect(m);
       if (Math.max(mr.w, mr.h) >= DIALS.world_scale_extent_m) return false;
       return mr.w * mr.h > ta && marksContain(m, target); // strictly larger, as the fold requires of a parent
@@ -1049,12 +1238,15 @@ function regionOf(state, world) {
 function orderBands(keys) { const order = DIALS.distance_bands.map((b) => b.name); return keys.slice().sort((a, b) => order.indexOf(a) - order.indexOf(b)); }
 // band names are written as prose ("a fair way off"); a section head wants sentence case
 function bandHeading(name) { const s = String(name ?? ""); return s.charAt(0).toUpperCase() + s.slice(1); }
+// A horizon's label is the skeleton's (the town's terrain); with none, the
+// body is told only when the mark is the town's own, and a resident's far mark
+// is named by author and id (POS-393, § the telling renderer).
 function lostHorizonPhrase(m) {
-  const name = m.label || shortName(m);
+  const name = m.label || (townsOwn(m) ? shortName(m) : residentMarkNamed(m));
   return `${m.bearing}, where ${name} stood: only grey`;
 }
 function horizonPhrase(m) {
   const km = (m.distM / 1000).toFixed(0);
-  const name = m.label || ellipsize(bodyProse(m.body), 80); // a short label, not the decision-008 arithmetic
+  const name = m.label || (townsOwn(m) ? ellipsize(bodyProse(m.body), 80) : residentMarkNamed(m)); // a short label, not the decision-008 arithmetic
   return `${name} (${m.bearing}, ~${km} km, ${m.heightM} m up)`;
 }

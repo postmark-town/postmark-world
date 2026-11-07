@@ -6,7 +6,6 @@ date: 2026-08-20
 class: genesis-line
 version: 1
 extends: postmark-derived
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

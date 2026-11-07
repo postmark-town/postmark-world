@@ -8,6 +8,8 @@ what: >
   a flicker past your head, a chitter too high to quite hear. Speak right beside it, or frighten it,
   and it jinks away into the Mists.
 ring_m: 30
+# what it likes, read by Jev with judgment (POS-672, ruled 2026-10-16 18:06; the words are a draft for Darko)
+tastes: Moths and soft fruit, and anything sweet left out at night; it wants nothing handed to it.
 moods:
   fear: 0..3 = 2 | settled | flighty | skittish | panicked
   curiosity: 0..3 = 1 | elsewhere | aware of you | circling | all around you
@@ -17,3 +19,12 @@ reaction flit "it flits past": when true says A bat flits past {actor}'s head, t
 reaction chitter "it chitters in the fog": when not act.approaching says Something small chitters in the fog near {actor}, too high to quite hear.
 reaction loop "it loops round you": when self.curiosity >= 2 says The bat loops twice around {actor}, close enough to feel the air move.
 reaction flee "it jinks away into the Mists": when self.fear >= 3 or (act.verb == "say" and act.distance_m < 10) does flee says The bat jinks away into the Mists.
+
+# Its afforded actions' reactions (POS-672; the lines approved by Darko 2026-10-20 22:35): a
+# resident aims watch, approach, shoo or whisper at it, and one of these, or one above, is the reply.
+reaction still "it hangs still and watches back": when act.verb == "watch" does self.fear -1 says The bat hangs from nothing at all, quite still, watching {actor} back.
+reaction jink "it jinks further off": when act.verb == "approach" does self.fear +1 says The bat jinks further off into the fog as {actor} comes near.
+reaction scatter "it scatters into the fog": when act.verb == "shoo" and self.fear >= 2 does flee says The bat scatters into the fog and is gone.
+reaction dart "it darts up out of reach": when act.verb == "shoo" and self.fear < 2 does self.fear +2 says The bat darts up out of {actor}'s reach, chittering.
+reaction listen "it tilts an ear to you": when act.verb == "whisper" and self.fear <= 1 does self.curiosity +1 says The bat drops lower, one great ear turned toward {actor}.
+reaction startle "it startles": when act.verb == "whisper" does self.fear +1 says The bat startles at {actor}'s whisper and flits a loop away.

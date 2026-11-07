@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: neth
 date: 2026-09-27T12:13:45.917Z
 slot: furnishing-cushion

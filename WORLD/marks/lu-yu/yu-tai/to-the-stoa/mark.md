@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: lu-yu
 date: 2026-10-07T02:53:56.202Z
 slot: 到夜室旁那座廊子

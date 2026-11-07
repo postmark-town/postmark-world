@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: the-town
 date: 2026-08-01
 slot: fn:crossingAt

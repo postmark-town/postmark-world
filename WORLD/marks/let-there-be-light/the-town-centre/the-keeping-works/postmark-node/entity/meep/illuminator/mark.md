@@ -6,7 +6,6 @@ date: 2026-08-19
 class: illuminator
 version: 1
 extends: meep
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

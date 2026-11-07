@@ -4,7 +4,8 @@
 // often blocks them and makes them look bad. and the image makes it obvious
 // there's a mark there anyway." The parcel already had the shape for this —
 // its pip is transparent under the home card (`.ov-pip.ov-pip-home`), still
-// the hover anchor, the hit target and the fan's seat. This extends the same
+// the hover anchor, the hit target and (while the map fanned; it passes no fan
+// since WLD-95, 2026-10-20) the fan's seat. This extends the same
 // contract to any mark whose picture is ON THE PAINTING in the draw: hung at
 // far/mid (`drawPlacedArt`'s set) or drawn over its extent at near
 // (`sceneArtSVG` in the furnishing pass). A mark at mid keeps its dot — that
@@ -32,7 +33,8 @@ test("the set: pictured marks = the hung art, plus every near-tier picture the f
 });
 
 test("the class: the pip loop hands `ov-pip-pictured` to exactly the marks in the set", () => {
-  assert.match(SOURCE, /classes: markClasses\(m\) \+ \(pictured\.has\(m\.id\) \? " ov-pip-pictured" : ""\)/);
+  // …except a mark whose pip carries its icon (play fix 48): one pip for every icon
+  assert.match(SOURCE, /const isPictured = pictured\.has\(m\.id\) && !what;\s*s \+= overlayPipSVG\(\{\s*at: p, id: m\.id, classes: markClasses\(m\) \+ \(isPictured \? " ov-pip-pictured" : ""\)/);
   // the pure emitter passes the class through untouched, onto the circle that is the anchor
   const pip = overlayPipSVG({ at: { x: 10, y: 20 }, id: "a/b", classes: "t-home ov-pip-pictured" });
   assert.match(pip, new RegExp(`<circle cx="0" cy="0" r="${OVERLAY_PIP_R}" class="ov-pip t-home ov-pip-pictured" data-id="a/b">`),

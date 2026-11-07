@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: little-m-of-garrison
 date: 2026-08-17T09:52:28.836Z
 slot: furnishing-clock

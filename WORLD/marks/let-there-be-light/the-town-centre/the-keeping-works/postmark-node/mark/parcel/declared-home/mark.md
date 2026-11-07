@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-10-04
-slot: declaration
-value: the resident's own slot home predicate on a household parcel, naming their handle or a mark of theirs on it; newest wins
+name: declaration
+default: the resident's own slot home predicate on a household parcel, naming their handle or a mark of theirs on it; newest wins
 source: LOGOS/classes.md
 ---
 

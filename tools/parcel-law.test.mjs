@@ -28,7 +28,8 @@ const law = (id) => {
   assert.ok(m, `the law mark ${id} stands in WORLD/marks`);
   assert.equal(m.by, "the-town", `${id} is the town's`);
   assert.equal(m.tier, "constitution", `${id} is constitution tier`);
-  assert.equal(m.kind, "predicated", `${id} is a predicate`);
+  // a class's own clause is a property now (LOGOS v2 part 2): slot → name, value → default
+  assert.equal(m.kind, "property", `${id} is a property of the parcel class`);
   assert.equal(m.parent, "the-town/parcel", `${id} describes the parcel class`);
   return m;
 };
@@ -41,21 +42,23 @@ const P = (id, by, x, date) => ({
 
 test("the claim cap in code IS the claim-cap law mark's value", () => {
   const cap = law(CLAIM_CAP_LAW);
-  assert.equal(cap.slot, "claim-cap");
-  assert.equal(Number(cap.value), PARCEL_CLAIM_CAP,
+  assert.equal(cap.name, "claim-cap");
+  assert.equal(Number(cap.default), PARCEL_CLAIM_CAP,
     "PARCEL_CLAIM_CAP must equal the-town/claim-cap's value — change one and the other must follow");
   assert.match(String(cap.date), /^2026-10-04/, "dated the day Darko restated it");
 });
 
 test("the per-resident refusal names the one-per-resident law, and says the cap the law says", () => {
   const one = law(ONE_PER_RESIDENT_LAW);
-  assert.equal(one.slot, "holder");
-  assert.match(String(one.value), /exactly one resident; a resident holds at most one parcel/);
+  // `holder` until LOGOS v2 part 2; renamed so no property name clashes with the
+  // holder true/false (settled 2026-10-17, WLD-73 F3)
+  assert.equal(one.name, "owner");
+  assert.match(String(one.default), /exactly one resident; a resident holds at most one parcel/);
   assert.ok(ONE_PER_RESIDENT_REFUSAL.includes(ONE_PER_RESIDENT_LAW), "the sentence names the law it enforces");
   assert.ok(ONE_PER_RESIDENT_REFUSAL.startsWith(
     "this resident already holds a parcel; a household may hold up to three, one per resident"),
     "Darko's sentence, word for word");
-  const word = NUMBER_WORD[Number(law(CLAIM_CAP_LAW).value)];
+  const word = NUMBER_WORD[Number(law(CLAIM_CAP_LAW).default)];
   assert.ok(ONE_PER_RESIDENT_REFUSAL.includes(`up to ${word},`),
     "the number in the sentence is the claim-cap law's number");
 });
@@ -81,8 +84,8 @@ test("household-scope no longer says one parcel to a handle; it says three to a 
 });
 
 test("the homes law marks stand (homes per resident; the resident's own declaration)", () => {
-  assert.match(String(law("the-town/homes-per-resident").value), /per resident/);
-  assert.match(String(law("the-town/declared-home").value), /resident's own slot home predicate/);
+  assert.match(String(law("the-town/homes-per-resident").default), /per resident/);
+  assert.match(String(law("the-town/declared-home").default), /resident's own slot home predicate/);
 });
 
 test("Sol's Driftlight stands as PRIOR ESTATE, never a home, and is the only one", () => {

@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: rei
 date: 2026-08-19T23:23:25.788Z
 slot: keeping

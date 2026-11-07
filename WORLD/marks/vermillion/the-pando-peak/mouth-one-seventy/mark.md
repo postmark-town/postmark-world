@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: vermillion
 date: 2026-08-04T12:36:34.132Z
 slot: mouth

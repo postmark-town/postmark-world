@@ -3,8 +3,20 @@
 // Ruled in Sitting E (Darko, 2026-10-14 §§ 3, 6, 7; the record is Starstory
 // docs/2026-10-14/halloween/sitting-E-entities.md). A creature is a living node: its
 // spawn is a LIVE create by `the-town`, its reactions are its own live acts, and it
-// leaves by a live withdraw, reason `faded` (12 h after its spawn) or `fled` (the
-// only leaving by outcome). Each crossing's save photographs the living ones.
+// leaves by a live withdraw: `fled` (the only leaving by outcome) or `ended`, by the-town,
+// when its season ends. A creature does not fade: the twelve-hour fade was ruled out
+// (WLD-96, Darko 2026-10-21 19:39 and 19:41), and nothing here computes one. Rows written
+// before that ruling are history and fold as written: a spawn may still carry `fades_at`,
+// and a `faded` withdraw is still honoured (DESPAWN_REASONS). Each crossing's save
+// photographs the living ones.
+//
+// A NAMED CREATURE (WLD-25, Darko 2026-10-20 22:47 and 22:56; W1–W11 settled by
+// Wright). A kind class may declare named creatures (`named` on its mark): each
+// one place, spawned once ever by the-town with `stays: true`. It never flees
+// (its kind is `finishable`); residents
+// finish it (the office's `finish` rows), and the settlement after the first
+// finish ENDS it: a withdraw by the-town, reason `ended`, the one leaving a named
+// creature has. What it `carries` goes to the first finisher at that settlement.
 // Engineering settled by Wright on WLD-56 (W1–W8), from Plumb's gap read.
 //
 // Everything here is PURE: no clock, no store, no network. The office's writer tick
@@ -35,40 +47,57 @@
 //
 // THE NUMBERS ARE LAW (D1, D2; Darko 2026-10-15 12:09, as recommended): the band
 // is the 400 m fringe on the clear side of the wall, open country only; per window
-// a wolf 2, a raven 4, a bat 3, each at its own seeded minute. They live on the
-// creature class's dials and each kind's `count_per_window` (WORLD/marks/…/entity/
-// creature/), read by `creatureLaw`; nothing here hard-codes a creature's numbers.
+// a wolf 2, a raven 4, a bat 3, each at its own seeded minute. *SUPERSEDED
+// 2026-10-17 13:58 (Darko, WLD-56): one creature a window, the kinds in turn, a
+// bat first; each count_per_window is 1, under the rotation below.* The numbers
+// live on the creature class's dials and each kind's `count_per_window`
+// (WORLD/marks/…/entity/creature/), read by `creatureLaw`; nothing here
+// hard-codes a creature's numbers.
+//
+// THE KINDS IN TURN (Darko 2026-10-17 13:58, WLD-56): one creature per window, a
+// bat first, then raven, then wolf, and round again. The class's `rotation` dial
+// names the kinds in turn; window N brings only `rotation[(N - from_crossing) mod
+// length]`, at that kind's `count_per_window`. Written null, every kind comes at
+// its own count; an absent rotation mark is refused, like any missing dial.
 //
 // ── THE FOLD (W4, W5) ──────────────────────────────────────────────────────────
 // A creature is a fold of the log's rows: `spawn` (the-town, object = its id),
 // its reactions (action `react`, actor = its id; payload `moods_after` and
 // `flags_after`, a sorted array of the set flags, are its state from then on), and
-// `withdraw` (object = its id, by the-town or itself, payload.reason faded | fled;
-// any other withdraw is not the record's and is ignored).
+// `withdraw` (object = its id, by the-town or itself, payload.reason fled | ended, or `faded` on a
+// row written before WLD-96; any other withdraw is not the record's and is ignored).
 //
 // EVERY ROW CARRIES ITS WRITE TIME; THE SCHEDULE RIDES IN THE PAYLOAD. The log is
 // append-only and nobody back-dates it: a spawn written 20 s after its minute is
-// dated when it was written, with the minute in `payload.at`; a fade is dated when
-// the tick wrote it, with the span's end in `payload.fades_at`.
+// dated when it was written, with the minute in `payload.at`; a withdraw is dated when
+// the tick wrote it.
 //
-// Two readings of the same rows:
-//   - the WRITTEN fold (`creaturesWritten`): spawned and not yet withdrawn. The
-//     crossing save photographs this, so a fade the tick has not yet written is
-//     still in the photograph and still due afterwards (`dueFades`).
-//   - the LIVING read (`creaturesAt`): the written fold with the span cut. Past
-//     `fades_at` a creature is gone whether or not its withdraw is written yet.
-// Both fold a crossing's snapshot plus the rows written since it, never the whole
-// history (snapshot per settlement, delta only). The creature's short memory is
-// NOT here and is never saved: "for its own span only" (§ 7).
+// ONE READING, the WRITTEN fold (`creaturesWritten`): spawned and not yet withdrawn. The
+// crossing save photographs it and the replay check folds it again. Nothing in it expires a
+// creature by the clock: only a lawful withdraw ends one. A spawn row written before WLD-96
+// carries `fades_at`, and that value is passed through untouched, so a past season replays
+// to the bytes it was saved with; it is a recorded fact, never a deadline. (The fold used to
+// have a second reading, `creaturesAt`, that cut a creature at `fades_at`, and `dueFades`
+// told the tick which fades to write; the office has not written one since WLD-96 and
+// no code called either, so both are gone.) It folds a crossing's snapshot plus the rows
+// written since, never the whole history (snapshot per settlement, delta only). A
+// creature's short memory is NOT here and is never saved.
 
 import { createHash, createHmac } from "node:crypto";
 import { mistsAt, mistsHere } from "./world-engine.mjs";
 import { mistsKeepRects, keptByTheTown } from "./mists-keep.mjs";
 import { CROSSING_EPOCH_UTC, CROSSING_MS } from "./walk.mjs";
 import { pointInPolygon, polygonOf } from "./geometry.mjs";
+import { classIndex, propertyOf } from "./class-properties.mjs";
+import { AFFORDED_VERBS } from "./creature-kind.mjs";
+import { entryLawOf, REQUIRES_AT_SETTLEMENT } from "./enter-exit.mjs";
+import { unmetRequires } from "./portals.mjs";
 
 export const TOWN = "the-town";
-export const DESPAWN_REASONS = Object.freeze(["faded", "fled"]);
+// `faded` stays for the rows written before WLD-96, which the fold must still honour; no live writer writes one.
+export const DESPAWN_REASONS = Object.freeze(["faded", "fled", "ended"]);
+/** The one withdraw only the-town writes: a named creature's ending at its settlement (WLD-25). */
+export const ENDED = "ended";
 export const ID_PREFIX = "creature:";
 /** A creature's own act: its reaction, as the office writes it (POS-637 W4). */
 export const REACT_ACTION = "react";
@@ -78,38 +107,201 @@ export const REACT_ACTION = "react";
  *  directory never moves (the frozen filing), so this is a durable address. */
 export const CREATURE_LAW_DIR = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works/postmark-node/entity/creature";
 
-/** The dials the schedule reads, each from the creature class (or a kind's mark). */
-export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "keep_m", "apart_m", "span_h"]);
+/** The dials the schedule reads, each from the creature class (or a kind's mark). There is no span: a creature does not fade (WLD-96, WLD-131). */
+export const CREATURE_DIAL_NAMES = Object.freeze(["band_from_m", "band_to_m", "keep_m", "apart_m"]);
 
 /**
  * The creature law as the class marks write it: { fromCrossing, dials, kinds }.
  *   fromCrossing  the class's launch dial (null is off, W6)
- *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m, span_h }
+ *   dials         { counts: { <kind>: count_per_window }, band_from_m, band_to_m, keep_m, apart_m }
  *   kinds         [{ kind, kind_file }], by name
+ *   afforded      { <kind>: [{ action, who, from, effect, residue, from_class }] }: the
+ *                 afforded actions a resident may aim at a creature of that kind
+ *                 (POS-672), the creature class's first, then the kind's own
  * `marks` are parsed mark records (`loadMarks`, or `parseRecord` on each file read
- * at a ref). Only the-town's classes count. Null when there is no creature class:
- * no class, no creatures. A class missing a dial, or a kind with no whole count or
- * no kind file, throws: the law is read whole or not at all.
+ * at a ref). Only the-town's classes count. Each dial is a property of its class
+ * (LOGOS v2 part 2: "every dial is a property, and a locked value is its
+ * default"), read up `extends` by tools/class-properties.mjs. Records read file by
+ * file carry no id or parent, so those are taken from the path each was read at
+ * (`nestedByPath`). Null when there is no creature class: no class, no creatures.
+ * A class missing a dial, or a kind with no whole count or no kind file, throws:
+ * the law is read whole or not at all.
  */
-export function creatureLaw(marks) {
-  const classes = (marks ?? []).filter((m) => m?.kind === "class" && m.by === TOWN);
+export function creatureLaw(records) {
+  const marks = nestedByPath(records ?? []);
+  const classes = marks.filter((m) => m?.kind === "class" && m.by === TOWN);
   const c = classes.find((m) => String(m.class) === "creature");
   if (!c) return null;
+  const idx = classIndex(marks);
+  const dial = (name, k) => propertyOf(idx, name, k)?.value;
   const dials = { counts: {} };
   for (const k of CREATURE_DIAL_NAMES) {
-    const v = c.dials?.[k];
+    const v = dial("creature", k);
     if (typeof v !== "number" || !Number.isFinite(v) || v < 0) throw new Error(`creatureLaw: the creature class's ${k} dial is ${JSON.stringify(v)}, not a number ≥ 0`);
     dials[k] = v;
   }
   const kinds = [];
   for (const m of classes.filter((x) => x.extends === "creature").sort((a, b) => (String(a.class) < String(b.class) ? -1 : 1))) {
-    const kind = String(m.class), n = m.dials?.count_per_window;
+    const kind = String(m.class), n = dial(kind, "count_per_window");
     if (!Number.isInteger(n) || n < 0) throw new Error(`creatureLaw: ${kind}'s count_per_window is ${JSON.stringify(n)}, not a whole number`);
     if (typeof m.kind_file !== "string" || !m.kind_file) throw new Error(`creatureLaw: ${kind} names no kind_file`);
     dials.counts[kind] = n;
     kinds.push({ kind, kind_file: m.kind_file });
   }
-  return { fromCrossing: c.dials?.from_crossing ?? null, dials, kinds };
+  // Read whole like every other dial (review-239 N1): an absent rotation mark is
+  // refused, never read as "every kind at its count". Only a written null is none.
+  const rot = propertyOf(idx, "creature", "rotation");
+  if (!rot) throw new Error("creatureLaw: the creature class has no rotation dial (write it null for no rotation)");
+  const rotation = rotationOf(rot.value, dials.counts);
+  if (rotation) dials.rotation = rotation;
+  const shared = affordedOf(c);
+  const afforded = {};
+  for (const { kind } of kinds) {
+    const own = affordedOf(classes.find((m) => String(m.class) === kind));
+    for (const a of own) if (shared.some((x) => x.action === a.action))
+      throw new Error(`creatureLaw: ${kind} declares ${a.action}, which every creature already has`);
+    afforded[kind] = [...shared, ...own];
+  }
+  // the named creatures (WLD-25): each kind class's own `named`, read whole; one id, one creature
+  const named = [];
+  for (const { kind } of kinds)
+    for (const d of namedOf(classes.find((m) => String(m.class) === kind), kind)) {
+      if (named.some((x) => x.id === d.id)) throw new Error(`creatureLaw: the named creature ${d.id} is declared twice`);
+      named.push(d);
+    }
+  return { fromCrossing: dial("creature", "from_crossing") ?? null, dials, kinds, afforded, named };
+}
+
+/**
+ * A kind class's named creatures (WLD-25), its mark's `named`: a list of
+ * { slug, at: { x, y }, carries?, from_crossing?, after?, after_door?, return_until? }, read whole like `actions`.
+ * `return_until` (WLD-124, 2026-10-27): an ISO instant in UTC. A creature that carries it COMES BACK after
+ * it ends, as a new generation of the same declaration, at each settlement strictly before that instant
+ * (read by the office's creature-tick namedSpawns). The declaration is written once.
+ * `after` (a creature that tempts, its fight's opening): the ids of named
+ * creatures (creature:<kind>-<slug>) that must all have ended before it comes out.
+ * `after_door` (2026-10-22, WLD-25/k): a door's mark id. The creature comes out
+ * at the first settlement whose world shows that door open: its `requires` met
+ * as the settlement printed it (portals.mjs § unmetRequires), so the door must
+ * count `at: "settlement"` (mark-lint holds it to that) and the two open together.
+ * Each is one creature, `creature:<kind>-<slug>`, standing at `at` from its
+ * crossing on (the class's launch dial when it names none), and carrying the
+ * standing thing `carries` names, which goes to its first finisher. A bad slug,
+ * no place, a carries that is not a mark's id, or a crossing that is not a whole
+ * number throws. An absent or empty `named` is none.
+ */
+function namedOf(mark, kind) {
+  const raw = mark?.named ?? [];
+  const list = typeof raw === "string" ? JSON.parse(raw) : raw;
+  if (!Array.isArray(list)) throw new Error(`creatureLaw: ${kind}'s named creatures are not a list`);
+  return list.map((d) => {
+    const where = `creatureLaw: ${kind}'s named creature ${JSON.stringify(d?.slug)}`;
+    if (typeof d?.slug !== "string" || !/^[a-z][a-z0-9-]*$/.test(d.slug)) throw new Error(`${where} needs a lowercase slug`);
+    const x = Number(d.at?.x), y = Number(d.at?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error(`${where} has no place (at: { x, y })`);
+    if (d.carries != null && (typeof d.carries !== "string" || !d.carries.includes("/"))) throw new Error(`${where} carries ${JSON.stringify(d.carries)}, not a mark's id (<by>/<slug>)`);
+    if (d.from_crossing != null && !Number.isInteger(d.from_crossing)) throw new Error(`${where}'s from_crossing is ${JSON.stringify(d.from_crossing)}, not a whole crossing`);
+    if (d.after != null && (!Array.isArray(d.after) || !d.after.length || d.after.some((a) => !isCreatureId(a))))
+      throw new Error(`${where}'s after is ${JSON.stringify(d.after)}, not a list of named creatures' ids`);
+    if (d.after_door != null && (typeof d.after_door !== "string" || !d.after_door.includes("/")))
+      throw new Error(`${where}'s after_door is ${JSON.stringify(d.after_door)}, not a door's mark id (<by>/<slug>)`);
+    if (d.return_until != null && (typeof d.return_until !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$/.test(d.return_until) || !Number.isFinite(Date.parse(d.return_until))))
+      throw new Error(`${where}'s return_until is ${JSON.stringify(d.return_until)}, not an ISO instant in UTC (YYYY-MM-DDTHH:MM:SSZ)`);
+    return { id: `${ID_PREFIX}${kind}-${d.slug}`, kind, x, y, ...(d.carries != null ? { carries: d.carries } : {}),
+      ...(d.from_crossing != null ? { from_crossing: d.from_crossing } : {}), ...(d.after != null ? { after: [...d.after] } : {}),
+      ...(d.after_door != null ? { after_door: d.after_door } : {}),
+      ...(d.return_until != null ? { return_until: d.return_until } : {}),
+      declared: `${TOWN}/${kind}#${d.slug}` };
+  });
+}
+
+/** Why a named declaration's `after_door` can never open it, or null: the door is a mark
+ *  whose entry `requires` counts `at: "settlement"`. A door that reads the live record,
+ *  asks nothing, or is not there would keep the creature in for good. */
+export function afterDoorRefusal(decl, marks = []) {
+  if (decl?.after_door == null) return null;
+  const door = (marks ?? []).find((m) => m?.id === decl.after_door);
+  if (!door) return `its after_door ${JSON.stringify(decl.after_door)} names no mark`;
+  const req = entryLawOf(door)?.requires;
+  if (!req) return `its after_door ${decl.after_door} asks for nothing (no entry.requires), so it is no lock to wait on`;
+  if (req.malformed) return `its after_door ${decl.after_door} asks for something it does not say plainly (${req.malformed})`;
+  if (req.at !== REQUIRES_AT_SETTLEMENT) return `its after_door ${decl.after_door} reads the live record; a creature waits on a door that counts at: "settlement", so the two open at the same settlement`;
+  return null;
+}
+
+/** Has a named declaration's door opened in this world (the world as a settlement printed
+ *  it)? `{ open: true }`, or `{ open: false, why }`; a declaration with no `after_door` is
+ *  open; a door that is only shut says `shut: true` (a wait, not a fault). The tick asks it of
+ *  the blessed world, so the creature comes out at the first
+ *  settlement whose world shows the door open, the same reading the door's passage makes. */
+export function afterDoorOpen(decl, marks = []) {
+  if (decl?.after_door == null) return { open: true };
+  const bad = afterDoorRefusal(decl, marks);
+  if (bad) return { open: false, why: bad };
+  const unmet = unmetRequires((marks ?? []).find((m) => m?.id === decl.after_door), { marks });
+  const n = (v) => (Array.isArray(v) ? v.length : Number(v));   // a door that is not shown says only its counts
+  return unmet ? { open: false, shut: true, why: `its door ${decl.after_door} is shut: ${n(unmet.requires.held)} of ${unmet.requires.asks ?? n(unmet.requires.holds)} in place at this settlement` } : { open: true };
+}
+
+/** WHERE AN AFFORDED ACTION MAY BE TAKEN FROM: in sight of the creature, or inside its ring. */
+export const AFFORDED_FROM = Object.freeze(["sight", "ring"]);
+
+/**
+ * A creature class's own afforded actions, its mark's `actions` (the Candy Bowl's
+ * shape: { action, who, from, effect, residue }), read whole: an action outside
+ * AFFORDED_VERBS, a `from` outside AFFORDED_FROM, a missing field or a verb
+ * declared twice throws. An absent or empty `actions` is none.
+ */
+function affordedOf(mark) {
+  const raw = mark?.actions ?? [];
+  const list = typeof raw === "string" ? JSON.parse(raw) : raw;
+  if (!Array.isArray(list)) throw new Error(`creatureLaw: ${mark.class}'s actions are not a list`);
+  const seen = new Set();
+  return list.map((a) => {
+    const where = `creatureLaw: ${mark.class}'s afforded action ${JSON.stringify(a?.action)}`;
+    if (!AFFORDED_VERBS.includes(a?.action)) throw new Error(`${where} is not one of ${AFFORDED_VERBS.join(", ")}`);
+    if (seen.has(a.action)) throw new Error(`${where} is declared twice`);
+    seen.add(a.action);
+    if (!AFFORDED_FROM.includes(a.from)) throw new Error(`${where} is taken from ${JSON.stringify(a.from)}, not ${AFFORDED_FROM.join(" or ")}`);
+    for (const f of ["who", "effect", "residue"]) if (typeof a[f] !== "string" || !a[f].trim()) throw new Error(`${where} names no ${f}`);
+    return { action: a.action, who: a.who, from: a.from, effect: a.effect, residue: a.residue, from_class: `${TOWN}/${mark.class}` };
+  });
+}
+
+// A record from `parseRecord` alone has no id and no parent; the file it was read
+// from does (`_file`, unlisted), and the directory above a property's is the node
+// it stands under. Loader records already carry both and pass through unchanged.
+function nestedByPath(records) {
+  if (records.every((m) => m?.id != null)) return records;
+  const dirOf = (file) => String(file ?? "").replace(/\\/g, "/").replace(/(^|\/)mark\.md$/, "");
+  const up = (dir) => (dir.includes("/") ? dir.slice(0, dir.lastIndexOf("/")) : "");
+  return records.map((m) => {
+    if (!m || m.id != null || m._file == null) return m;
+    const dir = dirOf(m._file);
+    return { ...m, id: `path:${dir}`, parent: `path:${up(dir)}` };
+  });
+}
+
+/** The rotation dial, read whole: text naming the class's own kinds in turn
+ *  ("bat raven wolf", the one form that is also a LOGOS v2 property's free-text
+ *  value), or null for none. Anything else throws. */
+function rotationOf(v, counts) {
+  if (v === null) return null;
+  const list = typeof v === "string" ? v.trim().split(/\s+/).filter(Boolean) : null;
+  if (!list?.length || !list.every((k) => Object.hasOwn(counts, k)))
+    throw new Error(`creatureLaw: the creature class's rotation dial is ${JSON.stringify(v)}, not its kinds in turn`);
+  return list;
+}
+
+/** The kinds crossing N brings and how many of each: every kind at its count, or,
+ *  under a rotation, only the kind whose turn N is (counted from the launch dial). */
+export function countsFor(crossing, dials, fromCrossing) {
+  const counts = dials?.counts ?? {};
+  const rotation = dials?.rotation ?? null;
+  if (!rotation) return counts;
+  const from = Number(fromCrossing), len = rotation.length;
+  const kind = rotation[((((crossing | 0) - from) % len) + len) % len];
+  return { [kind]: counts[kind] ?? 0 };
 }
 
 /** A plain object: {…} or Object.create(null); never an array, a date or a boxed value. */
@@ -205,12 +397,12 @@ const TRIES = 64;
 
 /**
  * Crossing N's schedule, from its secret. Returns { crossing, spawns, unplaced }:
- * spawns are [{ id, kind, index, crossing, at_ms, at, fades_at, x, y }] in time order
+ * spawns are [{ id, kind, index, crossing, at_ms, at, x, y }] in time order
  * (ties by id), unplaced [{ id, kind, index }] the spawns no place was found for.
  *
  *   mists        the skeleton's `mists` block at the window's opening sha
  *   marks        the standing marks at that sha (the town's keep-out is read from them)
- *   dials        { counts, band_from_m, band_to_m, keep_m, apart_m, span_h }: creatureLaw's
+ *   dials        { counts, rotation?, band_from_m, band_to_m, keep_m, apart_m }: creatureLaw's
  *   fromCrossing the creature class's launch dial; null is off (W6)
  *
  * Empty when the dial is off for N or the Mists are out of season (mistsAt null).
@@ -224,17 +416,17 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
   if (!secret) throw new Error("scheduleFor: no secret for this crossing");
   if (!dials) throw new Error("scheduleFor: no dials (read them with creatureLaw)");
   const { startMs } = windowOf(N);
-  const spanMs = Number(dials.span_h) * 3600 * 1000;
   const from = Number(dials.band_from_m), to = Number(dials.band_to_m), apart = Number(dials.apart_m) || 0;
-  const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m));
+  const keep = mistsKeepRects(marks, mists?.clearings_m ?? [], Number(dials.keep_m), { m });
   const waters = townWaterRings(marks);
   const minutes = CROSSING_MS / 60000;
   // Each spawn's draws are named by its own id (its minute, then two per try), so
   // another kind's count never moves it; only "apart" couples spawns, in a fixed
   // order (kinds by name, then index).
   const placed = [];
-  for (const kind of Object.keys(dials.counts ?? {}).sort()) {
-    const n = Math.max(0, Math.floor(Number(dials.counts[kind]) || 0));
+  const counts = countsFor(N, dials, fromCrossing);
+  for (const kind of Object.keys(counts).sort()) {
+    const n = Math.max(0, Math.floor(Number(counts[kind]) || 0));
     for (let i = 1; i <= n; i += 1) {
       const id = creatureId(kind, N, i);
       const minute = Math.floor(draw(secret, `${id}|minute`) * minutes);
@@ -246,8 +438,7 @@ export function scheduleFor(crossing, secret, { mists, marks = [], dials = null,
       if (!at) { out.unplaced.push({ id, kind, index: i }); continue; }
       placed.push(at);
       const atMs = startMs + minute * 60000;
-      out.spawns.push({ id, kind, index: i, crossing: N, at_ms: atMs, at: new Date(atMs).toISOString(),
-        fades_at: new Date(atMs + spanMs).toISOString(), x: at.x, y: at.y });
+      out.spawns.push({ id, kind, index: i, crossing: N, at_ms: atMs, at: new Date(atMs).toISOString(), x: at.x, y: at.y });
     }
   }
   out.spawns.sort((a, b) => a.at_ms - b.at_ms || (a.id < b.id ? -1 : 1));
@@ -305,36 +496,20 @@ export function auditWindow(crossing, acts, inputs) {
 // ── the fold ────────────────────────────────────────────────────────────────────
 const msOf = (v) => (typeof v === "number" ? v : Date.parse(v));
 
-/**
- * The living creatures at `atMs`: the written fold with the span cut. Past
- * `fades_at` a creature has faded, written or not. Returns a Map id → { id, kind,
- * crossing, x, y, spawned_at, fades_at, moods, flags }.
+/** Is this row a withdraw the record honours? By the-town or the creature itself,
+ *  for a reason in DESPAWN_REASONS; an ending only by the-town (WLD-25). */
+const lawfulWithdraw = (a) => a.action === "withdraw" && isCreatureId(a.object)
+  && (a.actor === TOWN || (a.actor === a.object && a.payload?.reason !== ENDED)) && DESPAWN_REASONS.includes(a.payload?.reason);
+
+/** The written fold: spawned, revised by its own acts, removed only by a lawful
+ *  withdraw, over the rows written after the snapshot's instant and by `atMs`.
+ *  Returns a Map id → { id, kind, crossing, x, y, spawned_at, fades_at, moods, flags }.
  *
  *   snapshot  a crossing save's creatures.json (or null: start from nothing)
  *   acts      rows { at, actor, action, object, payload }, `at` their write time
- */
-export function creaturesAt(snapshot, acts, atMs) {
-  const living = creaturesWritten(snapshot, acts, atMs);
-  for (const [id, c] of living) if (msOf(c.fades_at) <= atMs) living.delete(id);
-  return living;
-}
-
-/** The fades due by `nowMs`: creatures past their span whose withdraw is not yet
- *  written. The tick writes each as a `withdraw` by the-town, dated now, with
- *  payload { reason: "faded", fades_at }. */
-export function dueFades(snapshot, acts, nowMs) {
-  return [...creaturesWritten(snapshot, acts, nowMs).values()]
-    .filter((c) => msOf(c.fades_at) <= nowMs)
-    .map((c) => ({ id: c.id, reason: "faded", fades_at: c.fades_at }));
-}
-
-/** Is this row a withdraw the record honours? By the-town or the creature itself,
- *  for a reason in DESPAWN_REASONS. */
-const lawfulWithdraw = (a) => a.action === "withdraw" && isCreatureId(a.object)
-  && (a.actor === TOWN || a.actor === a.object) && DESPAWN_REASONS.includes(a.payload?.reason);
-
-/** The written fold: spawned, revised by its own acts, removed only by a lawful
- *  withdraw, over the rows written after the snapshot's instant and by `atMs`. */
+ *
+ *  `fades_at` is a spawn row's own value when it has one (written before WLD-96) and passes
+ *  through as recorded; nothing here reads it as a deadline. */
 export function creaturesWritten(snapshot, acts, atMs) {
   const living = new Map();
   const fromMs = snapshot ? msOf(snapshot.evaluated_at) : -Infinity;
@@ -349,8 +524,10 @@ export function creaturesWritten(snapshot, acts, atMs) {
       const p = a.payload ?? {};
       living.set(a.object, {
         id: a.object, kind: p.kind, crossing: p.crossing, x: p.x, y: p.y,
-        spawned_at: new Date(msOf(p.at ?? a.at)).toISOString(), fades_at: p.fades_at,
+        spawned_at: new Date(msOf(p.at ?? a.at)).toISOString(), fades_at: p.stays === true ? null : p.fades_at,
         moods: isPlainObject(p.moods) ? { ...p.moods } : {}, flags: Array.isArray(p.flags) ? [...p.flags].sort() : [],
+        // a named creature (WLD-25): it stays, and names what it carries
+        ...(p.stays === true ? { stays: true, ...(typeof p.carries === "string" ? { carries: p.carries } : {}) } : {}),
       });
     } else if (lawfulWithdraw(a)) {
       living.delete(a.object);
@@ -368,18 +545,18 @@ export function creaturesWritten(snapshot, acts, atMs) {
 
 /** The crossing save's photograph, STATE/snapshot/<N>/creatures.json (W5): the
  *  WRITTEN fold at the boundary (the previous photograph plus the rows written
- *  since), by id. A creature whose fade is not yet written is still in it, so the
- *  fade is still due after the save. No memory: it lives for a creature's span only
- *  and is never saved. */
+ *  since), by id. A creature leaves it only by a lawful withdraw; a historic `fades_at`
+ *  rides through as recorded. No memory: it is never saved. */
 export function creaturesSnapshot(crossing, evaluatedAtMs, previous, acts) {
   const creatures = [...creaturesWritten(previous, acts, evaluatedAtMs).values()]
     .map((c) => ({ id: c.id, kind: c.kind, crossing: c.crossing, x: c.x, y: c.y, spawned_at: c.spawned_at, fades_at: c.fades_at,
+      ...(c.stays ? { stays: true, ...(c.carries ? { carries: c.carries } : {}) } : {}),
       moods: Object.fromEntries(Object.keys(c.moods ?? {}).sort().map((k) => [k, c.moods[k]])), flags: [...(c.flags ?? [])].sort() }))
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return {
     crossing: crossing | 0,
     evaluated_at: new Date(evaluatedAtMs).toISOString(),
-    grammar: "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+    grammar: "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); no elapsed-time fade is inferred; legacy withdraw reasons and any recorded fades_at are kept as recorded; a creature's memory is never saved",
     creature_count: creatures.length,
     creatures,
   };

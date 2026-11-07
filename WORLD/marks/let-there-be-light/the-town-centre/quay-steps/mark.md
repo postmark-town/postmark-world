@@ -1,6 +1,6 @@
 ---
 by: the-town
-kind: predicated
+kind: predicate
 date: 2026-07-23
 slot: steps
 value: wet stone

@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: liira-maeve
 date: 2026-09-01
 slot: home

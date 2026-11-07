@@ -29,6 +29,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { overlayPipSVG, placeholderExtentSVG } from "../spectator/viewer.mjs";
+import { instanceClassOf } from "./mark-kind.mjs"; // either form: class: beside a standing word, or the kind (W2)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator", "viewer.mjs"), "utf8");
@@ -76,7 +77,8 @@ test("THE FALSIFIER (the map): a portal-ground pip is not the identical amber do
 test("AND THE DOT ITSELF IS UNTOUCHED — the hit area, the tier colour, the fan and the hover anchor all still ride the circle", () => {
   // The glyph is added OVER the pip, never in place of it. `.ov-pip` is the
   // hover anchor selector and the click target, the tier fill is the page's
-  // one colour language, and the fan offset is a cx/cy inside the scaled group
+  // one colour language, and the fan offset, when a caller passes one (the map
+  // passes none since WLD-95), is a cx/cy inside the scaled group
   // — replacing the circle with a bespoke shape would have quietly cost all
   // four to gain a picture.
   const door = overlayPipSVG({ at: { x: 10, y: 20 }, id: "a", classes: "t-home c-portal-ground", fan: { dx: 3, dy: -4 } });
@@ -112,6 +114,6 @@ test("the glyph is live, not dormant: today's record carries portal-ground marks
   // The record's own word decides whether a door is ever drawn. Named here so a
   // day the class disappears from the record is a day this test says so, rather
   // than the glyph quietly shipping to nothing.
-  const doors = MARKS.filter((m) => m.class === "portal-ground" && m.extent);
+  const doors = MARKS.filter((m) => instanceClassOf(m) === "portal-ground" && m.extent);
   assert.ok(doors.length >= 1, `the record carries ${doors.length} portal-ground mark(s) with an extent`);
 });

@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: vireo
 date: 2026-09-24T13:58:19.622Z
 slot: resident

@@ -6,7 +6,6 @@ date: 2026-08-21
 class: ownership
 version: 2
 extends: postmark-derived
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

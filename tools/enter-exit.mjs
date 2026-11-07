@@ -41,7 +41,10 @@
 // entry law governs future entries only, and nobody's history rewrites.
 //
 // Pure: no fs, no geometry, no engine import. The office pen owns writing; the
-// verbs (world-verbs.mjs) own the geometry; this owns grammar and arithmetic.
+// verbs (world-verbs.mjs) own the geometry; this owns grammar and arithmetic. The
+// one import is mark-kind.mjs, pure too: what a record is, in either form.
+
+import { isSited, instanceClassOf } from "./mark-kind.mjs";
 
 // ── the three words ─────────────────────────────────────────────────────────
 export const ENTRY_WORDS = Object.freeze(["welcomed", "neutral", "opposed"]);
@@ -157,7 +160,12 @@ export const stampAt = (fc) => Math.floor(Number(fc) * 1e4) / 1e4;
 export function formatEnterExit({ handle, act, mark, at, word = null, iso = null }) {
   const stamp = iso ?? new Date().toISOString();
   const said = act === "enters" && isEntryWord(word) ? ` · word ${word}` : "";
-  return `- ${stamp} · ${handle} · ${act} ${mark} · ${FERRY_FIELD} ${stampAt(at).toFixed(4)}${said}`;
+  // `at` arrives as the record's value: every writer hands this row stampAt's
+  // floor (the office's passageInstant, src/world-crossings.mjs). It is printed,
+  // never floored again. In floats stampAt is not idempotent ((k/1e4)·1e4 can land
+  // just under k), so a second floor wrote about 9% of rows 0.0001 crossing early
+  // (POS-699, 2026-10-19).
+  return `- ${stamp} · ${handle} · ${act} ${mark} · ${FERRY_FIELD} ${Number(at).toFixed(4)}${said}`;
 }
 
 export function parseEnterExitLedger(text) {
@@ -208,8 +216,40 @@ export function parseEnterExitLedger(text) {
 // never lowercased — because a landing that names no mark is refused by
 // quoting the field, and a quote that has been tidied is not the field.
 // Present only when written, so every law without them reads as before.
+//
+// ── A DOOR THAT OPENS WHEN IT HOLDS WHAT IT ASKS FOR (WLD-5 B) ───────────────
+//
+//   requires  — { holds: [ids], in: <holder id> | [holder ids], at, says: "…" }
+//               on a portal. The passage is refused until the holder (`in`;
+//               absent, the portal itself) holds every mark `holds` names; then
+//               it passes for everyone. `in` may be a list of holders: then each
+//               mark counts when any one of them holds it (which mark goes in
+//               which holder is each holder's own law, its `accepts`). `says` is
+//               the refusal's own line, and `{held}` and `{asks}` in it read as
+//               the counts. What a holder holds is the record's, so the office
+//               hands it to the passage (`holdings`); a passage told nothing
+//               holds nothing, and the door stays shut.
+//               `at: "settlement"` (the one value) reads no live record at all:
+//               a mark counts as held when the world as the last settlement
+//               printed it says so (its `held_by`, POS-688). What is put in now
+//               opens the door at the next settlement, never before, and there
+//               is no second clock. Carried exactly as written, `at` present only
+//               when written.
+//               `shown: false` (the maker's, default true): the refusal names
+//               nothing the door asks for and nowhere it looks, only its line and
+//               the count; the condition stays readable in the door's law, for
+//               anyone who reads it there (a puzzle whose hint is elsewhere).
+//
+// ── THE STAIRS CLASS (WLD-21, ruled by Darko 2026-10-15) ─────────────────────
+//
+// A mark of class `stairs` that writes no `entry:` at all is a portal by its
+// class: it leads into itself and refuses, with the class's line as its whole
+// answer, until the floor it leads to exists. A stair that writes its own
+// `entry:` is an ordinary portal and keeps the class, so a later floor is
+// reached by writing `into`, `lands_at` and a word, and nothing of the default
+// carries over.
 export function entryLawOf(mark) {
-  const raw = mark?.entry;
+  const raw = mark?.entry ?? (isStairs(mark) ? stairsLaw(mark) : null);
   if (!raw || typeof raw !== "object") return null;
   const word = isEntryWord(raw.word) ? raw.word : DEFAULT_ENTRY_WORD;
   const edge = raw.edge ? String(raw.edge) : null;
@@ -219,8 +259,36 @@ export function entryLawOf(mark) {
     word, edge, consequence, from: mark.id ?? null,
     ...(into ? { into } : {}),
     ...(raw.lands_at !== undefined && raw.lands_at !== null ? { lands_at: raw.lands_at } : {}),
+    ...(raw.requires !== undefined && raw.requires !== null ? { requires: requiresOf(raw.requires) } : {}),
   };
 }
+
+/** The one `at` a door may write: it reads what the last settlement printed. */
+export const REQUIRES_AT_SETTLEMENT = "settlement";
+
+/** `requires` as `{ holds, in, says }` (and `at`, when written), or `{ malformed:
+ *  <why> }` when it is not that shape (the lint names it, and the passage
+ *  refuses: a door whose condition cannot be read stays shut, never open). */
+export function requiresOf(v) {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return { malformed: "requires is { holds: [ids], in, says }" };
+  const holds = Array.isArray(v.holds) ? v.holds : v.holds === undefined ? null : [v.holds];
+  if (!holds || !holds.length || !holds.every((x) => typeof x === "string" && x !== ""))
+    return { malformed: "requires.holds is a list of mark ids, at least one" };
+  const id = (x) => typeof x === "string" && x !== "";
+  if (v.in !== undefined && v.in !== null && !(Array.isArray(v.in) ? v.in.length && v.in.every(id) : id(v.in)))
+    return { malformed: "requires.in is a mark id, or a list of them, at least one" };
+  if (v.at !== undefined && v.at !== null && v.at !== REQUIRES_AT_SETTLEMENT)
+    return { malformed: `requires.at is "${REQUIRES_AT_SETTLEMENT}" or absent` };
+  if (v.says !== undefined && v.says !== null && typeof v.says !== "string") return { malformed: "requires.says is a line of words" };
+  const shown = v.shown === undefined || v.shown === null ? true : v.shown === true || v.shown === "true" ? true : v.shown === false || v.shown === "false" ? false : null;
+  if (shown === null) return { malformed: "requires.shown is true or false" };
+  return { holds: [...holds], in: Array.isArray(v.in) ? [...v.in] : v.in ?? null, says: v.says ?? null,
+    ...(v.at === REQUIRES_AT_SETTLEMENT ? { at: REQUIRES_AT_SETTLEMENT } : {}),
+    ...(shown === false ? { shown: false } : {}) };
+}
+
+/** The holders a well-formed `requires` looks in, as a list: `in` as written, or the portal. */
+export const requiresHoldersIn = (req, portal) => Array.isArray(req.in) ? [...req.in] : [req.in ?? portal?.id ?? null].filter(Boolean);
 
 /** `into` as a list of ids, in the order written; null when the key is absent.
  *  A malformed value (a number, an object) becomes `[]`, a portal into nothing,
@@ -230,6 +298,15 @@ function intoOf(v) {
   const list = Array.isArray(v) ? v : [v];
   return list.filter((x) => typeof x === "string" && x !== "");
 }
+
+export const STAIRS_CLASS = "stairs";
+/** The stairs class's answer, verbatim (Darko, 2026-10-15 13:31). */
+export const STAIRS_LINE = "Moving to higher/lower floors has not been implemented yet. Coming Soon!";
+/** A stairs is an instance: a sited mark carrying the class (never its declaration). */
+export const isStairs = (m) => instanceClassOf(m) === STAIRS_CLASS && isSited(m);
+/** The class's default law: into itself, opposed, the line as its consequence.
+ *  Applied only to a stair that writes no `entry:` (entryLawOf). */
+export const stairsLaw = (m) => ({ word: "opposed", consequence: STAIRS_LINE, into: m?.id ?? null });
 
 /** Whether a mark is a portal: its entry law carries `into`. */
 export const isPortal = (mark) => !!entryLawOf(mark)?.into;
@@ -367,6 +444,20 @@ export function entityChild(handle, markId) {
   return { id: handle, kind: ENTITY_KIND, handle, within: markId, at: null, extent: null, weight: 0, stamps: 0 };
 }
 
+// ── the terms' sentence, in plain English (WLD-109) ─────────────────────────
+//
+// An edge is a mark's own word ("aboard", "latch", "knock"), so its article is
+// read off it: "an aboard edge", "a latch edge". And a consequence is the
+// mark's own sentence, so when it already ends in a stop the sentence adds
+// none ("It opens." is never "It opens.."). The World page says the same two
+// things the same way (spectator/viewer.mjs § the terms sheet).
+
+/** "a" or "an" for an edge word, by its first letter. */
+export const edgeArticle = (word) => (/^[aeiou]/i.test(String(word ?? "").trim()) ? "an" : "a");
+
+/** Whether a line already ends in a stop of its own: . ! or ?, before any closing quotes or brackets. */
+export const endsInStop = (text) => /[.!?]["'”’)\]]*$/.test(String(text ?? "").trim());
+
 // ── adjudication: the walker's side meeting the mark's ──────────────────────
 //
 // One link of a chain. `accepted` is the walker's explicit word, demanded only
@@ -375,11 +466,19 @@ export function entityChild(handle, markId) {
 export function adjudicate(mark, { accepted = false } = {}) {
   const law = entryLawOf(mark);
   const word = law?.word ?? DEFAULT_ENTRY_WORD;
+  // A stair's refusal IS its line (WLD-21, Darko 2026-10-15): `because` is what
+  // every reader prints (the World page prints nothing else), so the class's
+  // answer goes there, not only into the terms. Only a stair that reads the class's
+  // default says it: a stair that writes its own entry is read by it alone, and
+  // every other opposed mark keeps the town's standing sentence.
   if (word === "opposed")
     return { mark: mark.id, word, effect: "refused", terms: termsAt(mark),
-             because: `${mark.id} opposes entry — an entity child opposed is a refusal at the threshold, and you are left standing at the door.` };
+             because: isStairs(mark) && mark.entry == null
+               ? STAIRS_LINE
+               : `${mark.id} opposes entry — an entity child opposed is a refusal at the threshold, and you are left standing at the door.` };
   if (law?.edge && !accepted)
     return { mark: mark.id, word, effect: "terms", terms: termsAt(mark),
-             because: `${mark.id} forms an ${law.edge} edge back at you on entry${law.consequence ? ` — ${law.consequence}` : ""}. Entering means accepting it; say so, or stay outside.` };
+             because: `${mark.id} forms ${edgeArticle(law.edge)} ${law.edge} edge back at you on entry${law.consequence ? ` — ${law.consequence}` : ""}`
+               + `${endsInStop(law.consequence || "on entry") ? "" : "."} Entering means accepting it; say so, or stay outside.` };
   return { mark: mark.id, word, effect: "entered", terms: termsAt(mark), because: null };
 }

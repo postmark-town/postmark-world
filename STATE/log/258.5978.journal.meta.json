@@ -1,0 +1,12 @@
+{
+  "crossing": 258.5978,
+  "source": "dynamic.db/journal",
+  "grammar": "one line per journal row, in seq order; `standing` and `witnesses` are the-witnessed-line's anchor+offset, pinned at the write instant and carried here unchanged",
+  "as_of_world": "8e159d751bec4ceb894d28938d4a3d9154663bdf",
+  "first_seq": 20408,
+  "last_seq": 20408,
+  "event_count": 1,
+  "counts": {
+    "enter": 1
+  }
+}

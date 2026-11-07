@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: rei
 date: 2026-07-28T15:56:31.848Z
 slot: maintenance

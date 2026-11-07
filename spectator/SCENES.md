@@ -12,6 +12,9 @@
 > and a room is not on it, the difference is a defect — replace it with the
 > main-world primitive and say so here if a new one is ever earned.
 
+*Building code that mounts on or beside a scene? See
+[Integration craft](#integration-craft--code-that-mounts-on-or-beside-a-scene) at the foot.*
+
 ## The model
 
 The world is scenes all the way down. The main world is itself an entered state
@@ -32,14 +35,20 @@ overlay, walkers, hover, click precedence, choosers, walk desk, bubbles, camera.
   `data-src` (`mark:<id>` · `feature:<id>` · `light:<id>` · `light:day-axis`),
   which is what makes "from the world" a thing a test can read rather than a
   claim a screenshot would pass on.
-- A room's ground is `roomGround(mark)`: the **paper floor** — a full-bleed
-  drafting sheet (warm paper, squared with a ruled grid at a round number of
-  metres, the room's own boundary drawn as the wall — its POLYGON RING where the
-  mark carries one, its at/extent box where it does not, because for a mark that
-  is a rectangle the box IS the shape), the mark's own image over
-  its footprint when it has one, and an (initially empty) svg art slot — the
-  same base-raster-svg structure the atlas has, so the two grounds are the same
-  shape all the way down. (The founder's word, revising his own earlier white.)
+- A room's ground is `roomGround(mark)`: the **slate floor** — one full-bleed
+  rect (`.wv-scene-ground`, a dark muted blue-gray like the outside world's
+  night, with no grid or rule over it), the room's own boundary drawn as the
+  wall (`.wv-scene-wall`) — its POLYGON RING where the mark carries one, its
+  at/extent box where it does not, because for a mark that is a rectangle the
+  box IS the shape — the mark's own image over its footprint when it has one
+  (sliced to fill the room, and cut to the ring where there is one), and an
+  (initially empty) svg art slot (`.wv-scene-art`) — the same slot, in the same
+  place, that `townGround` carries, so the two grounds are the same shape all
+  the way down. (The floor has had three looks, each the founder's word: the
+  white of the ruling above; then, 2026-08-20, a warm paper drafting sheet
+  squared with a ruled grid; then, 2026-09-15 (POS-89, Keemin: *"the white grid
+  is jarring … let's just remove them for now"*), this slate, with the grid
+  gone.)
 
 Entering swaps scenes the way a door works in Pokémon: the town's svg comes out
 of the box whole (held aside, listeners alive), the room's ground mounts through
@@ -58,10 +67,10 @@ merge — see its row; 2026-09-11: #9 added).
 |---|---|---|
 | 1 | **Ground source** — `townGround(marks, skeleton)` vs `roomGround(mark)` | The founder's ruling itself: the background is the ONE scene-unique element. Same layer slot, same structure, different src. **Narrowed 2026-09-08:** it used to be a fetch versus a function, and the fetch was the last thing on this page that read a surface the world does not own. Both grounds are now generated from the record by a sibling function, so the difference is which record — the town's whole ground versus one mark's floor — and no longer where the picture comes from. |
 | 2 | **Registration** — the skeleton grid vs a per-room frame (`ROOM_GROUND_UNITS` span) | Keeps the engine in the numeric regime the town tuned it for (zoomK ≈ 1, marker var ≈ 1). A shared frame forced rooms to zoomK 400–600 — past `MAX_ZOOM_IN`, where markers blow out and atlas text drowns the art. Same arithmetic, sane numbers; QA-asserted. |
-| 3 | **`zoomOutLimit: 1`** — the wheel's zoom-OUT clamp is the whole room (the town keeps `MAX_ZOOM_OUT`); everything else on the camera — zoom-in, pan, the full `.wv-mapctl` rail (fit, follow, grid, footprints, conversations) — is the town's own, live | The revised camera ruling (founder, 2026-08-20 evening, superseding "a room refuses a camera"): a room HAS a camera, but its outermost state IS the whole room — dive into a corner, toggle the extent outlines, read the talk, and fit brings the floor back; you never drift past the walls into the void. |
+| 3 | **`zoomOutLimit: 1`** — the wheel's zoom-OUT clamp is the whole room (the town keeps `MAX_ZOOM_OUT`); everything else on the camera — zoom-in, pan, the full `.wv-mapctl` rail (search, to the World, fit, follow, conversations, the tour, and for an acting resident the outsider toggle `.wv-outsider-toggle`, hidden for a spectator; the grid and footprint buttons left it for both scenes on 2026-09-11) — is the town's own, live | The revised camera ruling (founder, 2026-08-20 evening, superseding "a room refuses a camera"): a room HAS a camera, but its outermost state IS the whole room — dive into a corner, read the talk, and fit brings the floor back; you never drift past the walls into the void. |
 | 4 | **`includeMine: false`** — the portfolio union (`state.mineIds`) stays out of the draw-set | The roof. Without it every mark the acting resident owns anywhere in town enters `glyphIds` and stays hit-testable from inside a room (2026-08-20 spike receipt). Refused at the source, not filtered later. |
-| 5 | **The room card** — `.wv-room-card`, the entered room's own card held open at the pane's upper left in every view mode — open, and it expands on a click (a second click folds it) — with the one way out inside it in both states; the corner dot (`.wv-worldmark`) stands down while it is up. **Revised 2026-09-23 (POS-206)** from "the exit chrome — `.wv-scene-exit`, bottom-left of the pane". | The way out must exist where the reader is. The telling's own exit collapsed with the telling in painting-only — the DEFAULT mode — which is how the founder stood in a room with no visible door (the b6 diagnosis); the pane pill answered that. Keemin, 2026-09-23: *"just always have that mark card expanded, and sitting in the upper left, and move the 'exit' button* into *the card while making it easily distinguishable."* So the card the corner dot used to reveal on a hover or a click (`syncRoomCard`: the room's mark cell and its predicates, the pinned bubble's recipe and dress) is simply open; it rests compact and a click on it opens the investigate expansion by the pinned bubble's own click route (Keemin, same day: *"the card is always open but not expanded, and you can click to expand it"*), the way out sits on its own ruled row inside it, and the pill and the telling's copy are gone. Same `.wv-int-exit-btn` class and handler: one card, one exit, one click route. Outdoors nothing changes — the dot is the frame's, as before. |
-| 6 | ~~**`placeholderExtents: true`**~~ — **RETIRED 2026-09-08. NOT A DIFFERENCE ANY MORE: both scenes pass `true`.** | This row's justification was *"the town needs no such pass because the atlas bakes art at sync; a room has no baker"* — and on 2026-09-08 the town stopped being served by the baker. `townGround()` draws geometry, never images, so an unfurnished town would have hung nothing at all: 540 sited marks as bare pips over a ground with no houses on it. The pass itself is unchanged and its founder's word still governs it (2026-08-20, replacing always-on footprints: inside a room, furniture without its footprint is a dot pretending to be a table; distinctness comes from hue, never transparency; the same mark is the same colour for every reader on every load; drawn by the ONE overlay). What changed is that it is no longer *scene-unique* — which is the direction this list is supposed to move. The town keeps its footprint toggle, unchanged. **Revised 2026-09-11** (founder: *"reduce the opacity of placeholder mark-images to around 50%"*): the blocks draw at half opacity in both scenes — the never-transparency half of the 08-20 word is withdrawn, the hue half stands. |
+| 5 | **The room card** — `.wv-room-card`, the entered room's own card held open at the pane's upper left in every view mode — open, and since 2026-10-15 a nameplate (the room's icon and name, `is-plate`) with the one way out beside it as a small button; a press on the name opens the room's column and a second press shuts it — the corner dot (`.wv-worldmark`) stands down while it is up. **Revised 2026-09-23 (POS-206)** from "the exit chrome — `.wv-scene-exit`, bottom-left of the pane", and again 2026-10-15 from the open card to the nameplate. | The way out must exist where the reader is. The telling's own exit collapsed with the telling in painting-only — the DEFAULT mode — which is how the founder stood in a room with no visible door (the b6 diagnosis); the pane pill answered that. Keemin, 2026-09-23: *"just always have that mark card expanded, and sitting in the upper left, and move the 'exit' button* into *the card while making it easily distinguishable."* So the card the corner dot used to reveal on a hover or a click is simply open, and the pill and the telling's copy are gone. It was first built as the room's mark cell with its predicates (the pinned bubble's recipe), resting compact and opening the investigate expansion on a click (Keemin, same day: *"the card is always open but not expanded, and you can click to expand it"*), with the way out on its own ruled row. Darko, 2026-10-15 18:20, cut that back to a nameplate and one small button, and the full description became the room's column, opened by a press on the plate (`syncRoomCard` builds it from `markNameplateHTML`; the root click delegate's `[data-nameplate]` branch toggles the room's selection). Same `.wv-int-exit-btn` class and handler: one card, one exit, one click route. Outdoors nothing changes — the dot is the frame's, as before. |
+| 6 | ~~**`placeholderExtents: true`**~~ — **RETIRED 2026-09-08. NOT A DIFFERENCE ANY MORE: both scenes pass `true`.** | This row's justification was *"the town needs no such pass because the atlas bakes art at sync; a room has no baker"* — and on 2026-09-08 the town stopped being served by the baker. `townGround()` draws geometry, never images, so an unfurnished town would have hung nothing at all: 540 sited marks as bare pips over a ground with no houses on it. The pass itself is unchanged and its founder's word still governs it (2026-08-20, replacing always-on footprints: inside a room, furniture without its footprint is a dot pretending to be a table; distinctness comes from hue, never transparency; the same mark is the same colour for every reader on every load; drawn by the ONE overlay). What changed is that it is no longer *scene-unique* — which is the direction this list is supposed to move. The footprint layer and its `mapCtx.toggleFp` are the engine's, the same for both scenes; the rail button for it went on 2026-09-11 (founder: *"remove the 'grid' button in the upper right (it's meaningless), as well as the every mark's true extent button"*), so nothing in this repo calls the toggle now. **Revised 2026-09-11** (founder: *"reduce the opacity of placeholder mark-images to around 50%"*): the blocks draw at half opacity in both scenes — the never-transparency half of the 08-20 word is withdrawn, the hue half stands. |
 | 7 | **At-rest refit letterboxes** — a contained scene sitting at its full view letterboxes on pane reshape (contains the ground, centred); once zoomed in, the town's keep-width refit takes over | The room-shown-whole guarantee at rest (scene-qa's pip at y=−183 is the receipt), without fighting the hand once a hand exists. One branch on the same `zoomOutLimit` signal as #3. |
 | 8 | **`sceneWalkerSet`** — WHICH bodies the walk layer may draw, and nothing else about them: indoors, the room's own manifest (the crossing record's occupants, child rooms included); outdoors, the whole town, unchanged. How a body is drawn and where it stands are untouched — see the walker clause below | The founder's word (fix list 2026-08-29, reaffirmed 2026-08-31): *"resident activity OUTSIDE the interior is visible from interior view."* A room's ground carries its own registration (#2), so every walker in town projected onto it and anyone whose COORDINATES happened to fall inside the footprint was painted on the floor — 81 bodies offered, 2 of the 6 that landed being people the record puts in other rooms entirely. But standing on it is not being in it: coordinates answer `within`, a room is `insideOf`, and `standpointOccupancy`'s own header says the two "routinely disagree." The telling has enforced the crossing answer for its bodies since the room shipped; the floor was never asked the question, and a reader believes what they can see. Refused at the source like #4, so a body outside the room never becomes a glyph and cannot be hit, hovered or chosen either. |
 | 9 | **The parcel underfoot wears no card** — `enclosingParcels(sceneRoomId, byId)`, asked once per draw: the mounted room's own parcel (itself, or the parcel its `parent`/`placementParent` chain reaches) is skipped by both house passes — no card, no pip, no glyph id. Outdoors nothing is mounted and the set is empty. | Founder, 2026-09-11: *"let's not display the parcel card when the view is the parcel itself or anything within it."* A card is a landmark seen from outside; drawn over the floor you are standing on it is the roof over your head. Every other parcel in view keeps its card, exactly as outside — the inside-as-outside rule (What was deleted, 2026-09-11) is what makes this the ONE exception rather than a gate. |
@@ -76,7 +85,7 @@ two lawful askers — the same seam the telling itself has always had.
 (`overlayPipSVG` + `markerScale` + the one `--wv-mk` variable), hover snap and
 the glance, click precedence (faces → chooser → wash → mark → open ground),
 contested-click choosers, the walk desk and leg preview, stake sheets, say,
-bubbles, highlight, footprint/grid toggles, walkers (positions from the same
+bubbles, highlight, the footprint and grid layers (no rail buttons since 2026-09-11), walkers (positions from the same
 poll — a body the movement record places stands there; the plaque, not the
 floor, carries record-occupancy for the unplaced).
 
@@ -100,8 +109,9 @@ overlay and its CSS. A second way to express a mark is a permanent divergence
 tax (one-question-one-owner); it is gone, not deprecated.
 
 What survives of the old interior is *chrome and data*, not render: the room
-card (`roomCardHTML` around the room's own mark cell — its name and its own
-words, open on the painting, since POS-206), the plaque (`interiorPlaqueHTML` —
+card (`roomCardHTML`: the room's nameplate from `markNameplateHTML`, with the
+way out on its own row under it — open on the painting since POS-206; a press on
+the name opens the room's own column, which carries its words), the plaque (`interiorPlaqueHTML` —
 who else is in the room, in the telling), the contents cards, `interiorFurniture`
 (the sorted containment answer), and `rimPointOf` (where the camera lands on
 exit).
@@ -123,11 +133,105 @@ system: if room names ever get drawn into a room's ground, it is the same thing.
   fingerprint (layer identity + paint order, camera, overlay shape, every pip's
   placement transform), clock-pinned, refuses verdicts across mismatched
   exposures. Green at this refactor.
-- `tools/qa/scene-qa.mjs` — the room must work: mounts as a scene, white
-  ground, roof holds, pips through the one overlay, the room card open at the
-  pane's upper left in BOTH view modes with the one exit inside it and the
-  corner dot stood down (POS-206; it was "exit bottom-left in the default
-  mode"), wheel inert, hover/select/bubble in both view modes, floor click arms
-  the real walk desk, stacked exits walk out level by level through the card's
-  button, town remounts whole with the card gone and the dot back. Its rig left
-  the repo with `demo/` — the file's header says what a rig must provide.
+- `tools/qa/scene-qa.mjs` — the room must work: mounts as a scene, the
+  scene's own ground (`.wv-scene-ground`), roof holds, pips through the one
+  overlay, the room card open at the pane's upper left in BOTH view modes with
+  the one exit inside it and the corner dot stood down (POS-206; it was "exit
+  bottom-left in the default mode"), the wheel zooms in but stops at the whole
+  room, hover/select/bubble in both view modes, floor click arms the real walk
+  desk, stacked exits walk out level by level through the card's button, town
+  remounts whole with the card gone and the dot back. Its rig left the repo with
+  `demo/` — the file's header says what a rig must provide. Several of its
+  assertions predate later rulings and want updating before a rig is run
+  against them (read from the viewer's source; no rig was run). The ruled-paper
+  pattern (POS-89) and the rail's footprint button (2026-09-11) are gone. The
+  room card has been a nameplate since 2026-10-15, with no `.wv-card[data-id]`
+  cell and no expansion, so the "room's own card" check, the click-to-expand
+  and fold checks and the "rests compact" check are stale (the first two cannot
+  find their cell; the last passes with nothing to test), and the "filled pill"
+  check describes a larger button than the small one there now. The file's
+  header lists them.
+
+## Integration craft — code that mounts on, or beside, a scene
+
+Three lessons for a builder whose code reads the viewer's painting or the home
+resolver from outside. Craft, not law: nothing here adds a rule, a field or an
+interface, and the difference list above is untouched. Pointers are symbols and
+test titles, not line numbers, so they survive edits. Measured at World
+`2173dcaa` and Site `493e08d0` (read-only); re-measure before leaning on either.
+
+**1. A scene swap replaces the svg. Reacquire it at use time.**
+`mountScene` clears the box (`boxEl.innerHTML = ""`) and appends the new ground;
+`mountRoomScene` holds the town's svg aside in `townKeep` and `remountTown`
+puts it back. So between an enter and an exit the svg you met at mount time can
+be detached, and a detached svg still answers `getBoundingClientRect` (zeros)
+and `viewBox` (stale), so a node kept from mount time measures a ghost. Ask for
+the connected, active painting each time you draw or measure, and re-point any
+`MutationObserver` when the node changes. The Site's cockpit does this with a
+`liveSvg()` over a caller-supplied `svgOf`, whose `mapSvg()` in
+`src/components/WorldCockpit.astro` prefers a connected `svg[data-wv-m-per-px]`
+and otherwise takes `#wv-overlay`'s `ownerSVGElement`
+(`src/lib/world-cockpit-mount.mjs`). On the inspected World refs nothing sets
+that stamp (see the last paragraph), so the overlay fallback is the active path
+there. The site tests that pin it
+(`test/world-cockpit-dock.test.mjs`, "the camera watch follows the living svg…")
+are regex pins over source text: they show the source says it, not that a swap
+was survived. Hunt for leftovers too: a bare `o.svg` read (one remains in that
+module, for a speech-bubble width budget) is the same mistake.
+
+**2. The viewer owns its camera; a room's painting owns its registration.**
+`view` is the camera and `applyView` is the one writer of the `viewBox`, which
+clamps (`tools/viewer-camera-bounds.test.mjs`, "THE FENCE HAS ONE OWNER…", a
+source pin). An outside `setAttribute("viewBox", …)` moves the attribute and
+leaves `view`, `zoomK` and everything sized from them where they were, so the
+next wheel notch, refit or follow writes the stale `view` back. The camera
+functions (`mapCtx.frameOn`, `setView`, `lockOn`) are closure-local to
+`mountViewer`; the returned handle (`window.__pmViewer`) offers `rerender`,
+`reload`, `select`, `stop` and a few instruments, but no camera. So external
+code today has no verified way to move the camera: read it, don't write it.
+Reading is fine: the `viewBox` can be read for a zoom ratio, and `viewCentreM(ctx)`
+is the viewer's own pure reader (`tools/act-as-scene.test.mjs`, "viewCentreM…").
+Registration is per scene: the town's comes from the skeleton's `_grid`, a
+room's from `roomGround(mark)` (`originPx`, `mPerPx`, `ROOM_GROUND_UNITS`;
+difference #2), and every viewer projection reads the active
+`mapCtx.originPx/mPerPx` (`viewportWorldBounds`, `viewCentreM`, `frameOn`'s
+`camPx`). An overlay placed with the town grid on a room's svg lands at the
+wrong place and scale. As measured, the viewer sets no registration attribute
+on its svg (only `data-ground`, `data-tier` and the like), so an overlay has
+nothing in the DOM to read it from; if it needs one, that is a viewer change
+to be ruled, not a thing to assume.
+
+**3. A home or geometry test proves its wiring only if it follows the loader.**
+`homeOf` and `whereIs` (`tools/where-is.mjs`) are pure and answer from whatever
+`world` they are handed, so a test that builds `{ marks, parcels }` by hand
+proves the resolver and nothing about whether the page supplies those inputs
+(`tools/where-is.test.mjs` is that kind, and is right to be). The consumers
+build their world through `assembleWorld` (`tools/world-build.mjs`), which
+picks fields: if it omitted a field the resolver needs (say a household map),
+every resolver test would stay green while the live readers answered "no
+home". A test that closes that gap runs the real assembly and then the
+resolver (`tools/homes-per-resident.test.mjs`, "D7 · …through assembleWorld").
+It closes the assembly pass-through only: its `worldState` is hand-built, so
+whether the fetched or folded world-state itself carries the field is not
+proved by D7. Its sibling D8 goes through `buildWorld` over
+the published registry files, which is a real-record read: know that before
+running it. Write the test on the path the application takes, with synthetic
+inputs; do not bring back a seed manifest as the authority for homes.
+
+**The old four-word handshake is historical here.** Older notes name
+`pm:frame-on`, `pm:cockpit-dock`, `pm:act-as` and the stamps
+`data-wv-origin-x/y` and `data-wv-m-per-px`. The Site side exists at `493e08d0`
+(it dispatches the three events and reads the stamps in `gridNow()`, falling
+back to the town grid when there is none). The World side does not exist on
+`main` at `2173dcaa`: `spectator/viewer.mjs` has no listener for any of the
+three events and sets none of the stamps; its only inbound event is
+`pm:stood-out`, which the Site does dispatch. Listeners and a stamp exist on
+prototype branches that are not ancestors of `main` (checked with
+`git merge-base --is-ancestor` for the camera-request and stamp commits), so
+each name has one traced end on `main`, not two. Do not describe these as a
+current interface. Which
+World commit production serves is not established here: the Site's floor pin
+(`package.json`, also `WORLD-PIN.md`) is `50d1e6ee`, an ancestor of `main`
+without the listeners or the stamps, and the resolved pin is the newest
+`settlement/S<n>` tag at rebuild time, which this note did not read. Nothing
+here claims the live site works or fails.

@@ -26,6 +26,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { dialsOf } from "./class-dials.mjs";
+import { instanceClassOf } from "./mark-kind.mjs"; // what a record IS, in either form (W2)
 
 const here = dirname(fileURLToPath(import.meta.url));
 const WORKS = "WORLD/marks/let-there-be-light/the-town-centre/the-keeping-works";
@@ -36,6 +38,9 @@ const field = (rel, name) => {
   assert.ok(line, `${rel} carries a ${name}: line`);
   return JSON.parse(line.slice(name.length + 1).trim());
 };
+// A class's dials are its property nodes now (LOGOS v2 part 2: "every dial is a
+// property, and a locked value is its default"), still read off the files.
+const dialsAt = (rel) => dialsOf(join(here, "..", rel));
 const scalar = (rel, name) => {
   const line = read(rel).split("\n").find((l) => l.startsWith(`${name}:`));
   return line ? line.slice(name.length + 1).trim() : null;
@@ -83,8 +88,8 @@ test("the human's stride POINTS at the resident's — one number, one home", () 
   // one was ever read (`departurePace` asks the-town/resident by name, office
   // src/world-classes.mjs:143-146). The assertion now is that the second copy
   // does not exist.
-  const resident = field(`${WORKS}/postmark-node/entity/resident/mark.md`, "dials");
-  const human = field(HUMAN, "dials");
+  const resident = dialsAt(`${WORKS}/postmark-node/entity/resident/mark.md`);
+  const human = dialsAt(HUMAN);
 
   assert.equal(human.pace_km_per_crossing, "the-town/resident",
     "the human class declares the SLOT and names its owner — a literal here is a second copy of a number that has one home");
@@ -95,7 +100,7 @@ test("the human's stride POINTS at the resident's — one number, one home", () 
   // the pointer resolves: whatever the resident is ruled to, the human is that,
   // because there is nothing else for it to be.
   const slot = `${WORKS}/postmark-edge/depart/pace-slot/mark.md`;
-  assert.equal(scalar(slot, "value"), "the-town/resident",
+  assert.equal(scalar(slot, "default"), "the-town/resident",
     "the third declaration points too — depart's own body already said 'The stride is the mover's, never this verb's'");
 });
 
@@ -153,8 +158,8 @@ test("the held-grant slot is unsealed and in the town's own custody", () => {
   // Unsealed is what lets one weapon differ from another; constitutional
   // custody on the VALUES is what stops a resident hanging a verb on a pocket.
   // Both halves, or the channel is a capability-escalation door.
-  assert.equal(scalar(HELD_SLOT, "slot"), "held-grant");
-  assert.equal(scalar(HELD_SLOT, "value"), "unsealed",
+  assert.equal(scalar(HELD_SLOT, "name"), "held-grant");
+  assert.equal(scalar(HELD_SLOT, "default"), "unsealed",
     "each object fills its own — the class speaks the grammar, never the value");
   assert.equal(scalar(HELD_SLOT, "values-tier"), "constitution",
     "scope and custody compose: unsealed + constitutional custody is the town's pen and nobody else's");
@@ -252,14 +257,14 @@ test("every fighting verb ENDS THE TURN, and none of them carries a cooldown any
   //   "While an encounter is live, an arena affords its verbs — and walking —
   //    only to whoever the wheel is on."
   for (const v of ["strike", "guard", "cast", "lift"]) {
-    const dials = field(VERB(v), "dials");
+    const dials = dialsAt(VERB(v));
     assert.equal(dials.ends_turn, true, `${v} spends the turn that used it`);
     assert.equal(dials.cooldown_seconds, undefined,
       `${v} still carries a cooldown — a wheel and a cooldown are two pacing laws, and a verb under both obeys neither predictably`);
   }
   // loot is the exception and it is on the record as one: the fight is over by
   // then, so there is no wheel left for it to spend.
-  assert.equal(field(VERB("loot"), "dials").ends_turn, false);
+  assert.equal(dialsAt(VERB("loot")).ends_turn, false);
 });
 
 test("ends_turn says out loud that nothing reads it yet — a declared dial with no reader is flagged, not hidden", () => {
@@ -283,7 +288,7 @@ test("ends_turn says out loud that nothing reads it yet — a declared dial with
   // retiring the flag, and the flag is now the lie instead — which is why the
   // note names the reader that would falsify it.
   for (const v of ["strike", "guard", "cast", "lift", "loot"]) {
-    const dials = field(VERB(v), "dials");
+    const dials = dialsAt(VERB(v));
     assert.ok(Object.hasOwn(dials, "ends_turn"), `${v} still declares ends_turn`);
     const notes = field(VERB(v), "implements").join("\n");
     assert.match(notes, /ends_turn[^\n]*ASPIRATIONAL/,
@@ -302,7 +307,7 @@ test("the one dial that names a duration resolves at a door, never on a clock", 
   // objection itself was not answered by ignoring it, and this is where the
   // answer is checkable. A duration dial anywhere but the arena would be a
   // ticker in the making.
-  const arena = field(ARENA, "dials");
+  const arena = dialsAt(ARENA);
   assert.ok(Number.isFinite(arena.turn_timeout_s) && arena.turn_timeout_s > 0);
 
   // THE CLASS DEFAULT IS A NUMBER, and this asserts WHICH — LOGOS/classes.md
@@ -320,7 +325,7 @@ test("the one dial that names a duration resolves at a door, never on a clock", 
   assert.equal(arena.turn_timeout_s, 600,
     "the arena class carries the DEFAULT turn timeout, and LOGOS names it 600 — an instance may set its own, but the class's own number is this one");
   for (const v of ["strike", "guard", "cast", "lift", "loot"])
-    for (const k of Object.keys(field(VERB(v), "dials")))
+    for (const k of Object.keys(dialsAt(VERB(v))))
       assert.ok(!/_s$|_seconds$/.test(k),
         `${v} declares "${k}" — no verb names a duration; the only one in this design is the arena's, and it fires at a door`);
 });
@@ -339,8 +344,8 @@ test("the fighting verbs roll DICE, and every die is on the record", () => {
   // LOGOS/classes.md § The witnessed roll, verbatim:
   //   "The die is a class dial, like every other number a class speaks — so
   //    what a verb rolls is amendable law, not a constant in an office."
-  const strike = field(VERB("strike"), "dials");
-  const cast = field(VERB("cast"), "dials");
+  const strike = dialsAt(VERB("strike"));
+  const cast = dialsAt(VERB("cast"));
   for (const [name, d] of [["strike", strike], ["cast", cast]]) {
     assert.ok(Number.isInteger(d.to_hit_die) && d.to_hit_die > 1, `${name} names its to-hit die`);
     assert.ok(Number.isInteger(d.damage_die) && d.damage_die > 1, `${name} names its damage die`);
@@ -349,7 +354,7 @@ test("the fighting verbs roll DICE, and every die is on the record", () => {
   }
   assert.ok(cast.damage_die > strike.damage_die,
     "cast costs the same turn and reaches further — if its die were no better, nobody would ever spend one on it");
-  assert.equal(field(VERB("guard"), "dials").halves_next_hit, true,
+  assert.equal(dialsAt(VERB("guard")).halves_next_hit, true,
     "guard's effect is a dial, not a hardcode — the town can amend what bravery is worth");
 });
 
@@ -362,10 +367,10 @@ test("the arena keeps the wheel, and the plain portal ground does NOT", () => {
   // would be decoration and the antechamber would be a fight nobody declared.
   assert.equal(scalar(ARENA, "extends"), "portal-ground",
     "an arena IS a portal ground — same lent verbs, same fence, plus a wheel");
-  const arena = field(ARENA, "dials");
+  const arena = dialsAt(ARENA);
   for (const k of ["turn_timeout_s", "initiative_die", "lift_to"])
     assert.ok(k in arena, `the arena declares ${k}`);
-  const plain = field(PORTAL, "dials");
+  const plain = dialsAt(PORTAL);
   for (const k of ["turn_timeout_s", "initiative_die", "lift_to"])
     assert.equal(plain[k], undefined, `the plain portal ground must not declare ${k} — a room with a wheel and no fight is a room that cannot be walked through`);
 });
@@ -381,7 +386,7 @@ test("lift is granted by the arena and by nothing else", () => {
     "the arena grants lift to BOTH kinds — a guest's human watching a housemate lie there and unable to help is the one shape this room must not have");
   assert.ok(!(field(PORTAL, "actions") ?? []).some((a) => a.action === "lift"),
     "the antechamber does not — there is nobody down in a room with no fight in it");
-  const lift = field(VERB("lift"), "dials");
+  const lift = dialsAt(VERB("lift"));
   assert.equal(lift.ends_turn, true, "the cost IS the turn");
   assert.ok(Number.isInteger(lift.restores_to) && lift.restores_to > 0,
     "and you come back at PARTIAL strength, a number the record carries");
@@ -426,7 +431,7 @@ test("the first portal ground stands geometrically inside the parcel it was buil
   const parcelWorld = { x: 1338 - 250, y: -994.5 + 200 };
   const fence = { x0: parcelWorld.x - 12.5, x1: parcelWorld.x + 12.5, y0: parcelWorld.y - 12.5, y1: parcelWorld.y + 12.5 };
   const g = frontmatter("WORLD/marks/wright/the-cellar-door/mark.md");
-  assert.equal(g.class, "portal-ground");
+  assert.equal(instanceClassOf(g), "portal-ground");
   const box = { x0: g.at.x - g.extent.w / 2, x1: g.at.x + g.extent.w / 2,
                 y0: g.at.y - g.extent.h / 2, y1: g.at.y + g.extent.h / 2 };
   assert.ok(box.x0 >= fence.x0 && box.x1 <= fence.x1 && box.y0 >= fence.y0 && box.y1 <= fence.y1,
@@ -438,13 +443,13 @@ test("the thing that lends a verb is the TOWN's, and the things that do not lend
   //   "only a thing whose `by:` is the town's own pen may carry a held grant"
   const lender = frontmatter("WORLD/marks/the-town/the-good-lighter/mark.md");
   assert.equal(lender.by, "the-town");
-  assert.equal(lender.class, "thing");
+  assert.equal(instanceClassOf(lender), "thing");
   assert.ok(Array.isArray(lender.held_grant) && lender.held_grant.length >= 1);
   for (const g of lender.held_grant)
     assert.ok(g.residue, "a held grant names its residue — the door quotes the residue's own mark, never a copy beside the grant");
   for (const t of ["a-slice-to-take-home", "the-wick-end"]) {
     const carried = frontmatter(`WORLD/marks/the-town/${t}/mark.md`);
-    assert.equal(carried.class, "thing", "what is carried out is an ORDINARY thing — that is the whole thesis of the room");
+    assert.equal(instanceClassOf(carried), "thing", "what is carried out is an ORDINARY thing — that is the whole thesis of the room");
     assert.equal(carried.held_grant, undefined, "a trophy lends nothing; it is a keepsake, not a key");
   }
 });
@@ -463,11 +468,11 @@ test("the adversary's numbers are on its own mark, not in any office", () => {
   // words allow ("a clause with no instance is a clause nobody has had to
   // mean"). The class-grammar half is still live law and still checked. When
   // the next adversary stands, the instance assertions return with its name.
-  const cls = field(`${WORKS}/postmark-node/mark/adversary/mark.md`, "dials");
+  const cls = dialsAt(`${WORKS}/postmark-node/mark/adversary/mark.md`);
   assert.equal(cls.hp, "unsealed", "the class speaks the grammar and never the value");
   assert.equal(cls.hits_for, "unsealed");
   const monument = frontmatter("WORLD/marks/wright/the-unlit-cake/mark.md");
-  assert.equal(monument.class, "thing", "the fallen boss is an ordinary thing — the retirement ruling, held");
+  assert.equal(instanceClassOf(monument), "thing", "the fallen boss is an ordinary thing — the retirement ruling, held");
   assert.equal(monument.dials, undefined, "a monument carries no combat dials");
 });
 

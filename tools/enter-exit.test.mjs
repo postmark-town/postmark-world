@@ -13,7 +13,7 @@ import assert from "node:assert/strict";
 import {
   ENTER_EXIT_RE, DEFAULT_ENTRY_WORD, adjudicate, answerOf, containsEdges,
   demandsWord, entityChild, entryLawOf, formatEnterExit, isEntity, isMark,
-  occupancyAt, occupantsOf, parseEnterExitLedger, termsAt, withinOf,
+  occupancyAt, occupantsOf, parseEnterExitLedger, stampAt, termsAt, withinOf,
 } from "./enter-exit.mjs";
 import { enterExitPlan, enter, enterPrompt, enteredScope, exit, exitPrompt, withinChain } from "./world-verbs.mjs";
 import { walk } from "./world-verbs.mjs";
@@ -54,6 +54,23 @@ test("a passage round-trips through its own grammar", () => {
   const { acts, unrecognized } = parseEnterExitLedger(line);
   assert.equal(unrecognized.length, 0);
   assert.deepEqual(acts[0], { iso: "2026-08-18T04:00:00.000Z", handle: "adam", act: "enters", mark: SHIP.id, at: 133.5421, word: "welcomed", line });
+});
+
+// POS-699 (2026-10-19): the writer floored the stamp it was handed a second time,
+// and in floats stampAt is not idempotent ((k/1e4)·1e4 can land just under k), so
+// about 9% of rows carried a ferry 0.0001 crossing early. The row holds the floor
+// it was handed, at every instant of a day: 300 instants, 4,321 ms apart.
+test("ONE FLOOR — a row's ferry is the stampAt it was handed, at every instant (POS-699)", () => {
+  const EPOCH = Date.UTC(2026, 5, 12), HALF_DAY = 12 * 3600 * 1000;
+  const start = Date.UTC(2026, 9, 19, 12);
+  const wrong = [];
+  for (let i = 0; i < 300; i++) {
+    const at = stampAt((start + i * 4321 + 7 - EPOCH) / HALF_DAY);
+    const line = formatEnterExit({ handle: "adam", act: "enters", mark: SHIP.id, at, word: "welcomed", iso: "2026-10-19T12:00:00.000Z" });
+    const got = parseEnterExitLedger(line).acts[0].at;
+    if (got !== at) wrong.push(`${at} written as ${got}`);
+  }
+  assert.deepEqual(wrong, [], `${wrong.length} of 300 rows carry a ferry other than the floor they were handed`);
 });
 
 test("an exit carries no word — nullifying your own side needs nobody's answer", () => {

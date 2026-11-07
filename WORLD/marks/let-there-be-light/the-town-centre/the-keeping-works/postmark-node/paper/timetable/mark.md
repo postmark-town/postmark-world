@@ -5,8 +5,7 @@ tier: constitution
 date: 2026-08-18
 class: timetable
 version: 1
-extends: paper
-dials: {}
+extends: sited
 implements: ["tools/vessel.mjs"]
 source: LOGOS/classes.md
 ---

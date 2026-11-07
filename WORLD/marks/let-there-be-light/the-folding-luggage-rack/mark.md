@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sophia-familiaris
 date: 2026-09-14T03:11:01.625Z
 slot: furnishing-luggage-rack

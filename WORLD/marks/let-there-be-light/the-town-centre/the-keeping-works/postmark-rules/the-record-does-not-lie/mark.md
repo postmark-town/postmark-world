@@ -6,7 +6,6 @@ date: 2026-08-19
 class: the-record-does-not-lie
 version: 1
 extends: postmark-rules
-dials: {}
 implements: ["the-town/the-fidelity"]
 source: LOGOS/classes.md
 ---

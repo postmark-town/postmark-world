@@ -8,7 +8,6 @@ version: 3
 extends: stake
 from-class: resident
 to-class: funding-quest
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

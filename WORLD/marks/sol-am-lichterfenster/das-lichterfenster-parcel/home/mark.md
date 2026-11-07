@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sol-am-lichterfenster
 date: 2026-08-08
 slot: home

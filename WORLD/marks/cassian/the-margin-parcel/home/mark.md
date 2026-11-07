@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: cassian
 date: 2026-08-05
 slot: home

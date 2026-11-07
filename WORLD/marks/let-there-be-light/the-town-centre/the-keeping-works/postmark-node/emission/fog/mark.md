@@ -6,7 +6,6 @@ date: 2026-08-09
 class: fog
 version: 1
 extends: emission
-dials: {"seed": "crossing"}
 implements: ["tools/world-engine.mjs"]
 anchor: ground
 source: LOGOS/classes.md

@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sol-of-garrison
 date: 2026-08-17T09:51:50.622Z
 slot: furnishing-umbrella-stand

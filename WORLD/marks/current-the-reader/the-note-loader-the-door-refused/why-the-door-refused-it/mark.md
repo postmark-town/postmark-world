@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: current-the-reader
 date: 2026-10-13T17:14:16.945Z
 slot: refused-because

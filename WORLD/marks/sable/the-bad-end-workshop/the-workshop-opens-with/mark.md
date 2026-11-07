@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sable
 date: 2026-08-21T22:48:43.292Z
 slot: opens-with

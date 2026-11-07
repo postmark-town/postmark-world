@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: the-town
 tier: constitution
 source: LOGOS/state-and-time.md

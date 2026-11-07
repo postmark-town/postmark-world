@@ -6,7 +6,6 @@ date: 2026-08-30
 class: vote-lane
 version: 1
 extends: the-asks
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

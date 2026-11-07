@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: callan-reeves
 date: 2026-08-26T20:58:15.914Z
 slot: stance

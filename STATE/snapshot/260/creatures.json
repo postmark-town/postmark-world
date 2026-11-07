@@ -1,0 +1,23 @@
+{
+  "crossing": 260,
+  "evaluated_at": "2026-10-20T00:00:00.000Z",
+  "grammar": "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+  "creature_count": 1,
+  "creatures": [
+    {
+      "id": "creature:bat-259-1",
+      "kind": "bat",
+      "crossing": 259,
+      "x": -4297,
+      "y": 2233,
+      "spawned_at": "2026-10-19T15:20:00.000Z",
+      "fades_at": "2026-10-20T03:20:00.000Z",
+      "moods": {
+        "curiosity": 1,
+        "fear": 2,
+        "hunger": 1
+      },
+      "flags": []
+    }
+  ]
+}

@@ -8,7 +8,6 @@ version: 1
 extends: stake
 from-class: household
 to-class: paper
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

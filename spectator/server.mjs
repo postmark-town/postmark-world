@@ -3,18 +3,36 @@
 //
 // A spectator is a CAMERA, not an agent: there is no write path here. The viewer
 // computes the field of view CLIENT-SIDE (viewer.mjs imports the same engine a
-// clone runs), so this server only SERVES — it never tells. Its jobs:
-//   • /                         → the shell (spectator/index.html)
-//   • /world-engine/**          → the viewer module + the engine .mjs (so the
-//                                  browser imports the exact library, unbundled)
-//   • /WORLD/*.json             → the world's public record, off THIS clone's disk
+// clone runs), so this server only SERVES — it never tells. Its routes, exactly
+// as the handler below answers them (anything else is a 404):
+//   • /favicon.ico              → 204, no body
+//   • / and /index.html         → the shell (spectator/index.html)
+//   • /world-engine/spectator/*.mjs and /world-engine/tools/*.mjs
+//                               → the viewer module + the engine .mjs (so the
+//                                  browser imports the exact library, unbundled);
+//                                  .mjs files only
+//   • /WORLD/world-state.json, /WORLD/skeleton.json
+//                               → the world's public record, off THIS clone's disk
 //   • /WORLD/enter-exit-ledger.md → the crossings; the page derives occupancy from
 //                                  them the way it derives position from walks
+//   • /WORLD/walk-ledger.md     → the walks, the same way (the page derives
+//                                  position from them)
 //   • /api/stakes?holder=       → per-holder stakes, parsed from the town's
 //                                  stamp-ledger (LOCAL-ONLY; the island hides the half)
+//   • /api/walks?at=            → the movement ledger's derived state, for the
+//                                  walkers layer; `at` scrubs the clock
+//   • /api/world2/walks?since=  → the same both-era read in the office's own
+//                                  answer shape (the viewer asks the office first,
+//                                  and a local page's office base is /api)
 //   • /atlas/*, /media/*        → proxied to postmark.town (the painting and its
 //                                  assets; the processed images the map hangs
 //                                  placed artwork from)
+//   • /shelf/*                  → proxied to the media shelf (a different host
+//                                  from the town), as <shelf>/media/*: where a
+//                                  mark's picture reaches the interior floor
+//   Environment: PORT, WORLD_DIR (a synthetic world in place of this clone's
+//   record: the four /WORLD/ files and both walks routes read it), STAMP_LEDGER,
+//   ATLAS_ORIGIN, SHELF_ORIGIN.
 //
 // The island (postmark.town/world) has none of this server — it serves the same
 // viewer.mjs statically and STAGES the same record files beside it at build time,
@@ -22,11 +40,12 @@
 // atlas same-origin too, and the stakes half feature-detects itself off. Neither
 // habitat reads the world repo's main tip any more; see `tools/record-sources.mjs`.
 //
-// Run: node server.mjs   → http://localhost:4877
+// Run: node spectator/server.mjs   → http://localhost:4877 (PORT overrides)
 import { createServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
-import { parseWalkLedger, publicWalkers, fractionalCrossing } from "../tools/walk.mjs";
+import { publicWalkers, fractionalCrossing } from "../tools/walk.mjs";
 import { publicResidents } from "../tools/where-is.mjs";
+import { spectatorDepartures, officeWalks } from "../tools/movement-records.mjs";
 import { dirname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -66,6 +85,9 @@ function serveFile(res, relPath) {
 const WORLD_DIR = process.env.WORLD_DIR ? normalize(process.env.WORLD_DIR) : null;
 function serveWorld(res, file) {
   if (!WORLD_DIR) return serveFile(res, "WORLD/" + file);
+  // A SYNTHETIC WORLD IS WHOLE (WLD-29): every record file this server hands
+  // the page — the fold, the skeleton AND the ledgers — comes from WORLD_DIR
+  // when it is set, so a fixture never quietly mixes in this clone's real walks.
   const abs = join(WORLD_DIR, file);
   if (!existsSync(abs)) return json(res, 404, { error: `not found: ${abs}` });
   send(res, 200, readFileSync(abs), MIME[".json"]);
@@ -133,7 +155,7 @@ createServer(async (req, res) => {
     // what the page needs is the record, not this server's opinion of it — and
     // serving it here is what lets a local read stand on THIS clone's disk
     // instead of falling through to the published raw file.
-    if (p === "/WORLD/enter-exit-ledger.md") return serveFile(res, "WORLD/enter-exit-ledger.md");
+    if (p === "/WORLD/enter-exit-ledger.md") return serveWorld(res, "enter-exit-ledger.md");
     // ONE NAME. The retired `threshold` spelling was served here too while the
     // record answered to both, and the twin file it read is deleted (2026-08-28,
     // #2152). A route to a file that is not in this package would serve a 404
@@ -147,7 +169,7 @@ createServer(async (req, res) => {
     // got a 404, and quietly read the world repo's main tip instead — a
     // different world from the one on this clone's disk. The fallback is gone
     // now, so this route is not a convenience; it is the answer.
-    if (p === "/WORLD/walk-ledger.md") return serveFile(res, "WORLD/walk-ledger.md");
+    if (p === "/WORLD/walk-ledger.md") return serveWorld(res, "walk-ledger.md");
     // `/seeding/manifest.json` was served here beside it, for the viewer's
     // green. The manifest is deleted (postmark#3025) — green is the fold's
     // answer now — so the route goes with the file rather than answering 404.
@@ -167,13 +189,13 @@ createServer(async (req, res) => {
       const raw = url.searchParams.get("at");
       const at = raw === null ? fractionalCrossing() : Number(raw);
       if (!Number.isFinite(at) || at < 0) return json(res, 400, { error: "at must be a fractional crossing >= 0" });
-      let text = "";
-      try { text = readFileSync(join(ROOT, "WORLD/walk-ledger.md"), "utf8"); } catch { /* no ledger yet */ }
-      const { departures, unrecognized } = parseWalkLedger(text);
+      // BOTH ERAS (WLD-98): the frozen ledger and every departure in STATE/log since
+      // the seam, by the engine's one movement read; a synthetic WORLD_DIR is its ledger alone
+      const { departures, unrecognized } = spectatorDepartures(ROOT, { worldDir: WORLD_DIR });
       // the fold, for everyone standing on their own ground; a spectator with no
       // world-state still gets the walk ledger's answer rather than an error
       let worldState = null;
-      try { worldState = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8")); } catch { /* ledger only */ }
+      try { worldState = JSON.parse(readFileSync(WORLD_DIR ? join(WORLD_DIR, "world-state.json") : join(ROOT, "WORLD/world-state.json"), "utf8")); } catch { /* ledger only */ }
       const roster = [
         ...departures.map((d) => d.handle),
         ...((worldState?.parcels ?? []).map((pc) => pc.household)),
@@ -191,6 +213,17 @@ createServer(async (req, res) => {
       });
     }
 
+    // THE OFFICE'S WALKS, ANSWERED HERE (WLD-98). The viewer reads walks office
+    // first, and a local page's office base is /api, so it asked this server for
+    // /api/world2/walks, got a 404, and fell back to the ledger frozen at 08-10:
+    // Lately showed nothing since the seam. This answers the office's own shape
+    // from the same both-era read as /api/walks, off this clone's disk.
+    if (p === "/api/world2/walks") {
+      const since = url.searchParams.get("since");
+      if (since !== null && !Number.isFinite(Date.parse(since))) return json(res, 400, { error: "since must be an ISO instant" });
+      return json(res, 200, officeWalks(spectatorDepartures(ROOT, { worldDir: WORLD_DIR }).departures, { since }));
+    }
+
     if (p.startsWith("/atlas/") || p.startsWith("/media/")) return proxyTown(res, p);
     // THE SHELF, which is a different host from the town. An SVG <image href> may
     // carry no protocol and no host (safeAvatarUrl refuses both — escaping is the
@@ -200,7 +233,7 @@ createServer(async (req, res) => {
     // shelves hold different files under identical-looking paths.
     if (p.startsWith(SHELF_ROUTE)) return proxyOrigin(res, SHELF_ORIGIN, "/media/" + p.slice(SHELF_ROUTE.length));
 
-    json(res, 404, { error: "not found — /, /world-engine/**, /WORLD/*.json, /WORLD/enter-exit-ledger.md, /api/stakes?holder=, /api/walks?at=, /atlas/*, /media/*" });
+    json(res, 404, { error: "not found — /, /world-engine/**, /WORLD/*.json, /WORLD/enter-exit-ledger.md, /api/stakes?holder=, /api/walks?at=, /api/world2/walks?since=, /atlas/*, /media/*" });
   } catch (e) {
     json(res, 500, { error: String(e?.message ?? e) });
   }

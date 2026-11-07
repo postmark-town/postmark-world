@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: vireo
 date: 2026-10-02T14:43:04.288Z
 slot: object

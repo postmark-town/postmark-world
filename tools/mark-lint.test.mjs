@@ -156,6 +156,10 @@ function fidelityRepo() {
   cpSync(join(REPO_SRC, "LOGOS"), join(repo, "LOGOS"), { recursive: true });
   copyFileSync(join(REPO_SRC, "WRITES.md"), join(repo, "WRITES.md"));
   copyFileSync(join(REPO_SRC, "WORLD", "skeleton.json"), join(repo, "WORLD", "skeleton.json"));
+  // The engine's notes are a source too (the season's mechanics live there, not in
+  // LOGOS, ruled 2026-10-10), so a rendering may cite WORLD/ENGINE.md and the copy
+  // carries it.
+  copyFileSync(join(REPO_SRC, "WORLD", "ENGINE.md"), join(repo, "WORLD", "ENGINE.md"));
   cpSync(join(REPO_SRC, "WORLD", "marks"), join(repo, "WORLD", "marks"), { recursive: true });
   // The fossil's boundary travels with the tree it bounds (the freeze,
   // 2026-08-25). A whole-tree copy without it is a tree the freeze gates cannot
@@ -367,6 +371,25 @@ test("POS-369 · a market opposition: the senior at contact may oppose a straddl
   assert.doesNotMatch(out, /"pondhh\/the-old-pond"[^\n]*(ignored|not inside)/, "held for POS-572: a welcome on what stands inside your mark is read as before");
 });
 
+test("WLD-102 · a market opposition on the town's own mark, or inside a standing parcel laid after it, is named and ignored; the commons newcomer and the elder inside the parcel are not", () => {
+  const { dir, root } = fixtureTree();
+  const put = (slug, fm, body) => {
+    mkdirSync(join(root, slug), { recursive: true });
+    writeFileSync(join(root, slug, "mark.md"), `---\n${fm}\n---\n\n${body}\n`);
+  };
+  put("the-old-estate", 'kind: sited\nby: estatehh\ndate: 2026-07-25\nat: { x: 800, y: 800 }\nextent: { w: 400, h: 400 }\nconsent: {"the-town/the-new-well": "opposed", "lothh/the-new-house": "opposed", "shedhh/the-new-shed": "opposed", "huthh/the-old-hut": "opposed"}', "An estate that was here first.");
+  put("the-new-well", "kind: sited\nby: the-town\ndate: 2026-08-20\nat: { x: 900, y: 900 }\nextent: { w: 20, h: 20 }", "The town's well.");
+  put("the-lot", "kind: parcel\nby: lothh\ndate: 2026-08-01\nat: { x: 700, y: 700 }\nextent: { w: 25, h: 25 }", "A parcel inside the estate.");
+  put("the-new-house", "kind: sited\nby: lothh\ndate: 2026-08-20\nat: { x: 700, y: 700 }\nextent: { w: 10, h: 10 }", "A house on its own parcel.");
+  put("the-old-hut", "kind: sited\nby: huthh\ndate: 2026-07-28\nat: { x: 705, y: 705 }\nextent: { w: 6, h: 6 }", "A hut that stood before the parcel.");
+  put("the-new-shed", "kind: sited\nby: shedhh\ndate: 2026-08-20\nat: { x: 850, y: 700 }\nextent: { w: 10, h: 10 }", "A shed on the open commons.");
+  const out = runLint(dir);
+  assert.match(out, /"the-town\/the-new-well" is the town's own mark — ignored/, "the town is exempt");
+  assert.match(out, /"lothh\/the-new-house" stands inside the parcel lothh\/the-lot, laid after it — ignored/, "the parcel's interior is the holder's");
+  assert.doesNotMatch(out, /"shedhh\/the-new-shed"[^\n]*(ignored|does not touch)/, "the commons newcomer is still the senior's to speak on");
+  assert.doesNotMatch(out, /"huthh\/the-old-hut"[^\n]*(ignored|does not touch)/, "a mark older than the parcel keeps its senior");
+});
+
 // ── WLD-41 · a value the parser silently empties (Darko, 2026-10-13 16:47) ───
 //
 // parseRecord reads a `{…}` value as strict JSON first, and anything else through
@@ -410,4 +433,19 @@ test("POS-619 · a [ value that isn't JSON reds with marks-fold's sentence; JSON
     `a bare-word list must red, got:\n${red}`);
   const green = runLint(lossyTree(['implements: ["candy", "chest"]', "labels: []", "title: [draft] my house"]));
   assert.doesNotMatch(green, /not strict JSON/, `JSON lists lose nothing, got:\n${green}`);
+});
+
+test("POS-672 · a creature class whose afforded actions the creature law cannot read is a lint ERROR, before a blessing can stop every spawn", () => {
+  const { dir, root } = fixtureTree();
+  const REL = join("the-town-centre", "the-keeping-works", "postmark-node", "entity", "creature");
+  cpSync(join(REAL, REL), join(root, REL), { recursive: true });
+  const SAYS = /the creature law cannot be read whole, so the creatures' tick would spawn nothing/;
+  assert.doesNotMatch(runLint(dir), SAYS, "the law as it stands reads whole");
+  const file = join(root, REL, "mark.md");
+  const text = readFileSync(file, "utf8");
+  writeFileSync(file, text.replace(/"action":"watch"/, '"action":"strike"'));
+  const out = runLint(dir);
+  assert.match(out, /\[ERROR\][^\n]*creature[^\n]*the creature law cannot be read whole[^\n]*"strike" is not one of watch, approach, shoo, call, offer, whisper/);
+  writeFileSync(file, text.replace(/"from":"sight"/, '"from":"anywhere"'));
+  assert.match(runLint(dir), /\[ERROR\][^\n]*taken from "anywhere", not sight or ring/);
 });

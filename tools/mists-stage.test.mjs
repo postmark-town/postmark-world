@@ -27,6 +27,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { viewBoxTransform, mistsPaintHTML } from "../spectator/viewer.mjs";
 import { MISTS_PAINT, mistsCreatureHTML, mistsCreatureSVG } from "../spectator/mists-render.mjs";
+import { machineContext } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const reg = { originPx: { x: 700, y: 760 }, mPerPx: 5 };
@@ -127,8 +128,9 @@ before(async () => {
 });
 
 test("the page: an idle second of drift lays the map out zero times, and the stage maps every point where the svg does", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: the stage's compositing and camera went UNGUARDED"); return; }
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
+  if (!chromium) { t.skip("NO PLAYWRIGHT — the stage's compositing and camera went UNGUARDED"); return; }
+  // the set machine (page-machine.mjs); ?lite=0 below names the mode this test is about
+  const ctx = await machineContext(browser, { viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
   // crossing 247, five hours in: the Mists are on, whatever today's crossing is;
   // and a frame loop from the first byte, as the walk layer runs one
   await ctx.addInitScript(() => {
@@ -179,7 +181,8 @@ test("the page: an idle second of drift lays the map out zero times, and the sta
   assert.deepEqual(where.inSvg, [], "nothing animates inside the map's svg");
   assert.equal(where.paintInSvg, false, "the moving paint is not in the svg");
   assert.equal(where.wallInSvg, true, "the wall stays in the svg, where it takes the pointer");
-  assert.deepEqual(where.topOrder, ["wv-convo-hover-layer", "wv-housemate-edge-layer"], "what drew above the Mists draws above them still");
+  // the live creatures (play fix 35) stand over the Mists' paint too, under the housemate chevrons
+  assert.deepEqual(where.topOrder, ["wv-convo-hover-layer", "wv-creature-layer", "wv-housemate-edge-layer"], "what drew above the Mists draws above them still");
 
   // the stage's camera is the svg's: each bake's corner lands where the svg puts the same painting point
   const agree = (label) => page.evaluate((label) => {

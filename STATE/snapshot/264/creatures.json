@@ -1,0 +1,23 @@
+{
+  "crossing": 264,
+  "evaluated_at": "2026-10-22T00:00:00.000Z",
+  "grammar": "creatures: the creatures spawned and not yet withdrawn at evaluated_at, folded from the log (spawn, their own acts, withdraw); one whose fades_at has passed is gone to every read and its fade is still due; a creature's memory is never saved",
+  "creature_count": 1,
+  "creatures": [
+    {
+      "id": "creature:raven-263-1",
+      "kind": "raven",
+      "crossing": 263,
+      "x": 764,
+      "y": 9279,
+      "spawned_at": "2026-10-21T13:31:00.000Z",
+      "fades_at": "2026-10-22T01:31:00.000Z",
+      "moods": {
+        "curiosity": 2,
+        "fear": 1,
+        "hunger": 1
+      },
+      "flags": []
+    }
+  ]
+}

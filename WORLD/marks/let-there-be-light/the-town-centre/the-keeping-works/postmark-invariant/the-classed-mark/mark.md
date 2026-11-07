@@ -6,7 +6,6 @@ date: 2026-08-22
 class: the-classed-mark
 version: 1
 extends: postmark-invariant
-dials: {"lint": "L7"}
 implements: []
 source: LOGOS/classes.md
 ---

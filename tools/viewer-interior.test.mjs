@@ -79,44 +79,34 @@ test("the real marks build a real interior — the Town Centre, entered", () => 
 // used to open), so what is pinned here is the card's frame: the head, the cell
 // passed through whole, and the way out on its own row.
 
-test("the room card speaks in the ROOM's own words, and the way out is INSIDE it", () => {
+test("the room card is the room's NAMEPLATE and its way out, and nothing else (Darko, 2026-10-15 18:20)", () => {
+  // CHANGED 2026-10-15 (playground sitting): the open card with the room's whole
+  // cell "is a bit obnoxious"; the corner holds the hover's own nameplate for the
+  // room and "one smaller version of the step outside button. That's it." The
+  // room's words moved to its column, which a press on the plate opens.
   const built = realInterior();
-  assert.ok(built.room.body && built.room.body.length > 20, "the fixture room must have prose to show");
-  // a stand-in for markCell carrying the room's real body: the frame must pass
-  // the cell through whole, never re-render the mark itself
-  const cellHTML = `<article class="wv-card" data-id="${built.room.id}"><div class="cbody">${built.room.body}</div></article>`;
-  const html = roomCardHTML({ roomId: built.room.id, cellHTML, exitLabel: "↤ step outside" });
-  assert.match(html, /you are inside/i, "the head says where you are");
-  assert.match(html, /lamplit quay/, "the card carries the mark's body text verbatim, through its own cell");
-  // ORDER: head, then the reading, then the one act — the exit is the card's last row
-  const head = html.indexOf("you are inside"), cell = html.indexOf('class="wv-card"'), exit = html.indexOf("wv-room-card-exit");
-  assert.ok(head >= 0 && head < cell && cell < exit, "head → cell → exit row");
+  const plateHTML = `<div class="wv-nameplate" data-nameplate="${built.room.id}"><span class="wv-np-name">The Room</span></div>`;
+  const html = roomCardHTML({ roomId: built.room.id, plateHTML, exitLabel: "↤ step outside" });
+  assert.ok(html.startsWith(plateHTML), "the plate, passed through whole, comes first");
+  assert.doesNotMatch(html, /lamplit quay/, "the room's body is not on the card any more — it is the column's");
+  assert.doesNotMatch(html, /you are inside/i, "no head: the card is the plate and the way out (the head rides as its title)");
   // the SAME button the click route has always listened for, on the room it leaves
   assert.match(html, /<div class="wv-int-exit wv-room-card-exit"><button type="button" class="ctl wv-int-exit-btn" data-mark="the-town\/the-town-centre">↤ step outside<\/button><\/div>$/,
     "one exit, the card's own last row, the existing class and data-mark");
-  assert.equal(roomCardHTML({ roomId: null, cellHTML }), "", "no room, no card");
+  assert.equal(roomCardHTML({ roomId: null, plateHTML }), "", "no room, no card");
 });
 
-test("[pin] the page builds the card from the room's OWN mark cell, open but COMPACT, and it survives remounts", () => {
+test("[pin] the page builds the card from the hover's own NAMEPLATE, opens the room's column on a press, and survives remounts", () => {
   const fn = SOURCE.match(/function syncRoomCard\(boxEl, room, key = null\) \{[\s\S]*?\n  \}\n/);
   assert.ok(fn, "syncRoomCard exists");
   assert.match(fn[0], /card\.setAttribute\("data-wv-keep", ""\)/, "data-wv-keep: a scene remount keeps the card");
-  assert.match(fn[0], /card\.className = `wv-bubble wv-room-card \$\{markClasses\(mark\)\}`/, "the pinned bubble's own dress");
-  assert.match(fn[0], /cellHTML: markCell\(mark, \{ role: "fov" \}\)/, "the room's own mark cell — the card the corner dot used to open");
-  // OPEN, NOT EXPANDED (Keemin, 2026-09-23, the second POS-206 PR): the card
-  // rests compact, and the build never opens the expansion on its own
-  assert.doesNotMatch(fn[0], /_stack = \[room\.id\]/, "the build does not force the expansion open");
-  // the reader's open/closed survives a rebuild of the SAME room, and a new room starts compact
-  assert.match(fn[0], /const keptStack = card\.dataset\.room === room\.id\s*\?[^:]*\._stack[^:]*:\s*\[\];/, "the stack is kept only for the same room");
-  assert.match(fn[0], /if \(cell && keptStack\.length\) \{ cell\._stack = keptStack; renderExpansion\(cell\); \}/, "…and restored only when the reader had it open");
-  assert.ok(fn[0].indexOf("const keptStack") < fn[0].indexOf("card.innerHTML ="), "the stack is read BEFORE the rebuild replaces the cell");
+  assert.match(fn[0], /const plateHTML = markNameplateHTML\(room\.id\);/, "the plate is the hover's own component");
+  assert.match(fn[0], /card\.className = `wv-bubble wv-room-card is-plate \$\{markClasses\(mark\)\}`/, "in the bubble's dress, as a plate");
   assert.match(fn[0], /exitButtonLabel\(entered, nameOf\)/, "the exit still names the room a nested dweller lands in");
-  // A CLICK EXPANDS IT, BY THE PINNED BUBBLE'S OWN ROUTE — the card is a
-  // .wv-bubble, and a .wv-card inside a bubble toggles its stack on a click.
-  // One route: no second handler names the room card.
-  assert.match(SOURCE, /if \(b\.closest\("\.wv-bubble"\)\) \{\s*b\._stack = b\._stack\?\.length \? \[\] : \[b\.dataset\.id\];\s*renderExpansion\(b\);\s*return;\s*\}/,
-    "the bubble's click-to-expand route is the one that folds the card open and shut");
-  assert.doesNotMatch(SOURCE, /closest\("\.wv-room-card[^"]*"\).*_stack/, "no second expansion route for the room card");
+  assert.match(fn[0], /const built = `\$\{room\.id\} \$\{exitLabel\} \$\{plateHTML\}`;/, "rebuilt only when the room, the label or the plate changes");
+  // A PRESS ON THE ROOM'S PLATE OPENS AND SHUTS ITS COLUMN, and proposes no walk
+  assert.match(SOURCE, /if \(id && id === sceneRoomId\) \{\s*bubbleTrail = \[\];\s*markInteraction\.select\(markInteraction\.getState\(\)\.selectedId === id \? null : id\);/,
+    "the room's plate toggles its own selection, not selectMark's walk preview");
   // retired: the pane pill, and the telling's second copy of the button
   assert.doesNotMatch(SOURCE, /wv-scene-exit/, "the bottom-left pill is gone, selector and all");
   assert.equal((SOURCE.match(/class="ctl wv-int-exit-btn"/g) ?? []).length, 1, "ONE exit button in the source: the card's");
@@ -125,21 +115,20 @@ test("[pin] the page builds the card from the room's OWN mark cell, open but COM
   assert.match(SOURCE, /const onPane = \(id\) => \(id && id === sceneRoomId \? null : id\);/, "the mounted room is never a bubble");
 });
 
-test("[pin] the card's way out is the FILLED pill, and only the card's (Keemin: \"the step outside button needs to stand out more\")", () => {
+test("[pin] the card's way out is the FILLED pill, smaller, and only the card's (Darko 2026-10-15: \"one smaller version of the step outside button\")", () => {
   const rule = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl \{([^}]*)\}/);
   assert.ok(rule, "a modifier scoped to the card's exit row");
   assert.match(rule[1], /background:#e8c48b/, "amber ground");
   assert.match(rule[1], /color:#0d1426/, "the town's navy on it");
-  assert.match(rule[1], /width:100%/, "the whole width of its row");
-  assert.match(rule[1], /font-size:\.82rem/, "a step up in size");
-  assert.match(rule[1], /padding:\.7em 1em/, "and in padding");
+  assert.match(rule[1], /font-size:\.7rem/, "smaller now, beside the plate (was .82rem, full width)");
+  assert.match(rule[1], /width:auto/, "no longer the whole width of a row");
   const hover = SOURCE.match(/\n\.wv-int-exit\.wv-room-card-exit \.ctl:hover \{([^}]*)\}/);
   assert.ok(hover && /background:#d4a862/.test(hover[1]), "hover deepens the ground");
   // the crossing sheet's outline pill is untouched: the shared rule still dresses it
   assert.match(SOURCE, /\n\.wv-int-exit \.ctl, \.wv-cross-row \.ctl \{[^}]*color:#e8c48b; background:rgba\(13,20,38,\.92\);/, "the shared outline pill is unchanged");
   assert.doesNotMatch(SOURCE, /\n\.[^\n{]*wv-cross-row[^\n{]*\{[^}]*background:#e8c48b/, "no filled dress leaks onto the crossing sheet");
   // same class, same glyph
-  assert.match(roomCardHTML({ roomId: "r", cellHTML: "", exitLabel: "↤ step outside" }), /class="ctl wv-int-exit-btn" data-mark="r">↤ step outside</);
+  assert.match(roomCardHTML({ roomId: "r", plateHTML: "", exitLabel: "↤ step outside" }), /class="ctl wv-int-exit-btn" data-mark="r">↤ step outside</);
 });
 
 test("the telling's plaque says who is here, and leaves the room's name and words to the card", () => {

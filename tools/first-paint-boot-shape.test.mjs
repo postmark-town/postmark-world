@@ -68,6 +68,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { townRegionMarks, MINE_PAGE_SIZE } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SERVED = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
@@ -214,7 +215,7 @@ before(async () => {
 /** One signed-in boot, with every office request timed. */
 async function bootAndWatch() {
   office.forget();   // this office serves every boot; the portfolio book is this one's
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const asked = [];      // { url, at } — WHAT the boot asked for; the office keeps the ORDER
   page.on("request", (r) => asked.push({ url: r.url(), at: Date.now() }));
   await page.addInitScript((base) => { try { localStorage.setItem("pm.office.base", base); } catch {} },
@@ -284,7 +285,8 @@ test("THE PALETTE IS ASKED FOR ONCE IN A BOOT", async (t) => {
   const palette = asked.filter((r) => {
     if (!r.url.includes("/world/apex")) return false;
     const q = new URL(r.url).searchParams;
-    return !!q.get("handle") && q.get("telling") !== "true";
+    // and a read: shadow or a close look (mark:, investigate:) is another question again (POS-678)
+    return !!q.get("handle") && q.get("telling") !== "true" && !q.get("read") && !q.get("mark") && !q.get("investigate");
   });
 
   assert.equal(palette.length, 1,

@@ -6,7 +6,6 @@ date: 2026-08-20
 class: holo
 version: 2
 extends: stamp
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

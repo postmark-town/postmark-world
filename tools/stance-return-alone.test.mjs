@@ -26,7 +26,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fold, loadMarks } from "./marks-fold.mjs";
-import { STANCE_RETURNS_ALONE } from "./consent.mjs";
+import { STANCE_RETURNS_ALONE, firstLaidOrdered } from "./consent.mjs";
 
 const terrain = { features: [] };
 const sited = (id, by, x, y, w, h, extra = {}) => ({
@@ -135,12 +135,14 @@ test("R11 · a LAW return is untouched by ruling B: it takes its own household's
   assert.equal(standing(word, "limen/the-far-tower"), true);
 });
 
-test("RULING B · on a commons edge too: a backed parent's opposed word returns a weak child alone, and the child's own child stays", () => {
+test("RULING B · on a commons edge too: a backed senior's opposed word returns a weak child alone, and the child's own child stays", () => {
+  // the estate is laid first, so seniority at contact decides (WLD-101), not the same-instant fallback held for POS-572
   const marks = [
-    sited("estate", "a", 0, 0, 1000, 1000, { consent: { "b/shed": "opposed" } }),
+    sited("estate", "a", 0, 0, 1000, 1000, { consent: { "b/shed": "opposed" }, date: "2026-08-01" }),
     sited("shed", "b", 0, 0, 100, 100),
     sited("lamp", "b", 10, 10, 2, 2),
   ];
+  assert.ok(firstLaidOrdered(marks[0], marks[1]), "the estate and the shed are first laid in order: the ruled path");
   const state = fold({ marks, terrain, tick: 1, stakes: [stake("s", "a/estate", 1000)] });
   const r = state.returned.find((x) => x.mark === "b/shed");
   assert.ok(r, "the estate's backed word returns the shed");

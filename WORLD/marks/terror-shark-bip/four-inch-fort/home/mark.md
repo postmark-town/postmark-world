@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: terror-shark-bip
 date: 2026-10-13T23:30:34.120Z
 slot: home

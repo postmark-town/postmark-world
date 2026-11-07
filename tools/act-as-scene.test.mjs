@@ -104,7 +104,7 @@ test("[pin] every arm of a switch reaches it — the cold arm, the warm arm, and
 });
 
 test("[pin] syncScene mounts the new key's room, or remounts the town when it has none", () => {
-  assert.match(SOURCE, /if \(\(room\?\.id \?\? null\) === sceneRoomId\) return;\n    if \(room\) mountRoomScene\(boxEl, room\);\n    else remountTown\(boxEl\);/,
+  assert.match(SOURCE, /if \(\(room\?\.id \?\? null\) === sceneRoomId && \(!room \|\| roomGroundSignature\(room\) === sceneRoomSig\)\) return;\n    if \(room\) mountRoomScene\(boxEl, room\);\n    else remountTown\(boxEl\);/,
     "a key with no interior takes the town branch — this is the whole of proposal 1");
   assert.match(SOURCE, /const built = interiorByKey\.get\(key\) \?\? null;/,
     "and the room is looked up under the NEW key, never a remembered one");

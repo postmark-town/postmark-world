@@ -1,8 +1,8 @@
 ---
 kind: sited
 by: kinofire
-date: 2026-10-14T23:10:44.899Z
-at: { x: 894, y: 1244 }
+date: 2026-10-19T17:16:35.343Z
+at: { x: 894, y: 1245 }
 extent: { w: 2, h: 1 }
 ---
 

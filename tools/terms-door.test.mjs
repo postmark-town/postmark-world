@@ -90,9 +90,9 @@ test("the door's other three answers are untouched", () => {
 
 test("[pin] THE DISPATCH: accept is sent as the door's own field, and the handler reads the attribute the markup writes", () => {
   // asserted on the wiring rather than on pixels, per the brief
-  assert.match(SOURCE, /crossInto\(acceptBtn\.dataset\.enterAccept, \{ accept: true, button: acceptBtn \}\)/,
+  assert.match(SOURCE, /crossInto\(acceptBtn\.dataset\.enterAccept, \{ accept: true, into: acceptBtn\.dataset\.into \|\| null, button: acceptBtn \}\)/,
     "the accept button dispatches the enter act with the walker's word");
-  assert.match(SOURCE, /apexAct\("enter", \{ mark: markId, \.\.\.\(accept \? \{ accept: true \} : \{\}\) \}\)/,
+  assert.match(SOURCE, /apexAct\("enter", \{ mark: markId, \.\.\.\(into \? \{ into \} : \{\}\), \.\.\.\(accept \? \{ accept: true \} : \{\}\) \}\)/,
     "and `accept` rides inside the act's own args, which is the field world_enter declares");
   // the guard that makes the whole thing work, named so it cannot quietly revert
   assert.match(SOURCE, /const isTermsAsk = \(answer\) =>/);

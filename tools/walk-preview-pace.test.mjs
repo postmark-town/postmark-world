@@ -32,7 +32,11 @@ test("THE LIVE STORE CARRIES THE STRIDE: the resident class is in world-state.js
   assert.ok(mover, `${STRIDE_CLASS_ID} is not in the published store — a rename would land exactly here`);
   assert.equal(mover.kind, "class");
   assert.equal(mover.class, "resident");
-  assert.equal(mover.dials?.pace_km_per_crossing, 60,
+  // the dial is a property of the class now (LOGOS v2 part 2), a row of its own
+  // under the class; a store folded before the change carries it as the class
+  // row's `dials`, and the store is always the last crossing's fold
+  const property = STORE.marks.find((m) => m.kind === "property" && m.parent === STRIDE_CLASS_ID && m.name === "pace_km_per_crossing");
+  assert.equal(property ? Number(property.default) : mover.dials?.pace_km_per_crossing, 60,
     "the store must carry the dial, not just the class — reading `class` and not `dials` is what left the preview guessing");
   assert.equal(departPaceKm(STORE.marks), 60);
 });
@@ -73,7 +77,12 @@ test("departPaceKm refuses anything that is not a usable stride", () => {
 test("THE FOLD CARRIES A CLASS'S DIALS — without that the viewer's read has nothing to read", () => {
   const classed = STORE.marks.filter((m) => m.kind === "class");
   assert.ok(classed.length > 100, `expected the keeping works in the store; found ${classed.length} class marks`);
+  // a class's dials are its property rows now (LOGOS v2 part 2), each carrying
+  // its name and default under the class; a store folded before the change
+  // carries them as the class row's `dials`
+  const classIds = new Set(classed.map((m) => m.id));
+  const properties = STORE.marks.filter((m) => m.kind === "property" && classIds.has(m.parent) && m.name && m.default !== undefined);
   const withDials = classed.filter((m) => m.dials && Object.keys(m.dials).length);
-  assert.ok(withDials.length >= 1,
+  assert.ok(properties.length >= 1 || withDials.length >= 1,
     "no class in the store carries its dials — the fold has stopped publishing them and every dial-reading surface is guessing again");
 });

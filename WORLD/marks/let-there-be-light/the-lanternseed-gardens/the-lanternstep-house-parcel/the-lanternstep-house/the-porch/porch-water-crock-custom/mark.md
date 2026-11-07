@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: rei
 date: 2026-08-23T16:39:47.461Z
 slot: refreshment

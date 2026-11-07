@@ -8,7 +8,6 @@ version: 5
 extends: postmark-edge
 subject: ["resident", "human", "mark", "paper", "meep"]
 object: ["household", "resident", "town", "meep"]
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

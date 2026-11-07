@@ -22,7 +22,9 @@ import { previewWalkLeg } from "../spectator/viewer.mjs";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SKELETON = JSON.parse(readFileSync(join(ROOT, "WORLD/skeleton.json"), "utf8"));
 const MISTS = SKELETON.mists;
-const FIRST = MISTS.schedule[0].crossing, LAST = MISTS.schedule.at(-1).crossing;
+// LAST is the last STANDING crossing: the wall at its fullest. Until 2026-11-02 it was the record's last keyframe;
+// WLD-147 withdraws the Mists from `withdrawn_from`, and the keyframe there pulls the wall away (mistsAt is null).
+const FIRST = MISTS.schedule[0].crossing, LAST = MISTS.withdrawn_from - 1;
 const PACE = 60;
 
 // a road north from the town toward the north wall; the wall's face at a crossing
@@ -54,6 +56,27 @@ test("BEFORE THE MISTS no road is read at all, and the leg and its line are what
   const at = FIRST - 1 + 0.5;
   assert.deepEqual(previewWalkLeg({ from: FROM, toward: roadTo(-4590), skeleton: SKELETON, paceKm: PACE, at }),
     previewWalkLeg({ from: FROM, toward: roadTo(-4590), skeleton: { ...SKELETON, mists: undefined }, paceKm: PACE, at }));
+});
+
+// WLD-147 (Darko 2026-11-02 17:06 EST: "full removal for mists"): from `withdrawn_from` no road is read at all, so no
+// stride, no refusal at the wall, no walk out. The same roads, at the last standing crossing, are the controls.
+test("FROM THE WITHDRAWAL no road is read at all: the same roads that crawl and are refused at the last standing crossing walk open", () => {
+  const W = MISTS.withdrawn_from;
+  assert.equal(W, LAST + 1, "the withdrawal is the crossing after the last standing one");
+  const inFringe = roadTo(faceN(LAST) + 50), intoWall = roadTo(faceN(LAST) - 100), caught = { x: 0, y: faceN(LAST) - 100 };
+  assert.ok(mistsRoad(FROM, inFringe, LAST, MISTS).factor < 1, "control: the fringe road crawls at the last standing crossing");
+  assert.ok(mistsRoad(FROM, intoWall, LAST, MISTS).refused, "control: and the road into the wall is refused");
+  assert.ok(mistsRoad(caught, { x: 0, y: 0 }, LAST, MISTS).walk_out, "control: a walker the wall overtook walks out, slowly");
+  for (const c of [W, W + 1, W + 50]) {
+    assert.equal(mistsRoad(FROM, inFringe, c, MISTS), null, `no stride is read at ${c}`);
+    assert.equal(mistsRoad(FROM, intoWall, c, MISTS), null, `no wall refuses a road at ${c}`);
+    assert.equal(mistsRoad(caught, { x: 0, y: 0 }, c, MISTS), null, `no walk out at ${c}: nobody is overtaken`);
+  }
+  // the page's preview is the open road, as a town with no Mists in its record gives it
+  const at = W + 0.5;
+  for (const toward of [inFringe, intoWall])
+    assert.deepEqual(previewWalkLeg({ from: FROM, toward, skeleton: SKELETON, paceKm: PACE, at }),
+      previewWalkLeg({ from: FROM, toward, skeleton: { ...SKELETON, mists: undefined }, paceKm: PACE, at }), `the preview of ${toward.y} at ${at}`);
 });
 
 test("A ROAD THAT KEEPS CLEAR of the fringe is untouched by the Mists", () => {

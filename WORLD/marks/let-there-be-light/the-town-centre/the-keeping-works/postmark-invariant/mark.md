@@ -5,7 +5,6 @@ tier: constitution
 date: 2026-08-22
 class: postmark-invariant
 version: 1
-dials: {}
 implements: ["the-town/the-invariant"]
 source: LOGOS/classes.md
 ---

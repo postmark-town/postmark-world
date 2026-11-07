@@ -20,7 +20,7 @@
 // Pure-ish: reads the two files it is pointed at, nothing else. No fold, no
 // engine, no clock of its own — the caller passes the instant it means.
 
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import { parseWalkLedger } from "./walk.mjs";
@@ -87,4 +87,53 @@ export function mergedRecords(root, { atMs = Date.now() } = {}) {
       return a.era === b.era ? 0 : (a.era === "ledger" ? -1 : 1);
     })
     .filter((r) => Date.parse(r.iso) <= atMs && r.from && r.toward && Number.isFinite(r.at));
+}
+
+// ── THE SPECTATOR'S ONE MOVEMENT READ (WLD-98) ─────────────────────────────
+//
+// The local spectator read the frozen ledger alone, so every walk since the seam
+// was missing from its walkers and its Lately. It reads THIS module now, both eras,
+// the same join the engine's other readers use (3D's reconvergence A1 wants the
+// same one read).
+
+/**
+ * Both eras as the spectator serves them: `{ departures, unrecognized }`, the
+ * ledger's grammar, oldest first. `worldDir` (a perf run's synthetic world) has no
+ * store era, so it is its ledger alone, exactly as before. Kept per change of the
+ * record (the ledger's size and time, the log's file list), so a polling viewer
+ * does not re-read every STATE/log file each time.
+ */
+const kept = { key: null, value: null };
+export function spectatorDepartures(root, { worldDir = null } = {}) {
+  const ledgerPath = worldDir ? join(worldDir, "walk-ledger.md") : join(root, LEDGER_REL);
+  const logDir = join(root, LOG_REL);
+  const ledgerStat = existsSync(ledgerPath) ? statSync(ledgerPath) : null;
+  const logs = !worldDir && existsSync(logDir) ? readdirSync(logDir).filter((n) => n.endsWith(".jsonl")) : [];
+  const key = JSON.stringify([ledgerPath, ledgerStat?.size ?? null, ledgerStat?.mtimeMs ?? null, logs.length, logs.at(-1) ?? null,
+    logs.length ? statSync(join(logDir, [...logs].sort().at(-1))).mtimeMs : null]);
+  if (kept.key === key) return kept.value;
+  const ledger = ledgerStat ? parseWalkLedger(readFileSync(ledgerPath, "utf8")) : { departures: [], unrecognized: [] };
+  const departures = worldDir ? ledger.departures
+    : [...ledger.departures.map((d) => ({ ...d, era: "ledger" })), ...storeRecords(root)]
+      .sort((a, b) => (Date.parse(a.iso) - Date.parse(b.iso)) || (a.era === b.era ? 0 : a.era === "ledger" ? -1 : 1))
+      .filter((r) => r.from && r.toward && Number.isFinite(r.at));
+  kept.key = key;
+  kept.value = { departures, unrecognized: ledger.unrecognized };
+  return kept.value;
+}
+
+/**
+ * The office's `/world2/walks` shape, so the viewer's office-first loader reads
+ * the same record locally: `{ walks: [{ iso, handle, from, toward, at, within, to,
+ * pace }] }`, the store's column names (`within`, `to`) for what walk.mjs calls
+ * targetExtent and targetMarkId, from `since` on (ISO with a fixed Z offset
+ * compares as a string, as the viewer compares it).
+ */
+export function officeWalks(departures, { since = null } = {}) {
+  return {
+    walks: departures.filter((d) => !since || String(d.iso) >= since).map((d) => ({
+      iso: d.iso, handle: d.handle, from: d.from, toward: d.toward, at: d.at,
+      within: d.targetExtent ?? null, to: d.targetMarkId ?? null, pace: d.pace ?? null,
+    })),
+  };
 }

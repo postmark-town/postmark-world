@@ -92,21 +92,27 @@ test("the relative links into and out of the new document resolve", () => {
   }
 });
 
-test("the doctrine's own explanation of `kind` names every value the unchanged lint accepts — class included", () => {
+// ⚠ SUPERSEDED 2026-10-17 (LOGOS v2 part 2, the data change WLD-73 part 2 owed):
+// these two pinned the lint's five kinds and lifetimes.md's sentence about them
+// ("the field and its five values are what they were"). lifetimes.md already
+// marks that sentence SUPERSEDED (2026-10-16) and names the records, the lint and
+// SCHEMA.md as keeping the old filing "until the owed data change". This is it:
+// `property` joins, so what is pinned now is that the record's own
+// explanation (SCHEMA.md) and the lint agree, kind for kind.
+test("the record's own explanation of `kind` names every value the lint accepts — class and property included", () => {
   const kinds = JSON.parse(read("tools/mark-lint.mjs").match(/^const KINDS = new Set\((\[[^\n]+\])\);$/m)[1]);
-  assert.equal(kinds.length, 5);
-  // only the enumeration sentence: "class param" elsewhere in the document is not it
-  const explanation = read("LOGOS/lifetimes.md").match(/A mark's `kind` field[\s\S]*?(?=\(WORLD\/marks\/SCHEMA\.md\))/)?.[0];
-  assert.ok(explanation, "lifetimes.md explains the kind field");
+  assert.deepEqual(kinds, ["sited", "predicate", "predicated", "naming", "parcel", "class", "property"]);
+  // only the enumeration sentence of SCHEMA.md, never its superseded quotation
+  const explanation = read("WORLD/marks/SCHEMA.md").match(/The field `kind` describes how a record stands[\s\S]*?\(WLD-39\)/)?.[0];
+  assert.ok(explanation, "SCHEMA.md explains the kind field");
   for (const kind of kinds) assert.match(explanation, new RegExp(`\\b${kind}\\b`), `the explanation omits ${kind}`);
 });
 
-test("a mark's `kind` is unchanged: SCHEMA says it is how a mark stands, the field and its five values are what they were", () => {
+test("`kind` is still how a record stands, and lifetimes are still another word: SCHEMA says so, and the table row is untouched", () => {
   const schema = read("WORLD/marks/SCHEMA.md");
-  assert.match(schema, /The field `kind` describes how a mark stands — sited, predicated, parcel,\nnaming, or `class`/);
+  assert.match(schema, /The field `kind` describes how a record stands — sited, predicate, parcel,\nnaming, `class` or `property` \(note ⁷; a claim's was `predicated` until G10\) — and nothing else: standing, living and fleeting\nare lifetimes/);
   assert.match(schema, /^\| `kind` \| required \| required \| required \| required \|$/m, "the frontmatter table row is untouched");
   const lint = read("tools/mark-lint.mjs");
-  assert.match(lint, /^const KINDS = new Set\(\["sited", "predicated", "naming", "parcel", "class"\]\);$/m);
   assert.match(lint, /cite\("the-town\/the-kinds"\)/, "historical mark ids keep their names");
 });
 

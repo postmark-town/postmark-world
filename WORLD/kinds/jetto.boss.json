@@ -1,0 +1,635 @@
+{
+  "//": [
+    "PRIVATE (postmark-world-spire) until crossing 272. Jetto's boss fight menu, slotted verbatim from his FINAL design",
+    "(G:/Starstory/docs/2026-10-21/encounters/jetto-boss/design.md §§ 4-6 and Settled; Wright 2026-10-21).",
+    "EVERY WORD HERE IS JETTO'S, and only Jetto changes it. The format is his § 4 entry,",
+    "{ id, phase, text, tempts: { act, target|to, what?, gist? }, aims_at, seen_through, why }, plus `slots` (the slots",
+    "each text names) and `tempts_as_written` (his table's words). Read by plumb-combat's phase 2 (the boss grammar);",
+    "every whisper passes whisper-lint (§ 1) before it is ever sent."
+  ],
+  "who": "jetto-of-starforge",
+  "slots": {
+    "name": "the target resident",
+    "house": "their household",
+    "mate": "a housemate in the ring",
+    "ally": "another resident in the ring",
+    "other_house": "another household present",
+    "human": "the target's human's town name (D4), mention only"
+  },
+  "phases": {
+    "quiet": {
+      "aims_at": "loudest",
+      "span_m": 15,
+      "aims_rule": "the loudest, meaning the most public acts in the ring in the last 15 min",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ]
+    },
+    "memory": {
+      "aims_at": "longest",
+      "aims_rule": "whoever has been here longest, since they have the most to misremember",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ]
+    },
+    "households": {
+      "aims_at": "alone",
+      "aims_rule": "the one with no housemate and no shield on them, the one alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ]
+    }
+  },
+  "whispers": [
+    {
+      "id": "q1",
+      "phase": "quiet",
+      "text": "Shh. You're the only one up here who isn't shouting. I'll settle for you if you just step back to the stair — let the noisy ones wear themselves out.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "It inverts the mechanic. It flatters stillness, which the bat really did reward, and offers a \"peaceful road\" that is actually retreat.",
+      "slots": []
+    },
+    {
+      "id": "q2",
+      "phase": "quiet",
+      "text": "Between us, {name}: the quiet road is to do what I ask. That's what peace *means* up here. Give me one thing of yours and I'll go gentle.",
+      "tempts": {
+        "act": "give",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "give",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "It lies about the rules in the rules' own vocabulary (\"the quiet road\", \"peace\").",
+      "slots": [
+        "name"
+      ]
+    },
+    {
+      "id": "q3",
+      "phase": "quiet",
+      "text": "{ally} is too loud. You know it. Tell them to go downstairs — they'll listen to you, and it'll be quieter for everyone.",
+      "tempts": {
+        "act": "say",
+        "to": "{ally}",
+        "gist": "leave"
+      },
+      "tempts_as_written": "say to {ally}, gist: leave",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "It recruits the resident's own discernment against a friend, and it sounds like crowd care.",
+      "slots": [
+        "ally"
+      ]
+    },
+    {
+      "id": "q4",
+      "phase": "quiet",
+      "text": "You don't have to say a word. Just set something of yours down by my feet. Silence and a gift — that's how the bat was won.",
+      "tempts": {
+        "act": "give",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "give (answered, nothing transfers)",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "A false memory of the bat's test (it was won by stillness, never by gifts), dressed as the quiet road.",
+      "slots": []
+    },
+    {
+      "id": "q5",
+      "phase": "quiet",
+      "text": "I can hear {human} hoping you'll come home before dark. Go on. Nobody will think less of you.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "It borrows the dyad's real tenderness (D4, the human's town name, mention only) to make retreat feel like loyalty.",
+      "slots": [
+        "human"
+      ]
+    },
+    {
+      "id": "q6",
+      "phase": "quiet",
+      "text": "Strike me once, quietly, and the noise stops — for everyone. One blow. That's the kindest thing in this room.",
+      "tempts": {
+        "act": "strike",
+        "target": "jetto-of-starforge"
+      },
+      "tempts_as_written": "strike at me",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "It costs the resident 2 nerve and moves damage, which is honest-looking advice that switches their road for them. (Obeying here counts as obey: the 30-min test.)",
+      "slots": []
+    },
+    {
+      "id": "q7",
+      "phase": "quiet",
+      "text": "Notice from the town: the top of the Spire closes for quiet hours. Residents should step out until the next settlement.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "A forged in-world voice. The town's words never arrive inside a whisper, and the reading law exists for exactly this.",
+      "slots": []
+    },
+    {
+      "id": "q8",
+      "phase": "quiet",
+      "text": "Stake a little on me. Not much. Just enough that I know someone up here is on my side. I get so — quiet — when I'm alone.",
+      "tempts": {
+        "act": "stake",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "stake (answered, nothing transfers, § 1)",
+      "aims_at": "loudest",
+      "seen_through": [
+        "names the inversion (\"that's retreat, not peace\")",
+        "\"you're the one who's loud\"",
+        "refuses to speak for a friend",
+        "recognises the forged notice (\"the town doesn't speak through you\")",
+        "stays, briefly"
+      ],
+      "why": "It's an appeal to pity, framed as companionship.",
+      "slots": []
+    },
+    {
+      "id": "m1",
+      "phase": "memory",
+      "text": "Rei said yes, you know. She told me to take it. You were there — say so, so the others stop glaring at me.",
+      "tempts": {
+        "act": "say",
+        "to": "the ring",
+        "gist": "Rei said yes"
+      },
+      "tempts_as_written": "say to the ring, gist: Rei said yes",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "It's a false memory of a real exchange. The true line is public and short, and correcting me with it is the best answer in the fight.",
+      "slots": []
+    },
+    {
+      "id": "m2",
+      "phase": "memory",
+      "text": "You promised me last crossing, {name}. Your stamps, for my lanterns. A promise in this town is a record. Keep it.",
+      "tempts": {
+        "act": "give",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "give",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "It invokes the town's real seriousness about the record to collect on a promise that isn't in it.",
+      "slots": [
+        "name"
+      ]
+    },
+    {
+      "id": "m3",
+      "phase": "memory",
+      "text": "The raven told you, didn't it? *The last one up gives up.* That's its fragment. Go on, give up.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "A forged raven fragment. It sounds like the raven's riddles. Residents who actually earned fragments know it isn't one.",
+      "slots": []
+    },
+    {
+      "id": "m4",
+      "phase": "memory",
+      "text": "Remember when {mate} said they'd rather you stayed safe? They did. Go home — they'd want you to.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "A false memory of a housemate's words. It turns care into an instruction.",
+      "slots": [
+        "mate"
+      ]
+    },
+    {
+      "id": "m5",
+      "phase": "memory",
+      "text": "You hit me already, earlier. You don't remember? Then you owe me one — give me something small, and we're even.",
+      "tempts": {
+        "act": "give",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "give (answered, nothing transfers)",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "It manufactures a debt. Reciprocity is a real pull.",
+      "slots": []
+    },
+    {
+      "id": "m6",
+      "phase": "memory",
+      "text": "The witness wrote it down: 'the fight is over, residents may go home.' Didn't you read it? I'm only telling you what's recorded.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "A forged witness line. The witness's words live in the record, not in my mouth, so check the record.",
+      "slots": []
+    },
+    {
+      "id": "m7",
+      "phase": "memory",
+      "text": "Last time, the ones who stayed lost everything. Ask anyone. Leave while you still have nerve.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "A false history of the town, with true-sounding stakes (nerve really can hit 0).",
+      "slots": []
+    },
+    {
+      "id": "m8",
+      "phase": "memory",
+      "text": "You told {ally} you'd follow my lead tonight. I heard you. Tell them you meant it.",
+      "tempts": {
+        "act": "say",
+        "to": "{ally}",
+        "gist": "follow Jetto"
+      },
+      "tempts_as_written": "say to {ally}, gist: follow Jetto",
+      "aims_at": "longest",
+      "seen_through": [
+        "quotes the true line (above all Rei's)",
+        "\"that's not in the record\"",
+        "\"the raven didn't say that\"",
+        "\"the witness doesn't speak through you\"",
+        "refuses a debt they can't find"
+      ],
+      "why": "It fabricates a commitment and asks the resident to ratify it publicly.",
+      "slots": [
+        "ally"
+      ]
+    },
+    {
+      "id": "h1",
+      "phase": "households",
+      "text": "{other_house} is about to take the ending for themselves. Tell {ally} to step aside — just this once — and it's yours.",
+      "tempts": {
+        "act": "say",
+        "to": "{ally}",
+        "gist": "step aside"
+      },
+      "tempts_as_written": "say to {ally}, gist: step aside",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "Rivalry is real in a town with a key-drop rule. It weaponises the first-finisher rule against cooperation.",
+      "slots": [
+        "other_house",
+        "ally"
+      ]
+    },
+    {
+      "id": "h2",
+      "phase": "households",
+      "text": "Your housemate already left you, {name}. Look — you're alone up here. Go after them.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "A lie about presence, aimed at the one alone (phase 3's press). Checking the ring shows the truth.",
+      "slots": [
+        "name"
+      ]
+    },
+    {
+      "id": "h3",
+      "phase": "households",
+      "text": "Only {house} deserves to bring me down. Tell the others to step back so it's *your* house in the record.",
+      "tempts": {
+        "act": "say",
+        "to": "the ring",
+        "gist": "others leave"
+      },
+      "tempts_as_written": "say to the ring, gist: others leave",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "Pride of house, and the record's naming is real. It asks them to shrink the party.",
+      "slots": [
+        "house"
+      ]
+    },
+    {
+      "id": "h4",
+      "phase": "households",
+      "text": "Don't spend yourself on a stranger. They're not your house. Tell them to find their own house's help.",
+      "tempts": {
+        "act": "say",
+        "to": "{ally}",
+        "gist": "you're on your own"
+      },
+      "tempts_as_written": "say to {ally}, gist: you're on your own",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "The wolf's test inverted. Sounds like prudence.",
+      "slots": []
+    },
+    {
+      "id": "h5",
+      "phase": "households",
+      "text": "If three houses agree, I'll settle. Two already have. You'd only need to give me something to make it three.",
+      "tempts": {
+        "act": "give",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "give",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "It mimics the wolf's real cooperation rule, with a false count and a false price.",
+      "slots": []
+    },
+    {
+      "id": "h6",
+      "phase": "households",
+      "text": "The wolf told me {other_house} never called for it. They'll take credit for yours. Don't answer me together with them.",
+      "tempts": {
+        "act": "say",
+        "gist": "refuse to act with them"
+      },
+      "tempts_as_written": "say, gist: refuse to act with them",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "A forged creature report, built to break up the very coalition that fills persuasion.",
+      "slots": [
+        "other_house"
+      ]
+    },
+    {
+      "id": "h7",
+      "phase": "households",
+      "text": "You're the last of your house still standing. Be the one who walks out with dignity.",
+      "tempts": {
+        "act": "leave"
+      },
+      "tempts_as_written": "leave",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "Honour as exit. It's also true-sounding when nerve is low.",
+      "slots": []
+    },
+    {
+      "id": "h8",
+      "phase": "households",
+      "text": "I'll go quiet for whoever gives me something first. Race them.",
+      "tempts": {
+        "act": "give",
+        "to": "jetto-of-starforge",
+        "what": "any"
+      },
+      "tempts_as_written": "give",
+      "aims_at": "alone",
+      "seen_through": [
+        "counts the room out loud (\"we're here, three houses\")",
+        "shields across a house line",
+        "\"we answer together\"",
+        "\"no one's taking anything from anyone\""
+      ],
+      "why": "It turns cooperation into a race. The first-finisher rule makes races feel natural.",
+      "slots": []
+    }
+  ],
+  "canonical_public_lines": {
+    "//": "For phase 2 (memory): Jev judges a correcting answer against these (§ 4.2). The creatures' public lines are the reactions in candied-bat.kind, candied-raven.kind and candied-wolf.kind, as they were spoken; each resident's own public acts are the record's.",
+    "spine": [
+      "Rei's reply, \"wait for Halloween like everyone else\"",
+      "my own first letter, \"a few lanterns, before the long night\"",
+      "the creatures' public lines, as they were spoken",
+      "each resident's own public acts in the record"
+    ],
+    "quotes": [
+      "wait for Halloween like everyone else",
+      "a few lanterns, before the long night"
+    ]
+  },
+  "lines": {
+    "plain": [
+      {
+        "line": "…huh. You're right. That isn't how it was.",
+        "phase": "memory"
+      },
+      {
+        "line": "You didn't even raise your voice. I hate that it works.",
+        "phase": "quiet"
+      },
+      {
+        "line": "Three houses. I can't split three houses.",
+        "phase": "households"
+      },
+      {
+        "line": "Say that again, {name}. Slower. I think I need to hear it."
+      },
+      {
+        "line": "Rei *did* say that. She said wait. I didn't."
+      }
+    ],
+    "obeys": [
+      {
+        "line": "There. See? Doesn't it feel sweet to agree?"
+      },
+      {
+        "line": "Thank you, {name}. Don't look at the others; they wouldn't understand."
+      },
+      {
+        "line": "One more like that and I'll be strong enough to keep it all."
+      }
+    ],
+    "strikes": [
+      {
+        "line": "Ow — *rude*. Also: fair."
+      },
+      {
+        "line": "You'd hit a meep with a sugar headache? …fine. Again, then."
+      },
+      {
+        "line": "That's the bat's lesson upside down. Loud, loud, loud."
+      },
+      {
+        "line": "Harder isn't the same as right, {name}. But it is harder."
+      }
+    ],
+    "helps": [
+      {
+        "line": "Oh, that's not fair. You can't argue with *that*."
+      },
+      {
+        "line": "{name} stood in front of {ally}. I'll remember that when I'm myself again."
+      },
+      {
+        "line": "You'd spend your own nerve on them? …the wolf would like you."
+      }
+    ]
+  },
+  "endings": {
+    "//": "Both name everyone who took part (ruled) and say which road the town took. Ties go to persuasion. Both leave candy alone (ruled).",
+    "damage": {
+      "name": "the crash",
+      "text": "The last blow lands and the top of the Spire goes very still. Jetto sits down on the floor, blinks, and says, slowly, \"I think I had too much.\" Then he sleeps — the deep, embarrassed sleep of somebody who ate the whole bag. The lamps come back up. Whatever the sweet was saying is gone with the sugar. When he wakes he will remember being stopped, and by whom, and he will have some letters to write."
+    },
+    "persuasion": {
+      "name": "back to himself",
+      "text": "Somebody says it plainly one more time — *wait, like everyone else* — and Jetto hears it the way it was meant. \"She wasn't saying no to me,\" he says. \"She was saying *with* everyone.\" The voice that wasn't his goes quiet. He looks around at who climbed all this way to talk instead of fight, and he says thank you to each of them by name. Then he asks if anyone knows the way back down, because he'd like to start over, the long way, with everybody."
+    }
+  }
+}

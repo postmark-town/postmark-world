@@ -32,6 +32,7 @@ import {
   markInDrawnBounds,
   pointInDrawnBounds,
   walkerFrameSVG,
+  farWalkLegsSVG,
   WALKER_FRAME,
   overlayHouseGlyphSVG,
   overlayHomeCardSVG,
@@ -268,12 +269,15 @@ test("[pin] THE TIER IS THE CAMERA'S ON EVERY PATH — no resident-path null, no
   // ⚑ THE FLIP: restore `onResidentPath() ? null :` in drawTier → the first and last lines red.
 });
 
-test("[pin] THE PLACEHOLDER BLOCK IS HALF PRESENT — the ground reads through it (founder, 2026-09-11, revising 08-20's 'no transparency games')", () => {
-  assert.match(SOURCE, /\.wv-ph-extent \{ [^}]*opacity:\.5;/, "50%, on the element, so the edge fades with the fill");
+test("[pin] AN IMAGE-LESS MARK IS ITS OUTLINE; ONLY A THING KEEPS THE HALF-PRESENT BLOCK (Darko, playground 2026-10-15, play fix 14, revising the founder's 2026-09-11 half block)", () => {
+  assert.match(SOURCE, /\.wv-ph-extent \{ [^}]*fill-opacity:0;/, "by default the block has no fill: the ground and any art read through it");
+  assert.match(SOURCE, /\.wv-ph-extent\.is-thing \{ [^}]*opacity:\.5; fill-opacity:1;/, "a thing keeps the 50% block, on the element, so the edge fades with the fill");
   const svg = placeholderExtentSVG({ id: "a/b", kind: "sited", at: { x: 0, y: 0 }, extent: { w: 4, h: 4 } }, (p) => p);
-  assert.match(svg, /class="wv-ph-extent"/, "the block is still the block");
-  assert.doesNotMatch(svg, /opacity/, "the half is the stylesheet's, not the markup's — one place");
-  // ⚑ THE FLIP: delete `opacity:.5;` from the .wv-ph-extent rule → reds.
+  assert.match(svg, /class="wv-ph-extent"/, "a place is the plain block");
+  assert.doesNotMatch(svg, /opacity/, "the opacity is the stylesheet's, not the markup's — one place");
+  const thing = placeholderExtentSVG({ id: "a/c", kind: "sited", class: "thing", at: { x: 0, y: 0 }, extent: { w: 4, h: 4 } }, (p) => p);
+  assert.match(thing, /class="wv-ph-extent is-thing"/, "a thing wears is-thing");
+  // ⚑ THE FLIP: drop `fill-opacity:0;` from the .wv-ph-extent rule, or the is-thing class → reds.
 });
 
 test("THE MID FURNITURE — a mark's shape without its photograph", () => {
@@ -358,10 +362,42 @@ test("townHouseMarks on the town's own record: every parcel present, and only de
   const out = townHouseMarks(TOWN.marks);
   const parcels = TOWN.marks.filter((m) => m.kind === "parcel").length;
   assert.equal(out.filter((m) => m.kind === "parcel").length, parcels, "every parcel is handed over");
-  const words = TOWN.marks.filter((m) => m.kind === "predicated" && m.slot === "home").length;
+  const words = TOWN.marks.filter((m) => (m.kind === "predicated" || m.kind === "predicate") && m.slot === "home").length;
   assert.ok(out.length <= parcels + words, "at most one house per resident's home word rides with the parcels");
   // A declared house is SITED. Its tier is not asserted: a home word does not
   // read standing, and on the committed record vermillion's house (named by his
   // own slot: home word) stands market (POS-368).
   assert.ok(out.every((m) => m.kind === "parcel" || m.kind === "sited"), "nothing but parcels and the houses declared on them");
+});
+
+test("THE TOWN'S WALKING LEGS ARE DRAWN AT TOWN WIDTH TOO — one line per mover, none for the still or the household's own (Darko, 2026-10-26)", () => {
+  const px = (m) => ({ x: m.x / 5, y: m.y / 5 });
+  const bodies = [
+    { handle: "a", x: 0, y: 0, moving: true, toward: { x: 500, y: 250 } },
+    { handle: "b", x: 10, y: 10, moving: false, toward: { x: 500, y: 250 } },   // at rest
+    { handle: "c", x: 20, y: 20, arrived: true, toward: { x: 1, y: 1 } },        // arrived, no moving flag
+    { handle: "d", x: 30, y: 30, moving: true },                                  // no destination
+    { handle: "mine", x: 40, y: 40, moving: true, toward: { x: 90, y: 90 } },    // drawn in its own colour elsewhere
+    { handle: "e", x: NaN, y: 0, moving: true, toward: { x: 1, y: 1 } },         // no place
+  ];
+  const svg = farWalkLegsSVG(bodies, px, (w) => w.handle === "mine");
+  assert.equal((svg.match(/<line /g) ?? []).length, 1, "only the mover with a destination who is not skipped");
+  assert.ok(svg.includes(`<line x1="0" y1="0" x2="100" y2="50" class="wv-walk-leg"/>`), "the leg runs from the body to where it is going, in painting units");
+  assert.equal(farWalkLegsSVG([], px), "");
+  assert.equal(farWalkLegsSVG(null, px), "");
+  // ⚑ THE FLIP: drop the moving test or the toward test in farWalkLegsSVG → the extra lines red.
+});
+
+test("[pin] THE FAR LEGS RIDE THE WALK PASS, NEVER THE CAMERA — drawn at the far tier, built once per draw, held in screen pixels", () => {
+  assert.ok(SOURCE.includes("const legs = farWalkLegsSVG(bodies, px, (w) => isOwnHandle(w.handle));\n      writeWalkLayer(paths + legs + s, bodies);\n      return;"),
+    "the far branch writes the legs under the bodies");
+  // the helper is called from the walk pass alone: not from the per-frame camera (applyCameraScale / applyView) or the wheel
+  assert.equal(SOURCE.split("farWalkLegsSVG(").length - 1, 2, "the definition and the one call in drawWalkers");
+  const camera = SOURCE.slice(SOURCE.indexOf("function applyCameraScale()"), SOURCE.indexOf("// ── WHAT THE CAMERA IS LOOKING AT"));
+  assert.doesNotMatch(camera, /farWalkLegsSVG|drawWalkers|innerHTML/, "no per-frame rebuild");
+  // the stroke is one rule in screen units, so a leg neither vanishes nor thickens with the zoom
+  assert.match(SOURCE, /.wv-walk-leg [{][^}]*vector-effect:non-scaling-stroke;/);
+  // and the layer is rewritten only when its markup changed
+  assert.ok(SOURCE.includes("if (markup !== walkState.lastMarkup) {"));
+  // ⚑ THE FLIP: put the call back to `paths + s` → the first assertion reds.
 });

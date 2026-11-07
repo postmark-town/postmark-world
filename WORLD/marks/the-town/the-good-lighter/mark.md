@@ -1,7 +1,6 @@
 ---
-kind: sited
+kind: thing
 by: the-town
-class: thing
 date: 2026-08-26
 at: { x: 1081, y: -793.8 }
 extent: { w: 0.2, h: 0.2 }

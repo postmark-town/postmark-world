@@ -186,7 +186,11 @@ const SIZED_FOR = {
 };
 // the town's own marks the clearings hold, which they must keep clear
 const TOWN_IN_A_CLEARING = ["the-town/pando-peak", "the-town/the-pando-landing"];
-const keyframesOf = (skeleton) => skeleton.mists.schedule.map((e) => e.crossing);
+// The season's STANDING keyframes: those before the withdrawal. Until 2026-11-02 this was every keyframe, and the last
+// one was the wall at its fullest; WLD-147 (Darko: "full removal for mists") appends a hold at the last standing
+// crossing and a keyframe at `withdrawn_from` that pulls the wall away (mistsAt is null there), so the last
+// keyframe is no longer a state the engine tells. Whole-withdrawal checks live in tools/mists-withdrawn.test.mjs.
+const keyframesOf = (skeleton) => skeleton.mists.schedule.filter((e) => !(e.crossing >= (skeleton.mists.withdrawn_from ?? Infinity))).map((e) => e.crossing);
 const KEYFRAMES = () => keyframesOf(real().skeleton);
 const corners = (p) => {
   const hw = (p.extent?.w ?? 0) / 2, hh = (p.extent?.h ?? 0) / 2;
@@ -207,15 +211,18 @@ const outOfTheFringe = (mk, m) => corners(mk).every((q) => { const h = mistsHere
 // households' ground each receipt names is only told about, as returned notes.
 function clearingsHold({ skeleton, worldState }) {
   const ks = keyframesOf(skeleton), byId = new Map(worldState.marks.map((m) => [m.id, m]));
-  const committed = skeleton.mists.clearings_m.map((k) => ({ id: k.id, x: k.x, y: k.y, r: k.r_m }));
+  const committed = skeleton.mists.clearings_m.map((k) => ({ id: k.id, x: k.x, y: k.y, r: k.r_m, from: k.from_crossing }));
+  // a clearing with a from_crossing stands from that crossing on (WLD-134)
+  const standingAt = (c) => committed.filter((k) => !(Number.isFinite(k.from) && c < k.from)).map(({ id, x, y, r }) => ({ id, x, y, r }));
   for (const id of Object.keys(SIZED_FOR)) assert.ok(committed.some((k) => k.id === id), `the record carries the ${id} clearing`);
   const town = TOWN_IN_A_CLEARING.map((id) => byId.get(id));
   for (const [i, mk] of town.entries()) assert.ok(mk?.at && theTowns(mk), `the town's ${TOWN_IN_A_CLEARING[i]} is on the record`);
   const notes = new Map();   // one note per household mark: the first crossing it is told at
   const note = (mid, text) => { if (!notes.has(mid)) notes.set(mid, text); };
-  for (let c = ks[0]; c <= ks.at(-1) + 10; c += 1) {
+  // every crossing the Mists stand (until 2026-11-02 this ran ten past the last keyframe, to see the wall hold; it holds now through the last standing one)
+  for (let c = ks[0]; c <= ks.at(-1); c += 1) {
     const m = mistsAt(c, skeleton.mists);
-    assert.deepEqual(m.clearings.map(({ id, x, y, r }) => ({ id, x, y, r })), committed, `the clearings stand as committed at crossing ${c}`);
+    assert.deepEqual(m.clearings.map(({ id, x, y, r }) => ({ id, x, y, r })), standingAt(c), `the clearings stand as committed at crossing ${c}`);
     for (const mk of town) {
       assert.ok(m.clearings.some((k) => Math.hypot(mk.at.x - k.x, mk.at.y - k.y) <= k.r), `the town's ${mk.id} stands in a clearing`);
       assert.ok(outOfTheFringe(mk, m), `the town's ${mk.id} is in the wall or a clearing's fringe at crossing ${c}`);
@@ -242,7 +249,7 @@ function townClear({ skeleton, worldState }) {
   const town = worldState.marks.filter((m) => m.at && theTowns(m) && !isFrame(m) && !RUNS_INTO_THE_MIST.has(m.id));
   assert.ok(town.length > 50, `the town's own marks are all here (${town.length})`);
   const covered = {};
-  for (const c of [...ks, ks.at(-1) + 10]) {
+  for (const c of ks) {   // until 2026-11-02 also ks.at(-1) + 10, to see the wall hold; the last standing keyframe is that hold now
     const m = mistsAt(c, skeleton.mists);
     for (const mk of town) assert.equal(behindTheWall(mk, m), false, `the town's ${mk.id} is behind the wall at crossing ${c}`);
     covered[c] = worldState.marks.filter((mk) => mk.at && !theTowns(mk) && !isFrame(mk) && behindTheWall(mk, m)).map((mk) => mk.id);
@@ -287,10 +294,10 @@ function nearestSighted({ skeleton, worldState, withM, without }) {
 // veil must not re-rank it. Every parcel whose standpoint stands out of the wall
 // and its fringe (inside them, sight is the fringe's own law, held above),
 // Pando's with them, at the first keyframe and the last.
-function lawReach({ skeleton, worldState, withM, without }, { near = () => true } = {}) {
+function lawReach({ skeleton, worldState, withM, without }, { pick = (ps) => ps } = {}) {
   const ks = keyframesOf(skeleton);
-  const parcels = worldState.marks.filter((m) => m.kind === "parcel" && m.at && near(m))
-    .sort((p, q) => (p.id < q.id ? -1 : 1));
+  const parcels = pick(worldState.marks.filter((m) => m.kind === "parcel" && m.at)
+    .sort((p, q) => (p.id < q.id ? -1 : 1)));
   const reachOf = (fov) => [...fov.carried.map((s) => s.id), ...fov.far.map((f) => f.id)].sort();
   let checked = 0;
   const fogged = [];
@@ -309,6 +316,43 @@ function lawReach({ skeleton, worldState, withM, without }, { near = () => true 
   return { checked, fogged };
 }
 
+// A FIXED SAMPLE (WLD-101, 2026-10-21). These reads cost a field of view per
+// standpoint per crossing, and run in order inside this file, so reading every
+// parcel and every crossing made this the suite's slowest file. Each check
+// below keeps its assertions and reads a fixed sample instead: the same sample
+// every run, so a red one reproduces.
+//
+// mulberry32: a seeded, deterministic pick of n of the items
+const seededPick = (items, n, seed = 101) => {
+  let a = seed >>> 0;
+  const rand = () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i -= 1) { const j = Math.floor(rand() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
+  return out.slice(0, n);
+};
+const clearAt = (p, m) => { const h = mistsHere(p.at, m); return !h.inWall && h.thickness === 0; };
+// LAW REACH's parcels: the one nearest each side of the map (closest to the
+// wall; on the map, as THE PARCEL NEAREST EACH SIDE reads it) and Pando's (in a
+// clearing past it), plus 20 by the seeded pick, of those whose standpoint
+// stands clear at both keyframes it reads.
+const lawSample = ({ skeleton }, n = 20) => (parcels) => {
+  const ks = keyframesOf(skeleton);
+  const clear = parcels.filter((p) => [ks[0], ks.at(-1)].every((c) => clearAt(p, mistsAt(c, skeleton.mists))));
+  const onTheMap = clear.filter((p) => Math.abs(p.at.x) < 6000 && Math.abs(p.at.y) < 10000);
+  const side = (better) => onTheMap.reduce((a, p) => (better(p, a) ? p : a));
+  const head = [...new Set([
+    side((p, a) => p.at.y < a.at.y), side((p, a) => p.at.y > a.at.y), side((p, a) => p.at.x > a.at.x), side((p, a) => p.at.x < a.at.x),
+    ...clear.filter((p) => p.id === PANDO),
+  ])];
+  return [...head, ...seededPick(clear.filter((p) => !head.includes(p)), n)];
+};
+// The season's crossings: its keyframes (the Mists' schedule and the ladder's
+// rungs) and the last crossing read, with one crossing between each pair.
+const seasonCrossings = (skeleton, last = skeleton.mists.withdrawn_from - 1) => {   // until 2026-11-02 the default was 300; the Mists stand through the last crossing before the withdrawal
+  const keys = [...new Set([...keyframesOf(skeleton), ...SEASON_LADDER.map((r) => r.from), last])].sort((a, b) => a - b);
+  return keys.flatMap((c, i) => (i && c - keys[i - 1] > 1 ? [Math.floor((keys[i - 1] + c) / 2), c] : [c]));
+};
+
 test("THE CLEARINGS HOLD: each stands as committed, and the town's marks in one stay clear of the wall AND its fringe, at every crossing; the households' ground they were sized for is told about, never failed", (t) => {
   const notes = clearingsHold(real());
   t.diagnostic(notes.length ? notes.join("; ") : "the ground each clearing was sized for stands clear, Pando's parcel in its own");
@@ -326,8 +370,11 @@ test("THE PARCEL NEAREST EACH SIDE, of those clear all season, stays fully sight
 
 test("LAW REACH: from a parcel, the Mists change what is reached only by what the wall hides, never by the veil", () => {
   assert.ok(real().worldState.marks.filter((m) => m.kind === "parcel" && m.at).length >= 117);
-  const { checked } = lawReach(real());
-  assert.ok(checked >= 150, `every sighted parcel, at both keyframes (${checked})`);
+  const sample = lawSample(real())(real().worldState.marks.filter((m) => m.kind === "parcel" && m.at));
+  assert.ok(sample.length >= 24 && sample.some((p) => p.id === PANDO), `the sample: each side, Pando's, and 20 more (${sample.map((p) => p.id).join(", ")})`);
+  const { checked, fogged } = lawReach(real(), { pick: lawSample(real()) });
+  assert.deepEqual(fogged, [], "every sampled standpoint stands clear");
+  assert.equal(checked, sample.length * 2, `every sampled parcel, at both keyframes (${checked})`);
 });
 
 // MAY COVER (WLD-38): a household's placement never holds a settlement. On
@@ -367,9 +414,13 @@ test("MAY COVER: a household's mark straddling the wall, a parcel in its fringe,
     assert.ok(covered[ks.at(-1)].includes(id), `${id} is counted covered at ${ks.at(-1)}`);
   const nearest = nearestSighted(rec);
   assert.ok(!extra.some((x) => Object.values(nearest).includes(x)), "the nearest sighted parcel is never one the Mists reach");
-  // law reach from the parcels round the added ones (the whole record is the test above)
-  const near = (p) => extra.some((x) => Math.hypot(p.at.x - x.at.x, p.at.y - x.at.y) < 2500);
-  const { checked, fogged } = lawReach(rec, { near });
+  // law reach from the added parcels and the real parcel nearest each added mark (the whole record is the test above)
+  const added = new Set(extra.map((x) => x.id));
+  const pick = (ps) => [...new Set([
+    ...ps.filter((p) => added.has(p.id)),
+    ...extra.map((x) => ps.filter((p) => !added.has(p.id)).reduce((a, p) => (Math.hypot(p.at.x - x.at.x, p.at.y - x.at.y) < Math.hypot(a.at.x - x.at.x, a.at.y - x.at.y) ? p : a))),
+  ])];
+  const { checked, fogged } = lawReach(rec, { pick });
   t.diagnostic(`law reach: ${checked} standpoints checked; out of it, in the wall or the fringe: ${fogged.join(", ")}`);
   assert.ok(checked > 0, "the parcels round them were read");
   assert.ok(fogged.includes(`a-household/a-parcel-in-the-fringe@${ks.at(-1)}`) && fogged.includes(`a-household/a-parcel-behind-the-wall@${ks.at(-1)}`));
@@ -381,7 +432,7 @@ test("A TALL THING past the north wall: 100 m high, behind the wall at every key
   const w = assembleWorld({ worldState: { ...worldState, marks: [...worldState.marks, tall] }, skeleton });
   const nearest = worldState.marks.filter((m) => m.kind === "parcel" && m.at && Math.abs(m.at.x) < 6000 && Math.abs(m.at.y) < 10000)
     .reduce((a, p) => (Math.hypot(p.at.x - tall.at.x, p.at.y - tall.at.y) < Math.hypot(a.at.x - tall.at.x, a.at.y - tall.at.y) ? p : a));
-  for (const crossing of [...KEYFRAMES(), 300]) {
+  for (const crossing of KEYFRAMES()) {   // until 2026-11-02 also 300, to see the wall hold; the last standing keyframe is that hold now
     const m = mistsAt(crossing, skeleton.mists);
     assert.equal(mistsHere(tall.at, m).inWall, true, `behind the wall at ${crossing}`);
     for (const from of [{ x: 0, y: 0 }, { x: 575, y: -2600 }, nearest.at]) {
@@ -407,16 +458,21 @@ test("THE CLEARING: land far past the border keeps open air round it, and no lin
 test("THE THICKENING: the density eases in, from its first value to its last, gaining more every crossing", () => {
   const { skeleton } = real();
   const ks = KEYFRAMES(), d = skeleton.mists.density;
+  // The easing runs over the density's OWN span (WLD-147). Until 2026-11-02 it ran from the schedule's first keyframe
+  // to its last, and `ks.at(-1)` was 282; the withdrawal appends keyframes, so the span is now named by the record.
+  const first = d.from_crossing ?? ks[0], full = d.to_crossing ?? ks.at(-1);
+  assert.equal(first, ks[0], "the density starts thickening with the season");
+  assert.equal(full, 282, "and finishes at the keyframe the wall reaches its fullest, as it always did");
   const at = (c) => mistsAt(c, skeleton.mists).density;
-  assert.equal(+at(ks[0]).toFixed(6), d.from);
-  assert.equal(+at(ks.at(-1)).toFixed(6), d.to);
+  assert.equal(+at(first).toFixed(6), d.from);
+  assert.equal(+at(full).toFixed(6), d.to);
   let lastStep = 0;
-  for (let c = ks[0] + 1; c <= ks.at(-1); c += 1) {
+  for (let c = first + 1; c <= full; c += 1) {
     const step = at(c) - at(c - 1);
     assert.ok(step > lastStep, `crossing ${c} gains more than the one before (${step} vs ${lastStep})`);
     lastStep = step;
   }
-  assert.equal(at(ks.at(-1) + 20), at(ks.at(-1)), "and holds after");
+  for (let c = full + 1; c <= ks.at(-1); c += 1) assert.equal(at(c), at(full), `and holds after, at ${c}, through the last crossing the Mists stand`);
 });
 
 // THE BEFORE-START IDENTITY, on the real record: the record's own schedule, at
@@ -483,6 +539,72 @@ test("the page cuts each clearing out of the wall, so the land past the border i
   const cx = 485 + k.x / 5, cy = 760 + k.y / 5, r = k.r / 5;
   assert.ok(svg.includes(` M ${(cx - r).toFixed(1)} ${cy.toFixed(1)} a ${r.toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(2 * r).toFixed(1)} 0`), "the hole");
   assert.match(svg, /<circle class="wv-mists-fringe" data-src="mists:clearing-[^"]+" pointer-events="none"/, "its fringe ring");
+});
+
+// What the page's wall covers at a point, read off the markup as a browser would:
+// the path's own rings even-odd, then every clip it is nested in (each its own
+// even-odd ring set). Rings are the shapes mistsWallSVG writes: the square and the
+// box (M H V H Z), a clearing circle (M, two half-arcs) and a ragged ring (M L … Z).
+function wallCovers(svg, cls, p, reg) {
+  const q = { x: reg.originPx.x + p.x / reg.mPerPx, y: reg.originPx.y + p.y / reg.mPerPx };
+  const inRing = (ring) => {
+    const arc = ring.match(/^M (\S+) (\S+) a (\S+)/);
+    if (arc) { const r = Number(arc[3]); return Math.hypot(q.x - (Number(arc[1]) + r), q.y - Number(arc[2])) < r; }
+    const pts = [];
+    for (const [, op, args] of ring.matchAll(/([MLHV]) ([-\d. ]+?)(?= [MLHVZ]|$)/g)) {
+      const v = args.trim().split(" ").map(Number), last = pts.at(-1);
+      if (op === "H") pts.push({ x: v[0], y: last.y });
+      else if (op === "V") pts.push({ x: last.x, y: v[0] });
+      else for (let i = 0; i < v.length; i += 2) pts.push({ x: v[i], y: v[i + 1] });
+    }
+    let ins = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const a = pts[i], b = pts[j];
+      if ((a.y > q.y) !== (b.y > q.y) && q.x < (b.x - a.x) * (q.y - a.y) / (b.y - a.y) + a.x) ins = !ins;
+    }
+    return ins;
+  };
+  const evenOdd = (d) => d.split(/ (?=M )/).filter((ring) => inRing(ring.replace(/ Z$/, ""))).length % 2 === 1;
+  const hit = svg.match(new RegExp(`((?:<g clip-path="url\\(#[^)]+\\)">)*)<path class="${cls}"[^>]* d="([^"]*)"`));
+  assert.ok(hit, `the page draws ${cls}`);
+  const clips = [...hit[1].matchAll(/url\(#([^)]+)\)/g)].map(([, id]) => svg.match(new RegExp(`<clipPath id="${id}"[^>]*><path[^>]* d="([^"]*)"`))[1]);
+  return evenOdd(hit[2]) && clips.every(evenOdd);
+}
+
+// THE SPIRE'S CLEARING IS DRAWN CLEAR (WLD-134, 2026-10-31): the way to the Spire
+// overlaps the town's clear ground and the Spire's own clearing, and while each
+// clearing was one more even-odd ring in the wall's path, a point inside two of
+// them was drawn as wall: the Spire's grounds painted over and their pointer
+// taken, on the night the Mists parted for them.
+test("the page's wall covers exactly what the engine hides, where clearings overlap the clear ground and each other", async () => {
+  const { mistsWallSVG } = await import("../spectator/viewer.mjs");
+  const reg = { originPx: { x: 485, y: 760 }, mPerPx: 5 };
+  const { skeleton } = real();
+  const parted = skeleton.mists.clearings_m.find((k) => k.id === "the-starforge-spire")?.from_crossing;
+  if (!Number.isFinite(parted)) return;   // a record without the Spire's clearing has nothing to ask
+  const m = mistsAt(parted, skeleton.mists);
+  const flat = mistsWallSVG(m, reg), painted = mistsWallSVG(m, { ...reg, painted: true });
+  // across the north corridor and the Spire's ground, a point a pixel or more from any edge
+  let asked = 0;
+  for (let x = 2800; x <= 4900; x += 70) for (let y = -6500; y <= -3000; y += 70) {
+    const p = { x, y }, here = mistsHere(p, m);
+    const nearEdge = Math.abs(p.y - m.clear.minY) < 10 || [p.x - m.clear.minX, m.clear.maxX - p.x].some((d) => Math.abs(d) < 10)
+      || m.clearings.some((k) => Math.abs(Math.hypot(p.x - k.x, p.y - k.y) - k.r) < 10);
+    if (nearEdge) continue;
+    for (const svg of [flat, painted]) assert.equal(wallCovers(svg, "wv-mists-wall", p, reg), here.inWall, `the wall at (${x}, ${y}): the engine says ${here.inWall ? "in the wall" : "clear"}`);
+    asked += 1;
+  }
+  assert.ok(asked > 1000, `the corridor was read (${asked})`);
+  // the ragged wall, once the paint is on: the Spire's ground stands clear, and so do the pointer's
+  const ragged = mistsWallSVG(m, { ...reg, painted: true, ragged: true });
+  const grounds = { at: { x: 3850, y: -5500 }, extent: { w: 500, h: 400 } };
+  for (const p of [grounds.at, { x: 3843, y: -5512 }, ...corners(grounds).map((c) => ({ x: (c.x + grounds.at.x) / 2, y: (c.y + grounds.at.y) / 2 })), { x: 3850, y: -4263 }]) {
+    assert.equal(mistsHere(p, m).inWall, false, `the engine has (${p.x}, ${p.y}) clear`);
+    assert.equal(wallCovers(ragged, "wv-mists-wall-ragged", p, reg), false, `the ragged wall leaves (${p.x}, ${p.y}) open`);
+    assert.equal(wallCovers(ragged, "wv-mists-wall", p, reg), false, `the pointer reaches (${p.x}, ${p.y})`);
+  }
+  // and behind the wall stays behind it
+  assert.equal(wallCovers(ragged, "wv-mists-wall-ragged", { x: 2000, y: -5500 }, reg), true, "west of the Spire, in the wall");
 });
 
 // THE GENERATOR KEEPS THE BLOCK. tools/world-terrain-gen.mjs writes the whole
@@ -554,7 +676,9 @@ test("the season line: the crossing picks it (crossing % 3); inside the wall or 
   const { withM, worldState } = real();
   assert.ok(openYourEyes({ x: 0, y: 0 }, withM, { crossing: 273 }).tell().includes(BELL));
   const landing = worldState.marks.find((m) => m.id === "the-town/the-pando-landing").at;
-  for (let c = 244; c <= 300; c += 1) {
+  const season = seasonCrossings(real().skeleton);
+  assert.deepEqual(new Set(season.map((c) => c % 3)), new Set([0, 1, 2]), `the season's crossings pick every line (${season.join(", ")})`);
+  for (const c of season) {
     const o = orient(landing, withM, { crossing: c });
     assert.doesNotMatch(openYourEyes(landing, withM, { crossing: c }).tell(), /north edge/, `the landing's telling at ${c}`);
     assert.doesNotMatch(airLine(o.you, c), /north edge/, `the landing's air at ${c}`);
@@ -574,11 +698,13 @@ test("the edge and veil sentences escalate in the telling, rung by rung; under t
   assert.match(openYourEyes({ x: -1900, y: 2150 }, withM, { crossing: 243 }).tell(), /dark end of the world/);
 });
 
-test("THE DARK END, UNDER THE VEIL: no daylight sentence is told at the quay or the Pando landing at any crossing of the season", () => {
+test("THE DARK END, UNDER THE VEIL: no daylight sentence is told at the quay or the Pando landing at the season's keyframes or between them", () => {
   const { withM, worldState } = real();
   const spots = ["the-town/the-quay", "the-town/the-pando-landing"].map((id) => worldState.marks.find((m) => m.id === id).at);
+  const season = seasonCrossings(real().skeleton);
+  assert.deepEqual(new Set(season.map((c) => c % 2)), new Set([0, 1]), `the season's crossings read evening and morning (${season.join(", ")})`);
   for (const at of spots)
-    for (let c = 244; c <= 300; c += 1) {
+    for (const c of season) {
       assert.doesNotMatch(openYourEyes(at, withM, { crossing: c }).tell(), DAYLIGHT, `telling at (${at.x}, ${at.y}), ${c}`);
       assert.doesNotMatch(airLine(orient(at, withM, { crossing: c }).you, c), DAYLIGHT, `air at (${at.x}, ${at.y}), ${c}`);
     }
@@ -596,6 +722,25 @@ test("a standpoint in a clearing past the town's clear box carries the clearing'
   assert.equal(orient({ x: 0, y: -5000 }, w, { crossing: 9, dials: CLEAR }).you.mists, undefined, "before the Mists, no block at all");
   // past the box, held clear: the north edge is never told there
   for (let c = 272; c <= 290; c += 1) assert.doesNotMatch(airLine(orient({ x: 0, y: -5000 }, w, { crossing: c, dials: CLEAR }).you, c), /north edge/);
+});
+
+// A CLEARING MAY START AT A CROSSING (WLD-134, Darko 2026-10-30 09:59 "Add from crossing"): before its
+// from_crossing the wall stands where it stood, so adding one never re-tells a past crossing.
+test("a clearing with a from_crossing stands from that crossing on, and before it the wall is as it was", () => {
+  const later = { ...MISTS, clearings_m: [{ id: "always", x: 0, y: -2000, r_m: 300 }, { id: "parted", x: 0, y: -3000, r_m: 300, from_crossing: 15 }] };
+  const p = { x: 0, y: -3000 };
+  for (const c of [10, 14]) {
+    const m = mistsAt(c, later);
+    assert.deepEqual(m.clearings.map((k) => k.id), ["always"], `only the standing clearing at ${c}`);
+    assert.equal(mistsHere(p, m).inWall, true, `behind the wall before it parts (${c})`);
+  }
+  for (const c of [15, 16, 30]) {
+    const m = mistsAt(c, later);
+    assert.deepEqual(m.clearings.map((k) => k.id), ["always", "parted"], `both clearings at ${c}`);
+    assert.equal(mistsHere(p, m).inWall, false, `clear from its crossing (${c})`);
+  }
+  // a clearing without the field stands at every crossing, as before
+  assert.deepEqual(mistsAt(10, later).clearings.map((k) => k.id), ["always"]);
 });
 
 // A line that names an hour is false at the other crossing of the day, since
@@ -641,6 +786,18 @@ test("the missing horizon: a far feature the wall takes is told where it stood, 
   // on the record: Pando Peak, from the Origin, at the first keyframe
   const told = openYourEyes({ x: 0, y: 0 }, real().withM, { crossing: KEYFRAMES()[0] }).tell();
   assert.match(told, /  · NW, where Pando Peak stood: only grey/);
+});
+
+test("POS-393 · the missing horizon names a resident's far mark, never its body: lost behind the wall with no skeleton label, it is 'a mark by <author> [id]'; the town's own keeps its name", () => {
+  const body = "Zed's beacon tower, whitewashed and very tall.";
+  const zed = { id: "zed/beacon", by: "zed", far: true, kind: "sited", at: { x: 0, y: -1200 }, extent: { w: 30, h: 30 }, body };
+  const town = { id: "the-town/old-mill", by: "the-town", far: true, kind: "sited", at: { x: 1200, y: 0 }, extent: { w: 30, h: 30 }, body: "The old mill, its sails long still." };
+  const e = openYourEyes({ x: 0, y: 0 }, worldOf([zed, town]), { crossing: 10, dials: CLEAR });
+  assert.deepEqual(e.fov.farLost.map((f) => f.id).sort(), ["the-town/old-mill", "zed/beacon"], "both are lost behind the wall (the fixture reaches the line)");
+  const told = e.tell();
+  assert.match(told, /  · N, where a mark by zed \[zed\/beacon\] stood: only grey/);
+  assert.ok(!told.includes(body) && !told.includes("Zed's beacon"), `the resident's words are in the town's telling:\n${told}`);
+  assert.match(told, /  · E, where The old mill stood: only grey/, "the town's own far mark is told by its own name");
 });
 
 test("the air, in one line: absent with no Mists; the weather by the crossing's hour, the rung's edge, its veil, and its line", () => {

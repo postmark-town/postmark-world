@@ -6,7 +6,6 @@ date: 2026-08-22
 class: the-owned-constants
 version: 1
 extends: postmark-invariant
-dials: {"lint": "L3"}
 implements: []
 source: LOGOS/classes.md
 ---

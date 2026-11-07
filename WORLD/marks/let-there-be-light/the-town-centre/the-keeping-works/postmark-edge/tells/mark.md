@@ -8,7 +8,6 @@ version: 1
 extends: postmark-edge
 subject: ["paper"]
 object: ["mark", "entity"]
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

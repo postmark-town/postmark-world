@@ -5,8 +5,7 @@ tier: constitution
 date: 2026-08-30
 class: idea
 version: 2
-extends: mark
-dials: {"beta": true}
+extends: post
 implements: []
 affordances: []
 source: LOGOS/classes.md

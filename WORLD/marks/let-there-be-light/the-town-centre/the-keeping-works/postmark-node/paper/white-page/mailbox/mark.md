@@ -6,7 +6,6 @@ date: 2026-08-19
 class: mailbox
 version: 1
 extends: white-page
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

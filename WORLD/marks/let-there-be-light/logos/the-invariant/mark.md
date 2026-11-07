@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: the-town
 tier: constitution
 date: 2026-08-22

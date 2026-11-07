@@ -6,7 +6,6 @@ date: 2026-08-30
 class: listing
 version: 1
 extends: the-asks
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

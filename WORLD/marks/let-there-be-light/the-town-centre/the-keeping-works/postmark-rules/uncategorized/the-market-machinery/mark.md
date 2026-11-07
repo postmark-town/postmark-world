@@ -7,7 +7,6 @@ class: the-market-machinery
 version: 0
 extends: uncategorized
 source: LOGOS/conflict-matrix.md
-dials: {}
 implements: []
 ---
 

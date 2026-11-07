@@ -7,7 +7,6 @@ class: the-two-question-lint
 version: 0
 extends: uncategorized
 source: LOGOS/the-north-star.md
-dials: {}
 implements: []
 ---
 

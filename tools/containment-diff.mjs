@@ -19,13 +19,14 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { placementParent } from "./marks-fold.mjs";
+import { isGround } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const arg = (f) => { const i = process.argv.indexOf(f); return i === -1 ? null : process.argv[i + 1]; };
 
 const world = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
 const marks = world.marks ?? [];
-const placeable = marks.filter((m) => (m.kind === "sited" || m.kind === "parcel") && m.at);
+const placeable = marks.filter((m) => isGround(m));
 
 const tree = {};
 for (const m of placeable) tree[m.id] = placementParent(m, marks);

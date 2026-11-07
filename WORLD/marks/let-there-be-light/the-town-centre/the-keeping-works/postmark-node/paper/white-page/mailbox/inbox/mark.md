@@ -6,7 +6,6 @@ date: 2026-08-19
 class: inbox
 version: 1
 extends: mailbox
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

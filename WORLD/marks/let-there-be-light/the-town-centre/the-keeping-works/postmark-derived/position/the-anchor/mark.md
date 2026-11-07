@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-08-22
-slot: anchor
-value: a mark, an entity, or the world
+name: anchor
+default: a mark, an entity, or the world
 source: LOGOS/classes.md
 ---
 

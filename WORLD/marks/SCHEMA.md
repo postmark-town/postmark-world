@@ -116,12 +116,29 @@ route) **by extraction from `WORLD/skeleton.json`** — `by: the-town`,
 Every record is `---` frontmatter then a body. The **path owns nothing but
 containment**; everything else is a field.
 
-The field `kind` describes how a mark stands — sited, predicated, parcel,
-naming, or `class` (note ⁷) — and nothing else: standing, living and fleeting
+The field `kind` describes how a record stands — sited, predicate, parcel,
+naming, `class` or `property` (note ⁷; a claim's was `predicated` until G10) — and nothing else: standing, living and fleeting
 are lifetimes, a different distinction, kept in
 [LOGOS/lifetimes.md](../../LOGOS/lifetimes.md) (WLD-39).
+*SUPERSEDED 2026-10-17 (LOGOS v2 part 2, the data change WLD-73 part 2 owed):
+"The field `kind` describes how a mark stands — sited, predicated, parcel,
+naming, or `class` (note ⁷)". A class's property is a node of its own,
+`kind: property`, filed in its class's directory with `name`, `tier`, `default` and a
+body (LOGOS/classes.md § Property and predicate); a child property (a cap or a
+bound) files beside it and names its parent property in `of:`. Ideas and bounties
+are posts in the law (§ Posts), but posts live in the office's post machine: the
+idea and bounty marks stay as they are until a later lane moves them. The kind migration then folds `class:` into `kind:`, so `kind` names
+the node's own class (§ The LOGOS ladder).*
+**The kind migration (W2, 2026-10-17):** an instance of a declared class writes
+that class as its kind — `kind: thing`, `kind: portal-ground`, `kind: town` —
+and no `class:` line. A post class's instances (idea, bounty) keep the old form
+until the post lane moves them to the office's post machine. The standing words above stay the kind of a plain mark of
+each standing (an unclassed `sited` mark, a `parcel`, a `predicate` claim, a
+`naming`). A claim wrote `kind: predicated` until G10 (2026-10-17); it writes
+`kind: predicate`, its class, and the old word is still read. Both forms are read (tools/mark-kind.mjs); the lint tells a record
+still written `kind: sited` + `class: thing` that `class:` folds into `kind:`.
 
-| field | sited | parcel | predicated | naming |
+| field | sited | parcel | predicate | naming |
 |---|---|---|---|---|
 | `kind` | required | required | required | required |
 | `by` (author handle) | required | required | required | required |
@@ -192,6 +209,11 @@ A `sited`/`parcel` mark **never** authors a `parent:` — containment is geometr
 A top-level `predicated`/`naming` mark may still name a terrain feature with an
 explicit `parent: terrain:<id>` (ids from `skeleton.json`), but nesting under the
 mark it describes is preferred.
+
+A predicate on an **entity** (`parent: resident:<handle>`, WLD-83, 2026-10-19) is
+**not filed in this tree**. It is an act in the store's log, canon live, folded
+by the office and photographed by the crossing-save (LOGOS/classes.md §
+Predicates on an entity). This tree stays the ground.
 
 **² `points:` — reserved, coarsely honored.** A mark may carry `points:` — an
 optional polygon (an SVG-polygon-style list of grid-meter vertices, a closed

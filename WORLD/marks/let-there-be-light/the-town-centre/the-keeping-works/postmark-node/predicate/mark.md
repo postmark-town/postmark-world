@@ -5,8 +5,7 @@ tier: constitution
 date: 2026-08-18
 class: predicate
 version: 1
-extends: postmark-node
-dials: {}
+extends: mark
 implements: []
 source: LOGOS/classes.md
 ---

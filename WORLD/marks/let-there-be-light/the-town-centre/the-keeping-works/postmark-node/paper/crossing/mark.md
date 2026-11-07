@@ -6,7 +6,6 @@ date: 2026-08-16
 class: crossing
 version: 1
 extends: paper
-dials: {}
 implements: []
 source: LOGOS/classes.md
 ---

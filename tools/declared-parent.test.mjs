@@ -65,7 +65,7 @@ test("the world's own record: kinofire/lafayettes-weasel-door sits inside kinofi
   else assert.deepEqual(up("kinofire/lafayettes-weasel-door", live), ["kinofire/spin-ghar-manor"]);
   let checked = 0;
   for (const p of marks) {
-    if (!marks.some((m) => m.parent === p.id && (m.kind === "predicated" || m.kind === "naming"))) continue;
+    if (!marks.some((m) => m.parent === p.id && (m.kind === "predicated" || m.kind === "predicate" || m.kind === "naming"))) continue;
     for (const child of investigate(p.id, live, { budget: 1000 }).predicates) {
       assert.deepEqual(up(child.id, live), [p.id], `${child.id} under ${p.id}`);
       checked += 1;

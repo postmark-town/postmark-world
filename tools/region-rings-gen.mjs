@@ -85,6 +85,7 @@
 // bounding box, so the coarse claim never lies about the fine shape. Receding
 // and smoothing move those boxes again, so the restatement happens after both.
 
+import { isPredicate } from "./mark-kind.mjs"; // a predicate in either spelling (G10: kind: predicated → predicate)
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -399,15 +400,6 @@ const nearestOnRing = (p, ring) => {
     if (!best || q.d < best.d) best = q;
   }
   return best;
-};
-const segmentHit = (a, b, c, d) => {
-  const r = { x: b.x - a.x, y: b.y - a.y }, s = { x: d.x - c.x, y: d.y - c.y };
-  const den = r.x * s.y - r.y * s.x;
-  if (Math.abs(den) < 1e-12) return null;
-  const t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / den;
-  const u = ((c.x - a.x) * r.y - (c.y - a.y) * r.x) / den;
-  if (t <= 0 || t >= 1 || u <= 0 || u >= 1) return null;
-  return { x: a.x + r.x * t, y: a.y + r.y * t, t };
 };
 
 // the same metre the recession's own GAP uses; stated locally because GAP is
@@ -805,7 +797,7 @@ const subtreeOf = (marks, id) => {
   return marks.filter((m) => {
     const dir = String(m._dir ?? "").replaceAll("\\", "/");
     if (!dir.startsWith(prefix)) return false;
-    if (m.kind === "predicated" || m.kind === "naming" || m.kind === "class") return false; // no geometry of their own
+    if (isPredicate(m) || m.kind === "naming" || m.kind === "class") return false; // no geometry of their own
     if (m.far) return false;
     return !!m.at;
   });

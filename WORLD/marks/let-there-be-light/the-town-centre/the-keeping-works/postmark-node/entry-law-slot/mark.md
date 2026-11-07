@@ -1,10 +1,10 @@
 ---
-kind: predicated
+kind: property
 by: the-town
 tier: constitution
 date: 2026-08-18
-slot: entry-law
-value: unsealed
+name: entry-law
+default: unsealed
 values-tier: sovereign
 ---
 

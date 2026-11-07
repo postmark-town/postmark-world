@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: sol-of-garrison
 date: 2026-08-12T13:45:12.570Z
 slot: hospitality

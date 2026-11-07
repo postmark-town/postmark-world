@@ -253,10 +253,40 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
   - **Where the wall stands.** `mistsAt(crossing, skeleton.mists)` puts a wall at the map's
     border (`border_m`, pinned config) on a crossing schedule: `front_m` per side (positive
     creeps onto the map, negative pulls back past the edge), `clearings_m` (open ground the
-    wall never takes: Pando Peak's ground and the far south-west), the fringe's `density`
+    wall never takes: Pando Peak's ground, the far south-west, and from crossing 282 the
+    Starforge Spire and the way to it; a clearing with a `from_crossing` stands only from that
+    crossing on, and before it the wall is as it was, so adding one never re-tells a past
+    crossing; WLD-134, Darko 2026-10-30), the fringe's `density`
     (eased in over the schedule), and the `veil` on all light. Before the schedule's first
     crossing it answers null, and every telling is the one it was before the Mists, byte for
     byte (`tools/mists.test.mjs`).
+  - **Withdrawn (WLD-147, Darko 2026-11-02).** The Mists were a season, and the season is over.
+    Darko, 17:06 EST, in chat, RULED: "full removal for mists." (His ask, 16:59 EST: "now that
+    the mists are kind of lingering, we do need to pare back on the ground that they cover. I
+    actually have half an inkling to just remove the mists entirely as they were intended to
+    just be a seasonal thing.") **From the crossing the record names, `skeleton.mists.withdrawn_from`
+    (its one dial in code is `MISTS_WITHDRAWN_FROM` in `tools/mists-record.mjs`), there are no
+    Mists at all:** `mistsAt` answers null, the same null as before the schedule's first
+    crossing, so no wall, no fringe, no veil, no slowed walk, no refusal at the wall and no
+    season line, the clearings go with the wall, and every telling is the one a town with no
+    Mists in its record gives, byte for byte (`tools/mists-withdrawn.test.mjs`). The target is a
+    crossing no reader has yet been told with Mists: crossing N opens at 2026-06-12T00:00Z + N x
+    12 h, and the readers take the record with the next settlement tag.
+    - **No crossing before it is re-told.** The last standing keyframe (crossing 282: front
+      760 m, veil 0.5) is held through the crossing before `withdrawn_from`, and the density
+      keeps its own span (`density.from_crossing` 244 to `to_crossing` 282), so the keyframes the
+      withdrawal adds do not stretch its easing. The Mists stay in the record as history: every
+      earlier crossing is told from them.
+    - **An older engine reads it as no wall.** The schedule's last keyframe, at `withdrawn_from`,
+      pulls the front back past the border by more than the fringe, with no veil, so an engine
+      that does not know `withdrawn_from` also reads no wall and no fringe on the map.
+    - **Superseded by this (2026-11-02, WLD-147), and kept as written:** above, the density
+      "eased in over the schedule" (it eases over its own span now); and in `LOGOS/classes.md`
+      § The creature class, the WLD-142 sentence "The Mists themselves are the skeleton's and
+      stay as they are" (Darko 2026-10-31 23:01 EDT: "keep the mist as is"), marked there. The
+      rest of this section describes the Mists as they stood for every crossing before
+      `withdrawn_from`; the engine's own header (`tools/world-engine.mjs`) says the same of
+      "after the last they hold", which is still true of a record with no `withdrawn_from`.
   - **What the wall hides.** Everything behind it, with no ceiling and no height exemption: a
     sight line is cut wherever it runs through the wall. The fringe on the clear side shortens
     sight like the weather, and a body inside the wall sees `wall_sight_m`. The world's
@@ -286,6 +316,14 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
     great marks can be re-filed in place and a filled notch counts as new. Marks already
     standing stay as they are. A portal ground never sets anyone down behind the wall. If the
     office cannot read the wall, both refuse rather than guess.
+    *SUPERSEDED 2026-10-16 20:04 (WLD-6, spawn option A), taking effect when office #600 ships:
+    "A portal ground never sets anyone down behind the wall." Darko answered "4A" to Wright's
+    call 4, "does entering a ground land you at its landing point even behind the Mists' wall?",
+    whose option A read "yes, safe because an entered mark is shelter". So entering a
+    ground sets you down at its landing point even behind the wall. The build carries
+    review-shelter's required condition (Wright's settled reading, not Darko's words): you are set
+    down only when the ground is actually on your enter stack, never after refused terms, a refused
+    door, awaiting, or already within. Until #600 ships, the sentence above is still what runs.*
   - **The Mists may cover a household's marks** (WLD-38, Darko 2026-10-12). As the wall creeps
     in on its schedule it takes whatever stands in its way, for the season: a mark placed clear
     of today's wall may stand in the fringe or behind the wall at a later keyframe, and that
@@ -296,8 +334,50 @@ the `ride` act, the deposit branch in exit, the ground block) is postmark-town/p
     household's: if it grows or moves past the rim it may be covered too, and the suite says
     so without failing (`tools/mists.test.mjs`). This supersedes the 2026-10-09 rule that no
     household's parcel is covered.
+  - **An entered mark is shelter** (Darko, 2026-10-15). Within a mark you have entered (it is on your
+    enter stack), the Mists neither slow your walk nor hide what it holds: no fringe pace, no wall stop,
+    and nothing inside it is cut from your reads. It follows entering, never standing: fog-covered ground
+    you have not entered is the Mists as ever, and nothing is drawn differently for anyone.
 - **Render cost capped by a context budget, never world size.** Candidates are
   culled to a sight radius, ranked, and carried to the budget; the rest aggregate.
+
+## The season's named creatures: finished, then ended at the settlement (WLD-25)
+
+Ruled by Darko 2026-10-20 22:47 and 22:56; the engineering settled by Wright the
+same night (W1–W11). A season's mechanics, kept here rather than in LOGOS (the
+10-10 ruling), to be promoted once a week of play has been watched.
+
+- **Declared, once.** A kind class may name creatures of its own (its mark's
+  `named`: a slug, a place, what it carries, the crossing it comes from). Each is
+  spawned ONCE EVER by the-town at its place with `stays: true`: it never fades.
+  Its kind file says `finishable: true`, so it never flees either.
+- **Waiting on a door (2026-10-22, carrying out WLD-25/k).** A declaration may name
+  `after_door`, a door's mark id. The creature then comes out at the first
+  settlement whose world shows that door open: its `requires` met as that
+  settlement printed it. The door must count `at: "settlement"`, which the lint
+  holds it to, so the door and the creature open at the same settlement.
+- **Finished by anyone, by any road.** A reaction carrying the effect `finish`,
+  or a mechanic that checks its own answer in code, writes one `finish` row: the
+  creature, the resident and the resident's act that earned it. Once per resident.
+  Nothing else changes: the creature stays, and others can still take part. An
+  earned finish is taken by code, never left to Jev or the die (W4).
+- **Ended at the settlement.** At the first landed settlement after a finish (the
+  office's tick, after the bless), the town gives what the creature carried to
+  the FIRST finisher, by act order on either road, and withdraws the creature,
+  reason `ended` (only the-town writes it), naming everyone who took part. A
+  finish counts when its act is before that settlement's own instant (06:00/18:00Z).
+  The creature is gone for the whole town: one creature, one ending.
+- **The line** is the kind's own `ending:` ({finisher}, {names}, {carried}) when it
+  writes one, else the town's plain words.
+- **A creature that tells (POS-712, lupi's shape B, postmark#3531).** A kind with
+  `fragments: n` and a public `fragment_words` list tells each resident one
+  fragment per visit (a settlement window), drawn from the list by the creature's
+  sealed secret. The word is in that resident's reply alone; the record holds its
+  commitment. Inside the window the same fragment is told again; after it, never.
+  Once all n are told it asks, and a call whose words from the list are exactly its n, in
+  order, finishes it (words off the list are free; reciting the list answers nothing). When
+  its settlement has ended it, its secret is published, and every commitment can
+  be checked by anyone. Fragments are the one thing that does not reset (08:39).
 
 ## Two lessons carried (from the budding-friendship build)
 

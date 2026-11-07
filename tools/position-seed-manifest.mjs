@@ -12,9 +12,9 @@
 // resident, what the record can say about where they are, and what a placement
 // would have to assert to make that durable.
 //
-// It lives beside `seeding/manifest.json` and for the same reason: `seeding/` is
-// outside `WORLD/`, because WORLD/ holds only what is backed. A manifest is a
-// build intermediate a human reads before anything lands.
+// It lives in `seeding/` (position-seed-manifest.json), which is outside `WORLD/`,
+// because WORLD/ holds only what is backed. A manifest is a build intermediate a
+// human reads before anything lands.
 //
 // ── WHY THE ROLL, AND NOT THE ROSTER ─────────────────────────────────────────
 //
@@ -141,8 +141,8 @@ const rows = roll.map((handle) => {
     // The landing act's assertion, for the states that need one. `null` means
     // the record already places them and a placement would be noise.
     seed: state === "unplaced"
-      ? { to: "quay", mark_id: QUAY_MARK_ID, at: { x: porch.x, y: porch.y },
-          because: "no movement record and no ground at any grain — the ruled default is the town's porch" }
+      ? { to: "origin", mark_id: null, at: { x: porch.x, y: porch.y },
+          because: "no movement record and no ground at any grain — the ruled default is the Origin (2026-09-17, 2026-10-21; the porch until then)" }
       : null,
   };
 });

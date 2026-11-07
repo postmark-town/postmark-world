@@ -20,6 +20,7 @@ import { createServer as createNetServer } from "node:net";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { LITE, LITE_NEXT, liteModeFor, liteCarryOld } from "../spectator/viewer.mjs";
+import { machineContext } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -101,21 +102,29 @@ before(async () => {
   CLEANUP.push(() => browser.close());
 });
 
+// THE MACHINE'S SPEED IS SET, NOT MEASURED (WLD-60). The bake times its first
+// layer with performance.now() and calls the machine slow past 3 ms per 1,000 px,
+// so on a busy host an "able machine" page read slow and lite came on. The
+// context holds the page's clock still within one task (page-machine.mjs §
+// holdClockWithinATask, first written here), so the bake reads instant. ONLY THE
+// SLOW MACHINE keeps the real clock, at the CPU throttle it names: its subject is
+// the measurement, so it opts out of the held clock, by name.
+
 // crossing 247, five hours in (the Mists on, whatever today's crossing is), and
 // the machine the page is told it runs on
 async function open({ query = "", cores = 16, memory = 8, throttle = 0 } = {}) {
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference" });
-  await ctx.addInitScript(({ cores, memory }) => {
+  const ctx = await machineContext(browser, {
+    viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference", machine: { cores, memory },
+    ...(throttle ? { clock: "real", throttle } : {}),
+  });
+  await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
     const off = (Date.UTC(2026, 5, 12) + 247 * 12 * 3600e3 + 5 * 3600e3) - realNow();
     globalThis.Date = class extends RealDate { constructor(...a) { if (a.length === 0) super(realNow() + off); else super(...a); } static now() { return realNow() + off; } };
-    Object.defineProperty(Navigator.prototype, "hardwareConcurrency", { get: () => cores, configurable: true });
-    Object.defineProperty(Navigator.prototype, "deviceMemory", { get: () => memory, configurable: true });
-  }, { cores, memory });
+  });
   const page = await ctx.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e.message).slice(0, 160)));
-  if (throttle) { const cdp = await ctx.newCDPSession(page); await cdp.send("Emulation.setCPUThrottlingRate", { rate: throttle }); }
   await page.goto(`http://localhost:${port}/${query}`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
@@ -141,8 +150,57 @@ const mists = (page) => page.evaluate(() => ({
   feather: !!document.querySelector(".wv-sheet-feather"),
 }));
 
+// ── WHAT THE PAGE SHOWED, SAID IN THE TAP (WLD-150 D1; a diagnostic, not a fix) ──
+//
+// The slow-bake case below waits up to 180 s for html.wv-lite, and when that wait has failed in CI the failure
+// said only "Timeout 180000ms exceeded": nothing about what the page looked like. This reads the page's own
+// existing state, in ONE page task so the fields agree with each other, and prints it as one t.diagnostic JSON line
+// on the case's success and on its timeout, and at the already-painted point of the toggle case as a control.
+//
+// WHAT IT IS NOT. It does not measure the bake (no layer time, no host speed, no throttle check), and `waited_ms`
+// is this process's own elapsed time around the wait, NOT bake time. It decides nothing: no assertion reads it, no
+// wait, timeout or threshold depends on it, and the original failure is re-thrown unchanged. Read it as a
+// description of the page at that moment: a painted page with no slow flag is a bake that FINISHED without
+// turning auto-lite on (it does not say how fast); an unpainted page is ambiguous between work still running,
+// aborted, or starved, and this line cannot tell which. A state read that does not answer within 3 s is
+// reported as unknown, never as a cause. It holds booleans, the stored keys' values and the toggle's static
+// words only: no mark, id, URL, credential or error text.
+const STATE_READ_MS = 3000;
+const pageState = (page) => page.evaluate(() => {
+  const btn = document.querySelector(".wv-lite-toggle");
+  return {
+    lite: document.documentElement.classList.contains("wv-lite"),
+    slowKey: localStorage.getItem("pm_world_lite_slow"),
+    storedChoice: localStorage.getItem("pm_world_lite"),
+    toggleLabel: btn?.getAttribute("aria-label") ?? null,
+    toggleTitle: btn?.title ?? null,
+    wall: !!document.querySelector("#wv-mists-layer .wv-mists-wall"),
+    paint: !!document.querySelector(".wv-mists-paint"),
+    feather: !!document.querySelector(".wv-sheet-feather"),
+  };
+});
+/** Close an OWNED context, but never wait on it past the same bound as the state read: a close that rejects, throws or
+ *  never settles must not delay or replace the failure being reported. A late completion or rejection is already
+ *  handled (the .catch is attached to the close itself), so it cannot surface as an unhandled rejection. */
+async function closeBounded(ctx) {
+  let timer;
+  try {
+    await Promise.race([Promise.resolve().then(() => ctx.close()).catch(() => {}), new Promise((resolve) => { timer = setTimeout(resolve, STATE_READ_MS); })]);
+  } finally { clearTimeout(timer); }
+}
+async function stateLine(page, errors, label, waitedMs) {
+  let state, timer;
+  try {
+    state = await Promise.race([pageState(page), new Promise((_, no) => { timer = setTimeout(() => no(new Error("no answer")), STATE_READ_MS); })]);
+  } catch {
+    // a fixed word, never the exception's text: the read may have failed at once or run out its 3 s, and either is just "unknown"
+    state = { unknown: "the page's state could not be read (no answer within the bound, or the read failed)" };
+  } finally { clearTimeout(timer); }
+  return JSON.stringify({ lite_state: label, waited_ms: waitedMs, waited_ms_is: "this process's elapsed time around the wait, not bake time", page_errors: errors.length, ...state });
+}
+
 test("the page: ?lite=1 draws the wall alone (no bake, no feather, nothing moving); the toggle beside the bell says so", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   const { ctx, page, errors } = await open({ query: "?lite=1" });
   await page.waitForSelector("#wv-mists-layer .wv-mists-wall", { state: "attached", timeout: 120_000 });
   await page.waitForTimeout(4000);   // longer than this rig's whole bake at full speed
@@ -160,7 +218,7 @@ test("the page: ?lite=1 draws the wall alone (no bake, no feather, nothing movin
 });
 
 test("the page: the toggle goes auto → on → off → auto, kept on the device, outranks the link, and the paint comes and goes with it", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   const { ctx, page, errors } = await open({ query: "?lite=1" });
   await page.waitForSelector("#wv-mists-layer .wv-mists-wall", { state: "attached", timeout: 120_000 });
   const click = async () => { await page.click(".wv-lite-toggle"); await page.waitForTimeout(400); return read(page); };
@@ -168,9 +226,11 @@ test("the page: the toggle goes auto → on → off → auto, kept on the device
   assert.equal(r.stored, "on"); assert.equal(r.lite, true); assert.equal(r.label, "lite mode: on");
   r = await click();
   assert.equal(r.stored, "off"); assert.equal(r.lite, false, "off outranks the ?lite=1 the page was opened with");
+  const paintStart = Date.now();
   await page.waitForSelector(".wv-mists-paint img", { state: "attached", timeout: 120_000 });
   await page.waitForTimeout(500);
   r = await read(page);
+  t.diagnostic(await stateLine(page, errors, "toggle case (able page, held clock): painted, the control observation", Date.now() - paintStart));
   assert.ok(r.mistsMotion.length >= 2, `out of lite mode the Mists are baked and drift again (${r.mistsMotion.join(",")})`);
   assert.equal((await mists(page)).feather, true, "and the sheet's feather is back");
   r = await click();
@@ -189,7 +249,7 @@ test("the page: the toggle goes auto → on → off → auto, kept on the device
 });
 
 test("the page: auto turns lite mode on for a small machine, and for a slow first bake, which stops (kept for the next visit)", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
   for (const [machine, why] of [[{ cores: 4, memory: 8 }, /few cores/], [{ cores: 16, memory: 4 }, /little memory/]]) {
     const { ctx, page } = await open(machine);
     const r = await read(page);
@@ -200,7 +260,17 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
   // a slow machine: the first layer of the bake, timed under a 6× CPU throttle
   // (at full speed here it reads about 1.3 ms per 1,000 px; the line is 3)
   const { ctx, page, errors } = await open({ throttle: 6 });
-  await page.waitForFunction(() => document.documentElement.classList.contains("wv-lite"), null, { timeout: 180_000 });
+  const waitStart = Date.now();
+  try {
+    await page.waitForFunction(() => document.documentElement.classList.contains("wv-lite"), null, { timeout: 180_000 });
+  } catch (e) {
+    // the page's state, bounded, then the ORIGINAL failure, unchanged: this case still fails exactly as it did. The label
+    // says only that the wait FAILED: whether it was Playwright's timeout is what the re-thrown error says, not this line.
+    t.diagnostic(await stateLine(page, errors, "slow case: the wait for wv-lite FAILED (the original error is re-thrown unchanged)", Date.now() - waitStart));
+    await closeBounded(ctx);
+    throw e;
+  }
+  t.diagnostic(await stateLine(page, errors, "slow case: wv-lite came on", Date.now() - waitStart));
   await page.waitForTimeout(6000);   // what was left of the bake would have finished and painted by now
   const r = await read(page);
   assert.equal(r.slow, "1", "the verdict is kept on the device");
@@ -211,14 +281,13 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
 });
 
 test("the page on a phone: no seventh circle; the bell opens a menu holding the bell and lite mode", async (t) => {
-  if (!chromium) { t.skip("Playwright is not installed: lite mode went UNGUARDED"); return; }
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
+  // an able phone (the set machine, page-machine.mjs): its row reads "auto (off)"
+  const ctx = await machineContext(browser, { viewport: { width: 390, height: 844 }, hasTouch: true });
   await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
     const off = (Date.UTC(2026, 5, 12) + 247 * 12 * 3600e3 + 5 * 3600e3) - realNow();
     globalThis.Date = class extends RealDate { constructor(...a) { if (a.length === 0) super(realNow() + off); else super(...a); } static now() { return realNow() + off; } };
-    Object.defineProperty(Navigator.prototype, "hardwareConcurrency", { get: () => 16, configurable: true });
-    Object.defineProperty(Navigator.prototype, "deviceMemory", { get: () => 8, configurable: true });
   });
   const page = await ctx.newPage();
   const errors = [];

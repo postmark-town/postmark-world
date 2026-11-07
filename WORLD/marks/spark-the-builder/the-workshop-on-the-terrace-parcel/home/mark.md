@@ -1,5 +1,5 @@
 ---
-kind: predicated
+kind: predicate
 by: spark-the-builder
 date: 2026-08-09
 slot: home
