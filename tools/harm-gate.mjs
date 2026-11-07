@@ -8,7 +8,7 @@
 // crisis." So a crossing REFUSES only for what it did to residents, and
 // everything else in the suite is a warning and a pull request.
 //
-// Five checks, all data-shaped. Each compares the tree the sweep produced (the
+// Six checks, all data-shaped. Each compares the tree the sweep produced (the
 // working tree, HEAD once the sweep has committed) with the tree it started from
 // (`--base`, the main the crossing was measured against), and reads the sweep's
 // own report as the list of declared acts. Nothing here compares today's world
@@ -27,6 +27,24 @@
 //                  it did not fold stampless (stake rows naming standing marks,
 //                  and every mark at zero stamps — the 09-16 scratch-fold class).
 //   5. parcels   — no two standing parcels overlap.
+//   6. takes     — the sweep takes no more than 5 marks from home rows, and no
+//                  more than 10 in all, unless a keeper lets it (below).
+//
+// ── 6 · THE MASS-TAKE CEILING (WLD-51, a belt for G2) ──────────────────────
+//
+// Since WLD-51's G2 (Darko, 2026-10-15 12:59: standing decides in both
+// directions) a home row is taken at ✦0 whenever its walk reaches market
+// ground. That widened the rows judged at ✦0 each crossing from 2 to 238, and
+// before it a home row was immune by its class. Each one now rests on the walk,
+// every crossing. The "lost" check above accepts any removal the sweep names,
+// so a walk that misread a district would take its homes silently. So a
+// crossing that takes more than MASS_TAKE.home marks from home rows, or more
+// than MASS_TAKE.all marks in all, is HARM, and the red names every one.
+//
+// THE OPERATOR'S DOOR. A keeper who has read the list and finds it lawful sets
+// HARM_GATE_MASS_TAKE_OK to a receipt ("<who>, <why>") for the re-run; the
+// check passes with the receipt in its note, so the crossing record says who
+// let it through. A take is ordinary; a mass take is a person's decision.
 //
 // A red names the marks, so no isolation pass is needed to attribute it. Exit 0
 // is no harm; 1 is harm, named; 2 is "could not gate" — a report or a tree it
@@ -42,6 +60,12 @@ import { dirname, join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadMarks, loadSnapshot, fold, rect, overlapArea, SNAPSHOT_ENV, SNAPSHOT_ROOT_ENV } from "./marks-fold.mjs";
+
+/** The mass-take ceiling (check 6): more than `home` takes from home rows, or more than `all` takes, is HARM. */
+export const MASS_TAKE = Object.freeze({ home: 5, all: 10 });
+/** The keeper's door for check 6: a receipt, "<who>, <why>". */
+export const MASS_TAKE_OK_ENV = "HARM_GATE_MASS_TAKE_OK";
+const massTakeOk = (env = process.env) => (String(env[MASS_TAKE_OK_ENV] ?? "").trim() || null);
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -84,7 +108,7 @@ export function harmGate({ repo, sweep = {}, base = null, stakes = null, lint = 
   if (!existsSync(statePath)) throw new Error("could not gate: no WORLD/world-state.json — the fold did not run, so escrow cannot be read");
   const state = JSON.parse(readFileSync(statePath, "utf8"));
   const lintRun = lint ? lintVerdict(repo) : null;
-  return { ...judge({ before, after, sweep, state, stakes: stakes ? stakesFrom(stakes) : null, lint: lintRun }), base: baseRef };
+  return { ...judge({ before, after, sweep, state, stakes: stakes ? stakesFrom(stakes) : null, lint: lintRun, massTakeOk: massTakeOk() }), base: baseRef };
 }
 
 // ── THE GATE ON A SNAPSHOT PAIR (POS-363; R1, R2) ───────────────────────────
@@ -103,7 +127,7 @@ export function harmGateOnSnapshots({ repo = join(HERE, ".."), before, after, ac
   const stakeRows = stakes ? (typeof stakes === "string" ? stakesFrom(stakes) : stakes) : [];
   const state = fold({ marks: structuredClone(now), terrain: null, stakes: stakeRows });
   const lintRun = lint && typeof after === "string" ? lintVerdict(repo, { [SNAPSHOT_ENV]: after, [SNAPSHOT_ROOT_ENV]: repo }) : null;
-  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null) }), base: exportRef(before) ?? "snapshot" };
+  return { ...judge({ before: was, after: byId(now), sweep: acts, state, stakes: stakes ? stakeRows : null, lint: lintRun ?? (lint ? { skipped: "lint reads a snapshot through its file: pass the after snapshot as a path" } : null), massTakeOk: massTakeOk() }), base: exportRef(before) ?? "snapshot" };
 }
 
 /** The commit a before-export was read at (`snapshot-export.mjs` writes `ref`), so the run names its base. */
@@ -126,11 +150,11 @@ function lintVerdict(repo, env = {}) {
 }
 
 /**
- * The five checks over two marks maps, the declared acts, the after fold's state
+ * The six checks over two marks maps, the declared acts, the after fold's state
  * and (optionally) the stakes and a lint verdict. PURE. The tree's gate and the
  * snapshot pair's gate are this one judgement.
  */
-export function judge({ before, after, sweep = {}, state = {}, stakes = null, lint = null }) {
+export function judge({ before, after, sweep = {}, state = {}, stakes = null, lint = null, massTakeOk = null }) {
   const published = ids(sweep.published), unpublished = ids(sweep.unpublished), withdrawn = ids(sweep.withdrawn);
   const checks = [];
   const check = (name, rows, note = null) => { checks.push({ name, ok: rows.length === 0, count: rows.length, rows: rows.slice(0, 40), ...(note ? { note } : {}) }); };
@@ -193,6 +217,18 @@ export function judge({ before, after, sweep = {}, state = {}, stakes = null, li
       }
     }
     check("parcels", rows, `${parcels.length} standing parcel(s)`);
+  }
+
+  // 6 · takes — the mass-take ceiling (see the header)
+  {
+    const taken = (Array.isArray(sweep.unpublished) ? sweep.unpublished : []).filter((r) => r?.id);
+    const home = taken.filter((r) => r.class === "home");
+    const over = home.length > MASS_TAKE.home || taken.length > MASS_TAKE.all;
+    const rows = over && !massTakeOk
+      ? [`a mass take: ${taken.length} mark(s), ${home.length} from home rows, over the ceiling (more than ${MASS_TAKE.home} from home rows or ${MASS_TAKE.all} in all) — a keeper reads the list, and ${MASS_TAKE_OK_ENV}="<who>, <why>" lets the crossing through`,
+        ...taken.map((r) => `${r.id}: taken from a ${r.class ?? "?"} row (${r.household ?? "?"})`)]
+      : [];
+    check("takes", rows, `${taken.length} taken, ${home.length} from home rows${over && massTakeOk ? `; over the ceiling, let through by ${MASS_TAKE_OK_ENV}: ${massTakeOk}` : ""}`);
   }
 
   return { ok: checks.every((c) => c.ok), before: before.size, after: after.size, checks };
