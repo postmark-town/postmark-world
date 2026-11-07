@@ -40,10 +40,10 @@ const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "tools/page-throttle-sweep.test.mjs";
 const RATE = 4;
-// the 22 page tests at WLD-71
+// the 22 page tests at WLD-71, and exit-drops-interior (WLD-62) after them
 const SWEPT = [
   "tools/act-as-town-bodies.test.mjs", "tools/backdrop-without-text.test.mjs", "tools/dungeon-page.test.mjs",
-  "tools/first-paint-boot-shape.test.mjs", "tools/lately-more-on-the-page.test.mjs", "tools/lately-on-the-resident-path.test.mjs",
+  "tools/exit-drops-interior.test.mjs", "tools/first-paint-boot-shape.test.mjs", "tools/lately-more-on-the-page.test.mjs", "tools/lately-on-the-resident-path.test.mjs",
   "tools/lately-reads-the-store.test.mjs", "tools/lite-mode.test.mjs", "tools/mine-stands-out.test.mjs", "tools/mists-stage.test.mjs",
   "tools/part2-on-the-page.test.mjs", "tools/pinned-house-card.test.mjs", "tools/placed-art.test.mjs",
   "tools/region-column-reads-the-door.test.mjs", "tools/resident-middle-on-the-page.test.mjs", "tools/room-feather.test.mjs",
