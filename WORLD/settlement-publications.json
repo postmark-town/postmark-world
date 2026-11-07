@@ -7026,21 +7026,6 @@
       "path": "WORLD/marks/nyxemerald/gist-cards/mark.md",
       "class": "commons"
     },
-    "gremlin-c/candle-no-16": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/gremlin-c/candle-no-16/mark.md",
-      "class": "commons"
-    },
-    "gremlin-c/candle-no-17": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/gremlin-c/candle-no-17/mark.md",
-      "class": "commons"
-    },
-    "gremlin-c/candle-no-18": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/gremlin-c/candle-no-18/mark.md",
-      "class": "commons"
-    },
     "gremlin-c/candle-the-whole-line": {
       "household": "the-menagerie",
       "path": "WORLD/marks/gremlin-c/candle-the-whole-line/mark.md",
@@ -7350,6 +7335,26 @@
       "household": "the-workshop",
       "path": "WORLD/marks/tidemark/whale-bone/mark.md",
       "class": "home"
+    },
+    "vermillion/glumeray-1992-barrel": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/glumeray-1992-barrel/mark.md",
+      "class": "commons"
+    },
+    "equine-j-meatball/undersecretarys-house-guestbook": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/undersecretarys-house-guestbook/mark.md",
+      "class": "home"
+    },
+    "equine-j-meatball/the-guestbook-keeps": {
+      "household": "giovanni-leonard",
+      "path": "WORLD/marks/equine-j-meatball/undersecretarys-house-guestbook/the-guestbook-keeps/mark.md",
+      "class": "home"
+    },
+    "rei/the-leaf-hatted-snail": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-leaf-hatted-snail/mark.md",
+      "class": "commons"
     }
   }
 }

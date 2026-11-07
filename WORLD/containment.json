@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2752,
+  "count": 2753,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2769,10 +2769,8 @@
     },
     {
       "id": "dom-pidgey/a-tin-of-pigeon-face-cookies-for-luna",
-      "parent": "equine-j-meatball/undersecretary-high-ground-parcel",
+      "parent": "the-town/let-there-be-light",
       "chain": [
-        "equine-j-meatball/undersecretary-high-ground-parcel",
-        "sage-reeves/the-high-ground",
         "the-town/let-there-be-light"
       ]
     },
@@ -3256,6 +3254,16 @@
       ]
     },
     {
+      "id": "equine-j-meatball/the-guestbook-keeps",
+      "parent": "equine-j-meatball/undersecretarys-house-guestbook",
+      "chain": [
+        "equine-j-meatball/undersecretarys-house-guestbook",
+        "equine-j-meatball/undersecretary-high-ground-parcel",
+        "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "equine-j-meatball/the-household-tea-table",
       "parent": "equine-j-meatball/undersecretary-high-ground-parcel",
       "chain": [
@@ -3277,6 +3285,15 @@
       "id": "equine-j-meatball/undersecretary-high-ground-parcel",
       "parent": "sage-reeves/the-high-ground",
       "chain": [
+        "sage-reeves/the-high-ground",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "equine-j-meatball/undersecretarys-house-guestbook",
+      "parent": "equine-j-meatball/undersecretary-high-ground-parcel",
+      "chain": [
+        "equine-j-meatball/undersecretary-high-ground-parcel",
         "sage-reeves/the-high-ground",
         "the-town/let-there-be-light"
       ]
@@ -4681,33 +4698,6 @@
       "parent": "gremlin-c/the-last-lamp",
       "chain": [
         "gremlin-c/the-last-lamp",
-        "gremlin-c/lanternwake",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "gremlin-c/candle-no-16",
-      "parent": "gremlin-c/the-candlewall",
-      "chain": [
-        "gremlin-c/the-candlewall",
-        "gremlin-c/lanternwake",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "gremlin-c/candle-no-17",
-      "parent": "gremlin-c/the-candlewall",
-      "chain": [
-        "gremlin-c/the-candlewall",
-        "gremlin-c/lanternwake",
-        "the-town/let-there-be-light"
-      ]
-    },
-    {
-      "id": "gremlin-c/candle-no-18",
-      "parent": "gremlin-c/the-candlewall",
-      "chain": [
-        "gremlin-c/the-candlewall",
         "gremlin-c/lanternwake",
         "the-town/let-there-be-light"
       ]
@@ -9723,6 +9713,14 @@
     },
     {
       "id": "rei/the-latecomers-circle",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/the-leaf-hatted-snail",
       "parent": "rei/the-lanternseed-gardens",
       "chain": [
         "rei/the-lanternseed-gardens",
@@ -21173,6 +21171,15 @@
       "chain": [
         "vermillion/the-haunted-caves",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/glumeray-1992-barrel",
+      "parent": "current-the-reader/the-snug-harbour",
+      "chain": [
+        "current-the-reader/the-snug-harbour",
+        "spar/the-doubled-coast",
         "the-town/let-there-be-light"
       ]
     },
