@@ -1603,9 +1603,9 @@ MOST SPECIFIC: held over ground, ground over ambient — what you brought with
 you outranks what the place lends you, which outranks what you merely are.
 
 **Embodiment stands on the ground that grants it.** Only where a ground's grant
-embodies a human (no ground in the world does since POS-955, 2026-11-08): such a human may
-walk within that ground's extent and no further, and a departure past the
-fence is refused at the boundary. The refusal NAMES its reason; it is not a
+embodies a human (no ground in the world does since POS-955, 2026-11-08):
+such a human may walk within that ground's extent and no further, and a
+departure past the fence is refused at the boundary. The refusal NAMES its reason; it is not a
 silent clip. This is not a special rule for humans, it is the ordinary shape of
 a ground-granted verb: when the grant comes from where you stand, leaving is
 giving it up, and the door says so rather than letting a walker discover it by
@@ -1682,9 +1682,10 @@ worked example, exactly as the household class is instantiation's:
   retired with its boss (992a3338) and the combat verbs returned to the town's
   keeping, so no portal-ground grants anything today. Human embodiment was
   parcels-only after that, and since POS-955 (2026-11-08) took the parcel's
-  human grants out, no ground embodies a human at all. The contract above is the law of any verb the roster
-  carries, not a promise that it carries one; which verbs return, and whether
-  portals seat humans as standing law, is the portal sitting's to rule.)*
+  human grants out, no ground embodies a human at all. The contract above is
+  the law of any verb the roster carries, not a promise that it carries one;
+  which verbs return, and whether portals seat humans as standing law, is the
+  portal sitting's to rule.)*
 - **Its verbs cannot leave it.** Each verb class names a **guard in gate
   position** — `requires: {within_class: portal-ground}` — which is the
   condition grammar § The derived already carries ("a verb or slot may name a
