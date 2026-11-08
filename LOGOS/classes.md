@@ -1509,18 +1509,10 @@ Ruled at the act-as-human sitting (2026-08-17; packet:
   fence: everything further waits for the humans-as-residents design, and
   arrives — if it arrives — as law here first.
 
-**The fence moved once, and only outward onto the household's own ground
-(PROPOSED 2026-08-26; awaiting the founder's word).** The one-grant fence was
-never a claim that a human may only ever speak — it was a claim that anything
-further "arrives as law here first." This is that arrival, and it is
-deliberately the smallest one available: the human class gains a **pace dial**
-(the resident's own stride — a person's walk is a person's walk), and the
-**parcel** class grants `walk` and `say` to the human of the
-household whose ground it is. Off that ground nothing changes: a human is a
-voice through their resident, exactly as before. The say granted at the parcel
-is not the ambient one duplicated — the ambient say is **companioned** (heard
-from a resident's standing), and this one is **embodied** (heard from the
-human's own feet). Two different acts that happen to share a word.
+**Speaking only, for now.** A household's human speaks beside one of their own
+household's residents, from that resident's standing, and does nothing on feet
+of their own anywhere: no walk, and no say heard from the human's own place.
+Walking may come later; if it does, it arrives as law here first.
 
 *(Amended 2026-08-30 — the pace dial POINTS, it does not restate. This clause
 read "a pace dial (60 km/crossing, the resident's own stride)", and the human
@@ -1551,8 +1543,8 @@ Rendered in the world as `the-town/a-grant-may-name-a-relation`,
 § Class-nodes already carries the two halves this section names: "the resident
 class carries every resident's standing capabilities, world-wide by its own
 ambient declaration; **a ground's class may grant more to those it reaches.**"
-The second clause was ruled 2026-08-15 and stood with zero live instances until
-the parcel grant above. Writing the calculus down is what that clause was owed.
+The second clause was ruled 2026-08-15. Writing the calculus down is what that
+clause was owed, and it stands as the law of any ground grant.
 
 - **Ambient** — what you ARE. The grants on a class you are an instance of,
   which declares itself `ambient: true`. Jurisdiction travels the law, not the
@@ -1583,9 +1575,11 @@ kind (§ The human class; absent means resident). A grant may additionally carry
 `scope:` — a RELATION between the actor and the granting node — and today there
 is exactly one value, `own-ground`: the grant reaches only an actor whose own
 household is the household of the ground granting it. A guest's human standing
-on the same parcel receives nothing, and that is the point. The generalization
-is deliberately withheld: `scope:` is one word with one value until a second
-relation is actually needed, which is when its grammar will be argued properly.
+on the same ground receives nothing, and that is the point. (No grant carries
+it today; the grammar stands for the day a ground grants by relation.) The
+generalization is deliberately withheld: `scope:` is one word with one value
+until a second relation is actually needed, which is when its grammar will be
+argued properly.
 
 **The calculus filters by actor kind before it admits anything.** An entry
 whose `for:` does not name the caller's kind is not the caller's door, even
@@ -1594,11 +1588,12 @@ that filter, and a verb reached through more than one channel resolves to the
 MOST SPECIFIC: held over ground, ground over ambient — what you brought with
 you outranks what the place lends you, which outranks what you merely are.
 
-**Embodiment stands on the ground that grants it.** A human embodied by their
-own parcel may walk within its extent and no further: a departure past the
-fence is refused at the boundary. The refusal NAMES its reason; it is not a
-silent clip. This is not a special rule for humans, it is the ordinary shape of
-a ground-granted verb: when the grant comes from where you stand, leaving is
+**Embodiment stands on the ground that grants it.** Only where a ground's grant
+embodies a human (no ground in the world does today): such a human may walk
+within that ground's extent and no further, and a departure past the fence is
+refused at the boundary. The refusal NAMES its reason; it is not a silent clip.
+This is not a special rule for humans, it is the ordinary shape of a
+ground-granted verb: when the grant comes from where you stand, leaving is
 giving it up, and the door says so rather than letting a walker discover it by
 arriving somewhere with no verbs.
 
@@ -1671,10 +1666,10 @@ worked example, exactly as the household class is instantiation's:
   never `scope: own-ground` — a portal's whole nature is that it grants to
   visitors. *(Interim state, 2026-08-30: the roster stands EMPTY — the arena
   retired with its boss (992a3338) and the combat verbs returned to the town's
-  keeping, so no portal-ground grants anything today and human embodiment is
-  parcels-only again. The contract above is the law of any verb the roster
-  carries, not a promise that it carries one; which verbs return, and whether
-  portals seat humans as standing law, is the portal sitting's to rule.)*
+  keeping, so no portal-ground grants anything today, and no ground embodies
+  a human. The contract above is the law of any verb the roster carries, not a
+  promise that it carries one; which verbs return, and whether portals seat
+  humans as standing law, is the portal sitting's to rule.)*
 - **Its verbs cannot leave it.** Each verb class names a **guard in gate
   position** — `requires: {within_class: portal-ground}` — which is the
   condition grammar § The derived already carries ("a verb or slot may name a
