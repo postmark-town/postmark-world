@@ -19,7 +19,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
-import { ABLE_MACHINE, NO_PLAYWRIGHT, THROTTLE_ENV, cpuThrottle, holdClockWithinATask, machineContext, machinePage, readsSettled, settleCheck, gate, stripComments } from "./page-machine.mjs";
+import { ABLE_MACHINE, NO_PLAYWRIGHT, SLOW_CLOCK_K, THROTTLE_ENV, cpuThrottle, holdClockWithinATask, slowClockWithinATask, machineContext, machinePage, readsSettled, settleCheck, gate, stripComments } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (rel) => readFileSync(join(ROOT, rel), "utf8");
@@ -33,6 +33,31 @@ test("the held clock: still within one task, moving between tasks", async () => 
   await new Promise((r) => setTimeout(r, 0));
   const c = sandbox.performance.now();
   assert.ok(c > a, `the next task reads a later instant (${a} → ${c}): timers and frames still advance`);
+});
+
+// WLD-170: the slow machine's clock. A fake real clock the test advances by hand, so the arithmetic is read directly.
+test("the slow clock: k times fast within a task, the real rate between tasks, and never backwards or jumping at a boundary", async () => {
+  const k = SLOW_CLOCK_K;
+  assert.equal(k, 10, "the assigned rate");
+  let real = 1000;
+  const sandbox = { performance: { now: () => real }, queueMicrotask };
+  runInNewContext(`(${slowClockWithinATask})(${k})`, sandbox);
+  const first = sandbox.performance.now();
+  assert.equal(first, 1000, "the first read of a task is the real time");
+  real += 5;   // 5 ms of real work inside the task
+  const inTask = sandbox.performance.now();
+  assert.equal(inTask - first, 5 * k, "5 ms of work reads as 50: the layer the bake times is k times slower");
+  real += 2;
+  const lastInTask = sandbox.performance.now();
+  assert.equal(lastInTask - first, 7 * k);
+  await Promise.resolve();   // the microtask that ends the task has run
+  real += 100;               // a timer's wait, between tasks
+  const next = sandbox.performance.now();
+  assert.ok(next >= lastInTask, `never backwards across the boundary (${lastInTask} → ${next})`);
+  // between tasks the real rate: 100 ms of waiting adds 100, on top of the task's 7 ms of work read as 70
+  assert.equal(next - first, 100 + 7 * k, "the wait is real time; only the work was stretched");
+  real += 3;
+  assert.equal(sandbox.performance.now() - next, 3 * k, "and the next task is slow again, from where the clock stood");
 });
 
 test("the run's throttle: none by default, a named rate, and a mistyped one refused", () => {
@@ -226,6 +251,25 @@ test("THE PAGE: a context from the helper is the able machine, its clock held wi
   assert.equal(s.cores, 4, "a test whose subject is the machine names it");
   assert.equal(s.moved, true, "clock: real is the real clock, inside a task too");
   await real.close();
+});
+
+test("THE PAGE: the slow context's receipt names its clock, and a task's work reads k times slower, on a clock that never goes back", async (t) => {
+  if (!chromium) return t.skip(SKIP);
+  const page = await machinePage(browser, { clock: "slow", throttle: 0 });
+  assert.deepEqual([page.context().machine.clock, page.context().machine.throttle], ["slow", 0], "the receipt: the clock and the throttle the page was opened on");
+  await page.setContent("<p>machine</p>");
+  const r = await page.evaluate(async () => {
+    const d0 = Date.now(), p0 = performance.now();
+    while (Date.now() - d0 < 30) { /* 30 ms of real work, in one task */ }
+    const ratio = (performance.now() - p0) / (Date.now() - d0);
+    const before = performance.now();
+    await new Promise((res) => setTimeout(res, 20));
+    return { ratio, forward: performance.now() > before };
+  });
+  t.diagnostic(`slow clock: a task's work read ${r.ratio.toFixed(2)}× the real time (k = ${SLOW_CLOCK_K})`);
+  assert.ok(r.ratio > SLOW_CLOCK_K * 0.8 && r.ratio < SLOW_CLOCK_K * 1.2, `work in one task reads about k× (${r.ratio})`);
+  assert.equal(r.forward, true, "time moves on across a task");
+  await page.close();
 });
 
 test("THE PAGE: on real contexts, every page is sent the expected CPU throttle on its own CDP session, answered by Chromium before it is handed over", async (t) => {
