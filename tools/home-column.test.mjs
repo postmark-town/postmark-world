@@ -21,7 +21,7 @@ import assert from "node:assert/strict";
 import vm from "node:vm";
 import { readFileSync } from "node:fs";
 import {
-  parseHomeMarkdown, parseInline, safeLinkHref, safeSwatch, homeHandleForParcel, isParcelMark,
+  parseHomeMarkdown, parseInline, safeLinkHref, safeSitePath, safeSwatch, homeHandleForParcel, isParcelMark,
   homeColumnModel, renderHomeColumn, createHomeColumn,
 } from "../spectator/home-column.mjs";
 import {
@@ -986,4 +986,36 @@ test("the walker card's \"their page →\" is the other place a handle becomes a
   assert.ok(!cardFor("the-town").includes("their page"), "the town's card has none");
   assert.ok(!cardFor("the-town").includes("/residents/"), "and no path to the site at all");
   // ⚑ THE FLIP: delete the `s === TOWN_HANDLE` line in residentHref → the town assertions red, and not the control
+});
+
+// ── A CONVERSATION'S COLUMN (POS-779, Darko 2026-11-06): plain-data blocks and a footer link ─────────────────────────
+
+test("a view may hand in plain-data blocks, and a statement's markdown and markup stay the letters it was typed in", () => {
+  const said = '# not a heading [x](javascript:alert(1)) <img src="x" onerror="alert(2)"> **not bold**';
+  const blocks = [{ type: "paragraph", spans: [{ type: "strong", spans: [{ type: "text", text: "rig-ash" }] }, { type: "text", text: ` (2026-11-06 14:05Z): ${said}` }] }];
+  const model = homeColumnModel({ handle: "the-town", kicker: "a conversation · live", title: "the porch", door: { blocks } });
+  assert.deepEqual(model.blocks, blocks, "the blocks are the ones handed in, not a parse of anything");
+  const host = render(model);
+  const tags = tagsIn(host);
+  for (const bad of ["SCRIPT", "IMG", "A", "H1", "B"]) assert.equal(tags.filter((t) => t === bad).length, 0, `no ${bad} was made from a statement`);
+  assert.ok(serialize(host).includes(said), "the statement reads exactly as typed");
+  assert.equal(find(host, "strong").length, 1, "and only the column's own emphasis (the speaker's name) is markup");
+  // the markdown path is unchanged for everything else
+  assert.equal(homeColumnModel({ handle: "x", kicker: "x", door: { description: "# a title" } }).blocks[0].type, "heading");
+  assert.deepEqual(homeColumnModel({ handle: "x", kicker: "x", door: { blocks: [] } }).blocks, [], "an empty list of blocks is the quiet thread, not a markdown parse");
+});
+
+test("a footer link is a same-origin path, opens beside the map, and nothing else is hung", () => {
+  const ok = render(homeColumnModel({ handle: "the-town", kicker: "k", title: "t", door: { blocks: [] }, footerLink: { href: "/conversations/#t1", text: "all conversations →" } }));
+  const [a] = byClass(ok, "wv-homecol-all");
+  assert.equal(a.getAttribute("href"), "/conversations/#t1");
+  assert.equal(a.getAttribute("target"), "_blank");
+  assert.equal(a.getAttribute("rel"), "noopener noreferrer");
+  assert.equal(a.textContent, "all conversations →");
+  assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "words" } })), "wv-homecol-all").length, 0, "no footer link unless a view asks");
+  for (const bad of ["https://evil.example/x", "//evil.example/x", "/\\evil", "javascript:alert(1)", "conversations/#t1", "/with space", "", null, undefined]) {
+    assert.equal(safeSitePath(bad), null, `refused: ${JSON.stringify(bad)}`);
+    assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "w" }, footerLink: { href: bad, text: "x" } })), "wv-homecol-all").length, 0, "and no anchor is hung for it");
+  }
+  assert.equal(safeSitePath("/conversations/#t%201"), "/conversations/#t%201");
 });
