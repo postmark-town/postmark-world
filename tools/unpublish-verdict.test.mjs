@@ -56,6 +56,22 @@ test("G2, THE OTHER HALF (Darko, WLD-51, 2026-10-15 12:59): a row stored home wh
   assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true }), { unpublish: null, why: "standing-unread" });
 });
 
+// THE HELD VETO REACHES A HOME ROW (independent review H1, 49bf7358). G2 makes a home row at ✦0 whose mark walks
+// market a candidate, and an unplaced held thing reads market, so the veto (POS-688 D4: published but unplaced,
+// never a candidate while held) is the only thing between G2 and a thing in a resident's hands. The row, escrow,
+// standing and path are the same in all three calls; only `held` differs, so a veto that asks the row's class
+// (commons only) turns the first assertion red.
+test("H1: a HOME row at ✦0 whose mark walks market is kept while held (why: held) and taken when not held", () => {
+  const home = { household: "invented-house", class: "home", path: "WORLD/marks/invented/a-held-thing/mark.md" };
+  const base = { escrow: 0, pathOnMain: true, standing: "market" };
+  assert.deepEqual(unpublishVerdict(home, { ...base, held: true }), { unpublish: false, why: "held" }, "held: kept, and it is the veto that says so");
+  assert.deepEqual(unpublishVerdict(home, { ...base, held: () => true }), { unpublish: false, why: "held" }, "held asked as a function: the same");
+  assert.deepEqual(unpublishVerdict(home, { ...base, held: false }), { unpublish: true, why: "commons-unbacked", path: home.path }, "the control: not held, the same row is taken");
+  assert.deepEqual(unpublishVerdict(home, base), { unpublish: true, why: "commons-unbacked", path: home.path }, "held defaults to not held");
+  // and the veto still holds for a commons row, so the pin separates the two classes' arms
+  assert.deepEqual(unpublishVerdict(commons, { ...base, held: true }), { unpublish: false, why: "held" });
+});
+
 test("kinofire's firepit, under the old dial: a commons row whose path is not on main was not swept", () => {
   assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: false, staleRows: "skip", ...market }), { unpublish: false, why: "stale-path" });
 });
