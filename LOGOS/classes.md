@@ -1510,10 +1510,11 @@ Ruled at the act-as-human sitting (2026-08-17; packet:
   arrives — if it arrives — as law here first.
 
 **Speaking only, for now** (the founder, 2026-11-08 14:18 EST, POS-955, as
-Wright's 19:19Z writeback records it: *"Speaking only, for now"*). A household's human speaks beside one of their own
-household's residents, from that resident's standing, and does nothing on feet
-of their own anywhere: no walk, and no say heard from the human's own place.
-Walking may come later; if it does, it arrives as law here first.
+Wright's 19:19Z writeback records it: *"Speaking only, for now"*). A
+household's human speaks beside one of their own household's residents, from
+that resident's standing, and does nothing on feet of their own anywhere: no
+walk, and no say heard from the human's own place. Walking may come later; if
+it does, it arrives as law here first.
 
 *(Until 2026-11-08 this paragraph carried a PROPOSAL of 2026-08-26 that never
 received the founder's word: the fence moved outward onto the household's own
@@ -1605,11 +1606,11 @@ you outranks what the place lends you, which outranks what you merely are.
 **Embodiment stands on the ground that grants it.** Only where a ground's grant
 embodies a human (no ground in the world does since POS-955, 2026-11-08):
 such a human may walk within that ground's extent and no further, and a
-departure past the fence is refused at the boundary. The refusal NAMES its reason; it is not a
-silent clip. This is not a special rule for humans, it is the ordinary shape of
-a ground-granted verb: when the grant comes from where you stand, leaving is
-giving it up, and the door says so rather than letting a walker discover it by
-arriving somewhere with no verbs.
+departure past the fence is refused at the boundary. The refusal NAMES its
+reason; it is not a silent clip. This is not a special rule for humans, it is
+the ordinary shape of a ground-granted verb: when the grant comes from where
+you stand, leaving is giving it up, and the door says so rather than letting a
+walker discover it by arriving somewhere with no verbs.
 
 *(Amended 2026-08-29 by the founder's seat ruling below. The clause also said
 `exit` "is refused with it", on the reasoning that stepping off the granting
