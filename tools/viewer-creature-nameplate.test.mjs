@@ -187,8 +187,9 @@ test("wiring: the closure is gone, and the one call site passes the looked-up ro
 // 107135 bytes, by the same first route as above (the file written beside symlinks to the real spectator/ and
 // tools/, its own `mountViewer` under a stub DOM). The same script run on the base 82e23532 reproduced the old
 // digest, and run on the batch head gave this digest too: the batch emits main's STYLE byte for byte.
-const PINNED_MASKED_STYLE_SHA256 = "94d56a4157be8427e46c0a1854ae319b1aea22cfea64978538491f2b410361a7";
-const PINNED_MASKED_STYLE_BYTES = 107135;
+// RE-PINNED FOR POS-945 ("In town by mail"), knowingly: STYLE gains the `.wv-bymail*` rules, 819 bytes (107135 -> 107954), nothing else.
+const PINNED_MASKED_STYLE_SHA256 = "37ddf8f8ef8c850058d84437666e948b2e4a67bd852e2e50a13a44f264eae621";
+const PINNED_MASKED_STYLE_BYTES = 107954;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";
