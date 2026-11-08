@@ -87,11 +87,13 @@ test("THE CANDLE'S LIST: the sweep is not among the suites the crossing runs, an
   assert.equal(listed.some((f) => /throttle-sweep/.test(f)), false, "no spelling of the sweep is in the candle's list");
 });
 
-test("[pin] npm test's glob is tools/*.test.mjs, which the sweep's name does not match, and the sweep has its own script", () => {
+test("[pin] npm test's glob is tools/*.test.mjs, which the sweep's name does not match, and the advisory workflow runs it", () => {
   const scripts = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).scripts;
   assert.equal(scripts.test, 'node --test "tools/*.test.mjs"', "the blocking suite's selector");
   assert.equal(/\.test\.mjs$/.test("page-throttle-sweep.advisory.mjs"), false, "the sweep's name is outside the selector");
   assert.equal(scripts["test:throttle"], "node --test tools/page-throttle-sweep.advisory.mjs", "its own script");
+  const wf = readFileSync(join(ROOT, ".github", "workflows", "throttle-advisory.yml"), "utf8");
+  assert.match(wf, /npm run test:throttle/, "the advisory workflow runs the sweep");
 });
 
 /** the sweep, run as its own process behind the recording preload; what it imported,
