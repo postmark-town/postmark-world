@@ -1,5 +1,6 @@
-// candle-boundary.test.mjs — the 4× page sweep runs in CI and `npm test`, never in
-// the settlement candle (WLD-71; Wright's independent review 2026-10-30 11:38).
+// candle-boundary.test.mjs — the 4× page sweep never runs in the settlement candle
+// (WLD-71; Wright's independent review 2026-10-30 11:38). Since WLD-170 it runs in
+// its own advisory workflow (throttle-advisory.yml), not in `npm test` either.
 //
 //   node --test tools/candle-boundary.test.mjs
 //
@@ -8,7 +9,7 @@
 //      runs it, over a private suite that records its own environment: the child it
 //      starts carries WORLD_CANDLE_RUN=1 even when the caller inherited CI=true and
 //      npm_lifecycle_event=test, and its [pin] test is still withheld.
-//   2. THE SWEEP. tools/page-throttle-sweep.test.mjs, run as its own process behind a
+//   2. THE SWEEP. tools/page-throttle-sweep.advisory.mjs, run as its own process behind a
 //      preload that (a) answers `import("playwright")` with a recording fake and (b)
 //      records and refuses every child_process spawn. With the candle's flag it
 //      imports no browser, launches none and starts no child, and its 24 throttled
@@ -29,10 +30,10 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, exis
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { CANDLE_ENV } from "./run-candle-suites.mjs";
+import { CANDLE_ENV, suiteFiles } from "./run-candle-suites.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SWEEP = join(ROOT, "tools", "page-throttle-sweep.test.mjs");
+const SWEEP = join(ROOT, "tools", "page-throttle-sweep.advisory.mjs");
 
 /** a caller's environment as CI or npm would hand it on: never the candle's flag
  *  unless asked, never the parent runner's channel */
@@ -73,6 +74,24 @@ test("THE RUNNER: the crossing's child carries the candle's flag, over an inheri
   const direct = spawnSync(process.execPath, ["--test", join(dir, "tools", "probe.test.mjs")], { cwd: dir, env: callerEnv(), encoding: "utf8" });
   assert.equal(count(direct.stdout + direct.stderr, "pass"), 1);
   assert.equal(JSON.parse(readFileSync(out, "utf8")).candle, null, "outside the runner, CI=true and npm_lifecycle_event=test set no flag");
+});
+
+// WLD-170: THE ROUTE OUT. Both the settlement-blocking suite and the candle enumerate tools/*.test.mjs, so the sweep's
+// name is outside that suffix, and neither can pick it up. The candle's list is read for real (suiteFiles, the
+// function it runs); `npm test`'s glob is a text pin, labelled so, with a control that the same read DOES see a
+// .test.mjs.
+test("THE CANDLE'S LIST: the sweep is not among the suites the crossing runs, and a .test.mjs is (the control)", () => {
+  const listed = suiteFiles().map((f) => f.split(/[\\/]/).pop());
+  assert.ok(listed.includes("candle-boundary.test.mjs"), "the control: the candle's list holds a .test.mjs file, this one");
+  assert.ok(!listed.includes("page-throttle-sweep.advisory.mjs"), "the candle cannot pick the sweep up");
+  assert.equal(listed.some((f) => /throttle-sweep/.test(f)), false, "no spelling of the sweep is in the candle's list");
+});
+
+test("[pin] npm test's glob is tools/*.test.mjs, which the sweep's name does not match, and the sweep has its own script", () => {
+  const scripts = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).scripts;
+  assert.equal(scripts.test, 'node --test "tools/*.test.mjs"', "the blocking suite's selector");
+  assert.equal(/\.test\.mjs$/.test("page-throttle-sweep.advisory.mjs"), false, "the sweep's name is outside the selector");
+  assert.equal(scripts["test:throttle"], "node --test tools/page-throttle-sweep.advisory.mjs", "its own script");
 });
 
 /** the sweep, run as its own process behind the recording preload; what it imported,

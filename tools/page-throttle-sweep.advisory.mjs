@@ -1,8 +1,15 @@
-// page-throttle-sweep.test.mjs — the swept page tests, run on a loaded machine
+// page-throttle-sweep.advisory.mjs — the swept page tests, run on a loaded machine
 // and required green (WLD-71's falsifier: "run the swept tests under a CPU
-// throttle (the slow-machine test already does this) and require them green").
+// throttle and require them green").
 //
-//   node --test tools/page-throttle-sweep.test.mjs
+//   node --test tools/page-throttle-sweep.advisory.mjs     (npm run test:throttle)
+//
+// AN ALARM, NOT A GATE (WLD-170; Darko 2026-11-08 14:47 EST: "the throttle test should
+// be demoted to an alarm that doesn't block settlement"). This file is NOT a
+// *.test.mjs, so `npm test` (the settlement-blocking suite) and the candle runner,
+// which both enumerate tools/*.test.mjs, never pick it up. It runs in its own
+// workflow, .github/workflows/throttle-advisory.yml, on pushes and pull requests
+// into main, where a red is a failed advisory check and blocks nothing.
 //
 // Each page test below runs in a child of its own (node --test <file>), one after
 // another, with WORLD_PAGE_CPU_THROTTLE=4: every page its contexts open is
@@ -10,7 +17,8 @@
 // let the page measure the host, is what a 4× box turns red. The receipt is the
 // helper's own: one line per real page opened, with its machine, so a file that
 // "passed" without opening a page, or a page that escaped the throttle, is a red
-// here. The slow-machine case keeps its own rate (6×, real clock) by name.
+// here. The slow-machine case keeps its own machine by name: the slow clock, no CPU
+// throttle (tools/lite-mode.test.mjs, page-machine.mjs § slowClockWithinATask).
 //
 // The list is explicit and is held to the census (every tools/*.test.mjs that
 // launches chromium, page-machine.test.mjs aside: its page half measures the
@@ -29,16 +37,17 @@ import { CANDLE_ENV } from "./run-candle-suites.mjs";
 
 // NOT IN THE CANDLE (WLD-71; Wright's review 2026-10-30 11:38). The settlement
 // crossing's gate (tools/run-candle-suites.mjs) sets WORLD_CANDLE_RUN=1 on its child,
-// and a crossing must not wait on 22 browsers at 4× CPU. There, this file probes no
-// browser and starts no child: its 22 throttled tests skip, saying why. CI and
-// `npm test` run them all. ONLY that name decides: an inherited CI=true,
-// GITHUB_ACTIONS or npm_lifecycle_event neither excludes the sweep nor brings it back.
+// and a crossing must not wait on 22 browsers at 4× CPU. Since WLD-170 the candle never
+// lists this file at all (its name is outside tools/*.test.mjs); the flag stays as the
+// belt: run with it, this file probes no browser and starts no child, and its throttled
+// tests skip, saying why. ONLY that name decides: an inherited CI=true, GITHUB_ACTIONS
+// or npm_lifecycle_event neither excludes the sweep nor brings it back.
 // (Not a [pin]: a pin is a source-text test, #2790; this is behaviour.)
 const IN_CANDLE = process.env[CANDLE_ENV] === "1";
 const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page sweep runs in CI and npm test, not in the settlement crossing — nothing rendered here`;
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SELF = "tools/page-throttle-sweep.test.mjs";
+const SELF = "tools/page-throttle-sweep.advisory.mjs";
 const RATE = 4;
 // the 24 page tests: the 22 at WLD-71, tools/conversation-pages.test.mjs (POS-779: the mounted conversation badges)
 // and WLD-74's resident card (tools/candle-boundary.test.mjs counts them too)
@@ -52,8 +61,8 @@ const SWEPT = [
   "tools/town-ground-page.test.mjs", "tools/walk-enter-terms-page.test.mjs", "tools/walk-layer-once.test.mjs",
   "tools/wld74-card-on-the-page.test.mjs",
 ];
-// the one deliberate exception, by name: lite-mode's slow machine is measured at its own rate
-const OWN_RATE = { "tools/lite-mode.test.mjs": { clock: "real", throttle: 6 } };
+// the one deliberate exception, by name: lite-mode's slow machine is the slow clock, SET (WLD-170), with no CPU throttle
+const OWN_RATE = { "tools/lite-mode.test.mjs": { clock: "slow", throttle: 0 } };
 
 const launches = (rel) => /\bchromium\s*\.\s*launch\s*\(/.test(stripComments(readFileSync(join(ROOT, rel), "utf8")));
 
@@ -140,7 +149,7 @@ for (const rel of SWEPT) {
     const atRate = r.pages.filter((p) => p.throttle === RATE && p.clock === "held").length;
     const atOwn = own ? r.pages.filter((p) => p.throttle === own.throttle && p.clock === own.clock).length : 0;
     t.diagnostic(`${rel}: pass ${r.pass} · fail ${r.fail} · skipped ${r.skipped} · pages ${r.pages.length} (${atRate} at ${RATE}× held clock`
-      + (own ? `, ${atOwn} at its own ${own.throttle}× ${own.clock} clock` : "") + `) · exit ${r.code ?? r.signal}`
+      + (own ? `, ${atOwn} on its own set machine (clock ${own.clock}, throttle ${own.throttle})` : "") + `) · exit ${r.code ?? r.signal}`
       + (r.skips.length ? ` · skips: ${r.skips.join(" | ")}` : ""));
     // WLD-150 D1b: the child's lite-state lines, forwarded BEFORE any assertion so a red child cannot cut them off;
     // informational only (nothing below reads it), and labelled as the CHILD's, not the direct run's
@@ -152,7 +161,7 @@ for (const rel of SWEPT) {
     assert.equal(r.code, 0, `the child exited ${r.code ?? r.signal}`);
     assert.ok(r.pass > 0, "the child passed nothing");
     assert.ok(r.pages.length > 0, "the file opened no page through the helper, so the throttle reached nothing");
-    assert.equal(atRate + atOwn, r.pages.length, `every page at ${RATE}× on the held clock${own ? `, or at the file's own rate` : ""}: ${JSON.stringify(r.pages)}`);
-    if (own) assert.ok(atOwn > 0, `${rel}'s own-rate case ran (${own.throttle}×, ${own.clock} clock)`);
+    assert.equal(atRate + atOwn, r.pages.length, `every page at ${RATE}× on the held clock${own ? `, or on the file's own set machine` : ""}: ${JSON.stringify(r.pages)}`);
+    if (own) assert.ok(atOwn > 0, `${rel}'s own-machine case ran (clock ${own.clock}, throttle ${own.throttle})`);
   });
 }
