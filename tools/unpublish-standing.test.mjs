@@ -5,9 +5,14 @@
 // stored "commons" at their own paths, seven of them at exactly ✦1 (Wright's
 // read of escrow_projection). The sweep trusted the stored class. Asked at ✦0
 // now, the one rule keeps every one of them. WLD-51's ruling 2 then reached the
-// other rows: the cone, stored home and walking market, is taken at ✦0 (G2,
+// other rows: the cone, stored home and walking market, is takeable at ✦0 (G2,
 // Darko 2026-10-15 12:59), and so are the 13 market marks whose rows named
 // stale paths (Darko 2026-10-14 14:51, "just take them"; repointed 10-15).
+// THE_13 AND THE CONE ARE CONDITIONAL COVERAGE, NOT TODAY'S EFFECT (Wright,
+// 2026-11-08 14:32Z: nothing removes the thirteen or the cone now). Their ✦0
+// below is FORCED by `atZero`; on Wright's 06:00Z store read they stand backed
+// at ✦1–5. The tests say what the rule would do if they were unstaked, and keep
+// the funded cohort in the rule's coverage; they claim no take at any settlement.
 // A row named here that a later settlement changes is reported, not failed.
 
 import test from "node:test";
@@ -49,7 +54,7 @@ const THE_13 = [
   "orion-by-the-fire/for-the-caterpillar-at-one-month", "lucien/little-moon-for-little-m", "little-pica/the-nest",
 ];
 
-test("WLD-51 ruling 2 reaches its rows: at ✦0 the cone (stored home, walking market) and the 13 are taken from where they are filed", (t) => {
+test("CONDITIONAL: IF the cone (stored home, walking market) and THE_13 were at ✦0 (forced here; they are backed in the store), the rule takes them from where they are filed", (t) => {
   const cone = "berthillon/cone-peche-de-vigne-2026-08-27";
   if (published[cone]?.class === "home" && tierOf.get(cone) === "market")
     assert.deepEqual(atZero(cone), { unpublish: true, why: "commons-unbacked", path: published[cone].path }, "G2: standing decides in both directions");

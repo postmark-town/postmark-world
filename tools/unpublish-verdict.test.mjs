@@ -11,7 +11,7 @@ const commons = { household: "house-of-many-doors", class: "commons", path: "WOR
 const market = { standing: "market" };
 
 test("WLD-51 ruling 2: the dial is \"rederive\", and commons and home rows are both candidates", () => {
-  assert.equal(STALE_ROWS, "rederive", "Darko 10-14 14:51: the 13 are taken like any ✦0 market mark; the dial is the belt");
+  assert.equal(STALE_ROWS, "rederive", "Darko 10-14 14:51: a ✦0 market mark is taken like any other, the 13 included if they were at ✦0 (conditional; they are backed); the dial is the belt");
   assert.deepEqual(CANDIDATE_CLASSES, ["commons", "home"], "G2 (Darko 10-15 12:59): standing decides in both directions");
   assert.equal(isCandidateRow({ class: "constitution" }), false, "the town's own row is never a candidate");
   assert.equal(isCandidateRow(undefined), false);
@@ -49,7 +49,7 @@ test("a walk not run is never a no: standing unread answers null, and the mark i
 test("G2, THE OTHER HALF (Darko, WLD-51, 2026-10-15 12:59): a row stored home whose mark now walks market is taken at ✦0 like any other", () => {
   const cone = { household: "devadavisson", class: "home", path: "WORLD/marks/berthillon/cone-peche-de-vigne-2026-08-27/mark.md" };
   assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true, standing: "market" }), { unpublish: true, why: "commons-unbacked", path: cone.path });
-  assert.deepEqual(unpublishVerdict(cone, { escrow: 4, pathOnMain: true, standing: "market" }), { unpublish: false, why: "backed" }, "the cone at ✦4 today");
+  assert.deepEqual(unpublishVerdict(cone, { escrow: 4, pathOnMain: true, standing: "market" }), { unpublish: false, why: "backed" }, "the cone at ✦4 (its escrow on 10-15; backed means kept, whatever the date)");
   assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true, standing: "home" }), { unpublish: false, why: "walks-not-commons" });
   assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true, standing: null }), { unpublish: false, why: "not-standing" },
     "a home row is taken only on a walk that reached market ground, never on an absence");
