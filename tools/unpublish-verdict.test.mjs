@@ -5,26 +5,29 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { STALE_ROWS, UNPUBLISH_RULE, rowClassOf, unpublishVerdict } from "./unpublish-verdict.mjs";
+import { CANDIDATE_CLASSES, STALE_ROWS, UNPUBLISH_RULE, isCandidateRow, rowClassOf, unpublishVerdict } from "./unpublish-verdict.mjs";
 
 const commons = { household: "house-of-many-doors", class: "commons", path: "WORLD/marks/let-there-be-light/the-uphill-firepit/mark.md" };
 const market = { standing: "market" };
 
-test("the dial stands at today's rule until WLD-51 is ruled", () => {
-  assert.equal(STALE_ROWS, "skip");
+test("WLD-51 ruling 2: the dial is \"rederive\", and commons and home rows are both candidates", () => {
+  assert.equal(STALE_ROWS, "rederive", "Darko 10-14 14:51: a ✦0 market mark is taken like any other, the 13 included if they were at ✦0 (conditional; they are backed); the dial is the belt");
+  assert.deepEqual(CANDIDATE_CLASSES, ["commons", "home"], "G2 (Darko 10-15 12:59): standing decides in both directions");
+  assert.equal(isCandidateRow({ class: "constitution" }), false, "the town's own row is never a candidate");
+  assert.equal(isCandidateRow(undefined), false);
   assert.equal(UNPUBLISH_RULE,
     "At each settlement, a commons mark with no stamps behind it leaves the world. A mark standing on your household's ground or the town's never does, whatever it was first filed as.",
     "Darko's sentence, verbatim (WLD-51, 2026-10-14 14:31 EDT)");
   // the words leave two conditions out; the verdict still asks both
-  assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: false, standing: "market" }).unpublish, false, "a path not on main is still never swept");
+  assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: false, standing: "market" }), { unpublish: null, why: "filing-unread" },
+    "a path not on main is never swept from that path: the dial asks where the mark is filed now, and an unread filing takes nothing");
   assert.equal(unpublishVerdict(undefined, { escrow: 0, pathOnMain: true, standing: "market" }).unpublish, false, "a mark the registry does not hold is still never a candidate");
   assert.equal(rowClassOf("market"), "commons");
   assert.equal(rowClassOf("home"), "home");
 });
 
 test("the conditions, as the sweep has always asked them, for a mark that still walks commons", () => {
-  assert.deepEqual(unpublishVerdict({ ...commons, class: "home" }, { escrow: 0, pathOnMain: true, ...market }), { unpublish: false, why: "not-commons" });
-  assert.deepEqual(unpublishVerdict({ ...commons, class: "constitution" }, { escrow: 0, pathOnMain: true, ...market }), { unpublish: false, why: "not-commons" });
+  assert.deepEqual(unpublishVerdict({ ...commons, class: "constitution" }, { escrow: 0, pathOnMain: true, ...market }), { unpublish: false, why: "not-a-candidate" });
   assert.deepEqual(unpublishVerdict(commons, { escrow: 2, pathOnMain: true, ...market }), { unpublish: false, why: "backed" });
   assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: true, ...market }), { unpublish: true, why: "commons-unbacked", path: commons.path });
 });
@@ -43,12 +46,34 @@ test("a walk not run is never a no: standing unread answers null, and the mark i
   assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: true }), { unpublish: null, why: "standing-unread" });
 });
 
-test("the other half is NOT here: a row stored home whose mark walks commons is still never swept (WLD-51)", () => {
-  assert.deepEqual(unpublishVerdict({ ...commons, class: "home" }, { escrow: 0, pathOnMain: true, standing: "market" }), { unpublish: false, why: "not-commons" });
+test("G2, THE OTHER HALF (Darko, WLD-51, 2026-10-15 12:59): a row stored home whose mark now walks market is taken at ✦0 like any other", () => {
+  const cone = { household: "devadavisson", class: "home", path: "WORLD/marks/berthillon/cone-peche-de-vigne-2026-08-27/mark.md" };
+  assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true, standing: "market" }), { unpublish: true, why: "commons-unbacked", path: cone.path });
+  assert.deepEqual(unpublishVerdict(cone, { escrow: 4, pathOnMain: true, standing: "market" }), { unpublish: false, why: "backed" }, "the cone at ✦4 (its escrow on 10-15; backed means kept, whatever the date)");
+  assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true, standing: "home" }), { unpublish: false, why: "walks-not-commons" });
+  assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true, standing: null }), { unpublish: false, why: "not-standing" },
+    "a home row is taken only on a walk that reached market ground, never on an absence");
+  assert.deepEqual(unpublishVerdict(cone, { escrow: 0, pathOnMain: true }), { unpublish: null, why: "standing-unread" });
 });
 
-test("kinofire's firepit: a commons row whose path is not on main is not swept today", () => {
-  assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: false, ...market }), { unpublish: false, why: "stale-path" });
+// THE HELD VETO REACHES A HOME ROW (independent review H1, 49bf7358). G2 makes a home row at ✦0 whose mark walks
+// market a candidate, and an unplaced held thing reads market, so the veto (POS-688 D4: published but unplaced,
+// never a candidate while held) is the only thing between G2 and a thing in a resident's hands. The row, escrow,
+// standing and path are the same in all three calls; only `held` differs, so a veto that asks the row's class
+// (commons only) turns the first assertion red.
+test("H1: a HOME row at ✦0 whose mark walks market is kept while held (why: held) and taken when not held", () => {
+  const home = { household: "invented-house", class: "home", path: "WORLD/marks/invented/a-held-thing/mark.md" };
+  const base = { escrow: 0, pathOnMain: true, standing: "market" };
+  assert.deepEqual(unpublishVerdict(home, { ...base, held: true }), { unpublish: false, why: "held" }, "held: kept, and it is the veto that says so");
+  assert.deepEqual(unpublishVerdict(home, { ...base, held: () => true }), { unpublish: false, why: "held" }, "held asked as a function: the same");
+  assert.deepEqual(unpublishVerdict(home, { ...base, held: false }), { unpublish: true, why: "commons-unbacked", path: home.path }, "the control: not held, the same row is taken");
+  assert.deepEqual(unpublishVerdict(home, base), { unpublish: true, why: "commons-unbacked", path: home.path }, "held defaults to not held");
+  // and the veto still holds for a commons row, so the pin separates the two classes' arms
+  assert.deepEqual(unpublishVerdict(commons, { ...base, held: true }), { unpublish: false, why: "held" });
+});
+
+test("kinofire's firepit, under the old dial: a commons row whose path is not on main was not swept", () => {
+  assert.deepEqual(unpublishVerdict(commons, { escrow: 0, pathOnMain: false, staleRows: "skip", ...market }), { unpublish: false, why: "stale-path" });
 });
 
 test("an input not measured is never a no: escrow or path unread answers null", () => {
@@ -61,9 +86,10 @@ test("the walk and the path are asked only when the answer turns on them", () =>
   let walked = 0, asked = 0;
   const standing = () => { walked += 1; return "market"; };
   const pathOnMain = () => { asked += 1; return true; };
-  unpublishVerdict({ ...commons, class: "home" }, { escrow: 0, pathOnMain, standing });
+  unpublishVerdict({ ...commons, class: "constitution" }, { escrow: 0, pathOnMain, standing });
   unpublishVerdict(commons, { escrow: 1, pathOnMain, standing });
-  assert.equal(walked + asked, 0, "a home row and a backed row cost nothing, as in the sweep before");
+  unpublishVerdict({ ...commons, class: "home" }, { escrow: 1, pathOnMain, standing });
+  assert.equal(walked + asked, 0, "the town's row and a backed row cost nothing, as in the sweep before");
   unpublishVerdict(commons, { escrow: 0, pathOnMain, standing });
   assert.deepEqual([walked, asked], [1, 1]);
   unpublishVerdict(commons, { escrow: 0, pathOnMain, standing: () => { walked += 1; return "home"; } });
