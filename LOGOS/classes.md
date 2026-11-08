@@ -1509,18 +1509,19 @@ Ruled at the act-as-human sitting (2026-08-17; packet:
   fence: everything further waits for the humans-as-residents design, and
   arrives — if it arrives — as law here first.
 
-**The fence moved once, and only outward onto the household's own ground
-(PROPOSED 2026-08-26; awaiting the founder's word).** The one-grant fence was
-never a claim that a human may only ever speak — it was a claim that anything
-further "arrives as law here first." This is that arrival, and it is
-deliberately the smallest one available: the human class gains a **pace dial**
-(the resident's own stride — a person's walk is a person's walk), and the
-**parcel** class grants `walk` and `say` to the human of the
-household whose ground it is. Off that ground nothing changes: a human is a
-voice through their resident, exactly as before. The say granted at the parcel
-is not the ambient one duplicated — the ambient say is **companioned** (heard
-from a resident's standing), and this one is **embodied** (heard from the
-human's own feet). Two different acts that happen to share a word.
+**Speaking only, for now** (the founder, 2026-11-08 14:18 EST, POS-955, as
+Wright's 19:19Z writeback records it: *"Speaking only, for now"*). A household's human speaks beside one of their own
+household's residents, from that resident's standing, and does nothing on feet
+of their own anywhere: no walk, and no say heard from the human's own place.
+Walking may come later; if it does, it arrives as law here first.
+
+*(Until 2026-11-08 this paragraph carried a PROPOSAL of 2026-08-26 that never
+received the founder's word: the fence moved outward onto the household's own
+ground, the **parcel** class granting `walk` and an **embodied** `say` (heard
+from the human's own feet, beside no resident) to the human of the household
+whose ground it was. The parcel class carried both grants in the meantime, and
+the office refused the walk it could not record. POS-955 took both grants out
+of the parcel class (version 4) and this paragraph back to the ruled fence.)*
 
 *(Amended 2026-08-30 — the pace dial POINTS, it does not restate. This clause
 read "a pace dial (60 km/crossing, the resident's own stride)", and the human
@@ -1539,6 +1540,9 @@ same bug with the copies still agreeing. Both dead copies now name their owner
 declared, so the law still says a human has a stride, and the VALUE has one
 home.)*
 
+*(The slot outlives POS-955, 2026-11-08: a stride declared is not a walk
+granted, and no ground in the world grants a human a walk.)*
+
 ## The three channels — where a standing action comes from
 
 *Ambient, ground-granted, held. The permission calculus is their union, and
@@ -1552,7 +1556,9 @@ Rendered in the world as `the-town/a-grant-may-name-a-relation`,
 class carries every resident's standing capabilities, world-wide by its own
 ambient declaration; **a ground's class may grant more to those it reaches.**"
 The second clause was ruled 2026-08-15 and stood with zero live instances until
-the parcel grant above. Writing the calculus down is what that clause was owed.
+the parcel's human grants of 2026-08-26, and has none for a human again since
+those came out (POS-955, 2026-11-08). Writing the calculus down is what that
+clause was owed, and it stands as the law of any ground grant.
 
 - **Ambient** — what you ARE. The grants on a class you are an instance of,
   which declares itself `ambient: true`. Jurisdiction travels the law, not the
@@ -1583,7 +1589,9 @@ kind (§ The human class; absent means resident). A grant may additionally carry
 `scope:` — a RELATION between the actor and the granting node — and today there
 is exactly one value, `own-ground`: the grant reaches only an actor whose own
 household is the household of the ground granting it. A guest's human standing
-on the same parcel receives nothing, and that is the point. The generalization
+on the same ground receives nothing, and that is the point. (No grant carries
+it since the parcel's human grants came out, POS-955, 2026-11-08; the grammar
+stands for the day a ground grants by relation again.) The generalization
 is deliberately withheld: `scope:` is one word with one value until a second
 relation is actually needed, which is when its grammar will be argued properly.
 
@@ -1594,8 +1602,9 @@ that filter, and a verb reached through more than one channel resolves to the
 MOST SPECIFIC: held over ground, ground over ambient — what you brought with
 you outranks what the place lends you, which outranks what you merely are.
 
-**Embodiment stands on the ground that grants it.** A human embodied by their
-own parcel may walk within its extent and no further: a departure past the
+**Embodiment stands on the ground that grants it.** Only where a ground's grant
+embodies a human (no ground in the world does since POS-955, 2026-11-08): such a human may
+walk within that ground's extent and no further, and a departure past the
 fence is refused at the boundary. The refusal NAMES its reason; it is not a
 silent clip. This is not a special rule for humans, it is the ordinary shape of
 a ground-granted verb: when the grant comes from where you stand, leaving is
@@ -1671,8 +1680,9 @@ worked example, exactly as the household class is instantiation's:
   never `scope: own-ground` — a portal's whole nature is that it grants to
   visitors. *(Interim state, 2026-08-30: the roster stands EMPTY — the arena
   retired with its boss (992a3338) and the combat verbs returned to the town's
-  keeping, so no portal-ground grants anything today and human embodiment is
-  parcels-only again. The contract above is the law of any verb the roster
+  keeping, so no portal-ground grants anything today. Human embodiment was
+  parcels-only after that, and since POS-955 (2026-11-08) took the parcel's
+  human grants out, no ground embodies a human at all. The contract above is the law of any verb the roster
   carries, not a promise that it carries one; which verbs return, and whether
   portals seat humans as standing law, is the portal sitting's to rule.)*
 - **Its verbs cannot leave it.** Each verb class names a **guard in gate

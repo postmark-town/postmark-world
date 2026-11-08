@@ -49,10 +49,13 @@ const FLIPS = [
     file: HUMAN, catches: "the human's stride POINTS at the resident's",
     edit: (t) => t.replace('"pace_km_per_crossing": "the-town/resident"', '"pace_km_per_crossing": 60') },
 
-  { name: "the parcel's walk loses its relation scope (every guest's human walks your garden)",
-    file: PARCEL, catches: "the parcel class grants walk and say to the ground's OWN household's human",
-    edit: (t) => t.replace('{"action": "walk", "for": "human", "scope": "own-ground",',
-                           '{"action": "walk", "for": "human",') },
+  // ⚠ TRUED 2026-11-08 with POS-955 ("Speaking only, for now"): the parcel's
+  // human grants came out, so the old flip (the walk losing its own-ground
+  // scope) matched nothing. The live rot is the grant growing back.
+  { name: "the parcel grows its human walk back (the retired embodiment returns without a ruling)",
+    file: PARCEL, catches: "the parcel class grants the human NOTHING",
+    edit: (t) => t.replace(/^actions: \[\]$/m,
+      'actions: [{"action": "walk", "for": "human", "scope": "own-ground", "residue": "the-town/depart"}]') },
 
   { name: "a scoped grant lands with no for: (and so reads as RESIDENT)",
     file: RESIDENT, catches: "no grant anywhere is scoped without naming the kind it is for",
