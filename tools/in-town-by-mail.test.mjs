@@ -104,6 +104,7 @@ const placeholderRow = (handle) => ({ handle, x: 0, y: 0, standing: true, placeh
 let TOWN = { at: 187.5, walkers: [], standing: [] };
 let TOWN_FAILS = false;
 let walkersAsked = 0;
+let presentAsked = 0;
 const baseTown = () => ({
   at: 187.5,
   walkers: [],
@@ -148,7 +149,7 @@ async function bootStubOffice() {
     if (url.pathname === "/ops/whoami") return send({ principal: false, household: "rig-house", handles: [ACTOR] });
     if (url.pathname === "/world/my-marks") return send({ drafts: [], docket: [], published: [], backed: [], counts: { drafts: 0, docket: 0, published: 0, backed: 0 }, complete: true });
     if (url.pathname === "/world/apex") return send(READ_NOW);
-    if (url.pathname === "/world/present") return send({ at: 187.5, residents: READ.present.residents });
+    if (url.pathname === "/world/present") { presentAsked += 1; return send({ at: 187.5, residents: READ.present.residents }); }
     if (url.pathname === "/world/walkers") {
       walkersAsked += 1;
       if (TOWN_FAILS) { res.writeHead(500, { "content-type": "application/json" }); return res.end(JSON.stringify({ error: "down" })); }
@@ -313,19 +314,49 @@ test("4. acting as a resident sees the same list, and so does an UNPLACED reader
     const r = await readList(page);
     assert.deepEqual(r.items.map((i) => i.href), [null, "/residents/mail-one/", "/residents/mail-three/", "/residents/mail-two/"], `${name}: the same four names`);
     assert.ok(![...MAIL, BAD].some((h) => r.drawn.includes(h)), `${name}: and nobody by mail is drawn`);
-    if (name === "a placed resident") await shot(page, "resident-1500");
+    if (name === "a placed resident") await shot(page, "resident-first-paint-1500"); // before the first poll with a standpoint: the first paint, not the standpoint branch
     assert.deepEqual(errors, [], `${name}: no page errors`);
     // a real position removes the name on this path too
     TOWN = withMailPlaced(baseTown(), "mail-one", { ...off(80, 20), standing: true });
-    const asked0 = walkersAsked;
+    const asked0 = walkersAsked, present0 = presentAsked;
     await page.evaluate(() => window.__pmViewer.reload());
     await waitForList(page, () => !/Mail One/.test(document.querySelector(".wv-bymail")?.textContent ?? ""));
     assert.ok(!listed(await readList(page)).includes("Mail One"), `${name}: a real row takes them off`);
+    // the poll that took it: a placed resident asks /world/present (the standpoint branch); an unplaced reader has none to ask from
+    assert.equal(presentAsked - present0, name === "a placed resident" ? 1 : 0, `${name}: /world/present ${name === "a placed resident" ? "fired once" : "was not asked (no standpoint, none invented)"}`);
     assert.equal(walkersAsked - asked0, 1, `${name}: one walkers request for the poll, the list included`);
     TOWN = baseTown();
     await page.close();
   }
   READ_NOW = READ;
+});
+
+const dupFirst = () => { const t = baseTown(); return { ...t, walkers: [{ ...placeholderRow("mail-one") }, ...t.walkers], standing: [...t.standing.filter((x) => x.handle !== "mail-one"), { handle: "mail-one", ...off(90, 25), standing: true }] }; };
+
+test("4b. a handle the answer carries twice, FLAGGED ROW FIRST and a real row second: on every path they are drawn at the real position and not listed (the resident path dedupes one row per handle)", async (t) => {
+  if (!chromium) return t.skip(skipReason);
+  TOWN_FAILS = false; READ_NOW = READ;
+  for (const [name, signedIn] of [["the Spectator", false], ["a positioned resident", true]]) {
+    TOWN = dupFirst();
+    const { page, errors } = await openPage({ signedIn });
+    await waitForList(page, () => document.querySelectorAll(".wv-bymail li").length > 0);
+    if (signedIn) {
+      // the standpoint branch itself: poll again until /world/present has really fired, then read what it drew
+      const present0 = presentAsked;
+      await page.evaluate(() => window.__pmViewer.reload());
+      await page.waitForFunction(() => true);
+      assert.equal(presentAsked - present0, 1, "/world/present fired: this is the standpoint branch");
+    }
+    await page.waitForFunction((h) => !!document.querySelector(`#wv-walk-layer g[data-handle="${h}"]`), "mail-one", { timeout: 60_000 });
+    const r = await readList(page);
+    assert.ok(r.drawn.includes("mail-one"), `${name}: the resident with a real second row is drawn: ` + JSON.stringify(r.drawn));
+    assert.ok(!listed(r).includes("Mail One") && !r.text.includes("mail-one"), `${name}: and is not listed: ` + JSON.stringify(listed(r)));
+    assert.deepEqual(listed(r), [BAD, "mail-three", "mail-two"], `${name}: the rest of the list is as before`);
+    assert.ok(!["mail-two", "mail-three", BAD].some((h) => r.drawn.includes(h)), `${name}: and nobody else by mail is drawn`);
+    if (signedIn) await shot(page, "resident-positioned-1500");
+    assert.deepEqual(errors, [], `${name}: no page errors`);
+    await page.close();
+  }
 });
 
 test("5. a missed poll leaves the last good list standing and shows no error of its own", async (t) => {

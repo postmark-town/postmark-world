@@ -7845,6 +7845,15 @@ export function byMailFrom(rows = []) {
   return [...mail].filter((h) => !placed.has(h)).sort();
 }
 
+/**
+ * The town's rows that are bodies: everything but a row the town flags `placeholder: true` (the Origin's stand-in, not a position).
+ * Taken BEFORE `withTownBodies` keeps one row per handle: it keeps the first, so a flagged row ahead of a real row for the same handle
+ * would otherwise win the dedupe, be dropped afterwards, and leave that resident neither listed nor drawn. Pure.
+ */
+export function placedRows(rows = []) {
+  return (rows ?? []).filter((w) => w?.placeholder !== true);
+}
+
 /** The list's items: a name, linked to their address page where `residentHref` allows one (it refuses what is not a handle), else the name as text. Escaped. Pure. */
 export function byMailHTML(handles = [], { nameOf = (h) => h } = {}) {
   return (handles ?? []).map((h) => {
@@ -13312,7 +13321,7 @@ export function mountViewer(appEl) {
   function takeWalkers(rows) {
     // POS-945: a resident the town marks `placeholder: true` has no position, only the Origin's stand-in coordinates. They are in
     // town by mail (the list beside the map), never a body at the Origin: the flag that feeds that list is the map's rule too.
-    rows = (rows ?? []).filter((w) => w?.placeholder !== true);
+    rows = placedRows(rows);
     walksPolledMs = Date.now();
     askNewWalkRecords(rows);
     animateWalks();
@@ -13415,7 +13424,7 @@ export function mountViewer(appEl) {
               // ONE render rather than on two polls 15 s apart (row 68 (b))
               const landedIso = freshLanding(bodies, state.handle, walkState.landedIso ?? null);
               if (landedIso) { walkState.landedIso = landedIso; await loadEnterExitLedger(); }
-              takeWalkers(withTownBodies(rows, bodies));
+              takeWalkers(withTownBodies(rows, placedRows(bodies))); // the flagged rows leave BEFORE the one-row-per-handle merge
               if (landedIso) renderCurrent();
             }
           }
@@ -16867,7 +16876,7 @@ export function mountViewer(appEl) {
             walkState.walkers = withTownBodies(near, walkState.walkers);
             drawWalkers();
             townBodies().then((town) => {
-              if (town && onResidentPath() && state.handle === handle) { takeByMail(town); takeWalkers(withTownBodies(near, town)); }
+              if (town && onResidentPath() && state.handle === handle) { takeByMail(town); takeWalkers(withTownBodies(near, placedRows(town))); }
             });
           }
         }
