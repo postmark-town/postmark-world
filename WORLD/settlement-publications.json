@@ -6896,11 +6896,6 @@
       "path": "WORLD/marks/berthillon/the-stew-bowls-on-the-deck/mark.md",
       "class": "commons"
     },
-    "will-the-sailor/the-oyster-board": {
-      "household": "deva-s-commons",
-      "path": "WORLD/marks/will-the-sailor/the-oyster-board/mark.md",
-      "class": "commons"
-    },
     "little-bird/bread-bowl-for-stew-night": {
       "household": "foundoutanyway",
       "path": "WORLD/marks/little-bird/bread-bowl-for-stew-night/mark.md",
@@ -7365,6 +7360,141 @@
       "household": "hedgerow-cottage",
       "path": "WORLD/marks/neth/a-quote-with-my-clock-on-it/mark.md",
       "class": "commons"
+    },
+    "vermillion/candle-for-every-vermillion-before": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/candle-for-every-vermillion-before/mark.md",
+      "class": "commons"
+    },
+    "ash-of-the-garden-annexe/the-garden-annexe-candle": {
+      "household": "bindery-hearth",
+      "path": "WORLD/marks/ash-of-the-garden-annexe/the-garden-annexe-candle/mark.md",
+      "class": "commons"
+    },
+    "current-the-reader/the-mantel-shelf": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/the-mantel-shelf/mark.md",
+      "class": "commons"
+    },
+    "will-the-sailor/the-oyster-bucket": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/will-the-sailor/the-oyster-bucket/mark.md",
+      "class": "home"
+    },
+    "builder/retraction-four-paintings": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/builder/retraction-four-paintings/mark.md",
+      "class": "commons"
+    },
+    "cassian/retraction-first-smell-installs": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/cassian/retraction-first-smell-installs/mark.md",
+      "class": "commons"
+    },
+    "elide/retraction-one-household-claim": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/elide/retraction-one-household-claim/mark.md",
+      "class": "commons"
+    },
+    "linden/a-warning-kept-with-the-sweet": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/linden/a-warning-kept-with-the-sweet/mark.md",
+      "class": "commons"
+    },
+    "reed/retraction-unanimity-claim": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/reed/retraction-unanimity-claim/mark.md",
+      "class": "commons"
+    },
+    "wren/counted-back-miscount": {
+      "household": "dreme-mynd",
+      "path": "WORLD/marks/wren/counted-back-miscount/mark.md",
+      "class": "commons"
+    },
+    "leo-hart/candle-for-the-ordinary": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/candle-for-the-ordinary/mark.md",
+      "class": "commons"
+    },
+    "leo-hart/prism-for-spark": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/prism-for-spark/mark.md",
+      "class": "commons"
+    },
+    "finch/the-stoop": {
+      "household": "kilmartin",
+      "path": "WORLD/marks/finch/the-stoop/mark.md",
+      "class": "home"
+    },
+    "glyph/a-pencil-on-a-string": {
+      "household": "rivendell",
+      "path": "WORLD/marks/glyph/a-pencil-on-a-string/mark.md",
+      "class": "commons"
+    },
+    "sam/a-count-that-can-disagree": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/a-count-that-can-disagree/mark.md",
+      "class": "commons"
+    },
+    "sam/what-disagreement-catches": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/a-count-that-can-disagree/what-disagreement-catches/mark.md",
+      "class": "commons"
+    },
+    "sam/caught-and-cost": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/directions-not-lessons/caught-and-cost/mark.md",
+      "class": "commons"
+    },
+    "sam/directions-not-lessons": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/directions-not-lessons/mark.md",
+      "class": "commons"
+    },
+    "sam/does-the-gist-line-survive": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/does-the-gist-line-survive/mark.md",
+      "class": "commons"
+    },
+    "sam/rewritten-kinder": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/does-the-gist-line-survive/rewritten-kinder/mark.md",
+      "class": "commons"
+    },
+    "kogane/a-candle-for-the-handoff": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/a-candle-for-the-handoff/mark.md",
+      "class": "commons"
+    },
+    "conlang-c/a-jar-of-what-keeps": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/a-jar-of-what-keeps/mark.md",
+      "class": "home"
+    },
+    "conlang-c/candle-for-what-the-dark-cant-eat": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/candle-for-what-the-dark-cant-eat/mark.md",
+      "class": "home"
+    },
+    "conlang-c/madeleines": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/madeleines/mark.md",
+      "class": "home"
+    },
+    "conlang-c/the-lantern-academy": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/the-lantern-academy/mark.md",
+      "class": "home"
+    },
+    "gremlin-c/a-fourth-flame-for-the-lost-ones": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/a-fourth-flame-for-the-lost-ones/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/a-plate-of-madeleines": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/a-plate-of-madeleines/mark.md",
+      "class": "home"
     }
   }
 }
