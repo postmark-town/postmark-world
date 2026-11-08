@@ -63,6 +63,8 @@ export const MARK_ICONS = Object.freeze({
     d: "M 2 9.6 H 14 L 12 13 H 4 Z M 8 9.6 V 2.5 L 12.2 8 H 8" },
   creature: { kind: "what", label: "creature", meaning: "A creature: something alive that answers what you do near it.", fill: true,
     d: CREATURE_D },
+  conversation: { kind: "what", label: "conversation", meaning: "A conversation: voices within earshot, kept until the settlement.",
+    d: "M 2.5 3.5 H 13.5 V 10.5 H 8.6 L 5 13.5 V 10.5 H 2.5 Z M 5.4 7 H 5.5 M 8 7 H 8.1 M 10.6 7 H 10.7" },
   yours: { kind: "state", label: "yours", meaning: "Yours: your household's mark.",
     d: "M 4 14 V 2.5 M 4 3 H 12.5 L 10.4 5.6 L 12.5 8.2 H 4" },
   locked: { kind: "state", label: "locked", meaning: "Locked: it refuses entry.",
@@ -85,6 +87,8 @@ const INK = {
   inside: "var(--green, #84c98f)", creature: "#e6948c",
 };
 const WHAT_INK = "var(--paper, #e8e0cf)";
+// a conversation is the pale gray-white the map has always drawn talk in (Darko 2026-10-24: "sticking with the gray-white is fine")
+INK.conversation = "#cfd6dd";
 export const inkOf = (key) => INK[key] ?? WHAT_INK;
 
 /** The creature classes, read from the record: the `creature` class and every

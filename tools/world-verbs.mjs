@@ -10,7 +10,7 @@
 //   { marks, terrain, heightfield, light, fogCeilingM, charter }
 // A `state` is the walker: { x, y, name, household? }.
 
-import { isSited, isGround, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isGround, isPredicate, isThingIn, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
   fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
@@ -46,7 +46,13 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
   const self = statusAt({ x: state.x, y: state.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM, veil: mists ? mists.veil : 0 });
   // the containment spine: root → inward. within[0] is the frame (the root),
   // whose body is the establishing line — charter out of code, into the record.
-  const within = containmentChain(state, world.marks);
+  // A THING IS WITHIN ONLY ONCE ENTERED (WLD-74 E2, Wright 2026-11-05 04:48): the
+  // chain stays geometric, asked over the marks less the things `entered` does not
+  // hold. `entered` null is nothing entered (a keyless reader, a coords glance, or a
+  // ledger that would not read: the inside of a thing is never claimed unread).
+  const idx = kindIndexOf(world.marks);
+  const ent = new Set(entered ?? []);
+  const within = containmentChain(state, world.marks.filter((m) => ent.has(m.id) || !isThingIn(m, idx)));
   const root = within[0];
   return {
     charter: { ...(world.charter ?? CHARTER), establishing: root?.body ?? (world.charter ?? CHARTER).light, from_mark: root?.id ?? null },
@@ -115,12 +121,18 @@ export function sightFrameOf(world, entered, standpoint = null) {
 // it is in view. No actor, or a home that resolves to nowhere, changes nothing.
 export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null, entered = null } = {}) {
   const home = actor ? homeOf(actor, world) : null;
+  // AT YOUR FEET (WLD-74 E3/E4, Wright 2026-11-05 04:48): a thing whose footprint holds
+  // the standpoint and that `entered` does not hold is not where you are; it is an
+  // object at your feet, seen and in reach like any other, never cut for standing on it.
+  const idx = kindIndexOf(world.marks);
+  const ent = new Set(entered ?? []);
+  const atFeet = new Set(world.marks.filter((m) => m.at && !ent.has(m.id) && isThingIn(m, idx) && pointWithinMark(state, m)).map((m) => m.id));
   const fov = fieldOfView(state, world, { crossing, budget, dials, keep: home?.placed ? home.mark_id : null,
-    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state) });
+    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state), atFeet });
   const radial = radialSerialize(fov);
-  radial.within = containmentChain(state, world.marks); // the spine: root → inward, parents first
+  radial.within = containmentChain(state, world.marks.filter((m) => ent.has(m.id) || !isThingIn(m, idx))); // the spine: root → inward, parents first; a thing only once entered (E3, as orient)
   fov.within = radial.within;
-  return { fov, radial, tell: () => renderTelling(state, radial, fov) };
+  return { fov, radial, tell: () => renderTelling(state, radial, fov, atFeet) };
 }
 
 // containmentChain — the telling's spine (Keemin, 2026-07-23): the marks the
@@ -830,7 +842,7 @@ const townsOwn = (m) => authorOf(m) === TELLING_TOWN;
 export function residentMarkNamed(m, { withId = true } = {}) {
   return `a mark by ${authorOf(m) || "someone"}${withId ? ` [${m?.id}]` : ""}`;
 }
-function renderTelling(state, radial, fov) {
+function renderTelling(state, radial, fov, atFeet = null) {
   const o = radial.observer;
   const within = radial.within ?? [];
   const L = [];
@@ -889,7 +901,9 @@ function renderTelling(state, radial, fov) {
       const occ = m.occluded && m.signal ? " — its footing is hidden, only the light shows" : "";
       const dim = m.dim < 0.5 ? " — dim, at the dark edge" : "";
       const more = m.clusteredCount ? ` (+${m.clusteredCount} more of ${m.household}'s — investigate)` : "";
-      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
+      // a thing at your feet reads as HERE (WLD-74 E6, Darko's 10-18 word), keyed on the at-feet relation
+      // openYourEyes measured, never on a rounded 0 m; `here` on the row stays the kept home's alone
+      parts.push(`  · ${m.here || atFeet?.has(m.id) ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
     }
     if (parts.length) { L.push(`${bandHeading(bandName)}:`); L.push(...parts); }
   }

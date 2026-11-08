@@ -11,11 +11,14 @@
 //   2. THE SWEEP. tools/page-throttle-sweep.test.mjs, run as its own process behind a
 //      preload that (a) answers `import("playwright")` with a recording fake and (b)
 //      records and refuses every child_process spawn. With the candle's flag it
-//      imports no browser, launches none and starts no child, and its 22 throttled
+//      imports no browser, launches none and starts no child, and its 24 throttled
 //      tests skip as a CANDLE EXCLUSION. Without the flag, under the same inherited CI
-//      and npm names, it does probe and does dispatch all 22: the ordinary run keeps
-//      the sweep. The fakes stand where a browser and 22 children would, so nothing
-//      heavy runs here.
+//      and npm names, it does probe and does dispatch all 24: the ordinary run keeps
+//      the sweep. The fakes stand where a browser and 24 children would, so nothing
+//      heavy runs here. (22 page tests at WLD-71; 24 with POS-779's
+//      tools/conversation-pages.test.mjs and WLD-74's resident card, which the sweep's
+//      census requires; the count moves with page-throttle-sweep's SWEPT, one test per
+//      listed file.)
 // Every nested run drops NODE_TEST_CONTEXT and must report nonzero TAP counts, so a
 // run that quietly tested nothing cannot pass as an exclusion.
 
@@ -111,23 +114,23 @@ function sweepUnderFakes(flag) {
 
 test("THE SWEEP IN THE CANDLE: with the flag, over an inherited CI and npm, it imports no browser, launches none, starts no child, and says why", () => {
   const r = sweepUnderFakes(true);
-  // nonzero, and the module's own: 23 tests counted and all 22 throttled ones reported by
-  // name, so this is an exclusion and not an empty run
-  assert.ok(r.tests >= 23, `the sweep module ran (tests ${r.tests})`);
-  assert.equal(r.swept.length, 22, "all 22 throttled tests reported");
+  // nonzero, and the module's own: 25 tests counted (the census and the 24 throttled ones) and all 24
+  // throttled ones reported by name, so this is an exclusion and not an empty run
+  assert.ok(r.tests >= 25, `the sweep module ran (tests ${r.tests})`);
+  assert.equal(r.swept.length, 24, "all 24 throttled tests reported");
   assert.deepEqual(r.swept.filter((s) => !(s.ok && /# SKIP CANDLE EXCLUSION/.test(s.line))).map((s) => s.line), [],
     "each one skipped as the candle's exclusion, by name");
   assert.equal(r.tap.match(/# SKIP.*(?:playwright is absent|NO PLAYWRIGHT)/g)?.length ?? 0, 0, "no skip claims a missing browser");
   assert.deepEqual(r.seen, [], "no playwright import, no launch, no child process");
 });
 
-test("THE SWEEP OUTSIDE THE CANDLE: without the flag, the same inherited CI and npm names leave it on — it probes, and dispatches all 22", () => {
+test("THE SWEEP OUTSIDE THE CANDLE: without the flag, the same inherited CI and npm names leave it on — it probes, and dispatches all 24", () => {
   const r = sweepUnderFakes(false);
-  assert.ok(r.tests >= 23, `the sweep module ran (tests ${r.tests})`);
-  assert.equal(r.swept.length, 22, "all 22 throttled tests reported");
+  assert.ok(r.tests >= 25, `the sweep module ran (tests ${r.tests})`);
+  assert.equal(r.swept.length, 24, "all 24 throttled tests reported");
   assert.equal(r.tap.match(/# SKIP CANDLE EXCLUSION/g)?.length ?? 0, 0, "nothing is excluded as the candle");
   assert.deepEqual(r.seen.slice(0, 2), [{ import: "playwright" }, { launch: "chromium" }], "the browser was asked for");
   const dispatched = r.seen.filter((s) => s.dispatch).map((s) => s.file);
-  assert.equal(dispatched.length, 22, `one child per throttled test was started (intercepted here): ${dispatched.length}`);
+  assert.equal(dispatched.length, 24, `one child per throttled test was started (intercepted here): ${dispatched.length}`);
   assert.deepEqual([...new Set(dispatched)].sort(), [...new Set(r.swept.map((s) => s.file))].sort(), "and each for its own file");
 });
