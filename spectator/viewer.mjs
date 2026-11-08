@@ -13418,13 +13418,14 @@ export function mountViewer(appEl) {
               // town door that does not answer leaves the earshot answer alone
               const answered = await town;
               if (answered) takeByMail(answered); // POS-945: the same answer that moves the bodies moves the list
-              const bodies = answered ?? [];
+              // the flagged rows leave BEFORE the one-row-per-handle merge below (withTownBodies keeps the first row of a handle)
+              const bodies = placedRows(answered ?? []);
               // A LANDING THIS PAGE DID NOT MAKE (the arrival tick's passage, another
               // tab): the room is read at once, so the scene and the body change in
               // ONE render rather than on two polls 15 s apart (row 68 (b))
               const landedIso = freshLanding(bodies, state.handle, walkState.landedIso ?? null);
               if (landedIso) { walkState.landedIso = landedIso; await loadEnterExitLedger(); }
-              takeWalkers(withTownBodies(rows, placedRows(bodies))); // the flagged rows leave BEFORE the one-row-per-handle merge
+              takeWalkers(withTownBodies(rows, bodies));
               if (landedIso) renderCurrent();
             }
           }
