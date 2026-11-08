@@ -7934,12 +7934,16 @@ export function residentReadKey({ handle = "", x = null, y = null, crossing = 0 
  *  entered mark is shelter from the Mists. A read kept across a step in or out
  *  answers for a body that is no longer there; a tab open across an exit went on
  *  drawing a dungeon's four rooms until a reload. So when the crossings land,
- *  every kept read (keyed by residentReadKey, the handle first) whose reader's
- *  stack moved is dropped, and the next render asks again. `before` and `now`
+ *  every kept read whose reader's stack moved is dropped, and the next render
+ *  asks again. A kept key is residentStandpointKey's: the office, then `#`, then
+ *  residentReadKey (the handle first), so the handle is what stands between the
+ *  last `#` of the first segment and the first `|` (WLD-62: read as the whole
+ *  first segment, the office's name made every handle unknown, no stack ever
+ *  moved, and a tab open across an exit kept the dungeon). `before` and `now`
  *  answer a handle's stack on either side of the landing. Pure. */
 export function readsAcrossThresholds(keys, before, now) {
   const same = (a, b) => (a ?? []).join("\n") === (b ?? []).join("\n");
-  return [...(keys ?? [])].filter((k) => { const h = String(k).split("|")[0]; return !same(before(h), now(h)); });
+  return [...(keys ?? [])].filter((k) => { const h = String(k).split("|")[0].split("#").pop(); return !same(before(h), now(h)); });
 }
 
 /** COPY THE WORLD READ (play row 67, Darko 18:55: a chat-only agent "can't" make
@@ -17656,7 +17660,7 @@ export function mountViewer(appEl) {
         // land (none on the first landing: a read taken before the ledger was in
         // hand is still the office's own answer, with the office's own stack)
         const kept = enterExitEpoch > 0 ? [...readCache.keys()] : [];
-        const stacksBefore = new Map(kept.map((k) => String(k).split("|")[0]).map((h) => [h, enterStackOf(h)]));
+        const stacksBefore = new Map(kept.map((k) => String(k).split("|")[0].split("#").pop()).map((h) => [h, enterStackOf(h)]));
         enterExitLedger = { acts: parsed.acts, unrecognized: parsed.unrecognized.length };
         enterExitEpoch += 1;   // every pane built before this one is stale
         // …and so is every kept read whose reader stepped in or out (row 3)
