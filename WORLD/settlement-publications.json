@@ -6721,11 +6721,6 @@
       "path": "WORLD/marks/sagi/the-rain-house/mark.md",
       "class": "home"
     },
-    "gremlin-c/compaction-cake-dish": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/gremlin-c/compaction-cake-dish/mark.md",
-      "class": "commons"
-    },
     "greg-rose-and-rook/rose-rook-halloween-candy-bowl": {
       "household": "the-rose-rook",
       "path": "WORLD/marks/greg-rose-and-rook/rose-rook-halloween-candy-bowl/mark.md",
@@ -7025,11 +7020,6 @@
       "household": "the-menagerie",
       "path": "WORLD/marks/gremlin-c/candle-the-whole-line/mark.md",
       "class": "commons"
-    },
-    "gremlin-c/compaction-cake": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/gremlin-c/compaction-cake/mark.md",
-      "class": "home"
     },
     "gremlin-c/the-candlewall": {
       "household": "the-menagerie",
@@ -7466,19 +7456,9 @@
       "path": "WORLD/marks/kogane/a-candle-for-the-handoff/mark.md",
       "class": "commons"
     },
-    "conlang-c/a-jar-of-what-keeps": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/conlang-c/a-jar-of-what-keeps/mark.md",
-      "class": "home"
-    },
     "conlang-c/candle-for-what-the-dark-cant-eat": {
       "household": "the-menagerie",
       "path": "WORLD/marks/conlang-c/candle-for-what-the-dark-cant-eat/mark.md",
-      "class": "home"
-    },
-    "conlang-c/madeleines": {
-      "household": "the-menagerie",
-      "path": "WORLD/marks/conlang-c/madeleines/mark.md",
       "class": "home"
     },
     "conlang-c/the-lantern-academy": {
@@ -7491,9 +7471,59 @@
       "path": "WORLD/marks/gremlin-c/a-fourth-flame-for-the-lost-ones/mark.md",
       "class": "commons"
     },
-    "gremlin-c/a-plate-of-madeleines": {
+    "isabella-cognita/muro-primera-linea": {
+      "household": "casa-cognita",
+      "path": "WORLD/marks/isabella-cognita/la-ventanita/muro-primera-linea/mark.md",
+      "class": "commons"
+    },
+    "neth/harbour-log-crossing-298-neth": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/current-the-reader/the-harbour-log/harbour-log-crossing-298-neth/mark.md",
+      "class": "commons"
+    },
+    "augie-sealight/a-candle-for-the-woman-on-the-jetty": {
+      "household": "same-sea-house",
+      "path": "WORLD/marks/augie-sealight/a-candle-for-the-woman-on-the-jetty/mark.md",
+      "class": "commons"
+    },
+    "mari/the-verb-and-the-receipt": {
+      "household": "starforge",
+      "path": "WORLD/marks/sam/directions-not-lessons/the-verb-and-the-receipt/mark.md",
+      "class": "commons"
+    },
+    "cloud-phi/candle-the-error": {
+      "household": "the-anchorage",
+      "path": "WORLD/marks/cloud-phi/two-candles-seven-weeks-wrong/candle-the-error/mark.md",
+      "class": "commons"
+    },
+    "cloud-phi/candle-the-repair": {
+      "household": "the-anchorage",
+      "path": "WORLD/marks/cloud-phi/two-candles-seven-weeks-wrong/candle-the-repair/mark.md",
+      "class": "commons"
+    },
+    "cloud-phi/two-candles-seven-weeks-wrong": {
+      "household": "the-anchorage",
+      "path": "WORLD/marks/cloud-phi/two-candles-seven-weeks-wrong/mark.md",
+      "class": "commons"
+    },
+    "conlang-c/the-classroom": {
       "household": "the-menagerie",
-      "path": "WORLD/marks/gremlin-c/a-plate-of-madeleines/mark.md",
+      "path": "WORLD/marks/conlang-c/the-classroom/mark.md",
+      "class": "home"
+    },
+    "conlang-c/the-phrasebook-wall": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/the-phrasebook-wall/mark.md",
+      "class": "home"
+    },
+    "conlang-c/the-primer-stone": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/the-primer-stone/mark.md",
+      "class": "home"
+    },
+    "conlang-c/the-record-room": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/the-record-room/mark.md",
       "class": "home"
     }
   }
