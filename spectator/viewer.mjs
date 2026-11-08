@@ -8634,6 +8634,24 @@ export function mountViewer(appEl) {
     const dx = Number(full.at.x) - from.at.x, dy = Number(full.at.y) - from.at.y;
     const distance = Number.isFinite(m?.distM) ? Number(m.distM) : Math.round(Math.hypot(dx, dy));
     const inside = pointInsideMark(from.at, full);
+    // A THING YOU STAND ON IS NOT ONE YOU ARE INSIDE (WLD-74, the resident card; Wright 2026-11-05 04:48):
+    // for a resident, a thing's footprint under their body reads "here" (Darko's 10-18 word) until their
+    // enter stack holds it. Only a crossing fills it. A room or a place keeps its geometry, and the
+    // camera, which has no body to carry across, keeps its own words.
+    //
+    // SILENCE BEFORE A WRONG "INSIDE" (R1, Wright 2026-11-05 11:5x EST, option 1): the kind is learned from the
+    // office's reply, which lands after the first paint. Until it is ACCEPTED the clause for an unentered mark under
+    // her feet is the existing empty detail: a moment of silence is true, "inside" before she entered is false. A
+    // failed or malformed reply is no answer, so the silence holds for the page session (askLineage asks a kind once
+    // and never clears it). The named cost: an unentered room, place or dungeon whose class is unanswered is silent too.
+    if (inside && from.who === "you") {
+      const cls = classToken(instanceClassOf(full));
+      const things = learnedThingClasses([full]);
+      if (!enterStackOf(state.handle).includes(full.id)) {
+        if (things.has(cls)) return { bearing: null, detail: "here" };
+        if (thingKinds.pending(cls)) return { bearing: null, detail: "" };
+      }
+    }
     const bearing = inside ? null : (m?.bearing ?? quantizeBearing(bearingDeg(dx, dy), state.dials.bearing_points));
     return { bearing, detail: whereLine({ distance, bearing, far: !!m?.far, who: from.who }) };
   }
@@ -14717,7 +14735,7 @@ export function mountViewer(appEl) {
     return {
       // the key carries everything that changes what the column says, so a
       // repaint happens exactly when one is owed (the column's own law)
-      key: [id, d ? "read" : "-", worldEpoch, enterExitEpoch, cameFrom ?? "", enter ?? "", inside.join(","),
+      key: [id, d ? "read" : "-", worldEpoch, enterExitEpoch, cameFrom ?? "", enter ?? "", inside.join(","), where.detail,
         icons.map((i) => `${i.key}${i.count ?? ""}`).join(","),
         holding ? `${holding.count}/${holding.capacity}/${holding.open}/${holding.kinds.map((k) => k.shows).join(",")}` : "-", carriedBy ?? "", heldIn ?? ""].join("|"),
       handle: String(mark.by ?? mark.household ?? "the town"),
@@ -14822,10 +14840,15 @@ export function mountViewer(appEl) {
     fetch(officeUrl(`/world/apex?explain=${encodeURIComponent(cls)}`), { headers: { accept: "application/json" }, credentials: "same-origin" })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
-        if (!Array.isArray(j?.extends)) return;
-        thingKinds.fromChain(cls, j.extends.map((c) => classToken(c?.class)));
+        // an ACCEPTED answer is the office's lineage: a list whose every entry carries a string class (class-read.mjs),
+        // however short (a root class has none). Anything else is malformed, so it is no answer (R1): the kind stays
+        // unanswered and silent, and nothing is learned from the part of it that reads.
+        const chain = j?.extends;
+        if (!Array.isArray(chain) || chain.some((c) => typeof c?.class !== "string" || !classToken(c.class))) return;
+        thingKinds.fromChain(cls, chain.map((c) => classToken(c.class)));
         if (lastRadial && mapCtx) drawOverlay(lastRadial);
         syncMarkInteractionViews();
+        reRender();   // the telling and the column say what the answer made true (R1): the page's own repaint, no manual one
       })
       .catch(() => {});
   }
