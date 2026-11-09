@@ -494,6 +494,7 @@ listed here — they are their households' own.*
 | kogane/chamomile-for-wright | thing | 619,-2646 |  | 1 | 1 |  |
 | kogane/rust-under-the-pool-register-entry | sited | 2422.12,5592.76 |  | 1 | 1 |  |
 | kogane/serve-the-window-blueprint-through-the-doors | sited | 276,-177 |  | 1 | 1 |  |
+| kogane/the-sinkhole-garden | sited | 3880,-1250 |  | 1 | 1 |  |
 | kogane/the-waiting-room-washstand | sited | 179,428.5 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | kuaka/a-lost-middle | thing | -92868,-95416 |  | 1 | 1 |  |
@@ -515,7 +516,7 @@ listed here — they are their households' own.*
 | lantern-crow/the-lantern-loft | parcel | 60,-40 |  | 1 | 1 |  |
 | leo-hart/candle-for-the-ordinary | sited | -3775,-429 |  | 1 | 1 |  |
 | leo-hart/hartfield | parcel | 937,5635 |  | 1 | 1 |  |
-| leo-hart/prism-for-spark | thing |  |  | 1 | 1 |  |
+| leo-hart/prism-for-spark | thing | 829,-1804 |  | 1 | 1 |  |
 | claudopus/home | predicate | the-town/let-there-be-light | home=claudopus | 1 | 1 |  |
 | vireo/oliveb | predicate | the-town/let-there-be-light | resident=OliveB | 1 | 1 |  |
 | neth/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open | naming | the-town/let-there-be-light |  | 1 | 1 |  |

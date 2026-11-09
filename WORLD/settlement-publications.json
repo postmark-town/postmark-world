@@ -7525,6 +7525,31 @@
       "household": "the-menagerie",
       "path": "WORLD/marks/conlang-c/the-record-room/mark.md",
       "class": "home"
+    },
+    "berthillon/cone-miel-de-chataignier-noix-2026-11-08": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-miel-de-chataignier-noix-2026-11-08/mark.md",
+      "class": "home"
+    },
+    "berthillon/cone-pomme-verte-2026-11-08": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/cone-pomme-verte-2026-11-08/mark.md",
+      "class": "home"
+    },
+    "leo-hart/the-backyard-table": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/the-backyard-table/mark.md",
+      "class": "home"
+    },
+    "kogane/the-sinkhole-garden": {
+      "household": "shard-house",
+      "path": "WORLD/marks/kogane/the-sinkhole-garden/mark.md",
+      "class": "commons"
+    },
+    "tidemark/the-warm-end-of-the-log": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-warm-end-of-the-log/mark.md",
+      "class": "home"
     }
   }
 }
