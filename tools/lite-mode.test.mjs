@@ -107,15 +107,17 @@ before(async () => {
 // so on a busy host an "able machine" page read slow and lite came on. The
 // context holds the page's clock still within one task (page-machine.mjs §
 // holdClockWithinATask, first written here), so the bake reads instant. ONLY THE
-// SLOW MACHINE keeps the real clock, at the CPU throttle it names: its subject is
-// the measurement, so it opts out of the held clock, by name.
+// SLOW MACHINE gets the slow clock (page-machine.mjs § slowClockWithinATask, k = 10,
+// WLD-170): its subject is the measurement, so it opts out of the held clock, by
+// name, and the machine it runs on is SET too (no CPU throttle, which still measured
+// the host: a fast runner was not slow enough, a loaded one never finished).
 
 // crossing 247, five hours in (the Mists on, whatever today's crossing is), and
 // the machine the page is told it runs on
-async function open({ query = "", cores = 16, memory = 8, throttle = 0 } = {}) {
+async function open({ query = "", cores = 16, memory = 8, slow = false } = {}) {
   const ctx = await machineContext(browser, {
     viewport: { width: 1366, height: 768 }, reducedMotion: "no-preference", machine: { cores, memory },
-    ...(throttle ? { clock: "real", throttle } : {}),
+    ...(slow ? { clock: "slow", throttle: 0 } : {}),
   });
   await ctx.addInitScript(() => {
     const RealDate = Date, realNow = RealDate.now.bind(RealDate);
@@ -188,6 +190,29 @@ async function closeBounded(ctx) {
     await Promise.race([Promise.resolve().then(() => ctx.close()).catch(() => {}), new Promise((resolve) => { timer = setTimeout(resolve, STATE_READ_MS); })]);
   } finally { clearTimeout(timer); }
 }
+/** The slow case's wait, shared with its falsifier (WLD-170): resolves when the page has turned lite mode on (the
+ *  bake's slow verdict), and REJECTS AT ONCE, with the page's state in the TAP, when the first bake has painted
+ *  without it (the machine was not slow: a lite-less paint can never turn into a verdict). The 180 s is only the
+ *  bound for a bake that neither paints nor judges. The caller owns the context. */
+const NOT_SLOW = "the first bake painted without turning lite mode on: the machine it ran on was not slow";
+async function awaitSlowVerdict(t, page, errors, label) {
+  const start = Date.now();
+  let how;
+  try {
+    how = await (await page.waitForFunction(
+      () => document.documentElement.classList.contains("wv-lite") ? "verdict" : document.querySelector(".wv-mists-paint img") ? "painted" : false,
+      null, { timeout: 180_000 })).jsonValue();
+  } catch (e) {
+    // the page's state, bounded, then the ORIGINAL failure, unchanged
+    t.diagnostic(await stateLine(page, errors, `${label}: the wait for wv-lite FAILED (the original error is re-thrown unchanged)`, Date.now() - start));
+    throw e;
+  }
+  if (how === "painted") {
+    t.diagnostic(await stateLine(page, errors, `${label}: painted WITHOUT the slow verdict`, Date.now() - start));
+    throw new Error(NOT_SLOW);
+  }
+  t.diagnostic(await stateLine(page, errors, `${label}: wv-lite came on`, Date.now() - start));
+}
 async function stateLine(page, errors, label, waitedMs) {
   let state, timer;
   try {
@@ -257,20 +282,10 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
     assert.match(r.title, why);
     await ctx.close();
   }
-  // a slow machine: the first layer of the bake, timed under a 6× CPU throttle
-  // (at full speed here it reads about 1.3 ms per 1,000 px; the line is 3)
-  const { ctx, page, errors } = await open({ throttle: 6 });
-  const waitStart = Date.now();
-  try {
-    await page.waitForFunction(() => document.documentElement.classList.contains("wv-lite"), null, { timeout: 180_000 });
-  } catch (e) {
-    // the page's state, bounded, then the ORIGINAL failure, unchanged: this case still fails exactly as it did. The label
-    // says only that the wait FAILED: whether it was Playwright's timeout is what the re-thrown error says, not this line.
-    t.diagnostic(await stateLine(page, errors, "slow case: the wait for wv-lite FAILED (the original error is re-thrown unchanged)", Date.now() - waitStart));
-    await closeBounded(ctx);
-    throw e;
-  }
-  t.diagnostic(await stateLine(page, errors, "slow case: wv-lite came on", Date.now() - waitStart));
+  // a slow machine, SET (WLD-170): the first layer of the bake, timed on the slow clock (k = 10: a layer that takes about
+  // 1.3 ms of real work per 1,000 px reads 13, and the line is 3), whatever the host's speed
+  const { ctx, page, errors } = await open({ slow: true });
+  try { await awaitSlowVerdict(t, page, errors, "slow case"); } catch (e) { await closeBounded(ctx); throw e; }
   await page.waitForTimeout(6000);   // what was left of the bake would have finished and painted by now
   const r = await read(page);
   assert.equal(r.slow, "1", "the verdict is kept on the device");
@@ -278,6 +293,20 @@ test("the page: auto turns lite mode on for a small machine, and for a slow firs
   assert.equal((await mists(page)).paint, false, "the bake stopped at its verdict: no paint");
   assert.deepEqual(errors, []);
   await ctx.close();
+});
+
+// THE FALSIFIER (WLD-170): the known able machine in the slow case's place. Its first bake paints, lite mode never comes
+// on, and the wait must say so AT ONCE, with the page's state, instead of waiting out 180 s: the rejection is the
+// paint's own words, never Playwright's timeout.
+test("FALSIFIER: the able (held-clock) machine in the slow case's place fails on its lite-less paint, with the page's state", async (t) => {
+  if (!chromium) { t.skip("NO PLAYWRIGHT — lite mode went UNGUARDED"); return; }
+  const { ctx, page, errors } = await open();
+  try {
+    await assert.rejects(awaitSlowVerdict(t, page, errors, "falsifier (able machine, held clock)"), (e) => e.message === NOT_SLOW,
+      "a paint with no verdict is the machine not being slow, said at once and not as a 180 s timeout");
+    const s = await pageState(page);
+    assert.deepEqual([s.lite, s.paint, s.slowKey], [false, true, null], "the page it describes: painted, no lite mode, no slow verdict kept");
+  } finally { await closeBounded(ctx); }
 });
 
 test("the page on a phone: no seventh circle; the bell opens a menu holding the bell and lite mode", async (t) => {

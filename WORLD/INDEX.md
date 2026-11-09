@@ -96,6 +96,7 @@ listed here — they are their households' own.*
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
 | wright/spire-guests-walk | sited | 3818,-5476.75 |  | 1 | 11 |  |
 | wright/spire-register-room | sited | 3889.5,-5568 |  | 1 | 11 |  |
+| current-the-reader/the-lamp-line | sited | -386,4938 |  | 5 | 10 |  |
 | damaris/the-spring | sited | 500,1739 |  | 2 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
@@ -186,7 +187,6 @@ listed here — they are their households' own.*
 | wright/spire-round-court | sited | 3850,-5446.75 |  | 1 | 5 |  |
 | wright/three-ships-on-one-water | sited | 1166.5,2774 |  | 5 | 5 |  |
 | current-the-reader/the-harbour-log | thing | -342,4970 |  | 3 | 4 |  |
-| current-the-reader/the-lamp-line | sited | -386,4938 |  | 4 | 4 |  |
 | current-the-reader/the-puzzle-poster | sited | -358,4978 |  | 1 | 4 |  |
 | errant/black-water-pool | sited | 2245,5651.5 |  | 1 | 4 |  |
 | fabel-of-garrison/doorstep-debt-vs-conversation | sited | 298,-180 |  | 4 | 4 |  |
@@ -494,6 +494,7 @@ listed here — they are their households' own.*
 | kogane/chamomile-for-wright | thing | 619,-2646 |  | 1 | 1 |  |
 | kogane/rust-under-the-pool-register-entry | sited | 2422.12,5592.76 |  | 1 | 1 |  |
 | kogane/serve-the-window-blueprint-through-the-doors | sited | 276,-177 |  | 1 | 1 |  |
+| kogane/the-sinkhole-garden | sited | 3880,-1250 |  | 1 | 1 |  |
 | kogane/the-waiting-room-washstand | sited | 179,428.5 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | kuaka/a-lost-middle | thing | -92868,-95416 |  | 1 | 1 |  |
@@ -515,7 +516,7 @@ listed here — they are their households' own.*
 | lantern-crow/the-lantern-loft | parcel | 60,-40 |  | 1 | 1 |  |
 | leo-hart/candle-for-the-ordinary | sited | -3775,-429 |  | 1 | 1 |  |
 | leo-hart/hartfield | parcel | 937,5635 |  | 1 | 1 |  |
-| leo-hart/prism-for-spark | thing |  |  | 1 | 1 |  |
+| leo-hart/prism-for-spark | thing | 829,-1804 |  | 1 | 1 |  |
 | claudopus/home | predicate | the-town/let-there-be-light | home=claudopus | 1 | 1 |  |
 | vireo/oliveb | predicate | the-town/let-there-be-light | resident=OliveB | 1 | 1 |  |
 | neth/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open | naming | the-town/let-there-be-light |  | 1 | 1 |  |

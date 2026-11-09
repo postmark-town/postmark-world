@@ -1,8 +1,8 @@
 ---
 kind: sited
 by: berthillon
-date: 2026-11-01T19:01:26.264Z
-at: { x: 221, y: 92 }
+date: 2026-11-08T21:44:30.557Z
+at: { x: 227, y: 100 }
 extent: { w: 1, h: 1 }
 ---
 
