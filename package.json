@@ -19,7 +19,7 @@
     "./spectator/index.html": "./spectator/index.html"
   },
   "scripts": {
-    "pretest": "node tools/settlement-test-world.mjs",
+    "pretest": "node tools/settlement-test-world.mjs --pretest",
     "test": "node --test \"tools/*.test.mjs\"",
     "test:candle": "node tools/run-candle-suites.mjs",
     "test:throttle": "node --test tools/page-throttle-sweep.advisory.mjs",

@@ -12,9 +12,10 @@
 //       read from that world grows by it, and the Lately rail (#310's existing UTC-day holdback, read here, not
 //       changed) still waits for its day. The pair is the discrimination: supplying the stale snapshot, or bypassing
 //       preparation, leaves the predicate red by name.
-//   1b · THE CALLER BOUNDARY. The Office's hourly shadow rehearsal sweeps with the crossing's actual stakes and then runs `npm test`
-//       in that clone. A tree whose world-state already agrees with its marks (a swept one) is READ AS IT IS: the CLI does not
-//       re-prepare it, and a sentinel the n-only composite could never produce survives. A tree with an added mark is prepared.
+//   1b · THE CALLER BOUNDARY. `npm test` has two callers. The Office's hourly shadow rehearsal sweeps with the crossing's actual
+//       stakes and then runs `npm test` in that clone: outside GitHub Actions the pretest leaves the supplied state alone (a sentinel
+//       the n-only composite could never produce survives, byte for byte). The required GitHub suite (GITHUB_ACTIONS=true) always
+//       prepares, whatever changed: here an amendment outside any short field list (a capacity) reaches the world the tests read.
 //   2 · IT FAILS, NEVER FALLS BACK: no state to derive stakes from, and a mark the loader refuses, each throw (the
 //       CLI exits 2, with the sentinel) and leave the committed state byte for byte as it was.
 //   3 · THE WIRING, a source pin (labelled): package.json's pretest runs it, `npm test` itself and the candle's
@@ -33,8 +34,7 @@ import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { COMPOSITE, REFUSAL_SENTINEL, STATE_REL, missingFromState, prepareCandidateWorld, stalenessOf } from "./settlement-test-world.mjs";
-import { loadMarks } from "./marks-fold.mjs";
+import { COMPOSITE, REFUSAL_SENTINEL, STATE_REL, missingFromState, prepareCandidateWorld } from "./settlement-test-world.mjs";
 import { mistsKeepRects } from "./mists-keep.mjs";
 import { activityFeed } from "../spectator/viewer.mjs";
 
@@ -99,38 +99,43 @@ test("THE S131 SHAPE: an added mark is absent from the world the suite would rea
   assert.deepEqual(rows(ADDED_DATE), [ADDED_ID], "on its day it is");
 });
 
-test("THE CALLER BOUNDARY: a tree whose world already agrees with its marks (the swept shadow's) is kept as it is; one with an added or changed mark is prepared", () => {
+test("THE CALLER BOUNDARY: outside GitHub Actions the pretest keeps the supplied state; the required GitHub suite always prepares, even an amendment no field list would name", () => {
   const dir = scratchTree();
-  // make the scratch tree what a sweep leaves: the state agrees with the marks, and carries a weight the n-only composite never would
+  // a world as a sweep leaves it: a weight only the sweep's own fold (or a test) could have written, which the n-only composite would replace
   const state = stateOf(dir);
-  const byId = new Map(loadMarks(join(dir, "WORLD", "marks")).map((m) => [m.id, m]));
-  for (const m of state.marks) for (const k of ["kind", "by", "date", "at", "extent", "body"]) if (byId.has(m.id)) m[k] = byId.get(m.id)[k] ?? m[k];
   const SENTINEL = 123456.5;
   state.marks[0].weight = SENTINEL;
   writeFileSync(join(dir, STATE_REL), JSON.stringify(state, null, 2) + "\n");
-  const swept = sha(join(dir, STATE_REL));
-  assert.equal(stalenessOf(dir).stale, false, "the swept tree is consistent: state and marks agree");
-  const run = () => spawnSync(process.execPath, [join(ROOT, "tools", "settlement-test-world.mjs"), dir], { encoding: "utf8" });
-  const kept = run();
+  const supplied = sha(join(dir, STATE_REL));
+  const cli = (args, actions) => {
+    const env = { ...process.env };
+    if (actions) env.GITHUB_ACTIONS = "true"; else delete env.GITHUB_ACTIONS;
+    return spawnSync(process.execPath, [join(ROOT, "tools", "settlement-test-world.mjs"), ...args], { encoding: "utf8", env });
+  };
+  // 1 · outside Actions, the pretest: the supplied bytes are read as they are, and it says so
+  const kept = cli(["--pretest", dir], false);
   assert.equal(kept.status, 0, kept.stderr);
-  assert.match(kept.stdout, /NOT re-prepared/);
-  assert.equal(sha(join(dir, STATE_REL)), swept, "the swept result is not overwritten by the composite");
-  assert.equal(stateOf(dir).marks[0].weight, SENTINEL, "a value only the sweep's own fold could have written is still there");
-  // the stale kinds are recognised, by name and without a fold: an amended mark (same id), and an added one
-  const amended = join(dir, "WORLD", "marks", state.marks[0].id.split("/")[0], state.marks[0].id.split("/").slice(1).join("/"), "mark.md");
-  const was = readFileSync(amended, "utf8");
-  writeFileSync(amended, was.replace(/\n$/, "") + " (amended after the last crossing)\n");
-  assert.deepEqual(stalenessOf(dir).changed, [state.marks[0].id], "a changed mark makes the world stale");
-  writeFileSync(amended, was);
-  assert.equal(stalenessOf(dir).stale, false, "and restoring it makes it agree again");
-  // the PR route: an added mark (the S131 shape) is prepared by the same CLI, and the composite replaces the stale world
-  addMark(dir);
-  const prepared = run();
+  assert.match(kept.stdout, /NOT preparing/);
+  assert.equal(sha(join(dir, STATE_REL)), supplied, "the swept shadow's state is not overwritten by the composite");
+  assert.equal(stateOf(dir).marks[0].weight, SENTINEL);
+  // 2 · inside the required GitHub suite, the same pretest prepares: an amendment OUTSIDE kind/by/date/at/extent/body (the capacity case)
+  const bowl = join(dir, "WORLD", "marks", "alex-rowan", "porch-bowl", "mark.md");
+  const text = readFileSync(bowl, "utf8");
+  assert.match(text, /^capacity: 30$/m, "the control: the real bowl carries capacity 30");
+  writeFileSync(bowl, text.replace(/^capacity: 30$/m, "capacity: 7777777"));
+  assert.equal(stateOf(dir).marks.find((m) => m.id === "alex-rowan/porch-bowl").capacity, 30, "the stale state still says 30");
+  const prepared = cli(["--pretest", dir], true);
   assert.equal(prepared.status, 0, prepared.stderr);
-  assert.match(prepared.stdout, /prepared \d+ marks \(1 not in the committed state; stale: 1 added/);
-  assert.notEqual(sha(join(dir, STATE_REL)), swept, "the stale world was replaced");
-  assert.equal(stateOf(dir).marks.some((m) => m.id === ADDED_ID), true, "with the candidate's mark in it");
-  assert.notEqual(stateOf(dir).marks.find((m) => m.id === state.marks[0].id).weight, SENTINEL, "and the sentinel is gone: the prepared world is the composite");
+  assert.match(prepared.stdout, /prepared \d+ marks/);
+  assert.match(prepared.stdout, /required GitHub suite \(pretest\)/);
+  assert.equal(stateOf(dir).marks.find((m) => m.id === "alex-rowan/porch-bowl").capacity, 7777777, "the candidate's amendment is in the world the tests read");
+  assert.notEqual(stateOf(dir).marks[0].weight, SENTINEL, "and the supplied state was replaced by the prepared one");
+  // 3 · a refusal inside Actions fails visibly, as ever
+  const none = scratchTree();
+  writeFileSync(join(none, STATE_REL), "{ not json");
+  const refused = cli(["--pretest", none], true);
+  assert.equal(refused.status, 2, "the required suite stops before a test runs");
+  assert.match(refused.stderr, new RegExp(REFUSAL_SENTINEL));
 });
 
 test("it fails and never falls back: no committed fold to take the stakes from, and a fold that dies, each leave the state as it was", () => {
@@ -159,7 +164,7 @@ test("it fails and never falls back: no committed fold to take the stakes from, 
 
 test("[pin] npm test prepares the candidate world first (pretest), and neither npm test's selector nor the candle's changed", () => {
   const scripts = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).scripts;
-  assert.equal(scripts.pretest, "node tools/settlement-test-world.mjs", "npm runs this before `npm test`, in the required suite's existing route");
+  assert.equal(scripts.pretest, "node tools/settlement-test-world.mjs --pretest", "npm runs this before `npm test`, in the required suite's existing route; the flag makes it the caller-aware pretest");
   assert.equal(scripts.test, 'node --test "tools/*.test.mjs"', "the blocking suite's selector is as it was");
   assert.equal(scripts["test:candle"], "node tools/run-candle-suites.mjs", "the crossing's own gate does not prepare: its sweep has just folded the world");
   assert.equal(/pretest|settlement-test-world/.test(scripts["test:candle"] + scripts.gate), false);
