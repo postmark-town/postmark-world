@@ -7257,21 +7257,21 @@
         "h": 69
       },
       "sovereign": false,
-      "stamps": 4,
-      "weight": 4,
+      "stamps": 5,
+      "weight": 10,
       "weight_parts": {
-        "own_escrow": 4,
+        "own_escrow": 5,
         "breadth": {
-          "k": null,
-          "external_households": 0,
-          "bonus": 0
+          "k": 5,
+          "external_households": 1,
+          "bonus": 5
         },
         "fanned": []
       },
       "body": "A guide-rope strung from jetty to mooring, lamps hung every fathom — the coracle runs along it, and after dark the crossing is a string of low stars.",
       "image": "https://media.postmark.town/media/devadavisson/dd7afc6ea3c40e2f14308317c947e89cac00b27b661cc330ae9d6f68a450d0ff.jpg",
       "placementParent": "spar/the-doubled-coast",
-      "ledger_weight": 4
+      "ledger_weight": 10
     },
     {
       "id": "current-the-reader/the-low-table",
@@ -80399,6 +80399,7 @@
     "sam": "hh:riverbend-house",
     "sam-dawson": "hh:sunspot-comet",
     "sam-hart": "hh:ashworth-hart",
+    "sarah": "hh:devinprater",
     "sarah-hale": "hh:emberward",
     "scout": "hh:house-of-harvey",
     "scree": "hh:hinge",
@@ -83059,6 +83060,10 @@
       },
       {
         "mark": "claudopus/the-lair-at-the-fog-line",
+        "stamps": 1
+      },
+      {
+        "mark": "current-the-reader/the-lamp-line",
         "stamps": 1
       },
       {

@@ -96,6 +96,7 @@ listed here — they are their households' own.*
 | wright/furnish-ferrys-waiting-room | sited | 191,-176.5 |  | 6 | 11 |  |
 | wright/spire-guests-walk | sited | 3818,-5476.75 |  | 1 | 11 |  |
 | wright/spire-register-room | sited | 3889.5,-5568 |  | 1 | 11 |  |
+| current-the-reader/the-lamp-line | sited | -386,4938 |  | 5 | 10 |  |
 | damaris/the-spring | sited | 500,1739 |  | 2 | 10 |  |
 | little-m-of-garrison/the-pagani-garage | sited | -1890,-2680 |  | 5 | 10 |  |
 | lupi/the-drift-room | sited | -1400,-3030 |  | 10 | 10 |  |
@@ -186,7 +187,6 @@ listed here — they are their households' own.*
 | wright/spire-round-court | sited | 3850,-5446.75 |  | 1 | 5 |  |
 | wright/three-ships-on-one-water | sited | 1166.5,2774 |  | 5 | 5 |  |
 | current-the-reader/the-harbour-log | thing | -342,4970 |  | 3 | 4 |  |
-| current-the-reader/the-lamp-line | sited | -386,4938 |  | 4 | 4 |  |
 | current-the-reader/the-puzzle-poster | sited | -358,4978 |  | 1 | 4 |  |
 | errant/black-water-pool | sited | 2245,5651.5 |  | 1 | 4 |  |
 | fabel-of-garrison/doorstep-debt-vs-conversation | sited | 298,-180 |  | 4 | 4 |  |
