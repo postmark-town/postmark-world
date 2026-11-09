@@ -15,7 +15,7 @@
 //   1b · THE CALLER BOUNDARY. `npm test` has two callers. The Office's hourly shadow rehearsal sweeps with the crossing's actual
 //       stakes and then runs `npm test` in that clone: outside GitHub Actions the pretest leaves the supplied state alone (a sentinel
 //       the n-only composite could never produce survives, byte for byte). The required GitHub suite (GITHUB_ACTIONS=true) always
-//       prepares, whatever changed: here an amendment outside any short field list (a capacity) reaches the world the tests read.
+//       prepares, whatever changed: here an amendment outside any short field list (an invented bowl's capacity, amended by the test) reaches the world the tests read.
 //   2 · IT FAILS, NEVER FALLS BACK: no state to derive stakes from, and a mark the loader refuses, each throw (the
 //       CLI exits 2, with the sentinel) and leave the committed state byte for byte as it was.
 //   3 · THE WIRING, a source pin (labelled): package.json's pretest runs it, `npm test` itself and the candle's
@@ -101,6 +101,11 @@ test("THE S131 SHAPE: an added mark is absent from the world the suite would rea
 
 test("THE CALLER BOUNDARY: outside GitHub Actions the pretest keeps the supplied state; the required GitHub suite always prepares, even an amendment no field list would name", () => {
   const dir = scratchTree();
+  // the amendment is TEST-OWNED (an invented bowl, never a real resident's mark): a baseline the test folds itself, then amends
+  const bowl = (capacity) => `---\nkind: halloween-candy-bowl\nby: ${ADDED.by}\ndate: ${ADDED_DATE}\nat: { x: 6000, y: 6000 }\nextent: { w: 1, h: 1 }\ncapacity: ${capacity}\nopen: true\nportable: false\n---\n\nAn invented bowl, for the test.\n`;
+  addMark(dir, bowl(11));
+  prepareCandidateWorld({ repo: dir });
+  assert.equal(stateOf(dir).marks.find((m) => m.id === ADDED_ID).capacity, 11, "the control: the baseline world carries the invented bowl at capacity 11");
   // a world as a sweep leaves it: a weight only the sweep's own fold (or a test) could have written, which the n-only composite would replace
   const state = stateOf(dir);
   const SENTINEL = 123456.5;
@@ -118,17 +123,14 @@ test("THE CALLER BOUNDARY: outside GitHub Actions the pretest keeps the supplied
   assert.match(kept.stdout, /NOT preparing/);
   assert.equal(sha(join(dir, STATE_REL)), supplied, "the swept shadow's state is not overwritten by the composite");
   assert.equal(stateOf(dir).marks[0].weight, SENTINEL);
-  // 2 · inside the required GitHub suite, the same pretest prepares: an amendment OUTSIDE kind/by/date/at/extent/body (the capacity case)
-  const bowl = join(dir, "WORLD", "marks", "alex-rowan", "porch-bowl", "mark.md");
-  const text = readFileSync(bowl, "utf8");
-  assert.match(text, /^capacity: 30$/m, "the control: the real bowl carries capacity 30");
-  writeFileSync(bowl, text.replace(/^capacity: 30$/m, "capacity: 7777777"));
-  assert.equal(stateOf(dir).marks.find((m) => m.id === "alex-rowan/porch-bowl").capacity, 30, "the stale state still says 30");
+  // 2 · inside the required GitHub suite, the same pretest prepares: an amendment OUTSIDE kind/by/date/at/extent/body (a capacity)
+  addMark(dir, bowl(13));
+  assert.equal(stateOf(dir).marks.find((m) => m.id === ADDED_ID).capacity, 11, "the supplied state still says 11");
   const prepared = cli(["--pretest", dir], true);
   assert.equal(prepared.status, 0, prepared.stderr);
   assert.match(prepared.stdout, /prepared \d+ marks/);
   assert.match(prepared.stdout, /required GitHub suite \(pretest\)/);
-  assert.equal(stateOf(dir).marks.find((m) => m.id === "alex-rowan/porch-bowl").capacity, 7777777, "the candidate's amendment is in the world the tests read");
+  assert.equal(stateOf(dir).marks.find((m) => m.id === ADDED_ID).capacity, 13, "the candidate's amendment is in the world the tests read");
   assert.notEqual(stateOf(dir).marks[0].weight, SENTINEL, "and the supplied state was replaced by the prepared one");
   // 3 · a refusal inside Actions fails visibly, as ever
   const none = scratchTree();
