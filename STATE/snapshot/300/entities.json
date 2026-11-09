@@ -2,7 +2,7 @@
   "crossing": 300,
   "evaluated_at": "2026-11-09T00:00:00.000Z",
   "grammar": "entities: position derived from the governing departure AT evaluated_at, and that departure travels with it — a snapshot of coordinates alone cannot be moved to another clock",
-  "as_of_world": "96370e2f0a3002399910d0cc01a5785787d925ef",
+  "as_of_world": "8937ae9167b1d3f9f4173dd88244176f7f79a4dc",
   "omits": [
     "vessels — derived mobility (position = f(timetable, clock)) is not crystallized at Stage 2; the boat is absent here rather than frozen at a stale coordinate"
   ],
