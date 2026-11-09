@@ -102,8 +102,13 @@ export const WORKFLOW_REL = ".github/workflows/crossing-rehearsal.yml";
  *                           env block), so its gate and sweep read the tree under
  *                           test; a runner that set both would point the read at
  *                           a file on that runner, nothing more.
+ *   HARM_GATE_MASS_TAKE_OK  harm-gate.mjs § check 6 (WLD-51): a keeper's receipt,
+ *                           "<who>, <why>", that lets a mass take through. A
+ *                           sentence, no credential, no store and no pen. The
+ *                           job sets it nowhere; a runner that did would only let
+ *                           a rehearsal that publishes nothing pass one check.
  */
-export const ALLOWED_TOOL_ENV = ["BOT_EMAIL", "BOT_NAME", "WORLD_SNAPSHOT", "WORLD_SNAPSHOT_ROOT"];
+export const ALLOWED_TOOL_ENV = ["BOT_EMAIL", "BOT_NAME", "HARM_GATE_MASS_TAKE_OK", "WORLD_SNAPSHOT", "WORLD_SNAPSHOT_ROOT"];
 
 /**
  * The files check 6 reads: the two tools the job runs, and the seam both of
