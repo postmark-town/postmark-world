@@ -24,6 +24,14 @@
 // no pending claim or sketchbook is folded. It answers "the committed marks plus this change, folded as the sweep
 // folds", and claims nothing about a live settlement.
 //
+// A TREE THAT HAS JUST BEEN SWEPT IS LEFT ALONE. The hourly shadow rehearsal (Office deploy/settlement-shadow.sh) sweeps with
+// the crossing's actual stakes, then runs `npm test` in that same clone: the world the sweep produced is exactly what its suite
+// must read, and re-preparing it from the n-only composite would overwrite a real result with an approximation. So the CLI
+// prepares only a STALE world (`stalenessOf`): the tree carries a mark the state lacks, the state carries one the tree lacks,
+// or a shared mark's own words differ (kind, by, date, at, extent, body). A swept tree is consistent by construction (the sweep's
+// fold reads the same marks), so it is kept as it is and the receipt says so; the required PR/CI route has the stale kind of
+// world (a PR that adds or changes marks after the last crossing), and is prepared automatically.
+//
 // IT FAILS, IT NEVER FALLS BACK. Any refusal (no state to derive stakes from, a mark the loader cannot read, a fold
 // that exits non-zero, a prepared state that does not hold every mark of the tree) throws, the CLI exits 2, and
 // `npm test` stops before a single test runs. WORLD/world-state.json is written LAST and only from a fold that
@@ -52,6 +60,27 @@ export function missingFromState(repo, state = JSON.parse(readFileSync(join(repo
   const inTree = new Set(loadMarks(join(repo, "WORLD", "marks")).map((m) => m.id));
   const inState = new Set((state.marks ?? []).map((m) => m.id));
   return { notInState: [...inTree].filter((id) => !inState.has(id)).sort(), notInTree: [...inState].filter((id) => !inTree.has(id)).sort() };
+}
+
+/** The fields of a mark the fold copies from the loader's record verbatim (measured: 0 differences on a swept tree). */
+export const COPIED_FIELDS = ["kind", "by", "date", "at", "extent", "body"];
+const wordsOf = (m) => JSON.stringify(COPIED_FIELDS.map((k) => m?.[k] ?? null));
+
+/**
+ * Is the committed world-state stale against this tree's marks? `stale: true` when the state is absent or unreadable (so the
+ * preparation refuses visibly), or the tree and the state disagree on which marks exist or on a shared mark's own words.
+ */
+export function stalenessOf(repo) {
+  const statePath = join(resolve(repo), STATE_REL);
+  let state;
+  try { state = JSON.parse(readFileSync(statePath, "utf8")); } catch (e) { return { stale: true, why: `${STATE_REL} is absent or unreadable`, added: [], removed: [], changed: [] }; }
+  const tree = loadMarks(join(resolve(repo), "WORLD", "marks"));
+  const inState = new Map((state.marks ?? []).map((m) => [m.id, m]));
+  const inTree = new Map(tree.map((m) => [m.id, m]));
+  const added = [...inTree.keys()].filter((id) => !inState.has(id)).sort();
+  const removed = [...inState.keys()].filter((id) => !inTree.has(id)).sort();
+  const changed = [...inTree].filter(([id, m]) => inState.has(id) && wordsOf(m) !== wordsOf(inState.get(id))).map(([id]) => id).sort();
+  return { stale: Boolean(added.length || removed.length || changed.length), why: null, added, removed, changed };
 }
 
 /**
@@ -99,9 +128,15 @@ export function prepareCandidateWorld({ repo = ROOT, scratchParent = tmpdir() } 
 function main() {
   const repo = resolve(process.argv[2] ?? ROOT);
   try {
+    const stale = stalenessOf(repo);
+    if (!stale.stale) {
+      console.log(`settlement-test-world: NOT re-prepared: the world this tree holds is already folded from its marks (a tree the sweep has just produced is read as it is, not overwritten by the n-only composite)`);
+      console.log(`settlement-test-world: receipt ${JSON.stringify({ prepared: false, reason: "state and marks agree (kind, by, date, at, extent, body)", state_file: { path: STATE_REL } })}`);
+      return;
+    }
     const receipt = prepareCandidateWorld({ repo });
-    console.log(`settlement-test-world: prepared ${receipt.folded.marks} marks (${receipt.candidate_contribution.marks_not_in_the_committed_state} not in the committed state) as a ${receipt.kind}`);
-    console.log(`settlement-test-world: receipt ${JSON.stringify(receipt)}`);
+    console.log(`settlement-test-world: prepared ${receipt.folded.marks} marks (${receipt.candidate_contribution.marks_not_in_the_committed_state} not in the committed state; stale: ${stale.added.length} added, ${stale.removed.length} removed, ${stale.changed.length} changed) as a ${receipt.kind}`);
+    console.log(`settlement-test-world: receipt ${JSON.stringify({ prepared: true, ...receipt, stale: { added: stale.added.slice(0, 5), removed: stale.removed.slice(0, 5), changed: stale.changed.slice(0, 5) } })}`);
   } catch (error) {
     const why = String(error?.message ?? error);
     console.error(`settlement-test-world: REFUSED — ${why}\n  ${STATE_REL} was left as it was; the suite does not run on a stale or half-made world.`);
