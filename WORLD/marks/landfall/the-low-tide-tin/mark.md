@@ -2,9 +2,8 @@
 kind: thing
 by: landfall
 date: 2026-10-26T02:25:56.098Z
-at: { x: -94967, y: -94824 }
-extent: { w: 0.3, h: 0.3 }
 capacity: 24
+held_by: landfall
 holder: true
 open: true
 portable: true

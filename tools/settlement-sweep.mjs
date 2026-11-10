@@ -19,7 +19,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
-import { unpublishVerdict, rowClassOf } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
+import { unpublishVerdict, rowClassOf, isCandidateRow } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
 import { isHeld, heldBy, holdOnlyChange, handOffOnly } from "./mark-kind.mjs"; // POS-688: published but unplaced
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -41,6 +41,7 @@ import {
 // a frame's record leaving canon or returning — never moves what stands on it.
 import { snapshotWorld, keepWorldAcross, ReframeRefusal } from "./reparent-keep-world.mjs";
 import { CONSENT_FIELD, consentMap } from "./consent.mjs";
+import { sketchbookHouse } from "./lane-author.mjs"; // whose a sketchbook is: the lane's one binding (WLD-122)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -1163,8 +1164,17 @@ export function settlementSweep({
     stamped: wallRegistryFile?.town_sha ?? null,
     verification: registryVerification,
   });
-  const branchHouseholdOf = (branchName) =>
-    wallRegistry.logins[branchName.slice("draft/".length).toLowerCase()] ?? null;
+  // A SKETCHBOOK'S HOUSEHOLD, BY THE LANE'S OWN BINDING (WLD-122; Wright,
+  // 2026-11-04T17:46:27Z, "one binding everywhere"). The same helper the first
+  // knock and the PR wall use (lane-author.mjs § sketchbookHouse), over main's
+  // own registry file: a `gh:<id>` name is that account's pinned household,
+  // never a raw `logins` value. `known` with no `house` is an account the town
+  // can name but binds to no household (an id the export left unbound, or no
+  // `pinned_ids` rendered yet): it gains no rights, and the walls below refuse
+  // it rather than stand down. A name the registry does not hold at all
+  // (`known: false`) keeps the status quo above: left alone, never a new refusal.
+  const branchBindingOf = (branchName) => sketchbookHouse(wallRegistryFile, branchName.slice("draft/".length));
+  const UNBOUND = "authorship: this sketchbook's account is known to the registry but pinned to no household, so it publishes and withdraws nothing";
   const mainTree = git(repo, ["rev-parse", `${mainBranch}^{tree}`]).trim();
   const resettable = new Set(branches.filter(
     (branch) => git(repo, ["rev-parse", `${branch}^{tree}`]).trim() === mainTree,
@@ -1370,7 +1380,12 @@ export function settlementSweep({
           continue;
         }
         const authorHh = wallRegistry.households[record.by] ?? null;
-        const branchHh = branchHouseholdOf(branch);
+        const branchBinding = branchBindingOf(branch);
+        if (branchBinding.known && !branchBinding.house) {
+          leftDrafted.push({ household, id: wid, path: delta.path, reason: UNBOUND });
+          continue;
+        }
+        const branchHh = branchBinding.house;
         if (authorHh && branchHh && authorHh !== branchHh) {
           leftDrafted.push({ household, id: wid, path: delta.path, reason: `authorship: "${record.by}" is not this sketchbook's to withdraw` });
           continue;
@@ -1423,7 +1438,12 @@ export function settlementSweep({
       // the authorship wall: a registered author on a branch the registry binds
       // to a DIFFERENT household never publishes from it
       const authorHousehold = wallRegistry.households[record.by] ?? null;
-      const branchHousehold = branchHouseholdOf(branch);
+      const branchBinding = branchBindingOf(branch);
+      if (branchBinding.known && !branchBinding.house) {
+        leftDrafted.push({ household, id: record.id, path: delta.path, reason: UNBOUND });
+        continue;
+      }
+      const branchHousehold = branchBinding.house;
       if (authorHousehold && branchHousehold && authorHousehold !== branchHousehold) {
         leftDrafted.push({ household, id: record.id, path: delta.path,
           reason: `authorship: "${record.by}" is ${authorHousehold}'s resident; this sketchbook is ${branchHousehold}'s` });
@@ -1539,12 +1559,14 @@ export function settlementSweep({
   holdOrphans(pending);
 
   const gone = new Set(withdrawn.map((item) => item.id));
-  // The marks the unpublish loop will ask standing of: commons rows at ✦0. Never
+  // The marks the unpublish loop will ask standing of: candidate rows at ✦0,
+  // commons and home alike, because standing decides in both directions (WLD-51
+  // G2: a home row whose mark now walks market is taken like any other). Never
   // a mark the town signs: a view drops the `tier` line the constitution
   // shortcut reads (mark-standing.mjs), so re-admitted it would read market;
   // the fold's own tier answers for it (review-214, finding 3).
   const judged = Object.entries(registry.published)
-    .filter(([id, entry]) => entry?.class === "commons" && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
+    .filter(([id, entry]) => isCandidateRow(entry) && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
       && !(mainFolded.has(id) && townOwned(mainFolded.get(id))))
     .map(([id]) => id);
   const candidateOf = new Map(pending.filter((row) => row.candidate).map((row) => [row.id, row.candidate]));
@@ -1658,11 +1680,15 @@ export function settlementSweep({
       ...(staleRows ? { staleRows } : {}),
     });
     if (verdict.unpublish !== true) continue;
+    // `class` is the ROW's, as the registry holds it (a home row taken under G2
+    // says home), and `walked` is what the walk found: every take walks commons.
+    // The row's class is also what a kept frame's row is put back with, below.
     unpublished.push({
       household: entry.household,
       id,
       path: verdict.path,
-      class: "commons",
+      class: entry.class,
+      walked: "commons",
       escrow: escrow.get(id) ?? 0,
       content: readAt(repo, mainBranch, verdict.path),
     });

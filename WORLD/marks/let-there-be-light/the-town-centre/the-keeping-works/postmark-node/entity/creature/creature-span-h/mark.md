@@ -7,4 +7,4 @@ name: span_h
 default: 12
 ---
 
-Hours a creature lasts from its own spawn.
+Not used: creatures don't fade (WLD-96, ruled 2026-10-21). This node stands until the town retires it by its own act.

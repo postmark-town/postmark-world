@@ -29,12 +29,27 @@ test("the creature class: a living node, live canon, its ways to leave (ended on
   assert.deepEqual(c.despawn, [...DESPAWN_REASONS]);
   assert.deepEqual(c.actions.map((a) => a.action), ["watch", "approach", "shoo"],
     "every creature's afforded actions (POS-672, ruled 2026-10-16 18:06): added to the ring, never replacing it");
-  assert.equal(dial("creature", "from_crossing"), 259, "the launch: the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58)");
+  // until 2026-11-01 this asserted 259, the window opening 2026-10-19 12:00Z (Darko 2026-10-17 13:58); WLD-142 (Darko 2026-10-31 23:01 EDT) turned it off
+  assert.equal(dial("creature", "from_crossing"), null, "off after Halloween: \"remove all like the Halloween creatures\" (Darko 2026-10-31 23:01)");
   // THE RAMP (Darko 2026-10-19 20:05, WLD-84): rotation null, every kind every window at its own count
   assert.equal(dial("creature", "rotation"), null, "the ramp: no rotation, every kind every window (Darko 2026-10-19 20:05)");
   assert.deepEqual(Object.fromEntries(KINDS.map((k) => [k, dial(k, "count_per_window")])), { wolf: 1, raven: 3, bat: 2 },
     "the ramp's counts: 2 bats, 3 ravens, 1 wolf a window (Darko 2026-10-19 20:05)");
-  assert.equal(dial("creature", "span_h"), 12, "a creature lasts 12 h (ruled), the span's one home");
+});
+
+// WLD-131: the span_h node stands (only the town retires a law node, by its own act; WLD-158) and
+// says it is unused. The runtime must not read it: the law has no span, and nothing fades.
+test("the span_h node stands as an unused node: the law the engine reads has no span", () => {
+  const node = marks.find((m) => m.id === "the-town/creature-span-h");
+  assert.ok(node, "the node stands: a PR does not retire a law node");
+  assert.equal(node.kind, "property");
+  assert.equal(node.tier, "constitution");
+  assert.equal(node.name, "span_h");
+  assert.match(String(node.body).trim(), /^Not used: creatures don't fade \(WLD-96, ruled 2026-10-21\)\. This node stands until the town retires it by its own act\.$/);
+  assert.doesNotMatch(String(node.body), /replay|Hours a creature lasts/, "no false reason: replay does not need it, and it no longer names a lifetime");
+  const law = creatureLaw(marks);
+  assert.equal("span_h" in law.dials, false, "the standing node is not a live dial");
+  assert.deepEqual(Object.keys(law.dials).filter((k) => k !== "counts" && k !== "rotation").sort(), ["apart_m", "band_from_m", "band_to_m", "keep_m"]);
 });
 
 test("the three kinds: each a class extending creature, whose kind file is its law and names it", () => {

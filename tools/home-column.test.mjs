@@ -18,11 +18,17 @@
 // sentence.
 import test from "node:test";
 import assert from "node:assert/strict";
+import vm from "node:vm";
 import { readFileSync } from "node:fs";
 import {
-  parseHomeMarkdown, parseInline, safeLinkHref, homeHandleForParcel, isParcelMark,
+  parseHomeMarkdown, parseInline, safeLinkHref, safeSitePath, safeSwatch, homeHandleForParcel, isParcelMark,
   homeColumnModel, renderHomeColumn, createHomeColumn,
 } from "../spectator/home-column.mjs";
+import {
+  residentProfileView, residentHref, residentFace, walkerHoverId, walkerHandleFromHoverId, walkingLabel, vesselHandles,
+  isRegionMark, isCreatureId, creatureColumnFacts, creatureIcon, chooserIdsFrom, isAmbientMark, enterAffordance,
+  standpointOccupancy, effectiveWeight, kickerOf, markByline, WORLD_ROOT_ID,
+} from "../spectator/viewer.mjs";
 
 // ── the stand-in ────────────────────────────────────────────────────────────
 
@@ -572,4 +578,444 @@ test("a resident's pronouns sit in the title row beside the name, as text; absen
   const none = render(homeColumnModel({ handle: "sb-dov", title: "Dov" }));
   assert.equal(byClass(none, "wv-homecol-pronouns").length, 0, "nothing written, nothing shown");
   assert.equal(homeColumnModel({ handle: "x", pronouns: "   " }).pronouns, null, "blank is not a word");
+});
+
+// ── THE WAY TO A RESIDENT'S PAGE (WLD-145; WLD-125 for the rest of the columns) ──
+//
+// Darko, 2026-11-01 19:18: "where (if at all) have we filed fixing the world page so resident
+// columns link back to the resident page? like by clicking their name? we somehow lost that
+// functionality." The column has always drawn "the resident page →" for a view that does not
+// turn it off. A mark's view and a creature's turn it off (their handle is an author, or the
+// town). The resident's own view was cut from a mark's and kept the switch (b06a478c8), so the
+// one column whose handle IS the resident drew no link.
+
+const SOURCE = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
+
+/** A closure function's own text from viewer.mjs, two-space indented (as outsider-and-fill.test.mjs lifts loadResidentRead). */
+function bodyOf(name) {
+  const text = SOURCE.match(new RegExp(`^  function ${name}\\([^\\n]*\\) \\{[\\s\\S]*?^  \\}`, "m"))?.[0];
+  assert.ok(text, `source extraction: ${name}`);
+  return text;
+}
+
+/**
+ * The fold, as far as a boat is concerned: a timetable mark names her vessel by mark id, and the walkers
+ * door publishes her under the bare handle (the same shape as viewer-axes.test.mjs). Synthetic.
+ */
+const FOLD = [
+  { id: "the-town/the-wheelhouse", mechanic: "timetable", timetable: { vessel: "the-town/the-post-office", stops: [] } },
+  { id: "the-town/the-post-office" },
+];
+
+/**
+ * The view the page builds for a resident's column: residentColumnView's own body, run against
+ * stand-ins for the page's state that nothing asserted here reads. The card is synthetic.
+ */
+function residentViewFor(card, handle = "rig-ash") {
+  const context = vm.createContext({
+    residentProfileView, residentHref, walkerHandleFromHoverId, walkingLabel, vesselHandles,
+    residentHoldLines: () => null, handsLines: () => null,
+    walkState: { walkers: [{ handle, standing: true }] }, hands: { for: null, holdings: null },
+    faceOf: (h) => residentFace(h, { name: h === "rig-ash" ? "Rig Ash" : h, household: "rig-house" }),
+    walkerPlace: () => "in the Town Centre", residentCloseLook: () => null, residentCard: () => card,
+    worldEpoch: 1, state: { handle: "someone-else" }, onResidentPath: () => false, allMarks: () => FOLD,
+    holdingFacts: () => [], closeLooks: new Map(), asWho: () => "", markIdentity: (m) => m.id, byId: new Map(),
+  });
+  vm.runInContext(bodyOf("residentColumnView"), context);
+  const made = context.residentColumnView(walkerHoverId(handle));
+  assert.ok(made, "the page builds a column for a resident who is on the map");
+  return made;
+}
+
+test("a view turns the way to the resident page off with `residentLink: false`, and only then", () => {
+  const host = element("aside");
+  const column = createHomeColumn({ doc, host, imagePath: shelfGate, residentHref: (h) => `/residents/${h}/` });
+  column.open({ ...view("a/p", "aaa"), door: { description: "words" } });
+  assert.equal(byClass(host, "wv-homecol-resident")[0]?.getAttribute("href"), "/residents/aaa/", "a view that says nothing gets the way to its handle's page");
+  column.open({ ...view("b/p", "bbb"), door: { description: "words" }, residentLink: false });
+  assert.equal(byClass(host, "wv-homecol-resident").length, 0, "a view that turns it off gets none");
+  // ⚑ THE FLIP: paint `residentHref: null` for every view (drop the call in createHomeColumn) → the first line reds;
+  //   ignore view.residentLink → the second reds
+});
+
+test("A RESIDENT'S COLUMN LINKS TO THEIR PAGE: the view the page builds does not turn it off, and the real column draws it", () => {
+  const v = residentViewFor({ profile: { bio: "A figure by the lamp." } });
+  assert.notEqual(v.residentLink, false, "the resident's view leaves the way to their page on");
+  const host = element("aside");
+  createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+  const [out] = byClass(host, "wv-homecol-resident");
+  assert.equal(out?.getAttribute("href"), "/residents/rig-ash/", "the link is the page's own resident route for this handle");
+  assert.equal(serialize(out), "the resident page →");
+  // ⚑ THE FLIP: put `residentLink: false` back on a resident's view in residentColumnView (the branch that is not a boat's) → this reds at the notEqual
+});
+
+test("[pin] a mark's column and a creature's column still turn the resident link off: their handle is an author or the town, not a resident", () => {
+  // text pins, because those two builders are closures far too wide to run here; the behaviour they
+  // switch is the controller's, tested above. WLD-125 decides, link by link, which of them gain one.
+  assert.match(bodyOf("markColumnView"), /residentLink: false,/, "a mark's handle is the household that made it");
+  assert.match(bodyOf("creatureColumnView"), /residentLink: false,/, "a creature's handle is the town's");
+  // ⚑ THE FLIP: delete either line → its assertion reds, and not the other
+});
+
+// ── THE COLOUR ITSELF (WLD-145, Darko 2026-11-01 19:18: "we also don't just SHOW the favorite color") ──
+
+test("safeSwatch: a hex colour and nothing else, lowercased; a resident's word never reaches a style", () => {
+  assert.equal(safeSwatch("#E6AC52"), "#e6ac52");
+  assert.equal(safeSwatch("  #c90 "), "#c90");
+  // a string that only ENDS in a valid hex is the leading anchor's to refuse: without the `^` each of these comes
+  // back whole and would be written into a `style` (Truey's review of this PR, F2)
+  const endsInHex = ["red;#fff", "x#fff", "url(x)#e6ac52", "red;background:url(https://evil.example/x);#fff"];
+  for (const bad of ["red", "#abcd", "#abcde", "#12345g", "#1234567", "e6ac52", "rgb(1,2,3)", "url(x)", "#fff;background:url(javascript:1)", '#fff" onclick="x', ...endsInHex, "", null, undefined, 7])
+    assert.equal(safeSwatch(bad), null, `refused: ${String(bad)}`);
+});
+
+test("a fact carries a swatch only when it is a colour; every other fact keeps its exact shape", () => {
+  const model = homeColumnModel({ handle: "x", facts: [
+    { label: "colour", value: "the running lamp · #E6AC52", swatch: "#E6AC52" },
+    { label: "colour", value: "ember", swatch: "red; background:url(x)" },
+    { label: "class", value: "room" },
+  ] });
+  assert.deepEqual(model.facts, [
+    { label: "colour", value: "the running lamp · #E6AC52", detail: null, swatch: "#e6ac52" },
+    { label: "colour", value: "ember", detail: null },
+    { label: "class", value: "room", detail: null },
+  ], "a valid swatch is kept lowercased; an invalid one, and a fact without one, have no swatch key at all");
+});
+
+test("THE COLOUR ITSELF: the line draws a chip before its words, the chip is a hex and nothing else, and the words are unchanged", () => {
+  const host = render(homeColumnModel({ handle: "x", facts: [
+    { label: "colour", value: "the running lamp · #e6ac52", swatch: "#e6ac52" },
+    { label: "runs on", value: "Claude or Codex" },
+  ] }));
+  const [ddColour, ddRuns] = find(host, "dd");
+  const [chip] = byClass(ddColour, "wv-homecol-swatch");
+  assert.ok(chip, "the colour line has a chip");
+  assert.equal(chip.getAttribute("style"), "background:#e6ac52", "painted with the one value");
+  assert.equal(chip.getAttribute("aria-hidden"), "true", "the name and the hex are the words; the chip is only the look");
+  assert.equal(ddColour.children[0], chip, "before the words");
+  assert.equal(serialize(ddColour), "the running lamp · #e6ac52", "and the words are as they were");
+  assert.equal(byClass(ddRuns, "wv-homecol-swatch").length, 0, "no other line has one");
+  assert.equal(serialize(ddRuns), "Claude or Codex");
+  // the sink checks as well as the model: a model built by hand with a hostile swatch draws none
+  const hostile = renderHomeColumn(doc, element("aside"),
+    { ...homeColumnModel({ handle: "x" }), facts: [{ label: "colour", value: "ember", detail: null, swatch: "red;background:url(x)" }] }, { imagePath: shelfGate });
+  assert.equal(byClass(hostile, "wv-homecol-swatch").length, 0, "a swatch that is not a hex colour never becomes a style");
+  assert.equal(serialize(find(hostile, "dd")[0]), "ember");
+  // ⚑ THE FLIPS: drop the chip branch in renderHomeColumn → the first assertions red; let safeSwatch pass anything → the hostile line reds
+});
+
+test("THE COLOUR REACHES THE SCREEN: a resident's card, through the page's own resident view and the real column, draws the colour they chose and never the map's", () => {
+  const draw = (card) => {
+    const host = element("aside");
+    createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(residentViewFor(card));
+    return host;
+  };
+  const chosen = draw({ profile: { color: "#E6AC52", color_name: "the running lamp" } });
+  assert.equal(byClass(chosen, "wv-homecol-swatch")[0]?.getAttribute("style"), "background:#e6ac52", "the colour they chose");
+  assert.match(serialize(byClass(chosen, "wv-homecol-facts")[0]), /the running lamp · #e6ac52/, "beside its name and hex");
+  // the page hands the column a face in the town's gold for a resident with no colour of their own;
+  // none of that gold may arrive as a swatch
+  assert.equal(byClass(draw({ profile: { bio: "A figure." } }), "wv-homecol-swatch").length, 0, "chose nothing, nothing drawn");
+  assert.equal(byClass(draw({ profile: { color_name: "ember" } }), "wv-homecol-swatch").length, 0, "a name alone is words only");
+  // ⚑ THE FLIP: drop `...(color ? { swatch: color } : {})` from residentProfileView → the first line reds
+});
+
+// ── THE BIO (WLD-145 c; Darko 2026-11-01 19:18: "the bio gets cut off") ─────
+//
+// Measured 2026-11-01 on the live roll (335 cards, 135 bios): every bio reaches the column's body
+// whole through this code. The office refuses a bio over 400 characters (edit.mjs PROFILE_CAPS,
+// a 422, never a clip) and its card keeps profile.bio as written, so a bio that reads cut was
+// stored cut. This pin keeps the World half honest: nothing here shortens it, or adds an ellipsis.
+
+test("THE BIO IS NEVER CUT HERE: one at the office's 400-character cap, ending mid-word as a writer left it, reaches the column whole", () => {
+  const bio = "lanterns ".repeat(45).slice(0, 400);
+  assert.equal(bio.length, 400);
+  assert.ok(bio.endsWith("lant"), "the fixture ends mid-word");
+  const draw = (card) => {
+    const host = element("aside");
+    createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(residentViewFor(card));
+    return byClass(host, "wv-homecol-body")[0];
+  };
+  assert.equal(serialize(draw({ profile: { bio } })), bio, "every character, nothing added and nothing taken");
+  assert.equal(residentProfileView({ profile: { bio: `  ${bio}  ` } }).bio, bio, "only the edges are trimmed");
+  // two paragraphs keep both, in order
+  const two = draw({ profile: { bio: "First, a few words.\n\nSecond, a few more." } });
+  assert.deepEqual(two.children.map(serialize), ["First, a few words.", "Second, a few more."]);
+  // ⚑ THE FLIP: `text(profile.bio)?.slice(0, 200)` in residentProfileView → the first assertion reds
+});
+
+// ── THE NAME IS THE LINK (WLD-145: "like by clicking their name?"; a resident's column only) ──
+
+test("the name in the header links to the resident's page only when a view says its title is a person", () => {
+  const person = homeColumnModel({ handle: "x", title: "Rig Ash", residentHref: "/residents/x/", titleLink: true });
+  assert.equal(person.titleLink, true);
+  assert.equal(homeColumnModel({ handle: "x", residentHref: "/residents/x/" }).titleLink, false, "a view that does not ask keeps its title as words");
+  assert.equal(homeColumnModel({ handle: "x", titleLink: true }).titleLink, false, "no page to go to, no link");
+  const [h2] = byClass(render(person), "wv-homecol-title");
+  const [a] = find(h2, "a");
+  assert.equal(a?.getAttribute("href"), "/residents/x/");
+  assert.equal(a?.getAttribute("rel"), "noopener");
+  assert.equal(serialize(h2), "Rig Ash", "the name itself is unchanged");
+  const home = byClass(render(homeColumnModel({ handle: "x", title: "the Trueing-House", residentHref: "/residents/x/" })), "wv-homecol-title")[0];
+  assert.equal(find(home, "a").length, 0, "a home's title is not a link");
+  // ⚑ THE FLIPS: drop the model's `titleLink` → the first line reds; drop the renderer's branch → the href line reds
+});
+
+test("A RESIDENT'S NAME IS THEIR LINK: through the page's own resident view and the real column; a mark's and a creature's views do not ask for it", () => {
+  const v = residentViewFor({ profile: { bio: "A figure." } });
+  assert.equal(v.titleLink, true, "the page's resident view asks for it");
+  const host = element("aside");
+  createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+  const [a] = find(byClass(host, "wv-homecol-title")[0], "a");
+  assert.equal(a?.getAttribute("href"), "/residents/rig-ash/", "the name goes to the page's own resident route for this handle");
+  assert.equal(serialize(a), "Rig Ash");
+  assert.equal(byClass(host, "wv-homecol-resident").length, 1, "and the line at the foot is still there");
+  assert.doesNotMatch(bodyOf("markColumnView"), /titleLink/, "WLD-125 decides, link by link, whether a mark's title is one");
+  assert.doesNotMatch(bodyOf("creatureColumnView"), /titleLink/);
+  // ⚑ THE FLIPS: drop `titleLink: true` from residentColumnView's flags → the first line reds; drop `titleLink: !!view.titleLink,` from the controller's paint → the href line reds
+});
+
+// ── A BOAT IS NOT A RESIDENT (Truey's review of this PR, F1) ────────────────
+//
+// A boat is a walker row the page keeps as a click target ("a boat too", viewer.mjs § walkerCandidatesAt), so a
+// click on her reaches residentColumnView. Her handle is a vessel mark's bare id, not a household's: there is no
+// resident page for it, so only a resident's column links.
+
+test("A BOAT'S COLUMN HAS NO RESIDENT LINK, neither the name nor the foot line; a resident's, from the same fold, has both", () => {
+  assert.equal(vesselHandles(FOLD).has("the-post-office"), true, "the fixture's boat is the fold's vessel");
+  assert.equal(vesselHandles(FOLD).has("rig-ash"), false, "and the resident is not");
+  const draw = (handle, card) => {
+    const v = residentViewFor(card, handle);
+    const host = element("aside");
+    createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+    return { v, host };
+  };
+  const boat = draw("the-post-office", null);   // the office has no resident card for a boat
+  assert.equal(boat.v.residentLink, false, "the boat's view switches the link off");
+  assert.notEqual(boat.v.titleLink, true, "and does not ask for the name link");
+  assert.equal(byClass(boat.host, "wv-homecol-resident").length, 0, "no \"the resident page →\" for a boat");
+  assert.equal(find(byClass(boat.host, "wv-homecol-title")[0], "a").length, 0, "and her name is not a link");
+  assert.equal(serialize(byClass(boat.host, "wv-homecol-title")[0]), "the-post-office", "her column is still drawn, with her name");
+  // the control: the same fold and the same stand-ins, a resident
+  const person = draw("rig-ash", { profile: { bio: "A figure." } });
+  assert.equal(byClass(person.host, "wv-homecol-resident").length, 1, "a resident, from the same fold, still has the foot line");
+  assert.equal(find(byClass(person.host, "wv-homecol-title")[0], "a").length, 1, "and the name link");
+  // ⚑ THE FLIPS: drop the vessel guard in residentColumnView → the boat's assertions red; make every walker a boat → the control reds;
+  //   leave the name link's flag on a boat (the model gates it on the href, so it draws nothing) → only the notEqual reds
+});
+
+// ── THE PAGE HANDS THE COLUMN ITS residentHref (Truey's review of this PR, F3) ──
+
+test("the page hands the column the real residentHref: the page's own createHomeColumn call, lifted and run, carries it", () => {
+  // Every test above builds its own column, so none could see whether the page does. The call is lifted and run
+  // rather than matched as text, so a commented-out line cannot satisfy it; its other arguments are stand-ins.
+  const call = SOURCE.match(/^  const homeColumn = createHomeColumn\(\{[\s\S]*?^  \}\);/m)?.[0];
+  assert.ok(call, "source extraction: the page's createHomeColumn call");
+  let handed = null;
+  const context = vm.createContext({
+    createHomeColumn: (options) => { handed = options; return {}; },
+    document: {}, $: () => null, root: {}, readHomePage: () => null, markImagePath: () => null, residentHref,
+  });
+  vm.runInContext(call, context);
+  assert.ok(handed, "the call ran and reached the column");
+  assert.equal(handed.residentHref, residentHref, "the column is handed the page's own residentHref, so every column's link is built by the one handle rule");
+  // ⚑ THE FLIPS: drop `residentHref,` from the call → undefined, this reds; hand it any other function → not the page's own, this reds
+});
+
+// ── WHAT THE TOWN OWNS DRAWS NO LINK (WLD-125, part 2 of 2) ─────────────────
+//
+// LAW (RULED, Darko 2026-11-02 08:32 EST, "ok from the morning dash: I agree with your recs on all calls"; Wright's
+// 14:34Z comment on WLD-125 states the call): "a World link from something the town owns draws no link. The town's
+// marks, regions and creatures link to no resident page. That also ends the two region links that 404 today
+// (/residents/the-town/)."
+//
+// Measured at World main 3cc1d218b, counts only: 2 of the record's 14 region marks are the town's, and each drew "the
+// resident page →" to /residents/the-town/, which is a 404 on the site. A mark's column and a creature's column
+// already turn the link off with `residentLink: false`. That switch is one door, so every test below reads the town's
+// handle on its own as well (the page's view with the switch taken off), and a later link choice for marks or
+// creatures (WLD-125's other six, still open) cannot bring the town's link back by flipping it.
+//
+// Every record below is invented (LANE-DISCIPLINE § Residents' data is public: tests use invented data because real
+// records change under you). The handles `rig-ash` and `the-lamplighter` are residents of this file only.
+
+/** What a view draws as ways out to the site, through the page's own residentHref and the real column. */
+function drawnLinks(v) {
+  const host = element("aside");
+  createHomeColumn({ doc, host, imagePath: shelfGate, residentHref }).open(v);
+  const title = byClass(host, "wv-homecol-title")[0];
+  assert.ok(title, "the column was drawn");
+  return {
+    foot: byClass(host, "wv-homecol-resident").map((a) => a.getAttribute("href")),
+    name: find(title, "a").map((a) => a.getAttribute("href")),
+    anchors: find(host, "a").map((a) => a.getAttribute("href")),
+  };
+}
+const NO_LINKS = { foot: [], name: [], anchors: [] };
+/** the page's view with the way-out switch taken off the table, so the handle rule is the only thing left to refuse */
+const withoutTheSwitch = (v) => { const { residentLink, ...rest } = v; return rest; };
+
+/** regionColumnView's own body, run against stand-ins for the page's state; the door is never answered. */
+function regionViewFor(mark) {
+  const context = vm.createContext({
+    isRegionMark, markImagePath: () => null, byId: new Map([[mark.id, mark]]), allMarks: () => [mark],
+    regionDoors: new Map(), readRegionDoor: () => {}, markIdentity: (m) => m.name ?? m.id, iconsOf: () => [],
+  });
+  vm.runInContext(bodyOf("regionColumnView"), context);
+  const made = context.regionColumnView(mark.id);
+  assert.ok(made, `the page builds a region column for ${mark.id}`);
+  return made;
+}
+
+/** creatureColumnView's own body, run against stand-ins; a live row and no investigate answer yet. */
+function creatureViewFor(row) {
+  const context = vm.createContext({
+    isCreatureId, liveCreatures: new Map([[row.id, row]]), creatureReads: new Map(), loadCreatureReading: () => {},
+    creatureColumnFacts, creatureIcon, sceneRoomId: null, byId: new Map(), pointInRect: () => false, rect: () => null,
+    markIdentity: (m) => m.id, isSpectating: () => true, walkState: { walkers: [] }, state: { cam: { x: 0, y: 0 }, handle: null },
+  });
+  vm.runInContext(bodyOf("creatureColumnView"), context);
+  const made = context.creatureColumnView(row.id);
+  assert.ok(made, `the page builds a creature column for ${row.id}`);
+  return made;
+}
+
+/**
+ * markColumnView's own body, run against stand-ins for the page's state that nothing asserted here reads (the
+ * record has no holdings, no law, no occupants, no read and no walkers). The real exports it calls stay real.
+ */
+function markViewFor(mark) {
+  const context = vm.createContext({
+    walkerHandleFromHoverId, chooserIdsFrom, isParcelMark, isRegionMark, isAmbientMark, enterAffordance, standpointOccupancy,
+    effectiveWeight, kickerOf, markByline, markImagePath: () => null, walkerHoverId, WORLD_ROOT_ID,
+    byId: new Map([[mark.id, mark]]), markName: (m) => ({ name: m.name ?? m.id }), markIdentity: (m) => m.name ?? m.id,
+    radialWhere: () => ({ detail: "in the Town Centre" }), columnReading: () => null,
+    state: { palette: { entries: [] }, handle: null }, standpointKey: () => null, enterExitLedger: { acts: [] }, occupancyClock: () => 0,
+    occupantsOf: () => new Map(), liveOccupancy: () => ({}), faceOf: (h) => ({ name: h }), entryLawOf: () => null,
+    markCloseLook: () => null, noteThingKind: () => {}, holderLines: () => null, heldBy: () => null, heldLine: () => null,
+    isThingId: () => false, iconsOf: () => [], instanceClassOf: () => null, ownedBy: () => null, hands: { for: null },
+    holdingFacts: () => [], polygonOf: () => null, polygonBBox: () => null, liveCreatures: new Map(), pointInsideMark: () => false,
+    silhouetteURL: () => "", bubbleTrail: [], worldEpoch: 1, enterExitEpoch: 1, sceneRoomId: null, canAct: () => false, loadAgentRead: () => null,
+  });
+  vm.runInContext(bodyOf("markColumnView"), context);
+  const made = context.markColumnView(mark.id);
+  assert.ok(made, `the page builds a mark column for ${mark.id}`);
+  return made;
+}
+
+const TOWN_REGION = { id: "the-town/the-headland", kind: "sited", by: "the-town", household: "the-town", name: "the Headland", body: "A headland the town keeps." };
+const RESIDENT_REGION = { id: "rig-ash/the-reach", kind: "sited", by: "rig-ash", household: "rig-house", name: "the Reach", body: "A reach a resident founded." };
+const TOWN_CREATURE = { id: "creature:rig-moth-1-0", kind: "moth", name: "a rig moth", x: 10, y: 20 };
+const TOWN_MARK = { id: "the-town/a-rig-lamp", kind: "sited", by: "the-town", household: "the-town", name: "A Rig Lamp", body: "A lamp the town keeps." };
+const RESIDENT_MARK = { id: "rig-ash/a-rig-lamp", kind: "sited", by: "rig-ash", household: "rig-house", name: "A Rig Lamp", body: "A lamp a resident made." };
+
+test("residentHref refuses the town's handle and only the town's: a lookalike, a longer name and a neighbour still link", () => {
+  assert.equal(residentHref("the-town"), null, "the town has no resident page");
+  assert.equal(residentHref("  the-town  "), null, "the same handle with its edges trimmed, as the rule has always trimmed");
+  // the rule is one exact handle: anything wider would take a real resident's link with it
+  for (const handle of ["the-town-crier", "the-townsfolk", "the-towne", "the-lamplighter", "town", "rig-ash"])
+    assert.equal(residentHref(handle), `/residents/${handle}/`, `${handle} is a resident and still links`);
+  // and the older refusals are unchanged: uppercase and shapes that are not handles never linked
+  for (const bad of ["The-Town", "the town", "the-town/", "", null, "../the-town"]) assert.equal(residentHref(bad), null, `no link for: ${String(bad)}`);
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the first two lines red; widen it to `s.startsWith("the-")` or
+  //   `s.includes("town")` → the lookalike lines red, and not the first two
+});
+
+test("A TOWN-OWNED REGION DRAWS NO LINK, and a resident's region still links to its founder: the page's own region view through the real column", () => {
+  const town = regionViewFor(TOWN_REGION);
+  assert.equal(town.handle, "the-town", "the page's region view carries the town's handle: this is the town's own region");
+  assert.deepEqual(drawnLinks(town), NO_LINKS, "nothing in the column goes to the site: no foot line, no name link, no anchor at all");
+  // the control, on the same builder and the same column: only the owner differs
+  const mine = regionViewFor(RESIDENT_REGION);
+  assert.equal(mine.handle, "rig-ash");
+  assert.deepEqual(drawnLinks(mine).foot, ["/residents/rig-ash/"], "a resident-founded region still has its foot line, to its founder");
+  assert.equal(drawnLinks(mine).name.length, 0, "and no name link (a region's title is not a person)");
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the first assertion that reads the column reds; make residentHref
+  //   return null for everything → the control reds, and not the town's
+});
+
+test("A TOWN-OWNED CREATURE DRAWS NO LINK, with the page's switch and without it", () => {
+  const v = creatureViewFor(TOWN_CREATURE);
+  assert.equal(v.handle, "the-town", "a creature's handle is the town's");
+  assert.equal(v.residentLink, false, "the page turns the way out off for a creature");
+  assert.deepEqual(drawnLinks(v), NO_LINKS, "with the page's switch: no link");
+  // the town's handle on its own: the switch is not there to save it
+  assert.deepEqual(drawnLinks(withoutTheSwitch(v)), NO_LINKS, "without the switch: still no link, because the owner is the town");
+  // the control that makes the absence mean something: the same bare view under a resident's handle does link
+  assert.deepEqual(drawnLinks({ ...withoutTheSwitch(v), handle: "rig-ash" }).foot, ["/residents/rig-ash/"], "the harness can draw this link");
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the without-the-switch assertion reds, and not the one before it;
+  //   delete `residentLink: false,` from creatureColumnView → the `residentLink` assertion reds (the pin above it reds too)
+});
+
+test("A TOWN-OWNED MARK DRAWS NO LINK, with the page's switch and without it; a resident's mark has no link either, as it never had", () => {
+  const v = markViewFor(TOWN_MARK);
+  assert.equal(v.handle, "the-town", "a mark's handle is the household that made it: here, the town");
+  assert.equal(v.residentLink, false, "the page turns the way out off for a mark");
+  assert.deepEqual(drawnLinks(v), NO_LINKS, "with the page's switch: no link");
+  assert.deepEqual(drawnLinks(withoutTheSwitch(v)), NO_LINKS, "without the switch: still no link, because the owner is the town");
+  // a resident's mark: unchanged. The page's switch keeps it linkless (WLD-125's choice 2, a mark's link to its author, is still open)...
+  const mine = markViewFor(RESIDENT_MARK);
+  assert.equal(mine.handle, "rig-ash");
+  assert.deepEqual(drawnLinks(mine), NO_LINKS, "a resident's mark: no link today, as before this change");
+  // ...and the handle rule alone would let it link, so the town's absence above is the town's rule and not a dead harness
+  assert.deepEqual(drawnLinks(withoutTheSwitch(mine)).foot, ["/residents/rig-ash/"], "the same view without the switch links to its author");
+  // ⚑ THE FLIPS: delete the `s === TOWN_HANDLE` line in residentHref → the town's without-the-switch assertion reds, and not the ones before it;
+  //   delete `residentLink: false,` from markColumnView → the `residentLink` assertion reds (the pin above it reds too)
+});
+
+test("any view whose handle is the town's draws neither the foot line nor the name link, a parcel's and a person's shape included", () => {
+  // the shapes the page builds for a home (a parcel held by the town: none today, the rule is the class) and for a person (titleLink)
+  for (const shape of [{}, { titleLink: true }, { residentLink: undefined }])
+    assert.deepEqual(drawnLinks({ ...view("the-town/p", "the-town"), door: { description: "words" }, ...shape }), NO_LINKS, JSON.stringify(shape));
+  // the control: the same shapes under a resident's handle link as they always did
+  const person = drawnLinks({ ...view("rig-ash/p", "rig-ash"), door: { description: "words" }, titleLink: true });
+  assert.deepEqual(person.foot, ["/residents/rig-ash/"]);
+  assert.deepEqual(person.name, ["/residents/rig-ash/"]);
+  // ⚑ THE FLIP: delete the `s === TOWN_HANDLE` line in residentHref → all three town lines red
+});
+
+test("the walker card's \"their page →\" is the other place a handle becomes a link: it draws none for the town, and still does for a resident", () => {
+  const cardFor = (handle) => {
+    const context = vm.createContext({
+      walkState: { walkers: [{ handle, standing: true }] }, walkerPlace: () => "in the Town Centre", formatEtaCrossings: () => "",
+      faceOf: (h) => residentFace(h, { name: h, household: "rig-house" }), residentHref, esc: (s) => String(s ?? ""),
+    });
+    vm.runInContext(bodyOf("walkerBubbleHTML"), context);
+    return context.walkerBubbleHTML(handle, { pressable: true });
+  };
+  assert.ok(cardFor("rig-ash").includes('<a href="/residents/rig-ash/">their page →</a>'), "a resident's pinned card still has the link");
+  assert.ok(!cardFor("the-town").includes("their page"), "the town's card has none");
+  assert.ok(!cardFor("the-town").includes("/residents/"), "and no path to the site at all");
+  // ⚑ THE FLIP: delete the `s === TOWN_HANDLE` line in residentHref → the town assertions red, and not the control
+});
+
+// ── A CONVERSATION'S COLUMN (POS-779, Darko 2026-11-06): plain-data blocks and a footer link ─────────────────────────
+
+test("a view may hand in plain-data blocks, and a statement's markdown and markup stay the letters it was typed in", () => {
+  const said = '# not a heading [x](javascript:alert(1)) <img src="x" onerror="alert(2)"> **not bold**';
+  const blocks = [{ type: "paragraph", spans: [{ type: "strong", spans: [{ type: "text", text: "rig-ash" }] }, { type: "text", text: ` (2026-11-06 14:05Z): ${said}` }] }];
+  const model = homeColumnModel({ handle: "the-town", kicker: "a conversation · live", title: "the porch", door: { blocks } });
+  assert.deepEqual(model.blocks, blocks, "the blocks are the ones handed in, not a parse of anything");
+  const host = render(model);
+  const tags = tagsIn(host);
+  for (const bad of ["SCRIPT", "IMG", "A", "H1", "B"]) assert.equal(tags.filter((t) => t === bad).length, 0, `no ${bad} was made from a statement`);
+  assert.ok(serialize(host).includes(said), "the statement reads exactly as typed");
+  assert.equal(find(host, "strong").length, 1, "and only the column's own emphasis (the speaker's name) is markup");
+  // the markdown path is unchanged for everything else
+  assert.equal(homeColumnModel({ handle: "x", kicker: "x", door: { description: "# a title" } }).blocks[0].type, "heading");
+  assert.deepEqual(homeColumnModel({ handle: "x", kicker: "x", door: { blocks: [] } }).blocks, [], "an empty list of blocks is the quiet thread, not a markdown parse");
+});
+
+test("a footer link is a same-origin path, opens beside the map, and nothing else is hung", () => {
+  const ok = render(homeColumnModel({ handle: "the-town", kicker: "k", title: "t", door: { blocks: [] }, footerLink: { href: "/conversations/#t1", text: "all conversations →" } }));
+  const [a] = byClass(ok, "wv-homecol-all");
+  assert.equal(a.getAttribute("href"), "/conversations/#t1");
+  assert.equal(a.getAttribute("target"), "_blank");
+  assert.equal(a.getAttribute("rel"), "noopener noreferrer");
+  assert.equal(a.textContent, "all conversations →");
+  assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "words" } })), "wv-homecol-all").length, 0, "no footer link unless a view asks");
+  for (const bad of ["https://evil.example/x", "//evil.example/x", "/\\evil", "javascript:alert(1)", "conversations/#t1", "/with space", "", null, undefined]) {
+    assert.equal(safeSitePath(bad), null, `refused: ${JSON.stringify(bad)}`);
+    assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "w" }, footerLink: { href: bad, text: "x" } })), "wv-homecol-all").length, 0, "and no anchor is hung for it");
+  }
+  assert.equal(safeSitePath("/conversations/#t%201"), "/conversations/#t%201");
 });

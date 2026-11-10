@@ -13,10 +13,11 @@ import { instanceClassOf } from "./mark-kind.mjs"; // either form (LOGOS v2 W2)
 const sited = (extra = {}) => ({ id: "h/m", kind: "sited", at: { x: 0, y: 0 }, extent: { w: 4, h: 4 }, ...extra });
 const tok = (c) => String(c ?? "").trim().toLowerCase();
 
-test("the vocabulary is closed: eight things a mark can be, six states, and no idea or bounty", () => {
+test("the vocabulary is closed: eight things a mark can be, a ninth glyph for a conversation (which is no mark), six states, and no idea or bounty", () => {
   const what = Object.entries(MARK_ICONS).filter(([, d]) => d.kind === "what").map(([k]) => k);
   const state = Object.entries(MARK_ICONS).filter(([, d]) => d.kind === "state").map(([k]) => k);
-  assert.deepEqual(what, ["place", "home", "thing", "door", "dungeon", "stairs", "vehicle", "creature"]);
+  assert.deepEqual(what, ["place", "home", "thing", "door", "dungeon", "stairs", "vehicle", "creature", "conversation"]);
+  assert.equal(markWhat(sited({ class: "conversation" }), { cls: "conversation" }), "place", "a conversation is never what a MARK is: markWhat never answers it (POS-779)");
   assert.deepEqual(state, ["yours", "locked", "consent", "staked", "inside", "soon"]);
   for (const [key, def] of Object.entries(MARK_ICONS)) {
     assert.ok(def.meaning.length > 10 && def.meaning.length < 90, `${key} says what it means in one line`);
@@ -163,4 +164,14 @@ test("a kind of thing is a thing (LOGOS v2 part 2, POS-678): the Halloween bowl 
   assert.equal(markWhat(bowl, { cls: "halloween-candy-bowl" }), "place", "with no lineage in hand, the old answer stands");
   assert.equal(markIcons(bowl, { cls: "halloween-candy-bowl", thingClasses: things })[0].meaning,
     "A thing: an object in the world, not ground to stand on.");
+});
+
+test("POS-779: a conversation has its own glyph in the family, in the map's gray-white", () => {
+  assert.equal(MARK_ICONS.conversation.kind, "what");
+  assert.match(MARK_ICONS.conversation.d, /^M 2\.5 3\.5 H 13\.5/, "a speech bubble");
+  assert.notEqual(MARK_ICONS.conversation.d, MARK_ICONS.place.d);
+  assert.match(MARK_ICONS_CSS_OF("conversation"), /color:#cfd6dd/, "gray-white (Darko 2026-10-24)");
+  const svg = iconSVG({ key: "conversation" }, { x: -6, y: -6, size: 12, ink: "#2b323a" });
+  assert.match(svg, /class="ov-ic ic-conversation"/);
+  assert.match(svg, /voices within earshot/);
 });

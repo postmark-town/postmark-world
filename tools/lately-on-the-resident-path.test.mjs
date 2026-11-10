@@ -74,6 +74,7 @@ import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -200,7 +201,7 @@ before(async () => {
 /** open the page, optionally signed in, and read the Lately pane off the DOM */
 async function openAndRead({ signedIn }) {
   const askedBefore = office.asked.length;   // this page's own doors, not the file's
-  const page = await browser.newPage({ viewport: { width: 1500, height: 950 } });
+  const page = await machinePage(browser, { viewport: { width: 1500, height: 950 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.addInitScript(

@@ -1,0 +1,167 @@
+// page-throttle-sweep.advisory.mjs — the swept page tests, run on a loaded machine
+// and required green (WLD-71's falsifier: "run the swept tests under a CPU
+// throttle and require them green").
+//
+//   node --test tools/page-throttle-sweep.advisory.mjs     (npm run test:throttle)
+//
+// AN ALARM, NOT A GATE (WLD-170; Darko 2026-11-08 14:47 EST: "the throttle test should
+// be demoted to an alarm that doesn't block settlement"). This file is NOT a
+// *.test.mjs, so `npm test` (the settlement-blocking suite) and the candle runner,
+// which both enumerate tools/*.test.mjs, never pick it up. It runs in its own
+// workflow, .github/workflows/throttle-advisory.yml, on pushes and pull requests
+// into main, where a red is a failed advisory check and blocks nothing.
+//
+// Each page test below runs in a child of its own (node --test <file>), one after
+// another, with WORLD_PAGE_CPU_THROTTLE=4: every page its contexts open is
+// throttled 4× by Chromium (page-machine.mjs). A test that waited on a sleep, or
+// let the page measure the host, is what a 4× box turns red. The receipt is the
+// helper's own: one line per real page opened, with its machine, so a file that
+// "passed" without opening a page, or a page that escaped the throttle, is a red
+// here. The slow-machine case keeps its own machine by name: the slow clock, no CPU
+// throttle (tools/lite-mode.test.mjs, page-machine.mjs § slowClockWithinATask).
+//
+// The list is explicit and is held to the census (every tools/*.test.mjs that
+// launches chromium, page-machine.test.mjs aside: its page half measures the
+// throttle itself). This file runs no page of its own (it launches a browser once,
+// to know whether the sweep can run) and never itself.
+
+import { test, before } from "node:test";
+import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { mkdtempSync, readFileSync, readdirSync, existsSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { MACHINE_LOG_ENV, NO_PLAYWRIGHT, THROTTLE_ENV, stripComments } from "./page-machine.mjs";
+import { CANDLE_ENV } from "./run-candle-suites.mjs";
+
+// NOT IN THE CANDLE (WLD-71; Wright's review 2026-10-30 11:38). The settlement
+// crossing's gate (tools/run-candle-suites.mjs) sets WORLD_CANDLE_RUN=1 on its child,
+// and a crossing must not wait on 22 browsers at 4× CPU. Since WLD-170 the candle never
+// lists this file at all (its name is outside tools/*.test.mjs); the flag stays as the
+// belt: run with it, this file probes no browser and starts no child, and its throttled
+// tests skip, saying why. ONLY that name decides: an inherited CI=true, GITHUB_ACTIONS
+// or npm_lifecycle_event neither excludes the sweep nor brings it back.
+// (Not a [pin]: a pin is a source-text test, #2790; this is behaviour.)
+const IN_CANDLE = process.env[CANDLE_ENV] === "1";
+const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page sweep runs in CI and npm test, not in the settlement crossing — nothing rendered here`;
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const SELF = "tools/page-throttle-sweep.advisory.mjs";
+const RATE = 4;
+// the 24 page tests: the 22 at WLD-71, tools/conversation-pages.test.mjs (POS-779: the mounted conversation badges)
+// and WLD-74's resident card (tools/candle-boundary.test.mjs counts them too)
+const SWEPT = [
+  "tools/act-as-town-bodies.test.mjs", "tools/backdrop-without-text.test.mjs", "tools/conversation-pages.test.mjs", "tools/dungeon-page.test.mjs",
+  "tools/first-paint-boot-shape.test.mjs", "tools/lately-more-on-the-page.test.mjs", "tools/lately-on-the-resident-path.test.mjs",
+  "tools/lately-reads-the-store.test.mjs", "tools/lite-mode.test.mjs", "tools/mine-stands-out.test.mjs", "tools/mists-stage.test.mjs",
+  "tools/part2-on-the-page.test.mjs", "tools/pinned-house-card.test.mjs", "tools/placed-art.test.mjs",
+  "tools/region-column-reads-the-door.test.mjs", "tools/resident-middle-on-the-page.test.mjs", "tools/room-feather.test.mjs",
+  "tools/search-the-town.test.mjs", "tools/standpoint-dot-culled.test.mjs", "tools/thumbnails-follow-the-drawn-size.test.mjs",
+  "tools/town-ground-page.test.mjs", "tools/walk-enter-terms-page.test.mjs", "tools/walk-layer-once.test.mjs",
+  "tools/wld74-card-on-the-page.test.mjs",
+];
+// the one deliberate exception, by name: lite-mode's slow machine is the slow clock, SET (WLD-170), with no CPU throttle
+const OWN_RATE = { "tools/lite-mode.test.mjs": { clock: "slow", throttle: 0 } };
+
+const launches = (rel) => /\bchromium\s*\.\s*launch\s*\(/.test(stripComments(readFileSync(join(ROOT, rel), "utf8")));
+
+test("the sweep's list is the census: every page test, none twice, not this file", () => {
+  const census = readdirSync(join(ROOT, "tools")).filter((f) => f.endsWith(".test.mjs")).map((f) => `tools/${f}`)
+    .filter((rel) => rel !== "tools/page-machine.test.mjs" && rel !== SELF && launches(rel)).sort();
+  assert.equal(new Set(SWEPT).size, SWEPT.length, "no file twice");
+  assert.ok(!SWEPT.includes(SELF), "the sweep never runs itself (its one launch is the probe below)");
+  assert.deepEqual([...SWEPT].sort(), census, "a page test not in the sweep is not proved on a loaded machine");
+});
+
+let chromium = null;
+before(async () => {
+  if (IN_CANDLE) return;   // the candle: no playwright import, no probe launch
+  try { chromium = (await import("playwright")).chromium; const b = await chromium.launch(); await b.close(); } catch { chromium = null; }
+});
+
+// WLD-150 D1b: THE LITE-STATE DIAGNOSTIC, DELIVERED TO ITS ACTUAL CONSUMER. tools/lite-mode.test.mjs prints one
+// `# {"lite_state": …}` TAP line (a t.diagnostic) when its slow-bake wait resolves or times out. The two CI failures
+// seen so far were THIS wrapper's, and the wrapper kept only counts, failing names and errors, so the line vanished
+// with the child. This forwards ONLY lines of that shape, bounded and checked, and only as information: it is
+// computed from the child's output, printed before the assertions, and read by none of them. It never dumps the
+// child's output, never decides an outcome, and a missing, oversized or malformed line is labelled unavailable.
+const LITE_STATE_CHILD = "tools/lite-mode.test.mjs";   // the only child that is expected to print a lite_state line
+const LITE_STATE_MAX = { records: 3, bytes: 2048, text: 300 };
+const LITE_STATE_KEYS = ["lite_state", "waited_ms", "waited_ms_is", "page_errors", "lite", "slowKey", "storedChoice", "toggleLabel", "toggleTitle", "wall", "paint", "feather", "unknown"];
+function liteStatesOf(out) {
+  const lines = [...out.matchAll(/^[ \t]*# (\{"lite_state".*)$/gm)].map((m) => m[1]);
+  const records = [];
+  for (const line of lines.slice(0, LITE_STATE_MAX.records)) {
+    if (Buffer.byteLength(line) > LITE_STATE_MAX.bytes) { records.push({ unavailable: "oversized, not parsed" }); continue; }
+    let rec;
+    try { rec = JSON.parse(line); } catch { records.push({ unavailable: "not valid JSON (truncated or malformed), not forwarded" }); continue; }
+    const safe = {};
+    for (const k of LITE_STATE_KEYS) {
+      const v = rec?.[k];
+      if (v === undefined) continue;
+      safe[k] = v === null || typeof v === "boolean" || typeof v === "number" || (typeof v === "string" && v.length <= LITE_STATE_MAX.text) ? v : "(dropped: not a short value)";
+    }
+    records.push(safe);
+  }
+  return { records, seen: lines.length };
+}
+
+/** one page test in a child, throttled; its TAP and the machine receipt */
+function runThrottled(rel) {
+  const log = join(mkdtempSync(join(tmpdir(), "wld71-sweep-")), "machine.jsonl");
+  // NODE_TEST_CONTEXT is the parent runner's: a child that inherits it reports to
+  // the parent's channel instead of running as a run of its own, and exits 0
+  // having passed nothing (measured on CI at f39d1ee7: all 22 "passed nothing")
+  const env = { ...process.env, [THROTTLE_ENV]: String(RATE), [MACHINE_LOG_ENV]: log };
+  delete env.NODE_TEST_CONTEXT;
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, ["--test", "--test-reporter=tap", rel], { cwd: ROOT, env, stdio: ["ignore", "pipe", "pipe"] });
+    let out = "";
+    child.stdout.on("data", (b) => { out += b; });
+    child.stderr.on("data", (b) => { out += b; });
+    const timer = setTimeout(() => child.kill("SIGKILL"), 25 * 60_000);
+    child.on("exit", (code, signal) => {
+      clearTimeout(timer);
+      const count = (k) => Number(out.match(new RegExp(`^# ${k} (\\d+)$`, "m"))?.[1] ?? NaN);
+      const pages = existsSync(log) ? readFileSync(log, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
+      resolve({
+        code, signal, pass: count("pass"), fail: count("fail"), skipped: count("skipped"), pages,
+        failing: [...out.matchAll(/^\s*not ok \d+ - (.*)$/gm)].map((m) => m[1]),
+        // a TAP error is often a block (`error: |-` and the message on the lines
+        // below), and the message is the evidence: an assertion, or a timeout
+        errors: [...out.matchAll(/^([ \t]+)error: (?:\|-\n((?:\1[ \t]+.*\n|[ \t]*\n)+)|(.*)$)/gm)]
+          .map((m) => (m[3] ?? m[2] ?? "").replace(/\s+/g, " ").trim().slice(0, 300)).slice(0, 6),
+        browserSkips: [...out.matchAll(/# SKIP.*(playwright is absent|NO PLAYWRIGHT).*$/gm)].map((m) => m[0].slice(0, 160)),
+        skips: [...out.matchAll(/# SKIP(.*)$/gm)].map((m) => m[1].trim().slice(0, 120)),
+        liteStates: liteStatesOf(out),
+      });
+    });
+  });
+}
+
+for (const rel of SWEPT) {
+  test(`AT ${RATE}× CPU: ${rel} is green, on real pages, every one throttled`, { timeout: 26 * 60_000 }, async (t) => {
+    if (IN_CANDLE) return t.skip(CANDLE_EXCLUSION);
+    if (!chromium) return t.skip(`${NO_PLAYWRIGHT} — the ${RATE}× sweep of ${rel} went UNGUARDED`);
+    const r = await runThrottled(rel);
+    const own = OWN_RATE[rel];
+    const atRate = r.pages.filter((p) => p.throttle === RATE && p.clock === "held").length;
+    const atOwn = own ? r.pages.filter((p) => p.throttle === own.throttle && p.clock === own.clock).length : 0;
+    t.diagnostic(`${rel}: pass ${r.pass} · fail ${r.fail} · skipped ${r.skipped} · pages ${r.pages.length} (${atRate} at ${RATE}× held clock`
+      + (own ? `, ${atOwn} on its own set machine (clock ${own.clock}, throttle ${own.throttle})` : "") + `) · exit ${r.code ?? r.signal}`
+      + (r.skips.length ? ` · skips: ${r.skips.join(" | ")}` : ""));
+    // WLD-150 D1b: the child's lite-state lines, forwarded BEFORE any assertion so a red child cannot cut them off;
+    // informational only (nothing below reads it), and labelled as the CHILD's, not the direct run's
+    if (r.liteStates.seen) t.diagnostic(`lite-state forwarded by this sweep from the CHILD run of ${rel} under the ${RATE}× sweep (not the direct run): `
+      + JSON.stringify(r.liteStates.records) + (r.liteStates.seen > r.liteStates.records.length ? ` · ${r.liteStates.seen - r.liteStates.records.length} more not forwarded` : ""));
+    else if (rel === LITE_STATE_CHILD) t.diagnostic(`lite-state UNAVAILABLE: the CHILD run of ${rel} under the ${RATE}× sweep printed no lite-state line (it may have failed before the slow case, or the line is missing); no cause is implied`);
+    assert.deepEqual(r.failing, [], `red at ${RATE}× CPU: ${r.failing.join(" | ")} — ${r.errors.join(" | ")}`);
+    assert.deepEqual(r.browserSkips, [], "a page test skipped for want of the browser, so nothing was proved");
+    assert.equal(r.code, 0, `the child exited ${r.code ?? r.signal}`);
+    assert.ok(r.pass > 0, "the child passed nothing");
+    assert.ok(r.pages.length > 0, "the file opened no page through the helper, so the throttle reached nothing");
+    assert.equal(atRate + atOwn, r.pages.length, `every page at ${RATE}× on the held clock${own ? `, or on the file's own set machine` : ""}: ${JSON.stringify(r.pages)}`);
+    if (own) assert.ok(atOwn > 0, `${rel}'s own-machine case ran (clock ${own.clock}, throttle ${own.throttle})`);
+  });
+}

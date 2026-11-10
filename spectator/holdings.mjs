@@ -1,10 +1,10 @@
 // holdings.mjs — LOGOS v2 part 2 on the World page (POS-678): what a holder
 // holds, where a carried thing stands, and the say card's numbers.
 //
-// THE PAGE READS WHAT THE RESIDENT READS. Every function here takes an answer
+// THE PAGE READS WHAT THE RESIDENT READS. Every reader here takes an answer
 // the office already gives a resident (at MCP, or through the same doors over
 // HTTP) and turns it into what the page says. None of them invents a number,
-// and none asks for a wider read than the resident's:
+// and none asks for a wider read than the resident's. The exports:
 //
 //   holderLines(focus)               the close look at a mark, world { mark: id }:
 //                                    `holder` { capacity, open } and `holds`
@@ -22,8 +22,21 @@
 //                                    or inside a holder, never at a place.
 //   sayCardNote(sources)             the say card's sentence, from the say
 //                                    class's dials as the office reads them.
-//   isThingKind(cls, lineage)        a kind of thing is a thing, by its class
-//                                    chain (a halloween-candy-bowl extends thing).
+//   isThingKind(cls, { chain,        a kind of thing is a thing, by its class
+//     pointer })                     chain (a halloween-candy-bowl extends thing)
+//                                    or by the office's `class_pointer`.
+//
+// …and the helpers beside them:
+//
+//   heldIdOf(h)                      a held thing's id, from a mark row `{ id }`,
+//                                    a world_holdings row `{ thing }`, or a bare id
+//   holdingParts(lines, { nameOf })  a holding (the lines above) as plain `head`,
+//                                    `items` and `open` for the column to build
+//   isThingId(id)                    a thing's id is `<by>/<slug>`; a resident is
+//                                    a bare handle
+//   thingKindLedger()                what the page has learned about which kinds
+//                                    are things: a small stateful ledger fed by
+//                                    close looks and class-chain answers
 //
 // COUNTS ARE BLUR (LOGOS/classes.md § The transfer edge, ruled 2026-10-16
 // 15:46–15:48): "a read gives it at the nearest common class, and investigate
@@ -33,7 +46,9 @@
 //
 // Browser-pure, no DOM: the column writes what these return as text.
 
-/** A positive integer, or null: a count the office did not give is never 0. */
+/** A non-negative integer (0 included), or null. A count the office left out
+ *  (undefined) or gave as anything but a whole number is null. Note that
+ *  Number() reads null, "" and false as 0, so those come back 0, not null. */
 const countOf = (n) => (Number.isInteger(Number(n)) && Number(n) >= 0 ? Number(n) : null);
 const plural = (n, one, many = `${one}s`) => (n === 1 ? one : many);
 
@@ -216,10 +231,11 @@ export function sayCardNote({ dials = null, conversations = null } = {}) {
 // ── A KIND OF THING IS A THING ───────────────────────────────────────────────
 
 /**
- * Whether a mark's class is thing or a kind of thing. `lineage` is either the
- * class chain's names (the fold's class marks, `classChain`) or the office's
+ * Whether a mark's class is thing or a kind of thing. The second argument is
+ * `{ chain, pointer }`, whichever the page holds: `chain` is the class chain's
+ * names (the fold's class marks, `classChain`), `pointer` the office's
  * `class_pointer` ("kind: halloween-candy-bowl · a thing · a sited — explain: …",
- * office class-read.mjs § classPointer), whichever the page holds.
+ * office class-read.mjs § classPointer).
  */
 export function isThingKind(cls, { chain = null, pointer = null } = {}) {
   if (cls === "thing") return true;
@@ -255,6 +271,8 @@ export function thingKindLedger() {
     /** whether the class chain should be asked for this kind, now */
     shouldAsk(kind) { return !!kind && kind !== "thing" && known.get(kind) !== true && !asked.has(kind); },
     asking(kind) { asked.add(kind); },
+    /** asked of the class layer and not yet answered: the reply is in flight, or it failed (a failed reply is no answer and is not asked again) */
+    pending(kind) { return !!kind && asked.has(kind) && !known.has(kind); },
     /** the chain's answer: the whole extends list, as explain gives it */
     fromChain(kind, chain) { if (kind && known.get(kind) !== true) known.set(kind, isThingKind(kind, { chain })); },
   };

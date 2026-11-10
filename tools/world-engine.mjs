@@ -173,32 +173,111 @@ export function buildHeightfield({ controlPoints, power = DIALS.idw_power, k = D
   // paths against the original sort.
   const grid = cps.length > GRID_MIN_POINTS && cps.every((c) => Number.isFinite(c.x) && Number.isFinite(c.y))
     ? buildGrid(cps, K) : null;
+  // ── OUT OF RINGS: ASK THE OCCUPIED CELLS, NOT EVERY POINT (WLD-144 / W5) ──
+  //
+  // A sample far from every cell used to run out of rings and take scanAll,
+  // visiting every control point (after a ring walk that had already looked up
+  // (2·maxRing+1)² empty cells). Opening eyes at ten times the town spent 175 of
+  // its 177 seconds there, and the cost grows with the town: dearer per sample,
+  // more samples. So the out-of-rings answer now comes from an index over the
+  // OCCUPIED cells only: a binary tree whose leaves are the occupied cells and
+  // whose every node carries the bounding box of the points under it, built
+  // lazily on the first far sample so a telling that never goes far pays nothing.
+  //
+  // It is the same selection, not an approximation. The search walks nearest
+  // box first and offers every point of every leaf it enters to the SAME beat
+  // (offer), so the (distance, index) order, the ties and the exact-hit shortcut
+  // are the beat's and the sort's. The stop rule is the ring walk's, restated for
+  // boxes: a box is skipped only when the nearest the box could possibly be is
+  // STRICTLY farther than the K-th distance held. Equal is never skipped, so a
+  // point tying the last seat with a lower index is still offered and still wins,
+  // as the stable sort had it. The box's distance is computed with the very
+  // operations offer uses (a difference, a square, a sum) on the box's own edge
+  // coordinates, which are the extreme coordinates of points actually in it, and
+  // rounding is monotone, so the computed bound can never exceed the computed
+  // distance of a point inside; no hair of margin is needed. K that the beat does
+  // not support (not a whole number of at least 1) keeps the full scan.
+  const farOk = Number.isInteger(K) && K >= 1;
+  let far = null;
+  function farSearch(x, y) {
+    if (!far) far = buildFarIndex(cps, grid.lists);
+    n = 0;
+    farVisit(far, 0, x, y);
+    return weigh();
+  }
+  function farVisit(f, node, x, y) {
+    const l = f.left[node];
+    if (l < 0) {
+      const cell = f.cells[f.cellOf[node]];
+      for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
+      return;
+    }
+    const r = f.right[node];
+    const dl = farBound(f, l, x, y), dr = farBound(f, r, x, y);
+    if (dl <= dr) {
+      if (n < K || !(dl > bestD2[K - 1])) farVisit(f, l, x, y);
+      if (n < K || !(dr > bestD2[K - 1])) farVisit(f, r, x, y);
+    } else {
+      if (n < K || !(dr > bestD2[K - 1])) farVisit(f, r, x, y);
+      if (n < K || !(dl > bestD2[K - 1])) farVisit(f, l, x, y);
+    }
+  }
   function elevationAt(x, y) {
     if (!grid || !Number.isFinite(x) || !Number.isFinite(y)) return scanAll(x, y);
     const { size, cells, maxRing } = grid;
     const cx = Math.floor(x / size), cy = Math.floor(y / size);
+    // a sample whose own cell index is past GRID_RING_INDEX is not walked at all
+    // (see the constant): it is answered from the occupied cells, or by the scan
+    // for a k the far search is not asked for
+    if (Math.abs(cx) > GRID_RING_INDEX || Math.abs(cy) > GRID_RING_INDEX) return farOk ? farSearch(x, y) : scanAll(x, y);
+    // the rings reach cx±maxRing, cy±maxRing: when that window misses every
+    // occupied cell the walk would find nothing and fall to the full scan
+    if (farOk && (cx + maxRing < grid.minGx || cx - maxRing > grid.maxGx || cy + maxRing < grid.minGy || cy - maxRing > grid.maxGy)) return farSearch(x, y);
     n = 0;
     for (let r = 0; r <= maxRing; r += 1) {
       for (let gx = cx - r; gx <= cx + r; gx += 1) {
         const edgeX = gx === cx - r || gx === cx + r;
+        const column = cells.get(gx);
+        if (!column) continue;
         for (let gy = cy - r; gy <= cy + r; gy += (edgeX || r === 0) ? 1 : 2 * r) {
-          const cell = cells.get(gx * GRID_KEY_SPAN + gy);
+          const cell = column.get(gy);
           if (cell) for (let m = 0; m < cell.length; m += 1) offer(cell[m], x, y);
         }
       }
+      // nothing in the nearest cells at all: a sample in the empty between (the
+      // marks and their outliers) is not going to be answered by walking more
+      // empty rings, so go to the occupied cells now
+      if (n === 0 && r === GRID_EMPTY_RINGS && farOk) return farSearch(x, y);
       if (n < K) continue;
       // the nearest a point outside the rings walked so far can be, less a
       // hair for the rounding in the division that filed each point in a cell
       const edge = Math.min(x - (cx - r) * size, (cx + r + 1) * size - x, y - (cy - r) * size, (cy + r + 1) * size - y) - size * 1e-9;
       if (edge > 0 && bestD2[K - 1] < edge * edge) return weigh();
     }
-    return scanAll(x, y);
+    return farOk ? farSearch(x, y) : scanAll(x, y);
   }
   return { elevationAt, controlPoints: cps };
 }
 
 const GRID_MIN_POINTS = 64;       // below this the full scan is already cheap
-const GRID_KEY_SPAN = 1 << 21;    // cell (gx, gy) → one number key; a collision only merges two cells, never loses one
+const GRID_EMPTY_RINGS = 1;       // rings 0..1 (a 3×3 block of cells) holding no point at all send a sample straight to the occupied cells
+// The ring walk is for cell indices a double counts in exactly and a margin can
+// cover. Past 2^19 (about half a million cells from the origin) a sample goes to
+// the occupied-cell search, which has no ring loops and no edge to round. Three
+// things go wrong in the walk past it, at cell indices no real sample has (the
+// cell is at least 1 m, so this is a coordinate of at least 524 km, and the engine's
+// own frame, world_scale_extent_m, is 50 km): the stop rule's margin (1e-9 of a
+// cell) is outgrown by the rounding in x - (cx - r) * size once |cx| is a few
+// million (rounding near 2^-52 of |cx| cells), and the loop variable stops
+// advancing at 2^53 (gx + 1 === gx), which is where main's walk never returned.
+const GRID_RING_INDEX = 2 ** 19;
+// The cells are filed by (gx, gy) exactly: a Map of columns, each a Map of cells.
+// They used to be filed under the single number gx * 2^21 + gy, which a double
+// holds exactly only while it stays under 2^53 (a cell index under 2^32) and
+// while no two cells' gy differ by 2^21; past that two cells shared a key, the
+// ring walk read a list twice and offered a point more than once (WLD-144, Bevel).
+// An answer anywhere the old key was exact is unchanged: the walk visits the same
+// cells in the same order, a column that holds nothing is skipped whole.
 // The cell is sized off the middle half of the points (the interquartile box
 // in x and in y), so the 96 km outliers cannot stretch it, to hold about K/4 of
 // them — measured on the town's 627 points over twenty tellings, ~350 m cells
@@ -210,14 +289,88 @@ function buildGrid(cps, K) {
   const area = Math.max(1, iqr(cps.map((c) => c.x)) * iqr(cps.map((c) => c.y)));
   const size = Math.max(1, Math.sqrt((area * K) / cps.length));
   const maxRing = Math.max(2, Math.floor((Math.sqrt(cps.length / 2) - 1) / 2));
-  const cells = new Map();
+  const cells = new Map(), lists = [];
+  let minGx = Infinity, maxGx = -Infinity, minGy = Infinity, maxGy = -Infinity;   // the occupied cells' span, for the far search
   for (let i = 0; i < cps.length; i += 1) {
-    const key = Math.floor(cps[i].x / size) * GRID_KEY_SPAN + Math.floor(cps[i].y / size);
-    let cell = cells.get(key);
-    if (!cell) cells.set(key, (cell = []));
+    const gx = Math.floor(cps[i].x / size), gy = Math.floor(cps[i].y / size);
+    if (gx < minGx) minGx = gx;
+    if (gx > maxGx) maxGx = gx;
+    if (gy < minGy) minGy = gy;
+    if (gy > maxGy) maxGy = gy;
+    let column = cells.get(gx);
+    if (!column) cells.set(gx, (column = new Map()));
+    let cell = column.get(gy);
+    if (!cell) { column.set(gy, (cell = [])); lists.push(cell); }
     cell.push(i);
   }
-  return { size, cells, maxRing };
+  return { size, cells, lists, maxRing, minGx, maxGx, minGy, maxGy };
+}
+
+// The far index (WLD-144): a binary tree over the OCCUPIED cells. A leaf is one
+// occupied cell and carries the bounding box of the points actually in it; an
+// inner node carries the union of its children's boxes. Nodes are split on the
+// wider axis at the median of the leaves' box centres, so the tree is balanced
+// (depth about log2 of the occupied cells) however the points are spread.
+function buildFarIndex(cps, lists) {
+  const m = lists.length;
+  const lMinX = new Float64Array(m), lMaxX = new Float64Array(m), lMinY = new Float64Array(m), lMaxY = new Float64Array(m);
+  for (let c = 0; c < m; c += 1) {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const i of lists[c]) {
+      const p = cps[i];
+      if (p.x < x0) x0 = p.x;
+      if (p.x > x1) x1 = p.x;
+      if (p.y < y0) y0 = p.y;
+      if (p.y > y1) y1 = p.y;
+    }
+    lMinX[c] = x0; lMaxX[c] = x1; lMinY[c] = y0; lMaxY[c] = y1;
+  }
+  const total = 2 * m - 1;
+  const f = {
+    minX: new Float64Array(total), maxX: new Float64Array(total), minY: new Float64Array(total), maxY: new Float64Array(total),
+    left: new Int32Array(total).fill(-1), right: new Int32Array(total).fill(-1), cellOf: new Int32Array(total).fill(-1),
+    cells: lists,
+  };
+  const order = Int32Array.from({ length: m }, (_, c) => c);
+  let used = 0;
+  function make(lo, hi) {
+    const id = used; used += 1;
+    if (hi - lo === 1) {
+      const c = order[lo];
+      f.minX[id] = lMinX[c]; f.maxX[id] = lMaxX[c]; f.minY[id] = lMinY[c]; f.maxY[id] = lMaxY[c];
+      f.cellOf[id] = c;
+      return id;
+    }
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (let s = lo; s < hi; s += 1) {
+      const c = order[s];
+      if (lMinX[c] < x0) x0 = lMinX[c];
+      if (lMaxX[c] > x1) x1 = lMaxX[c];
+      if (lMinY[c] < y0) y0 = lMinY[c];
+      if (lMaxY[c] > y1) y1 = lMaxY[c];
+    }
+    f.minX[id] = x0; f.maxX[id] = x1; f.minY[id] = y0; f.maxY[id] = y1;
+    const wide = (x1 - x0) >= (y1 - y0);
+    const edgeLo = wide ? lMinX : lMinY, edgeHi = wide ? lMaxX : lMaxY;
+    order.subarray(lo, hi).sort((p, q) => (edgeLo[p] + edgeHi[p]) - (edgeLo[q] + edgeHi[q]) || p - q);
+    const mid = (lo + hi) >> 1;
+    f.left[id] = make(lo, mid);
+    f.right[id] = make(mid, hi);
+    return id;
+  }
+  make(0, m);
+  return f;
+}
+
+// The least squared distance from (x, y) to anything inside a node's box,
+// computed with the same three operations (difference, square, sum) that offer
+// uses on a point, so that it never exceeds the distance offer computes for any
+// point the box holds (rounding is monotone in each operation).
+function farBound(f, node, x, y) {
+  let dx = 0, dy = 0;
+  if (x < f.minX[node]) dx = f.minX[node] - x; else if (x > f.maxX[node]) dx = x - f.maxX[node];
+  if (y < f.minY[node]) dy = f.minY[node] - y; else if (y > f.maxY[node]) dy = y - f.maxY[node];
+  return dx * dx + dy * dy;
 }
 
 // ───────────────────────── radial helpers ──────────────────────────────────
@@ -281,11 +434,14 @@ export function fogModel(crossing, dials = DIALS) {
 //              pinned as dated config. It is never derived from what the record
 //              happens to draw today, because a border that moved with the
 //              record would re-tell past crossings.
-//   clearings_m  [{ id, x, y, r_m }]  clear ground the wall never takes: a
-//              household's land standing far past the border keeps a circle of
-//              open air round it (ruled 2026-10-09). Elsewhere the wall may
-//              cover a household's marks as it creeps (WLD-38, 2026-10-12).
-//              Clearings do not creep.
+//   clearings_m  [{ id, x, y, r_m, from_crossing? }]  clear ground the wall
+//              never takes: a household's land standing far past the border
+//              keeps a circle of open air round it (ruled 2026-10-09). Elsewhere
+//              the wall may cover a household's marks as it creeps (WLD-38,
+//              2026-10-12). Clearings do not creep. A clearing with a
+//              from_crossing stands from that crossing on; before it the wall
+//              is as it was, so adding one never re-tells a past crossing
+//              (WLD-134, Darko 2026-10-30).
 //   fringe_m   the translucent haze on the clear side of the wall
 //   wall_sight_m  how far a body standing INSIDE the wall can see
 //   schedule   [{ crossing, front_m, veil }, …] in crossing order. front_m is
@@ -294,15 +450,25 @@ export function fogModel(crossing, dials = DIALS) {
 //              the map; negative means it has pulled back past the edge. veil
 //              [0..1] is the share of all light the Mists take (lightLevelAt).
 //              Between two entries both move linearly; after the last they hold.
-//   density    { from, to, power }  the fringe's thickness where it meets the
-//              wall, eased from the schedule's first crossing to its last:
-//              from + (to − from) · u^power, u the share of the span gone. A
-//              power above 1 thickens slowly at first and faster as the last
-//              crossing nears.
+//   density    { from, to, power, from_crossing?, to_crossing? }  the fringe's
+//              thickness where it meets the wall, eased from the schedule's first
+//              crossing to its last: from + (to − from) · u^power, u the share of
+//              the span gone. A power above 1 thickens slowly at first and faster
+//              as the last crossing nears. A density that names its own
+//              from_crossing and to_crossing eases over THAT span instead (WLD-147:
+//              the withdrawal appends keyframes, and an easing that followed the
+//              last keyframe would stretch and so re-tell every crossing already told).
+//   withdrawn_from  the first crossing with NO MISTS AT ALL (WLD-147, Darko
+//              2026-11-02 17:06 EST: "full removal for mists"). From it mistsAt
+//              answers null, whatever the schedule says after it. Absent, the
+//              Mists never end and the last keyframe holds, as before.
 //
 // BEFORE THE SCHEDULE'S FIRST CROSSING THERE ARE NO MISTS: mistsAt answers null,
-// and every reader then answers exactly as it did before the Mists existed. Like
-// the weather, it is a pure function of the crossing number, so replay holds.
+// and every reader then answers exactly as it did before the Mists existed. FROM
+// `withdrawn_from` ON THERE ARE NONE AGAIN, and the answer is the same null, so
+// the telling of every crossing from then on is the one a town with no Mists in
+// its record gives, byte for byte (tools/mists-withdrawn.test.mjs). Like the
+// weather, it is a pure function of the crossing number, so replay holds.
 //
 // THE WALL OCCLUDES EVERYTHING BEHIND IT. It has no ceiling and no height
 // exemption, and a signal's light does not cut it: no sight line that passes
@@ -327,20 +493,23 @@ export function mistsAt(crossing, mists) {
   if (!sched.length || !b || ![b.minX, b.minY, b.maxX, b.maxY].every(Number.isFinite)) return null;
   const c = crossing | 0;
   if (c < sched[0].crossing) return null;                    // before the dial: no Mists at all
+  if (Number.isFinite(mists.withdrawn_from) && c >= mists.withdrawn_from) return null;   // WLD-147: withdrawn, no Mists at all
   let i = 0;
   while (i + 1 < sched.length && sched[i + 1].crossing <= c) i += 1;
   const a = sched[i], z = sched[i + 1] ?? a;
   const t = z === a ? 0 : (c - a.crossing) / (z.crossing - a.crossing);
   const fa = sidesOf(a.front_m), fz = sidesOf(z.front_m);
   const front = Object.fromEntries(SIDES.map((s) => [s, lerpN(fa[s], fz[s], t)]));
-  // the density's own eased curve over the whole schedule
-  const first = sched[0].crossing, last = sched[sched.length - 1].crossing;
-  const u = last > first ? Math.max(0, Math.min(1, (c - first) / (last - first))) : 1;
+  // the density's own eased curve over the whole schedule, or over the span its own record names (WLD-147)
   const d = mists.density ?? {};
+  const first = Number.isFinite(d.from_crossing) ? d.from_crossing : sched[0].crossing;
+  const last = Number.isFinite(d.to_crossing) ? d.to_crossing : sched[sched.length - 1].crossing;
+  const u = last > first ? Math.max(0, Math.min(1, (c - first) / (last - first))) : 1;
   const power = Number(d.power) > 0 ? Number(d.power) : 1;
   const density = clamp01(lerpN(Number(d.from) || 0, Number(d.to ?? d.from) || 0, Math.pow(u, power)));
   const clearings = (Array.isArray(mists.clearings_m) ? mists.clearings_m : [])
     .filter((k) => [k?.x, k?.y, k?.r_m].every(Number.isFinite) && k.r_m > 0)
+    .filter((k) => !(Number.isFinite(k.from_crossing) && c < k.from_crossing))   // not yet parted: the wall as it was (WLD-134)
     .map((k) => ({ id: k.id ?? null, x: k.x, y: k.y, r: k.r_m }));
   return {
     crossing: c,
@@ -442,16 +611,11 @@ export function mistsStride(s, d) {
 // stamped pace is always a number a reader can divide by.
 export const MISTS_STRIDE_FLOOR = 1e-4;
 
-/** The Mists on one leg, read once at its declaration: `null` when there are no
- *  Mists this crossing; otherwise `{ refused }` for a road that ends in the wall
- *  or crosses it (with the point where it meets the wall), or `{ factor, deepest }`
- *  — the leg's even stride as a share of the open road's, and how deep into the
- *  fringe it goes (0 untouched, toward 1 at the wall's face). */
 // HACK (jetto): the old track north, walked like a road. Don't ask.
 // These boxes are only for the feet: the mist is still there, you still see
 // 20 m in it, nothing is drawn. From crossing 272.
-const KEPT_AIR_SINCE = 272;
-const KEPT_AIR = [
+export const KEPT_AIR_SINCE = 272;   // exported so the office can NAME the track in a refusal (it reads, never copies)
+export const KEPT_AIR = [
   { minX: 3690, maxX: 3770, minY: -5340, maxY: -3340 },
   { minX: 3690, maxX: 3912, minY: -5586, maxY: -5300 }, // widened to the servants' door (3902, -5575.5): Darko, WLD-6/b
 ];
@@ -465,6 +629,11 @@ function onKeptAir(p, crossing) {
 // office builds it from the walker's enter stack with shelterOf). It follows entering, never standing: with no
 // shelter the road is read exactly as before. And it is shelter only for a road that STARTS inside it: walking
 // in from outside is the Mists as ever (review-shelter #1), so a road whose start is unsheltered reads as before.
+/** The Mists on one leg, read once at its declaration: `null` when there are no
+ *  Mists this crossing; otherwise `{ refused }` for a road that ends in the wall
+ *  or crosses it (with the point where it meets the wall), or `{ factor, deepest }`
+ *  — the leg's even stride as a share of the open road's, and how deep into the
+ *  fringe it goes (0 untouched, toward 1 at the wall's face). */
 export function mistsRoad(from, toward, crossing, mists, { shelter = null } = {}) {
   const m = mistsAt(crossing, mists);
   if (!m) return null;
@@ -617,10 +786,12 @@ export function lodScore({ extentM, distM, weight = 0, dials = DIALS, dimming = 
 // observer: { x, y, name? }
 // world:    { marks, terrain, heightfield, light, fogCeilingM } — marks are the
 //           FOLDED marks (id, kind, at, extent, weight, body, signal?, household).
-// opts:     { crossing, budget, keep }   keep: a mark id carried beyond the budget when visible
+// opts:     { crossing, budget, keep, atFeet }   keep: a mark id carried beyond the budget when visible
+//           atFeet: a Set of the mark ids of the things at the observer's feet (WLD-74 E4: the caller's
+//           measure, openYourEyes's), candidates at any distance and seated first within the budget (E5)
 // Returns a structured telling: the observer's state, the ranked visible marks
 // grouped by bearing→band, far-features on the horizon, and the aggregate tail.
-export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null, frame = null } = {}) {
+export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null, frame = null, atFeet = null } = {}) {
   const { marks, terrain, heightfield, light, fogCeilingM } = world;
   const fog = fogModel(crossing, dials);
   // the Mists (POS-466): null before the schedule's first crossing, and then
@@ -688,11 +859,19 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     if (markExtent(mk) >= dials.world_scale_extent_m) continue; // the world-root is the frame — establishing line, not a list item
     const dx = mk.at.x - observer.x, dy = mk.at.y - observer.y;
     const distM = Math.hypot(dx, dy);
-    if (distM > dials.max_sight_m) continue;                // compute cull (bounds cost)
-    // standing on it — orient() covers "here". The one exception is the acting
+    // A THING AT YOUR FEET IS ADMITTED FROM WHERE YOU STAND (WLD-74 G1, Wright 2026-11-06 02:15Z: "for the
+    // at-feet ids only, max-sight, fog/Mists and line-of-sight admission use the resident's own point"): its
+    // footprint holds you, so its centre's distance or a rise before it never drops it. Its centre still
+    // places and ranks it (distM, bearing, score below); every other mark is admitted at its centre as ever.
+    const seenAt = atFeet?.has(mk.id) ? { x: observer.x, y: observer.y } : mk.at;
+    const seenM = seenAt === mk.at ? distM : 0;
+    if (seenM > dials.max_sight_m) continue;                // compute cull (bounds cost)
+    // standing on it — orient() covers "here". The exceptions are the acting
     // resident's own home (`keep`): standing at its centre is being at home, and
-    // the bare read must still carry it (WLD-9). Every other mark stays skipped.
-    if (distM < 1e-6 && mk.id !== keep) continue;
+    // the bare read must still carry it (WLD-9); and a thing at your feet
+    // (`atFeet`, WLD-74 E4): standing on a bowl is not being in it, so it stays an
+    // object you see and reach. Every other mark stays skipped.
+    if (distM < 1e-6 && mk.id !== keep && !atFeet?.has(mk.id)) continue;
     // angular size uses the mark's true SILHOUETTE span (its visible width from
     // here) when it carries a fine shape; a plain rect falls back to max(w,h) —
     // byte-identical for every current record (none carry a points: ring).
@@ -708,9 +887,9 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     // Mists, neither the wall nor the fringe's reach, for a reader standing inside it (`cover`, above the
     // loop: an entered mark you stand outside shelters nothing). `shelter` is the caller's test (the engine defines no
     // containment of its own): openYourEyes builds it from the reader's enter stack.
-    const mistHidden = !!mists && !cover?.(mk.at) && (mistsHide(observer, mk.at, mists)
-      || distM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
-    const fogHidden = distM > reach || mistHidden;
+    const mistHidden = !!mists && !cover?.(seenAt) && (mistsHide(observer, seenAt, mists)
+      || seenM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
+    const fogHidden = seenM > reach || mistHidden;
 
     // darkness dimming: a non-signal, non-luminous mark at the dark end is dim
     // the unveiled light ranks (it is the light there was before the Mists, bit
@@ -723,7 +902,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 
     // terrain occlusion (the FOV over the heightfield) — every lean honored from
     // `dials` so a dev-pane override changes the sightline too, not just the ranking
-    const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
+    const los = lineOfSight({ from: observer, to: seenAt, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
     const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
     bareScore.set(mk.id, lodScore({ extentM, distM, weight: 0, dials, dimming: rankDimming }));
@@ -736,9 +915,10 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       elevM: +targetH.toFixed(1), aboveFogTarget: targetH >= fogCeilingM,
       occluded: !los.visible, occludeAt: los.occludeAt, dim: +dimming.toFixed(2), score,
       visible,
-      // the resident is standing ON this mark (only the acting home can get this far): the
-      // telling says HERE, not a bearing and "0 m"
-      ...(distM < 1e-6 ? { here: true } : {}),
+      // the resident is standing ON their kept home: the telling says HERE, not a bearing and
+      // "0 m". The kept home's flag ALONE (WLD-74): a thing at your feet gets this far too, and
+      // is told here by the at-feet relation (world-verbs.mjs § renderTelling), never by this
+      ...(distM < 1e-6 && mk.id === keep ? { here: true } : {}),
       ...(mists ? { mistHidden } : {}),
     });
   }
@@ -779,7 +959,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   // rest folded into a clusteredCount you `investigate` to open. This is the LOD
   // law — top-level marks at distance, descend with proximity or attention.
   const ranked = seen.filter((s) => s.visible).sort((a, b) => b.score - a.score);
-  const { collapsed, carried, tail } = seatsOf(ranked, { keep, budget, dials, count: true });
+  const { collapsed, carried, tail } = seatsOf(ranked, { keep, budget, dials, count: true, atFeet });
 
   // THE LANDMARK LIFT (POS-632 G2, Darko 2026-10-14: "a place in view is flagged
   // landmark when its weight, not its size, puts it there"). The counterfactual,
@@ -792,7 +972,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   // so re-sorting the weighted order would let the stamps break a weight-0 tie
   // (review-217 § 4)
   const bareRanked = seen.filter((s) => s.visible).sort((a, b) => bareScore.get(b.id) - bareScore.get(a.id));
-  const bareSeated = new Set(seatsOf(bareRanked, { keep, budget, dials, count: false }).carried.map((s) => s.id));
+  const bareSeated = new Set(seatsOf(bareRanked, { keep, budget, dials, count: false, atFeet }).carried.map((s) => s.id));
   for (const s of carried) if (!bareSeated.has(s.id)) s.lifted = true;
   const tailByBearing = {};
   for (const t of tail) tailByBearing[t.bearing] = (tailByBearing[t.bearing] ?? 0) + 1;
@@ -824,14 +1004,15 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 // carry the kept home plus the first `budget` of the rest. `count` writes each
 // rep's clusteredCount (the real pass); the landmark lift's counterfactual pass
 // asks with count: false, so it never touches a row.
-function seatsOf(ranked, { keep, budget, dials, count }) {
+function seatsOf(ranked, { keep, budget, dials, count, atFeet = null }) {
   const repByHh = new Map();
   const collapsed = [];
   for (const s of ranked) {
     const far = s.distM > dials.cluster_beyond_m;
     // the acting home is never folded into (or made the rep of) its household's cluster: it
-    // is carried alone below, and the rest of the household clusters without it (WLD-9)
-    if (far && s.household && !s.signal && s.id !== keep) {
+    // is carried alone below, and the rest of the household clusters without it (WLD-9). A thing at
+    // your feet is not far, whatever its centre's distance: it goes on to the seats below (WLD-74 E5)
+    if (far && s.household && !s.signal && s.id !== keep && !atFeet?.has(s.id)) {
       const rep = repByHh.get(s.household);
       if (rep) { if (count) rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
       repByHh.set(s.household, s);
@@ -845,7 +1026,11 @@ function seatsOf(ranked, { keep, budget, dials, count }) {
   // the home sits at its own rank among them. It never makes a hidden mark
   // visible; the tail and the counts below describe what is left.
   const kept = keep == null ? null : collapsed.find((s) => s.id === keep) ?? null;
-  const rest = kept ? collapsed.filter((s) => s !== kept) : collapsed;
+  const others = kept ? collapsed.filter((s) => s !== kept) : collapsed;
+  // THE THINGS AT YOUR FEET GO FIRST IN THE BUDGET (WLD-74 E5, Wright 2026-11-05 04:48),
+  // after the kept home: they take the first seats and count toward the `budget`, and
+  // anything past it goes to the tail like any mark. Ordering, never an exemption.
+  const rest = atFeet?.size ? [...others.filter((s) => atFeet.has(s.id)), ...others.filter((s) => !atFeet.has(s.id))] : others;
   const seats = new Set(rest.slice(0, budget));
   const carried = collapsed.filter((s) => s === kept || seats.has(s));
   return { collapsed, carried, tail: rest.slice(budget) };

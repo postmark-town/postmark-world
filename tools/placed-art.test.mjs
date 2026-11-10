@@ -34,6 +34,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { placedArtSVG, SPECTATOR_DRAW_DEFAULTS, isRegionMark } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
@@ -249,7 +250,7 @@ before(async () => {
 
 /** open the page, settle the drawing, and read the art layer */
 async function readArt({ zoomIn = 0, stopAtTier = null } = {}) {
-  const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+  const page = await machinePage(browser, { viewport: { width: 1400, height: 900 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });
@@ -369,7 +370,7 @@ async function readArt({ zoomIn = 0, stopAtTier = null } = {}) {
 
 /** the SHAPE of what the placed-art layer drew, per mark — ringed or boxed */
 const pageShape = async () => {
-  const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+  const page = await machinePage(browser, { viewport: { width: 1400, height: 900 } });
   await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
@@ -693,7 +694,7 @@ test("[pin] the hit rect is opt-in, carries the id, and nothing else hung gets o
 
 test("THE PAGE — clicking a region's hung picture at far opens its column", async (t) => {
   if (!chromium) { t.skip("NO PLAYWRIGHT — the region click and its column went UNGUARDED."); return; }
-  const page = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+  const page = await machinePage(browser, { viewport: { width: 1400, height: 900 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
   await page.goto(`http://localhost:${port}/`, { waitUntil: "domcontentloaded", timeout: 90_000 });
