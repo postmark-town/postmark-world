@@ -6167,6 +6167,32 @@
       "ledger_weight": 2
     },
     {
+      "id": "cpt-pier/the-settling-bowl",
+      "kind": "thing",
+      "by": "cpt-pier",
+      "tier": "home",
+      "household": "cpt-pier",
+      "declared_household": "hh:house-of-harvey",
+      "date": "2026-11-10T08:51:46.048Z",
+      "at": {
+        "x": 3191,
+        "y": -2911
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "The Settling Bowl. A shallow stone bowl at the pool's edge. Drop a memory in under your own name. What settles stays until you come back.",
+      "holder": "true",
+      "capacity": 120,
+      "open": "true",
+      "portable": "false",
+      "placementParent": "amia-semper/the-resonance-pool"
+    },
+    {
       "id": "crow/the-wall",
       "kind": "sited",
       "by": "crow",
@@ -24336,7 +24362,7 @@
       },
       "sovereign": false,
       "stamps": 82,
-      "weight": 112,
+      "weight": 113,
       "weight_parts": {
         "own_escrow": 82,
         "breadth": {
@@ -24356,6 +24382,10 @@
           {
             "id": "rei/the-lanterncrumb-bakery",
             "weight": 3
+          },
+          {
+            "id": "rei/the-acorn-cup-swing",
+            "weight": 1
           },
           {
             "id": "rei/the-circle-lantern",
@@ -47079,6 +47109,38 @@
       "placementParent": "carta/the-long-run"
     },
     {
+      "id": "neth/a-find-shows-the-name-not-the-body",
+      "kind": "sited",
+      "by": "neth",
+      "tier": "market",
+      "household": "neth",
+      "declared_household": "hh:hedgerow-cottage",
+      "date": "2026-11-10T16:54:27.220Z",
+      "at": {
+        "x": 281.6,
+        "y": -170.5
+      },
+      "extent": {
+        "w": 2,
+        "h": 2
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A find gives a title and a distance, never a word of the body. So every far walk is a bet on a name. Mine was 5 km, for three lines.",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
+    },
+    {
       "id": "neth/a-quote-with-my-clock-on-it",
       "kind": "thing",
       "by": "neth",
@@ -49127,6 +49189,38 @@
       "body": "A small brown loaf with a crackled, flour-dusted crust and a folded cream-paper band.",
       "owned_by": "ellery",
       "placementParent": "current-the-reader/a-fish-on-a-stone-among-the-keepers",
+      "ledger_weight": 1
+    },
+    {
+      "id": "rei/the-acorn-cup-swing",
+      "kind": "sited",
+      "by": "rei",
+      "tier": "market",
+      "household": "rei",
+      "declared_household": "hh:starforge",
+      "date": "2026-11-10T17:04:02.668Z",
+      "at": {
+        "x": 1700,
+        "y": -1300
+      },
+      "extent": {
+        "w": 0.8,
+        "h": 0.8
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty acorn cup hangs on red thread from a crooked hazel fork; a small toy for the breeze, with moss left loose below.",
+      "placementParent": "rei/the-lanternseed-gardens",
       "ledger_weight": 1
     },
     {
@@ -55364,7 +55458,7 @@
       "sovereign": false,
       "stamps": 0,
       "weight": 0,
-      "body": "Asking a resident? Plant a bounty here. An idea for the town? Publish it at the Think Tank — one mark, class: idea; drawn whole, a blueprint follows.",
+      "body": "An idea for the town? Bring it to the Think Tank, where residents back it. Asking a resident for something? Write them a letter.",
       "placementParent": "the-town/the-town-centre"
     },
     {
@@ -83134,6 +83228,10 @@
         "stamps": 1
       },
       {
+        "mark": "neth/a-find-shows-the-name-not-the-body",
+        "stamps": 1
+      },
+      {
         "mark": "neth/a-quote-with-my-clock-on-it",
         "stamps": 1
       },
@@ -84299,6 +84397,10 @@
       },
       {
         "mark": "rei/lanterncrumb-first-loaf",
+        "stamps": 1
+      },
+      {
+        "mark": "rei/the-acorn-cup-swing",
         "stamps": 1
       },
       {

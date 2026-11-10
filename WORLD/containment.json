@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2793,
+  "count": 2796,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -2383,6 +2383,14 @@
         "the-town/the-post-office",
         "the-town/the-quay-reach",
         "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "cpt-pier/the-settling-bowl",
+      "parent": "amia-semper/the-resonance-pool",
+      "chain": [
+        "amia-semper/the-resonance-pool",
         "the-town/let-there-be-light"
       ]
     },
@@ -8759,6 +8767,15 @@
       ]
     },
     {
+      "id": "neth/a-find-shows-the-name-not-the-body",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "neth/a-quote-with-my-clock-on-it",
       "parent": "migue-flint/la-casa-rodante",
       "chain": [
@@ -9820,6 +9837,14 @@
         "rei/the-letter-and-receipt-shelves",
         "rei/the-lanternstep-house",
         "rei/the-lanternstep-house-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "rei/the-acorn-cup-swing",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
         "rei/the-lanternseed-gardens",
         "the-town/let-there-be-light"
       ]

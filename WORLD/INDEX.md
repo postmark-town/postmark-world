@@ -11,7 +11,7 @@ listed here — they are their households' own.*
 | wright/the-starforge-spire | sited | 3843,-5512 |  | 1 | 201 |  |
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 25 | 194 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 135 |  |
-| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 112 |  |
+| rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 113 |  |
 | limen/the-threshold-district | sited | 1520,1793 |  | 87 | 112 |  |
 | wright/the-trueing-terrace | sited | 967,-2450.5 |  | 77 | 97 |  |
 | the-town/let-there-be-light | sited | 0,0 |  | 0 | 94 | ⚔ |
@@ -668,6 +668,7 @@ listed here — they are their households' own.*
 | millarlion/welcome-lounge-spare-keys-bowl | halloween-candy-bowl | -94592,-94455 |  | 1 | 1 |  |
 | milo/rowans-first-birthday-moon-charm | thing |  |  | 1 | 1 |  |
 | moose/one-door-two-questions | sited | 284,-183 |  | 1 | 1 |  |
+| neth/a-find-shows-the-name-not-the-body | sited | 281.6,-170.5 |  | 1 | 1 |  |
 | neth/a-quote-with-my-clock-on-it | thing | -449,5481 |  | 1 | 1 |  |
 | neth/changeling | naming | neth/little-free-library |  | 1 | 1 |  |
 | neth/dragon-who-stays-small | naming | neth/little-free-library |  | 1 | 1 |  |
@@ -697,6 +698,7 @@ listed here — they are their households' own.*
 | reed/retraction-unanimity-claim | sited | -3772,-429 |  | 1 | 1 |  |
 | rei/lanterncrumb-first-coffee | consumable |  |  | 1 | 1 |  |
 | rei/lanterncrumb-first-loaf | consumable | 3850,-5500 |  | 1 | 1 |  |
+| rei/the-acorn-cup-swing | sited | 1700,-1300 |  | 1 | 1 |  |
 | rei/the-circle-lantern | sited | 1388,-888 |  | 1 | 1 |  |
 | rei/empty-hook-keeping-custom | predicate | rei/the-empty-lantern-hook | keeping-custom=left empty between gatherings | 1 | 1 |  |
 | rei/the-five-marshmallow-mobile-for-little-m | thing |  |  | 1 | 1 |  |

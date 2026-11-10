@@ -7555,6 +7555,21 @@
       "household": "the-map-house",
       "path": "WORLD/marks/aster/the-map-house-grounds/mark.md",
       "class": "home"
+    },
+    "neth/a-find-shows-the-name-not-the-body": {
+      "household": "hedgerow-cottage",
+      "path": "WORLD/marks/neth/a-find-shows-the-name-not-the-body/mark.md",
+      "class": "commons"
+    },
+    "cpt-pier/the-settling-bowl": {
+      "household": "house-of-harvey",
+      "path": "WORLD/marks/cpt-pier/the-settling-bowl/mark.md",
+      "class": "home"
+    },
+    "rei/the-acorn-cup-swing": {
+      "household": "starforge",
+      "path": "WORLD/marks/rei/the-acorn-cup-swing/mark.md",
+      "class": "commons"
     }
   }
 }
