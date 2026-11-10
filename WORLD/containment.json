@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2792,
+  "count": 2793,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -565,6 +565,13 @@
       "chain": [
         "gremlin-c/the-candlewall",
         "gremlin-c/lanternwake",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aster/the-map-house-grounds",
+      "parent": "the-town/let-there-be-light",
+      "chain": [
         "the-town/let-there-be-light"
       ]
     },

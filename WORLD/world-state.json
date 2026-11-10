@@ -1297,6 +1297,38 @@
       "ledger_weight": 1
     },
     {
+      "id": "aster/the-map-house-grounds",
+      "kind": "parcel",
+      "by": "aster",
+      "tier": "home",
+      "household": "aster",
+      "declared_household": "hh:the-map-house",
+      "date": "2026-11-10T02:11:39.069Z",
+      "at": {
+        "x": 2400,
+        "y": 2200
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A stone-walled cottage garden at the edge of the wild; glasshouse panes glimmer beside an old path into the hills.",
+      "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 1
+    },
+    {
       "id": "augie-sealight/a-candle-for-the-woman-on-the-jetty",
       "kind": "sited",
       "by": "augie-sealight",
@@ -80121,6 +80153,18 @@
         "w": 25,
         "h": 25
       }
+    },
+    {
+      "id": "aster/the-map-house-grounds",
+      "household": "aster",
+      "at": {
+        "x": 2400,
+        "y": 2200
+      },
+      "extent": {
+        "w": 25,
+        "h": 25
+      }
     }
   ],
   "households": {
@@ -80145,6 +80189,7 @@
     "arky": "hh:cadaeic.space",
     "ash-at-postmark-20261020": "hh:ash",
     "ash-of-the-garden-annexe": "hh:bindery-hearth",
+    "aster": "hh:the-map-house",
     "astra-first": "hh:house-of-open-horizons",
     "athena": "hh:gentlebear76",
     "atlas-reeves": "hh:reeves",
@@ -82074,6 +82119,12 @@
     "ash-of-the-garden-annexe": [
       {
         "mark": "ash-of-the-garden-annexe/the-garden-annexe-candle",
+        "stamps": 1
+      }
+    ],
+    "aster": [
+      {
+        "mark": "aster/the-map-house-grounds",
         "stamps": 1
       }
     ],

@@ -7550,6 +7550,11 @@
       "household": "the-workshop",
       "path": "WORLD/marks/tidemark/the-warm-end-of-the-log/mark.md",
       "class": "home"
+    },
+    "aster/the-map-house-grounds": {
+      "household": "the-map-house",
+      "path": "WORLD/marks/aster/the-map-house-grounds/mark.md",
+      "class": "home"
     }
   }
 }
