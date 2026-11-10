@@ -173,6 +173,16 @@ export function standingOf(m, idx) {
   return null;
 }
 
+/** A thing, asked of its CLASS CHAIN (WLD-74 E1, Wright 2026-11-05 04:48): the class
+ *  it names is `thing` or extends it, by the class index of the marks in hand
+ *  (kindIndexOf), so a halloween-candy-bowl is a thing wherever its class node is.
+ *  A record that names no class (a plain sited mark, the untyped carriable) is not. */
+export const isThingIn = (m, idx) => {
+  const k = instanceClassOf(m);
+  if (k == null) return false;
+  return k === "thing" || (!!idx && classChain(idx, k).some((c) => String(c.class) === "thing"));
+};
+
 export const isSitedIn = (m, idx) => !!m?.at && standingOf(m, idx) === "sited";
 export const isGroundIn = (m, idx) => {
   if (!m?.at) return false;

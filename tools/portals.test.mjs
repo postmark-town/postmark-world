@@ -527,12 +527,35 @@ test("THE GATE: a room with no path out is an ADVISORY now (21:13): the lint say
 import { loadMarks } from "./marks-fold.mjs";
 import { declaredRoomIds, roomsOverlap } from "./portals.mjs";
 
+// THE PAIR COMES FROM S144'S OWN TREE, NOT TODAY'S. The dish and the runner are market marks, and a maker may
+// withdraw a mark at any crossing: the S159 window withdrew the dish (its maker's WITHDRAW record), and while this
+// test read the pair from today's tree it went red on a world nobody had broken (c30b89d1, suite run 42507981329).
+// The crossing S144 refused on is a commit, and a commit cannot drift. So the two mark files, and the root that
+// frames them, are copied out of the commit settlement/S144 names and loaded by the real loader: the pair stands
+// exactly where S144 saw it. The Spire is still read from today's tree, because WLD-135 is a fact about the Spire now.
+const S144 = "8ed486ed8a20323428bc1461cb0ee78a17e78650";   // settlement/S144^{commit}
+const DISH = "gremlin-c/compaction-cake-dish", RUNNER = "wright/spire-gilded-vestibule-runner";
+
+function marksAtS144() {
+  const dir = mkdtempSync(join(tmpdir(), "portals-s144-")); SCRATCH.push(dir);
+  for (const rel of ["let-there-be-light", DISH, RUNNER]) {   // a directory under WORLD/marks; for the pair it is also the id
+    let text;
+    try { text = execFileSync("git", ["-C", join(HERE, ".."), "show", `${S144}:WORLD/marks/${rel}/mark.md`], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); }
+    catch (e) { assert.fail(`the S144 pair is read from S144's commit ${S144.slice(0, 8)} (settlement/S144), and this checkout cannot read ${rel} there: ${String(e.stderr || e.message).trim()}`); }
+    mkdirSync(join(dir, rel), { recursive: true });
+    writeFileSync(join(dir, rel, "mark.md"), text);
+  }
+  return new Map(loadMarks(dir).filter((m) => m && !m._error).map((m) => [m.id, m]));
+}
+
 test("S144 on the real marks: the dish and the runner overlap, the Spire is no dungeon and declares no rooms (WLD-135), and nothing is refused and nothing is excepted", () => {
   const marks = loadMarks(join(HERE, "..", "WORLD", "marks")).filter((m) => m && !m._error);
   const byId = new Map(marks.map((m) => [m.id, m]));
-  const dish = byId.get("gremlin-c/compaction-cake-dish"), runner = byId.get("wright/spire-gilded-vestibule-runner");
+  const atS144 = marksAtS144();
+  const dish = atS144.get(DISH), runner = atS144.get(RUNNER);
   const spire = byId.get("wright/the-starforge-spire");
-  assert.ok(dish && runner && spire, "the S144 marks are in the tree");
+  assert.ok(dish && runner, "the S144 pair is in S144's tree");
+  assert.ok(spire, "the Spire is in today's tree");
   assert.ok(roomsOverlap(dish, runner), "control: the dish really does lie partly on the runner (the finding S144 was refused on)");
   // until 2026-11-01 this asserted "the Spire declares its rooms" (its `rooms` named the vestibule and 21 more). WLD-135,
   // RULED by Darko 2026-11-01 18:24 EST (verbatim: "agreed on the 121 call"), agreeing to Wright's recommendation "The
@@ -541,7 +564,9 @@ test("S144 on the real marks: the dish and the runner overlap, the Spire is no d
   assert.equal(portals.isDungeon(spire), false, "the Spire is no dungeon (WLD-135)");
   assert.deepEqual(declaredRoomIds(spire).ids, [], "and declares no rooms, so no room rule of its own can refuse the S144 shape");
   assert.deepEqual(portalFindings(marks).filter((f) => f.sev === "ERROR"), []);
-  // and the rule still bites on the real ground: put the Spire back as a dungeon declaring the two, and the S144 finding returns
-  const bitten = marks.map((m) => (m === spire ? { ...m, kind: "dungeon", rooms: [dish.id, runner.id] } : m));
+  // and the rule still bites on the real ground: stand S144's pair on today's marks (in place of whatever of it is there
+  // now), put the Spire back as a dungeon declaring the two, and the S144 finding returns
+  const ground = [...marks.filter((m) => m.id !== DISH && m.id !== RUNNER), dish, runner];
+  const bitten = ground.map((m) => (m === spire ? { ...m, kind: "dungeon", rooms: [dish.id, runner.id] } : m));
   assert.deepEqual(portalFindings(bitten).filter((f) => f.rule === "rooms-do-not-overlap").map((f) => f.mark), [dish.id < runner.id ? dish.id : runner.id]);
 });

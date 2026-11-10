@@ -271,6 +271,8 @@ export function thingKindLedger() {
     /** whether the class chain should be asked for this kind, now */
     shouldAsk(kind) { return !!kind && kind !== "thing" && known.get(kind) !== true && !asked.has(kind); },
     asking(kind) { asked.add(kind); },
+    /** asked of the class layer and not yet answered: the reply is in flight, or it failed (a failed reply is no answer and is not asked again) */
+    pending(kind) { return !!kind && asked.has(kind) && !known.has(kind); },
     /** the chain's answer: the whole extends list, as explain gives it */
     fromChain(kind, chain) { if (kind && known.get(kind) !== true) known.set(kind, isThingKind(kind, { chain })); },
   };

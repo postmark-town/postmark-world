@@ -11,8 +11,9 @@
 // from here is a known able machine: 16 cores, 8 GB, and a clock held still
 // within one task (holdClockWithinATask, below), so the bake reads instant while
 // time still moves between tasks for timers, frames and crossings. A test whose
-// subject IS the machine says so: `machine: { cores: 4, … }`, or `clock: "real"`
-// with a `throttle` for a slow first bake (tools/lite-mode.test.mjs). A test that
+// subject IS the machine says so: `machine: { cores: 4, … }`, or `clock: "slow"`
+// for a slow first bake (tools/lite-mode.test.mjs: SLOW_CLOCK_K, below), or
+// `clock: "real"` for the real one. A test that
 // wants a mode rather than a machine passes `?lite=0` / `?lite=1` on its URL.
 //
 // THE HOSTILE HOST, ON PURPOSE. WORLD_PAGE_CPU_THROTTLE=<rate> throttles every
@@ -22,8 +23,8 @@
 //
 //   WORLD_PAGE_CPU_THROTTLE=4 node --test tools/room-feather.test.mjs
 //
-// A context given its own `throttle` keeps it (the slow-machine case is measured
-// at the rate it names, whatever the run's).
+// A context given its own `throttle` keeps it (a case that names its machine keeps
+// that machine, whatever the run's rate).
 //
 // THE READS. readsSettled(page) waits until every fetch the page has made has
 // answered and every body it read has been read, twice across a task: the boot's
@@ -65,6 +66,34 @@ export const holdClockWithinATask = () => {
   };
 };
 
+// THE SLOW MACHINE, SET THE SAME WAY (WLD-170). The held clock is the infinitely fast
+// machine; this is the slow one, and it is just as little the host's: a first bake
+// that takes `ms` of real work within a task reads `ms * k`, whatever the host's
+// speed, so "slower than 3 ms per 1,000 px" is a fact about k and the work, not a
+// race the host wins or loses (a CPU throttle of 6 still measured the host: a fast
+// runner was not slow enough, and a loaded one was too slow to finish).
+//
+// Within a task the clock runs k times fast; between tasks it runs at the real rate
+// (a machine that is k times slower at WORK still waits out a timer in real time,
+// so timers, frames and crossings keep their real spacing). At the task's end the
+// stretch it added is carried forward, so the clock never steps back and never
+// jumps at a task boundary: monotonic, and a reading across tasks is the real
+// elapsed time plus every task's extra. Runs IN THE PAGE; `k` arrives as the
+// init script's argument.
+export const SLOW_CLOCK_K = 10;
+export const slowClockWithinATask = (k) => {
+  const realNow = performance.now.bind(performance);
+  let extra = 0, taskStart = null;
+  performance.now = () => {
+    const real = realNow();
+    if (taskStart === null) {
+      taskStart = real;
+      queueMicrotask(() => { extra += (k - 1) * (realNow() - taskStart); taskStart = null; });
+    }
+    return real + extra + (k - 1) * (real - taskStart);
+  };
+};
+
 // the cores and memory the page reads off navigator. Runs IN THE PAGE.
 const setMachine = ({ cores, memory }) => {
   Object.defineProperty(Navigator.prototype, "hardwareConcurrency", { get: () => cores, configurable: true });
@@ -99,15 +128,16 @@ export const stripComments = (src) => src.split("\n")
   .map((line) => line.replace(/\s\/\/\s.*$/, ""))
   .join("\n");
 
-/** A browser context on a SET machine. `clock`: "held" (the default) or "real";
+/** A browser context on a SET machine. `clock`: "held" (the default), "slow" (SLOW_CLOCK_K) or "real";
  *  `machine`: the cores and memory navigator reports; `throttle`: a CPU rate for
  *  every page it opens (default: the run's WORLD_PAGE_CPU_THROTTLE). Every other
  *  option is Playwright's own newContext option (viewport, reducedMotion, …). */
 export async function machineContext(browser, { clock = "held", machine = ABLE_MACHINE, throttle = cpuThrottle(), ...options } = {}) {
-  if (clock !== "held" && clock !== "real") throw new Error(`clock: "held" or "real", not ${JSON.stringify(clock)}`);
+  if (clock !== "held" && clock !== "slow" && clock !== "real") throw new Error(`clock: "held", "slow" or "real", not ${JSON.stringify(clock)}`);
   if (!(Number.isFinite(machine?.cores) && Number.isFinite(machine?.memory))) throw new Error("machine: { cores, memory }, both numbers");
   const ctx = await browser.newContext(options);
   if (clock === "held") await ctx.addInitScript(holdClockWithinATask);
+  if (clock === "slow") await ctx.addInitScript(slowClockWithinATask, SLOW_CLOCK_K);
   await ctx.addInitScript(setMachine, { cores: machine.cores, memory: machine.memory });
   await ctx.addInitScript(trackReads);
   // the throttle is put on each page as it is opened, before anything loads in it

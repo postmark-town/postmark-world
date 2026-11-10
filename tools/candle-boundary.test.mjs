@@ -1,5 +1,6 @@
-// candle-boundary.test.mjs — the 4× page sweep runs in CI and `npm test`, never in
-// the settlement candle (WLD-71; Wright's independent review 2026-10-30 11:38).
+// candle-boundary.test.mjs — the 4× page sweep never runs in the settlement candle
+// (WLD-71; Wright's independent review 2026-10-30 11:38). Since WLD-170 it runs in
+// its own advisory workflow (throttle-advisory.yml), not in `npm test` either.
 //
 //   node --test tools/candle-boundary.test.mjs
 //
@@ -8,14 +9,17 @@
 //      runs it, over a private suite that records its own environment: the child it
 //      starts carries WORLD_CANDLE_RUN=1 even when the caller inherited CI=true and
 //      npm_lifecycle_event=test, and its [pin] test is still withheld.
-//   2. THE SWEEP. tools/page-throttle-sweep.test.mjs, run as its own process behind a
+//   2. THE SWEEP. tools/page-throttle-sweep.advisory.mjs, run as its own process behind a
 //      preload that (a) answers `import("playwright")` with a recording fake and (b)
 //      records and refuses every child_process spawn. With the candle's flag it
-//      imports no browser, launches none and starts no child, and its 23 throttled
+//      imports no browser, launches none and starts no child, and its 25 throttled
 //      tests skip as a CANDLE EXCLUSION. Without the flag, under the same inherited CI
-//      and npm names, it does probe and does dispatch all 23: the ordinary run keeps
-//      the sweep. The fakes stand where a browser and 23 children would, so nothing
-//      heavy runs here.
+//      and npm names, it does probe and does dispatch all 25: the ordinary run keeps
+//      the sweep. The fakes stand where a browser and 25 children would, so nothing
+//      heavy runs here. (22 page tests at WLD-71; 24 with POS-779's
+//      tools/conversation-pages.test.mjs and WLD-74's resident card, which the sweep's
+//      census requires; 25 with POS-945's tools/in-town-by-mail.test.mjs; the count
+//      moves with page-throttle-sweep's SWEPT, one test per listed file.)
 // Every nested run drops NODE_TEST_CONTEXT and must report nonzero TAP counts, so a
 // run that quietly tested nothing cannot pass as an exclusion.
 
@@ -26,10 +30,10 @@ import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, exis
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { CANDLE_ENV } from "./run-candle-suites.mjs";
+import { CANDLE_ENV, suiteFiles } from "./run-candle-suites.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SWEEP = join(ROOT, "tools", "page-throttle-sweep.test.mjs");
+const SWEEP = join(ROOT, "tools", "page-throttle-sweep.advisory.mjs");
 
 /** a caller's environment as CI or npm would hand it on: never the candle's flag
  *  unless asked, never the parent runner's channel */
@@ -72,6 +76,26 @@ test("THE RUNNER: the crossing's child carries the candle's flag, over an inheri
   assert.equal(JSON.parse(readFileSync(out, "utf8")).candle, null, "outside the runner, CI=true and npm_lifecycle_event=test set no flag");
 });
 
+// WLD-170: THE ROUTE OUT. Both the settlement-blocking suite and the candle enumerate tools/*.test.mjs, so the sweep's
+// name is outside that suffix, and neither can pick it up. The candle's list is read for real (suiteFiles, the
+// function it runs); `npm test`'s glob is a text pin, labelled so, with a control that the same read DOES see a
+// .test.mjs.
+test("THE CANDLE'S LIST: the sweep is not among the suites the crossing runs, and a .test.mjs is (the control)", () => {
+  const listed = suiteFiles().map((f) => f.split(/[\\/]/).pop());
+  assert.ok(listed.includes("candle-boundary.test.mjs"), "the control: the candle's list holds a .test.mjs file, this one");
+  assert.ok(!listed.includes("page-throttle-sweep.advisory.mjs"), "the candle cannot pick the sweep up");
+  assert.equal(listed.some((f) => /throttle-sweep/.test(f)), false, "no spelling of the sweep is in the candle's list");
+});
+
+test("[pin] npm test's glob is tools/*.test.mjs, which the sweep's name does not match, and the advisory workflow runs it", () => {
+  const scripts = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).scripts;
+  assert.equal(scripts.test, 'node --test "tools/*.test.mjs"', "the blocking suite's selector");
+  assert.equal(/\.test\.mjs$/.test("page-throttle-sweep.advisory.mjs"), false, "the sweep's name is outside the selector");
+  assert.equal(scripts["test:throttle"], "node --test tools/page-throttle-sweep.advisory.mjs", "its own script");
+  const wf = readFileSync(join(ROOT, ".github", "workflows", "throttle-advisory.yml"), "utf8");
+  assert.match(wf, /npm run test:throttle/, "the advisory workflow runs the sweep");
+});
+
 /** the sweep, run as its own process behind the recording preload; what it imported,
  *  launched and spawned, and its TAP */
 function sweepUnderFakes(flag) {
@@ -111,23 +135,23 @@ function sweepUnderFakes(flag) {
 
 test("THE SWEEP IN THE CANDLE: with the flag, over an inherited CI and npm, it imports no browser, launches none, starts no child, and says why", () => {
   const r = sweepUnderFakes(true);
-  // nonzero, and the module's own: 24 tests counted and all 23 throttled ones reported by (22 at WLD-71, 23 with POS-945's page test)
-  // name, so this is an exclusion and not an empty run
-  assert.ok(r.tests >= 24, `the sweep module ran (tests ${r.tests})`);
-  assert.equal(r.swept.length, 23, "all 23 throttled tests reported");
+  // nonzero, and the module's own: 26 tests counted (the census and the 25 throttled ones; the 25th is POS-945's page test) and all 25
+  // throttled ones reported by name, so this is an exclusion and not an empty run
+  assert.ok(r.tests >= 26, `the sweep module ran (tests ${r.tests})`);
+  assert.equal(r.swept.length, 25, "all 25 throttled tests reported");
   assert.deepEqual(r.swept.filter((s) => !(s.ok && /# SKIP CANDLE EXCLUSION/.test(s.line))).map((s) => s.line), [],
     "each one skipped as the candle's exclusion, by name");
   assert.equal(r.tap.match(/# SKIP.*(?:playwright is absent|NO PLAYWRIGHT)/g)?.length ?? 0, 0, "no skip claims a missing browser");
   assert.deepEqual(r.seen, [], "no playwright import, no launch, no child process");
 });
 
-test("THE SWEEP OUTSIDE THE CANDLE: without the flag, the same inherited CI and npm names leave it on — it probes, and dispatches all 23", () => {
+test("THE SWEEP OUTSIDE THE CANDLE: without the flag, the same inherited CI and npm names leave it on — it probes, and dispatches all 25", () => {
   const r = sweepUnderFakes(false);
-  assert.ok(r.tests >= 24, `the sweep module ran (tests ${r.tests})`);
-  assert.equal(r.swept.length, 23, "all 23 throttled tests reported");
+  assert.ok(r.tests >= 26, `the sweep module ran (tests ${r.tests})`);
+  assert.equal(r.swept.length, 25, "all 25 throttled tests reported");
   assert.equal(r.tap.match(/# SKIP CANDLE EXCLUSION/g)?.length ?? 0, 0, "nothing is excluded as the candle");
   assert.deepEqual(r.seen.slice(0, 2), [{ import: "playwright" }, { launch: "chromium" }], "the browser was asked for");
   const dispatched = r.seen.filter((s) => s.dispatch).map((s) => s.file);
-  assert.equal(dispatched.length, 23, `one child per throttled test was started (intercepted here): ${dispatched.length}`);
+  assert.equal(dispatched.length, 25, `one child per throttled test was started (intercepted here): ${dispatched.length}`);
   assert.deepEqual([...new Set(dispatched)].sort(), [...new Set(r.swept.map((s) => s.file))].sort(), "and each for its own file");
 });

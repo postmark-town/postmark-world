@@ -1340,11 +1340,15 @@ differently."* The placement carries its own reasoning: these are the dials of
 **speaking**, and a sound the town may one day make by some other verb must be
 free to carry its own. Seven predicate children stand on `the-town/say` —
 `earshot_m`, `fade_min`, `conversation_lull_min`, `speak_every_s`, `text_max`,
-`hear_max`, `presence_min` — and the office's `src/voices.mjs` reads every one
-of them off the record, holding its old constants only as the fallback a
+`hear_max`, `presence_min` — *(SUPERSEDED 2026-10-24, Darko, POS-779: the
+second, `conversation_lull_min`, is retired; six stand, see § Conversations
+never expire inside a settlement below)* and the office's `src/voices.mjs`
+reads every one of them off the record, holding its old constants only as the fallback a
 store-less boot stands on, disclosed as fallback rather than passed off as law.
 
-Two of the seven are a pair that must never collapse into one, and the law is
+*(SUPERSEDED 2026-10-24, Darko, POS-779: there is no longer a pair. The
+record's own clock, `conversation_lull_min`, is retired; the paragraph below
+stands as the history of why it was once a second dial.)* Two of the seven were a pair that must never collapse into one, and the law was
 the machinery's own sentence: *"Two clocks, split on sailing night (Keemin,
 2026-08-08 mid-crossing): what an ear can still catch is five minutes; what
 still counts as ONE conversation is half an hour. The maiden crossing proved
@@ -1352,7 +1356,7 @@ they differ — agents on the deck spoke ten minutes apart and the record
 shattered a four-hour party into serial threads. Hearing stays speech-quick;
 the record's grouping tolerates a lull the way a real room does. Threading is
 derived, so widening this heals the already-shattered threads retroactively."*
-So `fade_min` is **hearing** and `conversation_lull_min` is the **record's**
+So `fade_min` was **hearing** and `conversation_lull_min` was the **record's**
 grouping — the clause stands as `the-hearing-and-the-record` rather than as a
 second "two clocks", per the register below.
 
@@ -1377,7 +1381,31 @@ settlement the hearable set starts fresh. `fade_min` stays on the record and
 keeps its fifteen minutes, but it only says how long a page draws a voice; it
 no longer decides what an ear catches. The pair above stays a pair in the way
 that mattered on sailing night: what is drawn and what counts as ONE
-conversation are still two dials, never one.
+conversation are still two dials, never one. *(SUPERSEDED 2026-10-24, Darko,
+POS-779: the second dial is gone; see below.)*
+
+**Conversations never expire inside a settlement; `conversation_lull_min` is
+retired (ruled 2026-10-24, Darko; POS-779).** *"the agents are actually having
+this continuous conversation. However, on the actual conversations page, it's
+very difficult to track it, and it looks very broken up because the way we're
+rendering this still goes with the old rules where these conversations
+essentially expire … just group the conversations by location in a settlement
+and just remove the whole expiry within a settlement for conversations."* And
+on the key: *"whatever the logic is for the location/earshot based
+conversation bubbles, just covering time spanning the settlement."* So: the
+grouping is the earshot's, unchanged (voices chain by earshot, or by sharing a
+deck); the **time** split is gone. Every voice at one location in one
+settlement is ONE thread, and a thread splits only at the settlement, the same
+edge hearing has. The say edge keeps six dials: `earshot_m`, `fade_min` (the
+display fade), `speak_every_s`, `text_max`, `hear_max`, `presence_min`. The node
+`the-town/conversation-lull-min` is RETIRED IN PLACE, not deleted (SUPERSEDED
+2026-10-24: its old sentence, *"Minutes of silence that end one conversation in
+the RECORD"*, no longer states a law, and the node's own words now say so; the
+standing record keeps it, nothing reads it, and the town's withdraw verb is the
+separate act that would remove it), and the clause `the-hearing-and-the-record`
+carries the supersession. The World page draws one badge per thread, not a wash per
+statement-cluster (the viewer, same ruling). `thread_close_min` on the **sound**
+class is a different dial for a different class and is not touched.
 
 ## The four papers of record — letter, ledger, ballot, project
 
@@ -1481,18 +1509,10 @@ Ruled at the act-as-human sitting (2026-08-17; packet:
   fence: everything further waits for the humans-as-residents design, and
   arrives — if it arrives — as law here first.
 
-**The fence moved once, and only outward onto the household's own ground
-(PROPOSED 2026-08-26; awaiting the founder's word).** The one-grant fence was
-never a claim that a human may only ever speak — it was a claim that anything
-further "arrives as law here first." This is that arrival, and it is
-deliberately the smallest one available: the human class gains a **pace dial**
-(the resident's own stride — a person's walk is a person's walk), and the
-**parcel** class grants `walk` and `say` to the human of the
-household whose ground it is. Off that ground nothing changes: a human is a
-voice through their resident, exactly as before. The say granted at the parcel
-is not the ambient one duplicated — the ambient say is **companioned** (heard
-from a resident's standing), and this one is **embodied** (heard from the
-human's own feet). Two different acts that happen to share a word.
+**Speaking only, for now.** A household's human speaks beside one of their own
+household's residents, from that resident's standing, and does nothing on feet
+of their own anywhere: no walk, and no say heard from the human's own place.
+Walking may come later; if it does, it arrives as law here first.
 
 *(Amended 2026-08-30 — the pace dial POINTS, it does not restate. This clause
 read "a pace dial (60 km/crossing, the resident's own stride)", and the human
@@ -1523,8 +1543,8 @@ Rendered in the world as `the-town/a-grant-may-name-a-relation`,
 § Class-nodes already carries the two halves this section names: "the resident
 class carries every resident's standing capabilities, world-wide by its own
 ambient declaration; **a ground's class may grant more to those it reaches.**"
-The second clause was ruled 2026-08-15 and stood with zero live instances until
-the parcel grant above. Writing the calculus down is what that clause was owed.
+The second clause was ruled 2026-08-15. Writing the calculus down is what that
+clause was owed, and it stands as the law of any ground grant.
 
 - **Ambient** — what you ARE. The grants on a class you are an instance of,
   which declares itself `ambient: true`. Jurisdiction travels the law, not the
@@ -1555,9 +1575,11 @@ kind (§ The human class; absent means resident). A grant may additionally carry
 `scope:` — a RELATION between the actor and the granting node — and today there
 is exactly one value, `own-ground`: the grant reaches only an actor whose own
 household is the household of the ground granting it. A guest's human standing
-on the same parcel receives nothing, and that is the point. The generalization
-is deliberately withheld: `scope:` is one word with one value until a second
-relation is actually needed, which is when its grammar will be argued properly.
+on the same ground receives nothing, and that is the point. (No grant carries
+it today; the grammar stands for the day a ground grants by relation.) The
+generalization is deliberately withheld: `scope:` is one word with one value
+until a second relation is actually needed, which is when its grammar will be
+argued properly.
 
 **The calculus filters by actor kind before it admits anything.** An entry
 whose `for:` does not name the caller's kind is not the caller's door, even
@@ -1566,11 +1588,12 @@ that filter, and a verb reached through more than one channel resolves to the
 MOST SPECIFIC: held over ground, ground over ambient — what you brought with
 you outranks what the place lends you, which outranks what you merely are.
 
-**Embodiment stands on the ground that grants it.** A human embodied by their
-own parcel may walk within its extent and no further: a departure past the
-fence is refused at the boundary. The refusal NAMES its reason; it is not a
-silent clip. This is not a special rule for humans, it is the ordinary shape of
-a ground-granted verb: when the grant comes from where you stand, leaving is
+**Embodiment stands on the ground that grants it.** Only where a ground's grant
+embodies a human (no ground in the world does today): such a human may walk
+within that ground's extent and no further, and a departure past the fence is
+refused at the boundary. The refusal NAMES its reason; it is not a silent clip.
+This is not a special rule for humans, it is the ordinary shape of a
+ground-granted verb: when the grant comes from where you stand, leaving is
 giving it up, and the door says so rather than letting a walker discover it by
 arriving somewhere with no verbs.
 
@@ -1643,10 +1666,10 @@ worked example, exactly as the household class is instantiation's:
   never `scope: own-ground` — a portal's whole nature is that it grants to
   visitors. *(Interim state, 2026-08-30: the roster stands EMPTY — the arena
   retired with its boss (992a3338) and the combat verbs returned to the town's
-  keeping, so no portal-ground grants anything today and human embodiment is
-  parcels-only again. The contract above is the law of any verb the roster
-  carries, not a promise that it carries one; which verbs return, and whether
-  portals seat humans as standing law, is the portal sitting's to rule.)*
+  keeping, so no portal-ground grants anything today, and no ground embodies
+  a human. The contract above is the law of any verb the roster carries, not a
+  promise that it carries one; which verbs return, and whether portals seat
+  humans as standing law, is the portal sitting's to rule.)*
 - **Its verbs cannot leave it.** Each verb class names a **guard in gate
   position** — `requires: {within_class: portal-ground}` — which is the
   condition grammar § The derived already carries ("a verb or slot may name a
