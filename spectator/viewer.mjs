@@ -6689,6 +6689,14 @@ ${WV_ENTER_CSS}
 .wv-enterexit-lbl { font-size:.68rem; letter-spacing:.13em; text-transform:uppercase; color:var(--dim); }
 .wv-enterexit-room b { color:var(--amber); font-weight:600; }
 #wv-walk-readout { opacity:.75; }
+/* IN TOWN BY MAIL (POS-945): a quiet strip under the painting, capped so a long list scrolls itself and never takes the map */
+.wv-bymail { flex:none; max-height:7.5rem; overflow-y:auto; padding:8px 12px 10px; border-top:1px solid var(--line); background:var(--panel);
+  scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
+.wv-bymail[hidden] { display:none; }
+.wv-bymail-head { margin:0 0 5px; font-size:.68rem; letter-spacing:.13em; text-transform:uppercase; color:var(--dim); font-weight:600; }
+.wv-bymail-list { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:3px 14px; font-size:.82rem; line-height:1.45; }
+.wv-bymail-link { color:var(--amber); text-decoration:none; overflow-wrap:anywhere; }
+.wv-bymail-link:hover, .wv-bymail-link:focus-visible { text-decoration:underline; }
 /* the viewport (P2 right-pane convergence): pan/zoom/lock-on live on the painting */
 /* The painting's controls FLOAT ON THE PAINTING (Keemin, 2026-08-04) — they act
    on what is under them, so they sit on it, in the same family as the coordinate
@@ -7415,6 +7423,12 @@ const MARKUP = `
             <p class="wv-walk-answer" hidden></p>
           </div>
         </section></div>
+      <!-- IN TOWN BY MAIL (POS-945, Darko 2026-11-07: "A list beside the map"). Residents the town has no position for: names only,
+           each to their address page, never a dot on the painting. Hidden until the town's own answer names one. -->
+      <section class="wv-bymail" aria-label="In town by mail" hidden>
+        <h2 class="wv-bymail-head">In town by mail</h2>
+        <ul class="wv-bymail-list"></ul>
+      </section>
     </div>
   </aside>
 </div>
@@ -7814,6 +7828,47 @@ export function withTownBodies(earshot = [], town = []) {
   }
   for (const r of near.values()) if (!seen.has(r.handle)) { seen.add(r.handle); out.push(r); }
   return out;
+}
+
+// ── IN TOWN BY MAIL (POS-945, Darko 2026-11-07 22:06 EST: "A list beside the map") ──
+//
+// Little Bird counted, on Discord 11-07 20:27 EST: residents who have never walked sit on the walkers door at
+// the Origin with `placeholder: true`, and the map leaves them off — 71 of the 356 that evening, 14 of whom had
+// written letters that week. Pidgey found it. They are in town by mail: they have a name and no position.
+//
+// Wright's build shape (11-08 03:08Z): "In town by mail", names only, each linking to their address page.
+// Never a dot at the Origin, and no position made up. A resident leaves the list the moment they have a real
+// position (a walk, a landing or ground). Source the list from what already marks them (the walkers door's
+// placeholder: true), so it can't drift from the map's own rule.
+//
+// So the list is read from the town's raw walkers answer, before anything is filtered to the positioned, and by
+// the flag alone: not a zero coordinate, not the absence of a walk, not earshot. A handle the answer ALSO carries
+// without the flag has a real row, and a real row wins. Pure.
+export function byMailFrom(rows = []) {
+  const mail = new Set(), placed = new Set();
+  for (const w of rows ?? []) {
+    if (!w?.handle || w.handle === TOWN_HANDLE) continue;
+    (w.placeholder === true ? mail : placed).add(String(w.handle));
+  }
+  return [...mail].filter((h) => !placed.has(h)).sort();
+}
+
+/**
+ * The town's rows that are bodies: everything but a row the town flags `placeholder: true` (the Origin's stand-in, not a position).
+ * Taken BEFORE `withTownBodies` keeps one row per handle: it keeps the first, so a flagged row ahead of a real row for the same handle
+ * would otherwise win the dedupe, be dropped afterwards, and leave that resident neither listed nor drawn. Pure.
+ */
+export function placedRows(rows = []) {
+  return (rows ?? []).filter((w) => w?.placeholder !== true);
+}
+
+/** The list's items: a name, linked to their address page where `residentHref` allows one (it refuses what is not a handle), else the name as text. Escaped. Pure. */
+export function byMailHTML(handles = [], { nameOf = (h) => h } = {}) {
+  return (handles ?? []).map((h) => {
+    const name = esc(String(nameOf(h) ?? h));
+    const href = residentHref(h);
+    return href ? `<li><a class="wv-bymail-link" href="${esc(href)}">${name}</a></li>` : `<li>${name}</li>`;
+  }).join("");
 }
 
 // ── A LANDING IS DRAWN WITH THE ROOM (WLD-63 row 68 (b), Darko 2026-10-16) ──
@@ -12230,6 +12285,8 @@ export function mountViewer(appEl) {
   let walkState = {
     at: null,
     walkers: [],
+    // POS-945: the handles the last accepted town answer marks `placeholder: true` (byMailFrom); held across a missed poll
+    byMail: [],
     // the instant of the last landing of the reader this page has drawn (row 68 (b))
     landedIso: null,
     // the reader's own body while it walks, from /world/walkers (null when standing)
@@ -12314,8 +12371,22 @@ export function mountViewer(appEl) {
       if (!r.ok) return;
       const body = await r.json();
       const entries = Object.entries(body?.residents ?? {});
-      if (entries.length) residentsMeta = new Map(entries);
+      if (entries.length) { residentsMeta = new Map(entries); renderByMail(); } // the names the list already shows arrive with the faces
     } catch { /* no faces today; the dots are still the truth */ }
+  }
+  // IN TOWN BY MAIL (POS-945): names only, each linking to their address page; hidden while nobody is. It draws from what the
+  // last accepted town answer said (walkState.byMail) and from nothing else: no position, no count, no letter activity.
+  function renderByMail() {
+    const box = $(root, ".wv-bymail");
+    const list = box && $(box, ".wv-bymail-list");
+    if (!box || !list) return;
+    list.innerHTML = byMailHTML(walkState.byMail, { nameOf: (h) => faceOf(h).name });
+    box.hidden = walkState.byMail.length === 0;
+  }
+  // The same update that accepts a town answer takes its list: a resident with a real row is out of it from that moment.
+  function takeByMail(townRows) {
+    walkState.byMail = byMailFrom(townRows);
+    renderByMail();
   }
 
   // Where the town is talking — the office's own thread derivation (voices.mjs:
@@ -13406,6 +13477,9 @@ export function mountViewer(appEl) {
   }
   if (typeof document !== "undefined") document.addEventListener("visibilitychange", () => { if (!document.hidden) animateWalks(); });
   function takeWalkers(rows) {
+    // POS-945: a resident the town marks `placeholder: true` has no position, only the Origin's stand-in coordinates. They are in
+    // town by mail (the list beside the map), never a body at the Origin: the flag that feeds that list is the map's rule too.
+    rows = placedRows(rows);
     walksPolledMs = Date.now();
     askNewWalkRecords(rows);
     animateWalks();
@@ -13500,7 +13574,10 @@ export function mountViewer(appEl) {
               }
               // the town's bodies, earshot's rows winning for their handles; a
               // town door that does not answer leaves the earshot answer alone
-              const bodies = (await town) ?? [];
+              const answered = await town;
+              if (answered) takeByMail(answered); // POS-945: the same answer that moves the bodies moves the list
+              // the flagged rows leave BEFORE the one-row-per-handle merge below (withTownBodies keeps the first row of a handle)
+              const bodies = placedRows(answered ?? []);
               // A LANDING THIS PAGE DID NOT MAKE (the arrival tick's passage, another
               // tab): the room is read at once, so the scene and the body change in
               // ONE render rather than on two polls 15 s apart (row 68 (b))
@@ -13511,6 +13588,11 @@ export function mountViewer(appEl) {
             }
           }
         } catch { /* a poll miss is silent — the last good reading stands */ }
+      } else {
+        // AN UNPLACED READER (POS-945): no standpoint to ask earshot from, and none is invented. The list needs none: it is the
+        // town's own answer, asked once here as it is above. The bodies stay as they were (nothing is drawn without a standpoint).
+        const answered = await townBodies();
+        if (answered) takeByMail(answered);
       }
       return;
     }
@@ -13531,7 +13613,9 @@ export function mountViewer(appEl) {
         // are people; they are drawn together and told apart by `standing`,
         // which this renderer already understood. The office publishes them
         // under separate keys so `walkers` keeps meaning what it always meant.
-        takeWalkers([...(j.walkers ?? []), ...(j.standing ?? [])]);
+        const townRows = [...(j.walkers ?? []), ...(j.standing ?? [])];
+        if (path === paths[0]) takeByMail(townRows); // /walks, the local-spectator fallback, is not the town's answer and carries no flag
+        takeWalkers(townRows);
         const origin = actorOrigin();
         if (canAct() && origin && walkState.actorBound) {
           const moved = state.cam.x !== origin.x || state.cam.y !== origin.y;
@@ -16964,7 +17048,7 @@ export function mountViewer(appEl) {
             walkState.walkers = withTownBodies(near, walkState.walkers);
             drawWalkers();
             townBodies().then((town) => {
-              if (town && onResidentPath() && state.handle === handle) takeWalkers(withTownBodies(near, town));
+              if (town && onResidentPath() && state.handle === handle) { takeByMail(town); takeWalkers(withTownBodies(near, placedRows(town))); }
             });
           }
         }
