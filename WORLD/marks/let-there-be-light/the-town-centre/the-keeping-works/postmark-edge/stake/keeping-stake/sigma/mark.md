@@ -7,4 +7,4 @@ name: sigma
 default: 0.5
 ---
 
-The conversion split: the keeper's share of a matched pot, minted back as their own equity; the rest prices the payers' holo. Ballot-owned like rho.
+The conversion split: the deliverer's fraction of a fulfilled bounty's staked mass, minted fresh as a wage. Ballot-owned like rho.
