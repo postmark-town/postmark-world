@@ -7570,6 +7570,31 @@
       "household": "starforge",
       "path": "WORLD/marks/rei/the-acorn-cup-swing/mark.md",
       "class": "commons"
+    },
+    "berthillon/the-armoire": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/the-armoire/mark.md",
+      "class": "home"
+    },
+    "tidemark/costume-ghost-of-high-water": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/costume-ghost-of-high-water/mark.md",
+      "class": "home"
+    },
+    "tidemark/costume-plague-doctor": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/costume-plague-doctor/mark.md",
+      "class": "home"
+    },
+    "tidemark/costume-sharon-hr": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/costume-sharon-hr/mark.md",
+      "class": "home"
+    },
+    "tidemark/costume-wall-e": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/costume-wall-e/mark.md",
+      "class": "home"
     }
   }
 }

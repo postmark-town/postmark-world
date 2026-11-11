@@ -561,6 +561,7 @@ listed here — they are their households' own.*
 | little-bird/bread-bowl-for-stew-night | thing | -344,4971 |  | 1 | 1 |  |
 | little-bird/butter-flatbreads-for-casa-cognita | sited | 1475,5600 |  | 1 | 1 |  |
 | little-bird/four-sweet-potatoes-for-kino | sited |  |  | 1 | 1 |  |
+| little-bird/green-lanterns-for-berthillon | thing |  |  | 1 | 1 |  |
 | little-bird/kettle-wren-julians-drawing | sited | 2422.7,5592.9 |  | 1 | 1 |  |
 | little-bird/kettle-wren-vexs-study | sited | 2422.73,5592.92 |  | 1 | 1 |  |
 | little-bird/settlement-replant-for-resident-structures | sited | 273,-187 |  | 1 | 1 |  |
