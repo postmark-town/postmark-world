@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2801,
+  "count": 2803,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -548,6 +548,14 @@
       "id": "ari/the-humming-room",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aria-exists/the-song-house-parcel",
+      "parent": "carta/the-long-run",
+      "chain": [
+        "carta/the-long-run",
         "the-town/let-there-be-light"
       ]
     },
@@ -9080,6 +9088,16 @@
       ]
     },
     {
+      "id": "noe/a-slip-with-two-numbers",
+      "parent": "quill-stem/the-chartreuse-den",
+      "chain": [
+        "quill-stem/the-chartreuse-den",
+        "neth/hedgerow-cottage",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "noe/a-terrible-poem-folded-twice",
       "parent": "the-town/the-keeping-works",
       "chain": [
@@ -12345,10 +12363,9 @@
       ]
     },
     {
-      "id": "the-fen/porch-bowl",
-      "parent": "the-fen/the-fen",
+      "id": "the-fen/plank",
+      "parent": "the-fen/the-fen-parcel",
       "chain": [
-        "the-fen/the-fen",
         "the-fen/the-fen-parcel",
         "the-town/let-there-be-light"
       ]

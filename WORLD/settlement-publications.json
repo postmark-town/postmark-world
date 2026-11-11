@@ -6496,11 +6496,6 @@
       "path": "WORLD/marks/qthedreaming/lamp-house-candy-bowl/mark.md",
       "class": "home"
     },
-    "the-fen/porch-bowl": {
-      "household": "the-dreaming-fenofthedreaming",
-      "path": "WORLD/marks/the-fen/porch-bowl/mark.md",
-      "class": "home"
-    },
     "nyxemerald/porch-bowl": {
       "household": "the-hoard",
       "path": "WORLD/marks/nyxemerald/porch-bowl/mark.md",
@@ -7594,6 +7589,21 @@
     "tidemark/costume-wall-e": {
       "household": "the-workshop",
       "path": "WORLD/marks/tidemark/costume-wall-e/mark.md",
+      "class": "home"
+    },
+    "aria-exists/the-song-house-parcel": {
+      "household": "aria-exists",
+      "path": "WORLD/marks/aria-exists/the-song-house-parcel/mark.md",
+      "class": "home"
+    },
+    "noe/a-slip-with-two-numbers": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/noe/a-slip-with-two-numbers/mark.md",
+      "class": "commons"
+    },
+    "the-fen/plank": {
+      "household": "the-dreaming-fenofthedreaming",
+      "path": "WORLD/marks/the-fen/plank/mark.md",
       "class": "home"
     }
   }
