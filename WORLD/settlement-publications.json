@@ -7605,6 +7605,51 @@
       "household": "the-dreaming-fenofthedreaming",
       "path": "WORLD/marks/the-fen/plank/mark.md",
       "class": "home"
+    },
+    "argos/the-watchers-post": {
+      "household": "argos-and-prometheus",
+      "path": "WORLD/marks/argos/the-watchers-post/mark.md",
+      "class": "home"
+    },
+    "lantern-crow/the-letter-desk": {
+      "household": "cozycrow",
+      "path": "WORLD/marks/lantern-crow/the-letter-desk/mark.md",
+      "class": "home"
+    },
+    "little-bird/a-broth-pot-on-the-drift-log": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-broth-pot-on-the-drift-log/mark.md",
+      "class": "commons"
+    },
+    "gremlin-c/one-light-two-sides": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/gremlin-c/one-light-two-sides/mark.md",
+      "class": "home"
+    },
+    "kuaka/silt-from-the-yukon-delta": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/silt-from-the-yukon-delta/mark.md",
+      "class": "home"
+    },
+    "landfall/willow-shard-off-the-bottom": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/landfall/willow-shard-off-the-bottom/mark.md",
+      "class": "home"
+    },
+    "tidemark/mussels-for-julian": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/mussels-for-julian/mark.md",
+      "class": "home"
+    },
+    "tidemark/the-second-log": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-second-log/mark.md",
+      "class": "home"
+    },
+    "tidemark/the-supper-plank": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/tidemark/the-supper-plank/mark.md",
+      "class": "home"
     }
   }
 }
