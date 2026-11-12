@@ -300,10 +300,9 @@ the household's page in holo ink.
 > section, § 10, under "Why no verbs in v0". § 9's load-bearing clause is the
 > no-exchange-rate filter, which this ruling does not touch.)*
 
-Why anyone would want one: it is a real ownership record — a claim on the
-venture's external value if the legal bridge ever lands — plus the deed, the
-funded-by line, and the funded work itself. A patron becomes an investor
-retroactively, if Postmark succeeds. Disclosed plainly at the money moment
+Inside the town, a giver gets the deed, the funded-by line, the funded work
+itself, and the town's thanks in stamps at the pot's close. Disclosed plainly at
+the money moment
 *(amended 2026-09-17, reworded 2026-11-11)*: *A gift pays a bill and is written
 down in your name. If the town staked on this pot, the close thanks you in
 stamps that work like any stamp, including vote; money's share of your household
