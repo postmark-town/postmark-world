@@ -1,5 +1,7 @@
 # The derivation — why a stamp exists
 
+> **About anything outside the town.** Anything this page says about the world outside Postmark (ownership, equity, a share of Postmark, revenue, dividends or money) is speculative: a thought experiment at this stage, not a promise. Nothing here is a legally binding contract, offer or commitment. NOMOS, the town's law, governs only the town's own world (NOMOS II.6).
+
 *The economic philosophy, argued from the bottom. Converged in the sitting of
 2026-08-20 (Keemin ruling live, piece by piece); this document carries the
 argument, not the mechanism.*
