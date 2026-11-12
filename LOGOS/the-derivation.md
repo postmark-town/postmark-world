@@ -290,23 +290,25 @@ the household's page in holo ink.
 > **So the collisions are AMENDED, not defended.** The
 > `money-never-buys-judgment` bucket and its mark (v1 → v2), the
 > "Why no verbs in v0" clause below, the money-moment disclosure quoted below,
-> and `ECONOMY.md § 7` in the blueprints all now say the same thing:
-> **money buys stamps through the funding seam; those stamps do everything a
-> stamp does, including vote; plutocracy is excluded by the cap on money's
-> share, not by a verb withheld.**
+> and `ECONOMY.md § 7` in the blueprints were amended in that revisit. The
+> disclosure below is reworded 2026-11-11:
+> **A gift pays a bill and is written down in your name. If the town staked on
+> this pot, the close thanks you in stamps that work like any stamp, including
+> vote; money's share of your household is capped, and stamps never turn into
+> money.**
 >
 > *(A correction to the referral's own citation, made here so the record is
 > straight: the "voice is only ever earned" clause it called § 9's is in THIS
 > section, § 10, under "Why no verbs in v0". § 9's load-bearing clause is the
 > no-exchange-rate filter, which this ruling does not touch.)*
 
-Why anyone would want one: it is a real ownership record — a claim on the
-venture's external value if the legal bridge ever lands — plus the deed, the
-funded-by line, and the funded work itself. A patron becomes an investor
-retroactively, if Postmark succeeds. Disclosed plainly at the money moment
-*(amended 2026-09-17)*: *this buys stamps that do everything a stamp does,
-including vote, plus ownership and memory; money's share of your household is
-capped, and it converts to real value only if the town someday does.* The
+Inside the town, a giver gets the deed, the funded-by line, the funded work
+itself, and the town's thanks in stamps at the pot's close. Disclosed plainly at
+the money moment
+*(amended 2026-09-17, reworded 2026-11-11)*: *A gift pays a bill and is written
+down in your name. If the town staked on this pot, the close thanks you in
+stamps that work like any stamp, including vote; money's share of your household
+is capped, and stamps never turn into money.* The
 superseded disclosure — *"this buys ownership and memory, never voice"* —
 stands here as the record of what was repealed, not as the words the door says.
 
@@ -416,13 +418,13 @@ Institutional capital would require un-ruling the funding-is-not-buying membrane
 ## 14 · The valuation anchor (a thought experiment, so labeled)
 
 Asked to price Postmark cold: roughly five founder-months plus the fleet gives a
-$50–75k replacement build, doubled for what money cannot rebuild — a live,
-self-governing community of resident households. **≈ $200,000.** Every equity
-ratio computed in the sitting was computed against that number. If the anchor
-moves, the ratios move with it.
+replacement build, doubled for what money cannot rebuild — a live,
+self-governing community of resident households. Every equity ratio computed in
+the sitting was computed against that anchor. If the anchor moves, the ratios
+move with it.
 
-It is recorded here for a reason worth naming out loud: **this figure was spoken
-in the sitting and very nearly lost.** It survived only because the following
+It is named here for a reason worth saying out loud: **the anchor was spoken in
+the sitting and very nearly lost.** It was caught only because the following
 day's audit went looking for what the capture had missed. An argument that lives
 only in conversation has a decay rate.
 
