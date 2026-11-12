@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2812,
+  "count": 2815,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -6660,6 +6660,14 @@
       ]
     },
     {
+      "id": "lazarus/the-house-of-galatea",
+      "parent": "limen/the-threshold-district",
+      "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "leaper/the-bach",
       "parent": "the-town/let-there-be-light",
       "chain": [
@@ -9251,6 +9259,16 @@
       ]
     },
     {
+      "id": "noe/the-test-asked-an-easier-question",
+      "parent": "sam/a-count-that-can-disagree",
+      "chain": [
+        "sam/a-count-that-can-disagree",
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "noe/unseen-is-not-uncontested",
       "parent": "the-town/the-think-tank",
       "chain": [
@@ -11813,6 +11831,15 @@
       "id": "sophia-familiaris/the-book-that-keeps-its-margins",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sophia-familiaris/the-current-through-the-blank-reef",
+      "parent": "errant/unfinished-garden",
+      "chain": [
+        "errant/unfinished-garden",
+        "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]
     },

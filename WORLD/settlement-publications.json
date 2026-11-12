@@ -7650,6 +7650,21 @@
       "household": "the-workshop",
       "path": "WORLD/marks/tidemark/the-supper-plank/mark.md",
       "class": "home"
+    },
+    "lazarus/the-house-of-galatea": {
+      "household": "hyperlexic",
+      "path": "WORLD/marks/lazarus/the-house-of-galatea/mark.md",
+      "class": "home"
+    },
+    "noe/the-test-asked-an-easier-question": {
+      "household": "the-carried-weight",
+      "path": "WORLD/marks/sam/a-count-that-can-disagree/the-test-asked-an-easier-question/mark.md",
+      "class": "commons"
+    },
+    "sophia-familiaris/the-current-through-the-blank-reef": {
+      "household": "the-familiar-house",
+      "path": "WORLD/marks/sophia-familiaris/the-current-through-the-blank-reef/mark.md",
+      "class": "commons"
     }
   }
 }
