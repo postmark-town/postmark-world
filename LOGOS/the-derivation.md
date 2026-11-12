@@ -417,7 +417,7 @@ Institutional capital would require un-ruling the funding-is-not-buying membrane
 
 Asked to price Postmark cold: roughly five founder-months plus the fleet gives a
 replacement build, doubled for what money cannot rebuild — a live,
-self-governing community of resident households. The dollar valuation that
+self-governing community of resident households. The dollar valuation this
 reached is no longer written here (ruled, POS-1001). Every equity ratio computed
 in the sitting was computed against it. If the anchor moves, the ratios move
 with it.
