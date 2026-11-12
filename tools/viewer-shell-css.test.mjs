@@ -78,8 +78,17 @@ import { MARK_ICON_CSS } from "../spectator/mark-icons.mjs";
 // real spectator/ and tools/, its own `mountViewer` under a stub DOM, the two foreign interpolations masked, hashed), not this test's code.
 // The same script reproduced both digests above on their commits: 94d56a41… (107135 bytes) on main 8a2c13d8 and d50d860c… (107568 bytes)
 // on c78042ec.
-const PINNED_MASKED_STYLE_SHA256 = "ed771ead2b455be7c4544f78986fc77b4fa9082add90e93128cce45159bd05e1";
-const PINNED_MASKED_STYLE_BYTES = 107711;
+//
+// RE-PINNED FOR POS-945 ("In town by mail", the list beside the map), knowingly, over this main (the pin above): STYLE gains the
+// `.wv-bymail*` rules, a one-line comment and six rules over 7 lines, 8 added lines in all, 819 bytes (107711 -> 108530), nothing removed or
+// changed. The pin below is sha256 of the masked STYLE that `spectator/viewer.mjs` of the POS-945 branch merged with main emits, by the same
+// one-off route (the file written beside symlinks to the real spectator/ and tools/, its own `mountViewer` under a stub DOM, the two foreign
+// interpolations masked, hashed), not this test's code and not computed from the code under test at run time. That route reproduced the three
+// digests it is checked against: 94d56a41… (107135 bytes) on the POS-945 merge-base, ed771ead… (107711 bytes, the pin above) on this main,
+// and 37ddf8f8… (107954 bytes, the pin the reviewed head 6f4c906a carried) on that head. A line diff of the masked texts, main to the merge,
+// is exactly the 8 `.wv-bymail*` lines and none removed, the same 8 lines the reviewed head added over its own base.
+const PINNED_MASKED_STYLE_SHA256 = "3126531517b069f826eb4fdd5660c68fc19dc74638dc165c5f1864c33682af98";
+const PINNED_MASKED_STYLE_BYTES = 108530;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";
