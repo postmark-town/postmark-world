@@ -24,7 +24,7 @@
 // (The header used to document a `stake:mark:<id>` grammar the mint could never
 // produce — a read-side orphan, flagged 2026-07-23, closed by this pass.)
 
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, lstatSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
@@ -391,6 +391,9 @@ export function frameMarks(out) {
 // mark never changes its id (stakes stay attached). Shared with mark-lint.mjs so
 // both read the world from disk the same way. Bad frontmatter is flagged on the
 // record (_error), never thrown, so one bad file can't blind the whole fold/lint.
+// Plain files only (POS-969): folders are read with lstat, so a symbolic link
+// (mode 120000) is never walked into, and a `mark.md` that isn't a plain file
+// is flagged on its record the same way, never read.
 //
 // Every record comes back in WORLD coordinates whatever frame the files are
 // written in (see § the frame above) — `at` is world, `_fileAt` is what the file
@@ -460,7 +463,7 @@ export function loadTreeMarks(dir) {
   if (!existsSync(dir)) return out;
   for (const entry of readdirSync(dir)) {
     const p = join(dir, entry);
-    let st; try { st = statSync(p); } catch { continue; }
+    let st; try { st = lstatSync(p); } catch { continue; }
     if (!st.isDirectory()) continue;
     walkMarks(p, null, out); // v2: no household from the path; `by` comes from each mark's frontmatter
   }
@@ -474,7 +477,9 @@ function walkMarks(nodeDir, parentMarkId, out) {
     const slug = basename(nodeDir);
     let rec;
     try {
-      rec = parseRecord(readFileSync(join(nodeDir, "mark.md"), "utf8"), `${slug}/mark.md`);
+      const file = join(nodeDir, "mark.md");
+      if (!lstatSync(file).isFile()) throw new Error("not a plain file (the world reads plain files only)");
+      rec = parseRecord(readFileSync(file, "utf8"), `${slug}/mark.md`);
     } catch (e) {
       rec = { _error: e.message, body: "" };
     }
@@ -506,7 +511,7 @@ function walkMarks(nodeDir, parentMarkId, out) {
   for (const e of entries) {
     if (e === "mark.md") continue;
     const p = join(nodeDir, e);
-    let s; try { s = statSync(p); } catch { continue; }
+    let s; try { s = lstatSync(p); } catch { continue; }
     if (s.isDirectory()) walkMarks(p, thisId, out);
   }
 }
