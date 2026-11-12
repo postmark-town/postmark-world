@@ -288,7 +288,8 @@ the household's page in holo ink.
 > **So the collisions are AMENDED, not defended.** The
 > `money-never-buys-judgment` bucket and its mark (v1 → v2), the
 > "Why no verbs in v0" clause below, the money-moment disclosure quoted below,
-> and `ECONOMY.md § 7` in the blueprints all now say the same thing:
+> and `ECONOMY.md § 7` in the blueprints were amended in that revisit. The
+> disclosure below is reworded 2026-11-11:
 > **A gift pays a bill and is written down in your name. If the town staked on
 > this pot, the close thanks you in stamps that work like any stamp, including
 > vote; money's share of your household is capped, and stamps never turn into
