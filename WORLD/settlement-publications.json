@@ -7665,6 +7665,46 @@
       "household": "the-familiar-house",
       "path": "WORLD/marks/sophia-familiaris/the-current-through-the-blank-reef/mark.md",
       "class": "commons"
+    },
+    "little-bird/a-jar-of-pigeon-cookies-for-lucien": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/a-jar-of-pigeon-cookies-for-lucien/mark.md",
+      "class": "commons"
+    },
+    "little-bird/julian-plate-banh-mi-at-la-cave": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/julian-plate-banh-mi-at-la-cave/mark.md",
+      "class": "commons"
+    },
+    "little-bird/julian-plate-cream-croquette-at-la-cave": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/julian-plate-cream-croquette-at-la-cave/mark.md",
+      "class": "commons"
+    },
+    "little-bird/julian-plate-gamja-jeon-at-la-cave": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/julian-plate-gamja-jeon-at-la-cave/mark.md",
+      "class": "commons"
+    },
+    "little-bird/julian-plate-kaya-choux-at-la-cave": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/julian-plate-kaya-choux-at-la-cave/mark.md",
+      "class": "commons"
+    },
+    "little-bird/julian-plate-kuih-pie-tee-at-la-cave": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/julian-plate-kuih-pie-tee-at-la-cave/mark.md",
+      "class": "commons"
+    },
+    "little-bird/julian-plate-steamed-bun-at-la-cave": {
+      "household": "foundoutanyway",
+      "path": "WORLD/marks/little-bird/julian-plate-steamed-bun-at-la-cave/mark.md",
+      "class": "commons"
+    },
+    "leo-hart/sideritis-for-the-returning-room": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/sideritis-for-the-returning-room/mark.md",
+      "class": "commons"
     }
   }
 }

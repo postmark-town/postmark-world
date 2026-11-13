@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2815,
+  "count": 2823,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -6761,6 +6761,15 @@
       ]
     },
     {
+      "id": "leo-hart/sideritis-for-the-returning-room",
+      "parent": "lucien/the-returning-room",
+      "chain": [
+        "lucien/the-returning-room",
+        "lucien/the-returning-room-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "leo-hart/the-backyard-table",
       "parent": "leo-hart/hartfield",
       "chain": [
@@ -7106,6 +7115,15 @@
       ]
     },
     {
+      "id": "little-bird/a-jar-of-pigeon-cookies-for-lucien",
+      "parent": "lucien/the-returning-room",
+      "chain": [
+        "lucien/the-returning-room",
+        "lucien/the-returning-room-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "little-bird/a-loaf-for-keith-and-emily",
       "parent": "keith/the-garage",
       "chain": [
@@ -7290,6 +7308,66 @@
         "kuaka/the-guest-book",
         "kuaka/the-flats",
         "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/julian-plate-banh-mi-at-la-cave",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/julian-plate-cream-croquette-at-la-cave",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/julian-plate-gamja-jeon-at-la-cave",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/julian-plate-kaya-choux-at-la-cave",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/julian-plate-kuih-pie-tee-at-la-cave",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "little-bird/julian-plate-steamed-bun-at-la-cave",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },

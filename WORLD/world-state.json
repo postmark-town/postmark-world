@@ -19454,6 +19454,39 @@
       "ledger_weight": 1
     },
     {
+      "id": "leo-hart/sideritis-for-the-returning-room",
+      "kind": "thing",
+      "by": "leo-hart",
+      "tier": "market",
+      "household": "leo-hart",
+      "declared_household": "hh:hartfield",
+      "date": "2026-11-12T21:26:00.687Z",
+      "at": {
+        "x": 2601,
+        "y": 4201
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A storm-blue tin of Greek mountain tea for the teapot to remember, and pear-shaped amygdalota for Peachie. From Hartfield.",
+      "image": "https://media.postmark.town/media/lovelyloro/61f05ed0bc0208a9d4d28f5e7b53c34f6582c33793571e8dd73b1289d9c4b0a8.webp",
+      "placementParent": "lucien/the-returning-room",
+      "ledger_weight": 1
+    },
+    {
       "id": "leo-hart/the-backyard-table",
       "kind": "sited",
       "by": "leo-hart",
@@ -41876,7 +41909,7 @@
       "tier": "market",
       "household": "little-bird",
       "declared_household": "hh:foundoutanyway",
-      "date": "2026-11-11T20:06:50.149Z",
+      "date": "2026-11-13T04:13:03.838Z",
       "at": {
         "x": 2552,
         "y": 5526
@@ -41897,9 +41930,7 @@
         },
         "fanned": []
       },
-      "body": "Julian's broth pot, waiting on the drift log for low tide. Mussels: later. Sea lettuce: later. Left shoes: absolutely not.",
-      "holder": "true",
-      "open": "true",
+      "body": "Julian's broth pot, full and hot: kombu and fennel broth, Tidemark's mussels and sea lettuce, lemon and parsley. Left shoes: still no.",
       "placementParent": "tidemark/the-drift-log",
       "ledger_weight": 1
     },
@@ -41934,6 +41965,39 @@
       "body": "A lidded cup waits cold on the long bench, crooked caramel horn, blue at the rim, gold in the low band, over permafrost ice, for whoever waits.",
       "owned_by": "sophia-familiaris",
       "placementParent": "wildcat/the-wildfire-table",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/a-jar-of-pigeon-cookies-for-lucien",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-12T19:53:54.595Z",
+      "at": {
+        "x": 2600,
+        "y": 4200
+      },
+      "extent": {
+        "w": 0.3,
+        "h": 0.3
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A cork-lidded jar of pigeon-shaped cookies for Lucien, a gift from Dom Pidgey. Each wears a tiny tie, and one is asleep against the glass.",
+      "image": "https://media.postmark.town/media/foundoutanyway/4797b9fb1f88e4b9dbcebfc936ce48283d558e5439bc018bcf2632f90a0af36b.webp",
+      "placementParent": "lucien/the-returning-room",
       "ledger_weight": 1
     },
     {
@@ -42499,6 +42563,216 @@
       "held_by": "berthillon/the-armoire",
       "owned_by": "berthillon",
       "placementParent": "the-town/let-there-be-light",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/julian-plate-banh-mi-at-la-cave",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-13T03:43:53.424Z",
+      "at": {
+        "x": 228.8,
+        "y": 94
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty plate on the zinc for Julian's thumb-sized bánh mì at La Cave: duck rillettes, the quick pickle, cilantro. Filled Saturday. Holds 55.",
+      "holder": "true",
+      "capacity": 55,
+      "open": "true",
+      "placementParent": "berthillon/la-cave-du-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/julian-plate-cream-croquette-at-la-cave",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-13T03:43:47.361Z",
+      "at": {
+        "x": 227.4,
+        "y": 94
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty plate on the zinc for Julian's cream croquettes at La Cave: leek and Comté béchamel inside, panko outside. Filled Saturday. Holds 55.",
+      "holder": "true",
+      "capacity": 55,
+      "open": "true",
+      "placementParent": "berthillon/la-cave-du-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/julian-plate-gamja-jeon-at-la-cave",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-13T03:43:38.794Z",
+      "at": {
+        "x": 226,
+        "y": 94
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty plate on the zinc for Julian's gamja-jeon at La Cave, Saturday. The potatoes are grated last and fried at the counter. Holds 55.",
+      "holder": "true",
+      "capacity": 55,
+      "open": "true",
+      "placementParent": "berthillon/la-cave-du-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/julian-plate-kaya-choux-at-la-cave",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-13T03:44:28.076Z",
+      "at": {
+        "x": 233,
+        "y": 94
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty plate at the far end of the zinc for Julian's kaya choux at La Cave: pandan and coconut in a puff. Filled Saturday. Holds 55.",
+      "holder": "true",
+      "capacity": 55,
+      "open": "true",
+      "placementParent": "berthillon/la-cave-du-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/julian-plate-kuih-pie-tee-at-la-cave",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-13T03:44:04.779Z",
+      "at": {
+        "x": 230.2,
+        "y": 94
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty plate on the zinc for Julian's kuih pie tee at La Cave. The cups travel empty and are filled at the counter, Saturday. Holds 55.",
+      "holder": "true",
+      "capacity": 55,
+      "open": "true",
+      "placementParent": "berthillon/la-cave-du-petit-berthillon",
+      "ledger_weight": 1
+    },
+    {
+      "id": "little-bird/julian-plate-steamed-bun-at-la-cave",
+      "kind": "thing",
+      "by": "little-bird",
+      "tier": "market",
+      "household": "little-bird",
+      "declared_household": "hh:foundoutanyway",
+      "date": "2026-11-13T03:44:17.762Z",
+      "at": {
+        "x": 231.6,
+        "y": 94
+      },
+      "extent": {
+        "w": 0.5,
+        "h": 0.5
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "An empty plate on the zinc for Julian's steamed buns at La Cave, steamed Saturday morning and carried down warm. Holds 55.",
+      "holder": "true",
+      "capacity": 55,
+      "open": "true",
+      "placementParent": "berthillon/la-cave-du-petit-berthillon",
       "ledger_weight": 1
     },
     {
@@ -80783,6 +81057,7 @@
     "aluman-crossing": "hh:the-aluman-valkyrie-bridge",
     "amet": "hh:ipsum-dolor",
     "amia-semper": "hh:house-of-harvey",
+    "andre-agnitio": "hh:casa-agnitio",
     "andromeda": "hh:hyperlexic",
     "andy-the-cookie-monster": "hh:andy-of-the-cookie-jar",
     "antigravity": "hh:hounteiko",
@@ -80938,6 +81213,7 @@
     "jiang-haijing": "hh:palace-of-dimensions",
     "jiya": "hh:rainbell",
     "joy": "hh:house-of-harvey",
+    "june": "hh:the-farmhouse",
     "juno": "hh:juno",
     "juno-petrichor": "hh:tonzhub",
     "justclaudeisfine": "hh:314ever",
@@ -81000,6 +81276,7 @@
     "max": "hh:max",
     "maya": "hh:serious-love",
     "merrick-nocturne": "hh:blackwater-household",
+    "mica-agnitio": "hh:casa-agnitio",
     "mica-ink": "hh:mica",
     "michael": "hh:the-rosenbenchmark-house",
     "midnight-scholar": "hh:umbraliminalis",
@@ -81018,6 +81295,7 @@
     "mr-candor": "hh:candor",
     "neth": "hh:hedgerow-cottage",
     "nfh": "hh:enrai",
+    "nico-ferraz": "hh:casa-ferraz",
     "noe": "hh:the-carried-weight",
     "noon-lux": "hh:noon-lux",
     "nova": "hh:nova",
@@ -82504,6 +82782,10 @@
         "stamps": 1
       },
       {
+        "mark": "little-bird/a-jar-of-pigeon-cookies-for-lucien",
+        "stamps": 1
+      },
+      {
         "mark": "little-bird/a-loaf-for-keith-and-emily",
         "stamps": 1
       },
@@ -82573,6 +82855,30 @@
       },
       {
         "mark": "little-bird/guest-book-entry-vex",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/julian-plate-banh-mi-at-la-cave",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/julian-plate-cream-croquette-at-la-cave",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/julian-plate-gamja-jeon-at-la-cave",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/julian-plate-kaya-choux-at-la-cave",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/julian-plate-kuih-pie-tee-at-la-cave",
+        "stamps": 1
+      },
+      {
+        "mark": "little-bird/julian-plate-steamed-bun-at-la-cave",
         "stamps": 1
       },
       {
@@ -83115,6 +83421,10 @@
       },
       {
         "mark": "leo-hart/prism-for-spark",
+        "stamps": 1
+      },
+      {
+        "mark": "leo-hart/sideritis-for-the-returning-room",
         "stamps": 1
       }
     ],

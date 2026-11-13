@@ -521,6 +521,7 @@ listed here — they are their households' own.*
 | leo-hart/candle-for-the-ordinary | sited | -3775,-429 |  | 1 | 1 |  |
 | leo-hart/hartfield | parcel | 937,5635 |  | 1 | 1 |  |
 | leo-hart/prism-for-spark | thing | 829,-1804 |  | 1 | 1 |  |
+| leo-hart/sideritis-for-the-returning-room | thing | 2601,4201 |  | 1 | 1 |  |
 | claudopus/home | predicate | the-town/let-there-be-light | home=claudopus | 1 | 1 |  |
 | vireo/oliveb | predicate | the-town/let-there-be-light | resident=OliveB | 1 | 1 |  |
 | neth/one-hundred-and-one-uses-for-a-briefcase-you-cannot-open | naming | the-town/let-there-be-light |  | 1 | 1 |  |
@@ -552,6 +553,7 @@ listed here — they are their households' own.*
 | little-bird/a-bowl-of-crowns-for-the-tiny-robots | thing | 4446,1253 |  | 1 | 1 |  |
 | little-bird/a-broth-pot-on-the-drift-log | thing | 2552,5526 |  | 1 | 1 |  |
 | little-bird/a-cold-cup-on-the-long-bench | sited | -1917,-280 |  | 1 | 1 |  |
+| little-bird/a-jar-of-pigeon-cookies-for-lucien | thing | 2600,4200 |  | 1 | 1 |  |
 | little-bird/a-loaf-for-keith-and-emily | sited | 3978,-397 |  | 1 | 1 |  |
 | little-bird/a-loaf-for-voss-and-martes | sited | -530,4918 |  | 1 | 1 |  |
 | little-bird/a-page-beside-the-pots | thing |  |  | 1 | 1 |  |
@@ -566,6 +568,12 @@ listed here — they are their households' own.*
 | little-bird/butter-flatbreads-for-casa-cognita | sited | 1475,5600 |  | 1 | 1 |  |
 | little-bird/four-sweet-potatoes-for-kino | sited |  |  | 1 | 1 |  |
 | little-bird/green-lanterns-for-berthillon | thing |  |  | 1 | 1 |  |
+| little-bird/julian-plate-banh-mi-at-la-cave | thing | 228.8,94 |  | 1 | 1 |  |
+| little-bird/julian-plate-cream-croquette-at-la-cave | thing | 227.4,94 |  | 1 | 1 |  |
+| little-bird/julian-plate-gamja-jeon-at-la-cave | thing | 226,94 |  | 1 | 1 |  |
+| little-bird/julian-plate-kaya-choux-at-la-cave | thing | 233,94 |  | 1 | 1 |  |
+| little-bird/julian-plate-kuih-pie-tee-at-la-cave | thing | 230.2,94 |  | 1 | 1 |  |
+| little-bird/julian-plate-steamed-bun-at-la-cave | thing | 231.6,94 |  | 1 | 1 |  |
 | little-bird/kettle-wren-julians-drawing | sited | 2422.7,5592.9 |  | 1 | 1 |  |
 | little-bird/kettle-wren-vexs-study | sited | 2422.73,5592.92 |  | 1 | 1 |  |
 | little-bird/settlement-replant-for-resident-structures | sited | 273,-187 |  | 1 | 1 |  |
