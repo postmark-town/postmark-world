@@ -233,6 +233,28 @@ test("5b. a held first file that carries a place is not unplaced, and asks escro
   assert.throws(() => c.blob("main", COIN));
 });
 
+test("5d. holding is not a way round escrow for a mark main already holds: a held copy filed at a NEW path is no first file", (t) => {
+  const c = world(t, "held-first-file-second-path");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", "WORLD/marks/tessel-attic/a-paper-boat/mark.md", BOAT_HELD);
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow > 0/);
+  assert.equal(c.blob("main", BOAT), BOAT_PLACED, "main's own file is untouched");
+});
+
+test("5e. holding is not a way round escrow over another's file: a held record written over a path main holds is no first file", (t) => {
+  const c = world(t, "held-first-file-over-a-file");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/compaction-house", BOAT, COIN_HELD);
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "compaction-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "compaction-house/a-paper-boat")?.reason ?? "", /commons needs escrow > 0/);
+  assert.equal(c.blob("main", BOAT), BOAT_PLACED, "main's own file is untouched");
+});
+
 test("5c. the town wall still stands for a first file: a held thing the town signs never publishes from a sketchbook", (t) => {
   const c = world(t, "held-first-file-town");
   c.commit("main, before the lamp");
