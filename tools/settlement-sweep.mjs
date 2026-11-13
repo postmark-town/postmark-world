@@ -1487,6 +1487,14 @@ export function settlementSweep({
       // sol-am-lichterfenster/little-m-first-month-letter, each at {0,0} inside a
       // thing). The printout waits, by name, and the reads still show it in hands.
       const holdOnly = holdOnlyChange(mainRecordAt(repo, mainBranch, delta.path), record);
+      if (holdOnly && isHeld(record)) {
+        const framed = positionedInside(repo, mainBranch, delta.path);
+        if (framed.length) {
+          leftDrafted.push({ household, id: record.id, path: delta.path, class: sketchClass, escrow: n,
+            reason: `a hand-off cannot print yet: ${framed.length} mark(s) filed inside it write their place against it (${framed.slice(0, 4).join(", ")}) and would move; the reads still show it in ${heldBy(record)}'s hands` });
+          continue;
+        }
+      }
       // A HELD THING'S FIRST FILE (WLD-168): "the settlement sweep admits a held
       // thing's **first** file under the same hold-only exemption it gives a change
       // to an existing record". A thing taken into hands before it ever had a file
@@ -1498,14 +1506,6 @@ export function settlementSweep({
       const heldFirst = !holdOnly && isHeld(record) && !mainFolded.has(record.id)
         && !hasObject(repo, `${mainBranch}:${delta.path}`)
         && ["at", "extent", "points"].every((k) => record[k] === undefined);
-      if (holdOnly && isHeld(record)) {
-        const framed = positionedInside(repo, mainBranch, delta.path);
-        if (framed.length) {
-          leftDrafted.push({ household, id: record.id, path: delta.path, class: sketchClass, escrow: n,
-            reason: `a hand-off cannot print yet: ${framed.length} mark(s) filed inside it write their place against it (${framed.slice(0, 4).join(", ")}) and would move; the reads still show it in ${heldBy(record)}'s hands` });
-          continue;
-        }
-      }
       pending.push({
         household,
         id: record.id,
