@@ -185,6 +185,8 @@ const COIN = "WORLD/marks/compaction-house/a-prize-coin/mark.md";
 const COIN_HELD = "---\nkind: thing\nby: compaction-house\ndate: 2026-10-30T00:00:00.000Z\nheld_by: compaction-house\n---\n\nA copper prize coin.\n";
 const LOOSE = "WORLD/marks/compaction-house/a-loose-coin/mark.md";
 const LOOSE_PLACED = "---\nkind: thing\nby: compaction-house\ndate: 2026-10-30T00:00:00.000Z\nat: { x: 3730, y: -5207 }\nextent: { w: 0.3, h: 0.3 }\n---\n\nA copper coin on the path.\n";
+const TWIN = "WORLD/marks/compaction-house/a-twin-coin/mark.md";
+const TWIN_UNHELD = COIN_HELD.replace("held_by: compaction-house\n", "").replace("A copper prize coin.", "Its twin, in no one's hands.");
 const registryOn = (c, ref) => { try { return JSON.parse(c.blob(ref, "WORLD/settlement-publications.json")); } catch { return null; } };
 
 test("5. a held thing with no file, no registry row and no escrow prints its first file, held and unplaced; an unheld commons thing beside it still waits", (t) => {
@@ -193,8 +195,9 @@ test("5. a held thing with no file, no registry row and no escrow prints its fir
   assert.equal(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"], undefined, "no registry row before");
   c.git("switch", "-q", "-c", "draft/compaction-house");
   c.put(COIN, COIN_HELD);
+  c.put(TWIN, TWIN_UNHELD);
   c.put(LOOSE, LOOSE_PLACED);
-  c.commit("the held coin and a loose one, printed");
+  c.commit("the held coin, its unheld twin and a loose one, printed");
   c.git("switch", "-q", "main");
   const report = c.sweep();
   assert.ok(report.published.some((r) => r.id === "compaction-house/a-prize-coin"),
@@ -207,10 +210,13 @@ test("5. a held thing with no file, no registry row and no escrow prints its fir
   assert.equal(coin.at, undefined, "and it stands nowhere: published but unplaced");
   assert.deepEqual(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"],
     { household: "compaction-house", path: COIN, class: "commons" }, "a first publication's registry row");
-  // the negative control, in the same crossing: unheld, no file, no escrow
-  assert.equal(report.published.some((r) => r.id === "compaction-house/a-loose-coin"), false);
-  assert.match(report.left_drafted.find((r) => r.id === "compaction-house/a-loose-coin")?.reason ?? "", /commons needs escrow > 0/);
-  assert.throws(() => c.blob("main", LOOSE), "the loose coin has no file on main");
+  // the negative controls, in the same crossing, no file and no escrow: the coin's
+  // unheld twin (the same record without held_by), and an unheld coin on the ground
+  for (const [id, path] of [["compaction-house/a-twin-coin", TWIN], ["compaction-house/a-loose-coin", LOOSE]]) {
+    assert.equal(report.published.some((r) => r.id === id), false, `${id} is not published`);
+    assert.match(report.left_drafted.find((r) => r.id === id)?.reason ?? "", /commons needs escrow > 0/, `${id} waits for backing`);
+    assert.throws(() => c.blob("main", path), `${id} has no file on main`);
+  }
   // and the next crossing leaves it standing: a held thing is never taken while held
   c.sweep();
   assert.equal(c.blob("main", COIN), COIN_HELD);
