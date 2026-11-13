@@ -1487,6 +1487,17 @@ export function settlementSweep({
       // sol-am-lichterfenster/little-m-first-month-letter, each at {0,0} inside a
       // thing). The printout waits, by name, and the reads still show it in hands.
       const holdOnly = holdOnlyChange(mainRecordAt(repo, mainBranch, delta.path), record);
+      // A HELD THING'S FIRST FILE (WLD-168): "the settlement sweep admits a held
+      // thing's **first** file under the same hold-only exemption it gives a change
+      // to an existing record". A thing taken into hands before it ever had a file
+      // has no record on main to be a hand-off from, so `holdOnlyChange` (a change
+      // between two records) cannot say it. It is held and stands nowhere, so it is
+      // the town's record of where a thing is, like any hand-off, and no escrow is
+      // asked of it. Only that: the mark is nowhere on main (not at this path, not
+      // at any other), and it carries no place, so no ground crosses free.
+      const heldFirst = !holdOnly && isHeld(record) && !mainFolded.has(record.id)
+        && !hasObject(repo, `${mainBranch}:${delta.path}`)
+        && ["at", "extent", "points"].every((k) => record[k] === undefined);
       if (holdOnly && isHeld(record)) {
         const framed = positionedInside(repo, mainBranch, delta.path);
         if (framed.length) {
@@ -1511,6 +1522,9 @@ export function settlementSweep({
         // asks no escrow to print, like any hand-off, but where it now stands is judged
         // the way any mark is, so the registry takes the class its new place walks.
         ...(holdOnly && !isHeld(record) ? { dropped: true } : {}),
+        // ITS FIRST FILE, HELD (WLD-168): asks no escrow either, but it is a first
+        // publication, so the registry takes a new row for it below.
+        ...(heldFirst ? { held_first: true } : {}),
       });
     }
   }
@@ -1637,7 +1651,7 @@ export function settlementSweep({
   // MARKET, PUBLISHING: each row's class is read off the result.
   for (const { candidate, ...row } of pending) {
     const rowClass = result.viewed.has(row.id) ? rowClassOf(classifyMark(result.byId.get(row.id), result.byId)) : row.class;
-    if (rowClass !== "commons" || row.escrow > 0 || row.hold_only) {
+    if (rowClass !== "commons" || row.escrow > 0 || row.hold_only || row.held_first) {
       published.push({ ...row, class: rowClass });
       continue;
     }
@@ -1774,7 +1788,8 @@ export function settlementSweep({
         const row = published[i];
         if (!result.viewed.has(row.id)) continue;
         const cls = rowClassOf(classifyMark(result.byId.get(row.id), result.byId));
-        if (cls !== "commons" || row.escrow > 0) { row.class = cls; continue; }
+        // a held first file stands on no ground, so none of it can have stayed behind (WLD-168)
+        if (cls !== "commons" || row.escrow > 0 || row.held_first) { row.class = cls; continue; }
         published.splice(i, 1);
         removed.push(row);
         leftDrafted.push({ household: row.household, id: row.id, path: row.path, class: "commons", escrow: row.escrow,

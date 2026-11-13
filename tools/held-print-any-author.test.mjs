@@ -173,6 +173,69 @@ test("3b. THE BOUNDARY: a hold print that also carries any other difference from
   assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
 });
 
+// ── 5. A HELD THING'S FIRST FILE (WLD-168) ───────────────────────────────────
+//
+// The ask: "the settlement sweep admits a held thing's **first** file under the
+// same hold-only exemption it gives a change to an existing record". A thing
+// taken into hands before it ever had a file (the Pando Peak prize coin, held
+// and geometryless at zero stake) has no main record to be a hand-off FROM, so
+// it was judged as a new commons publication and waited for escrow forever.
+
+const COIN = "WORLD/marks/compaction-house/a-prize-coin/mark.md";
+const COIN_HELD = "---\nkind: thing\nby: compaction-house\ndate: 2026-10-30T00:00:00.000Z\nheld_by: compaction-house\n---\n\nA copper prize coin.\n";
+const LOOSE = "WORLD/marks/compaction-house/a-loose-coin/mark.md";
+const LOOSE_PLACED = "---\nkind: thing\nby: compaction-house\ndate: 2026-10-30T00:00:00.000Z\nat: { x: 3730, y: -5207 }\nextent: { w: 0.3, h: 0.3 }\n---\n\nA copper coin on the path.\n";
+const registryOn = (c, ref) => { try { return JSON.parse(c.blob(ref, "WORLD/settlement-publications.json")); } catch { return null; } };
+
+test("5. a held thing with no file, no registry row and no escrow prints its first file, held and unplaced; an unheld commons thing beside it still waits", (t) => {
+  const c = world(t, "held-first-file");
+  c.commit("main, before the coin");
+  assert.equal(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"], undefined, "no registry row before");
+  c.git("switch", "-q", "-c", "draft/compaction-house");
+  c.put(COIN, COIN_HELD);
+  c.put(LOOSE, LOOSE_PLACED);
+  c.commit("the held coin and a loose one, printed");
+  c.git("switch", "-q", "main");
+  const report = c.sweep();
+  assert.ok(report.published.some((r) => r.id === "compaction-house/a-prize-coin"),
+    `the held coin's first file did not print: ${JSON.stringify(report.left_drafted)}`);
+  assert.equal(c.blob("main", COIN), COIN_HELD, "printed at its path, byte for byte");
+  const coin = heldOf(c, "compaction-house/a-prize-coin");
+  assert.equal(coin.held_by, "compaction-house", "still in its holder's hands");
+  assert.equal(coin.by, "compaction-house");
+  assert.equal(coin.owned_by, undefined, "its maker still owns it");
+  assert.equal(coin.at, undefined, "and it stands nowhere: published but unplaced");
+  assert.deepEqual(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"],
+    { household: "compaction-house", path: COIN, class: "commons" }, "a first publication's registry row");
+  // the negative control, in the same crossing: unheld, no file, no escrow
+  assert.equal(report.published.some((r) => r.id === "compaction-house/a-loose-coin"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "compaction-house/a-loose-coin")?.reason ?? "", /commons needs escrow > 0/);
+  assert.throws(() => c.blob("main", LOOSE), "the loose coin has no file on main");
+  // and the next crossing leaves it standing: a held thing is never taken while held
+  c.sweep();
+  assert.equal(c.blob("main", COIN), COIN_HELD);
+  assert.ok(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"]);
+});
+
+test("5b. a held first file that carries a place is not unplaced, and asks escrow like any new commons mark", (t) => {
+  const c = world(t, "held-first-file-placed");
+  c.commit("main, before the coin");
+  c.print("draft/compaction-house", COIN, COIN_HELD.replace("held_by: compaction-house\n", "held_by: compaction-house\nat: { x: 3730, y: -5207 }\nextent: { w: 0.3, h: 0.3 }\n"));
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "compaction-house/a-prize-coin"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "compaction-house/a-prize-coin")?.reason ?? "", /commons needs escrow > 0/);
+  assert.throws(() => c.blob("main", COIN));
+});
+
+test("5c. the town wall still stands for a first file: a held thing the town signs never publishes from a sketchbook", (t) => {
+  const c = world(t, "held-first-file-town");
+  c.commit("main, before the lamp");
+  c.print("draft/house-a", LAMP, LAMP_HELD);
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "the-town/a-lamp"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "the-town/a-lamp")?.reason ?? "", /town wall/);
+});
+
 // ── THE PREDICATE ITSELF ─────────────────────────────────────────────────────
 
 test("4. handOffOnly: a hand-off, and nothing wider", () => {
