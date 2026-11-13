@@ -1001,7 +1001,7 @@ export const PARCEL_EXTENT_M = 25;
 // ── THE FIRST CLAIM, NOT THE LATEST DATE: claim-instant.mjs (POS-364 review,
 // 2026-10-08; POS-449). The claim order and the cap's law date read a record's
 // `claimed_at` first, its `date` only when it carries none.
-export { CLAIMED_AT_FIELD, claimInstant } from "./claim-instant.mjs";
+export { CLAIMED_AT_FIELD, claimInstant, FOOTPRINTS_FIELD, footprintsOf } from "./claim-instant.mjs";
 import { claimInstant } from "./claim-instant.mjs";
 
 export function compareClaimOrder(a, b) {
