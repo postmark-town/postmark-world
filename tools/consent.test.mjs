@@ -4,8 +4,11 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { fold } from "./marks-fold.mjs";
-import { firstLaidOrdered } from "./consent.mjs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { fold, loadMarks, footprintsOf } from "./marks-fold.mjs";
+import { firstLaidOrdered, firstCoverOrder } from "./consent.mjs";
 
 const terrain = { features: [] };
 const sited = (id, by, x, y, w, h, extra = {}) => ({
@@ -487,6 +490,87 @@ test("POS-369 · HELD FOR POS-572: several opposing seniors are judged ONE AT A 
   assert.ok(r, "a senior at 2e-2 outweighs the kiosk on its own");
   assert.equal(r.returned_from, "a/west", "and the return names that senior");
   assert.equal(r.state, "pending-escrow");
+});
+
+// ── POS-571: an expansion is a newcomer on its new cells ─────────────────────
+//
+// LOGOS conflict-matrix § Roles from seniority (RULED 2026-10-04): "per-cell
+// (whoever first covered a cell is that cell's incumbent)", and "an expansion is
+// a newcomer on its new cells". The estate was first laid 08-01 over x -50..50
+// and amended 08-20 to reach x 150. The mill was laid 08-10 at x 100..140, which
+// only the amend reached; the gate was laid 08-10 at x 30..70, across the old edge.
+
+const T = (d) => `2026-08-${d}T00:00:00Z`;
+const ESTATE_HISTORY = [
+  { since: T("01"), at: { x: 0, y: 0 }, extent: { w: 100, h: 100 } },
+  { since: T("20"), at: { x: 50, y: 0 }, extent: { w: 200, h: 100 } },
+];
+const estateOf = (extra = {}) => sited("estate", "a", 50, 0, 200, 100, { date: T("20"), claimed_at: T("01"), footprints: ESTATE_HISTORY, ...extra });
+const mill = (extra = {}) => sited("mill", "b", 120, 0, 40, 40, { date: T("10"), ...extra });
+const gate = (extra = {}) => sited("gate", "c", 50, 0, 40, 40, { date: T("10"), ...extra });
+
+test("POS-571 · an EXPANSION is a newcomer on its new cells: the mill laid before the amend holds the word there, and the estate has none", () => {
+  const millSays = fold({ marks: [estateOf(), mill({ consent: { "a/estate": "opposed" } })], terrain, tick: 1, stakes: [stake("s", "b/mill", 100)] });
+  assert.equal(standing(millSays, "a/estate"), false, "on the cells the amend added, the mill was there first");
+  assert.equal(millSays.returned.find((x) => x.mark === "a/estate")?.returned_from, "b/mill");
+  const estateSays = fold({ marks: [estateOf({ consent: { "b/mill": "opposed" } }), mill()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "b/mill"), true, "the estate's first claim does not make it the mill's elder on ground it reached later");
+});
+
+test("POS-571 · NO HISTORY keeps the whole-mark answer: the same estate without footprints is the mill's elder, as before", () => {
+  const scalar = (extra) => estateOf({ footprints: undefined, ...extra });
+  const estateSays = fold({ marks: [scalar({ consent: { "b/mill": "opposed" } }), mill()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "b/mill"), false, "dated by its first claim, the estate holds the word");
+  const millSays = fold({ marks: [scalar(), mill({ consent: { "a/estate": "opposed" } })], terrain, tick: 1, stakes: [stake("s", "b/mill", 100)] });
+  assert.equal(standing(millSays, "a/estate"), true, "and the mill has none");
+});
+
+test("POS-571 · the ORIGINAL cells keep the elder's age: on the gate across the old edge, the estate is first on its old cells and the gate on the new", () => {
+  assert.deepEqual(firstCoverOrder(estateOf(), gate()), { grantorFirst: true }, "the estate covered x 30..50 on 08-01, before the gate");
+  assert.deepEqual(firstCoverOrder(gate(), estateOf()), { grantorFirst: true }, "the gate covered x 50..70 on 08-10, before the amend");
+  assert.deepEqual(firstCoverOrder(mill(), estateOf()), { grantorFirst: true });
+  assert.deepEqual(firstCoverOrder(estateOf(), mill()), { grantorFirst: false }, "on the mill's ground every shared cell is the amend's");
+  const estateSays = fold({ marks: [estateOf({ consent: { "c/gate": "opposed" } }), gate()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "c/gate"), false, "the estate's word on the gate counts, from the cells it always covered");
+});
+
+test("POS-571 · HELD FOR POS-572 stays held: a twin first coverage on every shared cell falls back to the containment edge", () => {
+  const twin = (id, by, w, extra) => sited(id, by, 0, 0, w, w, { date: T("10"), footprints: [{ since: T("10"), at: { x: 0, y: 0 }, extent: { w, h: w } }], ...extra });
+  const state = fold({
+    marks: [twin("estate", "a", 1000, { consent: { "b/shed": "opposed" } }), twin("shed", "b", 100)],
+    terrain, tick: 1, stakes: [stake("s", "a/estate", 100)],
+  });
+  assert.equal(firstCoverOrder(state.marks[0], state.marks[1]), null, "the cells prove nothing");
+  assert.equal(standing(state, "b/shed"), false, "so the old edge holds, as POS-369 left it");
+});
+
+test("POS-571 · a history that does not read whole is no history: the whole-mark answer stands", () => {
+  const broken = [{ ...ESTATE_HISTORY[0], since: "the first of August" }, ESTATE_HISTORY[1]];
+  assert.equal(footprintsOf(estateOf({ footprints: broken })), null);
+  const estateSays = fold({ marks: [estateOf({ footprints: broken, consent: { "b/mill": "opposed" } }), mill()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "b/mill"), false, "dated by its first claim, as if it carried none");
+});
+
+test("POS-571 · the history rides a file in WORLD numbers: loaded from a relative tree, the footprints are not reframed, and the cells still decide", () => {
+  const dir = mkdtempSync(join(tmpdir(), "first-laid-cells-"));
+  try {
+    const put = (path, lines) => { const d = join(dir, ...path.split("/")); mkdirSync(d, { recursive: true }); writeFileSync(join(d, "mark.md"), `---\n${lines.join("\n")}\n---\n\nA record in a fixture.\n`); };
+    const R = "let-there-be-light";
+    put(R, ["kind: sited", "by: the-town", "tier: constitution", "date: 2026-07-22", "at: { x: 0, y: 0 }", "extent: { w: 320000, h: 320000 }", "coords: relative"]);
+    put(`${R}/region`, ["kind: sited", "by: the-town", "tier: constitution", "date: 2026-07-22", "at: { x: 1000, y: 2000 }", "extent: { w: 500, h: 500 }"]);
+    // the estate's file numbers are an offset from the region's centre; its footprints are world numbers
+    const history = ESTATE_HISTORY.map((e) => ({ ...e, at: { x: e.at.x + 1000, y: e.at.y + 2000 } }));
+    put(`${R}/region/estate`, ["kind: sited", "by: a", "tier: market", `date: ${T("20")}`, `claimed_at: ${T("01")}`, "at: { x: 50, y: 0 }", "extent: { w: 200, h: 100 }", `footprints: ${JSON.stringify(history)}`]);
+    put(`${R}/region/mill`, ["kind: sited", "by: b", "tier: market", `date: ${T("10")}`, "at: { x: 120, y: 0 }", "extent: { w: 40, h: 40 }", 'consent: {"a/estate": "opposed"}']);
+    const marks = loadMarks(dir);
+    const estate = marks.find((m) => m.id === "a/estate");
+    assert.deepEqual(estate.at, { x: 1050, y: 2000 }, "the file's offset composes to world numbers");
+    assert.deepEqual(estate.footprints, history, "and the footprints are read exactly as written, in world numbers");
+    const state = fold({ marks, terrain, tick: 1, stakes: [stake("s", "b/mill", 100)] });
+    assert.equal(standing(state, "a/estate"), false, "the mill was first on the cells the amend added, read off the file");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 // ── returned, never dropped ──────────────────────────────────────────────────
