@@ -36,6 +36,7 @@
 // Browser-pure: the viewer and the store readers ask through it too.
 
 import { classIndex, classChain } from "./class-properties.mjs";
+import { CLAIMED_AT_FIELD, FOOTPRINTS_FIELD } from "./claim-instant.mjs";
 
 /** The standing words `kind:` wrote before it named the class, and the node kinds. */
 export const STANDING_WORDS = Object.freeze(new Set(["sited", "predicated", "predicate", "naming", "parcel", "class", "property", "post"]));
@@ -101,6 +102,15 @@ export const ownedBy = (m) => {
 
 /** The fields a hand-off moves: where it is, whose hands it is in, or whose it is. Nothing else. */
 const HOLD_FIELDS = new Set(["at", "extent", "points", HELD_BY, OWNED_BY]);
+/**
+ * The facts the office prints into a record from its store, never a resident's
+ * words (WORLD/marks/SCHEMA.md § First-laid facts): when the mark was first laid,
+ * and the footprints it has stood on. A hand-off printed after the office began
+ * printing them carries them where main's copy may not yet (POS-571, Bevel
+ * 2026-11-13 15:47Z). They are not compared, and they never move a hand: a print
+ * that changes only them is no hand-off.
+ */
+const STORE_PRINTED = new Set([CLAIMED_AT_FIELD, FOOTPRINTS_FIELD]);
 
 /**
  * Is `after` the same mark as `before`, moved into or out of hands and nothing
@@ -114,7 +124,7 @@ export function holdOnlyChange(before, after) {
   const owned = ownedBy(before) !== ownedBy(after);
   if (!owned && isHeld(before) === isHeld(after) && heldBy(before) === heldBy(after)
     && JSON.stringify(before.at ?? null) === JSON.stringify(after.at ?? null)) return false; // no hand moved
-  const rest = (r) => JSON.stringify(Object.keys(r).filter((k) => !k.startsWith("_") && !HOLD_FIELDS.has(k)).sort().map((k) => [k, r[k]]));
+  const rest = (r) => JSON.stringify(Object.keys(r).filter((k) => !k.startsWith("_") && !HOLD_FIELDS.has(k) && !STORE_PRINTED.has(k)).sort().map((k) => [k, r[k]]));
   return rest(before) === rest(after) && (isHeld(before) || isHeld(after) || owned);
 }
 

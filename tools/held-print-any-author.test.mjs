@@ -173,6 +173,66 @@ test("3b. THE BOUNDARY: a hold print that also carries any other difference from
   assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
 });
 
+// ── 6. THE STORE'S PRINTED FACTS (POS-571) ───────────────────────────────────
+//
+// The office prints `claimed_at` and `footprints` from its store (SCHEMA §
+// First-laid facts). A hand-off printed after it began carries them where main's
+// copy does not, and it is still a hand-off; they are never a resident's words,
+// and a print that changes nothing but them moves no hand.
+
+const FACTS = `claimed_at: 2026-09-01T00:00:00.000Z\nfootprints: ${JSON.stringify([
+  { since: "2026-09-01T00:00:00.000Z", at: { x: 3700, y: -5200 }, extent: { w: 0.3, h: 0.3 } },
+  { since: "2026-09-14T00:00:00.000Z", at: { x: 3730, y: -5207 }, extent: { w: 0.3, h: 0.3 } },
+])}\n`;
+const withFacts = (text) => text.replace("\n---\n\n", `\n${FACTS}---\n\n`);
+
+test("6. a hand-off printed with the store's first-laid facts, which main's file lacks, is still a hand-off", (t) => {
+  const c = world(t, "held-print-facts");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", BOAT, withFacts(BOAT_HELD));
+  const report = c.sweep();
+  assert.ok(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), `the hold did not print: ${JSON.stringify(report.left_drafted)}`);
+  assert.equal(c.blob("main", BOAT), withFacts(BOAT_HELD), "printed with its facts, byte for byte");
+  assert.equal(heldOf(c, "tessel-house/a-paper-boat").held_by, "sb-bram");
+});
+
+test("6b. the facts excuse nothing authored: the same hand-off with new words is an authoring change", (t) => {
+  const c = world(t, "held-print-facts-words");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", BOAT, withFacts(BOAT_HELD).replace("A paper boat.", "A paper boat, renamed."));
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
+});
+
+test("6c. a print that changes only the facts moves no hand: it is no hand-off, and asks escrow like any change", (t) => {
+  const c = world(t, "held-print-facts-only");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", BOAT, withFacts(BOAT_PLACED));
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
+});
+
+test("6d. the town wall reads the facts the same way: a town-signed hand-off with them passes, and with new words it does not", (t) => {
+  const c = world(t, "held-print-facts-town");
+  c.put(LAMP, LAMP_PLACED);
+  c.commit("published main");
+  c.print("draft/house-a", LAMP, withFacts(LAMP_HELD));
+  const passes = c.sweep();
+  assert.ok(passes.published.some((r) => r.id === "the-town/a-lamp"), `the hold did not print: ${JSON.stringify(passes.left_drafted)}`);
+  const c2 = world(t, "held-print-facts-town-words");
+  c2.put(LAMP, LAMP_PLACED);
+  c2.commit("published main");
+  c2.print("draft/house-a", LAMP, withFacts(LAMP_HELD).replace("A brass lamp.", "A brass lamp, stolen."));
+  const refused = c2.sweep();
+  assert.equal(refused.published.some((r) => r.id === "the-town/a-lamp"), false);
+  assert.match(refused.left_drafted.find((r) => r.id === "the-town/a-lamp")?.reason ?? "", /town wall/);
+});
+
 // ── THE PREDICATE ITSELF ─────────────────────────────────────────────────────
 
 test("4. handOffOnly: a hand-off, and nothing wider", () => {
@@ -187,4 +247,8 @@ test("4. handOffOnly: a hand-off, and nothing wider", () => {
   assert.equal(handOffOnly(placed, { ...held, body: "y" }), false, "new words");
   assert.equal(handOffOnly(placed, { ...held, date: "2026-10-02" }), false, "any other field");
   assert.equal(handOffOnly(null, held), false, "a mark main does not hold");
+  const facts = { claimed_at: "2026-09-01", footprints: [{ since: "2026-09-01", at: { x: 1, y: 2 }, extent: { w: 1, h: 1 } }] };
+  assert.equal(handOffOnly(placed, { ...held, ...facts }), true, "into hands, printed with the store's facts (POS-571)");
+  assert.equal(handOffOnly(placed, { ...placed, ...facts }), false, "the facts alone move no hand");
+  assert.equal(handOffOnly(placed, { ...held, ...facts, body: "y" }), false, "and excuse no new words");
 });
