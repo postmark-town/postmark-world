@@ -15,8 +15,10 @@
 // marks with their weights. FOV is the render; recomputing the fold stays the
 // clone's job (marks-fold.mjs, which keeps its node:fs loader out of this graph).
 //
-// Browser-purity: this imports ONLY world-engine.mjs (pure). No node:*, no
-// marks-fold. All numeric leans are dials, movable by ruling.
+// Browser-purity: this imports only world-engine.mjs and mark-kind.mjs, both
+// pure (world-engine itself imports mark-kind, which imports class-properties,
+// which imports nothing). No node:*, no marks-fold. All numeric leans are dials,
+// movable by ruling.
 
 import { isSited, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { buildHeightfield } from "./world-engine.mjs";
@@ -94,8 +96,9 @@ export function waterControlPoints(skeleton) {
 // Marks-derived home densification — the browser-safe path (no manifest). Every
 // sited mark contributes a control point at the band-height of its NEAREST region
 // anchor, so a low region holds its corridor down instead of the hills bleeding
-// in. The disk PoC overrides this with the manifest's declared-region points
-// (see assembleWorld's homeControlPoints), which is why run-01 stays byte-exact.
+// in. The disk PoC used to override this with the manifest's declared-region
+// points, through assembleWorld's homeControlPoints; it stopped in postmark#3025
+// (see world-poc.mjs), so these derived points are what every caller gets now.
 // `anchors` is regionAnchors(skeleton).
 export function deriveHomeControlPoints(marks, anchors) {
   const pts = [];
@@ -114,10 +117,12 @@ export function deriveHomeControlPoints(marks, anchors) {
 // ───────────────────────── the assembly ─────────────────────────────────────
 // worldState: the fold output (has .marks with id/kind/at/extent/weight/body/…).
 // skeleton:   the terrain skeleton (features, elevation, light, far_features).
-// homeControlPoints: optional override for the home densification (the disk PoC
-//   passes the manifest's declared-region points; the browser passes null and the
-//   points are derived from the marks). Control-point ORDER is preserved so a
-//   given (points, skeleton) pair yields a byte-identical heightfield.
+// homeControlPoints: optional override for the home densification. No caller in
+//   this repo or in the office passes it now (the disk PoC stopped in
+//   postmark#3025), so the points are always derived from the marks. The
+//   parameter stays: this module is served at /world-engine, so it is a published
+//   export. Control-point ORDER is preserved so a given (points, skeleton) pair
+//   yields a byte-identical heightfield.
 // whenHeightsUnread: what to do when the skeleton's height dials cannot be read
 //   (no region anchors, no river_fall_m). "refuse" (the default) throws: the
 //   office tells the world, and a telling over ground it cannot read is no

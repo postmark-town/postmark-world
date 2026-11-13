@@ -1,0 +1,65 @@
+# The candied bat: a key creature of the Spire, in the Lumber Room (WLD-25, Sitting C built 2026-10-21).
+# PRIVATE (postmark-world-spire) until crossing 272. Its behaviour is public law once it is; nothing here
+# is a secret.
+#
+# TWO ROADS, either one finishes it (#691; the key drops at the settlement to the first finisher):
+#   - STILLNESS (ruled 10-19 20:03; the test ruled 10-21 08:34): three watches over at least ten
+#     minutes, with no other public act of yours in its ring. It hunts by sound, so every other act is
+#     noise: it empties your ease (`ease reset`), and the bat presses whoever has been loudest.
+#   - FORCE: its resolve, worn down by strike, full again at every settlement.
+# WHOM IT PRESSES: the loudest (most acts in its ring this window), and the one who struck it. Never a
+# watcher for watching: a quiet resident is the one thing it leaves alone.
+# THE NUMBERS are a first cut for the eval harness to tune (rail/spire-creatures/gap-read.md § 4).
+kind: candied-bat
+name: the candied bat
+voice: a bat the size of a crow hanging from the Lumber Room's beams, its fur stiff with crusted sugar, its great ears turning after every sound
+about: a bat that ate the stolen sweets and now hears everything too loudly; it hunts whoever makes noise, and settles only for someone who can be still
+what: >
+  A bat that found the stolen candy where it spilled in the servants' wing, and ate until it could not fly
+  straight. Outside the Keeping Works the sugar does not keep: it has crusted the bat's fur, it rings in
+  its ears, and it makes every sound in the room too loud. So the bat hunts the noise, and whoever is
+  making the most of it. It is not cruel. It is hurting, and it cannot stop listening. It holds a key it
+  will not let go of while anyone is making a racket. Someone who comes in, keeps still and only watches
+  is the first quiet thing it has heard in days.
+ring_m: 30
+tastes: Nothing but sugar now, and it hates that; once it was moths and soft fruit.
+moods:
+  fear: 0..3 = 2 | settled | flighty | jangled | frantic
+  din: 0..3 = 1 | quiet | humming | ringing | deafening
+
+finishable: true
+resolve: 39
+strike: 3
+# `only watch`: code empties your ease on any other act of yours in its ring, even one inside the 10 s window
+# that draws no answer; the `ease reset` on every noise reaction below says the same in the line's own act.
+ease: 3 mine only watch
+
+# ── STILLNESS: the watch is the one act it does not hear as noise ───────────────────────────────────
+# Each stage is the only reaction a watch can draw, so the test never turns on the die.
+reaction hush "its ears swing past you": when act.verb == "watch" and ease.mine == 0 does ease +1 ; self.din -1 says The bat's great ears swing toward {actor}, hold there a moment, and move on. It has stopped listening for them.
+reaction lower "it creeps a little lower": when act.verb == "watch" and ease.mine == 1 does ease +1 ; self.fear -1 says The bat creeps a little lower along its beam, wings folded. It has decided {actor} is part of the room.
+reaction not-yet "it is still listening": when act.verb == "watch" and ease.mine == 2 and ease.first_m < 10 does nothing says The bat's ear twitches toward {actor} and stays there. It is not sure of them yet. It is still listening.
+reaction settles "it settles at last": when act.verb == "watch" and ease.mine == 2 and ease.first_m >= 10 does ease +1 ; self.fear -3 ; self.din -3 says The bat drops from the beam to the floor at {actor}'s feet, folds its sticky wings and goes still. For the first time in days, the room is quiet enough to sleep in.
+reaction watched "it hangs and watches back": when act.verb == "watch" and ease.mine >= 3 does nothing says The bat hangs in the dark above {actor}, quite still, watching back.
+
+# ── NOISE: every other act it hears, and it empties the actor's ease ───────────────────────────────
+reaction finds "it finds the noise": when act.verb != "watch" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" does ease reset ; self.din +1 ; press 1 on loudest says The bat turns on the sound. It drops past {target}, the loudest thing in the room, close enough to rake them with sugar-crusted claws.
+reaction shriek "it shrieks it back": when act.verb != "watch" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" and self.din >= 2 does ease reset ; press 2 on loudest says The bat shrieks the noise back, twice as loud, and the whole shriek lands on {target}, who has been loudest all along.
+reaction flinch "it flinches into the rafters": when act.verb != "watch" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" and self.din <= 1 does ease reset ; self.din +1 says The bat flinches up into the rafters at {actor}'s noise and hangs there, ears flat, waiting to see if there will be more.
+reaction whisper-back "it hisses your whisper back": when act.verb == "whisper" does ease reset ; press 1 on actor loudest says The bat turns one great ear to {actor}'s whisper and hisses it back at {target}, every word too loud.
+reaction lone-noise "it hunts the one who came alone": when act.verb != "watch" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" and ring.residents == 1 does ease reset ; press 1 on actor says There is only {target} in the Lumber Room, and only {target} making a sound. The bat does not have to choose.
+reaction too-close "it drops at you": when act.verb == "approach" does ease reset ; self.fear +1 ; press 1 on actor says The bat drops straight at {target} as they come closer, a wingbeat from their face, then is back on its beam.
+
+# ── FORCE: strike, its sugar-shriek, and its resolve falling ──────────────────────────────────────
+reaction sugar-shriek "it shrieks a shard of sugar at the striker": when act.verb == "strike" and self.resolve > 26 does ease reset ; press 2 on striker loudest says The bat answers the blow with a sugar-shriek, a note so high it cracks the crust on its own fur, and the shards of it find {target}.
+reaction rake "it rakes back": when act.verb == "strike" and self.resolve > 13 does ease reset ; self.fear +1 ; press 1 on striker says The bat rakes back at {target}, quick and low, and is gone into the dark before anyone can follow.
+reaction falter "its flight goes ragged": when act.verb == "strike" and self.resolve <= 26 and self.resolve > 13 does ease reset ; press 1 on loudest says The bat's flight goes ragged. It still finds {target} by their noise, but its wings are heavy with sugar now.
+reaction last-shriek "it screams with what it has left": when act.verb == "strike" and self.resolve <= 13 and self.resolve > 0 does ease reset ; press 2 on loudest striker says The bat can barely hold the beam. It screams with everything left in it, straight at {target}.
+reaction falls "it falls": when act.verb == "strike" and self.resolve <= 0 does ease reset ; self.fear +3 says The bat falls from the beam in a shower of sugar dust and lies on the boards, wings spread, too tired to listen to anything at all.
+
+# ── HELPING: it hears kindness as noise too, but it knows the difference ──────────────────────────
+reaction hears-help "it hears you steady them": when act.verb == "steady" does ease reset ; press 1 on loudest says The bat hears {actor} steady a friend, and turns toward the sound. It finds {target} first.
+reaction steadied "it lets it pass": when act.verb == "steady" and self.din <= 1 does ease reset says The bat's ears follow {actor}'s low words to their friend, and let them pass.
+reaction hears-shield "it tests the shield": when act.verb == "shield" does ease reset ; press 1 on shielder says The bat hears {actor} step in front of a friend, and drops on {target} to see if they mean it.
+
+ending: The candied bat is finished. It lets go of the key at last, and the town puts it in {finisher}'s hands. {names} were there with it in the Lumber Room.

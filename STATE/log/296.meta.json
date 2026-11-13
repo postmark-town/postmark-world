@@ -1,0 +1,13 @@
+{
+  "crossing": 296,
+  "covers_from": "2026-11-07T00:00:00.000Z",
+  "covers_to": "2026-11-07T12:00:00.000Z",
+  "complete": true,
+  "as_of_world": "434114e800c1a44186656d913bc69ce2fc004643",
+  "event_count": 1011,
+  "counts": {
+    "departure": 200,
+    "attachment": 26,
+    "emission": 785
+  }
+}

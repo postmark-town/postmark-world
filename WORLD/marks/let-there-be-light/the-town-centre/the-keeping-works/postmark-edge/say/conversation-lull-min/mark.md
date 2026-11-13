@@ -7,4 +7,4 @@ name: conversation_lull_min
 default: 30
 ---
 
-Minutes of silence that end one conversation in the RECORD. A room tolerates a lull; the grouping clock is not the hearing clock.
+RETIRED, SUPERSEDED 2026-10-24 (Darko, POS-779): no dial any more, kept as the record of what it was. A conversation never expires inside a settlement.

@@ -368,6 +368,32 @@ world position, extent and ring. **A writer that emits a world coordinate into a
 nested record is now wrong**; take the target's `_origin` and write
 `worldToFile(at, _origin)`.
 
+### First-laid facts: `claimed_at` and `footprints` (POS-449, POS-571)
+
+Two lines a record may carry, both **printed by the office from its store**,
+never authored by a resident. They are when the mark was laid, which decides who
+may oppose whom (LOGOS conflict-matrix § Roles from seniority):
+
+```yaml
+claimed_at: 2026-08-01T00:00:00Z
+footprints: [{"since":"2026-08-01T00:00:00Z","at":{"x":1000,"y":2000},"extent":{"w":100,"h":100}},{"since":"2026-08-20T00:00:00Z","at":{"x":1050,"y":2000},"extent":{"w":200,"h":100}}]
+```
+
+- **`claimed_at`** is the instant of the mark's **first** claim, the start of its
+  claim chain. An amend re-dates `date` but never this (Darko, 2026-10-07: *"an
+  amend does not make an elder mark young"*). Absent, the mark's age is its `date`
+  (`tools/claim-instant.mjs § claimInstant`).
+- **`footprints`** is every footprint the mark has stood on: its origin, then each
+  successful amend that changed its geometry, each with the instant it took
+  effect (`since`). It is one line of strict JSON, oldest first, and each entry is
+  `{ since, at, extent, points? }`. **Its positions are WORLD numbers whatever the
+  tree's frame**: a past footprint has no parent to be an offset from, so
+  `loadMarks` never reframes it. With it, seniority at contact is read **cell by
+  cell** on the ground two marks share: whoever first covered a cell is that
+  cell's incumbent, and an expansion is a newcomer on its new cells
+  (`tools/consent.mjs § seniorAtContact`). Absent, or with any entry that does not
+  read whole, every cell is dated by the one instant above, as before.
+
 ## The body
 
 A present-tense observation, **≤ 150 characters**. It is the mark's face in every

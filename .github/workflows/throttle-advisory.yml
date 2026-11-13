@@ -1,0 +1,113 @@
+# throttle-advisory.yml — the 4× CPU page sweep, as an alarm that blocks nothing (WLD-170).
+#
+# Darko, 2026-11-08 14:47 EST: "I think the throttle test should be demoted to an
+# alarm that doesn't block settlement" (then "both", 15:01 EST). The sweep
+# (tools/page-throttle-sweep.advisory.mjs, 24 page tests, each in a child with every
+# page throttled 4×) used to be a test in `npm test`, so a slow shared runner
+# reddened the suite that gates the settlement (S159's hold: suite run 42507981329).
+# It now lives here, on its own check. This is NOT a required check and nothing
+# here changes branch protection: a red is an advisory failure, read by a person.
+# No step masks a failure (no continue-on-error): the job is honestly red when the
+# sweep, the direct lite test or the gauge is.
+#
+# THE ROUTE OUT. `npm test` and tools/run-candle-suites.mjs both enumerate
+# tools/*.test.mjs, and the sweep's name is outside that suffix, so neither can pick
+# it up (tools/candle-boundary.test.mjs holds both facts). The suite's own identity,
+# `suite` in suite.yml, is untouched.
+#
+# THE EVIDENCE THIS JOB CARRIES BESIDE THE SWEEP (WLD-170 A):
+#   · the runner's gauge: the existing tools/geometry-parity.test.mjs test
+#     "THE CROSSING-SPACE EQUIVALENCE", run first and in this same job, its duration
+#     read off the TAP into the job summary, so a reader sees how fast this runner
+#     was when the sweep ran. Informational: nothing reads it as a verdict.
+#   · the direct lite test (tools/lite-mode.test.mjs), whose slow case now runs on the
+#     set slow machine (page-machine.mjs § slowClockWithinATask), with its state lines
+#     in the TAP.
+# And the sweep itself, whose "AT 4× CPU" cases are counted into the summary: the
+# matching suite run has none of them, this one has all.
+#
+# SECURITY. Same as suite.yml: `pull_request`, never `pull_request_target`; no
+# secrets; read-only contents; Node 22, `npm ci` and Playwright's Chromium from the
+# lockfile and nothing else.
+
+name: throttle advisory
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: throttle-advisory-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  throttle-advisory:
+    name: throttle advisory
+    if: github.repository == 'postmark-town/postmark-world'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      # As suite.yml: the page tests read this repo's own history in places.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The page tests build scratch git repos in places (suite.yml measured 48 suites red without it).
+      - name: a committer identity
+        run: |
+          git config --global user.name "postmark throttle advisory"
+          git config --global user.email "throttle-advisory@postmark.invalid"
+
+      - name: playwright and its Chromium
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: the browser launches
+        run: node -e 'import("playwright").then(async ({ chromium }) => { const b = await chromium.launch(); console.log(`chromium ${b.version()} launches`); await b.close(); })'
+
+      # THE GAUGE, first, before anything heavy runs in this job. Its duration is the
+      # runner's speed as the existing suite measures it; 62 s is the reference WLD-170
+      # names (the failed run's gauge read 48 s on its own, inside a loaded suite).
+      - name: the gauge — the existing crossing-space equivalence test, in this job
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          node --test --test-reporter=tap tools/geometry-parity.test.mjs 2>&1 | tee "$RUNNER_TEMP/gauge.tap"
+          ms=$(awk '/^(ok|not ok) [0-9]+ - THE CROSSING-SPACE EQUIVALENCE/ {f=1; next} f && /duration_ms:/ {print $2; exit}' "$RUNNER_TEMP/gauge.tap")
+          test -n "$ms" || { echo "::error::the gauge test printed no duration, so this job has no runner-speed reading" >&2; exit 1; }
+          verdict=$(awk -v ms="$ms" 'BEGIN { print (ms < 62000) ? "below" : "NOT below" }')
+          echo "gauge (tools/geometry-parity.test.mjs, THE CROSSING-SPACE EQUIVALENCE): ${ms} ms on this runner, ${verdict} the 62 s reference" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: the direct lite test — its slow case on the set slow machine
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          node --test --test-reporter=tap tools/lite-mode.test.mjs 2>&1 | tee "$RUNNER_TEMP/lite.tap"
+          if grep -E '# .*(playwright is absent|NO PLAYWRIGHT)' "$RUNNER_TEMP/lite.tap"; then
+            echo "::error::the lite test skipped for want of playwright, so it guarded nothing" >&2
+            exit 1
+          fi
+
+      - name: the 4× CPU sweep
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          npm run test:throttle -- --test-reporter=tap 2>&1 | tee "$RUNNER_TEMP/sweep.tap"
+          ok=$(grep -c -E '^ok [0-9]+ - AT [0-9]+× CPU: ' "$RUNNER_TEMP/sweep.tap" || true)
+          bad=$(grep -c -E '^not ok [0-9]+ - AT [0-9]+× CPU: ' "$RUNNER_TEMP/sweep.tap" || true)
+          echo "sweep: ${ok} 'AT 4× CPU' cases ok, ${bad} not ok" | tee -a "$GITHUB_STEP_SUMMARY"
+          if grep -E '# .*(playwright is absent|NO PLAYWRIGHT)' "$RUNNER_TEMP/sweep.tap"; then
+            echo "::error::a swept test skipped for want of playwright, so it guarded nothing" >&2
+            exit 1
+          fi

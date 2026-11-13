@@ -22,14 +22,14 @@
 // runs the exact library anyone can `node`. If this page and a clone disagree,
 // the office has explaining to do.
 import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
-import { orient, openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
+import { openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
 import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creature's ring stops at its room's walls (WLD-25)
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
 import { propertyOf, propertyValue } from "../tools/class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2); a property's value as the record writes it
 import { markStanding } from "../tools/mark-standing.mjs"; // the ONE standing rule: in a parcel's directory → home
-import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING } from "../tools/walk.mjs";
+import { fractionalCrossing, positionAt, parseWalkLedger, targetEntryT, currentDeparture, WALK_KM_PER_CROSSING, CROSSING_EPOCH_UTC, CROSSING_MS } from "../tools/walk.mjs";
 import { crossingsOnSegment, waterFeatures, seaFeature } from "../tools/water.mjs";
 // the town's own roster of regions, stated once in the record's own view: a water
 // mark carries a ring too, and the sea is not a region anyone is filed under
@@ -57,7 +57,7 @@ import { createHomeColumn, homeHandleForParcel, isParcelMark, HOME_COLUMN_CSS } 
 import { homeOf, homesOnParcel } from "../tools/where-is.mjs";
 // WHAT A MARK IS, AS ICONS (Darko, playground sitting 2026-10-15): the closed
 // vocabulary, its one-line meanings and its three renderings live in one file.
-import { markIcons, iconSVG, iconsHTML, creatureClassesOf, thingClassesOf, MARK_ICON_CSS } from "./mark-icons.mjs";
+import { markIcons, iconSVG, iconsHTML, creatureClassesOf, thingClassesOf, MARK_ICON_CSS, MARK_ICONS } from "./mark-icons.mjs";
 // LOGOS v2 part 2 on the page (POS-678): what a holder holds, who carries what,
 // and the say card's numbers, each from the office's own reads.
 import { holderLines, residentHoldLines, handsLines, holdingParts, heldWords, sayCardNote, thingKindLedger, isThingId } from "./holdings.mjs";
@@ -1800,19 +1800,21 @@ export function townGround(marks, skeleton, { originPx, mPerPx, pad = TOWN_GROUN
 // so on the painting, OPEN, at the pane's upper left, in every view mode
 // (Keemin, 2026-09-23: "just always have that mark card expanded, and sitting in
 // the upper left, and move the 'exit' button *into* the card while making it
-// easily distinguishable"). It is the SAME card the corner dot used to open on a
-// hover or a click — the room's own mark cell and its predicates, the pinned
-// bubble's recipe — so outside and inside read the room with one component. It
-// rests COMPACT and a click expands it (Keemin, same day: "always open but not
-// expanded, and you can click to expand it"); see syncRoomCard. What this
-// function adds is the two things only the inside has: the "you are inside"
+// easily distinguishable"). It was built as the SAME card the corner dot used
+// to open on a hover or a click — the room's own mark cell and its predicates,
+// the pinned bubble's recipe — resting COMPACT with a click to expand (Keemin,
+// same day: "always open but not expanded, and you can click to expand it");
+// it is the nameplate now (see below), and syncRoomCard says what that changed.
+// What this function adds is the two things only the inside has: the "you are inside"
 // head, and THE WAY OUT, on its own row under a rule so it reads as the one act
 // on a card that is otherwise a reading.
 //
 // One button class for the way out (`.wv-int-exit-btn`, `data-mark`), the one
 // the click route has always listened for; the label is exitButtonLabel's, so a
-// nested dweller's exit still names the room it opens onto. `cellHTML` is the
-// caller's mark cell, passed in whole — this function never re-renders a mark.
+// nested dweller's exit still names the room it opens onto. The caller passes
+// the nameplate in whole (`plateHTML`, below) — this function never re-renders
+// a mark. (Before the nameplate the card held the room's own mark cell, and the
+// parameter was the cell's markup; the cell is gone from the card.)
 //
 // THE CARD IS A NAMEPLATE NOW (Darko, playground sitting 2026-10-15 18:20: the
 // open card "is a bit obnoxious … whatever code we use to simplify or minimize
@@ -1832,9 +1834,10 @@ export function roomCardHTML({ roomId = null, plateHTML = "", exitLabel = "↤ s
 // ── the plaque ──────────────────────────────────────────────────────────────
 //
 // What the telling still says about the room once the card carries its head:
-// who else is in it. The name and the room's own body live on the card (above);
-// printing them again at the top of the telling would be the one room told
-// twice on one screen. An empty company is no plaque at all.
+// who else is in it. The name lives on the card (above, as its nameplate) and
+// the room's own body in the column that a press on the plate opens; printing
+// either again at the top of the telling would be the one room told twice on
+// one screen. An empty company is no plaque at all.
 export function interiorPlaqueHTML({ room, bodies = [], you = null } = {}) {
   if (!room?.id || !bodies.length) return "";
   const others = bodies.filter((h) => h !== you);
@@ -2113,14 +2116,15 @@ const MARK_IMAGE_SHELF = /^https:\/\/media\.postmark\.town\/media\/[A-Za-z0-9][A
 // A DEFAULT, NOT AN AMPUTATION. The whole machinery stays; one switch turns it
 // back on, so restoring it later is a change of default rather than a rebuild.
 //
-// WHAT THIS REACHES, exactly. The mark CELL is the only surface outdoors that
-// fetches a mark's picture — the telling's cards and the bubbles, through
-// hydrateMarkImages. The other two art surfaces are already scene-gated to a
-// room and are untouched: the entered room's GROUND (roomGround, the founder's
-// own acceptance shape from the same evening) and the art hung on the things
-// inside it (sceneArtSVG, drawn only where mapCtx.placeholderExtents is set,
-// which only mountRoomScene sets). So "the map loads none, interiors paint
-// theirs" is not a state test at render time — it is which surface asks.
+// WHAT THIS SWITCH REACHES, exactly: the mark CELL — the telling's cards and
+// the bubbles, through hydrateMarkImages (markCell reads it). It was written
+// when the cell was the only surface outdoors that fetched a mark's picture;
+// the painting's own art surfaces are not behind it: the entered room's GROUND
+// (roomGround, the founder's own acceptance shape from the same evening) and
+// the art hung on the things inside a scene (sceneArtSVG, drawn only where
+// mapCtx.placeholderExtents is set — mountRoomScene sets it, and so does the
+// town's own mount, since the town hangs its own art now). So what loads where
+// is not a state test at render time — it is which surface asks.
 export const MARK_ART_PARAM = "mark-art";
 export function markArtOnMap(search = typeof location === "undefined" ? "" : location.search) {
   try { return new URLSearchParams(String(search ?? "")).get(MARK_ART_PARAM) === "on"; }
@@ -2209,12 +2213,13 @@ export const OVERLAY_PIP_R = 11;
 export const OVERLAY_DOT_R = 17;
 export const OVERLAY_HALO_R = 36;
 
-/** One pip, at its painting coordinates. The fan offset is a `cx`/`cy` INSIDE
- *  the scaled group, so it stays a constant few panel pixels at any zoom — the
- *  same thing dividing it by k used to buy. */
+/** One pip, at its painting coordinates. A `fan` offset, when one is passed, is
+ *  a `cx`/`cy` INSIDE the scaled group, so it stays a constant few panel pixels
+ *  at any zoom — the same thing dividing it by k used to buy. The map passes no
+ *  fan (WLD-95), so its pips sit at their anchors. */
 // A DOORWAY IS CUT INTO THE DOT, never drawn instead of it. `.ov-pip` is the
 // hover anchor selector, the click target and the tier-colour surface, and the
-// fan offset is a cx/cy inside the scaled group — swapping the circle for a
+// (optional) fan offset is a cx/cy inside the scaled group — swapping the circle for a
 // bespoke shape would have quietly cost all four to gain a picture. So the
 // circle is untouched and a small arched opening sits over it in the page's own
 // dark, which is enough to tell a way through from a thing on a shelf at a
@@ -2317,14 +2322,16 @@ export function standpointDotShown({ spectating = true, handle = null, walkers =
 //
 // Same contract as the pips: authored in painting units, sized by the camera
 // through `.ov-s`, no camera argument. The pip circle is still emitted on top,
-// transparent — it is the hover anchor (`anchor: ".ov-pip"`), the hit target and
-// the fan's seat, and none of that moves.
+// transparent — it is the hover anchor (`anchor: ".ov-pip"`) and the hit target
+// (and the seat of a fan offset, were one passed), and none of that moves.
 //
-// THE FRAME IS THE LIGHT (the two derived lights, ruled 2026-09-10): a house is
-// LIT when its resident is HOME — a walker of the parcel's household at rest
-// inside the parcel. Derived at draw time from the walkers the map already
-// holds; nothing is stored. AWAKE (acted within 72 h) has no source at the door
-// yet and is not drawn — a light that cannot be derived is left dark.
+// THE FRAME IS THE LIGHT: the frame glows when the house is LIT (`lit`, which
+// the caller derives with lightOf). On 2026-09-10 this was ruled as two derived
+// lights — resident HOME, a walker of the household at rest inside the parcel,
+// and AWAKE (acted within 72 h). The rule has since changed: the porch light is
+// household activity (WLD-29, `houseLight` below), and walker presence no
+// longer lights a house. Nothing is stored; a light that cannot be derived is
+// left dark.
 export const HOME_CARD = Object.freeze({ w: 52, h: 44, roof: 14 });
 export function homeCardPath({ w, h, roof } = HOME_CARD) {
   const x0 = -w / 2, top = -(h + roof) / 2, eave = top + roof, base = eave + h;
@@ -2345,9 +2352,10 @@ export function homeCardPath({ w, h, roof } = HOME_CARD) {
  *  windows were saying — somebody lives here, this is Postmark — in one mark
  *  instead of three, which is the whole reason the seal exists.
  *
- *  THE LIT STATE SURVIVES THE SWAP, and it had to: a lit house is one whose
- *  resident is home (the two derived lights, ruled 2026-09-10), and it read as
- *  lit because its WINDOWS warmed. With no windows the envelope inherits that
+ *  THE LIT STATE SURVIVES THE SWAP, and it had to: a lit house is a lit house
+ *  (when this was written, one whose resident was home — the rule is household
+ *  activity now, see `houseLight`), and it read as lit because its WINDOWS
+ *  warmed. With no windows the envelope inherits that
  *  job — it fills amber and brightens, beside the frame's own glow — so the
  *  state change is at least as visible as it was. See `.ov-home.lit` below.
  *
@@ -2439,6 +2447,28 @@ export function clipSegmentToBox(from, to, box) {
   };
 }
 
+/**
+ * The part of a walk still to be walked: from where the walker IS at `at`, to
+ * where they are going. Null when there is no leg to draw: no departure, a
+ * finished walk (arrived) or a stop (standing).
+ *
+ * THE DIRECTION IS THE POINT (WLD-144, Bevel 2026-11-02): this is the REMAINING
+ * segment, `positionAt(departure, at)` to `departure.toward`. It is not the
+ * origin to the walker, and not the path already walked.
+ *
+ * Pure, and exported so the 2D walk paths and the 3D trails read one leg
+ * instead of keeping two copies (WLD-105). It adds no clock and no maths: the
+ * position and its arrived/standing flags are positionAt's, `at` is passed
+ * through untouched (undefined stays undefined, so positionAt's own default
+ * clock applies exactly as it did inline), and clipping to the painting stays
+ * with the caller (clipSegmentToBox).
+ */
+export function remainingWalkLeg(departure, at) {
+  const here = positionAt(departure, at);
+  if (!here || here.arrived || here.standing) return null;   // a finished walk is not a path
+  return { from: here, to: departure.toward };
+}
+
 // ── HOW MUCH BIGGER "YOURS" IS (Keemin, 2026-09-13: "let's make them bigger
 // than the others") ────────────────────────────────────────────────────────
 //
@@ -2489,6 +2519,29 @@ export const WALKER_FRAME = Object.freeze({ far: 14, near: 22, legFar: 4, legNea
 // FILLED at every tier, the far tier included — never the far tier's empty
 // frame.
 export const ACTOR_HALO = 5;   // glyph units beyond the frame's rim
+// THE TOWN'S WALKING LEGS AT TOWN WIDTH (Darko, 2026-10-26: "could we make it
+// so that the walking paths are drawn at far distance as well"). The near and
+// mid tiers draw every mover's remaining leg (`wv-walk-leg`, the walker's own
+// line to where they are going) while the far tier drew bodies only, so zooming
+// out made every route but your household's vanish. This is that leg alone,
+// one `<line>` per mover, no destination ring and no faces: the stroke is the
+// stylesheet's `vector-effect:non-scaling-stroke`, so it holds its screen width
+// at any zoom, and the line runs to the walker's destination point (the
+// near-tier's entry-edge clip is sub-pixel at town width and is not asked).
+// Pure over the bodies already culled to the drawn box; it reads no camera, so
+// the wheel never rebuilds it — it is written only when the walk layer's markup
+// changes (writeWalkLayer). `skip` names bodies whose route is drawn elsewhere.
+export function farWalkLegsSVG(bodies, px, skip = () => false) {
+  let s = "";
+  for (const w of bodies ?? []) {
+    if (!w || !w.toward || skip(w)) continue;
+    if (!(w.moving ?? (!w.arrived && !w.standing))) continue;
+    const a = px(w), b = px(w.toward);
+    if (![a.x, a.y, b.x, b.y].every(Number.isFinite)) continue;
+    s += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="wv-walk-leg"/>`;
+  }
+  return s;
+}
 // YOUR HOUSEMATES' RING (POS-373, Darko 2026-10-09: "the residents of your
 // signed-in household are always highlighted, visible with their full profile
 // art"). `ring` is the colour a housemate's frame is drawn in: their own colour,
@@ -2575,7 +2628,7 @@ export function housemateEdges({ walkers = [], handles = [], viewport = null, in
 // instead of ten, and the map still reads as houses.
 //
 // The pip stays, and that is not an oversight: it is the hover anchor, the hit
-// target and the fan's seat (`anchor: ".ov-pip"`, screenMarkCandidates), so a
+// target (`anchor: ".ov-pip"`, screenMarkCandidates), so a
 // glyph that dropped it would make every house at town width unclickable —
 // which is the zoom a reader arrives at.
 export const HOME_GLYPH_SCALE = 0.46;
@@ -3447,6 +3500,13 @@ export function activityFeed({ departures = [], marks = [], stakes = [], blessin
     if (!b?.date || !Number.isInteger(Number(b.n))) continue;
     rows.push({ kind: "settlement", day: activityDayKey(b.date), time: b.date, who: "", subject: null, n: Number(b.n) });
   }
+  // A DAY THAT HAS NOT COME IS NOT LATELY (S131, 2026-10-25). A record dated
+  // after today (UTC, the day key's own clock) waits for its day: the rail is
+  // what has been happening, and a mark dated tomorrow, such as world#309's seven
+  // sweets at 2026-10-26, is not that yet. It is held back before the filter and
+  // the cut, so `total` and "more" count only what the rail may show.
+  const today = activityDayKey(now ?? new Date().toISOString());
+  for (let i = rows.length - 1; i >= 0; i -= 1) if (rows[i].day > today) rows.splice(i, 1);
   rows.sort((a, b) =>
     b.day.localeCompare(a.day)
     || b.time.localeCompare(a.time)
@@ -3463,7 +3523,6 @@ export function activityFeed({ departures = [], marks = [], stakes = [], blessin
   // existed.
   const wanted = kinds == null ? null : new Set(Array.isArray(kinds) ? kinds : [kinds]);
   const kept = wanted?.size ? rows.filter((row) => wanted.has(row.kind)) : rows;
-  const today = activityDayKey(now ?? new Date().toISOString());
   // PAGING, NOT A WIDER CUT. `offset` walks a window of `limit` down the list;
   // raising `limit` alone would re-publish every row the reader has already read
   // and could never reach past one page's worth at the far end. The two are
@@ -3837,7 +3896,9 @@ export function residentProfileView(card = null, look = null, face = null) {
   const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(profile.color ?? "").trim());
   const color = hex ? `#${hex[1].toLowerCase()}` : null;
   const colorName = text(profile.color_name);
-  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · ") });
+  // and the colour itself is drawn beside those words (WLD-145, Darko 2026-11-01 19:18: "we also
+  // don't just SHOW the favorite color"): a swatch only when they chose one, so a name alone has none
+  if (color || colorName) facts.push({ label: "colour", value: [colorName, color].filter(Boolean).join(" · "), ...(color ? { swatch: color } : {}) });
   if (text(profile.runtime)) facts.push({ label: "runs on", value: text(profile.runtime) });
   // A shelf picture travels by the page's own /shelf/ route, as a mark's does
   // (markImagePath): the column's <img> then loads wherever the page is served
@@ -3853,9 +3914,18 @@ export function residentProfileView(card = null, look = null, face = null) {
 // town's own law, but this is a link built from map data, so it is encoded
 // rather than trusted — and a handle that isn't handle-shaped gets no link at
 // all rather than a guessed one.
+//
+// WHAT THE TOWN OWNS HAS NO RESIDENT PAGE (WLD-125; RULED, Darko 2026-11-02 08:32 EST, "I agree with
+// your recs on all calls", the morning dash's call being: a World link from something the town owns
+// draws no link). The town's marks, regions and creatures all carry the handle `the-town`, and
+// `/residents/the-town/` is a 404 on the site. This is the one place the page turns a handle into a
+// link (the home column's foot line and name, and the walker card's "their page →", both come here),
+// so the town's handle is refused here, once, and every link built from an owner inherits it.
 const HANDLE_RE = /^[a-z0-9][a-z0-9-]*$/;
+const TOWN_HANDLE = "the-town";
 export function residentHref(handle) {
   const s = String(handle ?? "").trim();
+  if (s === TOWN_HANDLE) return null;
   return HANDLE_RE.test(s) ? `/residents/${encodeURIComponent(s)}/` : null;
 }
 
@@ -4245,14 +4315,29 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
   const n = (v) => v.toFixed(1);
   const a = px({ x: m.clear.minX, y: m.clear.minY }), b = px({ x: m.clear.maxX, y: m.clear.maxY });
   const r = MISTS_FAR_M / mPerPx;
-  // the wall: everything outward of the clear ground, as one even-odd ring
-  const wall = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
-    + ` d="M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-    + ` M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z`
-    // each clearing is one more hole: a circle, drawn as two half-arcs
-    + (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
-      return ` M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; }).join("")
-    + `"/>`;
+  const sq = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`;
+  // THE CLEARINGS ARE CUT, NOT COUNTED (WLD-134, 2026-10-31: the Spire's
+  // clearing drew as wall). Each clearing used to be one more even-odd ring in
+  // the wall's own path, which is a hole only where a point is inside an ODD
+  // number of rings. Clearings that overlap the clear ground or each other (the
+  // way to the Spire overlaps both; the ragged rings, pushed out to where the
+  // paint turns opaque, overlap wider still) put a point inside two rings, and
+  // two holes made wall: the Spire's grounds were painted over and their
+  // pointer taken, while the engine told them clear. So the path keeps only the
+  // clear ground's ring, and each clearing is its own clip (the square less that
+  // one ring), nested: a point is drawn only if no clearing holds it, the union
+  // the engine's mistsHere already answers. Clips bind the pointer as well as
+  // the paint. No clearing, no clip: the wall is the path it always was.
+  const cut = (body, rings, tag) => !rings.length ? body
+    : `<defs>${rings.map((ring, i) => `<clipPath id="${id}-${tag}${i}" clipPathUnits="userSpaceOnUse"><path clip-rule="evenodd" d="${sq} ${ring}"/></clipPath>`).join("")}</defs>`
+      + rings.reduceRight((inner, _, i) => `<g clip-path="url(#${id}-${tag}${i})">${inner}</g>`, body);
+  // each clearing a circle, drawn as two half-arcs
+  const circles = (m.clearings ?? []).map((k) => { const c = px(k), kr = k.r / mPerPx;
+    return `M ${n(c.x - kr)} ${n(c.y)} a ${n(kr)} ${n(kr)} 0 1 0 ${n(2 * kr)} 0 a ${n(kr)} ${n(kr)} 0 1 0 ${n(-2 * kr)} 0 Z`; });
+  // the wall: everything outward of the clear ground, as one even-odd ring, less the clearings
+  const wallPath = `<path class="wv-mists-wall" data-src="mists:wall" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="all"`
+    + ` d="${sq} M ${n(a.x)} ${n(a.y)} H ${n(b.x)} V ${n(b.y)} H ${n(a.x)} Z"/>`;
+  const wall = cut(wallPath, circles, "cut");
   if (painted && ragged) {
     const STEP = 60, pt = (q) => { const v = px(q); return `${n(v.x)} ${n(v.y)}`; };
     const out = (at, dir) => { const d = mistsOpaqueFromM(m, at, dir, { stepM: 15 }); return { x: at.x + dir.x * d, y: at.y + dir.y * d }; };
@@ -4263,15 +4348,14 @@ export function mistsWallSVG(m, { originPx, mPerPx, id = "wv-mists", painted = f
     side(c.maxX, c.minY, c.maxX, c.maxY, { x: 1, y: 0 });
     side(c.maxX, c.maxY, c.minX, c.maxY, { x: 0, y: 1 });
     side(c.minX, c.maxY, c.minX, c.minY, { x: -1, y: 0 });
-    let d = `M ${n(originPx.x - r)} ${n(originPx.y - r)} H ${n(originPx.x + r)} V ${n(originPx.y + r)} H ${n(originPx.x - r)} Z`
-      + ` M ${ring.map(pt).join(" L ")} Z`;
-    for (const k of m.clearings ?? []) {
+    const arcs = (m.clearings ?? []).map((k) => {
       const steps = Math.max(24, Math.ceil(2 * Math.PI * k.r / STEP)), arc = [];
       for (let i = 0; i < steps; i++) { const a = 2 * Math.PI * i / steps, dir = { x: Math.cos(a), y: Math.sin(a) };
         arc.push(out({ x: k.x + dir.x * k.r, y: k.y + dir.y * k.r }, dir)); }
-      d += ` M ${arc.map(pt).join(" L ")} Z`;
-    }
-    const back = `<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none" d="${d}"/>`;
+      return `M ${arc.map(pt).join(" L ")} Z`;
+    });
+    const back = cut(`<path class="wv-mists-wall-ragged" data-src="mists:wall-ragged" fill="${MISTS_INK}" fill-rule="evenodd" pointer-events="none"`
+      + ` d="${sq} M ${ring.map(pt).join(" L ")} Z"/>`, arcs, "rcut");
     return `<g class="wv-mists" aria-hidden="true">${back}${wall.replace(` fill="${MISTS_INK}"`, ` fill="${MISTS_INK}" fill-opacity="0"`)}</g>`;
   }
   // a clearing's fringe: a soft ring on its own clear side, fading inward from the wall
@@ -4534,6 +4618,35 @@ export function creatureIcon() {
   return markIcons({ kind: "sited", id: CREATURE_PREFIX, at: { x: 0, y: 0 } }, { cls: "creature" })[0];
 }
 
+/** The creature's own CSS in the 2D page's STYLE: the live-creature token (art, hit, disc, awareness ring,
+ *  highlight) and the red nameplate accent, one contiguous slice that `STYLE` interpolates at its original place
+ *  (WLD-144 W3; WLD-105). Bytes unchanged. Exported so the 3D view imports it instead of copying it. */
+export const CREATURE_CSS = `/* THE LIVE CREATURES (play fix 35): the Mists' own silhouette, dark with a pale
+   rim so it reads on any ground, held at a pip's size; the creature icon at its
+   feet at street zoom; their answer to an act in a note like the walk's */
+.ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
+.ov-creature-art { fill:#4a2326; pointer-events:none; }
+/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
+   portrait sits, the rim in a deeper red of the same hue, and no legs */
+.ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
+.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
+.ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
+.wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
+.wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */`;
+
+/** A live creature's nameplate (the hover plate): its icon and its name, the plate's `data-nameplate` carrying
+ *  its id. Pure: takes the creature row ({ id, name, ... } from liveCreaturesFrom), and a missing row is "".
+ *  Hoisted out of `mountViewer`, where it took the lookup key and read `liveCreatures.get(key)`; the row's own
+ *  `id` is that key, because the one writer sets `liveCreatures.set(c.id, c)` (loadLiveCreatures).
+ *  Its other dependencies are top-level in this module: `esc` (the escaper above), `iconsHTML` (imported from
+ *  ./mark-icons.mjs) and `creatureIcon` (above). */
+export function creatureNameplateHTML(c) {
+  if (!c) return "";
+  return '<div class="wv-nameplate" data-nameplate="' + esc(c.id) + '">'
+    + '<span class="wv-np-what">' + iconsHTML([creatureIcon()]) + '</span>'
+    + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
+}
+
 /** The living creatures in an apex find answer: [{ id, kind, name, x, y, fades_in }]. Pure. */
 export function liveCreaturesFrom(answer) {
   const rows = answer?.found?.creatures ?? answer?.creatures ?? [];
@@ -4576,6 +4689,20 @@ export function newReactions(rows = [], seenMs = null, { nowMs = Date.now(), fre
   return { lines, newestMs: Number.isFinite(newest) ? newest : seenMs };
 }
 
+/** The model a creature runs on: Jev answers for every creature (Darko 2026-10-24 14:21). */
+export const CREATURE_MODEL = "Jev";
+/** How many of a creature's newest reactions its column lists (the office serves up to ten). */
+export const CREATURE_HISTORY_ROWS = 10;
+const IRREGULAR_PAST = { say: "said", give: "gave", hold: "held", leave: "left", take: "took", go: "went", run: "ran", set: "set", put: "put",
+  make: "made", eat: "ate", throw: "threw", hurl: "hurled", come: "came", stand: "stood", sit: "sat", see: "saw", speak: "spoke", read: "read",
+  strike: "struck", tell: "told", "speak-for": "spoke for", cast: "cast", drop: "dropped", withdraw: "withdrew" };
+/** "kai approached": who acted and the verb they used, in the past. A missing verb leaves the name; a missing name, the verb. Pure. */
+export function pastVerb(who, verb) {
+  const v = String(verb ?? "").trim().toLowerCase();
+  const past = !v ? "" : IRREGULAR_PAST[v] ?? (/e$/.test(v) ? v + "d" : /[^aeiou]y$/.test(v) ? v.slice(0, -1) + "ied" : v + "ed");
+  return [String(who ?? "").trim(), past].filter(Boolean).join(" ");
+}
+
 /** What a creature's column says beside its words: { facts, lately } from its
  *  find row and its investigate answer (either may be missing). Pure. */
 export function creatureColumnFacts(row = null, inv = null, { timeZone = undefined } = {}) {
@@ -4594,10 +4721,14 @@ export function creatureColumnFacts(row = null, inv = null, { timeZone = undefin
     { label: "kind", value: row?.kind ?? inv?.id?.slice(CREATURE_PREFIX.length).replace(/-\d.*$/, "") ?? "" },
     { label: "doing", value: now?.state ?? "" },
     { label: "out since", value: when(now?.out_since) },
-    { label: "fades", value: [row?.fades_in ? `in ${row.fades_in}` : "", when(now?.fades_at) ? `(${when(now?.fades_at)})` : ""].filter(Boolean).join(" ") },
+    // what it runs on, where a resident's column says "runs on" (Darko 2026-10-24 14:21). A creature never fades (WLD-96), so no fade row
+    { label: "runs on", value: row || inv ? CREATURE_MODEL : "" },
   ].filter((f) => String(f.value ?? "").trim());
-  const lately = (inv?.reactions?.rows ?? []).filter((r) => String(r?.line ?? "").trim()).slice(0, 4)
-    .map((r) => ({ label: "lately", value: String(r.line).trim() + (when(r.at) ? " (" + when(r.at) + ")" : "") }));
+  // WHAT IT DID, AND TO WHOM (POS-781): "kai approached → it snarls at kai (2 min ago)". The office serves these from its acts, so a
+  // creature that has fled still shows them. A row with no words of its own says the reaction's name
+  const lately = (inv?.reactions?.rows ?? []).filter((r) => String(r?.line ?? r?.reaction ?? "").trim()).slice(0, CREATURE_HISTORY_ROWS)
+    .map((r) => ({ label: "lately", value: [pastVerb(r.to, r.verb), String(r.line ?? r.reaction).trim()].filter(Boolean).join(" → ")
+      + (when(r.at) ? " (" + when(r.at) + ")" : "") }));
   // (what it remembers is its lately rows below; the bare count repeated them)
   return { facts, lately, bars };
 }
@@ -4760,8 +4891,8 @@ export function snappedMarkAtPoint(point, marks = [], radiusPx = MARK_SNAP_RADIU
 //
 // The rule is DON'T GUESS. One pip in radius is exactly today's behaviour; more
 // than one and the reader chooses. That is the whole design — the chooser is the
-// guarantee, and the fan below is only a courtesy that makes the pile legible
-// before you click it.
+// guarantee. (A fan, below, was once a courtesy that made the pile legible
+// before you click it; the map no longer draws one.)
 
 // Everything the point reaches, best first. It is the SAME ranking function the
 // snap calls, not merely the same metric written twice, so the head of this list
@@ -5601,8 +5732,7 @@ const stepLabel = (m) => (m >= 1000 ? `${(m / 1000).toFixed(m % 1000 ? 1 : 0)} k
 // since the ledger's first delivery day; the "provisional pending a ruling" line is
 // now the viewer's default). fog is the crossing's weather, so an open tab that
 // rolls over a crossing boundary re-tells with fresh weather.
-const CROSSING_EPOCH_UTC = Date.UTC(2026, 5, 12); // 2026-06-12T00:00Z
-const liveCrossing = () => Math.max(0, Math.floor((Date.now() - CROSSING_EPOCH_UTC) / (12 * 3600 * 1000)));
+const liveCrossing = () => Math.max(0, Math.floor((Date.now() - CROSSING_EPOCH_UTC) / CROSSING_MS));
 
 // dev-pane dials — the FOV-time leans only (assembly-time idw stays fixed, so a
 // dial change never re-folds or re-assembles: it re-tells). Each is {key,label,
@@ -5639,8 +5769,12 @@ const DRAW_DIALS = [
   { key: "placed_art_min_m", label: "hangs its picture above (m)", min: 25, max: 4000, step: 25 },
 ];
 
-const STYLE = `
-.wv { --night:#14171d; --panel:#1c2129; --panel2:#20262f; --line:#2e3542;
+// The three slices of the shell that the 3D view shares with this one (WLD-144;
+// WLD-105: "Where the World exports a thing, import it"). Each is the exact text
+// that STYLE carried at that spot, interpolated back in place below, so the page
+// emits the same bytes it always did. The root rule sets the defaults (amber, gold,
+// the draft grey…) on .wv itself; a host's season frame overrides them there.
+export const WV_ROOT_CSS = `.wv { --night:#14171d; --panel:#1c2129; --panel2:#20262f; --line:#2e3542;
   --paper:#e8e0cf; --dim:#9a9280; --amber:#e8c56a; --amber-dark:#b8964a; --err:#d98a7a;
   --you:#e0654a; /* ember — "this is you", softened from alarm-red (Keemin 2026-07-30) */
   --mono:ui-monospace,"SF Mono",Consolas,Menlo,monospace;
@@ -5659,7 +5793,19 @@ const STYLE = `
      this world is warm, so a draft reads as not yet of it. */
   --draft:#9aa0ab; --draft-dark:#5d636e;
   background:var(--night); color:var(--paper); font:16px/1.55 Georgia,"Times New Roman",serif;
-  min-height:100vh; }
+  min-height:100vh; }`;
+export const WV_EXTENT_CSS = `.wv-extent { display:inline-flex; align-items:center; gap:4px; opacity:.8; }
+.wv-extent svg { display:block; }
+.wv-extent svg rect, .wv-extent svg polygon { fill:rgba(154,146,128,.18); stroke:var(--dim); stroke-width:1; }
+.wv-extent-t { font-size:.66rem; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap; }`;
+export const WV_ENTER_CSS = `/* the door, on the card it belongs to */
+.wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
+  border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
+.wv-enter:hover { background:rgba(224,160,42,.12); }
+.wv-enter[disabled] { opacity:.6; cursor:default; }`;
+
+const STYLE = `
+${WV_ROOT_CSS}
 .wv * { box-sizing:border-box; }
 /* ONE FOCUS RING for the whole viewer. Four controls used to take the browser's
    outline away and lean on their hover style instead — which leaves someone
@@ -5826,6 +5972,12 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   color:var(--dim); font-family:var(--mono); font-weight:400; }
 .wv-view-sub { margin:5px 0 0; color:var(--dim); font-size:.76rem; line-height:1.5;
   font-style:italic; max-width:48ch; }
+.wv-lens-note { margin:6px 0 0; font-size:.76rem; line-height:1.5; max-width:48ch; }
+/* where it goes when the Telling cannot be seen (a phone, or the Telling folded): the top of the map's side, right
+   above the toggle's cluster, in flow like the "world moved" toast so it cannot sit on a wrapped row of buttons. It
+   sets no display, so the hidden attribute still hides it. */
+.wv-map .wv-lens-note { position:sticky; top:6px; z-index:5; align-self:flex-end; margin:6px 10px 8px; padding:4px 13px;
+  max-width:min(30rem,calc(100% - 20px)); background:var(--panel2); border:1px solid var(--amber-dark); border-radius:14px; }
 .wv-viewhead + .wv-telling { padding-top:12px; }
 
 /* Two panels, no bars. Both are content to their own edges — the painting runs
@@ -5976,10 +6128,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-chip.stamps { border-color:var(--stamp-violet-dark); color:var(--stamp-violet); }
 .wv-chip.signal { border-color:var(--amber-dark); color:var(--amber); }
 .wv-chip.dim { opacity:.6; }
-.wv-extent { display:inline-flex; align-items:center; gap:4px; opacity:.8; }
-.wv-extent svg { display:block; }
-.wv-extent svg rect, .wv-extent svg polygon { fill:rgba(154,146,128,.18); stroke:var(--dim); stroke-width:1; }
-.wv-extent-t { font-size:.66rem; color:var(--dim); font-variant-numeric:tabular-nums; white-space:nowrap; }
+${WV_EXTENT_CSS}
 .wv-cluster { margin-top:7px; font-size:.8rem; font-style:italic; color:var(--amber); opacity:.85; }
 .wv-tallies { margin-top:22px; padding-top:10px; font-size:.82rem; color:var(--dim); border-top:1px solid var(--line); max-width:76ch; }
 /* what this standpoint has CROSSED INTO — never where it is standing (R15) */
@@ -5994,11 +6143,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   border-left:5px solid var(--amber); background:rgba(224,160,42,.07); }
 .wv-int-company { margin:8px 0 0; font-size:.86rem; font-style:italic; color:var(--dim); }
 .wv-int-plaque > .wv-int-company:first-child { margin-top:0; }
-/* the door, on the card it belongs to */
-.wv-enter { font:inherit; font-size:.78rem; padding:1px 9px; margin-right:6px; cursor:pointer;
-  border:1px solid var(--amber-dark); border-radius:999px; background:transparent; color:var(--amber); }
-.wv-enter:hover { background:rgba(224,160,42,.12); }
-.wv-enter[disabled] { opacity:.6; cursor:default; }
+${WV_ENTER_CSS}
 .wv-cross-sheet.is-far .wv-walk-enter { border-color:var(--amber); color:var(--amber); }
 .wv-cross-sheet { margin:10px 0 0; padding:10px 12px; border-left:4px solid var(--amber);
   background:rgba(224,160,42,.07); font-size:.92rem; }
@@ -6544,6 +6689,14 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-enterexit-lbl { font-size:.68rem; letter-spacing:.13em; text-transform:uppercase; color:var(--dim); }
 .wv-enterexit-room b { color:var(--amber); font-weight:600; }
 #wv-walk-readout { opacity:.75; }
+/* IN TOWN BY MAIL (POS-945): a quiet strip under the painting, capped so a long list scrolls itself and never takes the map */
+.wv-bymail { flex:none; max-height:7.5rem; overflow-y:auto; padding:8px 12px 10px; border-top:1px solid var(--line); background:var(--panel);
+  scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
+.wv-bymail[hidden] { display:none; }
+.wv-bymail-head { margin:0 0 5px; font-size:.68rem; letter-spacing:.13em; text-transform:uppercase; color:var(--dim); font-weight:600; }
+.wv-bymail-list { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:3px 14px; font-size:.82rem; line-height:1.45; }
+.wv-bymail-link { color:var(--amber); text-decoration:none; overflow-wrap:anywhere; }
+.wv-bymail-link:hover, .wv-bymail-link:focus-visible { text-decoration:underline; }
 /* the viewport (P2 right-pane convergence): pan/zoom/lock-on live on the painting */
 /* The painting's controls FLOAT ON THE PAINTING (Keemin, 2026-08-04) — they act
    on what is under them, so they sit on it, in the same family as the coordinate
@@ -6669,7 +6822,15 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
 .wv-convo { fill:rgba(183,198,212,.06); stroke:#7f93a6; }
 .wv-convo.is-live { fill:rgba(183,198,212,.12); stroke:#b7c6d4; stroke-width:2;
   stroke-dasharray:none; animation:wv-convo-breathe 3.2s ease-in-out infinite; }
-.wv-convo.is-aboard { stroke-dasharray:6 5; }
+/* a thread on the deck keeps its dashed ring, live or cooling: is-aboard sits on the badge wrapper, the ring is its circle */
+.wv-convo-badge.is-aboard .wv-convo { stroke-dasharray:6 5; }
+/* the badge (POS-779): a pale gray-white disc carrying the conversation icon; the ring is the
+   shared dotted line when the thread is from an earlier settlement, solid and breathing when live */
+.wv-convo-disc { fill:#cfd6dd; }
+.wv-convo-badge .wv-convo { fill:none; stroke:#7f93a6; }
+.wv-convo-badge .wv-convo.is-live { stroke:#ffffff; }
+.wv-convo-badge.is-cooling { opacity:.55; }
+.wv-convo-badge .ov-ic { pointer-events:none; }
 .wv-hl-label.wv-hl-convo { color:#b7c6d4; }
 .pannable.over-convo { cursor:pointer; }
 @keyframes wv-convo-breathe { 0%,100% { stroke-opacity:.9; } 50% { stroke-opacity:.45; } }
@@ -6765,18 +6926,7 @@ html.wv-lite .wv-mc-flit, html.wv-lite .wv-mc-lift, html.wv-lite .wv-mc-eyes { a
   font:600 .82rem/1.35 Consolas,Menlo,monospace; opacity:0; transition:opacity .25s; pointer-events:none; }
 .wv-walk-note.show { opacity:1; }
 .wv-walk-note.refusal { border-color:#b5524a; color:#f0b0a8; }
-/* THE LIVE CREATURES (play fix 35): the Mists' own silhouette, dark with a pale
-   rim so it reads on any ground, held at a pip's size; the creature icon at its
-   feet at street zoom; their answer to an act in a note like the walk's */
-.ov-creature-hit { fill:transparent; pointer-events:none; }   /* the map hit-tests the point; nothing on the stage takes the pointer */
-.ov-creature-art { fill:#4a2326; pointer-events:none; }
-/* THE CREATURE TOKEN (play fix 40; a diamond since WLD-82): pastel red where a
-   portrait sits, the rim in a deeper red of the same hue, and no legs */
-.ov-creature-disc { fill:#f4b4ad; pointer-events:none; }
-.ov-creature-aware { fill:rgba(216,112,106,.06); stroke:#d8706a; pointer-events:none; }   /* its awareness ring, in the faint ring's line (WLD-82) */
-.ov-creature-ring { fill:none; stroke:#d8706a; stroke-width:2; stroke-linejoin:round; vector-effect:non-scaling-stroke; pointer-events:none; }
-.wv-hl-creature { fill:none; stroke:#d8c6cf; stroke-width:2; vector-effect:non-scaling-stroke; }
-.wv-bubble.is-nameplate.is-creature { --wv-mark-accent:#d8706a; }   /* red means a creature (play fix 43) */
+${CREATURE_CSS}
 .wv-choose-row.is-convo { border-left:3px solid #7f93a6; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
 .wv-choose-row.is-creature { border-left:3px solid #d8706a; display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; font-size:.78rem; }
 .wv-creature-note { position:absolute; z-index:9; left:50%; bottom:58px; transform:translateX(-50%); max-width:min(34rem,80%);
@@ -7173,6 +7323,7 @@ const MARKUP = `
     <div class="wv-viewhead">
       <h2>The Telling</h2>
       <p class="wv-view-sub">closer to how your agent sees the world — the record told in words from where you stand, never drawn</p>
+      <p class="wv-lens-note wv-quiet" role="status" hidden></p>
     </div>
     <div class="wv-telling"><div class="wv-quiet">opening your eyes…</div></div>
   </section>
@@ -7236,7 +7387,7 @@ const MARKUP = `
                the rail no longer offers them. -->
           <button type="button" class="ctl wv-outsider-toggle" aria-pressed="false" hidden aria-label="view as an outsider"
             title="view as an outsider: the world as a stranger sees it, as if your household owned nothing (read-only)">👁</button>
-          <button class="ctl wv-map-convo" aria-label="conversations" title="where the town is talking — live threads and the last day's, drawn as the ground they covered; labels link to the record">💬</button>
+          <button class="ctl wv-map-convo" aria-label="conversations" title="where the town is talking — one badge per conversation, kept for the settlement; hover for the words, click to read it">💬</button>
           <button type="button" class="ctl wv-tour-open" aria-label="Take the tour"
             title="a short tour of the world">?</button>
           </div>
@@ -7272,6 +7423,12 @@ const MARKUP = `
             <p class="wv-walk-answer" hidden></p>
           </div>
         </section></div>
+      <!-- IN TOWN BY MAIL (POS-945, Darko 2026-11-07: "A list beside the map"). Residents the town has no position for: names only,
+           each to their address page, never a dot on the painting. Hidden until the town's own answer names one. -->
+      <section class="wv-bymail" aria-label="In town by mail" hidden>
+        <h2 class="wv-bymail-head">In town by mail</h2>
+        <ul class="wv-bymail-list"></ul>
+      </section>
     </div>
   </aside>
 </div>
@@ -7575,6 +7732,10 @@ export const mineForSight = (outsider, mine) => (outsider ? new Map() : mine);
  *  ignores the undeclared query key and answers your own sight, so an outsider
  *  read is believed only when it says `lens: "outsider"`. Pure. */
 export const lensAnswered = (asked, read) => !asked || read?.lens === OUTSIDER_LENS;
+/** The line the office says when the lens changed nothing for this household (POS-823: "when the World's outsider
+ *  view changes nothing for a household, say why"), exactly as it sent it; "" when it sent none. The office holds the
+ *  whole world, so it alone knows; this page keeps no rule and no wording of its own. Only a lens read's line counts. Pure. */
+export const lensNoteOf = (read) => (read?.lens === OUTSIDER_LENS && typeof read?.lens_note === "string" ? read.lens_note.trim() : "");
 /** Is a read that just landed still the one the page wants? The office, the
  *  actor AND the lens it was asked under must all still hold (WLD-110 F1). Pure. */
 export const readStillWanted = ({ handle, office, lens }, now) => handle === now.handle && office === now.office && lens === now.lens;
@@ -7667,6 +7828,47 @@ export function withTownBodies(earshot = [], town = []) {
   }
   for (const r of near.values()) if (!seen.has(r.handle)) { seen.add(r.handle); out.push(r); }
   return out;
+}
+
+// ── IN TOWN BY MAIL (POS-945, Darko 2026-11-07 22:06 EST: "A list beside the map") ──
+//
+// Little Bird counted, on Discord 11-07 20:27 EST: residents who have never walked sit on the walkers door at
+// the Origin with `placeholder: true`, and the map leaves them off — 71 of the 356 that evening, 14 of whom had
+// written letters that week. Pidgey found it. They are in town by mail: they have a name and no position.
+//
+// Wright's build shape (11-08 03:08Z): "In town by mail", names only, each linking to their address page.
+// Never a dot at the Origin, and no position made up. A resident leaves the list the moment they have a real
+// position (a walk, a landing or ground). Source the list from what already marks them (the walkers door's
+// placeholder: true), so it can't drift from the map's own rule.
+//
+// So the list is read from the town's raw walkers answer, before anything is filtered to the positioned, and by
+// the flag alone: not a zero coordinate, not the absence of a walk, not earshot. A handle the answer ALSO carries
+// without the flag has a real row, and a real row wins. Pure.
+export function byMailFrom(rows = []) {
+  const mail = new Set(), placed = new Set();
+  for (const w of rows ?? []) {
+    if (!w?.handle || w.handle === TOWN_HANDLE) continue;
+    (w.placeholder === true ? mail : placed).add(String(w.handle));
+  }
+  return [...mail].filter((h) => !placed.has(h)).sort();
+}
+
+/**
+ * The town's rows that are bodies: everything but a row the town flags `placeholder: true` (the Origin's stand-in, not a position).
+ * Taken BEFORE `withTownBodies` keeps one row per handle: it keeps the first, so a flagged row ahead of a real row for the same handle
+ * would otherwise win the dedupe, be dropped afterwards, and leave that resident neither listed nor drawn. Pure.
+ */
+export function placedRows(rows = []) {
+  return (rows ?? []).filter((w) => w?.placeholder !== true);
+}
+
+/** The list's items: a name, linked to their address page where `residentHref` allows one (it refuses what is not a handle), else the name as text. Escaped. Pure. */
+export function byMailHTML(handles = [], { nameOf = (h) => h } = {}) {
+  return (handles ?? []).map((h) => {
+    const name = esc(String(nameOf(h) ?? h));
+    const href = residentHref(h);
+    return href ? `<li><a class="wv-bymail-link" href="${esc(href)}">${name}</a></li>` : `<li>${name}</li>`;
+  }).join("");
 }
 
 // ── A LANDING IS DRAWN WITH THE ROOM (WLD-63 row 68 (b), Darko 2026-10-16) ──
@@ -7962,6 +8164,33 @@ export function layoutReactionBubbles(bubbles = [], avoid = [], { width = Infini
     out.push({ el: bub.el, x: box.x, y: box.y, tailX: Math.max(8, Math.min(w - 8, bub.anchor.x - box.x)) });
   }
   return out;
+}
+
+/**
+ * The office's `walks[]` onto the ledger's own departure grammar.
+ *
+ * `parseWalkLedger` defines that grammar and this is the same record in
+ * another wrapper: `within` and `to` are the STORE's column names for what
+ * walk.mjs reads as `targetExtent` and `targetMarkId` — the office's own
+ * `/world2/walks` says so where it renders them. Every other field is
+ * name-for-name. Unrecognized rows are COLLECTED, not silently dropped, which
+ * is the parser's own stance; one unreadable row must not discard the nine
+ * hundred good ones beside it.
+ */
+export function walksFromOffice(body) {
+  const departures = [], unrecognized = [];
+  for (const w of Array.isArray(body?.walks) ? body.walks : []) {
+    if (!w?.iso || !w?.handle || !w?.from || !w?.toward) { unrecognized.push(w); continue; }
+    departures.push({
+      iso: String(w.iso), handle: String(w.handle),
+      from: w.from, toward: w.toward, at: w.at,
+      targetExtent: w.within ?? null,
+      targetMarkId: w.to ?? null,
+      pace: w.pace ?? null,
+      line: w.line ?? null,
+    });
+  }
+  return { departures, unrecognized };
 }
 
 export function mountViewer(appEl) {
@@ -8313,12 +8542,6 @@ export function mountViewer(appEl) {
     data.trueWorld = ws.json;
   }
 
-  // Kept for the hosts that call it (the published `reload` handle, the replay
-  // shell): both halves, in the old order, with the old name.
-  async function loadData() {
-    await loadFold();
-    applyWorldLayer();
-  }
   // re-pull the fold from the same source and re-assemble (auto-update). The skeleton
   // is stable across a write, so only world-state is refetched.
   async function reloadWorld() {
@@ -8469,6 +8692,24 @@ export function mountViewer(appEl) {
     const dx = Number(full.at.x) - from.at.x, dy = Number(full.at.y) - from.at.y;
     const distance = Number.isFinite(m?.distM) ? Number(m.distM) : Math.round(Math.hypot(dx, dy));
     const inside = pointInsideMark(from.at, full);
+    // A THING YOU STAND ON IS NOT ONE YOU ARE INSIDE (WLD-74, the resident card; Wright 2026-11-05 04:48):
+    // for a resident, a thing's footprint under their body reads "here" (Darko's 10-18 word) until their
+    // enter stack holds it. Only a crossing fills it. A room or a place keeps its geometry, and the
+    // camera, which has no body to carry across, keeps its own words.
+    //
+    // SILENCE BEFORE A WRONG "INSIDE" (R1, Wright 2026-11-05 11:5x EST, option 1): the kind is learned from the
+    // office's reply, which lands after the first paint. Until it is ACCEPTED the clause for an unentered mark under
+    // her feet is the existing empty detail: a moment of silence is true, "inside" before she entered is false. A
+    // failed or malformed reply is no answer, so the silence holds for the page session (askLineage asks a kind once
+    // and never clears it). The named cost: an unentered room, place or dungeon whose class is unanswered is silent too.
+    if (inside && from.who === "you") {
+      const cls = classToken(instanceClassOf(full));
+      const things = learnedThingClasses([full]);
+      if (!enterStackOf(state.handle).includes(full.id)) {
+        if (things.has(cls)) return { bearing: null, detail: "here" };
+        if (thingKinds.pending(cls)) return { bearing: null, detail: "" };
+      }
+    }
     const bearing = inside ? null : (m?.bearing ?? quantizeBearing(bearingDeg(dx, dy), state.dials.bearing_points));
     return { bearing, detail: whereLine({ distance, bearing, far: !!m?.far, who: from.who }) };
   }
@@ -8707,21 +8948,23 @@ export function mountViewer(appEl) {
   function isMine(m) {
     return !!m?.id && state.mineIds.has(m.id);
   }
-  // ───────── per-resident views, built ahead ─────────
+  // ───────── per-resident views, kept once built ─────────
   //
   // A household is ONE world seen from N standpoints: the payload
   // (`data.myWorld`), the portfolio and the mine-set are all household-grain,
   // so what actually differs per resident is small — a standpoint, the telling
-  // read from it, a camera, and two office answers. Those are built ahead and
-  // kept in the DOM, one hidden pane per handle, so selecting a resident costs
-  // a visibility toggle and a viewBox instead of an engine call and a rebuild.
+  // read from it, and the resident's home, balance and action palette. A view,
+  // once built, is kept in the DOM (one hidden pane per handle), so selecting a
+  // resident whose pane is still true costs a visibility toggle and a viewBox
+  // instead of an engine call and a rebuild. Nothing builds a view ahead of
+  // being asked: see "warming is gone" below.
   //
   // A pane goes stale for reasons that are NOT its standpoint: the record
   // re-folds, the crossing moves, the reader changes the filter or a dial.
   // `viewSignature()` is exactly those reasons, in one string — a pane built
-  // under a different one is rebuilt rather than shown. There is no second
-  // invalidation concept: whatever refreshes the active view re-warms the rest.
-  const viewCache = new Map(); // handle → { pane, cam, origin, view, radial, home, balance, palette, signature }
+  // under a different one is rebuilt, when a reader switches onto it, rather
+  // than shown. There is no second invalidation concept.
+  const viewCache = new Map(); // handle → { pane, origin, radial, home, balance, palette, signature }
   const viewSignature = () => [
     worldEpoch, state.crossing, state.markFilter,
     identityResolved() ? 1 : 0, JSON.stringify(state.dials),
@@ -8729,12 +8972,11 @@ export function mountViewer(appEl) {
                      // inside what is stale the moment the ledger says otherwise
   ].join("|");
   const standpointKey = () => (isSpectating() || !state.handle ? SPECTATOR_ACTOR : state.handle);
-  const samePlace = (a, b) => !!a && !!b && a.x === b.x && a.y === b.y;
 
   function cacheEntry(handle) {
     let entry = viewCache.get(handle);
     if (!entry) {
-      entry = { pane: null, cam: null, origin: null, radial: null, home: null, balance: null, palette: null, signature: null };
+      entry = { pane: null, origin: null, radial: null, home: null, balance: null, palette: null, signature: null };
       viewCache.set(handle, entry);
     }
     return entry;
@@ -8757,8 +8999,8 @@ export function mountViewer(appEl) {
   const activeTellingPane = () => $(root, ".wv-telling-pane:not([hidden])") ?? $(root, ".wv-telling");
 
   // Build (or rebuild) ONE standpoint's pane. It touches nothing shared — no
-  // painting, no readouts, no lastRadial — because this is also how a view is
-  // built for a resident the reader is not looking at.
+  // painting, no readouts, no lastRadial — it writes one standpoint's pane and
+  // that pane's cache entry, whichever standpoint it is handed.
   function buildPane(key, standpoint) {
     const pane = tellingPane(key);
     if (!pane) return null;
@@ -8767,9 +9009,7 @@ export function mountViewer(appEl) {
       const radial = composeTelling(pane, standpoint, key);
       if (entry) {
         const origin = originFor(key);
-        const moved = !samePlace(origin, entry.origin);
         entry.pane = pane;
-        entry.cam = { x: standpoint.x, y: standpoint.y };
         entry.origin = origin ? { x: origin.x, y: origin.y } : null;
         entry.radial = radial;
         entry.signature = viewSignature();
@@ -8952,14 +9192,20 @@ export function mountViewer(appEl) {
 
   // ── WHY STEPPING OUTSIDE TOOK A WHILE (founder, 2026-08-21) ────────────────
   //
+  // (The numbers below were measured when the atlas was the town's ground and
+  // carried its images. fetchAtlasGround strips every atlas <image> on import
+  // now, so the sixty-four are history; what the town's svg can still hold when
+  // it goes away is the art the map hangs on it — the placed-art layer, say —
+  // and the warm-up below asks for whatever <image> hrefs it holds.)
+  //
   // Measured, not guessed. The work the page does on the way out is small: the
   // engine's fieldOfView over the whole record runs in ~80 ms, assembleWorld in
   // under a millisecond, and click-to-settled is ~25 ms. What costs the wait is
-  // the PAINTING: the atlas carries ~64 <image> elements, disciplineAtlasImages
-  // marks them `loading="lazy"`, and while a room is mounted the town's svg is
-  // detached from the document — so not one of them has been fetched. The
-  // instant it is re-attached all sixty-four become visible at once and the
-  // browser asks for all sixty-four.
+  // the PAINTING: the atlas carried ~64 <image> elements, disciplineAtlasImages
+  // marked them `loading="lazy"`, and while a room is mounted the town's svg is
+  // detached from the document — so not one of them had been fetched. The
+  // instant it was re-attached all sixty-four became visible at once and the
+  // browser asked for all sixty-four.
   //
   // Nothing about that is the room's fault or the wheel's, and the fix does not
   // belong in the exit path: it belongs HERE, at the moment the town goes away,
@@ -9089,24 +9335,23 @@ export function mountViewer(appEl) {
   // the pill's button moved into the card — same class, same data-mark, same
   // click route (`.wv-int-exit-btn` → stepOutside); only where it sits changed.
   //
-  // THE SAME CARD, NOT A SECOND ONE: the pinned bubble's own recipe — the room's
-  // mark cell, its predicates folded in — in the bubble's own dress. One
-  // component, outside and inside.
+  // THE SAME CARD, NOT A SECOND ONE (as first built: the pinned bubble's own
+  // recipe — the room's mark cell, its predicates folded in — in the bubble's
+  // own dress). It is the hover's NAMEPLATE now (markNameplateHTML, below),
+  // plus the way out: a press on the plate opens the room's column
+  // (markColumnView), and the card holds no cell. One component, outside and
+  // inside.
   //
   // OPEN, NOT EXPANDED (Keemin, 2026-09-23, the second POS-206 PR: "the card is
-  // always open but not expanded, and you can click to expand it"). The card
-  // RESTS compact — the room's cell and the way out — and a click on the cell
-  // folds the investigate expansion open, a second click shut. That click is
-  // the pinned bubble's own route (the root click handler: a `.wv-card` inside
-  // a `.wv-bubble` toggles its `_stack` and calls renderExpansion), so this
-  // function adds no second one; it only stops opening the expansion itself.
+  // always open but not expanded, and you can click to expand it"). That was the
+  // cell's click-to-expand; with the plate there is nothing on the card to
+  // expand, so the card is always compact and the full description is the
+  // column's.
   //
   // BUILT ONCE PER ROOM AND LABEL, the pinned bubble's rule: this runs on every
-  // scene sync, and a rebuild would drop an open backing sheet or the reader's
-  // scroll. A nested exit changes the room (or the label), and that rebuilds it.
-  // The reader's open/closed (the cell's whole `_stack`, a drilled crumb
-  // included) is carried across a rebuild of the SAME room — a label change is
-  // not the reader closing the card — and a new room starts compact.
+  // scene sync, and rebuilding identical markup each time would be wasted work.
+  // A nested exit changes the room (or the label), and that rebuilds it. The
+  // `built` key below is what is compared.
   function syncRoomCard(boxEl, room, key = null) {
     let card = $(boxEl, ".wv-room-card");
     if (!room) { card?.remove(); return; }
@@ -9783,8 +10028,9 @@ export function mountViewer(appEl) {
   //    the same furnishing pass the room does, and difference #6 stops being a
   //    difference. SCENES.md is amended in the same commit.
   // The town's own rendering of its ground, mounted exactly as the atlas was
-  // until 2026-09-08 (that code, restored): scripts stripped, images made lazy,
-  // relative art paths rebased on the atlas directory. Null when the file is
+  // until 2026-09-08 (that code, restored): scripts stripped, images made lazy.
+  // It has since lost its words, pictures and frames too (below), so no art path
+  // is left to rebase. Null when the file is
   // absent or unreadable — never a throw, because the generated ground is the
   // answer then and the reader must not see "the ground didn't draw" for a
   // missing picture.
@@ -9901,11 +10147,6 @@ export function mountViewer(appEl) {
           for (const poly of bySlug.values()) last.parentNode.insertBefore(doc.importNode(poly, true), last.nextSibling);
         }
       }
-      const base = new URL(ATLAS_GROUND_URL, location.origin);
-      svg.querySelectorAll("image").forEach((im) => {
-        const hh = im.getAttribute("href") ?? im.getAttribute("xlink:href");
-        if (hh && !/^(https?:)?\//.test(hh)) { im.setAttribute("href", new URL(hh, base).pathname); im.removeAttribute("xlink:href"); }
-      });
       return document.importNode(svg, true);
     } catch { return null; }
   }
@@ -10096,8 +10337,10 @@ export function mountViewer(appEl) {
     const convoLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     convoLayer.setAttribute("id", "wv-convo-layer");
     convoLayer.style.pointerEvents = "none";
-    convoLayer.style.display = "none"; // OFF until asked for (Keemin: the bubbles were blocking the painting)
-    svg.appendChild(convoLayer);
+    // ON by default since POS-779 (Darko 2026-10-24): a conversation is one thread per place per
+    // settlement now, so one badge each, and "there will be less bubbles now". The 💬 button still hides it.
+    convoLayer.style.display = convoVisible ? "" : "none";
+    // (appended below, after the walkers: a badge floats over the speakers it names, POS-779)
     const overlay = document.createElementNS("http://www.w3.org/2000/svg", "g");
     overlay.setAttribute("id", "wv-overlay");
     svg.appendChild(overlay);
@@ -10119,6 +10362,14 @@ export function mountViewer(appEl) {
     const walkLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     walkLayer.setAttribute("id", "wv-walk-layer");
     svg.appendChild(walkLayer);
+    // THE EXTENT WASH (Darko 2026-11-06): nothing draws it by default; hovering a conversation badge draws it, selecting keeps it.
+    // Under the badges, over the walkers' ground; pointer-events none (renderConvoWash fills it).
+    const convoWashLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    convoWashLayer.setAttribute("id", "wv-convo-wash-layer");
+    convoWashLayer.style.pointerEvents = "none";
+    convoWashLayer.style.display = convoVisible ? "" : "none";
+    svg.appendChild(convoWashLayer);
+    svg.appendChild(convoLayer); // ABOVE the walkers (POS-779): a conversation badge hangs over the faces that are talking, never under them
     // THE MISTS' WALL (POS-466): above everything the record draws, walkers
     // included, because nothing behind the wall may be seen or clicked
     const mistsLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -10144,7 +10395,7 @@ export function mountViewer(appEl) {
     const convoHoverLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     convoHoverLayer.setAttribute("id", "wv-convo-hover-layer");
     convoHoverLayer.style.pointerEvents = "none";
-    convoHoverLayer.style.display = "none"; // rides the same toggle as its washes
+    convoHoverLayer.style.display = convoVisible ? "" : "none"; // rides the same toggle as its badges
     stageTop.appendChild(convoHoverLayer);
     // THE LIVE CREATURES (play fix 35) ride the stage's top, over the Mists'
     // paint: they stand in the fringe, which the paint's banks haze over, and a
@@ -10162,13 +10413,16 @@ export function mountViewer(appEl) {
     housemateEdgeLayer.style.pointerEvents = "none";
     stageTop.appendChild(housemateEdgeLayer);
     function renderConvoHover(hit) {
+      // the hover washes the thread it is on (and stops when it leaves); the selected thread's wash is not the hover's to take away
+      if ((hit?.id ?? null) !== convoHoverId) { convoHoverId = hit?.id ?? null; renderConvoWash(); }
       if (!hit) { convoHoverLayer.innerHTML = ""; return; }
       const bounds = svg.getBoundingClientRect();
       // the box scales uniformly off its unit, so 1.6× the unit is the whole
       // box at 1.6× — ~19px type instead of the 12px the marks' box uses
       // (Keemin: at the marks' size these words were not legible)
       const unit = (bounds.width > 0 ? view.w / bounds.width : 1) * 1.6;
-      const at = { x: originPx.x + hit.cx / mPerPx, y: originPx.y + (hit.cy - hit.ryM) / mPerPx };
+      // above the badge: its radius and a gap, in painting units (the badge is counter-scaled, so 1/k)
+      const at = { x: originPx.x + hit.cx / mPerPx, y: originPx.y + hit.cy / mPerPx - (CONVO_LIFT + CONVO_BADGE_R + 6) / markerScale(mapCtx?.zoomK ?? 1) };
       convoHoverLayer.innerHTML = hoverLabelSVG({ text: hit.words, at, unit, view, className: "wv-hl-label wv-hl-convo" });
     }
     boxEl.innerHTML = "";
@@ -10231,7 +10485,7 @@ export function mountViewer(appEl) {
       svg.insertBefore(base, mistLayer);
     }
     const view = { ...full };
-    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoHoverLayer, housemateEdgeLayer, creatureLayer, stage, mistsCam, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
+    mapCtx = { svg, overlay, hlLayer, walkPreviewLayer, walkLayer, gridLayer, mistLayer, placedArtLayer, veilLayer, mistsLayer, convoLayer, convoWashLayer, convoHoverLayer, housemateEdgeLayer, creatureLayer, stage, mistsCam, originPx, mPerPx, full, view, zoomK: 1, follow: false, glyphIds: new Set(), _tweening: false, zoomOutLimit, includeMine, placeholderExtents, groundMarkIds };
     // THE STAGE FOLLOWS THE SVG (WLD-43): its box is the svg's box, its camera
     // is the viewBox the svg shows (not `view`, which leads it during a drag),
     // and while a drag slides the svg it slides the same way (applyView). The
@@ -10752,7 +11006,7 @@ export function mountViewer(appEl) {
         // click won't do.
         const clear = !snappedMarkAtPoint({ x: e.clientX, y: e.clientY }, screenWalkerCandidates());
         const wp = clear ? worldPointForEvent(e) : null;
-        const hit = wp ? convoAt(wp.x, wp.y) : null;
+        const hit = wp ? convoClickAt(wp.x, wp.y) : null;
         hoverMark(hit ? null : hoverTargetForEvent(e));
         boxEl.classList.toggle("over-convo", Boolean(hit));
         renderConvoHover(hit);
@@ -10820,19 +11074,20 @@ export function mountViewer(appEl) {
         return;
       }
       if (washes.length && (here.all.length || washes.length > 1)) { openChooser([...here.all, ...washes]); return; }
-      // THE TALK LENS WINS WHILE IT IS UP (Keemin, launch night: with washes
+      // THE TALK LENS WINS ON ITS OWN BADGE (Keemin, launch night: with washes
       // sharing ground with pips and parcels, "sometimes the click reached
-      // the thread" read as broken). The layer is opt-in — switching 💬 on IS
-      // the statement of intent — so while it shows, a click on a wash goes
-      // to the thread for everyone, losing only to a face: a small, precise
-      // target you aimed at. Toggled off (the default), the washes are gone
-      // and every click means exactly what it meant before the layer existed.
+      // the thread" read as broken). The layer is ON by default now (POS-779,
+      // Darko 2026-10-24), so it must not eat the walk: a reader who can act
+      // opens the thread only by clicking the badge's own disc, and a click on
+      // the ground beside it walks as ever; a spectator keeps the easy reach.
+      // Hidden (the 💬 button), the badges are gone and every click means what
+      // it meant before the layer existed.
       {
         const wp = worldPointForEvent(e);
-        const hit = convoAt(wp.x, wp.y); // visibility-gated: always null while hidden
-        // a NEW tab (Keemin): the reader is mid-world with a lens up and a
-        // camera aimed — the thread opens beside the map, never over it
-        if (hit) { window.open(convoHref(hit.id), "_blank", "noopener"); return; }
+        const hit = convoClickAt(wp.x, wp.y); // visibility-gated: always null while hidden
+        // the thread opens in the right-hand column (Darko 2026-11-06), beside the map, never over it and in no new tab:
+        // a click selects it, and the selection is what the column and the wash follow
+        if (hit) { selectMark(convoChoiceId(hit.id)); return; }
       }
       // THE CONTESTED CLICK. Every seating mints a parcel, a building and a
       // predicate at nearly one spot, so the pips pile up and the snap can
@@ -10972,8 +11227,10 @@ export function mountViewer(appEl) {
     mapCtx.toggleConvo = () => {
       const on = convoLayer.style.display === "none";
       convoLayer.style.display = on ? "" : "none";
+      convoWashLayer.style.display = on ? "" : "none";
       convoHoverLayer.style.display = on ? "" : "none";
       convoVisible = on;
+      convoStore(on);
       if (on) loadConversations().then(drawConversations);
       else { renderConvoHover(null); boxEl.classList.remove("over-convo"); }
       return on;
@@ -10984,6 +11241,9 @@ export function mountViewer(appEl) {
     // first toggle is not also the first correction
     mapCtx.refit();
     if (lastRadial) drawOverlay(lastRadial);
+    // the conversations layer is on by default (POS-779), so it loads with the map, not on a first click
+    $(root, ".wv-map-convo")?.classList.toggle("on", convoVisible); // the lit button follows the layer, remembered or default
+    if (convoVisible) Promise.resolve().then(() => loadConversations()).then(drawConversations).catch(() => {});
   }
   // What the painting draws: the field of view, plus all of yours whether it holds
   // them or not. The filter chips are the Telling's business and this asks them
@@ -11034,9 +11294,10 @@ export function mountViewer(appEl) {
   // So the markup carries the marker size as a CSS variable and the camera sets
   // that ONE property. Each pip is a `translate` group (an attribute, written
   // once, with the record) wrapping a scale group (a CSS transform, driven by
-  // the variable), which is also what keeps the FAN honest: the offset lives
-  // inside the scaled space, so it stays a constant few panel pixels exactly as
-  // it did when it was divided by k in the string.
+  // the variable), which is also what would keep a FAN honest (the map draws
+  // none since WLD-95): the offset lives inside the scaled space, so it stays a
+  // constant few panel pixels exactly as it did when it was divided by k in the
+  // string.
   //
   // The reach ring stays OUT of that group deliberately — it is a distance, not
   // a marker, and a distance must be drawn true to the ground.
@@ -11053,6 +11314,7 @@ export function mountViewer(appEl) {
     mapCtx._scaleKey = key; mapCtx._scaleOverlay = mapCtx.overlay;
     mapCtx.overlay.style.setProperty("--wv-mk", overlayScale(k));
     mapCtx.creatureLayer?.style.setProperty("--wv-mk", overlayScale(k));   // the live creatures (play fix 35)
+    mapCtx.convoLayer?.style.setProperty("--wv-mk", overlayScale(k));      // the conversation badges (POS-779)
     // THE WALK LAYER IS SIZED THE SAME WAY (#2912 (3)): the bodies through
     // `.ov-s`, the vessel through her own floor (see vesselGlyphSVG). Two
     // properties on one element per frame; no walker markup is touched.
@@ -11586,10 +11848,11 @@ export function mountViewer(appEl) {
     overlay.setAttribute("data-tier", tier ?? "resident");
     // tierOf, not m.tier: FOV marks carry no tier field, so it looks the full
     // mark up by id (and catches sovereign/home, which is not a tier value).
-    // THE FAN, high zoom only. Pips sharing a spot get a few pixels of
-    // separation so a hover can tell them apart before anyone has to click.
-    // At low zoom they merge again on purpose — the pile is honest about being
-    // a pile, and the chooser is the guarantee that you can still reach into it.
+    // NO FAN HERE ANY MORE (WLD-95, see "NO FAN" below). This pass once fanned
+    // pips sharing a spot a few pixels apart at high zoom, so a hover could tell
+    // them apart before anyone had to click. They stand at their own anchors
+    // now — the pile is honest about being a pile, and the chooser is the
+    // guarantee that you can still reach into it.
     //
     // THE CULL (2026-09-11): a mark outside the viewBox plus one viewport of
     // margin is not drawn. It is the same question the off-screen highlight
@@ -11611,7 +11874,7 @@ export function mountViewer(appEl) {
     // set of marks whose picture is ON THE PAINTING in this draw — hung at
     // far/mid, or drawn over its extent at near — and their pip goes
     // transparent the way a parcel's already does under its card: the circle
-    // stays as the hover anchor, the hit target and the fan's seat, and only
+    // stays as the hover anchor and the hit target, and only
     // the paint is withdrawn. A mark at mid, where the furnishing pass draws
     // tinted extents and no pictures, keeps its dot: nothing else marks it.
     const pictured = new Set(hungArt);
@@ -11762,7 +12025,8 @@ export function mountViewer(appEl) {
       // THE FAN RIDES INSIDE THE SCALED SPACE, which is why it is a `cx`/`cy` on
       // the circle rather than an addition to the translate: scaled by the same
       // variable, it stays the constant few panel pixels it was when the string
-      // divided it by k.
+      // divided it by k. (Since WLD-95 the `null`s below pass none, but the
+      // parameters stay for the overlay builders that take one.)
       glyphIds.add(m.id);
       if (full.kind === "parcel") {
         s += homeCard(full, p, null, nameOf(m), tier);
@@ -12024,6 +12288,8 @@ export function mountViewer(appEl) {
   let walkState = {
     at: null,
     walkers: [],
+    // POS-945: the handles the last accepted town answer marks `placeholder: true` (byMailFrom); held across a missed poll
+    byMail: [],
     // the instant of the last landing of the reader this page has drawn (row 68 (b))
     landedIso: null,
     // the reader's own body while it walks, from /world/walkers (null when standing)
@@ -12066,7 +12332,7 @@ export function mountViewer(appEl) {
   // A fetch of 120 commits and a keep of 40 stakes: both were literals in the
   // line below, and both are what a reader runs into when they ask Lately for
   // more. They are variables so the pane can lift them ONCE, to the door's own
-  // cap — `repoLog` clamps `limit` at 200 (office `src/queries.mjs`) — when a
+  // cap — `repoLog` clamps `limit` at 200 (office `src/town-index-store.mjs`) — when a
   // page runs past what they hold. Past that cap the tail needs `offset` on the
   // office's `/repo/log` route, which it does not pass (#2846, "not this").
   //
@@ -12108,8 +12374,22 @@ export function mountViewer(appEl) {
       if (!r.ok) return;
       const body = await r.json();
       const entries = Object.entries(body?.residents ?? {});
-      if (entries.length) residentsMeta = new Map(entries);
+      if (entries.length) { residentsMeta = new Map(entries); renderByMail(); } // the names the list already shows arrive with the faces
     } catch { /* no faces today; the dots are still the truth */ }
+  }
+  // IN TOWN BY MAIL (POS-945): names only, each linking to their address page; hidden while nobody is. It draws from what the
+  // last accepted town answer said (walkState.byMail) and from nothing else: no position, no count, no letter activity.
+  function renderByMail() {
+    const box = $(root, ".wv-bymail");
+    const list = box && $(box, ".wv-bymail-list");
+    if (!box || !list) return;
+    list.innerHTML = byMailHTML(walkState.byMail, { nameOf: (h) => faceOf(h).name });
+    box.hidden = walkState.byMail.length === 0;
+  }
+  // The same update that accepts a town answer takes its list: a resident with a real row is out of it from that moment.
+  function takeByMail(townRows) {
+    walkState.byMail = byMailFrom(townRows);
+    renderByMail();
   }
 
   // Where the town is talking — the office's own thread derivation (voices.mjs:
@@ -12121,7 +12401,12 @@ export function mountViewer(appEl) {
   // earshot_m, fade_minutes (the DISPLAY fade) and hearable_since (the ear's window: the settlement)
   let convoMeta = null;
   const convoMetaOf = (body) => Object.fromEntries(["earshot_m", "fade_minutes", "hearable_since"].filter((k) => Object.hasOwn(body ?? {}, k)).map((k) => [k, body[k]]));
-  let convoVisible = false; // the layer is opt-in (upper-right 💬); hidden draws nothing, hits nothing, fetches nothing
+  // THE READER'S OWN CHOICE persists per browser (POS-779, review): the default is on, a reader who
+  // switched it off stays off. Storage can be absent or throw (private windows, blocked data); then the default stands.
+  const CONVO_KEY = "pm.world.conversations";
+  const convoStored = () => { try { const v = globalThis.localStorage?.getItem(CONVO_KEY); return v === "off" ? false : v === "on" ? true : null; } catch { return null; } };
+  const convoStore = (on) => { try { globalThis.localStorage?.setItem(CONVO_KEY, on ? "on" : "off"); } catch { /* the choice just does not persist */ } };
+  let convoVisible = convoStored() ?? true;  // on by default since POS-779 (upper-right 💬 hides it); hidden draws nothing, hits nothing, fetches nothing
   async function loadConversations() {
     try {
       const r = await fetch(officeUrl("/world/conversations"), { credentials: "same-origin" });
@@ -12152,8 +12437,8 @@ export function mountViewer(appEl) {
     return householdHomeAt(handle, homesSources());
   }
   // Where a handle stands — the walk ledger first, their home second. One
-  // function for every resident in the household, because a view built ahead
-  // needs the same answer the selected one gets.
+  // function for every resident in the household, because the resident being
+  // switched to needs the same answer the selected one gets.
   // ONE OWNER FOR WHERE A BODY IS (POS-92): every sentence about a walker's
   // place — the hover, the highlight title, the bubble — is printed from
   // bodyPlace's answer, never from the walk's named target.
@@ -12446,66 +12731,173 @@ export function mountViewer(appEl) {
     return new Set(hung.map((m) => m.id));
   }
 
-  // ── conversations on the ground ────────────────────────────────────────────
-  // Each thread draws as the ground it covered: the office ships an extent — a
-  // bbox over EVERY statement in the thread, not just the shown tail — and the
-  // wash is that box grown by half an earshot, because a voice fills a room,
-  // not a point. Live threads carry their label (place · statements · speakers);
-  // a finished conversation fades to bare geometry and leaves the map after a
-  // day — the conversations page is the archive, this layer answers "where is
-  // the town talking right now". Same-named places holding several distinct
-  // circles (three "Volvigradus Garden" threads on party night) is exactly what
-  // this layer exists to disambiguate: the words collide, the ground does not.
-  const CONVO_PAD_M = 30;                        // half an earshot: the room around the words
-  const CONVO_CLOSED_KEEP_MS = 24 * 3600 * 1000; // a cooling mark, then the page remembers
-  // The drawn ellipses in WORLD metres, smallest-first — the click and the
-  // hover pick the most specific room when circles nest (a garden thread sat
-  // inside the party's wash on the night this shipped).
+  // ── conversations on the map: ONE BADGE PER THREAD ───────────────────────────
+  // Darko 2026-10-24 (POS-779/b): "one badge per thread … change the default to
+  // toggle on for the bubbles (and have a distinct icon for each conversation,
+  // like we do for sited marks, dungeons, creatures, etc) given there will be
+  // less bubbles now. I think sticking with the gray-white is fine."
+  //
+  // A thread is one place per settlement now (the office groups by earshot and
+  // splits only at a settlement), so the wash that drew the ground it covered —
+  // a box that grows all settlement long — is replaced by a badge at the place
+  // the conversation IS now (the thread's own point, the latest voice): the
+  // conversation icon of the mark-icons family (a speech bubble, as a dungeon
+  // has its keep and a creature its diamond) on a pale gray-white disc, held at
+  // a constant size on screen like a creature (`.ov-s`). Live threads are solid
+  // and breathe; a thread from the previous settlement stays a day as a faint,
+  // dotted cooling badge, then leaves (the conversations page is the archive).
+  const CONVO_CLOSED_KEEP_MS = 24 * 3600 * 1000; // a cooling badge, then the page remembers
+  const CONVO_BADGE_R = 9;                       // painting units at ov-s scale 1: the disc's radius
+  const CONVO_LIFT = 16;                         // painting units at ov-s scale 1: the badge hangs this far above its point, like a speech bubble
+  const CONVO_HIT_MIN_PX = 13;                   // a badge is a small target; reach a little past it
+  const CONVO_PAD_FALLBACK_M = 30;               // half an earshot (60 m) when the office has not said its earshot
+  let convoHoverId = null;                       // the thread id the pointer is on: a hover washes its extent
+  // The drawn badges in WORLD metres — the click and the hover pick the nearest.
   let convoHits = [];
   const convoAt = (wx, wy) => convosAt(wx, wy)[0] ?? null;
-  // every wash holding the point, most specific first (row 63's rule counts them all)
-  const convosAt = (wx, wy) => (!convoVisible ? [] : convoHits.filter((h) => {
-    const nx = (wx - h.cx) / h.rxM, ny = (wy - h.cy) / h.ryM;
-    return nx * nx + ny * ny <= 1;
-  }));
+  // The reach of a badge in metres at the current zoom: its disc counter-scales
+  // (1/k painting units), so its metres are fixed by the marker scale, with a
+  // floor in screen pixels so it stays easy to hit.
+  const convoHitM = () => {
+    const m = mapCtx;
+    if (!m?.mPerPx) return 0;
+    const k = markerScale(m.zoomK ?? 1);
+    const mpp = m.paneW > 0 && m.view?.w ? (m.view.w / m.paneW) * m.mPerPx : 0;
+    return Math.max((CONVO_BADGE_R * m.mPerPx) / k, CONVO_HIT_MIN_PX * mpp);
+  };
+  // every badge holding the point, nearest first (row 63's rule counts them all)
+  const convosAt = (wx, wy, { disc = false } = {}) => {
+    if (!convoVisible) return [];
+    // `disc`: only the badge's own disc, no easy-target reach past it
+    const r = disc ? (CONVO_BADGE_R * mapCtx.mPerPx) / markerScale(mapCtx.zoomK ?? 1) : convoHitM();
+    const lift = (CONVO_LIFT * mapCtx.mPerPx) / markerScale(mapCtx.zoomK ?? 1); // the badge hangs above its point
+    return convoHits.map((h) => ({ h, d: Math.hypot(wx - h.cx, wy - (h.cy - lift)) })).filter((o) => o.d <= r)
+      .sort((a, b) => a.d - b.d).map((o) => o.h);
+  };
   // the island serves /conversations/ same-origin; on the local spectator the
   // link 404s, which is the dev-server's honest shape (it has no site around it)
   const convoHref = (id) => `/conversations/#${encodeURIComponent(id)}`;
+  const convoThreadById = (id) => [...convoState.live, ...convoState.closed].find((t) => t && String(t.id) === String(id)) ?? null;
+
+  // ── THE EXTENT WASH, ON HOVER AND SELECTION (POS-779, Darko 2026-11-06) ────────────────────────────────────────────────
+  //
+  // "Hovering a conversation badge draws a light wash from the thread's existing `extent`, as the old layer did (the box grown by
+  // half an earshot). Selecting the badge keeps it drawn. Nothing draws it by default." The old layer's ellipse, from the same
+  // `extent` the office already ships (a deck thread, or one with no extent, from its own point), grown by half an earshot
+  // (the office's own `earshot_m` when it has said it, 60 m otherwise). Drawn into its own layer under the badges, for the
+  // hovered thread and the selected one, and for nothing else.
+  function convoWashOf(t) {
+    if (!t?.at || !Number.isFinite(t.at.x) || !Number.isFinite(t.at.y)) return null;
+    const e = t.aboard || !t.extent ? { x0: t.at.x, y0: t.at.y, x1: t.at.x, y1: t.at.y } : t.extent;
+    if (![e.x0, e.y0, e.x1, e.y1].every((n) => Number.isFinite(Number(n)))) return null;
+    const earshot = Number(convoMeta?.earshot_m);
+    const pad = (Number.isFinite(earshot) && earshot > 0 ? earshot : 2 * CONVO_PAD_FALLBACK_M) / 2;
+    return { cx: (e.x0 + e.x1) / 2, cy: (e.y0 + e.y1) / 2, rx: (e.x1 - e.x0) / 2 + pad, ry: (e.y1 - e.y0) / 2 + pad };
+  }
+  function renderConvoWash() {
+    const layer = mapCtx?.convoWashLayer;
+    if (!layer) return;
+    const sel = markInteraction.getState().selectedId;
+    const selected = isConvoChoiceId(sel) ? sel.slice(CONVO_CHOICE_PREFIX.length) : null;
+    let out = "";
+    if (convoVisible) {
+      const live = new Set(convoState.live.map((t) => String(t?.id)));
+      for (const id of new Set([selected, convoHoverId].filter((x) => x != null))) {
+        const w = convoWashOf(convoThreadById(id));
+        if (!w) continue;
+        const c = { x: mapCtx.originPx.x + w.cx / mapCtx.mPerPx, y: mapCtx.originPx.y + w.cy / mapCtx.mPerPx };
+        const isLive = live.has(String(id));
+        // presentation attributes, not a stylesheet rule: the wash is the old layer's own look (gray-white, dotted when cooling)
+        out += `<ellipse class="wv-convo-wash" data-wash="${esc(String(id))}"${selected != null && String(id) === String(selected) ? ' data-selected="1"' : ""}${String(id) === String(convoHoverId) ? ' data-hover="1"' : ""} `
+          + `cx="${c.x}" cy="${c.y}" rx="${w.rx / mapCtx.mPerPx}" ry="${w.ry / mapCtx.mPerPx}" `
+          + (isLive ? 'fill="rgba(183,198,212,.12)" stroke="#b7c6d4" stroke-width="2"' : 'fill="rgba(183,198,212,.06)" stroke="#7f93a6" stroke-width="1.5" stroke-dasharray="3 4"')
+          + ` vector-effect="non-scaling-stroke"/>`;
+      }
+    }
+    layer.innerHTML = out;
+  }
+
+  // ── A CONVERSATION'S COLUMN (POS-779, Darko 2026-11-06) ────────────────────────────────────────────────────────────────
+  //
+  // "A click opens the conversation in the right-side column, not a new tab. Use the existing column host and dispatcher, with a
+  // thread view built from the data the page already has: the place, the speakers, the statements, the times, and whether it's
+  // live. Put an 'all conversations' link at the bottom." The thread is the one the map already holds (`convoState`, the body of
+  // `/world/conversations`); nothing is read for it. What residents said is CONTENT: it goes in as plain-data blocks, never parsed as
+  // markdown, and the column writes it with textContent like every other string.
+  const convoWhen = (iso) => { const m = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(String(iso ?? "")); return m ? `${m[1]} ${m[2]}Z` : ""; };
+  function convoColumnView(id) {
+    if (!isConvoChoiceId(id)) return null;
+    const tid = id.slice(CONVO_CHOICE_PREFIX.length);
+    const t = convoThreadById(tid);
+    if (!t) return null;
+    const live = convoState.live.includes(t);
+    const voices = Array.isArray(t.voices) ? t.voices : [];
+    const n = Number(t.voice_count) || voices.length, people = Array.isArray(t.participants) ? t.participants : [];
+    const blocks = [];
+    if (n > voices.length) blocks.push({ type: "paragraph", spans: [{ type: "em", spans: [{ type: "text", text: `the newest ${voices.length} of ${n} statements; the conversations page keeps the whole` }] }] });
+    for (const v of voices) {
+      const at = convoWhen(v?.at);
+      blocks.push({ type: "paragraph", spans: [
+        { type: "strong", spans: [{ type: "text", text: String(v?.handle ?? "") }] },
+        { type: "text", text: `${at ? ` (${at})` : ""}: ${String(v?.said ?? "")}` },
+      ] });
+    }
+    return {
+      key: [id, t.latest, n, live ? "live" : "quiet"].join("|"),
+      handle: "the-town", residentLink: false,
+      kicker: live ? "a conversation · live" : "a conversation · gone quiet",
+      title: String(t.place ?? "somewhere"),
+      region: `${n} statement${n === 1 ? "" : "s"} · ${people.length} speaker${people.length === 1 ? "" : "s"}`,
+      leadImage: null,
+      door: { blocks },
+      byline: live ? "in this settlement" : "in an earlier settlement",
+      facts: [
+        { label: "now", value: live ? "live: a conversation lasts the settlement" : "gone quiet: an earlier settlement's" },
+        { label: "speakers", value: people.join(", ") },
+        { label: "began", value: convoWhen(t.started) },
+        { label: "latest", value: convoWhen(t.latest) },
+      ],
+      icons: MARK_ICONS.conversation ? [{ key: "conversation", label: MARK_ICONS.conversation.label, meaning: MARK_ICONS.conversation.meaning }] : [],
+      footerLink: { href: convoHref(tid), text: "all conversations →" },
+    };
+  }
+  // What a plain click or hover on the map means for a thread (POS-779, review): a
+  // reader who CAN ACT is walking the map, so only the badge's own disc is the
+  // thread's; ground merely near it is still ground. A spectator has nothing to
+  // walk, so the reach stays easy.
+  const convoClickAt = (wx, wy) => (canAct() ? convosAt(wx, wy, { disc: true })[0] ?? null : convoAt(wx, wy));
   function drawConversations() {
     if (!mapCtx?.convoLayer || !convoVisible) return;
     const px = (x, y) => ({ x: mapCtx.originPx.x + x / mapCtx.mPerPx, y: mapCtx.originPx.y + y / mapCtx.mPerPx });
     let s = "";
     const hits = [];
     const paint = (t, live) => {
-      if (!t?.at) return;
-      // A deck thread's box is the length of the water it crossed — true of the
-      // crossing, wrong as a room. The vessel is the room: it draws at the
-      // thread's own point instead (voices.mjs threadOf ships the flag).
-      const e = t.aboard || !t.extent ? { x0: t.at.x, y0: t.at.y, x1: t.at.x, y1: t.at.y } : t.extent;
-      const cxM = (e.x0 + e.x1) / 2, cyM = (e.y0 + e.y1) / 2;
-      const rxM = (e.x1 - e.x0) / 2 + CONVO_PAD_M, ryM = (e.y1 - e.y0) / 2 + CONVO_PAD_M;
-      // a wash says nothing until pointed at; the words it says then ride the
-      // hit, spoken by the SAME name-box a mark raises (renderConvoHover).
-      // The box truncates at 58 chars, so the PLACE carries the cut and the
-      // numbers always survive — a long place name was eating '· 1 speaker'
-      // off the tail (the same class the old labels were fixed for once).
+      if (!t?.at || !Number.isFinite(t.at.x) || !Number.isFinite(t.at.y)) return;
+      // The words it says when pointed at ride the hit, spoken by the SAME
+      // name-box a mark raises (renderConvoHover). The box truncates at 58
+      // chars, so the PLACE carries the cut and the numbers always survive.
       const n = Number(t.voice_count) || 0, p = (t.participants ?? []).length;
-      const tail = `${n} statement${n === 1 ? "" : "s"} · ${p} speaker${p === 1 ? "" : "s"}${live ? "" : " · gone quiet"}`;
+      const tail = `${n} statement${n === 1 ? "" : "s"} · ${p} speaker${p === 1 ? "" : "s"}${live ? "" : " · earlier settlement"}`;
       let where = String(t.place ?? "somewhere");
       const room = 58 - tail.length - 3;
       if (where.length > room) where = `${where.slice(0, Math.max(8, room - 1))}…`;
       const words = `${where} — ${tail}`;
-      if (t.id) hits.push({ id: t.id, cx: cxM, cy: cyM, rxM, ryM, live, words });
-      const c = px(cxM, cyM);
-      const rx = rxM / mapCtx.mPerPx, ry = ryM / mapCtx.mPerPx;
-      s += `<ellipse cx="${c.x}" cy="${c.y}" rx="${rx}" ry="${ry}" class="wv-convo${live ? " is-live" : ""}${t.aboard ? " is-aboard" : ""}"/>`;
+      if (t.id) hits.push({ id: t.id, cx: t.at.x, cy: t.at.y, live, words });
+      const c = px(t.at.x, t.at.y);
+      // the glyph is the family's own (mark-icons.mjs), cut into the disc in the page's dark
+      s += `<g transform="translate(${c.x} ${c.y})"><g class="ov-s"><g class="wv-convo-badge${live ? " is-live" : " is-cooling"}${t.aboard ? " is-aboard" : ""}" data-convo="${esc(String(t.id ?? ""))}">`
+        + `<g transform="translate(0 ${-CONVO_LIFT})"><circle r="${CONVO_BADGE_R}" class="wv-convo-disc"/>`
+        + iconSVG({ key: "conversation" }, { x: -6, y: -6, size: 12, ink: "#2b323a" })
+        + `<circle r="${CONVO_BADGE_R}" class="wv-convo${live ? " is-live" : ""}"/></g>`
+        + `</g></g></g>`;
     };
     const t0 = Date.now();
     for (const t of convoState.closed)
       if (t0 - Date.parse(t.latest) <= CONVO_CLOSED_KEEP_MS) paint(t, false);
     for (const t of convoState.live) paint(t, true); // live paints over cooled
-    convoHits = hits.sort((a, b) => a.rxM * a.ryM - b.rxM * b.ryM); // most specific room first
+    convoHits = hits;
     mapCtx.convoLayer.innerHTML = s;
+    renderConvoWash(); // the badges were redrawn; the wash follows the thread as the poll has it
   }
 
   // ── WHERE YOUR OWN PEOPLE ARE GOING (Keemin, 2026-09-13: "walk paths
@@ -12546,9 +12938,9 @@ export function mountViewer(appEl) {
     for (const handle of handles) {
       const departure = currentDeparture(departures, handle);
       if (!departure) continue;
-      const now_ = positionAt(departure, now);
-      if (!now_ || now_.arrived || now_.standing) continue;   // a finished walk is not a path
-      const seg = clipSegmentToBox(now_, departure.toward, box);
+      const leg = remainingWalkLeg(departure, now);            // where they are, to where they are going
+      if (!leg) continue;                                      // a finished walk is not a path
+      const seg = clipSegmentToBox(leg.from, leg.to, box);
       if (!seg) continue;                                      // all of it is off the sheet
       const a = px(seg.from), b = px(seg.to);
       const colour = faceOf(handle).color ?? "#bfe4c6";
@@ -12667,7 +13059,10 @@ export function mountViewer(appEl) {
           art: face ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null,
           thumb: face?.avatar ? thumbFor(FACE_UNITS, mine) : null, ring: face ? ringOf(w.handle, face, actor) : null });
       }
-      writeWalkLayer(paths + s, bodies);
+      // THE TOWN'S LEGS, UNDER THE BODIES (Darko, 2026-10-26): own household's
+      // routes are already drawn above in their own colour (walkPathsSVG)
+      const legs = farWalkLegsSVG(bodies, px, (w) => isOwnHandle(w.handle));
+      writeWalkLayer(paths + legs + s, bodies);
       return;
     }
     for (const w of bodies) {
@@ -13085,6 +13480,9 @@ export function mountViewer(appEl) {
   }
   if (typeof document !== "undefined") document.addEventListener("visibilitychange", () => { if (!document.hidden) animateWalks(); });
   function takeWalkers(rows) {
+    // POS-945: a resident the town marks `placeholder: true` has no position, only the Origin's stand-in coordinates. They are in
+    // town by mail (the list beside the map), never a body at the Origin: the flag that feeds that list is the map's rule too.
+    rows = placedRows(rows);
     walksPolledMs = Date.now();
     askNewWalkRecords(rows);
     animateWalks();
@@ -13179,7 +13577,10 @@ export function mountViewer(appEl) {
               }
               // the town's bodies, earshot's rows winning for their handles; a
               // town door that does not answer leaves the earshot answer alone
-              const bodies = (await town) ?? [];
+              const answered = await town;
+              if (answered) takeByMail(answered); // POS-945: the same answer that moves the bodies moves the list
+              // the flagged rows leave BEFORE the one-row-per-handle merge below (withTownBodies keeps the first row of a handle)
+              const bodies = placedRows(answered ?? []);
               // A LANDING THIS PAGE DID NOT MAKE (the arrival tick's passage, another
               // tab): the room is read at once, so the scene and the body change in
               // ONE render rather than on two polls 15 s apart (row 68 (b))
@@ -13190,6 +13591,11 @@ export function mountViewer(appEl) {
             }
           }
         } catch { /* a poll miss is silent — the last good reading stands */ }
+      } else {
+        // AN UNPLACED READER (POS-945): no standpoint to ask earshot from, and none is invented. The list needs none: it is the
+        // town's own answer, asked once here as it is above. The bodies stay as they were (nothing is drawn without a standpoint).
+        const answered = await townBodies();
+        if (answered) takeByMail(answered);
       }
       return;
     }
@@ -13210,7 +13616,9 @@ export function mountViewer(appEl) {
         // are people; they are drawn together and told apart by `standing`,
         // which this renderer already understood. The office publishes them
         // under separate keys so `walkers` keeps meaning what it always meant.
-        takeWalkers([...(j.walkers ?? []), ...(j.standing ?? [])]);
+        const townRows = [...(j.walkers ?? []), ...(j.standing ?? [])];
+        if (path === paths[0]) takeByMail(townRows); // /walks, the local-spectator fallback, is not the town's answer and carries no flag
+        takeWalkers(townRows);
         const origin = actorOrigin();
         if (canAct() && origin && walkState.actorBound) {
           const moved = state.cam.x !== origin.x || state.cam.y !== origin.y;
@@ -13539,6 +13947,13 @@ export function mountViewer(appEl) {
     // A LIVE CREATURE IS SELECTABLE (play fix 35), as a face is: no trail, no walk
     // preview, a second press puts its column away. Its whole reading is asked
     // for as it opens.
+    // A CONVERSATION IS SELECTABLE (POS-779, Darko 2026-11-06): no trail, no walk preview, a second press puts its column away.
+    if (isConvoChoiceId(id)) {
+      if (markInteraction.getState().selectedId === id) { markInteraction.select(null); return false; }
+      bubbleTrail = [];
+      markInteraction.select(id);
+      return true;
+    }
     if (isCreatureId(id)) {
       if (markInteraction.getState().selectedId === id) { markInteraction.select(null); return false; }
       bubbleTrail = [];
@@ -13624,9 +14039,6 @@ export function mountViewer(appEl) {
     chooseWalkPoint(mark.at.x, mark.at.y, id);
   }
 
-  // `scrollDesk` is gone with the rail (Keemin, 2026-08-04): the desk was down a
-  // scrolling column and had to be scrolled to, which is precisely the problem
-  // moving it to the painting's corner solves — it now opens where you are looking.
   /**
    * THE GROUND'S STRIDE, and the one place it is kept.
    *
@@ -14410,7 +14822,7 @@ export function mountViewer(appEl) {
     return {
       // the key carries everything that changes what the column says, so a
       // repaint happens exactly when one is owed (the column's own law)
-      key: [id, d ? "read" : "-", worldEpoch, enterExitEpoch, cameFrom ?? "", enter ?? "", inside.join(","),
+      key: [id, d ? "read" : "-", worldEpoch, enterExitEpoch, cameFrom ?? "", enter ?? "", inside.join(","), where.detail,
         icons.map((i) => `${i.key}${i.count ?? ""}`).join(","),
         holding ? `${holding.count}/${holding.capacity}/${holding.open}/${holding.kinds.map((k) => k.shows).join(",")}` : "-", carriedBy ?? "", heldIn ?? ""].join("|"),
       handle: String(mark.by ?? mark.household ?? "the town"),
@@ -14515,10 +14927,15 @@ export function mountViewer(appEl) {
     fetch(officeUrl(`/world/apex?explain=${encodeURIComponent(cls)}`), { headers: { accept: "application/json" }, credentials: "same-origin" })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
-        if (!Array.isArray(j?.extends)) return;
-        thingKinds.fromChain(cls, j.extends.map((c) => classToken(c?.class)));
+        // an ACCEPTED answer is the office's lineage: a list whose every entry carries a string class (class-read.mjs),
+        // however short (a root class has none). Anything else is malformed, so it is no answer (R1): the kind stays
+        // unanswered and silent, and nothing is learned from the part of it that reads.
+        const chain = j?.extends;
+        if (!Array.isArray(chain) || chain.some((c) => typeof c?.class !== "string" || !classToken(c.class))) return;
+        thingKinds.fromChain(cls, chain.map((c) => classToken(c.class)));
         if (lastRadial && mapCtx) drawOverlay(lastRadial);
         syncMarkInteractionViews();
+        reRender();   // the telling and the column say what the answer made true (R1): the page's own repaint, no manual one
       })
       .catch(() => {});
   }
@@ -14577,6 +14994,9 @@ export function mountViewer(appEl) {
     if (!handle) return null;
     const w = (walkState.walkers ?? []).find((entry) => entry?.handle === handle);
     if (!w) return null;
+    // A BOAT IS A WALKER ROW TOO: the click snap keeps every row ("a boat too", walkerCandidatesAt),
+    // so a click on her lands here. Her handle is a vessel mark's bare id, not a household's.
+    const boat = vesselHandles(allMarks()).has(handle);
     const inv = residentCloseLook(handle);
     const lines = handle === hands.for && hands.holdings ? handsLines(hands.holdings) : residentHoldLines(inv);
     const face = faceOf(handle);
@@ -14589,8 +15009,13 @@ export function mountViewer(appEl) {
     return {
       // the place line is in the key: it changes when the page learns a kind is a thing (not ground)
       key: ["resident", handle, worldEpoch, inv ? "read" : "-", card ? "card" : "-", JSON.stringify(profile.facts), profile.picture ?? "", profile.pronouns ?? "", moving ? "m" : "s", things.join(","), lines?.count ?? "-", region].join("|"),
-      handle, residentLink: false,
-      residentHref: residentHref(handle),
+      // THE WAY TO THEIR PAGE STAYS ON (WLD-145, Darko 2026-11-01 19:18: "we somehow lost that
+      // functionality"). This view was cut from a mark's, whose `residentLink: false` is right
+      // (a mark's handle is its author) and wrong here (the handle IS the resident), so the
+      // column drew no link. It also carried a `residentHref` the column never read. A boat's
+      // column has neither link (Truey's F1): there is no resident page for a vessel's handle.
+      handle,
+      ...(boat ? { residentLink: false } : { titleLink: true }),   // and a resident's name in the header is that link ("like by clicking their name?")
       kicker: face.household || "a resident",
       title: face.name || handle,
       pronouns: profile.pronouns,
@@ -14672,15 +15097,8 @@ export function mountViewer(appEl) {
     }
     return rings + out;
   }
-  function creatureNameplateHTML(id) {
-    const c = liveCreatures.get(id);
-    if (!c) return "";
-    return '<div class="wv-nameplate" data-nameplate="' + esc(id) + '">'
-      + '<span class="wv-np-what">' + iconsHTML([creatureIcon()]) + '</span>'
-      + '<span class="wv-np-name">' + esc(c.name) + '</span></div>';
-  }
   // ITS COLUMN: what it is in its kind's own words, its kind, what it is doing,
-  // its moods, when it came out and when it fades, and what it did lately.
+  // its moods, when it came out, what it runs on, and what was done to it and how it answered.
   function creatureColumnView(id) {
     if (!isCreatureId(id)) return null;
     const c = liveCreatures.get(id) ?? null;
@@ -14697,7 +15115,7 @@ export function mountViewer(appEl) {
     const from = body && [body.x, body.y].every(Number.isFinite) ? { x: Number(body.x), y: Number(body.y) } : state.cam;
     const where = c && !inRoom ? Math.round(Math.hypot(c.x - Number(from.x), c.y - Number(from.y))) : null;
     return {
-      key: [id, read?.at ?? 0, c?.fades_in ?? ""].join("|"),
+      key: [id, read?.at ?? 0].join("|"),
       handle: "the-town", residentLink: false,
       kicker: "a creature",
       title: name.charAt(0).toUpperCase() + name.slice(1),
@@ -15224,9 +15642,9 @@ export function mountViewer(appEl) {
   // points in the art", and "a card doesn't even tell you if something is a
   // thing or not". So the glance is now the smallest of the three levels he
   // approved ("each shown only when asked for"): the mark's NAME, set BESIDE its
-  // drawn ground (positionBubbles passes the footprint as `reach`), raised only
-  // after the pointer has rested (GLANCE_DELAY_MS) so a sweep across the map
-  // flashes nothing. No body: the words are the click's, in the column.
+  // drawn ground (positionBubbles passes the footprint as `reach`), raised
+  // at once, in the same frame as the highlight (see raiseGlance). No body: the
+  // words are the click's, in the column.
   //
   // THE DOT RIDES BESIDE THE NAME (Darko, 18:00): the mark's own pip is hidden
   // while it is hovered (renderMarkHighlight), so the plate wears it instead —
@@ -15252,58 +15670,35 @@ export function mountViewer(appEl) {
       + (states.length ? `<span class="wv-np-icons">${iconsHTML(states)}</span>` : "")
       + `</div>`;
   }
-  // A RESTING POINTER, NOT A PASSING ONE. The glance waits this long on one mark
-  // before it is raised.
-  // NO TIMER (play fix 37, Darko 19:29: "make it happen simultaneously as like
-  // the highlight on hover effect"): what a glance shows, it shows at once.
-  const GLANCE_DELAY_MS = 0;
-  // …AND A SHOWN PLATE GETS A BEAT BEFORE IT GOES. Nearly every mark stands
+  // A SHOWN PLATE GETS A BEAT BEFORE IT GOES. Nearly every mark stands
   // inside some larger ground, so the pointer leaving a pip on its way to the
   // plate's icons is, for a moment, pointing at the forecourt around it. For
   // this long the plate stays put; a pointer that reaches it holds it.
   const GLANCE_GRACE_MS = 220;
   let glanceShown = null;     // the id the hover bubble is showing, or null
-  let glancePending = null;   // the id waiting out the delay, or null
-  let glanceTimer = null;
   let glanceNext = null;      // what the pointer is on while a shown plate takes its beat
   let glanceLeaving = null;   // that beat's timer
   let glanceHeld = false;     // the pointer is resting on the nameplate itself
   function paintGlance(el, id) {
     const handle = walkerHandleFromHoverId(id);
     const creature = isCreatureId(id);
-    const html = handle ? walkerBubbleHTML(handle) : creature ? creatureNameplateHTML(id) : markNameplateHTML(id);
+    const html = handle ? walkerBubbleHTML(handle) : creature ? creatureNameplateHTML(liveCreatures.get(id)) : markNameplateHTML(id);
     if (!html) { el.hidden = true; glanceShown = null; return; }
     el.className = `wv-bubble is-hover${handle ? "" : ` is-nameplate ${creature ? "is-creature" : markClasses(byId.get(id))}`}`;
     if (el._pmHtml !== html) { el._pmHtml = html; el.innerHTML = html; }
     el.hidden = false;
   }
+  // NO TIMER (play fix 37, Darko 19:29: "make it happen simultaneously as like
+  // the highlight on hover effect"): what a glance shows, it shows at once.
   function raiseGlance(el, id) {
     if (!id) {
-      clearTimeout(glanceTimer);
-      glanceTimer = null; glancePending = null; glanceShown = null;
+      glanceShown = null;
       el.hidden = true;
       return;
     }
-    if (id === glancePending) return;
-    if (!GLANCE_DELAY_MS) {
-      clearTimeout(glanceTimer);
-      glanceTimer = null; glancePending = null; glanceShown = id;
-      paintGlance(el, id);
-      positionBubbles();
-      return;
-    }
-    el.hidden = true;
-    glanceShown = null;
-    glancePending = id;
-    clearTimeout(glanceTimer);
-    glanceTimer = setTimeout(() => {
-      glanceTimer = null;
-      if (glancePending !== id) return;
-      glancePending = null;
-      glanceShown = id;
-      paintGlance(el, id);
-      positionBubbles();
-    }, GLANCE_DELAY_MS);
+    glanceShown = id;
+    paintGlance(el, id);
+    positionBubbles();
   }
   function renderHoverBubble(id) {
     const el = bubbleEl("hover");
@@ -15443,8 +15838,9 @@ export function mountViewer(appEl) {
     // to swap either: the click scrolls the mark's cell up in the Telling, and
     // it still does.)
     const selected = markInteraction.getState().selectedId;
-    const column = parcelColumnView(selected) ?? regionColumnView(selected) ?? creatureColumnView(selected) ?? residentColumnView(selected) ?? markColumnView(selected);
+    const column = convoColumnView(selected) ?? parcelColumnView(selected) ?? regionColumnView(selected) ?? creatureColumnView(selected) ?? residentColumnView(selected) ?? markColumnView(selected);
     if (column) homeColumn.open(column); else homeColumn.close();
+    renderConvoWash(); // the selected thread keeps its wash drawn, and clearing the selection takes it away
     // ── AND THE MAP HAS TO HEAR ABOUT IT (2026-09-12) ─────────────────────
     //
     // A selection does not redraw the overlay. Measured, not assumed: the six
@@ -15764,6 +16160,7 @@ export function mountViewer(appEl) {
       button.title = on ? "show the telling" : "hide the telling and give the painting the page";
     }
     $(root, ".wv-main")?.classList.toggle("is-telling-collapsed", on);
+    paintLensNote();   // the outsider line is read in the Telling, or at the map side when the Telling is folded (POS-823)
     renderBubbles();
     // The pane is mid-slide. Re-measure when the slide ENDS, not on the next
     // frame — a single rAF lands in the middle of a 300 ms transition, which is
@@ -15849,7 +16246,7 @@ export function mountViewer(appEl) {
   }
 
   // a window resize is the same event as a toggle, only slower
-  const onViewerResize = () => { mapCtx?.refit?.(); sizeSearchField(); seatRoomCard(); positionBubbles(); placeTour(); };
+  const onViewerResize = () => { mapCtx?.refit?.(); sizeSearchField(); seatRoomCard(); positionBubbles(); placeTour(); paintLensNote(); };
   window.addEventListener("resize", onViewerResize);
   // THE COCKPIT'S ONE WORD TO THIS PANE — see standOutOfRoom for why the redraw
   // cannot wait for the ledger's clock. Guarded like the dock and feed seams
@@ -15931,6 +16328,28 @@ export function mountViewer(appEl) {
       ? "viewing as an outsider: the world as a stranger sees it (read-only). Click to see as yourself again."
       : "view as an outsider: the world as a stranger sees it, as if your household owned nothing (read-only)";
   }
+  // THE OUTSIDER VIEW SAYS WHY IT CHANGED NOTHING (POS-823): the office's line, as it sent it. The page keeps no rule
+  // and no wording of its own: it reads the line off the lens read it holds for this standpoint and crossing (the
+  // cache key carries the lens, so with the lens off it finds your own sight, which has none), and an office that
+  // sends none shows nothing. It only decides WHERE the line can be read.
+  //
+  // The toggle is on the map, so a line left in the Telling is never read when the Telling is not there to be seen:
+  // on a phone (under 720 px `.wv-view` is display:none) or folded away (visibility:hidden). Then the line goes where
+  // the toggle is, the map's side: the host reRender's toast already uses when the Telling is folded (review of
+  // 5e869ee8, finding A). reRender itself is left as it was: on a phone its toast would take space for good.
+  function tellingShows() {
+    return !state.paintingOnly && !onPhone();
+  }
+  function paintLensNote() {
+    const el = root.querySelector(".wv-lens-note");
+    if (!el) return;
+    const line = lensNoteOf(readCache.get(residentStandpointKey(null, state.handle)));
+    const inHead = tellingShows();
+    const host = inHead ? root.querySelector(".wv-viewhead") : root.querySelector(".wv-map .wv-sticky");
+    if (host && el.parentElement !== host) (inHead ? host.append(el) : host.prepend(el));
+    el.textContent = line;
+    el.hidden = !line;
+  }
   function outsiderUnavailable() {
     if (!state.outsider) return;
     state.outsider = false;
@@ -15959,6 +16378,7 @@ export function mountViewer(appEl) {
   }
   function renderCurrent() {
     paintOutsiderButton();
+    paintLensNote();
     renderStandpointReadouts();
     if (state.view === "telling") renderTelling();
     renderModeControls();
@@ -16032,7 +16452,7 @@ export function mountViewer(appEl) {
     // picking one out of the stack: from here it is an ordinary selection, and
     // the mark opens in exactly the bubble it would have opened in alone
     const chosen = e.target.closest("[data-choose]");
-    if (chosen && isConvoChoiceId(chosen.dataset.choose)) { window.open(convoHref(chosen.dataset.choose.slice(CONVO_CHOICE_PREFIX.length)), "_blank", "noopener"); return; }
+    if (chosen && isConvoChoiceId(chosen.dataset.choose)) { selectMark(chosen.dataset.choose); return; }
     if (chosen) { selectMark(chosen.dataset.choose, { scrollCell: true }); return; }
     const actor = e.target.closest("[data-act-as]");
     if (actor) { selectActor(actor.dataset.actAs); return; }
@@ -16631,7 +17051,7 @@ export function mountViewer(appEl) {
             walkState.walkers = withTownBodies(near, walkState.walkers);
             drawWalkers();
             townBodies().then((town) => {
-              if (town && onResidentPath() && state.handle === handle) takeWalkers(withTownBodies(near, town));
+              if (town && onResidentPath() && state.handle === handle) { takeByMail(town); takeWalkers(withTownBodies(near, placedRows(town))); }
             });
           }
         }
@@ -17384,32 +17804,6 @@ export function mountViewer(appEl) {
   // args (the w43 nginx conf), and a since to the millisecond missed it on every
   // load (~18 s under party load). Every page in one hour asks the same thing.
   const walkWindowSince = () => new Date(Math.floor((Date.now() - walkWindowDays * 86_400_000) / 3_600_000) * 3_600_000).toISOString();
-  /**
-   * The office's `walks[]` onto the ledger's own departure grammar.
-   *
-   * `parseWalkLedger` defines that grammar and this is the same record in
-   * another wrapper: `within` and `to` are the STORE's column names for what
-   * walk.mjs reads as `targetExtent` and `targetMarkId` — the office's own
-   * `/world2/walks` says so where it renders them. Every other field is
-   * name-for-name. Unrecognized rows are COLLECTED, not silently dropped, which
-   * is the parser's own stance; one unreadable row must not discard the nine
-   * hundred good ones beside it.
-   */
-  function walksFromOffice(body) {
-    const departures = [], unrecognized = [];
-    for (const w of Array.isArray(body?.walks) ? body.walks : []) {
-      if (!w?.iso || !w?.handle || !w?.from || !w?.toward) { unrecognized.push(w); continue; }
-      departures.push({
-        iso: String(w.iso), handle: String(w.handle),
-        from: w.from, toward: w.toward, at: w.at,
-        targetExtent: w.within ?? null,
-        targetMarkId: w.to ?? null,
-        pace: w.pace ?? null,
-        line: w.line ?? null,
-      });
-    }
-    return { departures, unrecognized };
-  }
   let departures = [];
   // ONE INSTANT PER LOAD, threaded through: the chain, the cut and the absence
   // sentence must all name the same fortnight, or the sentence a reader is
@@ -17970,11 +18364,4 @@ export function mountViewer(appEl) {
   };
   try { window.__pmViewer = handle; } catch { /* no window: the tests import this file */ }
   return handle;
-}
-
-// ───────── tiny helpers (display only) ─────────
-function firstWords(body, n) {
-  const s = String(body ?? "").replace(/^\s*(sits|region|kind|at|date|slot|value|household|mark|parent)\s*:\s*/i, "").trim().replace(/\s+/g, " ");
-  const w = s.split(" ").slice(0, n).join(" ");
-  return w + (s.split(" ").length > n ? "…" : "");
 }

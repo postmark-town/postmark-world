@@ -44,12 +44,11 @@ const real = worldState.marks ?? [];
 // Predicates and namings ride along unchanged: cloning them would inflate the
 // count without touching the path under test, which would be cheating the number.
 const embodied = real.filter((m) => m?.at && Number.isFinite(m.at.x) && Number.isFinite(m.at.y));
-const others = real.filter((m) => !embodied.includes(m));
 
 // A LATTICE, NOT A PILE. Copies are spread on a grid wide enough that the clones
 // do not all land inside one another — a 10× world where every extra mark shares
-// one coordinate would exercise the fan and nothing else, and the fan is not what
-// is being measured.
+// one coordinate would exercise the pile of co-located pips and nothing else, and
+// that pile is not what is being measured.
 const RING_M = 3000;
 const side = Math.ceil(Math.sqrt(MULT));
 const clones = [];

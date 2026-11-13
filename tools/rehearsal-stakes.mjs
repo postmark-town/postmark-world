@@ -84,7 +84,7 @@
 //
 // WHAT IT DOES NOT REPRODUCE, SAID PLAINLY: `weight`. A real stake row's weight
 // is `n` plus a BREADTH BONUS the town computes from its own k dial
-// (marks-fold.mjs:923, `const bonus = (s.weight ?? s.n) - s.n`), and the fold
+// (marks-fold.mjs, § THE BREADTH SPLIT: `const bonus = (s.weight ?? s.n) - s.n`), and the fold
 // records that bonus per MARK (`weight_parts.breadth`), never per row — so it
 // cannot be attributed back to the holders it came from without inventing an
 // attribution rule. MEASURED on e3cf2b37: 38 of 1224 marks carry a non-zero

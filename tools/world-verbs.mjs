@@ -10,11 +10,11 @@
 //   { marks, terrain, heightfield, light, fogCeilingM, charter }
 // A `state` is the walker: { x, y, name, household? }.
 
-import { isSited, isGround, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isGround, isPredicate, isThingIn, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
-  fieldOfView, radialSerialize, statusAt, lightLevelAt, fogModel,
+  fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
-  bearingDeg, quantizeBearing, distanceBand, DIALS,
+  DIALS,
 } from "./world-engine.mjs";
 import { homeOf } from "./where-is.mjs"; // the ONE home resolver (declared, own parcel, household)
 import { propertyOf } from "./class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
@@ -24,9 +24,9 @@ import {
 import {
   adjudicate, containsEdges as containsEdgesOf, entityChild, entryLawOf, formatEnterExit,
   isMark, occupantsOf, termsAt, withinOf,
-} from "./enter-exit.mjs"; // DEMO SLICE — the enter-exit acts (step 5, jetto/enter-exit-demo)
+} from "./enter-exit.mjs"; // the enter-exit acts (production, planted as law 2026-08-22; see its header)
 import {
-  pointInMark, markInside, roomHolds, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
+  pointInMark, roomHolds, isDungeon, dungeonIndex, dungeonsOf, heldDungeon, hiddenFrom, scopeWorld, standpointSight, walkFence,
   landingOf, passageTargetOf, portalsIn, portalsInto, dungeonLanding, exitLockWords, lockStandsWords, lockedPassage, hhmmZ,
   unmetRequires, requiresHolderOf, requiresHoldersOf,
 } from "./portals.mjs"; // WLD-5: portals and the dungeon class, one home for the verbs and the lint
@@ -46,7 +46,13 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
   const self = statusAt({ x: state.x, y: state.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM, veil: mists ? mists.veil : 0 });
   // the containment spine: root → inward. within[0] is the frame (the root),
   // whose body is the establishing line — charter out of code, into the record.
-  const within = containmentChain(state, world.marks);
+  // A THING IS WITHIN ONLY ONCE ENTERED (WLD-74 E2, Wright 2026-11-05 04:48): the
+  // chain stays geometric, asked over the marks less the things `entered` does not
+  // hold. `entered` null is nothing entered (a keyless reader, a coords glance, or a
+  // ledger that would not read: the inside of a thing is never claimed unread).
+  const idx = kindIndexOf(world.marks);
+  const ent = new Set(entered ?? []);
+  const within = containmentChain(state, world.marks.filter((m) => ent.has(m.id) || !isThingIn(m, idx)));
   const root = within[0];
   return {
     charter: { ...(world.charter ?? CHARTER), establishing: root?.body ?? (world.charter ?? CHARTER).light, from_mark: root?.id ?? null },
@@ -66,22 +72,12 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
       // AN ENTERED MARK IS SHELTER: standing within one, the Mists hide nothing it holds (airLine says so)
       ...(mists && shelterOf(world, entered, state) ? { sheltered: true } : {}),
     },
-    // enter/exit are DEMO-SLICE verbs (step 5) — listed so a reader of the
-    // demo sees the pair, and pointedly listed apart from walk, which reaches
-    // coordinates and never an inside.
+    // enter/exit are listed so a reader sees the pair, and pointedly listed
+    // apart from walk, which reaches coordinates and never an inside.
     verbs: ["open-your-eyes", "investigate(mark)", "walk(dir, dist)", "enter(mark)", "exit(mark)"],
   };
 }
 
-// ───────────────────────── open-your-eyes — the FOV telling ──────────────────
-// Field of view in radial coordinates: quantized bearings, named distance bands,
-// ranked by angular size modulated by stamps, capped at the context budget, fog
-// and darkness applied, signal-marks cutting through. Returns both the raw fov
-// (for callers) and a `tell()` that renders the human/agent-facing prose.
-//
-// `actor` is the handle of the resident the eyes belong to (WLD-9): their home,
-// as tools/where-is.mjs § homeOf resolves it, is carried beyond the budget when
-// it is in view. No actor, or a home that resolves to nowhere, changes nothing.
 /** AN ENTERED MARK IS SHELTER (Darko 2026-10-15): the test of a point the Mists leave alone for a walker whose enter
  *  stack is `entered` (mark ids): inside any of those marks. With `standpoint`, only the entered marks that contain it
  *  count: an entered mark you stand outside shelters nothing. null when nothing counts, so the Mists read as ever.
@@ -114,14 +110,29 @@ export function sightFrameOf(world, entered, standpoint = null) {
   return (mk) => roomHolds(room, mk, marks);
 }
 
+// ───────────────────────── open-your-eyes — the FOV telling ──────────────────
+// Field of view in radial coordinates: quantized bearings, named distance bands,
+// ranked by angular size modulated by stamps, capped at the context budget, fog
+// and darkness applied, signal-marks cutting through. Returns both the raw fov
+// (for callers) and a `tell()` that renders the human/agent-facing prose.
+//
+// `actor` is the handle of the resident the eyes belong to (WLD-9): their home,
+// as tools/where-is.mjs § homeOf resolves it, is carried beyond the budget when
+// it is in view. No actor, or a home that resolves to nowhere, changes nothing.
 export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null, entered = null } = {}) {
   const home = actor ? homeOf(actor, world) : null;
+  // AT YOUR FEET (WLD-74 E3/E4, Wright 2026-11-05 04:48): a thing whose footprint holds
+  // the standpoint and that `entered` does not hold is not where you are; it is an
+  // object at your feet, seen and in reach like any other, never cut for standing on it.
+  const idx = kindIndexOf(world.marks);
+  const ent = new Set(entered ?? []);
+  const atFeet = new Set(world.marks.filter((m) => m.at && !ent.has(m.id) && isThingIn(m, idx) && pointWithinMark(state, m)).map((m) => m.id));
   const fov = fieldOfView(state, world, { crossing, budget, dials, keep: home?.placed ? home.mark_id : null,
-    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state) });
+    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state), atFeet });
   const radial = radialSerialize(fov);
-  radial.within = containmentChain(state, world.marks); // the spine: root → inward, parents first
+  radial.within = containmentChain(state, world.marks.filter((m) => ent.has(m.id) || !isThingIn(m, idx))); // the spine: root → inward, parents first; a thing only once entered (E3, as orient)
   fov.within = radial.within;
-  return { fov, radial, tell: () => renderTelling(state, radial, fov) };
+  return { fov, radial, tell: () => renderTelling(state, radial, fov, atFeet) };
 }
 
 // containmentChain — the telling's spine (Keemin, 2026-07-23): the marks the
@@ -165,8 +176,9 @@ export const pointWithinMark = pointInMark;
 // The target additionally carries `weight_parts`, which is that ✦ number's
 // receipt (marks-fold.mjs § partsOf) — because a reader shown one figure built
 // out of three sources cannot otherwise tell which of them they are looking at.
-// `occupancy` (DEMO SLICE, step 5) is OPTIONAL and defaults to empty, so every
-// existing caller gets a byte-identical answer. Passed, the manifest grows its
+// `occupancy` (the enter-exit acts' derived occupants) is OPTIONAL and defaults
+// to empty, so every existing caller gets a byte-identical answer. Passed, the
+// manifest grows its
 // entity children — who is aboard is a child of the ship, and investigate is
 // the read that opens one mark, so it is where "who's here" belongs.
 export function investigate(markId, world, { depth = 1, budget = DIALS.context_budget, occupancy = null } = {}) {
@@ -337,16 +349,20 @@ function markDescent(fromIds, world, byId, opts) {
 }
 
 // ───────────────────────── walk — the walk dial + anonymous wear ─────────────
-// Move `distM` metres in a compass `dir`. `walkSpeed` here is the skeleton's 60 km
-// per crossing (decision 008) — the LEGACY engine dial; the live resident stride is
-// 60 km per crossing (008b, 2026-08-16), read off `the-town/resident` by the office.
-// A walk here spends `distM / walkSpeed` crossings. The path lands
-// in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
+// Move `distM` metres in a compass `dir`. `walkSpeed` is read from the
+// skeleton's walk_speed_m_per_crossing, 60 km per crossing since e505ca95
+// (POS-223): the same number as the live resident stride (008b, 2026-08-16),
+// which the office reads off `the-town/resident`. Decision 008's original 15 km
+// survives only as the fossil fallback in this function (tools/walk.mjs keeps
+// 15 on purpose, for unstamped legs). A walk here spends `distM / walkSpeed`
+// crossings. The path lands in a walk-ledger and its wear aggregates per grid cell WITHOUT names — where
 // you wander is more intimate than who you wrote (epic § Paths are wear).
 export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } = {}) {
-  // the stride is the mover's: the resident class's dial (the node the founder
-  // moved it to, 2026-08-22) is the first word; terrain may override; 15000 is
-  // the pre-dial fossil, kept only for worlds folded before dials rode the store.
+  // the stride is the mover's: it lives on the resident class's dial (the node
+  // the founder moved it to, 2026-08-22), but the terrain's own
+  // walk_speed_m_per_crossing, when the world carries one, is read first (see
+  // the header); 15000 is the pre-dial fossil, kept only for worlds folded
+  // before dials rode the store.
   // The dial is a property of resident now (LOGOS v2 part 2). A store folded
   // before that change still carries it as the class row's dial, so a world
   // read from the last crossing's store answers either way, the property first.
@@ -381,7 +397,7 @@ export function walk(state, dir, distM, world, { walkLedger = null, cell = 50 } 
 
 // ───────────────────────── enter / exit(mark) — the crossings ───────────────
 //
-// DEMO SLICE (step 5). Walk and entry are fully decoupled axes (R15): the walk
+// Walk and entry are fully decoupled axes (R15): the walk
 // above moves you to coordinates and never puts you INSIDE anything —
 // geometrically-inside-legally-outside is a real state, and it is the visitor
 // standing on the deck who never stepped aboard. Entry is the other axis, and
@@ -826,7 +842,7 @@ const townsOwn = (m) => authorOf(m) === TELLING_TOWN;
 export function residentMarkNamed(m, { withId = true } = {}) {
   return `a mark by ${authorOf(m) || "someone"}${withId ? ` [${m?.id}]` : ""}`;
 }
-function renderTelling(state, radial, fov) {
+function renderTelling(state, radial, fov, atFeet = null) {
   const o = radial.observer;
   const within = radial.within ?? [];
   const L = [];
@@ -885,7 +901,9 @@ function renderTelling(state, radial, fov) {
       const occ = m.occluded && m.signal ? " — its footing is hidden, only the light shows" : "";
       const dim = m.dim < 0.5 ? " — dim, at the dark edge" : "";
       const more = m.clusteredCount ? ` (+${m.clusteredCount} more of ${m.household}'s — investigate)` : "";
-      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
+      // a thing at your feet reads as HERE (WLD-74 E6, Darko's 10-18 word), keyed on the at-feet relation
+      // openYourEyes measured, never on a rounded 0 m; `here` on the row stays the kept home's alone
+      parts.push(`  · ${m.here || atFeet?.has(m.id) ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
     }
     if (parts.length) { L.push(`${bandHeading(bandName)}:`); L.push(...parts); }
   }
@@ -1176,13 +1194,14 @@ function directChildren(contained) {
 // rei/the-lanternseed-gardens: a door in a field.
 //
 // THRESHOLD_KINDS answers "what must I CROSS?" and deliberately stays sited.
-// A crossing is an authored consent act that appends a row to the threshold
+// A crossing is an authored consent act that appends a row to the enter-exit
 // ledger, and a parcel is a land title, not a room — "wright enters
 // rei/the-lanternstep-house-parcel" would put a claim in the permanent record
 // that nobody made. It would also part the derivation from the record already
 // written: occupancy is derived from the ledger's own rows, and every crossing
-// in WORLD/threshold-ledger.md was recorded under the sited-only chain. That
-// this is a bound and not an oversight is pinned by its own test below.
+// in the enter-exit ledger (enter-exit.mjs § LEDGER_HEADER) was recorded under
+// the sited-only chain. That this is a bound and not an oversight is pinned by
+// tools/parcel-parents.test.mjs ("THE BOUND, PINNED").
 // Whether a title is a threshold is the founder's call, and it is one list away.
 const CONTAINER_KINDS = ["sited", "parcel"];
 const THRESHOLD_KINDS = ["sited"];

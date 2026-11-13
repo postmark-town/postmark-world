@@ -19,8 +19,8 @@ import {
 } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
-import { unpublishVerdict, rowClassOf } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
-import { isHeld, heldBy, holdOnlyChange } from "./mark-kind.mjs"; // POS-688: published but unplaced
+import { unpublishVerdict, rowClassOf, isCandidateRow } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
+import { isHeld, heldBy, holdOnlyChange, handOffOnly } from "./mark-kind.mjs"; // POS-688: published but unplaced
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -41,6 +41,7 @@ import {
 // a frame's record leaving canon or returning — never moves what stands on it.
 import { snapshotWorld, keepWorldAcross, ReframeRefusal } from "./reparent-keep-world.mjs";
 import { CONSENT_FIELD, consentMap } from "./consent.mjs";
+import { sketchbookHouse } from "./lane-author.mjs"; // whose a sketchbook is: the lane's one binding (WLD-122)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -1163,8 +1164,17 @@ export function settlementSweep({
     stamped: wallRegistryFile?.town_sha ?? null,
     verification: registryVerification,
   });
-  const branchHouseholdOf = (branchName) =>
-    wallRegistry.logins[branchName.slice("draft/".length).toLowerCase()] ?? null;
+  // A SKETCHBOOK'S HOUSEHOLD, BY THE LANE'S OWN BINDING (WLD-122; Wright,
+  // 2026-11-04T17:46:27Z, "one binding everywhere"). The same helper the first
+  // knock and the PR wall use (lane-author.mjs § sketchbookHouse), over main's
+  // own registry file: a `gh:<id>` name is that account's pinned household,
+  // never a raw `logins` value. `known` with no `house` is an account the town
+  // can name but binds to no household (an id the export left unbound, or no
+  // `pinned_ids` rendered yet): it gains no rights, and the walls below refuse
+  // it rather than stand down. A name the registry does not hold at all
+  // (`known: false`) keeps the status quo above: left alone, never a new refusal.
+  const branchBindingOf = (branchName) => sketchbookHouse(wallRegistryFile, branchName.slice("draft/".length));
+  const UNBOUND = "authorship: this sketchbook's account is known to the registry but pinned to no household, so it publishes and withdraws nothing";
   const mainTree = git(repo, ["rev-parse", `${mainBranch}^{tree}`]).trim();
   const resettable = new Set(branches.filter(
     (branch) => git(repo, ["rev-parse", `${branch}^{tree}`]).trim() === mainTree,
@@ -1370,7 +1380,12 @@ export function settlementSweep({
           continue;
         }
         const authorHh = wallRegistry.households[record.by] ?? null;
-        const branchHh = branchHouseholdOf(branch);
+        const branchBinding = branchBindingOf(branch);
+        if (branchBinding.known && !branchBinding.house) {
+          leftDrafted.push({ household, id: wid, path: delta.path, reason: UNBOUND });
+          continue;
+        }
+        const branchHh = branchBinding.house;
         if (authorHh && branchHh && authorHh !== branchHh) {
           leftDrafted.push({ household, id: wid, path: delta.path, reason: `authorship: "${record.by}" is not this sketchbook's to withdraw` });
           continue;
@@ -1407,7 +1422,15 @@ export function settlementSweep({
       // berth's grant reach main: `the-town` is bound to no household by
       // construction, so it passed as an unverifiable stranger. Nothing signed
       // by the town publishes from a sketchbook, whatever the registry knows.
-      if (townOwned(record)) {
+      //
+      // ONE THING PASSES IT: a hand-off. Holding a thing is not authoring it, and
+      // a hand-off prints the town's own record of where a thing is (held_by,
+      // owned_by, and the place leaving or returning), so it lands on a thing
+      // the town signed as on any other. `handOffOnly` is the whole of what
+      // passes: every other field of the mark must read as it does on main, and
+      // a place that moves while the thing stays on the ground is still the
+      // author's move, which the wall still refuses.
+      if (townOwned(record) && !handOffOnly(mainRecordAt(repo, mainBranch, delta.path), record)) {
         leftDrafted.push({ household, id: record.id, path: delta.path,
           reason: `the town wall: "${record.by}" writes the town's own record, which a founder's pen rules onto main and no sketchbook admits` });
         continue;
@@ -1415,7 +1438,12 @@ export function settlementSweep({
       // the authorship wall: a registered author on a branch the registry binds
       // to a DIFFERENT household never publishes from it
       const authorHousehold = wallRegistry.households[record.by] ?? null;
-      const branchHousehold = branchHouseholdOf(branch);
+      const branchBinding = branchBindingOf(branch);
+      if (branchBinding.known && !branchBinding.house) {
+        leftDrafted.push({ household, id: record.id, path: delta.path, reason: UNBOUND });
+        continue;
+      }
+      const branchHousehold = branchBinding.house;
       if (authorHousehold && branchHousehold && authorHousehold !== branchHousehold) {
         leftDrafted.push({ household, id: record.id, path: delta.path,
           reason: `authorship: "${record.by}" is ${authorHousehold}'s resident; this sketchbook is ${branchHousehold}'s` });
@@ -1467,6 +1495,17 @@ export function settlementSweep({
           continue;
         }
       }
+      // A HELD THING'S FIRST FILE (WLD-168): "the settlement sweep admits a held
+      // thing's **first** file under the same hold-only exemption it gives a change
+      // to an existing record". A thing taken into hands before it ever had a file
+      // has no record on main to be a hand-off from, so `holdOnlyChange` (a change
+      // between two records) cannot say it. It is held and stands nowhere, so it is
+      // the town's record of where a thing is, like any hand-off, and no escrow is
+      // asked of it. Only that: the mark is nowhere on main (not at this path, not
+      // at any other), and it carries no place, so no ground crosses free.
+      const heldFirst = !holdOnly && isHeld(record) && !mainFolded.has(record.id)
+        && !hasObject(repo, `${mainBranch}:${delta.path}`)
+        && ["at", "extent", "points"].every((k) => record[k] === undefined);
       pending.push({
         household,
         id: record.id,
@@ -1483,6 +1522,9 @@ export function settlementSweep({
         // asks no escrow to print, like any hand-off, but where it now stands is judged
         // the way any mark is, so the registry takes the class its new place walks.
         ...(holdOnly && !isHeld(record) ? { dropped: true } : {}),
+        // ITS FIRST FILE, HELD (WLD-168): asks no escrow either, but it is a first
+        // publication, so the registry takes a new row for it below.
+        ...(heldFirst ? { held_first: true } : {}),
       });
     }
   }
@@ -1531,12 +1573,14 @@ export function settlementSweep({
   holdOrphans(pending);
 
   const gone = new Set(withdrawn.map((item) => item.id));
-  // The marks the unpublish loop will ask standing of: commons rows at ✦0. Never
+  // The marks the unpublish loop will ask standing of: candidate rows at ✦0,
+  // commons and home alike, because standing decides in both directions (WLD-51
+  // G2: a home row whose mark now walks market is taken like any other). Never
   // a mark the town signs: a view drops the `tier` line the constitution
   // shortcut reads (mark-standing.mjs), so re-admitted it would read market;
   // the fold's own tier answers for it (review-214, finding 3).
   const judged = Object.entries(registry.published)
-    .filter(([id, entry]) => entry?.class === "commons" && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
+    .filter(([id, entry]) => isCandidateRow(entry) && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
       && !(mainFolded.has(id) && townOwned(mainFolded.get(id))))
     .map(([id]) => id);
   const candidateOf = new Map(pending.filter((row) => row.candidate).map((row) => [row.id, row.candidate]));
@@ -1607,7 +1651,7 @@ export function settlementSweep({
   // MARKET, PUBLISHING: each row's class is read off the result.
   for (const { candidate, ...row } of pending) {
     const rowClass = result.viewed.has(row.id) ? rowClassOf(classifyMark(result.byId.get(row.id), result.byId)) : row.class;
-    if (rowClass !== "commons" || row.escrow > 0 || row.hold_only) {
+    if (rowClass !== "commons" || row.escrow > 0 || row.hold_only || row.held_first) {
       published.push({ ...row, class: rowClass });
       continue;
     }
@@ -1650,11 +1694,15 @@ export function settlementSweep({
       ...(staleRows ? { staleRows } : {}),
     });
     if (verdict.unpublish !== true) continue;
+    // `class` is the ROW's, as the registry holds it (a home row taken under G2
+    // says home), and `walked` is what the walk found: every take walks commons.
+    // The row's class is also what a kept frame's row is put back with, below.
     unpublished.push({
       household: entry.household,
       id,
       path: verdict.path,
-      class: "commons",
+      class: entry.class,
+      walked: "commons",
       escrow: escrow.get(id) ?? 0,
       content: readAt(repo, mainBranch, verdict.path),
     });
@@ -1740,7 +1788,8 @@ export function settlementSweep({
         const row = published[i];
         if (!result.viewed.has(row.id)) continue;
         const cls = rowClassOf(classifyMark(result.byId.get(row.id), result.byId));
-        if (cls !== "commons" || row.escrow > 0) { row.class = cls; continue; }
+        // a held first file stands on no ground, so none of it can have stayed behind (WLD-168)
+        if (cls !== "commons" || row.escrow > 0 || row.held_first) { row.class = cls; continue; }
         published.splice(i, 1);
         removed.push(row);
         leftDrafted.push({ household: row.household, id: row.id, path: row.path, class: "commons", escrow: row.escrow,

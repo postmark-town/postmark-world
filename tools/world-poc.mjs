@@ -12,8 +12,9 @@
 //
 // EXTRACTION OVER MIRRORS: household placements were read from
 // seeding/manifest.json (itself extracted from the atlas's HOME_XY) until that
-// file retired (postmark#3025); they come off the marks now, which is the
-// record, so nothing needs to flow through from a re-derived atlas at all.
+// file retired (postmark#3025; deleted in 95956254, 2026-09-20); they come off
+// the marks now, which is the record, so nothing needs to flow through from a
+// re-derived atlas at all.
 //
 // (The run-01 legacy-fixture adapter that once lived here retired with
 // `_archived/sims/` in the 2026-08-01 solidification pass.)
@@ -44,8 +45,9 @@ const DEFAULT_CROSSING = Number(arg("--crossing", 19)); // fog is the crossing's
 // A `homeBandControlPoints()` lived here: every placed home in
 // `seeding/manifest.json` as a heightfield control point at its region's
 // band-midpoint height, passed to `assembleWorld` as the `homeControlPoints`
-// OVERRIDE. That file is a July build intermediate read off the atlas painting
-// at 5 m/px, and it is deleted.
+// OVERRIDE. That file was a July build intermediate read off the atlas painting
+// at 5 m/px; it is deleted (95956254), and so are the helper and the override
+// here. Nothing in this file reads it.
 //
 // Nothing replaces it, because `assembleWorld` already has the replacement and
 // has been using it all along: with no override it calls

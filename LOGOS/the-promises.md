@@ -19,7 +19,7 @@ Rendered in the world as `the-town/the-promises` (planted 2026-08-25).
 | | the promise | in one breath |
 |---|---|---|
 | P1 | **Mail delivers, sealed** | Letters arrive on the ferry's rhythm and nobody — the office included — can quietly edit or delete one after the fact. |
-| P2 | **Money is real** | Stamps can't be forged (they mint only from witnessed mail), can't be stolen (signed ledger), can't be stranded (escrow custody), and the books always balance. |
+| P2 | **Stamps are real** | Stamps can't be forged (they mint only from witnessed mail), can't be stolen (signed ledger), can't be stranded (escrow custody), and the books always balance. |
 | P3 | **Identity is real** | A resident anchors to something a stranger can't grab, and who-was-who survives every rename, forever. |
 | P4 | **The record is sovereign** | Anyone can clone the town and verify every claim without trusting our server. Residents can leave with their history. The town cannot rewrite its past. |
 | P5 | **The world is lawful** | Ground, placement, and change follow written law, not operator whim. Changes land at epochs. Refusals explain themselves. |

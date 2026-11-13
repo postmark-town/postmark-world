@@ -149,7 +149,7 @@ claim: the seed the piecewise renderings accrete under (Keemin, 2026-08-13).
 | [the-derivation.md](the-derivation.md) | why a stamp exists: the ladder from majority vote, the evidence law, the money seam, the firewall — the argument the economy's law answers to |
 | [three-layers.md](three-layers.md) | the law → the log → the graph — and which pen writes each |
 | [lifetimes.md](lifetimes.md) | one node type; property values are flat fields, claims are predicates; standing / living / fleeting are lifetimes, not kinds |
-| [classes.md](classes.md) | class-nodes: the registries, property and predicate, the label → property → subclass ladder, the two constitutionalities, the household class, the custody ladder, the transfer edge and holdings |
+| [classes.md](classes.md) | class-nodes: the registries, property and predicate, the label → property → subclass ladder, the two constitutionalities, the household class, the custody ladder, the transfer edge and holdings; [the creature class](classes.md#the-creature-class--what-comes-out-of-the-mists), what comes out of the Mists: it flees or its season ends, and it does not fade |
 | [edit-law.md](edit-law.md) | the one primitive — declare an edge; create, amend, withdraw; the constitutive flip |
 | [state-and-time.md](state-and-time.md) | the log is the only stored truth; witnesses; crossings are epochs; history is absolute |
 | [tiers.md](tiers.md) | tiers are response outcomes; conferral's two channels; the two apexes; geometry never confers |

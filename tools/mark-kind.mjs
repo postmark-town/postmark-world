@@ -36,6 +36,7 @@
 // Browser-pure: the viewer and the store readers ask through it too.
 
 import { classIndex, classChain } from "./class-properties.mjs";
+import { CLAIMED_AT_FIELD, FOOTPRINTS_FIELD } from "./claim-instant.mjs";
 
 /** The standing words `kind:` wrote before it named the class, and the node kinds. */
 export const STANDING_WORDS = Object.freeze(new Set(["sited", "predicated", "predicate", "naming", "parcel", "class", "property", "post"]));
@@ -101,6 +102,15 @@ export const ownedBy = (m) => {
 
 /** The fields a hand-off moves: where it is, whose hands it is in, or whose it is. Nothing else. */
 const HOLD_FIELDS = new Set(["at", "extent", "points", HELD_BY, OWNED_BY]);
+/**
+ * The facts the office prints into a record from its store, never a resident's
+ * words (WORLD/marks/SCHEMA.md § First-laid facts): when the mark was first laid,
+ * and the footprints it has stood on. A hand-off printed after the office began
+ * printing them carries them where main's copy may not yet (POS-571, Bevel
+ * 2026-11-13 15:47Z). They are not compared, and they never move a hand: a print
+ * that changes only them is no hand-off.
+ */
+const STORE_PRINTED = new Set([CLAIMED_AT_FIELD, FOOTPRINTS_FIELD]);
 
 /**
  * Is `after` the same mark as `before`, moved into or out of hands and nothing
@@ -114,8 +124,27 @@ export function holdOnlyChange(before, after) {
   const owned = ownedBy(before) !== ownedBy(after);
   if (!owned && isHeld(before) === isHeld(after) && heldBy(before) === heldBy(after)
     && JSON.stringify(before.at ?? null) === JSON.stringify(after.at ?? null)) return false; // no hand moved
-  const rest = (r) => JSON.stringify(Object.keys(r).filter((k) => !k.startsWith("_") && !HOLD_FIELDS.has(k)).sort().map((k) => [k, r[k]]));
+  const rest = (r) => JSON.stringify(Object.keys(r).filter((k) => !k.startsWith("_") && !HOLD_FIELDS.has(k) && !STORE_PRINTED.has(k)).sort().map((k) => [k, r[k]]));
   return rest(before) === rest(after) && (isHeld(before) || isHeld(after) || owned);
+}
+
+/**
+ * Is `after` the same mark as `before` with ONLY the hand-off fields moved, and
+ * moved no further than a hand-off moves them? PURE.
+ *
+ * This is the question the town wall asks, and it is narrower than
+ * `holdOnlyChange`: holding a thing is not authoring it, so a hand-off may print
+ * on a mark the town signed, but nothing else about that mark may change. Beyond
+ * `holdOnlyChange` (every other field equal), the place may differ only when the
+ * thing goes into hands (the place leaves) or comes out of them (a fresh place
+ * is printed); a mark that stays on the ground and whose place moves is the
+ * author's move, and an owner stamped on beside a new place is not a hand-off.
+ */
+export function handOffOnly(before, after) {
+  if (!holdOnlyChange(before, after)) return false;
+  const same = (k) => JSON.stringify(before[k] ?? null) === JSON.stringify(after[k] ?? null);
+  if (isHeld(before) !== isHeld(after)) return true; // into or out of hands: the place may leave or return
+  return ["at", "extent", "points"].every(same);      // held to held, or ground to ground: the place stays put
 }
 
 // ── the chain's answer (G12) ─────────────────────────────────────────────────
@@ -153,6 +182,16 @@ export function standingOf(m, idx) {
   for (const s of ["post", "naming", "predicate", "parcel", "sited"]) if (chain.includes(s)) return s;
   return null;
 }
+
+/** A thing, asked of its CLASS CHAIN (WLD-74 E1, Wright 2026-11-05 04:48): the class
+ *  it names is `thing` or extends it, by the class index of the marks in hand
+ *  (kindIndexOf), so a halloween-candy-bowl is a thing wherever its class node is.
+ *  A record that names no class (a plain sited mark, the untyped carriable) is not. */
+export const isThingIn = (m, idx) => {
+  const k = instanceClassOf(m);
+  if (k == null) return false;
+  return k === "thing" || (!!idx && classChain(idx, k).some((c) => String(c.class) === "thing"));
+};
 
 export const isSitedIn = (m, idx) => !!m?.at && standingOf(m, idx) === "sited";
 export const isGroundIn = (m, idx) => {

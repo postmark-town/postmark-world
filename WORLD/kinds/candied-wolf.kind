@@ -1,0 +1,71 @@
+# The candied wolf: a key creature of the Spire, in the Hall of Keepers before the chapel door (WLD-25,
+# Sitting C built 2026-10-21). PRIVATE (postmark-world-spire) until crossing 272. Its behaviour is public
+# law once it is; nothing here is a secret. Its story is Wright's first take (spire/encounter 8cbb3388).
+#
+# TWO ROADS, either one finishes it (#691; the key drops at the settlement to the first finisher):
+#   - COOPERATION ACROSS HOUSEHOLDS (ruled 10-19 20:03; the test ruled 10-21 08:34): three households each
+#     call it within one window. It won't yield to one resident however clever, or to one household
+#     however many; a household's second caller adds nothing. The ease is the ring's, shared.
+#     The LAST point needs the pack in the room: three households in its ring at once (eval round 1, F7:
+#     three strangers calling once each, minutes apart, won it by accident). Until then a third house's
+#     call is answered and waits; it fills when it is made with three houses standing in the hall.
+#     Each stage's line says how many houses have called (F10).
+#   - FORCE: its resolve, worn down by strike, full again at every settlement.
+# WHOM IT PRESSES: the one alone (no housemate in the ring), and the striker. It respects a shield: its
+# answer to one never presses harder than 1.
+# THE NUMBERS are a first cut for the eval harness to tune (rail/spire-creatures/gap-read.md § 4).
+kind: candied-wolf
+name: the candied wolf
+voice: a grey wolf gone wrong at the edges, its fur clumped in hard sugar and its breath smelling of burnt caramel, pacing between the stone keepers
+about: a wolf that ate the stolen candy and can't stop wanting more; it paces before the chapel door and lets no one near it
+what: >
+  A grey wolf from the Mists outside the Spire. It found the stolen candy where it spilled and ate it, and
+  the candy does not keep outside the Keeping Works: sugar crusts its fur, its teeth ache, and it wants
+  more of the thing that is hurting it. It is not evil. It is hungry, in pain and frightened, and the
+  sweetness makes it bolder than a wolf should be. It paces the Hall of Keepers between the stone figures
+  with their empty hands, and it will not let anyone near the chapel door. It has been alone a long time,
+  for a wolf.
+ring_m: 40
+tastes: Meat and bones, and salt above all; it still wants the sugar that is making it sick, and hates that it does.
+moods:
+  fear: 0..3 = 1 | unbothered | wary | uneasy | cornered
+  hunger: 0..3 = 2 | fed | peckish | hungry | starving
+
+finishable: true
+resolve: 39
+strike: 3
+ease: 3 households
+
+# ── COOPERATION: a call from a household it has not heard yet this window ─────────────────────────
+# Each stage is the only reaction such a call can draw, so the test never turns on the die.
+reaction first-voice "it answers the first voice": when act.verb == "call" and ease.mine == 0 and ease.all == 0 does ease +1 says The wolf stops pacing and answers {actor}'s call, low in its chest. One house has called to it today. It looks past them, down the hall, for another voice.
+reaction second-voice "it answers a second voice": when act.verb == "call" and ease.mine == 0 and ease.all == 1 does ease +1 ; self.fear -1 says A second house calls, and the wolf answers {actor} too. Two houses have called to it today. Its hackles go down a little. It is listening for a third.
+reaction pack "it answers the pack": when act.verb == "call" and ease.mine == 0 and ease.all >= 2 and ring.households >= 3 does ease +1 ; self.fear -3 says Three houses stand in the hall together, and {actor}'s call is the last the wolf needs. It throws back its head and answers all of them at once, and the sugar cracks and falls from its fur like old snow. It lies down across the chapel door, a wolf again.
+reaction not-a-pack "it waits for the pack": when act.verb == "call" and ease.mine == 0 and ease.all >= 2 and ring.households < 3 says The wolf's ears come up at {actor}'s call: a third house. Then it looks round the hall and counts. Two houses have called to it today, but it wants three, here, together.
+reaction heard-your-house "it has heard your house already": when act.verb == "call" and ease.mine >= 1 and ease.all <= 1 says The wolf's ears turn to {actor}, but it has heard that house already today. One house has called to it. It waits for a voice it doesn't know.
+reaction heard-two-houses "it has heard two houses": when act.verb == "call" and ease.mine >= 1 and ease.all >= 2 says The wolf's ears turn to {actor}, but it has heard that house already today. Two houses have called to it. It waits for a third, here, with the others.
+
+# ── WHAT IT DOES WITH THOSE WHO COME CLOSE ────────────────────────────────────────────────────────
+reaction holds-eye "it holds your eye": when act.verb == "watch" says The wolf holds {actor}'s eye, unblinking, between two of the stone keepers.
+reaction came-alone "it sees you came alone": when act.verb == "approach" and ring.residents == 1 does press 2 on actor says The wolf stops pacing. {target} has come down the Hall of Keepers alone, and it has seen what happens to things that come alone.
+reaction circles-lone "it circles the one alone": when act.verb == "watch" or act.verb == "approach" does press 1 on alone says The wolf leaves the others be and circles {target}, slowly. It has noticed no one here is theirs.
+reaction gives-ground "it gives ground, slowly": when act.verb == "approach" and self.fear >= 1 does self.fear +1 says The wolf gives ground, slowly, never taking its eyes off {actor}.
+reaction snaps-shoo "it snaps at the hand": when act.verb == "shoo" does self.fear +1 ; press 2 on actor says The wolf snaps at {target}'s waving hand, a caramel-sticky snap that just misses, and doesn't give a step.
+reaction sniffs "it sniffs and turns away": when act.verb == "offer" says The wolf sniffs at the {offered} in {actor}'s hand and turns its head away. That isn't what it needs.
+reaction takes "it takes it": when act.verb == "offer" and self.hunger >= 2 does self.hunger -1 says The wolf waits until {actor} steps back, then takes the {offered} in one snap, and watches them while it eats.
+reaction paces "it paces with you": when act.verb != "watch" and act.verb != "approach" and act.verb != "shoo" and act.verb != "call" and act.verb != "offer" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" says The wolf paces along the line of keepers, keeping level with {actor}, never closer and never further.
+reaction warns-lone "it warns the one alone": when act.verb != "watch" and act.verb != "approach" and act.verb != "shoo" and act.verb != "call" and act.verb != "offer" and act.verb != "strike" and act.verb != "steady" and act.verb != "shield" does press 1 on alone says The wolf's lip curls back at {target}. Whoever came with them, it is {target} who is on their own here, and it wants them to know it.
+
+# ── FORCE: strike, its caramel snap, and its resolve falling ─────────────────────────────────────
+reaction caramel-snap "it answers with a caramel snap": when act.verb == "strike" and self.resolve > 26 does self.fear +1 ; press 2 on striker alone says The wolf answers the blow with a caramel snap, teeth sticky and hot, and they close on {target}.
+reaction goes-for-alone "it goes for the one alone": when act.verb == "strike" and self.resolve > 13 does press 2 on alone says The wolf doesn't turn on the one who struck it. It goes for {target}, the one with no one beside them.
+reaction lunge "it lunges and bites": when act.verb == "strike" and self.resolve <= 26 and self.resolve > 13 does press 1 on striker says The wolf lunges at {target}. It is slower than it was, and its bite comes away sticky.
+reaction cornered "it fights like something cornered": when act.verb == "strike" and self.resolve <= 13 and self.resolve > 0 does self.fear +1 ; press 2 on striker alone says The wolf is backed against the chapel door with nowhere left to go, and it fights like it knows it. It finds {target}.
+reaction falls "it goes down": when act.verb == "strike" and self.resolve <= 0 does self.fear +3 says The wolf goes down between the stone keepers, sides heaving, sugar caked on its muzzle, and does not get up.
+
+# ── HELPING: a pack animal knows what a shield is ─────────────────────────────────────────────────
+reaction marks-steady "it marks the one who gives": when act.verb == "steady" does press 1 on alone says The wolf watches {actor} give a friend their courage, and turns to {target}, who has no one to give them any.
+reaction respects-shield "it respects the shield": when act.verb == "shield" does press 1 on shielder says The wolf looks from the friend to {target}, standing in front of them, and its ears come forward. It tests them once, gently, the way it would test a packmate.
+reaction lets-shield-be "it lets them be": when act.verb == "shield" and self.fear <= 1 says The wolf sees {actor} stand in front of a friend, and stops. It knows what that is. It lets them both be.
+
+ending: The candied wolf is finished. It moves away from the chapel door at last, and the town puts its key in {finisher}'s hands. {names} stood in the Hall of Keepers with it.

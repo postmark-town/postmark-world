@@ -14,9 +14,10 @@
 // extraction can't (fix the class, not the instance).
 //
 // Usage: node tools/world-terrain-gen.mjs [--atlas <dir>]
-//   --atlas defaults to this repo's own PROJECTS/build-the-town/atlas copy;
-//   point it at the live clone's atlas dir for a fresh derive. The source
-//   used is printed loudly either way.
+//   --atlas defaults to PROJECTS/build-the-town/atlas under this repo's root,
+//   which this repo does not have (the atlas lives in the town's repo), so
+//   without the flag the first read fails; always point it at the live clone's
+//   atlas dir. The source used is printed loudly either way.
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

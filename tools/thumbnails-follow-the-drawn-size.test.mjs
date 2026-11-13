@@ -31,6 +31,7 @@ import {
   THUMB_VARIANTS, THUMB_SIZES, thumbHref, thumbSizeFor, glyphScreenPx, noteThumbMissing, forgetThumbMisses,
   armThumbFallback, walkerFrameSVG, overlayHomeCardSVG, WALKER_FRAME, HOME_CARD, MINE_GLYPH_SCALE, markerScale,
 } from "../spectator/viewer.mjs";
+import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 // the viewer as TEXT, for the call-site pins at the bottom (POS-163)
@@ -176,7 +177,7 @@ function farTierDraw(src = SRC) {
   assert.ok(i >= 0, "the far-tier branch of drawWalkers is not where this reader looks for it");
   // the drawn list's name is not this reader's business (POS-373 split it from
   // the dot's), only the write that ends the branch
-  const j = src.indexOf("writeWalkLayer(paths + s, ", i);
+  const j = src.indexOf("writeWalkLayer(paths + legs + s, ", i);
   assert.ok(j > i, "the far-tier branch no longer ends at its own writeWalkLayer");
   return src.slice(i, j);
 }
@@ -218,7 +219,7 @@ test("[pin] the can-fail control: the same reader, over a far-tier draw that ask
     `          mine: isOwnHandle(w.handle), found: w.handle === walkState.foundHandle, threshold: !!w.threshold, actor,`,
     `          art: actor ? (face.avatar ? { avatar: face.avatar } : { monogram: face.monogram, color: face.color }) : null });`,
     `      }`,
-    `      writeWalkLayer(paths + s, drawnWalkers);`,
+    `      writeWalkLayer(paths + legs + s, drawnWalkers);`,
   ].join("\n");
   const call = frameCall(farTierDraw(BEFORE));
   assert.ok(call, "the reader cannot even find the call in the shape it is meant to judge");
@@ -373,7 +374,7 @@ const skipReason = "playwright is absent, so the browser's half goes unmeasured:
 
 test("IN A REAL PAGE: a copy that is there costs one request; one that is not costs the 404 and the original, then stands", async (t) => {
   if (!chromium) return t.skip(skipReason);
-  const page = await browser.newPage();
+  const page = await machinePage(browser);
   await page.goto(`http://127.0.0.1:${rig.port}/`, { waitUntil: "load", timeout: 60_000 });
   await page.waitForFunction(() => window.__thumbRigReady === true, null, { timeout: 30_000 });
   // let the image loads settle: the 404, the swap, the original

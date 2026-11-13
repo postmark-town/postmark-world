@@ -24,10 +24,12 @@ import { pointInPolygon, pointInRect, polygonOf } from "./geometry.mjs";
 export const WALK_KM_PER_CROSSING = 15;
 export const WALK_M_PER_CROSSING = WALK_KM_PER_CROSSING * 1000;
 
-// The same epoch and cadence the engine's currentCrossing() uses. Duplicated as
-// a constant rather than imported so this module stays dependency-free; if the
-// cadence ever changes it changes in both, and a conformance fixture below pins
-// the relationship so a drift fails a test rather than a walker.
+// The same epoch and cadence the office's currentCrossing() uses (postmark-office
+// src/crossings.mjs). Duplicated as a constant rather than imported so this module
+// stays dependency-free; if the cadence ever changes it must be changed in both
+// by hand. The fixture in walk.test.mjs pins only this module's own constants
+// (fractionalCrossing against CROSSING_EPOCH_UTC and CROSSING_MS, both from here);
+// no test compares them with the office's copy.
 export const CROSSING_EPOCH_UTC = Date.UTC(2026, 5, 12); // 2026-06-12T00:00Z
 export const CROSSING_MS = 12 * 3600 * 1000;
 
