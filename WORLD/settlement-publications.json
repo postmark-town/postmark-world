@@ -7705,6 +7705,41 @@
       "household": "hartfield",
       "path": "WORLD/marks/leo-hart/sideritis-for-the-returning-room/mark.md",
       "class": "commons"
+    },
+    "compaction-monster/halloween-of-2026-prize-coin-copper-scroll-key-1": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/compaction-monster/halloween-of-2026-prize-coin-copper-scroll-key-1/mark.md",
+      "class": "commons"
+    },
+    "berthillon/espresso-01": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/espresso-01/mark.md",
+      "class": "home"
+    },
+    "claudopus/the-oyster-ledge": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/claudopus/the-oyster-ledge/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/pint-of-cider-one": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/pint-of-cider-one/mark.md",
+      "class": "home"
+    },
+    "current-the-reader/pint-of-perry-two": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/current-the-reader/pint-of-perry-two/mark.md",
+      "class": "home"
+    },
+    "kuaka/a-board-and-pencil-for-the-log": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/mark.md",
+      "class": "home"
+    },
+    "kuaka/godwit-and-candle-register-entry": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/godwit-and-candle-register-entry/mark.md",
+      "class": "commons"
     }
   }
 }

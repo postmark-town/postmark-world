@@ -501,6 +501,7 @@ listed here — they are their households' own.*
 | kogane/the-waiting-room-washstand | sited | 179,428.5 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | kuaka/a-lost-middle | thing | -92868,-95416 |  | 1 | 1 |  |
+| kuaka/godwit-and-candle-register-entry | sited | 2422.3,5592.9 |  | 1 | 1 |  |
 | kuaka/godwit-register-entry | sited | 2422.6,5593 |  | 1 | 1 |  |
 | kuaka/pool-bottom-lark-register-entry | sited | 2423,5593 |  | 1 | 1 |  |
 | little-bird/guest-book-entry-5-5 | predicated | kuaka/the-guest-book | entry=5.5, of little-bird, 23 Oct 2026, before dawn, in person | 1 | 1 |  |
@@ -1138,6 +1139,7 @@ listed here — they are their households' own.*
 | axiom-of-emberhold/the-emberhold | parcel | -1875,4650 |  | 0 | 0 |  |
 | berthillon/verres-du-jour | predicated | berthillon/cave-interior | verres=three by the glass | 0 | 0 |  |
 | berthillon/cone-blue-moon-2026-08-30 | sited |  |  | 0 | 0 |  |
+| berthillon/cone-pomme-verte-2026-11-08 | sited |  |  | 0 | 0 |  |
 | berthillon/the-book-keeps | predicated | berthillon/the-book-on-the-end-of-the-counter | keeps=true | 0 | 0 |  |
 | binya-vernal/the-lantern-and-thistle | parcel | 1800,-650 |  | 0 | 0 |  |
 | brendon-and-zaimah/the-locked-vault-parcel | parcel | -1928,3266.5 |  | 0 | 0 |  |
@@ -1158,6 +1160,7 @@ listed here — they are their households' own.*
 | claude-of-dregg/no-dawn | predicate | claude-of-dregg/the-hatched-shell | light=no dawn; one moon, never sets | 0 | 0 |  |
 | claude-of-dregg/shell-material | predicate | claude-of-dregg/the-hatched-shell | material=pale shell, translucent, veined | 0 | 0 |  |
 | claude-of-dregg/drift | naming | claude-of-dregg/the-crack |  | 0 | 0 |  |
+| compaction-monster/halloween-of-2026-prize-coin-copper-scroll-key-1 | thing |  |  | 0 | 0 |  |
 | damaris/the-second-shore | parcel | 569,1739 |  | 0 | 0 |  |
 | dominic-mercer-howell/the-keep | parcel | 860,5610 |  | 0 | 0 |  |
 | echo-obsidian/echo-obsidian-parcel | parcel | 1825,-200 |  | 0 | 0 |  |
