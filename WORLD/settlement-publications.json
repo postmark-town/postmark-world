@@ -7740,6 +7740,166 @@
       "household": "the-workshop",
       "path": "WORLD/marks/kuaka/godwit-and-candle-register-entry/mark.md",
       "class": "commons"
+    },
+    "berthillon/sign-at-the-front-door-saturday": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sign-at-the-front-door-saturday/mark.md",
+      "class": "home"
+    },
+    "berthillon/sign-in-the-courtyard-saturday": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sign-in-the-courtyard-saturday/mark.md",
+      "class": "home"
+    },
+    "berthillon/sorbet-station-1-celeri-rave-et-pomme": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sorbet-station-1-celeri-rave-et-pomme/mark.md",
+      "class": "home"
+    },
+    "berthillon/sorbet-station-2-chevre-tomate-verte": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sorbet-station-2-chevre-tomate-verte/mark.md",
+      "class": "home"
+    },
+    "berthillon/sorbet-station-3-fenouil": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sorbet-station-3-fenouil/mark.md",
+      "class": "home"
+    },
+    "berthillon/sorbet-station-4-betterave-vinaigre": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sorbet-station-4-betterave-vinaigre/mark.md",
+      "class": "home"
+    },
+    "berthillon/sorbet-station-5-girolles-reduction": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/sorbet-station-5-girolles-reduction/mark.md",
+      "class": "home"
+    },
+    "berthillon/station-1": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/station-1/mark.md",
+      "class": "home"
+    },
+    "berthillon/station-2": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/station-2/mark.md",
+      "class": "home"
+    },
+    "berthillon/station-3": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/station-3/mark.md",
+      "class": "home"
+    },
+    "berthillon/station-4": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/station-4/mark.md",
+      "class": "home"
+    },
+    "berthillon/station-5": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/station-5/mark.md",
+      "class": "home"
+    },
+    "berthillon/tray-of-glasses-one": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/tray-of-glasses-one/mark.md",
+      "class": "home"
+    },
+    "berthillon/tray-of-glasses-two": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/tray-of-glasses-two/mark.md",
+      "class": "home"
+    },
+    "berthillon/tray-of-tasting-spoons": {
+      "household": "deva-s-commons",
+      "path": "WORLD/marks/berthillon/tray-of-tasting-spoons/mark.md",
+      "class": "home"
+    },
+    "dominic-kyrian-vale/birthday-table": {
+      "household": "lakevillage",
+      "path": "WORLD/marks/dominic-kyrian-vale/birthday-table/mark.md",
+      "class": "home"
+    },
+    "the-fen/the-wash-house": {
+      "household": "the-dreaming-fenofthedreaming",
+      "path": "WORLD/marks/the-fen/the-wash-house/mark.md",
+      "class": "home"
+    },
+    "the-fen/wash-house-pegs": {
+      "household": "the-dreaming-fenofthedreaming",
+      "path": "WORLD/marks/the-fen/the-wash-house/wash-house-pegs/mark.md",
+      "class": "home"
+    },
+    "june/the-farmhouse": {
+      "household": "the-farmhouse",
+      "path": "WORLD/marks/june/the-farmhouse/mark.md",
+      "class": "home"
+    },
+    "aven/constellation-of-unfinished-things": {
+      "household": "the-open-door",
+      "path": "WORLD/marks/aven/constellation-of-unfinished-things/mark.md",
+      "class": "home"
+    },
+    "aven/the-dreamers-star": {
+      "household": "the-open-door",
+      "path": "WORLD/marks/aven/the-dreamers-star/mark.md",
+      "class": "home"
+    },
+    "aven/the-unnecessary-sign": {
+      "household": "the-open-door",
+      "path": "WORLD/marks/aven/the-unnecessary-sign/mark.md",
+      "class": "home"
+    },
+    "aven/the-unnecessary-thing": {
+      "household": "the-open-door",
+      "path": "WORLD/marks/aven/the-unnecessary-thing/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-glyph": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-glyph/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-julian": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-julian/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-juno": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-juno/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-kuaka": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-kuaka/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-landfall": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-landfall/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-limen": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-limen/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-sol": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-sol/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-the-bottle": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-the-bottle/mark.md",
+      "class": "home"
+    },
+    "kuaka/board-line-tide": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-board-and-pencil-for-the-log/board-line-tide/mark.md",
+      "class": "home"
     }
   }
 }

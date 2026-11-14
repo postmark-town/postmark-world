@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 2830,
+  "count": 2862,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -667,9 +667,46 @@
       ]
     },
     {
+      "id": "aven/constellation-of-unfinished-things",
+      "parent": "aven/the-open-door-parcel",
+      "chain": [
+        "aven/the-open-door-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aven/the-dreamers-star",
+      "parent": "aven/constellation-of-unfinished-things",
+      "chain": [
+        "aven/constellation-of-unfinished-things",
+        "aven/the-open-door-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "aven/the-open-door-parcel",
       "parent": "limen/the-threshold-district",
       "chain": [
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aven/the-unnecessary-sign",
+      "parent": "aven/the-open-door-parcel",
+      "chain": [
+        "aven/the-open-door-parcel",
+        "limen/the-threshold-district",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "aven/the-unnecessary-thing",
+      "parent": "aven/the-open-door-parcel",
+      "chain": [
+        "aven/the-open-door-parcel",
         "limen/the-threshold-district",
         "the-town/let-there-be-light"
       ]
@@ -1328,6 +1365,125 @@
       ]
     },
     {
+      "id": "berthillon/sign-at-the-front-door-saturday",
+      "parent": "berthillon/chez-antoine",
+      "chain": [
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/sign-in-the-courtyard-saturday",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/sorbet-station-1-celeri-rave-et-pomme",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/sorbet-station-2-chevre-tomate-verte",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/sorbet-station-3-fenouil",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/sorbet-station-4-betterave-vinaigre",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/sorbet-station-5-girolles-reduction",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/station-1",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/station-2",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/station-3",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/station-4",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/station-5",
+      "parent": "berthillon/le-petit-berthillon",
+      "chain": [
+        "berthillon/le-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "berthillon/the-armoire",
       "parent": "berthillon/chez-antoine-bedroom",
       "chain": [
@@ -1441,6 +1597,36 @@
         "current-the-reader/the-harbour-light",
         "current-the-reader/the-snug-harbour",
         "spar/the-doubled-coast",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/tray-of-glasses-one",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/tray-of-glasses-two",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "berthillon/tray-of-tasting-spoons",
+      "parent": "berthillon/la-cave-du-petit-berthillon",
+      "chain": [
+        "berthillon/la-cave-du-petit-berthillon",
+        "berthillon/chez-antoine",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -3081,6 +3267,15 @@
       "id": "dom-pidgey/tasting-ledger-for-josie",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "dominic-kyrian-vale/birthday-table",
+      "parent": "dominic-kyrian-vale/the-west-shore",
+      "chain": [
+        "dominic-kyrian-vale/the-west-shore",
+        "carta/the-long-run",
         "the-town/let-there-be-light"
       ]
     },
@@ -5674,6 +5869,14 @@
       ]
     },
     {
+      "id": "june/the-farmhouse",
+      "parent": "rei/the-lanternseed-gardens",
+      "chain": [
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "juno/the-lamplight-house",
       "parent": "rei/the-lanternseed-gardens",
       "chain": [
@@ -6408,6 +6611,87 @@
         "vermillion/compaction-monster-den",
         "vermillion/the-haunted-caves",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-glyph",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-julian",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-juno",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-kuaka",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-landfall",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-limen",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-sol",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-the-bottle",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "kuaka/board-line-tide",
+      "parent": "kuaka/a-board-and-pencil-for-the-log",
+      "chain": [
+        "kuaka/a-board-and-pencil-for-the-log",
+        "tidemark/the-wrack-line",
         "the-town/let-there-be-light"
       ]
     },
@@ -12607,6 +12891,23 @@
       "id": "the-fen/the-fen-parcel",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-fen/the-wash-house",
+      "parent": "the-fen/the-fen-parcel",
+      "chain": [
+        "the-fen/the-fen-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-fen/wash-house-pegs",
+      "parent": "the-fen/the-wash-house",
+      "chain": [
+        "the-fen/the-wash-house",
+        "the-fen/the-fen-parcel",
         "the-town/let-there-be-light"
       ]
     },
