@@ -775,15 +775,88 @@ test("THE TOWN'S OPPOSITION PREVAILS: infinite backing in the veto, so no arithm
   assert.equal(standing(state, "foreign/room"), true);
 });
 
-test("the town's opposition keeps the ESCROW GUARD: open stakes hold the return, and the mark stands until they unwind", () => {
+// ── WLD-201: THE TOWN'S OPPOSITION REMOVES, STAKED OR NOT ───────────────────
+// Darko 2026-11-18 14:53 EST: "the town declaring opposed to something should remove
+// it, even parcels"; 15:0x: "stamps staked on a town-opposed mark go back to each
+// staker when it leaves, the owner included. Nobody loses stamps because the town
+// removed a mark."
+
+test("WLD-201 · the town's opposition removes a backed common-ground mark, and owes each staker, the owner included, exactly their own open principal", () => {
   const marks = [sited("hall", "foreign", 0, 0, 100, 100)];
-  const state = fold({ marks, terrain, tick: 1, townWords: { "foreign/hall": "opposed" },
-    stakes: [{ holder: "backer", mark: "foreign/hall", n: 3, weight: 3, tick: 0 }] });
-  assert.equal(state.returned[0].authority, "the town (absolute)");
-  assert.equal(state.returned[0].state, "pending-escrow");
-  assert.deepEqual(state.returned[0].open_escrow_on, ["foreign/hall"]);
-  assert.equal(standing(state, "foreign/hall"), true);
-  assert.equal(w(state, "foreign/hall"), 3, "stamps go home whole: the weight is untouched");
+  const stakes = [
+    { holder: "foreign", mark: "foreign/hall", n: 2, weight: 2, tick: 0 },     // the owner's own
+    { holder: "backer", mark: "foreign/hall", n: 3, weight: 8, tick: 0 },      // breadth bonus 5: weight, never principal
+    { holder: "friend", mark: "foreign/hall", n: 4, weight: 4, tick: 0 },
+    { holder: "friend", mark: "foreign/hall", n: -1, weight: -1, tick: 0 },    // an unstake already made: net 3
+    { holder: "late", mark: "foreign/hall", n: 9, weight: 9, tick: 5 },        // not yet effective at tick 1
+  ];
+  const state = fold({ marks, terrain, tick: 1, townWords: { "foreign/hall": "opposed" }, stakes });
+  const r = state.returned.find((x) => x.mark === "foreign/hall");
+  assert.equal(r.authority, "the town (absolute)");
+  assert.equal(r.state, "returned", "it leaves at this settlement, staked or not");
+  assert.equal(r.open_escrow_on, undefined, "nothing waits on the stakes");
+  assert.deepEqual(r.escrow_returned_on, ["foreign/hall"]);
+  assert.deepEqual(r.escrow_return, [
+    { mark: "foreign/hall", holder: "backer", n: 3 },
+    { mark: "foreign/hall", holder: "foreign", n: 2 },
+    { mark: "foreign/hall", holder: "friend", n: 3 },
+  ], "each staker's own net raw principal, once: never weight, bonus or another's, and nothing not yet effective");
+  assert.equal(standing(state, "foreign/hall"), false, "the town removed it without the owner unstaking");
+});
+
+test("WLD-201 · even a parcel: a backed town-opposed parcel leaves with its continued marks and their stakes; a positioned child stays with its own", () => {
+  const marks = [
+    parcel("plot", "foreign", 0, 0),
+    { id: "foreign/plot-name", slug: "plot-name", by: "foreign", household: "foreign", kind: "naming",
+      tier: "market", parent: "foreign/plot", value: "the plot", date: "2026-08-10", body: "the plot" },
+    sited("shed", "foreign", 0, 0, 5, 5),
+  ];
+  const stakes = [stake("foreign", "foreign/plot", 3), stake("backer", "foreign/plot", 2),
+    stake("backer", "foreign/plot-name", 1), stake("friend", "foreign/shed", 4)];
+  const state = fold({ marks, terrain, tick: 1, townWords: { "foreign/plot": "opposed" }, stakes });
+  const r = state.returned.find((x) => x.mark === "foreign/plot");
+  assert.equal(r.state, "returned");
+  assert.equal(standing(state, "foreign/plot"), false, "the parcel leaves, backed");
+  assert.equal(standing(state, "foreign/plot-name"), false, "its name, the parcel continued, leaves with it");
+  assert.equal(standing(state, "foreign/shed"), true, "a positioned child stays (ruling B)");
+  assert.deepEqual(r.escrow_return, [
+    { mark: "foreign/plot", holder: "backer", n: 2 },
+    { mark: "foreign/plot", holder: "foreign", n: 3 },
+    { mark: "foreign/plot-name", holder: "backer", n: 1 },
+  ], "what leaves is owed back; the shed's stake stays with the shed");
+});
+
+test("WLD-201 · a town LIMIT is the town's opposition too: a backed parcel over the limit leaves and its stakers are owed, as git already withholds it", () => {
+  const marks = [parcel("plot", "foreign", 0, 0)];
+  const state = fold({ marks, terrain, tick: 1, stakes: [stake("foreign", "foreign/plot", 2)],
+    townWords: { "foreign/plot": "opposed" }, townLaws: { "foreign/plot": "one-per-resident" } });
+  const r = state.returned.find((x) => x.mark === "foreign/plot");
+  assert.equal(r.state, "returned");
+  assert.deepEqual(r.escrow_return, [{ mark: "foreign/plot", holder: "foreign", n: 2 }]);
+  assert.equal(standing(state, "foreign/plot"), false);
+});
+
+test("WLD-201 · CONTROLS: with no town word a backed mark stands; a declared neutral confers nothing; a holder's veto still waits on escrow", () => {
+  const marks = [sited("hall", "foreign", 0, 0, 100, 100)];
+  const stakes = [stake("backer", "foreign/hall", 3)];
+  const silent = fold({ marks, terrain, tick: 1, stakes });
+  assert.equal(silent.returned.length, 0);
+  assert.equal(standing(silent, "foreign/hall"), true);
+  const neutral = fold({ marks, terrain, tick: 1, stakes, townWords: { "foreign/hall": "neutral" } });
+  assert.equal(neutral.returned.length, 0);
+  assert.equal(standing(neutral, "foreign/hall"), true);
+  const held = fold({ marks: [parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }), ...marks], terrain, tick: 1, stakes });
+  assert.equal(held.returned[0].state, "pending-escrow", "a resident holder's opposition keeps the escrow guard");
+  assert.equal(held.returned[0].escrow_return, undefined, "and owes nothing back");
+  assert.equal(standing(held, "foreign/hall"), true);
+});
+
+test("WLD-201 · a replay of the same inputs owes the same returns, once each", () => {
+  const args = () => ({ marks: [sited("hall", "foreign", 0, 0, 100, 100)], terrain, tick: 1,
+    townWords: { "foreign/hall": "opposed" }, stakes: [stake("b", "foreign/hall", 1), stake("a", "foreign/hall", 2)] });
+  const one = fold(args()).returned, two = fold(args()).returned;
+  assert.deepEqual(one, two);
+  assert.deepEqual(one[0].escrow_return.map((x) => x.holder), ["a", "b"]);
 });
 
 test("the town over a holder: one return, and it names the town (the town's opposition always prevails)", () => {

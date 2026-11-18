@@ -1338,6 +1338,20 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
   });
   errors.push(...consent.errors);
   const returned = consent.returned;
+  // ESCROW_RETURN (WLD-201): a town return leaves with its stakes, and each staker,
+  // the owner included, is owed back their own open principal on every mark that
+  // leaves: the net raw `n` of their effective rows (`portfolios`), never ✦weight,
+  // breadth bonus or fan-up, and never another's. Sorted, so the list is the same
+  // on every replay of the same inputs. The ledger's return writer reads its live
+  // positions at apply time; this is the fold's own statement of what is owed.
+  for (const r of returned) {
+    if (!r.escrow_returned_on) continue;
+    const owed = [];
+    for (const id of r.escrow_returned_on)
+      for (const [holder, pf] of portfolios) { const n = pf.get(id) ?? 0; if (n > 0) owed.push({ mark: id, holder, n }); }
+    owed.sort((a, b) => (a.mark === b.mark ? (a.holder < b.holder ? -1 : a.holder > b.holder ? 1 : 0) : a.mark < b.mark ? -1 : 1));
+    r.escrow_return = owed;
+  }
   // A returned mark leaves the fold. It is never dropped silently — it left through
   // `returned[]` above, with its ground, its grantor and every member of its subtree
   // named — but from here down it is not part of the world.
