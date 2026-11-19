@@ -1,0 +1,34 @@
+{
+  "scenario": "room",
+  "entered": "the-town/the-town-centre",
+  "results": {
+    "desktop-1280": {
+      "roomGroundDrawn": true,
+      "roomWallDrawn": true,
+      "roomCard": "The Town Centre831↤ step outside",
+      "exitButton": true,
+      "townImages": 25,
+      "groundFailedNote": false,
+      "bodiesDrawn": [
+        "rig-actor"
+      ],
+      "scrollWidth": 1280,
+      "innerWidth": 1280,
+      "errors": []
+    },
+    "phone-390": {
+      "roomGroundDrawn": true,
+      "roomWallDrawn": true,
+      "roomCard": "The Town Centre831↤ step outside",
+      "exitButton": true,
+      "townImages": 1,
+      "groundFailedNote": false,
+      "bodiesDrawn": [
+        "rig-actor"
+      ],
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "errors": []
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "scenario": "root",
+  "entered": "the-town/let-there-be-light",
+  "results": {
+    "desktop-1280": {
+      "roomGroundDrawn": false,
+      "roomWallDrawn": false,
+      "roomCard": null,
+      "exitButton": false,
+      "townImages": 10,
+      "groundFailedNote": false,
+      "bodiesDrawn": [
+        "rig-actor"
+      ],
+      "scrollWidth": 1280,
+      "innerWidth": 1280,
+      "errors": []
+    },
+    "phone-390": {
+      "roomGroundDrawn": false,
+      "roomWallDrawn": false,
+      "roomCard": null,
+      "exitButton": false,
+      "townImages": 10,
+      "groundFailedNote": false,
+      "bodiesDrawn": [
+        "rig-actor"
+      ],
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "errors": []
+    }
+  }
+}
