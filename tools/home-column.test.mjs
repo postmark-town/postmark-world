@@ -1023,3 +1023,45 @@ test("a footer link is a same-origin path, opens beside the map, and nothing els
   }
   assert.equal(safeSitePath("/conversations/#t%201"), "/conversations/#t%201");
 });
+
+// ── THE CROWDED PRESS'S CHOICES (CORE-54, Wright 2026-11-20 16:57Z) ──────────────────────
+
+test("CORE-54: a view's chooser slot is filled by the viewer into the column's own host, and the column writes no markup and no 'nothing written here yet'", () => {
+  let filled = null;
+  const chooser = { fill: (host) => { filled = host; const row = element("button"); row.className = "wv-choose-row"; row.setAttribute("data-choose", "the-town/main-channel"); host.appendChild(row); } };
+  const model = homeColumnModel({ kicker: "here", title: "Choose one", chooser });
+  assert.equal(model.chooser, chooser, "the slot passes through the model");
+  assert.equal(model.note, "", "a chooser column is not an empty home");
+  const col = render(model);
+  const mount = byClass(col, "wv-homecol-chooser")[0];
+  assert.ok(mount, "the column holds a host for the choices");
+  assert.equal(filled, mount, "the viewer was handed exactly that host");
+  assert.deepEqual(byClass(mount, "wv-choose-row").map((r) => r.getAttribute("data-choose")), ["the-town/main-channel"], "its rows are the viewer's, with the viewer's ids");
+  assert.doesNotMatch(serialize(col), /nothing written here yet/);
+  // no slot, no host: every existing column is untouched
+  assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "w" } })), "wv-homecol-chooser").length, 0);
+  assert.equal(homeColumnModel({ kicker: "k", title: "t", chooser: { fill: "not a function" } }).chooser, null, "a slot with no fill is no slot");
+});
+
+test("CORE-54: the column OPENS the chooser view the viewer hands it (a handle and a key, its own empty door: no home read), and refuses a view with no handle", async () => {
+  // the first commit of this wiring handed a view with no handle: `open` returned false and a crowded press rendered nothing in the real browser
+  let reads = 0;
+  const host = element("aside");
+  const column = createHomeColumn({ doc, host, imagePath: shelfGate, readHome: async () => { reads++; return { description: "x" }; } });
+  const ids = "choose:the-town/the-main-channel convo:t1";
+  let fills = 0;
+  const chooser = { fill: (h) => { fills++; const row = element("button"); row.className = "wv-choose-row"; row.setAttribute("data-choose", "the-town/the-main-channel"); h.appendChild(row); } };
+  const view = { key: ids, handle: "the-town", residentLink: false, kicker: "here", title: "Choose one", byline: " ", door: { blocks: [] }, chooser };
+  assert.equal(column.open(view), true, "the column accepted the view");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(host.hidden, false);
+  assert.equal(reads, 0, "no home is read for a chooser");
+  assert.equal(fills, 1);
+  assert.deepEqual(byClass(host, "wv-choose-row").map((r) => r.getAttribute("data-choose")), ["the-town/the-main-channel"]);
+  assert.match(serialize(host), /Choose one/);
+  assert.doesNotMatch(serialize(host), /nothing written here yet|own words/, "no empty-home note and no 'in … own words' byline");
+  column.open(view);
+  assert.equal(fills, 1, "the same press does not rebuild the choices under the reader");
+  const bare = createHomeColumn({ doc, host: element("aside"), imagePath: shelfGate });
+  assert.equal(bare.open({ key: ids, kicker: "here", title: "Choose one", chooser }), false, "a view with no handle is refused (the lesson: it never opened)");
+});

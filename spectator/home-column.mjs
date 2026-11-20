@@ -243,7 +243,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null, footerLink = null, reader = null, speakers = [], kickerTitle = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null, footerLink = null, reader = null, chooser = null, speakers = [], kickerTitle = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -286,7 +286,7 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // it always was.
     byline: byline === false ? "" : byline ? String(byline) : (who ? `in ${who}'s own words` : ""),
     blocks,
-    note: blocks.length ? ""
+    note: blocks.length || (chooser && typeof chooser.fill === "function") ? ""
       : loading ? "reading the home…"
       : error ? `the office did not answer for this home — ${error}`
       : "nothing written here yet",
@@ -339,6 +339,10 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // shared reader where the flat statements stood. The flat `door.blocks` stay, drawn only when the reader says it could not read the
     // room (an unavailable read is said, and the words the map already holds stand in; it is never drawn as an empty room).
     reader: reader && reader.source && reader.roomId !== undefined && reader.roomId !== null ? reader : null,
+    // THE CROWDED PRESS'S CHOICES (CORE-54, Wright 2026-11-20 16:57Z: on a phone a tap on crowded marks or conversation badges opens the EXISTING chooser content
+    // in the phone column). The view hands in `{ fill(host) }`: the viewer fills the column's host with the chooser it has always drawn (its own markup, its own
+    // escaping, its own rows and `data-choose` ids); this file holds no markup of its own and still parses no HTML string.
+    chooser: chooser && typeof chooser.fill === "function" ? chooser : null,
     // WLD-215, the conversation's ONE header: who spoke (face + name, the face from the reader hook's host) and what the live mark means on hover. Plain data.
     speakers: (speakers ?? []).filter((s) => s && String(s.handle ?? "").trim())
       .map((s) => ({ handle: String(s.handle).trim(), name: String(s.name ?? s.handle).trim(), look: String(s.look ?? "") })),
@@ -630,6 +634,13 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
     fillSpeakers(doc, row, model.speakers, model.reader?.faceForSpeaker ?? null);
     row.__sig = JSON.stringify(model.speakers);
     scroll.appendChild(row);
+  }
+
+  if (model.chooser) {
+    // the crowded press's choices: the viewer fills this host with the chooser's rows (their `data-choose` ids are the viewer's one click delegate's)
+    const mount = el(doc, "div", "wv-homecol-chooser");
+    scroll.appendChild(mount);
+    model.chooser.fill(mount);
   }
 
   if (model.icons?.length) {
@@ -980,6 +991,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       pronouns: view.pronouns ?? null,
       footerLink: view.footerLink ?? null,
       reader: view.reader ?? null,
+      chooser: view.chooser ?? null,
       speakers: view.speakers ?? [],
       kickerTitle: view.kickerTitle ?? null,
     }), { imagePath });
@@ -1086,6 +1098,20 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-close { margin-left:auto; flex:none; border:0; background:transparent; color:var(--dim);
   font:inherit; font-size:.95rem; line-height:1; padding:3px 7px; border-radius:4px; cursor:pointer; }
 .wv-homecol-close:hover, .wv-homecol-close:focus-visible { color:var(--paper); background:var(--panel2); }
+/* CORE-54 (Darko 2026-11-20: "1. Buttons cover titles", "4. Small targets"). ON A PHONE the host's own floating buttons (a Postmark pill, a Time-travel pill)
+   ride over the top of this full-height column, and nothing reserved room for them: the title began under them. The host says, in --wv-chrome-bottom, the
+   y (px from the top of the screen) below which it has nothing floating; the column's sticky nav is at least that tall, so its bar IS the band the
+   host's buttons float on and the title, the facts and the close sit clear below it. No host value, no reserve (a standalone viewer has no such buttons).
+   The close keeps its mark and gains a 44 px press target. */
+@media (max-width:720px) {
+  .wv-homecol-nav { min-height:var(--wv-chrome-bottom, 0px); box-sizing:border-box; align-items:flex-start; }
+  .wv-homecol-kicker { margin-top:14px; }   /* the kicker stays on the top row beside the close (a bottom-aligned kicker sat where the host's Time-travel pill floats) */
+  .wv-homecol-close { align-self:flex-start; }
+}
+@media (max-width:720px), (pointer:coarse) {
+  .wv-homecol-close { min-width:44px; min-height:44px; }
+  .wv-homecol-all { display:inline-block; padding:12px 6px; }
+}
 .wv-homecol-scroll { flex:1; min-height:0; overflow-y:auto; padding:14px 15px 26px;
   scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 .wv-homecol-title { margin:0; color:var(--paper); font-size:1.22rem; line-height:1.25; }

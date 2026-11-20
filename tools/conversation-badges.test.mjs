@@ -42,7 +42,8 @@ test("the hit reach is a badge's, in metres, at the current zoom — nearest fir
 
 test("review: a reader who can act opens a thread only from its own disc; the ground beside it still walks (POS-779)", () => {
   assert.match(SOURCE, /const convoClickAt = \(wx, wy\) => \(canAct\(\) \? convosAt\(wx, wy, \{ disc: true \}\)\[0\] \?\? null : convoAt\(wx, wy\)\);/);
-  assert.match(SOURCE, /const hit = convoClickAt\(wp\.x, wp\.y\); \/\/ visibility-gated/);
+  // CORE-54: the click also takes the drawn badge disc on screen, a finger's reach (22 px) rather than the world-space one
+  assert.match(SOURCE, /const hit = convoClickAt\(wp\.x, wp\.y\) \?\? convoDiscsAt\(e\.clientX, e\.clientY, e\.pointerType\)\[0\] \?\? null; \/\/ visibility-gated/);
   assert.match(SOURCE, /const hit = wp \? convoClickAt\(wp\.x, wp\.y\) : null;/, "the hand cursor promises what the click does");
   assert.doesNotMatch(SOURCE, /Toggled off \(the default\)/, "the stale comment is gone");
 });

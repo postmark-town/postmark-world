@@ -32,7 +32,9 @@ test("the lead line counts conversations in plain words", () => {
 // POS-779 (Darko 2026-11-06: "A click opens the conversation in the right-side column, not a new tab") made both select the thread, which opens the column.
 test("pins: the wash case. Alone, its thread opens; with anything else, it joins the chooser", () => {
   // every wash holding the point, not only the smallest
-  assert.match(click, /const washes = \(\(\) => \{ const wp = worldPointForEvent\(e\); return convosAt\(wp\.x, wp\.y\)\.map\(\(h\) => convoChoiceId\(h\.id\)\); \}\)\(\);/);
+  // CORE-54: the world-space washes, plus the drawn discs resolved on screen for the pointer's own reach (a finger 22 px, a cursor 13 px)
+  assert.match(click, /const ids = new Set\(convosAt\(wp\.x, wp\.y\)\.map\(\(h\) => String\(h\.id\)\)\);\s*for \(const d of convoDiscsAt\(e\.clientX, e\.clientY, e\.pointerType\)\) ids\.add\(String\(d\.id\)\);/);
+  assert.match(click, /return \[\.\.\.ids\]\.map\(\(id\) => convoChoiceId\(id\)\);/);
   // a resident or creature under the point: the wash is one more entry
   assert.match(click, /if \(here\.all\.length \+ washes\.length > 1\) \{ openChooser\(\[\.\.\.here\.all, \.\.\.washes\]\); return; \}/);
   // marks only, or more than one wash: the chooser, with the washes

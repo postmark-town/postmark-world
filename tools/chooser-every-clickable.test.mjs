@@ -39,8 +39,10 @@ test("the lead line counts what is there in plain words", () => {
 });
 
 test("pins: both click branches ask the one rule; one entry opens directly", () => {
-  assert.match(SOURCE, /const here = clickablesAtPoint\(\{ x: e\.clientX, y: e\.clientY \},\s*\{ people: \[\.\.\.screenWalkerCandidates\(\), \.\.\.screenCreatureCandidates\(\)\], marks: screenMarkCandidates\(\) \}\);/);
+  // CORE-54: the reach is the pointer's own (snapRadiusFor: a finger 22 px, a cursor 18), the SAME rule for the people and the marks
+  assert.match(SOURCE, /const reach = snapRadiusFor\(e\.pointerType\);/);
+  assert.match(SOURCE, /const here = clickablesAtPoint\(\{ x: e\.clientX, y: e\.clientY \},\s*\{ people: \[\.\.\.screenWalkerCandidates\(\), \.\.\.screenCreatureCandidates\(\)\], marks: screenMarkCandidates\(\) \}, reach\);/);
   // CHANGED by the 18:06 wash follow-up: the washes under the point are entries too
   assert.match(SOURCE, /if \(here\.all\.length \+ washes\.length > 1\) \{ openChooser\(\[\.\.\.here\.all, \.\.\.washes\]\); return; \}\s*selectMark\(peopleHere\[0\]\);/);
-  assert.match(SOURCE, /const contested = clickablesAtPoint\(\{ x: e\.clientX, y: e\.clientY \}, \{ marks: candidates \}\)\.all;\s*if \(contested\.length > 1\) \{ openChooser\(contested\); return; \}/);
+  assert.match(SOURCE, /const contested = clickablesAtPoint\(\{ x: e\.clientX, y: e\.clientY \}, \{ marks: candidates \}, reach\)\.all;\s*if \(contested\.length > 1\) \{ openChooser\(contested\); return; \}/);
 });

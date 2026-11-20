@@ -43,7 +43,8 @@ test("[pin] a click on open ground inside a mark selects that ground and still w
 test("[pin] every mark's column, including the room you are in", () => {
   // play fix 35 put the live creatures' column in the chain, before the marks'
   // POS-779 (Darko 2026-11-06) put a conversation's column first in the chain: a `convo:` selection is no mark, so nothing below may claim it
-  assert.match(SOURCE, /const column = convoColumnView\(selected\) \?\? parcelColumnView\(selected\) \?\? regionColumnView\(selected\) \?\? (creatureColumnView\(selected\) \?\? )?(residentColumnView\(selected\) \?\? )?markColumnView\(selected\);/);
+  // CORE-54 (Wright 16:57Z): on a phone a crowded press's chooser is asked FIRST (it answers only for a chooser id, and only on a phone); the rest is the chain as it was
+  assert.match(SOURCE, /const column = (chooserColumnView\(selected\) \?\? )?convoColumnView\(selected\) \?\? parcelColumnView\(selected\) \?\? regionColumnView\(selected\) \?\? (creatureColumnView\(selected\) \?\? )?(residentColumnView\(selected\) \?\? )?markColumnView\(selected\);/);
   const fn = SOURCE.match(/function markColumnView\(id\) \{[\s\S]*?\n  \}\n/)[0];
   assert.match(fn, /region: id === sceneRoomId \? "you are inside" : where\.detail,/, "the mounted room's plate opens its column, which says where you are");
   // CHANGED by play fix 34 (Darko 18:25): the column opens in both view modes
