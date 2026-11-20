@@ -1,0 +1,925 @@
+{
+  "scenario": "filtered",
+  "results": {
+    "desktop-1280": {
+      "unfiltered": {
+        "opener": true,
+        "openerN": null,
+        "panelOpen": false,
+        "strip": null,
+        "pips": [
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/draft-gazebo",
+          "rig-house/home-parcel",
+          "rig-house/lantern",
+          "rig-house/second-parcel",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            483,
+            54,
+            1062,
+            779
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            749,
+            182,
+            637,
+            496
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            1012,
+            459,
+            14,
+            14
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            995,
+            428,
+            10,
+            10
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            980,
+            466,
+            4,
+            4
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            1027,
+            456,
+            4,
+            4
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            1004,
+            434,
+            20,
+            20
+          ],
+          "other-house/bench|circle.ov-pip": [
+            1018,
+            448,
+            20,
+            20
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            1057,
+            419,
+            20,
+            20
+          ],
+          "other-house/parcel-b|g.ov-home": [
+            1049,
+            471,
+            50,
+            64
+          ],
+          "other-house/parcel-b|circle.ov-pip": [
+            1064,
+            487,
+            20,
+            20
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            990,
+            423,
+            20,
+            20
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            972,
+            458,
+            20,
+            20
+          ],
+          "rig-house/home-parcel|g.ov-home": [
+            916,
+            380,
+            68,
+            86
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            937,
+            402,
+            27,
+            27
+          ],
+          "other-house/parcel-a|g.ov-home": [
+            897,
+            456,
+            50,
+            64
+          ],
+          "other-house/parcel-a|circle.ov-pip": [
+            912,
+            473,
+            20,
+            20
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1012,
+            366,
+            68,
+            86
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1033,
+            388,
+            27,
+            27
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            1010,
+            457,
+            20,
+            20
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "parcels:false",
+          "sort:false"
+        ],
+        "scrollW": 1280,
+        "innerW": 1280
+      },
+      "panel": {
+        "opener": true,
+        "openerN": "3",
+        "panelOpen": true,
+        "strip": "2 of 24 shown my marks ✕ parcels ✕ under 80 m ✕ clear all",
+        "pips": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "boxes": {
+          "rig-house/home-parcel|g.ov-home": [
+            916,
+            380,
+            68,
+            86
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            937,
+            402,
+            27,
+            27
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1012,
+            366,
+            68,
+            86
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1033,
+            388,
+            27,
+            27
+          ]
+        },
+        "chips": [
+          "mine:true",
+          "drafts:false",
+          "new:false",
+          "parcels:true",
+          "sort:false"
+        ],
+        "scrollW": 1280,
+        "innerW": 1280
+      },
+      "filtered": {
+        "opener": true,
+        "openerN": "3",
+        "panelOpen": false,
+        "strip": "2 of 24 shown my marks ✕ parcels ✕ under 80 m ✕ clear all",
+        "pips": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "boxes": {
+          "rig-house/home-parcel|g.ov-home": [
+            916,
+            380,
+            68,
+            86
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            937,
+            402,
+            27,
+            27
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1012,
+            366,
+            68,
+            86
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1033,
+            388,
+            27,
+            27
+          ]
+        },
+        "chips": [
+          "mine:true",
+          "drafts:false",
+          "new:false",
+          "parcels:true",
+          "sort:false"
+        ],
+        "scrollW": 1280,
+        "innerW": 1280
+      },
+      "sizeRemoved": {
+        "opener": true,
+        "openerN": "2",
+        "panelOpen": false,
+        "strip": "2 of 24 shown my marks ✕ parcels ✕ clear all",
+        "pips": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "boxes": {
+          "rig-house/home-parcel|g.ov-home": [
+            916,
+            380,
+            68,
+            86
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            937,
+            402,
+            27,
+            27
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1012,
+            366,
+            68,
+            86
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1033,
+            388,
+            27,
+            27
+          ]
+        },
+        "chips": [
+          "mine:true",
+          "drafts:false",
+          "new:false",
+          "parcels:true",
+          "sort:false"
+        ],
+        "scrollW": 1280,
+        "innerW": 1280
+      },
+      "cleared": {
+        "opener": true,
+        "openerN": null,
+        "panelOpen": false,
+        "strip": null,
+        "pips": [
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/draft-gazebo",
+          "rig-house/home-parcel",
+          "rig-house/lantern",
+          "rig-house/second-parcel",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            483,
+            54,
+            1062,
+            779
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            749,
+            182,
+            637,
+            496
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            1012,
+            459,
+            14,
+            14
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            995,
+            428,
+            10,
+            10
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            980,
+            466,
+            4,
+            4
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            1027,
+            456,
+            4,
+            4
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            1004,
+            434,
+            20,
+            20
+          ],
+          "other-house/bench|circle.ov-pip": [
+            1018,
+            448,
+            20,
+            20
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            1057,
+            419,
+            20,
+            20
+          ],
+          "other-house/parcel-b|g.ov-home": [
+            1049,
+            471,
+            50,
+            64
+          ],
+          "other-house/parcel-b|circle.ov-pip": [
+            1064,
+            487,
+            20,
+            20
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            990,
+            423,
+            20,
+            20
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            972,
+            458,
+            20,
+            20
+          ],
+          "rig-house/home-parcel|g.ov-home": [
+            916,
+            380,
+            68,
+            86
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            937,
+            402,
+            27,
+            27
+          ],
+          "other-house/parcel-a|g.ov-home": [
+            897,
+            456,
+            50,
+            64
+          ],
+          "other-house/parcel-a|circle.ov-pip": [
+            912,
+            473,
+            20,
+            20
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1012,
+            366,
+            68,
+            86
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1033,
+            388,
+            27,
+            27
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            1010,
+            457,
+            20,
+            20
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "parcels:false",
+          "sort:false"
+        ],
+        "scrollW": 1280,
+        "innerW": 1280
+      },
+      "errors": []
+    },
+    "phone-390": {
+      "unfiltered": {
+        "opener": true,
+        "openerN": null,
+        "panelOpen": false,
+        "strip": null,
+        "pips": [
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/draft-gazebo",
+          "rig-house/home-parcel",
+          "rig-house/lantern",
+          "rig-house/second-parcel",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            -185,
+            136,
+            767,
+            562
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            6,
+            228,
+            460,
+            358
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            197,
+            429,
+            10,
+            10
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            184,
+            406,
+            7,
+            7
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            173,
+            434,
+            3,
+            3
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            207,
+            426,
+            3,
+            3
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            191,
+            410,
+            14,
+            14
+          ],
+          "other-house/bench|circle.ov-pip": [
+            201,
+            420,
+            14,
+            14
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            229,
+            400,
+            14,
+            14
+          ],
+          "other-house/parcel-b|g.ov-home": [
+            223,
+            437,
+            36,
+            46
+          ],
+          "other-house/parcel-b|circle.ov-pip": [
+            234,
+            449,
+            14,
+            14
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            181,
+            402,
+            14,
+            14
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            168,
+            428,
+            14,
+            14
+          ],
+          "rig-house/home-parcel|g.ov-home": [
+            127,
+            371,
+            49,
+            63
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            142,
+            387,
+            19,
+            19
+          ],
+          "other-house/parcel-a|g.ov-home": [
+            113,
+            427,
+            36,
+            46
+          ],
+          "other-house/parcel-a|circle.ov-pip": [
+            124,
+            438,
+            14,
+            14
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            196,
+            361,
+            49,
+            63
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            211,
+            377,
+            19,
+            19
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            195,
+            427,
+            14,
+            14
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "parcels:false",
+          "sort:false"
+        ],
+        "scrollW": 390,
+        "innerW": 390
+      },
+      "panel": {
+        "opener": true,
+        "openerN": "3",
+        "panelOpen": true,
+        "strip": "2 of 24 shownmy marks✕parcels✕under 80 m✕clear all",
+        "pips": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "boxes": {
+          "rig-house/home-parcel|g.ov-home": [
+            127,
+            371,
+            49,
+            63
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            142,
+            387,
+            19,
+            19
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            196,
+            361,
+            49,
+            63
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            211,
+            377,
+            19,
+            19
+          ]
+        },
+        "chips": [
+          "mine:true",
+          "drafts:false",
+          "new:false",
+          "parcels:true",
+          "sort:false"
+        ],
+        "scrollW": 390,
+        "innerW": 390
+      },
+      "filtered": {
+        "opener": true,
+        "openerN": "3",
+        "panelOpen": false,
+        "strip": "2 of 24 shown my marks ✕ parcels ✕ under 80 m ✕ clear all",
+        "pips": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "boxes": {
+          "rig-house/home-parcel|g.ov-home": [
+            127,
+            371,
+            49,
+            63
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            142,
+            387,
+            19,
+            19
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            196,
+            361,
+            49,
+            63
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            211,
+            377,
+            19,
+            19
+          ]
+        },
+        "chips": [
+          "mine:true",
+          "drafts:false",
+          "new:false",
+          "parcels:true",
+          "sort:false"
+        ],
+        "scrollW": 390,
+        "innerW": 390
+      },
+      "sizeRemoved": {
+        "opener": true,
+        "openerN": "2",
+        "panelOpen": false,
+        "strip": "2 of 24 shown my marks ✕ parcels ✕ clear all",
+        "pips": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "boxes": {
+          "rig-house/home-parcel|g.ov-home": [
+            127,
+            371,
+            49,
+            63
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            142,
+            387,
+            19,
+            19
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            196,
+            361,
+            49,
+            63
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            211,
+            377,
+            19,
+            19
+          ]
+        },
+        "chips": [
+          "mine:true",
+          "drafts:false",
+          "new:false",
+          "parcels:true",
+          "sort:false"
+        ],
+        "scrollW": 390,
+        "innerW": 390
+      },
+      "cleared": {
+        "opener": true,
+        "openerN": null,
+        "panelOpen": false,
+        "strip": null,
+        "pips": [
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/draft-gazebo",
+          "rig-house/home-parcel",
+          "rig-house/lantern",
+          "rig-house/second-parcel",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            -185,
+            136,
+            767,
+            562
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            6,
+            228,
+            460,
+            358
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            197,
+            429,
+            10,
+            10
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            184,
+            406,
+            7,
+            7
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            173,
+            434,
+            3,
+            3
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            207,
+            426,
+            3,
+            3
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            191,
+            410,
+            14,
+            14
+          ],
+          "other-house/bench|circle.ov-pip": [
+            201,
+            420,
+            14,
+            14
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            229,
+            400,
+            14,
+            14
+          ],
+          "other-house/parcel-b|g.ov-home": [
+            223,
+            437,
+            36,
+            46
+          ],
+          "other-house/parcel-b|circle.ov-pip": [
+            234,
+            449,
+            14,
+            14
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            181,
+            402,
+            14,
+            14
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            168,
+            428,
+            14,
+            14
+          ],
+          "rig-house/home-parcel|g.ov-home": [
+            127,
+            371,
+            49,
+            63
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            142,
+            387,
+            19,
+            19
+          ],
+          "other-house/parcel-a|g.ov-home": [
+            113,
+            427,
+            36,
+            46
+          ],
+          "other-house/parcel-a|circle.ov-pip": [
+            124,
+            438,
+            14,
+            14
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            196,
+            361,
+            49,
+            63
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            211,
+            377,
+            19,
+            19
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            195,
+            427,
+            14,
+            14
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "parcels:false",
+          "sort:false"
+        ],
+        "scrollW": 390,
+        "innerW": 390
+      },
+      "errors": []
+    }
+  }
+}
