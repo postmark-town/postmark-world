@@ -39,6 +39,7 @@ import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs"
 import { portalFindings } from "./portals.mjs";
 import { classIndex, classChain, ownProperties, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
+import { regionAnchors, groundStands } from "./world-build.mjs"; // WLD-97: the ground_m rule the heightfield honors
 import { SPARK_CLASS, SPARK_LINK, sparkProblems, sparkRadiusM } from "./spark.mjs"; // WLD-173: the spark's own grammar
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -165,6 +166,10 @@ const SPARK_RADIUS_M = sparkRadiusM(CLASS_IDX);
 const chainOf = (name) => classChain(CLASS_IDX, String(name)).map((c) => String(c.class));
 const isPostClass = (name) => name !== undefined && chainOf(name).includes("post");
 const standingOfRecord = (rec) => {
+  // a landform answers by its class before the standing words, so the old spelling
+  // (kind: sited + class: landform), or a class under landform, is a landform (#296 review)
+  const lk = instanceClassOf(rec);
+  if (lk != null && (lk === "landform" || (CLASS_ROSTER.has(lk) && chainOf(lk).includes("landform")))) return "landform";
   if (KINDS.has(rec.kind)) return rec.kind === "predicate" ? "predicated" : rec.kind; // one standing, two spellings
   if (rec.kind == null || !CLASS_ROSTER.has(String(rec.kind)) || isPostClass(rec.kind)) return null;
   const chain = chainOf(rec.kind);
@@ -223,12 +228,20 @@ for (const rec of marks) {
   else if (standing == null) { err(rec, `kind must be one of ${[...KINDS].join(" | ")}, or name a class the works declare (got ${JSON.stringify(rec.kind)})${cite("the-town/the-kinds")}`); }
   // the old form still reads, and is told what it is now: class: folds into kind
   // (a post class's instances excepted, above)
+  // A LANDFORM IS WRITTEN ONLY AS kind: landform (WLD-97, #296 review): the office's
+  // store record drops `class:`, so an old-spelling landform would read there as
+  // the sited mark it names in `kind:`, and the world and the office would disagree
+  // about it. The old spelling is refused, not folded, so it can never land.
+  const landformClass = rec.class !== undefined && rec.kind !== "class" && rec.kind !== "property"
+    && (String(rec.class) === "landform" || (CLASS_ROSTER.has(String(rec.class)) && chainOf(rec.class).includes("landform")));
   // THE SPARK'S KIND (WLD-173; review 391 F2): a spark is written in the new form only. The old form,
   // `kind: sited` + `class: spark`, stands sited (mark-kind.mjs § standingOf), so it would be ground
   // and a container while naming a class that is neither; the spark class has no old-form instances
   // to keep, so the spelling is refused rather than read two ways.
   const namesSpark = rec.class !== undefined && rec.kind !== "class" && rec.kind !== "property" && chainOf(rec.class).includes(SPARK_CLASS);
-  if (namesSpark && String(rec.kind) !== String(rec.class))
+  if (landformClass)
+    err(rec, `class: ${rec.class} is a landform, and a landform is written kind: ${rec.class}, never with a class: line: write kind: ${rec.class} and drop the class: line (the office reads the old spelling as ${rec.kind}; WLD-97)`);
+  else if (namesSpark && String(rec.kind) !== String(rec.class))
     err(rec, `class: ${rec.class} is a spark, and a spark is written kind: ${rec.class} with no class: line — kind: ${JSON.stringify(rec.kind)} would make it stand as ${standing ?? "nothing"}, ground the spark is not (WLD-173: a spark is neither sited nor anchored)`);
   else if (rec.class !== undefined && rec.kind !== "class" && rec.kind !== "property" && !isPostClass(rec.class))
     warn(rec, `class: ${rec.class} folds into kind: write kind: ${rec.class} and drop the class: line (ruled 2026-10-16: "The \`class:\` field folds into \`kind\`")`);
@@ -443,6 +456,17 @@ for (const rec of marks) {
       if (!polygonOf(rec)) err(rec, `points: must be a ring of ≥3 vertices ([[x,y],…] or "x1,y1 x2,y2 …")`);
       else if (!ringMatchesClaim(rec)) err(rec, `the points: ring's bounding box must equal the mark's at/extent claim — the claim IS the ring's bbox (SCHEMA v2)`);
     }
+  } else if (standing === "landform") {
+    // A LANDFORM (WLD-97, ruled 2026-10-22 21:03–21:04) carries its own place and
+    // outline like a sited mark, and its ground_m (5e holds the rest of its law).
+    if (!hasGeom(rec)) err(rec, `a landform needs at {x,y} and extent {w,h} in grid meters: the ground it shapes`);
+    if (rec.ground_m === undefined) err(rec, `a landform carries ground_m: the height it holds its ground at, or a [lo, hi] range`);
+    if (rec.slot !== undefined || rec.value !== undefined) err(rec, `a landform carries no slot/value`);
+    if (rec._explicitParent) err(rec, `a landform never declares a parent: it nests in nothing`);
+    if (rec.points !== undefined) {
+      if (!polygonOf(rec)) err(rec, `points: must be a ring of ≥3 vertices ([[x,y],…] or "x1,y1 x2,y2 …")`);
+      else if (!ringMatchesClaim(rec)) err(rec, `the points: ring's bounding box must equal the landform's at/extent claim`);
+    }
   } else if (standing === SPARK_CLASS) {
     // 4c. A SPARK (WLD-173; CORE-70 calls 5, 9, 22, 23; Darko 2026-11-14 09:37,
     // 10:46 and 11:1x). It has a place and is not sited or anchored: its parts are
@@ -633,7 +657,8 @@ for (const rec of marks) {
 // 5b'. A PLACE IS SITED'S, OR A POST'S (G13, settled 2026-10-17, WLD-73). `at`
 // and `extent` are properties of sited (16:02 item 8), so an instance that
 // stands at a place is an instance of a class under sited, or of a class under
-// post (an idea may stand anywhere, founder-ruled 2026-09-01). A place on any
+// post (an idea may stand anywhere, founder-ruled 2026-09-01), or a landform (its
+// own at and extent, WLD-97, 2026-10-22). A place on any
 // other class's instance is refused: the lint never reads a record as sited
 // from its place alone. Asked only of a class whose chain reaches the root, so
 // a fixture's partial tree, which cannot answer, is left alone.
@@ -644,9 +669,11 @@ for (const rec of marks) {
     const klass = String(instanceClassOf(rec) ?? rec.kind);
     const chain = classChain(CLASS_IDX, klass).map((c) => String(c.class));
     if (!chain.includes("postmark-node")) continue;
-    // a spark's place is its own class's property (WLD-173, CORE-70 call 22): it has a place and is not sited
-    if (!chain.includes("sited") && !chain.includes("post") && !chain.includes(SPARK_CLASS))
-      err(rec, `a ${klass} stands at a place, but ${klass} is not under sited (its chain: ${chain.join(" → ")}) — at and extent are sited's properties; a place is lawful only on an instance of a class under sited, under post, or a spark's (G13, settled 2026-10-17; WLD-173)`);
+    // a landform carries its own place and outline as its own properties (WLD-97,
+    // ruled 2026-10-22 21:04): placed, and never sited; and a spark's place is its
+    // own class's property (WLD-173, CORE-70 call 22): it has a place and is not sited
+    if (!chain.includes("sited") && !chain.includes("post") && !chain.includes("landform") && !chain.includes(SPARK_CLASS))
+      err(rec, `a ${klass} stands at a place, but ${klass} is not under sited (its chain: ${chain.join(" → ")}) — at and extent are sited's properties; a place is lawful only on an instance of a class under sited, under post, a landform or a spark's (G13, settled 2026-10-17; WLD-97, WLD-173)`);
   }
 }
 
@@ -698,6 +725,21 @@ for (const rec of marks) {
   if (rec._error || rec.fill === undefined || rec.kind === "class" || rec.kind === "property") continue;
   if (typeof propertyValue(rec.fill) !== "boolean")
     err(rec, `fill: is true or false — whether the World page tints this thing's ground when it has no picture (false: its outline alone); got ${JSON.stringify(rec.fill)}`);
+}
+
+// 5e. THE GROUND THE TOWN SHAPES (WLD-97 part 2, ruled 2026-10-22): `ground_m`
+// is the town's alone for now, and sits inside the band of the mark's region.
+// The rule is world-build.mjs § groundStands, the same one the heightfield
+// honors, so a refused ground_m is one the heightfield would never lay.
+{
+  let anchors = null;
+  try { anchors = regionAnchors(terrain); } catch { /* reported below, once */ }
+  for (const rec of marks) {
+    if (rec._error || rec.ground_m === undefined) continue;
+    if (!anchors) { err(rec, `ground_m: the skeleton's region anchors cannot be read (${TERRAIN_PATH}), so no band can hold this ground`); continue; }
+    const s = groundStands(rec, anchors, terrain, CLASS_IDX);
+    if (s?.refused) err(rec, s.refused);
+  }
 }
 
 // THE FRAME LAW, written out here rather than imported from the loader.

@@ -43,6 +43,11 @@ export const ENGINE_FILES = [
   // joined 2026-10-19 (WLD-5 A, the exit lock): portals.mjs says a dungeon's name
   // in its words, and a mark's name is mark-name.mjs's, the one the page reads.
   "mark-name.mjs",
+  // joined 2026-10-22 (WLD-97 part 2): the lint refuses a ground_m by the rule the
+  // heightfield honors, world-build.mjs § groundStands, and world-build reads the
+  // engine's heightfield.
+  "world-build.mjs",
+  "world-engine.mjs",
   // joined 2026-11-14 (WLD-173): the lint reads a spark's own grammar from spark.mjs
   "spark.mjs",
 ];

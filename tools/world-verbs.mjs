@@ -10,7 +10,7 @@
 //   { marks, terrain, heightfield, light, fogCeilingM, charter }
 // A `state` is the walker: { x, y, name, household? }.
 
-import { isSited, isGround, isPredicate, isThingIn, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isGround, isPredicate, isLandform, isThingIn, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
   fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
@@ -78,6 +78,15 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
   };
 }
 
+// WHAT HAS AN INSIDE: a placed mark, and never a landform (WLD-97, ruled 2026-10-22:
+// a landform only shapes the ground; the #296 review found entering one sheltered you
+// from the Mists and framed your sight). Integrated onto main (WLD-197): the reviewed
+// test was `isGround`, which on main would also newly refuse a spark (WLD-173), so the
+// test is main's own `m.at` with the landform refused, and nothing else changes.
+function enterable(m, world) {
+  return !!m?.at && !isLandform(m, kindIndexOf(world?.marks ?? []));
+}
+
 /** AN ENTERED MARK IS SHELTER (Darko 2026-10-15): the test of a point the Mists leave alone for a walker whose enter
  *  stack is `entered` (mark ids): inside any of those marks. With `standpoint`, only the entered marks that contain it
  *  count: an entered mark you stand outside shelters nothing. null when nothing counts, so the Mists read as ever.
@@ -85,7 +94,7 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
 export function shelterOf(world, entered, standpoint = null) {
   const ids = new Set((entered ?? []).filter(Boolean));
   if (!ids.size) return null;
-  const marks = (world?.marks ?? []).filter((m) => ids.has(m.id) && m.at && (!standpoint || pointWithinMark(standpoint, m)));
+  const marks = (world?.marks ?? []).filter((m) => ids.has(m.id) && enterable(m, world) && (!standpoint || pointWithinMark(standpoint, m)));
   if (!marks.length) return null;
   return (p) => marks.some((m) => pointWithinMark(p, m));
 }
@@ -103,7 +112,7 @@ export function shelterOf(world, entered, standpoint = null) {
  *  frame, as ever. A future "see out" property on a mark is deferred, not built. */
 export function sightFrameOf(world, entered, standpoint = null) {
   const byId = new Map((world?.marks ?? []).map((m) => [m.id, m]));
-  const held = (entered ?? []).filter(Boolean).map((id) => byId.get(id)).filter((m) => m?.at && m.extent);
+  const held = (entered ?? []).filter(Boolean).map((id) => byId.get(id)).filter((m) => m?.at && m.extent && enterable(m, world));
   const room = [...held].reverse().find((m) => !standpoint || pointWithinMark(standpoint, m)) ?? null;
   if (!room) return null;
   const marks = world?.marks ?? [];
@@ -422,6 +431,7 @@ export function enterExitPlan(state, targetId, world, { occupancy = new Map(), h
   const byId = new Map(world.marks.map((m) => [m.id, m]));
   const target = byId.get(targetId);
   if (!target) return { error: `no mark '${targetId}' to enter` };
+  if (isLandform(target, kindIndexOf(world.marks))) return { error: `'${targetId}' is a landform: a landform is ground, not a place to go in`, refused: "landform" };
   if (!target.at || !target.extent) return { error: `'${targetId}' has no extent — there is no inside to step into` };
   // THRESHOLD_KINDS, not the container list: this chain becomes ledger rows, and
   // a land title is not a door somebody crossed (see the kinds note above).

@@ -71,6 +71,9 @@ is read from here (WLD-97, 2026-10-22): an anchor stands at its band's midpoint,
 typed once, so changing a dial (a band, an anchor, the fall, a lake's surface) is an
 edit to this file alone: `tools/world-terrain-gen.mjs` carries these dials across a
 regenerate rather than typing its own.
+A local landform (a basin, a knoll, a terrace) is a mark instead: a
+`kind: landform` mark (the town's alone) and its `ground_m`, laid within its own extent (`WORLD/marks/SCHEMA.md
+§ kind: landform`).
 
 **Placement dials** — `tools/world-poc.mjs`:
 - Household anchors are **extracted from the marks** — every sited mark at its

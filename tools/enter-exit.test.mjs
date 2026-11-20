@@ -15,7 +15,7 @@ import {
   demandsWord, entityChild, entryLawOf, formatEnterExit, isEntity, isMark,
   occupancyAt, occupantsOf, parseEnterExitLedger, stampAt, termsAt, withinOf,
 } from "./enter-exit.mjs";
-import { enterExitPlan, enter, enterPrompt, enteredScope, exit, exitPrompt, withinChain } from "./world-verbs.mjs";
+import { enterExitPlan, enter, enterPrompt, enteredScope, exit, exitPrompt, withinChain, shelterOf, sightFrameOf } from "./world-verbs.mjs";
 import { walk } from "./world-verbs.mjs";
 
 // ── a tiny world: a ship at the quay, a wheelhouse inside her, open ground ──
@@ -338,6 +338,35 @@ test("the legal chain and the geometric one are allowed to disagree", () => {
   assert.deepEqual(legal.map((w) => w.id), [SHIP.id], "he crossed one threshold");
   // his body, meanwhile, is ashore: he walked off after boarding (v0 does not stop him)
   assert.equal(exitPrompt(ASHORE, world, { occupancy: occupancyAt(acts, 10), handle: "adam" }).mark, SHIP.id);
+});
+
+// ── WLD-197 (#296 security review F1): the landform's refusal is the landform's alone ──
+//
+// Main lets a spark (WLD-173: a place, not ground) be entered, and an entered spark
+// shelters and frames sight. Integrating the landform class onto main must leave that
+// exactly so: only a landform is refused at the door, and only a landform shelters
+// nothing and frames nothing (WLD-97, ruled 2026-10-22: it only shapes the ground).
+test("WLD-197 · a spark is entered, sheltered in and framed by as on main; a landform alone is refused, shelters nothing and frames nothing", () => {
+  const SPARK = { id: "adam/the-lamp-song", kind: "spark", by: "adam", at: { x: 120, y: -40 }, extent: { w: 6, h: 6 },
+    body: "We sang until the lamps came on.", recounting: "It rained.", experienced_at: "2026-11-14T20:03:00Z" };
+  const LANDFORM = { id: "the-town/the-inlet-slope", kind: "landform", by: "the-town", at: { x: 200, y: 40 }, extent: { w: 10, h: 10 },
+    ground_m: 4, body: "The slope down to the inlet." };
+  const w = { ...world, marks: [...world.marks, SPARK, LANDFORM] };
+  const atSpark = { x: 120, y: -40, name: "adam" }, atSlope = { x: 200, y: 40, name: "adam" };
+
+  const spark = enterExitPlan(ASHORE, SPARK.id, w, { handle: "adam" });
+  assert.equal(spark.error, undefined, `entering a spark is allowed, as on main: ${spark.error}`);
+  assert.equal(spark.chain.at(-1), SPARK.id);
+  assert.ok(shelterOf(w, [SPARK.id], atSpark), "an entered spark shelters, as on main");
+  assert.ok(sightFrameOf(w, [SPARK.id], atSpark), "and frames sight, as on main");
+
+  const slope = enterExitPlan(ASHORE, LANDFORM.id, w, { handle: "adam" });
+  assert.equal(slope.refused, "landform", "a landform is no place to go in");
+  assert.equal(shelterOf(w, [LANDFORM.id], atSlope), null, "naming a landform shelters nothing");
+  assert.equal(sightFrameOf(w, [LANDFORM.id], atSlope), null, "and frames no sight");
+
+  // CONTROL: an ordinary sited mark is entered as ever
+  assert.equal(enterExitPlan(ASHORE, HOLD.id, w, { handle: "adam" }).error, undefined);
 });
 
 // ── WLD-212: a thing has no inside (the-town/the-not-ground) ────────────────
