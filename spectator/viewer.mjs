@@ -5295,11 +5295,25 @@ export function backingButton(markId, stamps = 0) {
 /** Ground you can step inside. The engine's own rule, in the shape a card can
  *  ask: enter refuses a mark with no extent — "a point has no inside" — so a
  *  naming, a predicate, or a bare coordinate affords nothing. */
-export function enterableMark(mark) {
+export function enterableMark(mark, { thingClasses = null } = {}) {
   if (!mark || isPredicate(mark) || mark.kind === "naming") return false;
   const at = mark.at, extent = mark.extent;
   if (!at || !Number.isFinite(Number(at.x)) || !Number.isFinite(Number(at.y))) return false;
-  return Number(extent?.w) > 0 && Number(extent?.h) > 0;
+  if (!(Number(extent?.w) > 0 && Number(extent?.h) > 0)) return false;
+  return !thingWithoutDoor(mark, { thingClasses });
+}
+
+/** A THING IS NOT GROUND (the-town/the-not-ground): "nothing files under it by
+ *  geometry, and a walk onto it sets you down on what it stands on." A bag, a bowl
+ *  or a pot has a footprint and no inside, so its card offers no enter. The one way
+ *  in is a door it carries: a thing may hold an `entry` naming an `into` (Bevel,
+ *  2026-11-19), and entering it passes you through to that room, so that thing keeps
+ *  the button. A kind of thing is a thing (W2 final): the caller passes the page's
+ *  thing classes; without them, only the class `thing` itself is known. */
+export function thingWithoutDoor(mark, { thingClasses = null } = {}) {
+  const cls = classToken(instanceClassOf(mark));
+  const isThing = cls === "thing" || (!!cls && !!thingClasses?.has?.(cls));
+  return isThing && !entryLawOf(mark)?.into;
 }
 
 /** Whether THIS reader may cross THIS threshold, and if not, why not.
@@ -5310,13 +5324,15 @@ export function enterableMark(mark) {
  *  no inside cannot be entered by anyone; and being already inside makes the
  *  door a no-op rather than a refusal. The reason is returned rather than
  *  swallowed so a caller can say it instead of just hiding a button. */
-export function enterAffordance({ mark = null, palette = [], actingAs = null, insideOf = null } = {}) {
+export function enterAffordance({ mark = null, palette = [], actingAs = null, insideOf = null, thingClasses = null } = {}) {
   if (!actingAs || actingAs === SPECTATOR_ACTOR)
     return { show: false, why: "a spectator has no body to carry across a threshold" };
   const granted = (Array.isArray(palette) ? palette : [])
     .some((entry) => String(entry?.action ?? "").trim() === "enter");
   if (!granted) return { show: false, why: "this standpoint is not granted the crossing" };
-  if (!enterableMark(mark)) return { show: false, why: "a point has no inside" };
+  if (mark && thingWithoutDoor(mark, { thingClasses }))
+    return { show: false, why: "a thing is not ground: it has no inside to step into, and no door of its own" };
+  if (!enterableMark(mark, { thingClasses })) return { show: false, why: "a point has no inside" };
   // THE TOWN ITSELF (CORE-118): the world-root is the ground every resident already stands within, so its door is a no-op, never offered (the page also
   // draws no entry of it as a room: viewerOccupancyAt). By the root's canonical id, not its name.
   if (mark.id === WORLD_ROOT_ID) return { show: false, why: "you are already within the town: it is the ground you stand in" };
@@ -9194,6 +9210,7 @@ export function mountViewer(appEl) {
     const crossing = enterAffordance({
       mark: full, palette: state.palette?.entries ?? [], actingAs: key,
       insideOf: standpointOccupancy({ acts: enterExitLedger.acts, at: occupancyClock(), handle: key }).insideOf,
+      thingClasses: thingClasses(),
     });
     return `<span class="wv-cell-actions">${crossing.show ? enterButtonHTML(m.id) : ""}`
       + `${backingButton(m.id, effectiveWeight(full))}</span>`;
@@ -15304,6 +15321,7 @@ export function mountViewer(appEl) {
     const crossing = enterAffordance({
       mark, palette: state.palette?.entries ?? [], actingAs: key,
       insideOf: standpointOccupancy({ acts: enterExitLedger.acts, at: occupancyClock(), handle: key }).insideOf,
+      thingClasses: thingClasses(),
     });
     const weight = effectiveWeight(mark);
     const inside = (occupantsOf(liveOccupancy()).get(id) ?? []).map((h) => faceOf(h).name);

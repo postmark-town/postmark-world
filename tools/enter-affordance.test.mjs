@@ -70,6 +70,45 @@ test("already inside is a no-op, not a refusal — and the door goes away", () =
     true, "a chain of crossings is how you get deep; the next door must still be there");
 });
 
+// ── a thing is not ground (the-town/the-not-ground) ─────────────────────────
+// little-bird/a-paper-bag-of-crumbs, as the door reads it: a thing, a holder, a
+// footprint of half a metre, and no inside. Its card offered "enter" (bug post
+// little-bird/the-world-page-offers-enter-on-a-thing-that-holds-contents-a).
+const BAG = { id: "little-bird/a-paper-bag-of-crumbs", kind: "thing", holder: true, capacity: 120,
+  at: { x: -60, y: 420 }, extent: { w: 0.5, h: 0.5 } };
+
+test("FALSIFIER: a thing with a footprint offers no door", () => {
+  assert.equal(enterableMark(BAG), false, "a bag is not ground to stand in");
+  const a = enterAffordance({ mark: BAG, palette: GRANTED, actingAs: "little-bird" });
+  assert.equal(a.show, false, "the bag's card offered enter");
+  assert.match(a.why, /a thing is not ground/);
+});
+
+test("the older spelling, kind sited with class thing, is a thing too", () => {
+  const old = { ...BAG, kind: "sited", class: "thing" };
+  assert.equal(enterAffordance({ mark: old, palette: GRANTED, actingAs: "little-bird" }).show, false);
+});
+
+test("a kind of thing is a thing, when the page knows its thing classes", () => {
+  const bowl = { ...BAG, id: "x/a-candy-bowl", kind: "halloween-candy-bowl" };
+  const things = new Set(["halloween-candy-bowl", "consumable"]);
+  assert.equal(enterAffordance({ mark: bowl, palette: GRANTED, actingAs: "little-bird", thingClasses: things }).show, false);
+  assert.equal(enterableMark(bowl, { thingClasses: things }), false);
+});
+
+test("a thing that carries a door keeps the button (Bevel, 2026-11-19: a thing can be a door)", () => {
+  const door = { ...BAG, entry: { word: "welcomed", into: "little-bird/inside-the-bag" } };
+  const a = enterAffordance({ mark: door, palette: GRANTED, actingAs: "little-bird" });
+  assert.equal(a.show, true, "a thing with an entry into a room is a way in");
+  assert.equal(enterableMark(door), true);
+});
+
+test("ground is untouched: a sited room and a parcel still offer the door", () => {
+  assert.equal(enterAffordance({ mark: ROOM, palette: GRANTED, actingAs: "wright" }).show, true);
+  const parcel = { id: "x/a-parcel", kind: "parcel", at: { x: 0, y: 0 }, extent: { w: 25, h: 25 } };
+  assert.equal(enterAffordance({ mark: parcel, palette: GRANTED, actingAs: "wright" }).show, true);
+});
+
 test("the button names its mark and says what it does", () => {
   const html = enterButtonHTML(ROOM.id);
   assert.match(html, /data-enter="rei\/the-lanternstep-house"/);

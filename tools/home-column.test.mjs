@@ -896,7 +896,7 @@ function markViewFor(mark) {
     state: { palette: { entries: [] }, handle: null }, standpointKey: () => null, enterExitLedger: { acts: [] }, occupancyClock: () => 0,
     occupantsOf: () => new Map(), liveOccupancy: () => ({}), faceOf: (h) => ({ name: h }), entryLawOf: () => null,
     markCloseLook: () => null, noteThingKind: () => {}, holderLines: () => null, heldBy: () => null, heldLine: () => null,
-    isThingId: () => false, iconsOf: () => [], instanceClassOf: () => null, ownedBy: () => null, hands: { for: null },
+    isThingId: () => false, iconsOf: () => [], instanceClassOf: () => null, ownedBy: () => null, hands: { for: null }, thingClasses: () => new Set(),
     markColumnParts, liveCreatures: new Map(), pointInsideMark: () => false,
     silhouetteURL: () => "", bubbleTrail: [], worldEpoch: 1, enterExitEpoch: 1, sceneRoomId: null, canAct: () => false, loadAgentRead: () => null,
   });
