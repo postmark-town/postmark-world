@@ -4,10 +4,17 @@
 //   node tools/perf/wld227-oneoff/capture.mjs --check --go <sha>     no browser: the pin, the clock, the pinned Playwright, the output place
 //   node tools/perf/wld227-oneoff/capture.mjs --go <sha> [--out DIR]  THE RUN (only on the lead's go that names the reviewed commit <sha>)
 //
-// Run it as the brief says: through run-heavy, with a finite wall bound, e.g.
-//   run-heavy timeout 660 node tools/perf/wld227-oneoff/capture.mjs --go <sha>
-// The script holds its own memory bound (RSS_LIMIT_MIB, the browser tree's summed VmRSS, polled once a second) and its own wall bound
-// (WALL_BOUND_S) because the seat cannot make an OS scope: it kills the browser and exits 3 / 4, naming which, and writes what it had.
+// Run it as LANE-DISCIPLINE.md:41 and the brief say: through run-heavy, inside the native 2 GiB / no-swap scope, with a finite total bound
+// (570 s, then a 15 s kill grace: 585 s, inside the ten minutes):
+//   XDG_RUNTIME_DIR=/run/user/$(id -u) run-heavy systemd-run --user --scope -q -p MemoryMax=2G -p MemorySwapMax=0 \
+//     timeout -k 15 570 node tools/perf/wld227-oneoff/capture.mjs --go <sha>
+// The scope is the memory bound. The script's own RSS_LIMIT_MIB tripwire (the browser tree's summed VmRSS, once a second) sits beneath it and is not a
+// substitute for it; its own wall timer (WALL_BOUND_S, 555 s) ends the run before `timeout` would: it kills the browser, exits 3 / 4 naming which, and
+// writes what it had.
+//
+// WHAT THE NUMBERS ARE NOT: the page carries this run's own instrumentation (a long-task PerformanceObserver and a requestAnimationFrame camera tracker,
+// the audit's own, named `wld227-harness.js` so its frames are their own bucket), and the V8 CPU sampler (1 ms) is on for the whole window, under the 4x
+// throttle. So the attribution says where the page's time goes; its frame timings are NOT the unprofiled audit's p95 and are never reported as that.
 //
 // WHAT IT DOES (the WLD-222 audit's own run, World #420 pin 9e7f0964, tools/perf/world-page-audit.mjs, reduced to ONE sample at ONE place):
 //   real, signed-out https://postmark.town/world/ in a FRESH context; unmodified prod; no cookie or profile reuse, no response rewriting, no clock
@@ -28,7 +35,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  PROD, WORLD_PATH, PINNED_PLAYWRIGHT, VIEWPORT, CPU_THROTTLE, IDLE_MS, PAN_MS, BASELINE_SCALE, MAP_WAIT_MS, SETTLE_CAP_MS, RSS_LIMIT_MIB, WALL_BOUND_S,
+  PROD, WORLD_PATH, PINNED_PLAYWRIGHT, VIEWPORT, CPU_THROTTLE, IDLE_MS, PAN_MS, BASELINE_SCALE, MAP_WAIT_MS, SETTLE_CAP_MS, RSS_LIMIT_MIB, WALL_BOUND_S, TOTAL_BOUND_S, TIMEOUT_S, KILL_GRACE_S, NEAR_CENTRE_M,
   pinProblems, clearOfCrossings, minutesToNearestBoundary, nearCentre, centredWithin, sameScale, dragMoved, rssMiB, attribute, phaseWindows,
 } from "./lib.mjs";
 
@@ -56,7 +63,7 @@ function preflight() {
   if (pwVersion !== PINNED_PLAYWRIGHT) problems.push(`Playwright is ${pwVersion}, not the pinned ${PINNED_PLAYWRIGHT}`);
   if (executable && !existsSync(executable)) problems.push(`the pinned Chromium is not installed at ${executable} (this script installs nothing)`);
   const now = Date.now();
-  if (!clearOfCrossings(now)) problems.push(`the clock is not clear: the ${WALL_BOUND_S / 60}-minute run would lie within 20 minutes of a 00/06/12/18 Z crossing or settlement (${Math.round(minutesToNearestBoundary(now))} min to the nearest now)`);
+  if (!clearOfCrossings(now)) problems.push(`the clock is not clear: the ${TOTAL_BOUND_S}-s bounded run would lie within 20 minutes of a 00/06/12/18 Z crossing or settlement (${Math.round(minutesToNearestBoundary(now))} min to the nearest now)`);
   return { problems, head, pw, pwVersion, executable, now };
 }
 
@@ -162,7 +169,12 @@ async function run(pre) {
     kind: "wld-227-attribution-capture", schema: 1, started_at: new Date(pre.now).toISOString(), valid: false, stopped: null, notes: [],
     script: { commit: pre.head, path: "tools/perf/wld227-oneoff/capture.mjs" },
     env: { origin: PROD, world_path: WORLD_PATH, cpu_throttle: CPU_THROTTLE, viewport: VIEWPORT, signed_in: false, idle_ms: IDLE_MS, pan_ms: PAN_MS, baseline_scale: BASELINE_SCALE,
-      playwright: pre.pwVersion, playwright_pinned: PINNED_PLAYWRIGHT, node: process.version, rss_limit_mib: RSS_LIMIT_MIB, wall_bound_s: WALL_BOUND_S, out: OUT },
+      playwright: pre.pwVersion, playwright_pinned: PINNED_PLAYWRIGHT, node: process.version, rss_limit_mib: RSS_LIMIT_MIB, wall_bound_s: WALL_BOUND_S, timeout_s: TIMEOUT_S, kill_grace_s: KILL_GRACE_S, total_bound_s: TOTAL_BOUND_S, memory_scope: "systemd-run --user --scope MemoryMax=2G MemorySwapMax=0 (applied by the caller)", out: OUT },
+    instrumentation: {
+      page_observers: ["PerformanceObserver longtask", "requestAnimationFrame frame/camera tracker (tracking switched on at the drag)"],
+      harness_script_name: "wld227-harness.js", cpu_sampler: { interval_us: 1000, over: "the whole window, idle and pan, under the 4x throttle" },
+      caveat: "instrumentation and the sampler were present: timings in this run are not the unprofiled audit p95, and are not comparable to it",
+    },
     phases: {}, marks: {}, requests: [], rss: { peak_mib: 0, samples: 0 },
   };
   const save = () => writeFileSync(join(OUT, "capture.json"), JSON.stringify(evidence, null, 1) + "\n");
@@ -185,7 +197,7 @@ async function run(pre) {
     }, 1000);
 
     const ctx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1 });
-    await ctx.addInitScript(pageInit);
+    await ctx.addInitScript({ content: `(${pageInit.toString()})();\n//# sourceURL=wld227-harness.js` });
     const page = await ctx.newPage();
     await page.goto(`${PROD}/build.json`);                       // same-site first, so the throttle is on the process the World page then runs in
     const cdp = await ctx.newCDPSession(page);
@@ -242,8 +254,8 @@ async function run(pre) {
     const rect = await placeRect(page, PLACE.id), pane = await paneRect(page);
     evidence.place = { id: PLACE.id, pill: await pill(page), rect, pane };
     const near = nearCentre(evidence.place.pill, { centred: centredWithin(rect, pane) });
-    evidence.place.near_centre = near;
-    if (!near.ok) throw new Stop(`not genuinely at the Town Centre: pill "${evidence.place.pill}" is ${near.metres ?? "unparsed"} m from it, shape centred: ${centredWithin(rect, pane)}`);
+    evidence.place.near_centre = near;       // the pill's metres gate; `shape_centred` (the polygon under the middle of the map) is evidence only
+    if (!near.ok) throw new Stop(`not genuinely at the Town Centre: the page's own pill "${evidence.place.pill}" is ${near.metres ?? "unparsed"} m from it (the bound is ${NEAR_CENTRE_M} m)`);
     grab = await bareGrab(page);
     if (!grab) throw new Stop("no bare map point to take hold of");
     evidence.grab = { x: Math.round(grab.x), y: Math.round(grab.y), under: grab.under };
@@ -259,22 +271,25 @@ async function run(pre) {
     await cdp.send("Profiler.setSamplingInterval", { interval: 1000 });
     const marks = {};
     const at = (k) => { marks[k] = { wall: Date.now() / 1000 }; };
+    at("start_sent");
     await cdp.send("Profiler.start");
-    at("profile_start");
+    at("start_ack");
     await sleep(IDLE_MS);                                          // nothing touched
-    at("idle_end"); at("pan_start");
+    at("idle_end");
     await page.evaluate(() => { const W = globalThis.__wpa; W.track = true; W.writes = 0; W.tx = null; W.ty = null; });
     await page.mouse.down();
+    at("pan_start");                                               // after the press returned; idle_end to here is in neither phase (transition_ms)
     const w0 = Date.now(); let moves = 0;
     while (Date.now() - w0 < PAN_MS) {
       const t = (Date.now() - w0) / 1000;
       await page.mouse.move(grab.x - 120 + 120 * Math.cos((2 * Math.PI * t) / 2.5), grab.y + 90 * Math.sin((2 * Math.PI * t) / 3.7));
       moves++; await sleep(16);
     }
+    at("pan_end");                                                 // the drag's last move; the release and the stop call are outside the pan window
     await page.mouse.up();
-    at("pan_end");
+    at("stop_sent");
     const { profile } = await cdp.send("Profiler.stop");
-    at("profile_stop");
+    at("stop_ack");
     // ── AFTER (outside the profile) ──────────────────────────────────────────────────────────────────────────────────────────────────────
     writeFileSync(join(OUT, "profile.cpuprofile"), JSON.stringify(profile));
     evidence.marks = marks;
@@ -294,10 +309,11 @@ async function run(pre) {
     if (evidence.visibility !== "visible") reasons.push(`tab was ${evidence.visibility}`);
     if (!evidence.frame_unchanged) reasons.push("the served code/World frame changed during the run");
     const win = phaseWindows({ profile, marks });
-    evidence.profile_clock = { basis: win.basis, profile_ms: win.profile_ms, wall_ms: win.wall_ms, skew_ms: win.skew_ms, within_tolerance: win.within_tolerance };
-    if (!win.within_tolerance) evidence.notes.push(`the profile's length and the wall time between start and stop differ by ${win.skew_ms} ms: phase edges are only that good`);
+    evidence.profile_clock = { basis: win.basis, start_call_ms: win.start_call_ms, stop_call_ms: win.stop_call_ms, edge_uncertainty_ms: win.edge_uncertainty_ms, profile_ms: win.profile_ms, wall_bounds_ms: win.wall_bounds_ms, length_within_bounds: win.length_within_bounds, transition_ms: win.transition_ms };
+    evidence.notes.push(`every phase edge carries ±${win.edge_uncertainty_ms} ms (half the Profiler.start round trip); idle_end to the press returning (transition) is ${win.transition_ms} ms and is in neither phase`);
+    if (!win.length_within_bounds) evidence.notes.push(`the profile's length (${win.profile_ms} ms) lies outside the wall bounds the start/stop round trips allow (${win.wall_bounds_ms.join(" to ")} ms): the phase edges cannot be trusted`);
     const attributed = Object.fromEntries(["idle", "pan", "all"].map((k) => [k, attribute(profile, win[k])]));
-    writeFileSync(join(OUT, "attribution.json"), JSON.stringify({ definition: attributed.all.definition, phases: attributed, windows_us: win }, null, 1) + "\n");
+    writeFileSync(join(OUT, "attribution.json"), JSON.stringify({ definition: attributed.all.definition, caveat: evidence.instrumentation.caveat, harness_note: "frames from this run's own init script (wld227-harness.js) and Playwright's evaluation scripts are the 'harness' bucket, never ranked with the town's code", phases: attributed, windows_us: win }, null, 1) + "\n");
     evidence.valid = reasons.length === 0;
     evidence.invalid = reasons;
     evidence.top10 = { idle: attributed.idle.top_functions.slice(0, 10), pan: attributed.pan.top_functions.slice(0, 10) };

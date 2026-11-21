@@ -23,7 +23,12 @@ export const MIN_TRAVEL_PX = 60;       // …or less far than this (CSS px)
 /** How near the origin the camera must be for "at the Town Centre": the page's own coordinate pill reads metres from TC. */
 export const NEAR_CENTRE_M = 250;
 export const RSS_LIMIT_MIB = 2048;     // the finite memory bound the brief names (2 GiB), enforced by the script's own watchdog (no OS scope is available to the seat)
-export const WALL_BOUND_S = 600;       // the whole run, preparation and teardown included (the brief's ten minutes)
+// The whole run, preparation and teardown included, is bounded at 585 s (inside the brief's ten minutes): the script's own timer ends it at
+// WALL_BOUND_S, `timeout -k 15 570` stops it at 570 s and kills at 585 s (TOTAL_BOUND_S).
+export const WALL_BOUND_S = 555;
+export const TIMEOUT_S = 570;
+export const KILL_GRACE_S = 15;
+export const TOTAL_BOUND_S = TIMEOUT_S + KILL_GRACE_S;
 export const CLEAR_MIN = 20;           // minutes clear of the 00/06/12/18 Z crossings and settlements
 
 // ── the commit pin: the run must be the reviewed script at the reviewed commit, on a clean tree ──────────────────────────────────────────────
@@ -48,7 +53,7 @@ export function minutesToNearestBoundary(t) {
   return best;
 }
 /** No boundary within CLEAR_MIN of any moment of [start, start + wallS]: the run, with its bound, lies wholly in the clear. */
-export function clearOfCrossings(startMs, wallS = WALL_BOUND_S, clearMin = CLEAR_MIN) {
+export function clearOfCrossings(startMs, wallS = TOTAL_BOUND_S, clearMin = CLEAR_MIN) {
   for (let t = startMs; t <= startMs + wallS * 1000; t += 60e3) if (minutesToNearestBoundary(t) < clearMin) return false;
   return minutesToNearestBoundary(startMs + wallS * 1000) >= clearMin;
 }
@@ -65,10 +70,15 @@ export function parsePill(text) {
   const x = m[3] ? (m[4] === "W" ? -1 : 1) * n(m[3]) : 0;
   return { x, y };
 }
-/** The camera is at the Town Centre only if the pill's own metres are near the origin AND the place's shape is under the middle of the map: the words "of TC" alone prove nothing. */
-export function nearCentre(pillText, { centred }) {
+/**
+ * The camera is at the Town Centre if the pill's own metres (the camera's position, as the page itself reads it) are near the origin: the words "of TC"
+ * alone prove nothing, so the pill is parsed. Whether the place's polygon sits under the middle of the map is carried as EVIDENCE (`shape_centred`), not a
+ * condition: it has not been proven against the live page, and a check that can abort an accepted scene on its own is not a gate.
+ */
+export function nearCentre(pillText, { centred } = {}) {
   const p = parsePill(pillText);
-  return { ok: !!p && Math.hypot(p.x, p.y) <= NEAR_CENTRE_M && !!centred, metres: p ? Math.round(Math.hypot(p.x, p.y)) : null, parsed: p };
+  const metres = p ? Math.round(Math.hypot(p.x, p.y)) : null;
+  return { ok: !!p && Math.hypot(p.x, p.y) <= NEAR_CENTRE_M, metres, parsed: p, shape_centred: centred === undefined ? null : !!centred };
 }
 export function centredWithin(rect, pane, frac = 0.12) {
   if (!rect || !pane) return false;
@@ -90,10 +100,13 @@ export function rssMiB(statusText) {
 // sample), `timeDeltas` (µs since the previous sample; the first is since startTime), `startTime`, `endTime` (µs). Sample i stood on its node
 // from its own time to the next sample's (the last until endTime): that interval is its SELF time.
 const SPECIAL = { "(idle)": "idle", "(program)": "program", "(garbage collector)": "gc", "(root)": "root" };
-/** What a frame is: a named bucket, native (a name, no file: a V8 builtin or a browser native), unattributed (no name, no file), or js (has a file). */
+/** A frame this run put in the page itself: the init script (it names itself `wld227-harness.js`) or Playwright's own evaluation scripts. Not the town's code. */
+export const HARNESS_URL = /wld227-harness|__playwright|pptr:|playwright/i;
+/** What a frame is: a named bucket, the run's own HARNESS, native (a name, no file: a V8 builtin or a browser native), unattributed (no name, no file), or js (has a file). */
 export function frameKind(cf) {
   const name = cf?.functionName ?? "", url = cf?.url ?? "";
   if (SPECIAL[name]) return SPECIAL[name];
+  if (HARNESS_URL.test(url)) return "harness";
   if (!url) return name ? "native" : "unattributed";
   return "js";
 }
@@ -118,7 +131,7 @@ export function attribute(profile, { fromUs = -Infinity, toUs = Infinity, top = 
   const nodes = new Map((profile?.nodes ?? []).map((n) => [n.id, n]));
   const parent = new Map();
   for (const n of nodes.values()) for (const c of n.children ?? []) parent.set(c, n.id);
-  const byKey = new Map(), byFile = new Map(), buckets = { idle: 0, program: 0, gc: 0, native: 0, unattributed: 0, js: 0, root: 0 };
+  const byKey = new Map(), byFile = new Map(), harnessBy = new Map(), buckets = { idle: 0, program: 0, gc: 0, native: 0, unattributed: 0, harness: 0, js: 0, root: 0 };
   const inclusive = new Map();
   let total = 0;
   for (const s of sampleSpans(profile)) {
@@ -128,6 +141,7 @@ export function attribute(profile, { fromUs = -Infinity, toUs = Infinity, top = 
     total += dur;
     const kind = frameKind(node.callFrame);
     buckets[kind] += dur;
+    if (kind === "harness") { const k = frameKey(node.callFrame); harnessBy.set(k, (harnessBy.get(k) ?? 0) + dur); }
     if (kind === "js") {
       const k = frameKey(node.callFrame), f = node.callFrame.url;
       byKey.set(k, (byKey.get(k) ?? 0) + dur);
@@ -151,26 +165,37 @@ export function attribute(profile, { fromUs = -Infinity, toUs = Infinity, top = 
     buckets_pct_of_window: Object.fromEntries(Object.entries(buckets).map(([k, v]) => [k, total ? round1((v / total) * 100) : null])),
     top_functions: rank(byKey).map(([k, us]) => ({ ...row(k, us), inclusive_ms: round1((inclusive.get(k) ?? 0) / 1000) })),
     top_files: rank(byFile).map(([k, us]) => row(k, us)),
+    // the run's own instrumentation, shown as itself: never ranked with the town's code
+    harness_functions: [...harnessBy.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k, us]) => row(k, us)),
   };
 }
 
 // ── mapping the run's phase boundaries onto the profile's clock ──────────────────────────────────────────────────────────────────────────────────
 /**
- * The boundaries are taken on the NODE side, by the wall clock, at the moment the script acts (the page's main thread is ~99 % busy under the
- * slowed CPU, so asking the page for the time at a boundary could itself stall and move it). `marks` carries { profile_start, idle_end, pan_start,
- * pan_end, profile_stop }, each { wall } in seconds. The window of each phase on the profile's clock (µs) is its wall offset from the profiler start
- * added to the profile's startTime. The check that the two clocks agree is the profile's own length against the wall time between start and stop:
- * the difference is returned, and a difference over `tolMs` is named so the reader knows the offsets are only that good.
+ * Boundaries are taken on the NODE side by the wall clock, when the script acts (the page's main thread is ~99 % busy under the slowed CPU, so asking the
+ * page for the time at a boundary could itself stall and move it). The profiler's own start and stop are CDP calls with a latency each, so each is stamped
+ * BEFORE it is sent and AFTER its response: `marks` = { start_sent, start_ack, idle_end, pan_start (after mouse.down returned), pan_end, stop_sent, stop_ack },
+ * each { wall } in seconds. The profile really started somewhere in [start_sent, start_ack] and really ended somewhere in [stop_sent, stop_ack].
+ *   - Every phase edge is its wall offset from the MIDDLE of the start window, added to the profile's startTime, and carries ±edge_uncertainty_ms (half the
+ *     start call's round trip): an edge is not claimed better than that, whatever the stop call's latency was.
+ *   - Whether the clocks agree is tested against BOUNDS, not against equal latencies: the profile's own length must lie between (stop_sent - start_ack) and
+ *     (stop_ack - start_sent). `length_within_bounds` says so; a profile outside it is named.
+ *   - The idle window runs to idle_end; the pan window starts AFTER mouse.down returned (pan_start). The gap between them (the page-side drag switch and the
+ *     press itself) is in neither phase and is reported as `transition_ms`.
  */
 export function phaseWindows({ profile, marks, tolMs = 250 }) {
-  const at = (k) => Math.round((marks[k].wall - marks.profile_start.wall) * 1e6 + profile.startTime);
+  const startLat = (marks.start_ack.wall - marks.start_sent.wall) * 1000;
+  const stopLat = (marks.stop_ack.wall - marks.stop_sent.wall) * 1000;
+  const anchor = (marks.start_sent.wall + marks.start_ack.wall) / 2;
+  const at = (k) => Math.round((marks[k].wall - anchor) * 1e6 + profile.startTime);
   const profileMs = (profile.endTime - profile.startTime) / 1000;
-  const wallMs = (marks.profile_stop.wall - marks.profile_start.wall) * 1000;
-  const skew = round1(Math.abs(profileMs - wallMs));
+  const lo = (marks.stop_sent.wall - marks.start_ack.wall) * 1000, hi = (marks.stop_ack.wall - marks.start_sent.wall) * 1000;
   return {
-    basis: "node-side wall-clock offsets from the profiler start, added to the profile's startTime",
-    profile_ms: round1(profileMs), wall_ms: round1(wallMs), skew_ms: skew, within_tolerance: skew <= tolMs,
-    idle: { fromUs: at("profile_start"), toUs: at("idle_end") },
+    basis: "node-side wall-clock offsets from the middle of the Profiler.start round trip, added to the profile's startTime; each edge is only as good as edge_uncertainty_ms",
+    start_call_ms: round1(startLat), stop_call_ms: round1(stopLat), edge_uncertainty_ms: round1(startLat / 2),
+    profile_ms: round1(profileMs), wall_bounds_ms: [round1(lo), round1(hi)], length_within_bounds: profileMs >= lo - tolMs && profileMs <= hi + tolMs,
+    transition_ms: round1((marks.pan_start.wall - marks.idle_end.wall) * 1000),
+    idle: { fromUs: profile.startTime, toUs: at("idle_end") },
     pan: { fromUs: at("pan_start"), toUs: at("pan_end") },
     all: { fromUs: profile.startTime, toUs: profile.endTime },
   };

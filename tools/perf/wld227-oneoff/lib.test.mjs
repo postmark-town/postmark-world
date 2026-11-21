@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   pinProblems, minutesToNearestBoundary, clearOfCrossings, parsePill, nearCentre, centredWithin, sameScale, dragMoved, rssMiB,
-  frameKind, sampleSpans, attribute, phaseWindows, BASELINE_SCALE,
+  frameKind, sampleSpans, attribute, phaseWindows, BASELINE_SCALE, WALL_BOUND_S, TIMEOUT_S, KILL_GRACE_S, TOTAL_BOUND_S, HARNESS_URL,
 } from "./lib.mjs";
 
 const SHA = "a".repeat(40), OTHER = "b".repeat(40);
@@ -29,6 +29,12 @@ test("the clock: the whole bounded run lies twenty minutes clear of every 00/06/
   assert.equal(clearOfCrossings(z(6, 20)), true, "twenty minutes after, with ten minutes of run, is clear");
   assert.equal(clearOfCrossings(z(11, 35)), false, "a run ending 11:45 is inside twenty minutes of 12:00");
   assert.equal(clearOfCrossings(z(11, 10)), true);
+  // the bound is the total 585 s (timeout 570 + 15 s kill grace), inside the brief's ten minutes
+  assert.equal(TOTAL_BOUND_S, 585);
+  assert.equal(TIMEOUT_S + KILL_GRACE_S, TOTAL_BOUND_S);
+  assert.equal(WALL_BOUND_S < TIMEOUT_S && TOTAL_BOUND_S <= 600, true, "the script's own timer ends before timeout would, and the whole is within 600 s");
+  assert.equal(clearOfCrossings(z(11, 30)), true, "ends 11:39:45: 20.25 minutes clear of 12:00");
+  assert.equal(clearOfCrossings(z(11, 31)), false, "ends 11:40:45: 19.25 minutes");
 });
 
 test("the place: 'of TC' is on every pill, so it is parsed, and only a position near the origin whose shape is under the middle of the map is the Town Centre", () => {
@@ -40,10 +46,17 @@ test("the place: 'of TC' is on every pill, so it is parsed, and only a position 
   assert.equal(parsePill("somewhere else"), null);
   const centred = true;
   assert.equal(nearCentre("79 m N · 54 m W of TC", { centred }).ok, true);
-  assert.equal(nearCentre("5,512 m N · 3,843 m E of TC · elevation +60 m", { centred }).ok, false, "the Spire's pill says 'of TC' too: it is NOT the Town Centre");
-  assert.equal(nearCentre("79 m N · 54 m W of TC", { centred: false }).ok, false, "near by the pill but the shape is not under the middle of the map: not placed");
+  assert.equal(nearCentre("5,512 m N · 3,843 m E of TC · elevation +60 m", { centred }).ok, false, "the Spire's pill says 'of TC' too: it is NOT the Town Centre, whatever the shape check says");
+  assert.equal(nearCentre("5,512 m N · 3,843 m E of TC", { centred: true }).ok, false, "a centred polygon never makes a far camera near");
   assert.equal(nearCentre("", { centred }).ok, false);
   assert.equal(nearCentre("at TC", { centred }).metres, 0);
+  // the polygon-under-the-middle check is evidence, not a conjunct: it has not been proven against the live page and cannot abort an accepted scene
+  const off = nearCentre("79 m N · 54 m W of TC", { centred: false });
+  assert.equal(off.ok, true, "near by the page's own pill: placed, even when the shape check says it is off the middle");
+  assert.equal(off.shape_centred, false, "…and the disagreement is carried as evidence");
+  assert.equal(nearCentre("79 m N · 54 m W of TC").shape_centred, null, "not measured is null, not false");
+  assert.equal(nearCentre("250 m N of TC").ok, true, "the bound is inclusive");
+  assert.equal(nearCentre("251 m N of TC").ok, false);
 });
 
 test("the geometry helpers behave as the audit's did", () => {
@@ -98,7 +111,7 @@ test("each sample counts for the time until the next, the last until endTime", (
 test("attribution: self time by function and file, the buckets said as buckets, no name invented for a minified file", () => {
   const all = attribute(profile, { fromUs: profile.startTime, toUs: profile.endTime });
   assert.equal(all.window_ms, 12);
-  assert.deepEqual(all.buckets_ms, { idle: 4, program: 1, gc: 1, native: 1, unattributed: 1, js: 4, root: 0 });
+  assert.deepEqual(all.buckets_ms, { idle: 4, program: 1, gc: 1, native: 1, unattributed: 1, harness: 0, js: 4, root: 0 });
   assert.equal(all.busy_ms, 8, "busy is the window without (idle)");
   const [a, b] = all.top_functions;
   assert.equal(a.key, "a @ https://x.test/app.min.js:1:101", "the function as the file says it, with its line and column");
@@ -121,14 +134,41 @@ test("attribution is clipped to the window: the idle phase and the pan phase are
   assert.equal(attribute({ nodes: [], samples: [], timeDeltas: [], startTime: 0, endTime: 0 }).top_functions.length, 0, "no profile, no culprit");
 });
 
-test("the phase windows ride the node-side wall clock from the profiler start, and the clocks' agreement is said", () => {
-  const marks = { profile_start: { wall: 100 }, idle_end: { wall: 110 }, pan_start: { wall: 110 }, pan_end: { wall: 120.1 }, profile_stop: { wall: 120.2 } };
-  const p = { startTime: 5_000_000, endTime: 5_000_000 + 20_150_000 };
+test("the run's own instrumentation is its own bucket, never ranked with the town's code (WLD-227 review 2)", () => {
+  for (const url of ["wld227-harness.js", "__playwright_evaluation_script__", "pptr:evaluate;x", "https://x.test/playwright/inject.js"]) assert.equal(HARNESS_URL.test(url), true, url);
+  assert.equal(HARNESS_URL.test("https://postmark.town/_astro/world.abc123.js"), false, "the town's own code is not harness");
+  assert.equal(frameKind({ functionName: "tick", url: "wld227-harness.js" }), "harness");
+  assert.equal(frameKind({ functionName: "(anonymous)", url: "__playwright_evaluation_script__" }), "harness");
+  const hp = {
+    nodes: [
+      { id: 1, callFrame: { functionName: "(root)", url: "" }, children: [2, 3, 4] },
+      { id: 2, callFrame: { functionName: "tick", url: "wld227-harness.js", lineNumber: 6, columnNumber: 10 } },
+      { id: 3, callFrame: { functionName: "render", url: "https://postmark.town/_astro/world.js", lineNumber: 0, columnNumber: 50 } },
+      { id: 4, callFrame: { functionName: "(idle)", url: "" } },
+    ],
+    startTime: 0, endTime: 10_000, samples: [2, 2, 3, 3, 3, 3, 3, 4, 4, 4], timeDeltas: Array(10).fill(1000),
+  };
+  const r = attribute(hp, { fromUs: 0, toUs: 10_000 });
+  assert.equal(r.buckets_ms.harness, 2, "the instrumentation's two samples are harness");
+  assert.equal(r.buckets_ms.js, 5);
+  assert.deepEqual(r.top_functions.map((f) => f.key), ["render @ https://postmark.town/_astro/world.js:1:51"], "the town's code is ranked alone");
+  assert.deepEqual(r.harness_functions.map((f) => [f.key, f.self_ms]), [["tick @ wld227-harness.js:7:11", 2]], "the harness is shown as itself");
+  assert.deepEqual(r.top_files.map((f) => f.key), ["https://postmark.town/_astro/world.js"], "and is no file in the town's ranking");
+});
+
+test("the phase windows carry the Profiler call latencies as uncertainty and test the profile's length against bounds, not against equal latencies (review 1)", () => {
+  // start call 100.00 -> 100.20 (200 ms round trip), idle ends 110.10, the press returns 110.30, the drag ends 120.30, stop call 120.40 -> 120.50
+  const marks = { start_sent: { wall: 100 }, start_ack: { wall: 100.2 }, idle_end: { wall: 110.1 }, pan_start: { wall: 110.3 }, pan_end: { wall: 120.3 }, stop_sent: { wall: 120.4 }, stop_ack: { wall: 120.5 } };
+  const p = { startTime: 5_000_000, endTime: 5_000_000 + 20_350_000 };
   const w = phaseWindows({ profile: p, marks });
-  assert.deepEqual(w.idle, { fromUs: 5_000_000, toUs: 15_000_000 });
-  assert.deepEqual(w.pan, { fromUs: 15_000_000, toUs: 25_100_000 });
-  assert.equal(w.skew_ms, 50);
-  assert.equal(w.within_tolerance, true);
-  const off = phaseWindows({ profile: { startTime: 0, endTime: 30_000_000 }, marks });
-  assert.equal(off.within_tolerance, false, "a profile much longer or shorter than the wall time between start and stop is named, not trusted");
+  assert.equal(w.start_call_ms, 200); assert.equal(w.stop_call_ms, 100);
+  assert.equal(w.edge_uncertainty_ms, 100, "every edge is only as good as half the start round trip");
+  assert.deepEqual(w.idle, { fromUs: 5_000_000, toUs: 5_000_000 + Math.round((110.1 - 100.1) * 1e6) }, "the idle window runs from the profile's own start to idle_end, anchored at the middle of the start call");
+  assert.deepEqual(w.pan, { fromUs: 5_000_000 + Math.round((110.3 - 100.1) * 1e6), toUs: 5_000_000 + Math.round((120.3 - 100.1) * 1e6) }, "the pan starts after the press returned");
+  assert.equal(w.transition_ms, 200, "idle_end to the press returning is reported, and in neither phase");
+  assert.ok(w.idle.toUs < w.pan.fromUs, "the two windows do not overlap");
+  assert.deepEqual(w.wall_bounds_ms, [20200, 20500], "the length must lie between stop_sent - start_ack and stop_ack - start_sent");
+  assert.equal(w.length_within_bounds, true, "20.35 s is inside, with no equal-latency assumption");
+  assert.equal(phaseWindows({ profile: { startTime: 0, endTime: 30_000_000 }, marks }).length_within_bounds, false, "a profile far outside the bounds is named, not trusted");
+  assert.equal(phaseWindows({ profile: { startTime: 0, endTime: 19_000_000 }, marks }).length_within_bounds, false);
 });
