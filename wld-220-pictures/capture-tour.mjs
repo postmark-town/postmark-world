@@ -60,16 +60,19 @@ try {
     for (let i = 0; i < 12; i++) {
       const s = await readTour(page);
       if (!s.kicker) break;
-      say(`${vp.name}-slide`, s);
-      await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-slide-${String(i + 1).padStart(2, "0")}.png`), fullPage: false });
       const last = s.next === "done";
+      // LAST_ONLY=1 (the docs-link completion): walk to the last step and photograph only it, plus the link's own bounds
+      if (!process.env.LAST_ONLY || last) {
+        say(`${vp.name}-slide`, { ...s, link: await page.evaluate(() => { const a = document.querySelector(".wv-tour-body a"); if (!a) return null; const r = a.getBoundingClientRect(); return { href: a.getAttribute("href"), text: a.textContent, x: +r.x.toFixed(1), y: +r.y.toFixed(1), right: +r.right.toFixed(1), bottom: +r.bottom.toFixed(1), w: +r.width.toFixed(1), h: +r.height.toFixed(1) }; }) });
+        await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-${process.env.LAST_ONLY ? "last-step" : `slide-${String(i + 1).padStart(2, "0")}`}.png`), fullPage: false });
+      }
       await press(".wv-tour-next");
       await page.waitForTimeout(900);
       if (last) break;
     }
     await page.waitForSelector(".wv-tour", { state: "hidden", timeout: 10_000 }).catch(() => {});
     await page.waitForTimeout(700);
-    await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-closed.png`), fullPage: false });
+    if (!process.env.LAST_ONLY) await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-closed.png`), fullPage: false });
     say(`${vp.name}-closed`, { tourHidden: await page.evaluate(() => !!document.querySelector(".wv-tour")?.hidden), mapThere: await page.evaluate(() => !!document.querySelector(".wv-minimap > svg")) });
     await ctx.close();
   }
