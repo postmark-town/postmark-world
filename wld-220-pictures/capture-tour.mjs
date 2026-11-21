@@ -51,7 +51,8 @@ try {
       maxRight: Math.max(...parts.filter(Boolean).map((b) => b.right)) };
   });
 
-  for (const vp of [{ name: "phone-390x844", viewport: { width: 390, height: 844 }, phone: true }, { name: "desktop-1440x900", viewport: { width: 1440, height: 900 }, phone: false }]) {
+  // ONLY_PHONE=1 (the post-merge refresh): the phone viewport alone; the desktop frames are carried at their pin, not retaken
+  for (const vp of [{ name: "phone-390x844", viewport: { width: 390, height: 844 }, phone: true }, { name: "desktop-1440x900", viewport: { width: 1440, height: 900 }, phone: false }].filter((v) => !process.env.ONLY_PHONE || v.phone)) {
     const ctx = await machineContext(browser, { viewport: vp.viewport, ...(vp.phone ? { isMobile: true, hasTouch: true, deviceScaleFactor: 1 } : {}) });
     const page = await ctx.newPage();
     await page.goto(`http://localhost:${port}/?lite=0`, { waitUntil: "domcontentloaded", timeout: 90_000 });
