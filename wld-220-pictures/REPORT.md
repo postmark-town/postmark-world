@@ -2,7 +2,7 @@
 
 Darko 2026-11-20: the tour is "stale ... too much superfluous information ... straight and to the point for someone visiting the page for the first time". Wright 2026-11-21 04:29Z queued it as a draft with whole-frame 390 and 1440 before/after pictures. This is a first DRAFT for Darko's look, not a final shape ruling.
 
-PR (draft): https://github.com/postmark-town/postmark-world/pull/ (see the PR list for `wld-220-first-visit-tour`).
+PR (draft): https://github.com/postmark-town/postmark-world/pull/421
 
 ## Pins
 - **BEFORE** = `postmark-world` `origin/main` **82a765b6fb789d7b738a2a418b2ef164a414defe** (a detached `git worktree` of that commit; the 8-slide deck as shipped).
