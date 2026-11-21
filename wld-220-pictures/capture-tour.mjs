@@ -21,7 +21,8 @@ const descendants = () => {
   const rows = execSync("ps -eo pid=,ppid=,args=", { encoding: "utf8" }).trim().split("\n").map((l) => { const m = l.trim().match(/^(\d+)\s+(\d+)\s+(.*)$/); return m && { pid: +m[1], ppid: +m[2], args: m[3] }; }).filter(Boolean);
   const kids = new Map(); for (const r of rows) { if (!kids.has(r.ppid)) kids.set(r.ppid, []); kids.get(r.ppid).push(r); }
   const out = []; const walk = (p) => { for (const k of kids.get(p) ?? []) { out.push(k); walk(k.pid); } }; walk(process.pid);
-  return out;
+  // this very probe (execSync spawns `/bin/sh -c ps -eo ...` and its `ps`) is a descendant of this process for the instant it runs: it is the instrument, not a leftover
+  return out.filter((d) => !/^(\/bin\/sh -c )?ps -eo pid=,ppid=,args=$/.test(d.args));
 };
 const port = await freePort();
 const proc = spawn(process.execPath, [join(ROOT, "spectator", "server.mjs")], { cwd: ROOT, env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:1" }, stdio: ["ignore", "pipe", "pipe"] });
