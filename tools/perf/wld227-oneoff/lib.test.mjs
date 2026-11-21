@@ -3,7 +3,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  pinProblems, minutesToNearestBoundary, clearOfCrossings, parsePill, nearCentre, centredWithin, sameScale, dragMoved, rssMiB,
+  pinProblems, minutesToNearestBoundary, clearOfCrossings, parsePill, nearCentre, centredWithin, sameScale, dragMoved,
   frameKind, sampleSpans, attribute, phaseWindows, BASELINE_SCALE, WALL_BOUND_S, TIMEOUT_S, KILL_GRACE_S, TOTAL_BOUND_S, HARNESS_URL,
 } from "./lib.mjs";
 
@@ -69,12 +69,6 @@ test("the geometry helpers behave as the audit's did", () => {
   assert.equal(dragMoved({ writes: 8, travelPx: 236 }), true, "the audit's row-1 drag at the Town Centre moved the camera");
   assert.equal(dragMoved({ writes: 2, travelPx: 236 }), false);
   assert.equal(dragMoved({ writes: 8, travelPx: 10 }), false);
-});
-
-test("the memory watchdog reads VmRSS from /proc status text", () => {
-  assert.equal(rssMiB("Name:\tchrome\nVmRSS:\t  2097152 kB\nThreads:\t4\n"), 2048);
-  assert.equal(rssMiB("Name:\tx\n"), 0);
-  assert.equal(rssMiB(undefined), 0);
 });
 
 // a small invented profile: root -> program, idle, gc, native "memcpy", a minified file's `a` and `b`, with b calling a (and a recursing)
@@ -171,4 +165,46 @@ test("the phase windows carry the Profiler call latencies as uncertainty and tes
   assert.equal(w.length_within_bounds, true, "20.35 s is inside, with no equal-latency assumption");
   assert.equal(phaseWindows({ profile: { startTime: 0, endTime: 30_000_000 }, marks }).length_within_bounds, false, "a profile far outside the bounds is named, not trusted");
   assert.equal(phaseWindows({ profile: { startTime: 0, endTime: 19_000_000 }, marks }).length_within_bounds, false);
+});
+
+// ── the launch/abort path, checked offline against the INSTALLED Playwright's own contract (the first run died on a member that does not exist) ─────────
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+const HERE = dirname(fileURLToPath(import.meta.url));
+const SOURCE = readFileSync(join(HERE, "capture.mjs"), "utf8");
+const TYPES = join(HERE, "..", "..", "..", "node_modules", "playwright-core", "types", "types.d.ts");
+/** the members one interface of the installed Playwright declares (methods and properties), read from its own type declarations */
+function membersOf(types, name) {
+  const i = types.search(new RegExp("export interface " + name + "\\b")); if (i < 0) return null;
+  let d = 0, j = types.indexOf("{", i); const s = j;
+  for (; j < types.length; j++) { if (types[j] === "{") d++; else if (types[j] === "}" && !--d) break; }
+  return new Set([...types.slice(s, j).matchAll(/\n  (?:readonly )?([A-Za-z_]\w*)\s*[(<:?]/g)].map((m) => m[1]));
+}
+
+test("[pin] the capture script uses no Puppeteer-only or process-tree mechanism: no browser.process(), no /proc walk, no memory watchdog (the scope is the cap)", () => {
+  assert.doesNotMatch(SOURCE, /\.process\s*\(/, "Playwright's Browser has no process(); it is Puppeteer's, and the first run died on it");
+  assert.doesNotMatch(SOURCE, /\/proc\b|readdirSync|treeRss|rssMiB|RSS_LIMIT|setInterval/, "no process-tree or memory watchdog: the native cap already works");
+  assert.match(SOURCE, /browser\?\.close\(\)/, "the wall bound closes the browser through Playwright's own teardown");
+  assert.match(SOURCE, /XDG_RUNTIME_DIR=\/run\/user\/\$\(id -u\) run-heavy systemd-run --user --scope -q -p MemoryMax=2G -p MemorySwapMax=0/, "the header names the real native capped command");
+  assert.match(SOURCE, /timeout -k 15 570/);
+});
+
+test("the Playwright members the capture script calls all exist in the installed Playwright 1.62's contract (offline: its type declarations; Browser has no process)", { skip: !existsSync(TYPES) && "playwright-core types are not installed here" }, () => {
+  const types = readFileSync(TYPES, "utf8");
+  const need = {
+    Browser: ["close", "version", "newContext"],
+    BrowserContext: ["newCDPSession", "addInitScript", "newPage", "close"],
+    CDPSession: ["send", "on"],
+    Page: ["goto", "evaluate", "locator", "click", "fill", "waitForSelector"],
+    Mouse: ["move", "down", "up", "wheel"],
+    Locator: ["count"],
+  };
+  for (const [iface, members] of Object.entries(need)) {
+    const have = membersOf(types, iface);
+    assert.ok(have, `${iface} is declared`);
+    for (const m of members) assert.ok(have.has(m), `${iface}.${m} exists in the installed Playwright`);
+  }
+  assert.equal(membersOf(types, "Browser").has("process"), false, "Browser.process does not exist: it is the member the first run called");
+  for (const m of ["newCDPSession", "addInitScript", "close", "newPage"]) assert.match(SOURCE, new RegExp("\\b" + m + "\\b"), `the script does call ${m}`);
 });

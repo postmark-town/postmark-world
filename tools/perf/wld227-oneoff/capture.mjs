@@ -8,9 +8,9 @@
 // (570 s, then a 15 s kill grace: 585 s, inside the ten minutes):
 //   XDG_RUNTIME_DIR=/run/user/$(id -u) run-heavy systemd-run --user --scope -q -p MemoryMax=2G -p MemorySwapMax=0 \
 //     timeout -k 15 570 node tools/perf/wld227-oneoff/capture.mjs --go <sha>
-// The scope is the memory bound. The script's own RSS_LIMIT_MIB tripwire (the browser tree's summed VmRSS, once a second) sits beneath it and is not a
-// substitute for it; its own wall timer (WALL_BOUND_S, 555 s) ends the run before `timeout` would: it kills the browser, exits 3 / 4 naming which, and
-// writes what it had.
+// The scope is the memory bound; the script adds no memory watchdog of its own. Its wall timer (WALL_BOUND_S, 555 s) closes the browser through
+// Playwright before `timeout` would end the process, and the run exits 4 naming it, with whatever evidence it had. An aborted run can leave
+// capture.json without a raw profile; that is a stated gap, and a run that is not valid is diagnostic only.
 //
 // WHAT THE NUMBERS ARE NOT: the page carries this run's own instrumentation (a long-task PerformanceObserver and a requestAnimationFrame camera tracker,
 // the audit's own, named `wld227-harness.js` so its frames are their own bucket), and the V8 CPU sampler (1 ms) is on for the whole window, under the 4x
@@ -30,13 +30,13 @@
 // It writes ONLY to its output folder. It reads prod with GETs and an ordinary page load. It never writes to the repo, so the script commit stays the
 // one that was reviewed; it checks that HEAD is that commit and the tree is clean before it does anything.
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  PROD, WORLD_PATH, PINNED_PLAYWRIGHT, VIEWPORT, CPU_THROTTLE, IDLE_MS, PAN_MS, BASELINE_SCALE, MAP_WAIT_MS, SETTLE_CAP_MS, RSS_LIMIT_MIB, WALL_BOUND_S, TOTAL_BOUND_S, TIMEOUT_S, KILL_GRACE_S, NEAR_CENTRE_M,
-  pinProblems, clearOfCrossings, minutesToNearestBoundary, nearCentre, centredWithin, sameScale, dragMoved, rssMiB, attribute, phaseWindows,
+  PROD, WORLD_PATH, PINNED_PLAYWRIGHT, VIEWPORT, CPU_THROTTLE, IDLE_MS, PAN_MS, BASELINE_SCALE, MAP_WAIT_MS, SETTLE_CAP_MS, WALL_BOUND_S, TOTAL_BOUND_S, TIMEOUT_S, KILL_GRACE_S, NEAR_CENTRE_M,
+  pinProblems, clearOfCrossings, minutesToNearestBoundary, nearCentre, centredWithin, sameScale, dragMoved, attribute, phaseWindows,
 } from "./lib.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -65,20 +65,6 @@ function preflight() {
   const now = Date.now();
   if (!clearOfCrossings(now)) problems.push(`the clock is not clear: the ${TOTAL_BOUND_S}-s bounded run would lie within 20 minutes of a 00/06/12/18 Z crossing or settlement (${Math.round(minutesToNearestBoundary(now))} min to the nearest now)`);
   return { problems, head, pw, pwVersion, executable, now };
-}
-
-// ── the browser tree's memory, summed from /proc (a watchdog, because no OS scope is available to the seat) ───────────────────────────────────────
-function treeRss(rootPid) {
-  const ppid = new Map();
-  for (const d of readdirSync("/proc")) {
-    if (!/^\d+$/.test(d)) continue;
-    try { const s = readFileSync(`/proc/${d}/stat`, "utf8"); ppid.set(Number(d), Number(s.slice(s.lastIndexOf(")") + 2).split(" ")[1])); } catch { /* gone */ }
-  }
-  const members = new Set([rootPid]);
-  for (let grew = true; grew;) { grew = false; for (const [p, pp] of ppid) if (members.has(pp) && !members.has(p)) { members.add(p); grew = true; } }
-  let mib = 0;
-  for (const p of members) { try { mib += rssMiB(readFileSync(`/proc/${p}/status`, "utf8")); } catch { /* gone */ } }
-  return { mib, pids: [...members] };
 }
 
 async function fetchJson(url) {
@@ -169,32 +155,22 @@ async function run(pre) {
     kind: "wld-227-attribution-capture", schema: 1, started_at: new Date(pre.now).toISOString(), valid: false, stopped: null, notes: [],
     script: { commit: pre.head, path: "tools/perf/wld227-oneoff/capture.mjs" },
     env: { origin: PROD, world_path: WORLD_PATH, cpu_throttle: CPU_THROTTLE, viewport: VIEWPORT, signed_in: false, idle_ms: IDLE_MS, pan_ms: PAN_MS, baseline_scale: BASELINE_SCALE,
-      playwright: pre.pwVersion, playwright_pinned: PINNED_PLAYWRIGHT, node: process.version, rss_limit_mib: RSS_LIMIT_MIB, wall_bound_s: WALL_BOUND_S, timeout_s: TIMEOUT_S, kill_grace_s: KILL_GRACE_S, total_bound_s: TOTAL_BOUND_S, memory_scope: "systemd-run --user --scope MemoryMax=2G MemorySwapMax=0 (applied by the caller)", out: OUT },
+      playwright: pre.pwVersion, playwright_pinned: PINNED_PLAYWRIGHT, node: process.version, wall_bound_s: WALL_BOUND_S, timeout_s: TIMEOUT_S, kill_grace_s: KILL_GRACE_S, total_bound_s: TOTAL_BOUND_S, memory_scope: "systemd-run --user --scope MemoryMax=2G MemorySwapMax=0 (applied by the caller)", out: OUT },
     instrumentation: {
       page_observers: ["PerformanceObserver longtask", "requestAnimationFrame frame/camera tracker (tracking switched on at the drag)"],
       harness_script_name: "wld227-harness.js", cpu_sampler: { interval_us: 1000, over: "the whole window, idle and pan, under the 4x throttle" },
       caveat: "instrumentation and the sampler were present: timings in this run are not the unprofiled audit p95, and are not comparable to it",
     },
-    phases: {}, marks: {}, requests: [], rss: { peak_mib: 0, samples: 0 },
+    phases: {}, marks: {}, requests: [],
   };
   const save = () => writeFileSync(join(OUT, "capture.json"), JSON.stringify(evidence, null, 1) + "\n");
   let browser = null, killedBy = null;
-  const killTree = (why) => {
-    killedBy ??= why;
-    try { const { pids } = treeRss(browser.process().pid); for (const p of pids) { try { process.kill(p, "SIGKILL"); } catch {} } } catch {}
-  };
-  const wall = setTimeout(() => { killTree("wall"); }, WALL_BOUND_S * 1000);
-  let dog = null;
+  // the wall bound: close the browser through Playwright (its documented teardown); the pending step then throws and the run reports it. `timeout` is the backstop.
+  const wall = setTimeout(() => { killedBy ??= "wall"; browser?.close().catch(() => {}); }, WALL_BOUND_S * 1000);
   try {
     evidence.town_before = await readTown();
     browser = await pre.pw.chromium.launch({ headless: true, args: ["--disable-renderer-backgrounding", "--disable-background-timer-throttling", "--disable-backgrounding-occluded-windows"] });
     evidence.env.chromium = browser.version();
-    const rootPid = browser.process().pid;
-    dog = setInterval(() => {
-      const { mib } = treeRss(rootPid);
-      evidence.rss.samples++; evidence.rss.peak_mib = Math.max(evidence.rss.peak_mib, Math.round(mib));
-      if (mib > RSS_LIMIT_MIB) killTree("rss");
-    }, 1000);
 
     const ctx = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1 });
     await ctx.addInitScript({ content: `(${pageInit.toString()})();\n//# sourceURL=wld227-harness.js` });
@@ -319,16 +295,16 @@ async function run(pre) {
     evidence.top10 = { idle: attributed.idle.top_functions.slice(0, 10), pan: attributed.pan.top_functions.slice(0, 10) };
     await ctx.close();
   } catch (e) {
-    evidence.stopped = killedBy ? `${killedBy === "rss" ? `memory bound ${RSS_LIMIT_MIB} MiB exceeded` : `wall bound ${WALL_BOUND_S} s exceeded`} (browser killed)` : String(e?.message ?? e).split("\n").slice(0, 4).join(" | ").slice(0, 500);
+    evidence.stopped = killedBy ? `wall bound ${WALL_BOUND_S} s exceeded (browser closed)` : String(e?.message ?? e).split("\n").slice(0, 4).join(" | ").slice(0, 500);
     evidence.stop_kind = killedBy ?? (e?.stop ? "stop" : "error");
   } finally {
-    clearTimeout(wall); if (dog) clearInterval(dog);
+    clearTimeout(wall);
     try { await browser?.close(); } catch {}
     evidence.finished_at = new Date().toISOString();
     save();
   }
-  console.log(JSON.stringify({ out: OUT, valid: evidence.valid, stopped: evidence.stopped, invalid: evidence.invalid ?? null, rss_peak_mib: evidence.rss.peak_mib, top10_pan: evidence.top10?.pan?.slice(0, 3) ?? null }));
-  return evidence.valid ? 0 : (evidence.stop_kind === "rss" ? 3 : evidence.stop_kind === "wall" ? 4 : 2);
+  console.log(JSON.stringify({ out: OUT, valid: evidence.valid, stopped: evidence.stopped, invalid: evidence.invalid ?? null, top10_pan: evidence.top10?.pan?.slice(0, 3) ?? null }));
+  return evidence.valid ? 0 : (evidence.stop_kind === "wall" ? 4 : 2);
 }
 
 const pre = preflight();

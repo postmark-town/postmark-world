@@ -22,7 +22,6 @@ export const MIN_CAMERA_WRITES = 5;    // a drag that moved the camera fewer tim
 export const MIN_TRAVEL_PX = 60;       // …or less far than this (CSS px)
 /** How near the origin the camera must be for "at the Town Centre": the page's own coordinate pill reads metres from TC. */
 export const NEAR_CENTRE_M = 250;
-export const RSS_LIMIT_MIB = 2048;     // the finite memory bound the brief names (2 GiB), enforced by the script's own watchdog (no OS scope is available to the seat)
 // The whole run, preparation and teardown included, is bounded at 585 s (inside the brief's ten minutes): the script's own timer ends it at
 // WALL_BOUND_S, `timeout -k 15 570` stops it at 570 s and kills at 585 s (TOTAL_BOUND_S).
 export const WALL_BOUND_S = 555;
@@ -87,13 +86,6 @@ export function centredWithin(rect, pane, frac = 0.12) {
 }
 export const sameScale = (a, b, tol = SCALE_TOLERANCE) => Number.isFinite(a) && Number.isFinite(b) && b > 0 && Math.abs(a / b - 1) <= tol;
 export const dragMoved = ({ writes, travelPx }) => writes >= MIN_CAMERA_WRITES && travelPx >= MIN_TRAVEL_PX;
-
-// ── memory: the watchdog's arithmetic ────────────────────────────────────────────────────────────────────────────────────────────────────────────
-/** VmRSS in MiB from a /proc/<pid>/status text, or 0. */
-export function rssMiB(statusText) {
-  const m = /^VmRSS:\s+(\d+)\s*kB/m.exec(String(statusText ?? ""));
-  return m ? Number(m[1]) / 1024 : 0;
-}
 
 // ── the profile: self time by function, file and line, and the idle/GC/native/unattributed buckets, over a window ────────────────────────────
 // A V8 CPU profile (CDP Profiler.stop): `nodes` (id, callFrame{functionName,url,lineNumber,columnNumber}, children), `samples` (a node id per
