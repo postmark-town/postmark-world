@@ -78,7 +78,7 @@ try {
     }
     if (!process.env.FIRST_ONLY) await page.waitForSelector(".wv-tour", { state: "hidden", timeout: 10_000 }).catch(() => {});
     await page.waitForTimeout(700);
-    if (!process.env.LAST_ONLY && !process.env.FIRST_ONLY) await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-closed.png`), fullPage: false });
+    if (!process.env.LAST_ONLY && !process.env.FIRST_ONLY && !process.env.NO_CLOSED) await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-closed.png`), fullPage: false });
     say(`${vp.name}-closed`, { tourHidden: await page.evaluate(() => !!document.querySelector(".wv-tour")?.hidden), mapThere: await page.evaluate(() => !!document.querySelector(".wv-minimap > svg")) });
     await ctx.close();
   }
