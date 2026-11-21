@@ -212,8 +212,11 @@ test("wiring: the closure is gone, and the one call site passes the looked-up ro
 // hashed), not this test's code. That route reproduced the three digests it is checked against: 94d56a41… (107135 bytes) on the POS-945
 // merge-base, ed771ead… (107711 bytes, the pin above) on this main, and 37ddf8f8… (107954 bytes, the pin the reviewed head 6f4c906a
 // carried) on that head. A line diff of the masked texts, main to the merge, is exactly the 8 `.wv-bymail*` lines and none removed.
-const PINNED_MASKED_STYLE_SHA256 = "3126531517b069f826eb4fdd5660c68fc19dc74638dc165c5f1864c33682af98";
-const PINNED_MASKED_STYLE_BYTES = 108530;
+const PINNED_MASKED_STYLE_SHA256 = "bb3ebfded41772ebc00939428283c0f612595af1e23eda8707d03e7826a775a1";
+// RE-PINNED IN CORE-127 (World viewer filters, PR #417), an INTENDED change to STYLE: the display-filter opener, its desktop popover and
+// its 390 px sheet (`.wv-filters-open`, `.wv-dpanel`, `.wv-dstrip`, `.wv-dfilter-host`) add 4075 bytes of CSS and nothing else moved (a line
+// diff of the masked texts, main 6928feab to the head, is added lines only).
+const PINNED_MASKED_STYLE_BYTES = 112605;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";

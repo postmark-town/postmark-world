@@ -500,6 +500,141 @@ export function viewerFilterControls(options = {}) {
     + `</div>`;
 }
 
+// ── THE DISPLAY SELECTION (CORE-127; Little Bird 2026-11-19 11:40–11:43 EST: "a filter layer for displays on the world map … My marks / My drafts /
+//    Parcels only / All marks above/under x size (you can type in the x) / Sort marks by type. You can choose multiple filters") ──────────────────────────
+//
+// A VIEWER'S CHOICE OF WHAT THIS PAGE SHOWS, so a legal huge mark cannot decide what a viewer sees. It changes nothing in the world: no law, ownership,
+// geometry, hearing or sight; the record, the office and every other reader are untouched. RULED by Darko 2026-11-20 08:47 EST (picker): non-matches are
+// HIDDEN ("Hide them"), from the map and the list both (Wright 13:50:52Z); facilities and biomes are "left out for now" (no mark kind says what they are).
+//
+//   whose   my marks  — the household's owned OR backed marks: the existing "just mine" set (isMine), unchanged
+//           my drafts — the household's unpublished marks (state.draftIds, the grey ones)
+//   type    parcels   — a mark of kind `parcel`
+//   size    longer side, in METRES, under or above a typed number: the mark's own extent in world units, so a camera zoom never changes it
+//   sort    by type   — reorders the Telling list only: no geometry, no canonical order, no hiding
+//
+// OR within a group, AND across groups (a mark must satisfy every group that has a choice). Nothing chosen = today's unfiltered page, exactly. This is NOT the
+// older everything / just mine / new row (Keemin 2026-08-04: those chips are the Telling's business and ask the map nothing): that row is untouched; "new"
+// in the panel is that same chip.
+export const DISPLAY_SIZE_MODES = Object.freeze(["under", "above"]);
+
+export function emptyDisplaySelection() {
+  return { mine: false, drafts: false, parcels: false, sizeMode: "under", sizeM: null, sortByType: false };
+}
+
+/** The typed number: plain digits (a thousands comma and one decimal point allowed), never negative; null when it is not one. */
+export function parseSizeM(text) {
+  const t = String(text ?? "").trim().replace(/,/g, "");
+  if (!/^\d+(?:\.\d+)?$/.test(t)) return null;
+  const n = Number(t);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** A mark's longer side in metres, from its own extent (world units are metres). A mark with no extent is a point: 0 m. */
+export function markLongerSideM(mark) {
+  const w = Number(mark?.extent?.w), h = Number(mark?.extent?.h);
+  const ok = (v) => Number.isFinite(v) && v >= 0;
+  if (!ok(w) && !ok(h)) return 0;
+  return Math.max(ok(w) ? w : 0, ok(h) ? h : 0);
+}
+
+/** Does the selection HIDE anything? (Sorting alone hides nothing.) */
+export function displaySelectionHides(sel) {
+  return !!(sel && (sel.mine || sel.drafts || sel.parcels || (sel.sizeM !== null && sel.sizeM !== undefined)));
+}
+
+/** One mark against the selection: every group with a choice must pass; `mine` and `drafts` are OR'd. */
+export function markInDisplaySelection(mark, sel, { isMine = () => false, isDraft = () => false } = {}) {
+  if (!displaySelectionHides(sel)) return true;
+  if (!mark) return false;
+  if (sel.mine || sel.drafts) {
+    const whose = (sel.mine && isMine(mark)) || (sel.drafts && isDraft(mark));
+    if (!whose) return false;
+  }
+  if (sel.parcels && mark.kind !== "parcel") return false;
+  if (sel.sizeM !== null && sel.sizeM !== undefined) {
+    const side = markLongerSideM(mark);
+    if (sel.sizeMode === "above" ? !(side > sel.sizeM) : !(side < sel.sizeM)) return false;
+  }
+  return true;
+}
+
+/** The removable chips for what is chosen, in the panel's order: `{ key, label }`. */
+export function displaySelectionChips(sel) {
+  const out = [];
+  if (sel?.drafts) out.push({ key: "drafts", label: "my drafts" });
+  if (sel?.mine) out.push({ key: "mine", label: "my marks" });
+  if (sel?.parcels) out.push({ key: "parcels", label: "parcels" });
+  if (sel && sel.sizeM !== null && sel.sizeM !== undefined) out.push({ key: "size", label: `${sel.sizeMode === "above" ? "above" : "under"} ${sel.sizeM} m` });
+  return out;
+}
+
+/** The selection with one choice removed (a chip's ✕); unknown keys change nothing. Pure: returns a new object. */
+export function clearDisplayChoice(sel, key) {
+  const next = { ...emptyDisplaySelection(), ...sel };
+  if (key === "mine") next.mine = false;
+  else if (key === "drafts") next.drafts = false;
+  else if (key === "parcels") next.parcels = false;
+  else if (key === "size") next.sizeM = null;
+  else if (key === "sort") next.sortByType = false;
+  return next;
+}
+
+/** The sort key of "sort by type": the record's own kind, then its class, then its id (stable). */
+export function displayTypeKey(mark) {
+  return `${String(mark?.kind ?? "")}\u0001${classToken(instanceClassOf(mark))}\u0001${String(mark?.id ?? "")}`;
+}
+export function sortByDisplayType(marks) {
+  return [...(marks ?? [])].sort((a, b) => displayTypeKey(a).localeCompare(displayTypeKey(b)));
+}
+
+/**
+ * The Filters opener, the panel (a popover on a desktop, a sheet on a phone) and the strip of removable chips, as markup. Pure: the page's one
+ * renderer builds it from the selection and what it knows of the reader. `signedIn` = a resident's household is known (my marks / my drafts need one);
+ * `newOn` = the existing "new" chip; `counts` = { shown, total } over the marks the page holds.
+ */
+export function displayControlsHTML({ sel = emptyDisplaySelection(), signedIn = false, newOn = false, open = false, counts = null } = {}) {
+  const chips = displaySelectionChips(sel);
+  const hiding = displaySelectionHides(sel);
+  const n = chips.length + (sel.sortByType ? 1 : 0) + (newOn ? 1 : 0);
+  const pressed = (on) => `aria-pressed="${on ? "true" : "false"}"`;
+  const fchip = (attrs, label, on, disabled = false, title = "") =>
+    `<button type="button" class="wv-fchip${on ? " on" : ""}" ${attrs} ${pressed(on)}${disabled ? ` disabled title="${esc(title)}"` : ""}>${label}</button>`;
+  const need = "sign in as a resident to choose your own marks";
+  const countLine = counts && hiding ? `${counts.shown} of ${counts.total} shown` : "";
+  const opener = `<button type="button" class="ctl wv-filters-open" aria-haspopup="dialog" aria-expanded="${open ? "true" : "false"}" aria-controls="wv-dpanel" `
+    + `title="choose which marks the map and the list show">`
+    + `<span class="wv-filters-glyph" aria-hidden="true">⛃</span><span class="wv-filters-word">Filters</span>`
+    + `${n ? `<span class="wv-filters-n" aria-label="${n} chosen">${n}</span>` : ""}</button>`;
+  const strip = hiding
+    ? `<div class="wv-dstrip" role="group" aria-label="Chosen filters">`
+      + (countLine ? `<span class="wv-dcount">${esc(countLine)}</span>` : "")
+      + chips.map((c) => `<span class="wv-dchip">${esc(c.label)}<button type="button" class="wv-dchip-x" data-dsel-remove="${c.key}" aria-label="remove ${esc(c.label)}">✕</button></span>`).join("")
+      + `<button type="button" class="wv-dchip wv-dclear" data-dsel-clear>clear all</button></div>`
+    : "";
+  const panel = `<div class="wv-dpanel" id="wv-dpanel" role="dialog" aria-label="Show on the map"${open ? "" : " hidden"}>`
+    + `<div class="wv-dhead"><span>SHOW ON THE MAP</span><button type="button" class="wv-dlink" data-dsel-clear${(hiding || sel.sortByType) ? "" : " disabled"}>clear all</button></div>`
+    + `<div class="wv-dgrp"><div class="wv-dk">WHOSE <em>· pick any</em></div><div class="wv-dchips">`
+    + fchip(`data-dsel="mine"`, "my marks", !!sel.mine, !signedIn, need)
+    + fchip(`data-dsel="drafts"`, "my drafts", !!sel.drafts, !signedIn, need)
+    + fchip(`data-dsel="new"`, "new", !!newOn)
+    + `</div></div>`
+    + `<div class="wv-dgrp"><div class="wv-dk">TYPE</div><div class="wv-dchips">`
+    + fchip(`data-dsel="parcels"`, "parcels", !!sel.parcels)
+    + `</div></div>`
+    + `<div class="wv-dgrp"><div class="wv-dk">SIZE <em>· longer side, in metres</em></div><div class="wv-dsize">`
+    + `<span class="wv-dseg" role="group" aria-label="under or above">`
+    + DISPLAY_SIZE_MODES.map((m) => `<button type="button" class="wv-dseg-b${sel.sizeMode === m ? " on" : ""}" data-dsel-mode="${m}" ${pressed(sel.sizeMode === m)}>${m}</button>`).join("")
+    + `</span><input type="text" inputmode="decimal" autocomplete="off" class="wv-dnum" data-dsel-size aria-label="size in metres" placeholder="metres"`
+    + `${sel.sizeM !== null && sel.sizeM !== undefined ? ` value="${esc(String(sel.sizeM))}"` : ""}><span class="wv-dunit">m</span></div></div>`
+    + `<div class="wv-dgrp"><div class="wv-dk">SORT THE LIST BY</div><div class="wv-dchips">`
+    + fchip(`data-dsel="sort"`, "type", !!sel.sortByType)
+    + `<span class="wv-dhint">reorders the list; the map does not move</span></div></div>`
+    + `<div class="wv-dfoot"><span class="wv-dcount">${esc(countLine || "nothing is hidden")}</span><button type="button" class="wv-fchip on wv-dclose" data-dsel-close>Done</button></div>`
+    + `</div>`;
+  return { opener, strip, panel };
+}
+
 export function townDate(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
@@ -6697,6 +6832,46 @@ ${WV_ENTER_CSS}
 .wv-fchip:hover { border-color:var(--amber-dark); color:var(--amber); }
 .wv-fchip.on { border-color:var(--amber); color:var(--amber); background:var(--panel2); }
 .wv-fchip:disabled { opacity:.38; cursor:not-allowed; }
+/* ── THE FILTERS (CORE-127): the opener, the panel (a popover; a sheet on a phone) and the chosen-chips strip ── */
+.wv-mapctl .ctl.wv-filters-open { display:inline-flex; flex-direction:row; align-items:center; width:auto; padding:0 .8rem; gap:.4rem; border-radius:999px; font-size:.72rem; letter-spacing:.05em; white-space:nowrap; }
+.wv-filters-n { background:var(--amber); color:var(--night); border-radius:999px; padding:0 .45rem; font-size:.68rem; font-weight:700; line-height:1.35; }
+.wv-dfilter-host { position:absolute; inset:0; z-index:7; pointer-events:none; }
+.wv-dfilter-host > * { pointer-events:auto; }
+.wv-dstrip { position:absolute; bottom:10px; right:10px; max-width:calc(100% - 20px); display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; align-items:center; }
+.wv-dcount { color:var(--dim); font-size:.7rem; letter-spacing:.03em; background:rgba(16,19,24,.85); border-radius:6px; padding:2px 6px; }
+.wv-dchip { display:inline-flex; align-items:center; gap:.35rem; border:1px solid var(--amber); color:var(--amber); background:rgba(32,38,47,.94);
+  border-radius:999px; padding:2px 6px 2px 11px; font-size:.7rem; letter-spacing:.04em; white-space:nowrap; }
+.wv-dchip-x { background:transparent; border:0; color:var(--amber); cursor:pointer; padding:0 4px; font-size:.72rem; line-height:1; border-radius:50%; }
+.wv-dchip-x:hover, .wv-dchip-x:focus-visible { background:rgba(232,197,106,.18); }
+.wv-dclear { padding:2px 11px; border-color:var(--line); color:var(--dim); cursor:pointer; }
+.wv-dclear:hover, .wv-dclear:focus-visible { border-color:var(--amber-dark); color:var(--amber); }
+.wv-dpanel { position:absolute; top:3.2rem; right:10px; width:min(22rem, calc(100% - 20px)); max-height:calc(100% - 4.2rem); overflow:auto; background:rgba(28,33,41,.985);
+  border:1px solid var(--line); border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,.55); padding:.75rem .9rem; color:var(--paper); }
+.wv-dpanel[hidden] { display:none; }
+.wv-dhead { display:flex; justify-content:space-between; align-items:center; font-size:.66rem; letter-spacing:.12em; color:var(--dim); margin-bottom:.4rem; }
+.wv-dlink { background:transparent; border:0; color:var(--amber); text-decoration:underline; cursor:pointer; font-size:.72rem; letter-spacing:.03em; }
+.wv-dlink:disabled { opacity:.38; cursor:default; text-decoration:none; }
+.wv-dgrp { margin:.6rem 0; }
+.wv-dk { font-size:.64rem; letter-spacing:.1em; color:var(--dim); margin-bottom:.3rem; }
+.wv-dk em { color:var(--amber-dark); font-style:normal; letter-spacing:0; }
+.wv-dchips { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.wv-dsize { display:flex; align-items:center; gap:.5rem; font-size:.74rem; color:var(--dim); }
+.wv-dseg { display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+.wv-dseg-b { background:transparent; border:0; color:var(--dim); padding:3px 13px; font-size:.72rem; cursor:pointer; }
+.wv-dseg-b.on { background:var(--panel2); color:var(--amber); }
+.wv-dnum { width:5.5rem; text-align:right; background:var(--night); color:var(--paper); border:1px solid var(--line); border-radius:8px; padding:3px 9px; font:inherit; font-size:.8rem; }
+.wv-dnum:focus { border-color:var(--amber); outline:none; }
+.wv-dhint { color:var(--dim); font-size:.66rem; }
+.wv-dfoot { display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-top:.6rem; padding-top:.5rem; border-top:1px dashed var(--line); }
+.wv-dfilter-host button:focus-visible, .wv-filters-open:focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+@media (max-width:720px) {
+  /* a sheet from the bottom, so the top of the painting stays usable; the chosen chips sit under the controls */
+  .wv-dpanel { top:auto; bottom:6px; left:6px; right:6px; width:auto; max-height:46%; padding:.6rem .7rem; }
+  .wv-dstrip { bottom:8px; left:8px; right:8px; justify-content:flex-start; }
+  .wv-dfilter-host.is-open .wv-dstrip { display:none; }   /* the sheet already says what is chosen */
+  .wv-dgrp { margin:.4rem 0; }
+  .wv-dhint { display:none; }
+}
 .wv-mine-tail { margin-top:4px; }
 .wv-mine-empty { margin:10px 0; font-style:italic; }
 .wv-elsewhere { display:flex; flex-direction:column; gap:6px; }
@@ -7780,6 +7955,8 @@ const MARKUP = `
                cannot split, so the group moves below the field whole, at
                whatever width it stops fitting, for ever. -->
           <div class="wv-mapctl-tools">
+          <!-- THE FILTERS OPENER (CORE-127): first in the tools, so the circles keep their order; its panel and chips are the host below -->
+          ${displayControlsHTML().opener}
           <!-- GLYPH ONLY (Keemin, 2026-08-04). These hang over a painting, and the
                words were four pills' worth of chrome across the top of it. The name
                keeps its seat in title and aria-label — dropping the word from
@@ -7798,7 +7975,7 @@ const MARKUP = `
           <button type="button" class="ctl wv-tour-open" aria-label="Take the tour"
             title="a short tour of the world">?</button>
           </div>
-        </div><div class="wv-spectator-coordinate" aria-live="polite" hidden></div><div class="wv-paint-tallies" hidden></div><div class="wv-bubbles"></div><!--
+        </div><div class="wv-dfilter-host" data-wv-keep>${displayControlsHTML().strip}${displayControlsHTML().panel}</div><div class="wv-spectator-coordinate" aria-live="polite" hidden></div><div class="wv-paint-tallies" hidden></div><div class="wv-bubbles"></div><!--
        THE PARCEL'S COLUMN hangs here, over the painting's right — the atlas's
        own place for it. One node, built by home-column.mjs and by nothing else;
        empty and hidden until a parcel is clicked. -->
@@ -8631,6 +8808,8 @@ export function mountViewer(appEl) {
     view: "telling",
     paintingOnly: readPaintingOnly(typeof localStorage === "undefined" ? null : localStorage),
     markFilter: "everything",           // "everything" | "mine" | "new" — the one marks vocabulary
+    display: emptyDisplaySelection(),   // CORE-127: the viewer's chosen display (whose / parcels / size / sort), hiding non-matches from the map AND the list
+    displayOpen: false,                 // the Filters panel (a popover, a sheet on a phone)
     draftIds: new Set(),                // household marks the town has not published — grey
     portfolio: null,                    // authenticated world_my_marks response
     mineIds: new Set(),                 // portfolio ids across drafts/published/backed
@@ -9255,6 +9434,17 @@ export function mountViewer(appEl) {
   // keep: optional predicate — under just mine, only cards whose mark passes
   // show (the telling stays otherwise identical: same order, same budget already
   // applied by the engine, same card behaviour — the filter only narrows WHO shows).
+  /** The cards of an entry list sorted by type (sortByDisplayType), a heading per kind. "" for an empty list. */
+  function typeGroupedCards(entries, cell) {
+    if (!entries.length) return "";
+    let html = "", kind = null;
+    for (const m of sortByDisplayType(entries)) {
+      const k = String(m.kind ?? "other");
+      if (k !== kind) { if (kind !== null) html += `</div>`; kind = k; html += `<div class="wv-band" data-type-group="${esc(k)}"><h3>${esc(k)}</h3>`; }
+      html += cell(m);
+    }
+    return html + `</div>`;
+  }
   function tellingCards(radial, keep = null) {
     const by = radial?.byBearing ?? {};
     // Distance orders the panel; bearing is a field on the cell (Keemin,
@@ -9270,6 +9460,13 @@ export function mountViewer(appEl) {
     // Under Mine a not-yours spine mark is absent from the ladder, but `keep` filters
     // it from the bands as well, so no mark can fall out of both and vanish.
     const spineIds = new Set((radial?.within ?? []).map((w) => w.id));
+    // SORT BY TYPE (CORE-127): the list alone, grouped by the record's own kind then class; no band, no geometry, nothing hidden
+    if (state.display.sortByType) {
+      let all = Object.values(byBand).flat().filter((m) => !spineIds.has(m.id));
+      if (keep) all = all.filter(keep);
+      const grouped = typeGroupedCards(all, (m) => markCell(m, { role: "fov", radialChips: true }));
+      if (grouped) return grouped;
+    }
     // outward, in the engine's own band order
     const bandOrder = DIALS.distance_bands.map((d) => d.name);
     const keys = Object.keys(byBand).sort((a, b) => bandOrder.indexOf(a) - bandOrder.indexOf(b));
@@ -9354,6 +9551,28 @@ export function mountViewer(appEl) {
   function isMine(m) {
     return !!m?.id && state.mineIds.has(m.id);
   }
+  // ───────── THE DISPLAY SELECTION, applied once (CORE-127) ─────────
+  // ONE predicate answers "does this viewer's page show this mark?" and EVERY consumer asks it: the radial the Telling and the painting are both built from
+  // (displayRadial), the painting's own draw-set additions (overlayMarks' "all of yours" union), the placed pictures (drawPlacedArt's admit and its
+  // ancestor suppression), the containing-mark pick (toldHere) and the Telling's own cards and feeds (displayKeep). So an invisible non-match can neither
+  // be drawn, listed, hovered nor take a click that belongs to a smaller match.
+  const displayHides = () => displaySelectionHides(state.display);
+  const shownByDisplay = (m) => !displayHides() || markInDisplaySelection(byId.get(m?.id) ?? m, state.display, { isMine, isDraft });
+  /** `base` (the older just-mine keep, or null) AND the display selection; null when neither applies. */
+  const displayKeep = (base = null) => (displayHides() ? (m) => (!base || base(m)) && shownByDisplay(m) : base);
+  /** The radial with the non-matches taken out: the standpoint's frame (`within`) and every band. A read-named mark the page could not describe cannot be
+   *  matched, so it is out while anything is chosen. Returned as is when nothing is chosen. */
+  function displayRadial(radial) {
+    if (!radial || !displayHides()) return radial;
+    const keep = (entry) => !entry?.unread && shownByDisplay(entry);
+    const byBearing = {};
+    for (const [bearing, bands] of Object.entries(radial.byBearing ?? {})) {
+      const next = {};
+      for (const [band, list] of Object.entries(bands ?? {})) next[band] = (list ?? []).filter(keep);
+      byBearing[bearing] = next;
+    }
+    return { ...radial, within: (radial.within ?? []).filter(keep), byBearing };
+  }
   // ───────── per-resident views, kept once built ─────────
   //
   // A household is ONE world seen from N standpoints: the payload
@@ -9372,7 +9591,7 @@ export function mountViewer(appEl) {
   // than shown. There is no second invalidation concept.
   const viewCache = new Map(); // handle → { pane, origin, radial, home, balance, palette, signature }
   const viewSignature = () => [
-    worldEpoch, state.crossing, state.markFilter,
+    worldEpoch, state.crossing, state.markFilter, JSON.stringify(state.display),
     identityResolved() ? 1 : 0, JSON.stringify(state.dials),
     enterExitEpoch,   // the crossings are the record too: a pane telling who is
                      // inside what is stale the moment the ledger says otherwise
@@ -9498,6 +9717,84 @@ export function mountViewer(appEl) {
     activateTellingPane(key, radial);
   }
 
+  // ───────── THE FILTERS PANEL (CORE-127) ─────────
+  // The opener (in the map's controls), the panel (a popover; a sheet on a phone) and the strip of removable chips are ONE pure render (displayControlsHTML)
+  // of the selection in `state.display`; every choice goes through applyDisplay, which puts down a selection the choice now hides, repaints the controls
+  // and rebuilds the Telling and the painting from the one selection. Keyboard: the chips and the number are real buttons and a real field; Escape closes
+  // the panel and puts focus back on the opener.
+  const parseHTML = (html) => { const t = document.createElement("template"); t.innerHTML = String(html).trim(); return t.content.firstElementChild; };
+  function focusKeyOf(el) {
+    if (!el || !root.contains(el)) return null;
+    if (el.matches?.(".wv-filters-open")) return ".wv-filters-open";
+    for (const attr of ["data-dsel", "data-dsel-mode", "data-dsel-remove", "data-dsel-clear", "data-dsel-close", "data-dsel-size"]) {
+      if (el.hasAttribute?.(attr)) return `[${attr}${el.getAttribute(attr) ? `="${el.getAttribute(attr)}"` : ""}]`;
+    }
+    return null;
+  }
+  function syncDisplayControls({ panel = true } = {}) {
+    const opener = $(root, ".wv-filters-open"), host = $(root, ".wv-dfilter-host");
+    if (!opener || !host) return;
+    const hides = displayHides();
+    const marks = hides ? allMarks().filter((m) => m?.id && m.at && Number.isFinite(Number(m.at.x))) : [];
+    const counts = hides ? { shown: marks.filter(shownByDisplay).length, total: marks.length } : null;
+    const ui = displayControlsHTML({ sel: state.display, signedIn: identityResolved(), newOn: state.markFilter === "new", open: state.displayOpen, counts });
+    const focusKey = panel ? focusKeyOf(document.activeElement) : null;
+    opener.replaceWith(parseHTML(ui.opener));
+    host.querySelector(".wv-dstrip")?.remove();
+    if (ui.strip) host.insertBefore(parseHTML(ui.strip), host.firstChild);
+    if (panel) host.querySelector(".wv-dpanel")?.replaceWith(parseHTML(ui.panel));
+    else {   // typing a size: only the numbers move, so the field keeps its caret
+      const c = host.querySelector(".wv-dfoot .wv-dcount");
+      if (c) c.textContent = counts ? `${counts.shown} of ${counts.total} shown` : "nothing is hidden";
+    }
+    host.classList.toggle("is-open", !!state.displayOpen);
+    if (focusKey) $(root, focusKey)?.focus?.();
+  }
+  function applyDisplay({ panel = true } = {}) {
+    // a mark the selection now hides is no longer on the page: its selection and hover are put away
+    const hidden = (id) => !!id && displayHides() && !shownByDisplay(byId.get(id));
+    const cur = markInteraction.getState();
+    if (hidden(cur.selectedId)) markInteraction.select(null);
+    if (hidden(cur.hoveredId)) markInteraction.hover(null);
+    syncDisplayControls({ panel });
+    const y = window.scrollY; renderTelling(); window.scrollTo(0, y);
+  }
+  function openDisplayPanel() {
+    state.displayOpen = true;
+    syncDisplayControls();
+    $(root, ".wv-dpanel")?.querySelector("button:not(:disabled), input")?.focus?.();
+  }
+  function closeDisplayPanel({ refocus = false } = {}) {
+    if (!state.displayOpen) return;
+    state.displayOpen = false;
+    syncDisplayControls();
+    if (refocus) $(root, ".wv-filters-open")?.focus?.();
+  }
+  function toggleDisplayChoice(key) {
+    if (key === "new") state.markFilter = state.markFilter === "new" ? "everything" : "new";   // the existing chip, one state
+    else if (key === "mine") state.display = { ...state.display, mine: !state.display.mine };
+    else if (key === "drafts") state.display = { ...state.display, drafts: !state.display.drafts };
+    else if (key === "parcels") state.display = { ...state.display, parcels: !state.display.parcels };
+    else if (key === "sort") state.display = { ...state.display, sortByType: !state.display.sortByType };
+    else return;
+    applyDisplay();
+  }
+  /** all-clear: today's unfiltered page (the "new" chip, which is the older Telling chip, goes back to everything too). */
+  function clearDisplay() {
+    state.display = emptyDisplaySelection();
+    if (state.markFilter === "new") state.markFilter = "everything";
+    applyDisplay();
+  }
+  let sizeTyping = null;
+  function typeDisplaySize(text) {
+    const raw = String(text ?? "").trim();
+    const n = raw === "" ? null : parseSizeM(raw);
+    if (raw !== "" && n === null) return;                 // not a number yet: the choice stays as it was
+    state.display = { ...state.display, sizeM: n };
+    clearTimeout(sizeTyping);
+    sizeTyping = setTimeout(() => applyDisplay({ panel: false }), 120);
+  }
+
   // ───────── inside ─────────
   //
   // The room, written into the same pane the telling would have used. Everything
@@ -9564,7 +9861,7 @@ export function mountViewer(appEl) {
   // and every consumer of mapCtx follows the pointer without knowing anything
   // happened. Exiting reverses it. The town is never refetched for a swap —
   // its node is held aside and remounted, which is also what makes exit cheap.
-  const SCENE_KEEP = [".wv-worldmark", ".wv-mapctl", ".wv-spectator-coordinate", ".wv-paint-tallies", ".wv-bubbles", ".wv-walkdesk"];
+  const SCENE_KEEP = [".wv-worldmark", ".wv-mapctl", ".wv-dfilter-host", ".wv-spectator-coordinate", ".wv-paint-tallies", ".wv-bubbles", ".wv-walkdesk"];
   function captureKeep(boxEl) {
     const overlays = [...new Set([
       ...SCENE_KEEP.map((selector) => $(boxEl, selector)),
@@ -10109,8 +10406,10 @@ export function mountViewer(appEl) {
       return null;
     }
     const e = eyesAt(standpoint, name, key);
-    const within = e.radial.within ?? [];
-    const obs = e.radial.observer ?? {};
+    // the display selection takes the non-matches out of the one radial both the list and the painting are built from (the memoised read is not touched)
+    const radial = displayRadial(e.radial);
+    const within = radial.within ?? [];
+    const obs = radial.observer ?? {};
     const isNew = state.markFilter === "new";
     // (`chips` — one row, one question: everything, just mine, or recency — is
     // hoisted above the resident branch, since both arms wear it.)
@@ -10142,7 +10441,7 @@ export function mountViewer(appEl) {
     // modularity, 2026-07-24 eve: the seam residents' own mechanics will use).
     const TELLERS = {
       elevation: () => elevStateLine(obs),
-      fog: () => fogStateLine(e.radial, obs),
+      fog: () => fogStateLine(radial, obs),
     };
     // World-law cells are the-town's (constitution) — skipped under Mine, and part
     // of the ladder, so they go with it under New.
@@ -10154,7 +10453,7 @@ export function mountViewer(appEl) {
     // the feed alone, with the feed's own count in place of the tallies, so a count
     // line never describes a list it isn't attached to (sight-counts under a listing
     // that ignores sight would be the regression).
-    const feed = isNew ? newFeed(mine ? isMine : null) : null;
+    const feed = isNew ? newFeed(displayKeep(mine ? isMine : null)) : null;
     box.innerHTML = chips
       // above the ladder, because "you are INSIDE the Post Office" outranks
       // "you are standing on its ground" the moment both are true
@@ -10165,12 +10464,12 @@ export function mountViewer(appEl) {
         ? `<div class="wv-section-lbl">new marks — the whole record, newest first</div>`
           + `<div class="wv-cards">${feed.html}</div>`
           + `<div class="wv-tallies">${esc(feed.count)}</div>`
-        : `<div class="wv-cards">${tellingCards(e.radial, mine ? isMine : null)}</div>`
-          + `<div class="wv-tallies">${esc(tallies(e.radial))}</div>`);
-    if (mine) renderMineTail(box, e.radial);  // the same just-mine list continues beyond this sight
+        : `<div class="wv-cards">${tellingCards(radial, mine ? isMine : null)}</div>`
+          + `<div class="wv-tallies">${esc(tallies(radial))}</div>`);
+    if (mine) renderMineTail(box, radial);  // the same just-mine list continues beyond this sight
     foldRenderedPredicates(box);
     mountMarkImages(box);
-    return e.radial;
+    return radial;
   }
   // ───────── the resident's telling, written from the read ───────────────────
   //
@@ -10196,6 +10495,17 @@ export function mountViewer(appEl) {
     // and then measuring with it.
     const bearings = Object.keys(radial.byBearing ?? {}).sort();
     let html = "";
+    const unreadCard = (m) => `<div class="wv-card wv-unread" data-id="${esc(m.id)}">`
+      + `<b>${esc(deslugMarkId(m.id))}</b>`
+      + `<p class="wv-quiet">the read names this, and the office sent no record for it — `
+      + `it is there, and this page cannot tell you what it is.</p></div>`;
+    // SORT BY TYPE (CORE-127): the list alone, grouped by kind then class; the read's own bearing grouping is only the default order
+    if (state.display.sortByType) {
+      let all = Object.values(radial.byBearing ?? {}).flatMap((g) => Object.values(g ?? {}).flat()).filter((m) => !spineIds.has(m.id));
+      if (keep) all = all.filter(keep);
+      const grouped = typeGroupedCards(all, (m) => (m.unread ? unreadCard(m) : markCell(m, { role: "fov", radialChips: true })));
+      if (grouped) return grouped;
+    }
     for (const bearing of bearings) {
       let rows = Object.values(radial.byBearing[bearing] ?? {}).flat()
         .filter((m) => !spineIds.has(m.id));     // the ladder above already gives the spine its cards
@@ -10218,7 +10528,7 @@ export function mountViewer(appEl) {
   }
 
   function composeResidentTelling(box, read, key, chips) {
-    const radial = residentRadial(read);
+    const radial = displayRadial(residentRadial(read));   // the display selection's non-matches are out of the list AND the painting (CORE-127)
     const mine = state.markFilter === "mine";
     const isNew = state.markFilter === "new";
     const { entered, alongside } = standpointOccupancy({
@@ -10271,7 +10581,7 @@ export function mountViewer(appEl) {
     (radial.within ?? []).forEach((w) => shown.add(w.id));
     const by = radial.byBearing ?? {};
     for (const b of Object.keys(by)) for (const m of Object.values(by[b]).flat()) shown.add(m.id);
-    const yours = allMarks().filter(isMine);
+    const yours = allMarks().filter(isMine).filter(shownByDisplay);
     const elsewhere = yours.filter((m) => m.id && !shown.has(m.id));
     const anyInView = yours.some((m) => shown.has(m.id));
 
@@ -11369,7 +11679,9 @@ export function mountViewer(appEl) {
       // the mounted room never answers a hover on its own floor (POS-91 box 1)
       insideRoomId: sceneRoomId,
     });
-    const toldHere = () => toldPaintingMarks(lastRadial, allMarks());
+    // (the display selection's non-matches never take a pick: not by their pip, their picture or by the ground they cover — a huge hidden mark must not
+    // answer a point that a smaller match is under, CORE-127)
+    const toldHere = () => toldPaintingMarks(lastRadial, allMarks()).filter(shownByDisplay);
     const paintingMarkForEvent = (event) => markAt(event, toldHere());
     // walkers, in the same screen-space shape the mark snap already eats, each
     // where the draw puts it (WLD-94: liveBody, never the poll's row)
@@ -11664,7 +11976,7 @@ export function mountViewer(appEl) {
       for (const arr of Object.values(bands ?? {}))
         for (const m of arr ?? []) {
           if (!m?.id || !m.at || typeof m.at.x !== "number" || seen.has(m.id)) continue;
-          seen.add(m.id); out.push(m);
+          seen.add(m.id); if (shownByDisplay(m)) out.push(m);
         }
     // the radial's own entries come first and are KEPT: they carry distM and
     // bearing, which the bare record mark does not
@@ -11679,11 +11991,13 @@ export function mountViewer(appEl) {
     for (const id of paintingMarkIds({ radialIds: [...seen], mineIds })) {
       if (seen.has(id)) continue;
       const m = byId.get(id);
-      if (m?.at && typeof m.at.x === "number") { seen.add(id); out.push(m); }
+      if (m?.at && typeof m.at.x === "number") { seen.add(id); if (shownByDisplay(m)) out.push(m); }
     }
     // A HELD THING IS NOT DRAWN (POS-688, Darko 2026-10-18 20:58): published but
     // unplaced, it shows as its holder's contents and never as a mark of its own.
     // The record says so (`held_by`, the office's world read over the hold record).
+    // THE DISPLAY SELECTION (CORE-127, Darko 2026-11-20: "Hide them"): a non-match is not in the draw-set, so it has no pip, no tinted extent, no icon and no hit
+    // target. The radial arrives already filtered (displayRadial); this is the other way in, "all of yours" above; both pushes above are gated on it.
     return out.filter((m) => !heldBy(byId.get(m.id) ?? m));
   }
   // ───────── the overlay: built on the RECORD, scaled on the CAMERA ─────────
@@ -12283,6 +12597,7 @@ export function mountViewer(appEl) {
     // gains a picture for being the right size.
     const drawnIds = new Set(drawn.map((m) => m.id));
     const { shown: hungArt, subjects: pictureSubjects, spans: artSpans } = drawPlacedArt(bounds, tier, (m) => !hiddenInsideParcel(byId.get(m.id) ?? m, byId, underfoot, townChain)
+      && shownByDisplay(m)
       && (isPlace(m) || (drawnIds.has(m.id) && isEmbodiedMark(m) && !(mapCtx.groundMarkIds ?? new Set()).has(m.id))));
     // A MARK WEARING ITS PICTURE NEEDS NO DOT (Keemin, 2026-09-18: "remove the
     // center dot on marks with images? it often blocks them and makes them look
@@ -12459,7 +12774,7 @@ export function mountViewer(appEl) {
     // stands on its ground is reached through it (the chooser, the column).
     let pills = "";
     const carded = iconsHere
-      ? allMarks().filter((pc) => pc?.kind === "parcel" && pc.at && pc.extent && !underfoot.has(pc.id) && markInDrawnBounds(pc, bounds))
+      ? allMarks().filter((pc) => pc?.kind === "parcel" && pc.at && pc.extent && !underfoot.has(pc.id) && shownByDisplay(pc) && markInDrawnBounds(pc, bounds))
       : [];
     const underCard = (mark) => !!mark?.at && carded.some((pc) => {
       const r = rect(pc);
@@ -12522,6 +12837,7 @@ export function mountViewer(appEl) {
     // EITHER scene is the one underfoot (2026-09-11) — see enclosingParcels.
     for (const m of allMarks()) {
       if (m.kind !== "parcel" || !m.at || glyphIds.has(m.id) || underfoot.has(m.id)) continue;
+      if (!shownByDisplay(m)) continue;   // the town's houses are marks too: a non-match of the display selection is not carded (CORE-127)
       if (!markInDrawnBounds(m, bounds)) continue;
       glyphIds.add(m.id);
       s += homeCard(m, px(m.at), null, nameOf(m), tier);
@@ -13193,7 +13509,9 @@ export function mountViewer(appEl) {
     const stepUp = (m) => byMarkId.get(m?.placementParent ?? m?.parent ?? "");
     const own = new Map();   // id -> this mark's own alpha, asked once
     const ownAlpha = (m) => {
-      if (!own.has(m.id)) own.set(m.id, artAlphaOf(m, ppm, tier));
+      // a mark the display selection hides hangs no picture, so it covers nothing either (CORE-127): hiding a huge ancestor must not leave its picture
+      // suppressing the smaller marks inside it
+      if (!own.has(m.id)) own.set(m.id, shownByDisplay(m) ? artAlphaOf(m, ppm, tier) : 0);
       return own.get(m.id);
     };
     /** the share of this mark's picture its ancestors leave it: the product of
@@ -16888,11 +17206,24 @@ export function mountViewer(appEl) {
 
   // ───────── events ─────────
   let devTimer = null;
+  // the size field applies as it is typed (a number only; anything else leaves the choice as it was)
+  root.addEventListener("input", (e) => { const f = e.target?.closest?.("[data-dsel-size]"); if (f) typeDisplaySize(f.value); });
   root.addEventListener("click", (e) => {
     // the tour first, and every branch returns: while it is up it owns the page,
     // and a click that fell through to the painting underneath would select a
     // mark the reader cannot see
     if (e.target.closest(".wv-tour-open")) { openTour(0); return; }
+    // THE FILTERS (CORE-127): the opener, the panel's chips and size mode, a chip's ✕, clear all, Done
+    if (e.target.closest(".wv-filters-open")) { if (state.displayOpen) closeDisplayPanel(); else openDisplayPanel(); return; }
+    const dsel = e.target.closest("[data-dsel]");
+    if (dsel) { if (!dsel.disabled) toggleDisplayChoice(dsel.dataset.dsel); return; }
+    const dmode = e.target.closest("[data-dsel-mode]");
+    if (dmode) { state.display = { ...state.display, sizeMode: dmode.dataset.dselMode === "above" ? "above" : "under" }; applyDisplay(); return; }
+    const dremove = e.target.closest("[data-dsel-remove]");
+    if (dremove) { state.display = clearDisplayChoice(state.display, dremove.dataset.dselRemove); applyDisplay(); return; }
+    const dclear = e.target.closest("[data-dsel-clear]");
+    if (dclear) { if (!dclear.disabled) clearDisplay(); return; }
+    if (e.target.closest("[data-dsel-close]")) { closeDisplayPanel({ refocus: true }); return; }
     const hit = e.target.closest(".wv-search-hit");
     if (hit) {
       actOnSearchHit(hit.dataset.kind, hit.dataset.hit);
@@ -17290,6 +17621,9 @@ export function mountViewer(appEl) {
       }
       return;
     }
+    // the Filters panel is put away first (one press, one undo), focus back on its opener; Enter in the size field only applies it
+    if (event.key === "Escape" && state.displayOpen) { event.preventDefault(); closeDisplayPanel({ refocus: true }); return; }
+    if (event.key === "Enter" && event.target?.matches?.("[data-dsel-size]")) { event.preventDefault(); typeDisplaySize(event.target.value); return; }
     // ── "/" OPENS THE SEARCH, BUT NEVER OUT OF SOMEBODY'S SENTENCE ────────
     //
     // (reviewer, 2026-09-13). A resident typing a letter in the say box must not
@@ -17671,6 +18005,7 @@ export function mountViewer(appEl) {
         state.ownIds = new Set();
         state.draftIds = new Set();
         if (state.markFilter === "mine") state.markFilter = "everything";
+        state.display = { ...state.display, mine: false, drafts: false };   // no household known: your marks / drafts are not a choice (CORE-127)
         applyWorldLayer();
       }
     } else {
@@ -17680,9 +18015,11 @@ export function mountViewer(appEl) {
       state.ownIds = new Set();
       state.draftIds = new Set();
       if (state.markFilter === "mine") state.markFilter = "everything";
+      state.display = { ...state.display, mine: false, drafts: false };
       applyWorldLayer();
     }
     identitySettled = true;   // the office has answered; a spectator is now a CHOICE, not a default
+    syncDisplayControls();    // my marks / my drafts are enabled only for a known household (CORE-127)
     pruneViewCache(handles); // a pane for a handle this key no longer has describes nobody
     renderPresets();
     renderIdentity();
