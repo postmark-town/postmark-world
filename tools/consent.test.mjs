@@ -775,15 +775,81 @@ test("THE TOWN'S OPPOSITION PREVAILS: infinite backing in the veto, so no arithm
   assert.equal(standing(state, "foreign/room"), true);
 });
 
-test("the town's opposition keeps the ESCROW GUARD: open stakes hold the return, and the mark stands until they unwind", () => {
-  const marks = [sited("hall", "foreign", 0, 0, 100, 100)];
-  const state = fold({ marks, terrain, tick: 1, townWords: { "foreign/hall": "opposed" },
-    stakes: [{ holder: "backer", mark: "foreign/hall", n: 3, weight: 3, tick: 0 }] });
-  assert.equal(state.returned[0].authority, "the town (absolute)");
-  assert.equal(state.returned[0].state, "pending-escrow");
-  assert.deepEqual(state.returned[0].open_escrow_on, ["foreign/hall"]);
-  assert.equal(standing(state, "foreign/hall"), true);
-  assert.equal(w(state, "foreign/hall"), 3, "stamps go home whole: the weight is untouched");
+// ── WLD-203: the town's stance removes a backed mark or parcel too ────────────
+// Darko, 2026-11-18 14:53 EST: "the town declaring opposed to something should
+// remove it, even parcels"; the stamps go "Back to each staker" as a
+// "Town-authored return", which the Office writes at the crossing. The fold only
+// says what leaves; it names no recipient or amount and claims no return.
+
+// The accepted Office consumer's selection, as it reads this output
+// (postmark-office bc2b2221 src/town-return.mjs § townReturnTargets): a
+// returned town return citing no law, the mark and its subtree, never `stays`.
+const officeTargets = (state) => (state.returned ?? [])
+  .filter((r) => r?.state === "returned" && !r.law && r.authority === "the town (absolute)")
+  .map((r) => ({ mark: String(r.mark), leaving: [...new Set([String(r.mark), ...(r.subtree ?? []).map(String)])].sort() }))
+  .sort((a, b) => a.mark.localeCompare(b.mark));
+const ENTRY_KEYS = ["authority", "by", "grantor", "mark", "returned_from", "state", "stays", "subtree"];
+
+test("WLD-203 · THE TOWN'S STANCE REMOVES A BACKED MARK: returned and dropped though staked; its staked positioned child stays, stamps and all", () => {
+  const marks = [
+    sited("hall", "foreign", 0, 0, 100, 100),
+    sited("room", "foreign", 0, 0, 10, 10),                         // positioned: ruling B keeps it
+    { id: "foreign/warm", slug: "warm", by: "foreign", household: "foreign", kind: "predicated",
+      tier: "market", parent: "foreign/hall", slot: "feel", value: "warm", date: "2026-08-10", body: "warm" },
+  ];
+  const stakes = [stake("owner-ish", "foreign/hall", 3), stake("backer", "foreign/hall", 2), stake("backer", "foreign/warm", 1), stake("keeper", "foreign/room", 4)];
+  const state = fold({ marks, terrain, tick: 1, stakes, townWords: { "foreign/hall": "opposed" } });
+  assert.equal(state.returned.length, 1);
+  const r = state.returned[0];
+  assert.equal(r.authority, "the town (absolute)");
+  assert.equal(r.state, "returned", "the town's word removes it, staked or not");
+  assert.deepEqual(r.subtree, ["foreign/warm"], "the mark continued leaves with it");
+  assert.deepEqual(r.stays, ["foreign/room"]);
+  assert.deepEqual(Object.keys(r).sort(), ENTRY_KEYS, "no open_escrow_on, no refund metadata, no recipient or amount");
+  assert.equal(standing(state, "foreign/hall"), false, "dropped at this settlement");
+  assert.equal(standing(state, "foreign/warm"), false);
+  assert.equal(standing(state, "foreign/room"), true, "the positioned child stands");
+  assert.equal(w(state, "foreign/room"), 4, "with its own backing whole");
+  assert.deepEqual(officeTargets(state), [{ mark: "foreign/hall", leaving: ["foreign/hall", "foreign/warm"] }],
+    "the Office selects exactly the leaving mark and its continuation, never the child that stays");
+});
+
+test("WLD-203 · EVEN PARCELS: a backed parcel the town opposes is returned and dropped; the household's mark on it stays with its stake", () => {
+  const marks = [
+    parcel("plot", "foreign", 0, 0),
+    { id: "foreign/plot-name", slug: "plot-name", by: "foreign", household: "foreign", kind: "predicated",
+      tier: "market", parent: "foreign/plot", slot: "name", value: "The Quiet Plot", date: "2026-08-10", body: "The Quiet Plot" },
+    sited("shed", "foreign", 0, 0, 4, 4),
+  ];
+  const stakes = [stake("foreign", "foreign/plot", 5), stake("backer", "foreign/plot-name", 1), stake("backer", "foreign/shed", 2)];
+  const state = fold({ marks, terrain, tick: 1, stakes, townWords: { "foreign/plot": "opposed" } });
+  const r = state.returned.find((x) => x.mark === "foreign/plot");
+  assert.equal(r.state, "returned");
+  assert.equal(r.authority, "the town (absolute)");
+  assert.deepEqual(r.subtree, ["foreign/plot-name"]);
+  assert.ok(!(r.subtree.includes("foreign/shed")), "the shed has a place of its own: it is not carried out");
+  assert.equal(standing(state, "foreign/plot"), false, "the parcel leaves, staked");
+  assert.equal(standing(state, "foreign/plot-name"), false);
+  assert.equal(standing(state, "foreign/shed"), true, "the household's positioned mark on it stands");
+  assert.equal(w(state, "foreign/shed"), 2, "with its own backing");
+  assert.deepEqual(officeTargets(state), [{ mark: "foreign/plot", leaving: ["foreign/plot", "foreign/plot-name"] }]);
+});
+
+test("WLD-203 · ONLY THE TOWN'S STANCE: a backed LIMIT (townLaws) and a backed holder's veto keep the escrow guard and stand", () => {
+  const limited = fold({ marks: [sited("hall", "foreign", 0, 0, 100, 100)], terrain, tick: 1,
+    townWords: { "foreign/hall": "opposed" }, townLaws: { "foreign/hall": "the-town/claim-cap" },
+    stakes: [stake("backer", "foreign/hall", 3)] });
+  assert.equal(limited.returned[0].state, "pending-escrow", "no widening of LIMITS: a limit's return still waits for its stakes");
+  assert.deepEqual(limited.returned[0].open_escrow_on, ["foreign/hall"]);
+  assert.equal(standing(limited, "foreign/hall"), true);
+  assert.deepEqual(officeTargets(limited), [], "a pending return is not the Office's to pay");
+
+  const held = fold({ marks: [parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }), sited("hall", "foreign", 0, 0, 100, 100)],
+    terrain, tick: 1, stakes: [stake("backer", "foreign/hall", 3)] });
+  assert.equal(held.returned[0].authority, "parcel (absolute)");
+  assert.equal(held.returned[0].state, "pending-escrow", "a holder's opposition keeps the guard");
+  assert.equal(standing(held, "foreign/hall"), true);
+  assert.deepEqual(officeTargets(held), []);
 });
 
 test("the town over a holder: one return, and it names the town (the town's opposition always prevails)", () => {

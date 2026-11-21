@@ -154,6 +154,19 @@
 // `state: "pending-escrow"` and the mark STANDS until the stakes unwind. This is
 // no new law, only the sequencing the existing one already implies.
 //
+// EXCEPT THE TOWN'S STANCE (WLD-203; Darko 2026-11-18 14:53 EST: "the town
+// declaring opposed to something should remove it, even parcels"; 15:0x: the
+// stamps go "Back to each staker"; 16:3x: a "Town-authored return"). A return
+// the town's declared word makes is `state: "returned"` and leaves at the next
+// settlement whatever is staked on it or its subtree: dropped, like any return
+// with nothing staked. The stamps are not returned here, and nothing here says
+// they were: the fold names no recipient or amount. At the crossing the Office
+// returns each staker's open principal on the marks that leave, as the town's
+// act in the ledger, and takes no such mark away before that return is home
+// (office src/town-return.mjs). A limit is the town's opposition too, but it
+// arrives in `townLaws` and keeps this guard, as a holder's and the commons'
+// return do.
+//
 // ── THE TOWN'S WORD (POS-361; Darko's rulings R7, R10, R15, 2026-10-04) ──────
 //
 // The town holds a third seat beside the parcel holder and the commons parent,
@@ -168,8 +181,9 @@
 //              fan-up, standing or any other use of density), so the existing
 //              return path carries it." With infinite backing, the comparison
 //              cannot fail, so a town opposition is a return with no arithmetic.
-//              It takes the return path and the escrow guard below, unchanged:
-//              an opposed mark with open stakes stands until they unwind.
+//              It takes the return path, and since WLD-203 not the escrow guard:
+//              the opposed mark leaves at the next settlement, parcels included,
+//              staked or not (§ THE ESCROW GUARD). A limit keeps the guard.
 //
 //   neutral    CONFERS NOTHING here (a DECLARED neutral). It clears the "awaiting the town" label
 //              (a read's concern, not the fold's) and is not welcome: welcome
@@ -551,6 +565,10 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, pla
     const whole = lawReturn.has(v.id);
     const { subtree, stays } = subtreeOf(v.id, { whole });
     const staked = [v.id, ...subtree].filter((id) => own(id) > 0);
+    // THE TOWN'S STANCE REMOVES, STAKED OR NOT (WLD-203; § THE ESCROW GUARD).
+    // Its declared word only: a limit (a `townLaws` return, `whole`) keeps the
+    // guard, as a holder's and the commons' return do.
+    const pending = staked.length > 0 && !(v.kind === "town" && !whole);
     const entry = {
       mark: v.id,
       by: byId.get(v.id)?.household ?? null,
@@ -559,12 +577,12 @@ export function resolveConsent({ byId, credOf, parcels, ownStamps, parentOf, pla
       grantor: v.grantor,
       subtree,
       ...(stays.length ? { stays } : {}),
-      state: staked.length ? "pending-escrow" : "returned",
+      state: pending ? "pending-escrow" : "returned",
       ...(v.detail ? { veto: v.detail } : {}),
-      ...(staked.length ? { open_escrow_on: staked } : {}),
+      ...(pending ? { open_escrow_on: staked } : {}),
     };
     returned.push(entry);
-    if (!staked.length) {
+    if (!pending) {
       dropped.add(v.id);
       for (const s of subtree) dropped.add(s);
       if (!whole) alone.add(v.id);
