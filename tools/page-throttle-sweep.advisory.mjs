@@ -49,9 +49,9 @@ const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "tools/page-throttle-sweep.advisory.mjs";
 const RATE = 4;
-// the 27 page tests: the 22 at WLD-71, tools/conversation-pages.test.mjs (POS-779: the mounted conversation badges),
-// WLD-74's resident card (tools/candle-boundary.test.mjs counts them too), POS-945's "In town by mail" page test, WLD-205's art-window page test and
-// CORE-119's walk-card hover (tools/viewer-walk-hover.test.mjs)
+// the 28 page tests: the 22 at WLD-71, tools/conversation-pages.test.mjs (POS-779: the mounted conversation badges),
+// WLD-74's resident card (tools/candle-boundary.test.mjs counts them too), POS-945's "In town by mail" page test, WLD-205's art-window page test,
+// CORE-119's walk-card hover (tools/viewer-walk-hover.test.mjs) and WLD-220's first-visit tour (tools/tour-first-visit.test.mjs)
 const SWEPT = [
   "tools/act-as-town-bodies.test.mjs", "tools/art-window.test.mjs", "tools/backdrop-without-text.test.mjs", "tools/conversation-pages.test.mjs", "tools/dungeon-page.test.mjs",
   "tools/first-paint-boot-shape.test.mjs", "tools/in-town-by-mail.test.mjs",
@@ -60,7 +60,7 @@ const SWEPT = [
   "tools/part2-on-the-page.test.mjs", "tools/pinned-house-card.test.mjs", "tools/placed-art.test.mjs",
   "tools/region-column-reads-the-door.test.mjs", "tools/resident-middle-on-the-page.test.mjs", "tools/room-feather.test.mjs",
   "tools/search-the-town.test.mjs", "tools/standpoint-dot-culled.test.mjs", "tools/thumbnails-follow-the-drawn-size.test.mjs",
-  "tools/town-ground-page.test.mjs", "tools/viewer-walk-hover.test.mjs", "tools/walk-enter-terms-page.test.mjs", "tools/walk-layer-once.test.mjs",
+  "tools/tour-first-visit.test.mjs", "tools/town-ground-page.test.mjs", "tools/viewer-walk-hover.test.mjs", "tools/walk-enter-terms-page.test.mjs", "tools/walk-layer-once.test.mjs",
   "tools/wld74-card-on-the-page.test.mjs",
 ];
 // the one deliberate exception, by name: lite-mode's slow machine is the slow clock, SET (WLD-170), with no CPU throttle

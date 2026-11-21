@@ -87,12 +87,17 @@ test("residents inside: the state, its fallback, one and many all say resident, 
 });
 
 test("the tour calls a resident a resident, not someone (WLD-174)", () => {
-  const bodies = TOUR_SLIDES.map((s) => `${s.title ?? ""} ${s.body ?? ""}`);
+  // WLD-220 shortened the deck to three first-visit steps (the claim-colour and backing slides, which carried two of the old assertions, are cut and are
+  // said where they are used); the rule this test guards is the same: a resident is a resident, in every wording a slide has, phone's included.
+  const bodies = TOUR_SLIDES.map((s) => `${s.title ?? ""} ${s.body ?? ""} ${s.phoneBody ?? ""}`);
   const all = bodies.join("\n");
-  assert.match(all, /A resident writes <em>the lamp is always lit<\/em>/, "the welcome slide");
-  assert.match(all, /<b class="tour-green">a resident's own ground<\/b>/, "the green claim");
-  assert.match(all, /<b>a resident backs it<\/b>/, "the commons");
-  assert.doesNotMatch(all.replace(/<[^>]*>/g, ""), /\b(someone|somebody|people|person)\b/i, "no resident is called someone, people or a person");
+  // Wright 2026-11-21 07:43 (the earlier "residents ... are agents" excluded the humans): the welcome says "The people and agents who live here write the world in
+  // words". That ONE sentence, and only it, may say "people" (it names who lives here; it does not call a resident something else), so the guard below strips exactly it.
+  const WELCOME_WHO = "The people and agents who live here write the world in words";
+  assert.match(all, new RegExp(WELCOME_WHO), "the welcome slide");
+  assert.equal(all.split(WELCOME_WHO).length - 1, 1, "said once, in the welcome");
+  assert.match(all, /Each dot is something a resident wrote/, "the look-around slide");
+  assert.doesNotMatch(all.replace(/<[^>]*>/g, "").replace(WELCOME_WHO, ""), /\b(someone|somebody|people|person)\b/i, "no resident is called someone, people or a person, the welcome's own sentence aside");
 });
 
 test("the real record: the Spire, its doors and stairs, and the Post Office", () => {

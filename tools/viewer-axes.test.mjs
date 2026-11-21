@@ -1251,10 +1251,11 @@ test("the tour walks forward, back, and off the end", () => {
   assert.equal(tourStep(1, "back", n), 0);
   assert.equal(tourStep(0, "back", n), 0, "back from the first slide stays put");
   assert.equal(tourStep(n - 1, "next", n), -1, "walking off the last slide is finishing");
-  assert.equal(tourStep(3, "skip", n), -1);
-  assert.equal(tourStep(0, 5, n), 5, "a dot jumps");
-  assert.equal(tourStep(2, 99, n), 2, "a dot out of range changes nothing");
-  assert.equal(tourStep(2, -1, n), 2);
+  assert.equal(tourStep(1, "skip", n), -1);
+  assert.equal(tourStep(0, n - 1, n), n - 1, "a dot jumps (to the last step of whatever deck this is)");
+  assert.equal(tourStep(0, n, n), 0, "a dot past the last step changes nothing");
+  assert.equal(tourStep(n - 1, 99, n), n - 1, "a dot out of range changes nothing");
+  assert.equal(tourStep(n - 1, -1, n), n - 1);
   // a caller that lost count must not fall off the end of the deck
   assert.equal(tourStep(999, "next", n), -1);
   assert.equal(tourStep(undefined, "next", n), 1);
@@ -1265,22 +1266,35 @@ test("the tour walks forward, back, and off the end", () => {
   assert.equal(tourProgress(99, 8), "8 / 8");
 });
 
-test("every slide is complete, and its anchor is a class the viewer really writes", async () => {
-  assert.ok(TOUR_SLIDES.length >= 6 && TOUR_SLIDES.length <= 10,
-    "a tour nobody finishes teaches nothing; keep the deck short");
+// WLD-220 (Darko 2026-11-20: "straight and to the point for someone visiting the page for the first time"): the first-visit deck is THREE short steps
+// (what this is; how to look around; where to go next and how the ? brings it back). The old floor of six slides and the 80-character body were
+// written for the eight-slide teaching deck; what protects a first visitor now is that the deck STAYS short and plain, so these are the falsifiers.
+const TOUR_TEXT = (html) => html.replace(/<[^>]*>/g, "");
+test("the first-visit deck is three short steps; every slide is complete, and its anchor is a class the viewer really writes", async () => {
+  assert.equal(TOUR_SLIDES.length, 3, "three short steps: a fourth is a lesson, and the cut ones are reachable where they are used");
+  assert.deepEqual(TOUR_SLIDES.map((s) => s.id), ["welcome", "explore", "next"]);
   const ids = new Set();
   const anchors = [];
   for (const slide of TOUR_SLIDES) {
     assert.match(slide.id, /^[a-z-]+$/, `slide id ${slide.id}`);
     assert.equal(ids.has(slide.id), false, `duplicate slide id ${slide.id}`);
     ids.add(slide.id);
-    assert.ok(slide.title?.length > 8, `${slide.id} needs a title`);
-    assert.ok(slide.body?.length > 80, `${slide.id} needs a body worth a slide`);
+    assert.ok(slide.title?.length > 8 && slide.title.length <= 30, `${slide.id} needs a short title`);
+    for (const key of ["body", "phoneBody"]) {
+      if (slide[key] === undefined) continue;
+      const words = TOUR_TEXT(slide[key]).trim().split(/\s+/).length;
+      assert.ok(TOUR_TEXT(slide[key]).length > 40, `${slide.id}.${key} needs a body worth a slide`);
+      assert.ok(words <= 45, `${slide.id}.${key} is ${words} words: a first visitor gets a sentence or two a step, not a wall`);
+    }
+    // no stage, and nothing that teaches law or a resident-only act before a visitor can look
+    assert.equal(slide.stage, undefined, `${slide.id} stages nothing: the page stays as the visitor found it`);
     if (slide.anchor === undefined) continue;
     assert.match(slide.anchor, /^\.[a-z-]+$/, `${slide.id} anchor must be one class selector`);
     anchors.push(slide.anchor.slice(1));
   }
-  assert.ok(anchors.length >= 3, "a tour that points at nothing may as well be a page of prose");
+  // only the map's own controls are pointed at: every rail anchor is display:none on a phone, so the deck never leans on one
+  assert.deepEqual([...new Set(anchors)].sort(), ["wv-mapctl", "wv-tour-open"]);
+  assert.ok(anchors.length >= 2, "a tour that points at nothing may as well be a page of prose");
 
   // The copy is prose and stays true on its own; an anchor is a PROMISE ABOUT
   // MARKUP, and it is the one part of a slide a refactor can quietly break. A
@@ -1292,6 +1306,51 @@ test("every slide is complete, and its anchor is a class the viewer really write
     assert.ok(source.includes(`class="${cls}`) || source.includes(`ctl ${cls}`) || source.includes(`"${cls} `)
       || source.includes(`${cls}"`),
       `no element in the viewer carries the class ${cls}, which a tour slide points at`);
+});
+
+test("WLD-220: a phone is told only what a phone has (drag, tap, what is drawn); a first visitor is not walked through law or a resident's acts; the ? is how it comes back", async () => {
+  const [welcome, explore, next] = TOUR_SLIDES;
+  // the phone's own words exist for the two slides that name an input, and say drag and tap, never a wheel, a hover or a click
+  for (const slide of [explore, next]) {
+    assert.equal(typeof slide.phoneBody, "string", `${slide.id} carries the phone's words`);
+    assert.doesNotMatch(TOUR_TEXT(slide.phoneBody), /scroll|zoom|hover|rest on|click|wheel/i, `${slide.id}: a phone has none of these`);
+    assert.match(TOUR_TEXT(slide.phoneBody), /\btap\b/i, `${slide.id}: the phone is told tap`);
+  }
+  assert.match(TOUR_TEXT(explore.phoneBody), /\bDrag\b/);
+  assert.match(TOUR_TEXT(explore.body), /\bscroll\b.*\bzoom\b/i, "the desktop is told its wheel");
+  assert.match(TOUR_TEXT(explore.body), /\bclick\b/i);
+  assert.equal(welcome.phoneBody, undefined, "the welcome has one wording: nothing in it names an input");
+  // it names only controls the map really draws: the fit button and the search, the conversations lens and the ? itself
+  assert.match(explore.body, /<b>⛶<\/b>/);
+  assert.match(next.body, /<b>💬<\/b>/);
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
+  for (const glyph of ["⛶", "💬"]) assert.ok(source.includes(`>${glyph}</button>`), `the map draws a ${glyph} button`);
+  assert.ok(source.includes('class="ctl wv-tour-open"'), "and the ? the last step points at");
+  // no law and no resident-only act before a visitor can look: those are said where they are used, not in the greeting
+  const all = TOUR_SLIDES.flatMap((s) => [s.title, s.body, s.phoneBody ?? ""]).map(TOUR_TEXT).join("\n");
+  assert.doesNotMatch(all, /constitution|commons|stamp|Act As|Telling|context budget|sixty|crossing|MCP/i, "the cut lessons stay cut");
+  // the welcome's one sentence (Wright 2026-11-21 07:43) says "the people and agents who live here"; it is exactly that sentence the guard permits, in the welcome only
+  const WELCOME_WHO = "The people and agents who live here write the world in words";
+  assert.ok(TOUR_TEXT(welcome.body).includes(WELCOME_WHO), "the welcome names who lives here: people and agents");
+  assert.equal(all.split(WELCOME_WHO).length - 1, 1, "and says it once");
+  assert.doesNotMatch(all.replace(WELCOME_WHO, ""), /\b(someone|somebody|people|person)\b/i, "a resident is a resident, the welcome's own sentence aside");
+  assert.doesNotMatch(all, /several dozen|dozens|\b\d+ residents\b/i, "no resident count to go stale");
+  // the last step says how to get the tour back, and points at the ? that does it
+  assert.equal(next.anchor, ".wv-tour-open");
+  assert.match(TOUR_TEXT(next.body), /\?.*again/);
+  // Wright 2026-11-21 06:17 (settled): the LAST step, and only it, links the site's docs: one plain link, the same on a phone and a desktop, no other link in the deck
+  // and no help at the controls
+  const links = (html) => [...html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)].map((m) => ({ tag: m[0].match(/^<a\b[^>]*>/)[0], text: TOUR_TEXT(m[1]) }));
+  for (const key of ["body", "phoneBody"]) {
+    assert.deepEqual(links(next[key]), [{ tag: '<a href="/docs/">', text: "the docs" }], `the last step's ${key} links /docs/ once, plainly`);
+    assert.match(TOUR_TEXT(next[key]), /Read more in the docs\.$/, `${key} ends on the link, said plainly`);
+  }
+  for (const slide of [welcome, explore]) for (const key of ["body", "phoneBody"]) assert.deepEqual(links(slide[key] ?? ""), [], `${slide.id}.${key} links nothing`);
+  // the renderer chooses the phone's words on a phone and nowhere else
+  assert.match(source, /\$\(el, "\.wv-tour-body"\)\.innerHTML = onPhone\(\) && slide\.phoneBody \? slide\.phoneBody : slide\.body;/);
+  // the greeting is unchanged: spectators each load, a resident once, never reset by this deck
+  assert.match(source, /if \(readTourSeen\(localStore, tourWho\(\)\)\) return;\s*greetedThisLoad = true;\s*openTour\(0\);/);
 });
 
 test("the tour is remembered against the resident, not the browser", () => {

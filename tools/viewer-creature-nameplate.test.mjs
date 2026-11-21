@@ -212,8 +212,10 @@ test("wiring: the closure is gone, and the one call site passes the looked-up ro
 // hashed), not this test's code. That route reproduced the three digests it is checked against: 94d56a41… (107135 bytes) on the POS-945
 // merge-base, ed771ead… (107711 bytes, the pin above) on this main, and 37ddf8f8… (107954 bytes, the pin the reviewed head 6f4c906a
 // carried) on that head. A line diff of the masked texts, main to the merge, is exactly the 8 `.wv-bymail*` lines and none removed.
-const PINNED_MASKED_STYLE_SHA256 = "3126531517b069f826eb4fdd5660c68fc19dc74638dc165c5f1864c33682af98";
-const PINNED_MASKED_STYLE_BYTES = 108530;
+// RE-PINNED FOR WLD-220 (the tour's last step links /docs/): one rule, `.wv-tour-body a`, 196 bytes (108530 -> 108726), nothing removed or moved; tools/viewer-shell-css.test.mjs
+// carries the account. CREATURE_CSS and both of its neighbours are untouched.
+const PINNED_MASKED_STYLE_SHA256 = "955f7eb3a83c3a445952293adb4cd817d4aaab8d5a53c43ef931d2b1c1b6aef1";
+const PINNED_MASKED_STYLE_BYTES = 108726;
 
 const HOME_TOKEN = "\u0000HOME_COLUMN_CSS\u0000";
 const ICON_TOKEN = "\u0000MARK_ICON_CSS\u0000";

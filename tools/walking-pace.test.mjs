@@ -68,12 +68,21 @@ test("walk() spends crossings at the dial, with the skeleton in the world", () =
 // above never load it.
 const PACE_WORDS = { fifteen: 15, thirty: 30, forty: 40, sixty: 60 };
 
-test("the tour's walking slide quotes the resident dial's pace", async () => {
+// WLD-220 cut the walking slide: the first-visit tour is three short steps and carries no pace at all, so there is nothing in it to go stale. What is left to
+// guard is the same rule, kept true in both directions: whatever the tour DOES say about a pace must be the dial's (the next author who puts a pace back in a
+// slide fails here, not after it has said "fifteen" for a month), and today it says none.
+test("the tour quotes no pace that is not the resident dial's (the first-visit deck quotes none)", async () => {
   const { TOUR_SLIDES } = await import("../spectator/viewer.mjs");
-  const slide = TOUR_SLIDES.find((s) => s.id === "walking");
-  assert.ok(slide, "the tour has no walking slide");
-  const said = /(\w+) kilometres a crossing/.exec(slide.body);
-  assert.ok(said, `the walking slide states no pace: ${slide.body}`);
-  assert.equal(PACE_WORDS[said[1]] ?? Number(said[1]), DIAL,
-    `the walking slide says "${said[0]}", the resident dial says ${DIAL}`);
+  const quoted = [];
+  for (const slide of TOUR_SLIDES) {
+    for (const key of ["body", "phoneBody"]) {
+      const said = /(\w+) kilometres a crossing/.exec(slide[key] ?? "");
+      if (!said) continue;
+      quoted.push(`${slide.id}.${key}: ${said[0]}`);
+      assert.equal(PACE_WORDS[said[1]] ?? Number(said[1]), DIAL,
+        `the ${slide.id} slide says "${said[0]}", the resident dial says ${DIAL}`);
+    }
+  }
+  assert.ok(!TOUR_SLIDES.some((s) => s.id === "walking"), "the walking slide is cut from the first-visit deck");
+  assert.deepEqual(quoted, [], "the first-visit deck states no pace");
 });
