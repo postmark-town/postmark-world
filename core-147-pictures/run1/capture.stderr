@@ -1,0 +1,3 @@
+telling before {"exp":"true","on":true,"cards":10,"telling":true}
+telling after {"exp":"false","on":false,"cards":10,"telling":true}
+reap: browser closed; spectator child pid none exit undefined

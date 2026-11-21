@@ -1,0 +1,9 @@
+readback 2026-11-21T16:41:36Z
+matching-procs-above (none = empty)
+run-heavy: 3 slots, the Artis at most 2
+  slot 1: free
+  slot 2: free
+  slot 3: free
+0
+d3a911ef4c5276ec06c201e09b4a4b0a481dd636
+d3a911ef4c5276ec06c201e09b4a4b0a481dd636

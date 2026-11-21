@@ -1,0 +1,500 @@
+{
+  "scenario": "full",
+  "results": {
+    "desktop-1440x900": {
+      "camera": {
+        "target": 96,
+        "notches": [
+          51,
+          59,
+          69,
+          80,
+          93,
+          108
+        ]
+      },
+      "closedDefault": {
+        "opener": true,
+        "openerN": null,
+        "panelOpen": false,
+        "strip": null,
+        "pips": [
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/draft-gazebo",
+          "rig-house/home-parcel",
+          "rig-house/lantern",
+          "rig-house/second-parcel",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            498,
+            7,
+            1185,
+            869
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            794,
+            149,
+            711,
+            553
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            1088,
+            459,
+            16,
+            16
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            1069,
+            424,
+            11,
+            11
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            1052,
+            466,
+            5,
+            5
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            1104,
+            455,
+            4,
+            4
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            1077,
+            428,
+            26,
+            26
+          ],
+          "other-house/bench|circle.ov-pip": [
+            1093,
+            444,
+            26,
+            26
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            1136,
+            412,
+            26,
+            26
+          ],
+          "other-house/parcel-b|g.ov-home": [
+            1124,
+            466,
+            65,
+            83
+          ],
+          "other-house/parcel-b|circle.ov-pip": [
+            1144,
+            487,
+            26,
+            26
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            1061,
+            416,
+            26,
+            26
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            1042,
+            456,
+            26,
+            26
+          ],
+          "rig-house/home-parcel|g.ov-home": [
+            975,
+            364,
+            88,
+            112
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            1002,
+            392,
+            35,
+            35
+          ],
+          "other-house/parcel-a|g.ov-home": [
+            955,
+            451,
+            65,
+            83
+          ],
+          "other-house/parcel-a|circle.ov-pip": [
+            974,
+            472,
+            26,
+            26
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1081,
+            348,
+            88,
+            112
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1108,
+            376,
+            35,
+            35
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            1083,
+            454,
+            26,
+            26
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "sort:false"
+        ],
+        "scrollW": 1440,
+        "innerW": 1440,
+        "layers": {
+          "residents": "true/residentson",
+          "conversation": "true/speech bubbleson",
+          "home": "true/parcelson",
+          "place": "true/placeson"
+        },
+        "layerBox": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            0
+          ]
+        ],
+        "walkerBodies": 1,
+        "standpointDot": false,
+        "bubblesLayerShown": true,
+        "oldBubbleButton": false,
+        "sheet": null
+      },
+      "openDefault": {
+        "opener": true,
+        "openerN": null,
+        "panelOpen": true,
+        "strip": null,
+        "pips": [
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/home-parcel",
+          "rig-house/second-parcel"
+        ],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "other-house/parcel-a",
+          "other-house/parcel-b",
+          "rig-house/draft-gazebo",
+          "rig-house/home-parcel",
+          "rig-house/lantern",
+          "rig-house/second-parcel",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            498,
+            7,
+            1185,
+            869
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            794,
+            149,
+            711,
+            553
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            1088,
+            459,
+            16,
+            16
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            1069,
+            424,
+            11,
+            11
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            1052,
+            466,
+            5,
+            5
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            1104,
+            455,
+            4,
+            4
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            1077,
+            428,
+            26,
+            26
+          ],
+          "other-house/bench|circle.ov-pip": [
+            1093,
+            444,
+            26,
+            26
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            1136,
+            412,
+            26,
+            26
+          ],
+          "other-house/parcel-b|g.ov-home": [
+            1124,
+            466,
+            65,
+            83
+          ],
+          "other-house/parcel-b|circle.ov-pip": [
+            1144,
+            487,
+            26,
+            26
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            1061,
+            416,
+            26,
+            26
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            1042,
+            456,
+            26,
+            26
+          ],
+          "rig-house/home-parcel|g.ov-home": [
+            975,
+            364,
+            88,
+            112
+          ],
+          "rig-house/home-parcel|circle.ov-pip": [
+            1002,
+            392,
+            35,
+            35
+          ],
+          "other-house/parcel-a|g.ov-home": [
+            955,
+            451,
+            65,
+            83
+          ],
+          "other-house/parcel-a|circle.ov-pip": [
+            974,
+            472,
+            26,
+            26
+          ],
+          "rig-house/second-parcel|g.ov-home": [
+            1081,
+            348,
+            88,
+            112
+          ],
+          "rig-house/second-parcel|circle.ov-pip": [
+            1108,
+            376,
+            35,
+            35
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            1083,
+            454,
+            26,
+            26
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "sort:false"
+        ],
+        "scrollW": 1440,
+        "innerW": 1440,
+        "layers": {
+          "residents": "true/residents ON",
+          "conversation": "true/speech bubbles ON",
+          "home": "true/parcels ON",
+          "place": "true/places ON"
+        },
+        "layerBox": [
+          [
+            76,
+            79
+          ],
+          [
+            76,
+            79
+          ]
+        ],
+        "walkerBodies": 1,
+        "standpointDot": false,
+        "bubblesLayerShown": true,
+        "oldBubbleButton": false,
+        "sheet": {
+          "scrollH": 349,
+          "clientH": 349,
+          "top": 51,
+          "bottom": 402
+        }
+      },
+      "click_home": true,
+      "click_residents": true,
+      "click_conversation": true,
+      "openOff": {
+        "opener": true,
+        "openerN": "3",
+        "panelOpen": true,
+        "strip": "20 of 24 shown no residents ✕ no speech bubbles ✕ no parcels ✕ clear all",
+        "pips": [],
+        "cards": [
+          "invented/the-huge-hall",
+          "other-house/bench",
+          "other-house/fountain",
+          "rig-house/draft-gazebo",
+          "rig-house/lantern",
+          "rig-house/the-big-orchard"
+        ],
+        "boxes": {
+          "invented/the-huge-hall|rect.wv-ph-extent": [
+            498,
+            7,
+            1185,
+            869
+          ],
+          "rig-house/the-big-orchard|rect.wv-ph-extent": [
+            794,
+            149,
+            711,
+            553
+          ],
+          "rig-house/draft-gazebo|rect.wv-ph-extent": [
+            1088,
+            459,
+            16,
+            16
+          ],
+          "other-house/fountain|rect.wv-ph-extent": [
+            1069,
+            424,
+            11,
+            11
+          ],
+          "rig-house/lantern|rect.wv-ph-extent": [
+            1052,
+            466,
+            5,
+            5
+          ],
+          "other-house/bench|rect.wv-ph-extent": [
+            1104,
+            455,
+            4,
+            4
+          ],
+          "invented/the-huge-hall|circle.ov-pip": [
+            1077,
+            428,
+            26,
+            26
+          ],
+          "other-house/bench|circle.ov-pip": [
+            1093,
+            444,
+            26,
+            26
+          ],
+          "rig-house/the-big-orchard|circle.ov-pip": [
+            1136,
+            412,
+            26,
+            26
+          ],
+          "other-house/fountain|circle.ov-pip": [
+            1061,
+            416,
+            26,
+            26
+          ],
+          "rig-house/lantern|circle.ov-pip": [
+            1042,
+            456,
+            26,
+            26
+          ],
+          "rig-house/draft-gazebo|circle.ov-pip": [
+            1083,
+            454,
+            26,
+            26
+          ]
+        },
+        "chips": [
+          "mine:false",
+          "drafts:false",
+          "new:false",
+          "sort:false"
+        ],
+        "scrollW": 1440,
+        "innerW": 1440,
+        "layers": {
+          "residents": "false/residents OFF",
+          "conversation": "false/speech bubbles OFF",
+          "home": "false/parcels OFF",
+          "place": "true/places ON"
+        },
+        "layerBox": [
+          [
+            76,
+            79
+          ],
+          [
+            76,
+            79
+          ]
+        ],
+        "walkerBodies": 0,
+        "standpointDot": true,
+        "bubblesLayerShown": false,
+        "oldBubbleButton": false,
+        "sheet": {
+          "scrollH": 349,
+          "clientH": 349,
+          "top": 51,
+          "bottom": 402
+        }
+      },
+      "errors": []
+    }
+  }
+}
