@@ -15,3 +15,14 @@ CARRIED (kept at their a7 pin, a7f3314e6; NOT relabelled): all 16 `fix-a7f3314e6
 - the media query changed from `(max-height:600px)` to `(max-height:600px) and (min-width:640px)`: 390x844 and 1440x900 were never short (the block never applied); 844x390 and 1440x480 are >=640 wide, so the same block applies as at a7. No carried frame is narrow-and-short.
 - input mode: `tourTouch()` = phone width OR coarse pointer. 390x844 touch was already phone-width; 1440 frames are fine-pointer. The only carried frames at a touch-but-wide size are the 844x390 step 2 top/end, and step 2 has no phone words and a picture that does not take the phone flag, so it reads the same.
 - fallback-marks frames: the marks picture has no input-mode flag; unaffected.
+
+---
+# REAL-PAGE CORRECTION — candidate 71e6eb7a02399779c814c17f684f726404ba8664 (WLD-220, Darko 22:01 EST "take assets directly from the actual world page")
+SUPERSEDES the illustrated candidates above (a7f3314e6, 46b331857 and their frames): those drew their own pictures and are rejected material; this set shows only the mounted page.
+Frames (label `real-71e6eb7a0`, 12): `real-71e6eb7a0-{phone-390x844,desktop-1440x900}-slide-0{1..5}.png`, `real-71e6eb7a0-phone-360x560-step2.png`, `real-71e6eb7a0-phone-844x390-step4.png`; readbacks `real-71e6eb7a0-capture.jsonl`; script `capture-real.mjs`.
+Fixture: the shipped viewer served by the repo's spectator/server.mjs over the repo's public WORLD snapshot (last changed at 1054c91dd), signed in as nobody, tools/page-machine.mjs machine, Playwright Chromium emulation; media shelf as the real shelf. Not the Site host, not a physical phone.
+Per-step real targets (public ids, read off the mounted page at capture):
+- step 2 house + resident: house pip `aion-solare/the-returning-house-parcel` (.ov-pip-home) with resident `aion-solare` (.wv-walker-far, standing, the map's green) — same on 390, 1440 and 360x560.
+- step 3 mark with its own picture: phone `aion-solare/aelyria`; desktop `dom-pidgey/pidgey-heights` — the map's pictured pip and its placed art in #wv-placed-art-layer, /shelf/ route.
+- step 4 a dot to read: phone/touch `hal/the-green-lamp-house-parcel`; desktop `waymark/the-turn-in-the-trail` (home pips nearest the painting's centre).
+- steps 1 and 5 light nothing drawn: the welcome sits over the live page; the last step spotlights the page's own `?` button (existing anchor).
