@@ -73,7 +73,8 @@ try {
         break;
       }
       // LAST_ONLY=1 (the docs-link completion): walk to the last step and photograph only it, plus the link's own bounds
-      if (!process.env.LAST_ONLY || last) {
+      // STEPS="2,4": only the camera-framed steps are photographed (the others are carried at their pin)
+      if ((!process.env.LAST_ONLY || last) && (!process.env.STEPS || process.env.STEPS.split(",").includes(String(i + 1)))) {
         say(`${vp.name}-slide`, { ...s, link: await page.evaluate(() => { const a = document.querySelector(".wv-tour-body a"); if (!a) return null; const r = a.getBoundingClientRect(); return { href: a.getAttribute("href"), text: a.textContent, x: +r.x.toFixed(1), y: +r.y.toFixed(1), right: +r.right.toFixed(1), bottom: +r.bottom.toFixed(1), w: +r.width.toFixed(1), h: +r.height.toFixed(1) }; }) });
         await page.screenshot({ path: join(OUT, `${LABEL}-${vp.name}-${process.env.LAST_ONLY ? "last-step" : `slide-${String(i + 1).padStart(2, "0")}`}.png`), fullPage: false });
       }
