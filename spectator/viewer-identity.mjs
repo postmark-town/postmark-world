@@ -33,11 +33,12 @@ export function setViewerIdentityForSpeaker(appEl, provider) {
   if (relabel) relabel();
 }
 
-/** The mounted viewer's one stable identityForSpeaker for `appEl`: whatever provider is set NOW, or null (the default face + name). A throw is the lower layer's to refuse. */
+/** The mounted viewer's one stable identityForSpeaker for `appEl`: whatever provider is set NOW, or null (the default face + name). A throw is the lower layer's to refuse.
+ *  WLD-256: a second argument (circle-reader.mjs § LINK_FREE, for an ancestor breadcrumb) is passed through when the reader sends one, and only then. */
 export function viewerIdentityFor(appEl) {
-  return (handle) => {
+  return (handle, ...context) => {
     const provider = PROVIDERS.get(appEl);
-    return typeof provider === "function" ? provider(handle) : null;
+    return typeof provider === "function" ? provider(handle, ...context) : null;
   };
 }
 

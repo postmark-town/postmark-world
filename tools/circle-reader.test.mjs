@@ -19,6 +19,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   modelOfRoom, modelOfCircle, shapeLines, linesOfBlocks, threadOf, linesOfThread, crumbsOf, createCircleReader, mountCircleReader, READER_CSS, READER_WORDS, whenOf, dateTimeOf,
+  LINK_FREE,
 } from "../spectator/circle-reader.mjs";
 import {
   TABLE, say, roomFind, circle50101, circle50105Page1, circle50105Page2, circle50106, forkedLines,
@@ -1782,4 +1783,190 @@ test("WLD-249 · the plain fallback a failed read shows is relabelled too, and a
   assert.equal(idsOf248(body).length, 3, "every shown plain line wears the identity now");
   v.col.close();
   assert.equal(v.col.refreshIdentities(), false, "closed: nothing to do");
+});
+
+// ── WLD-256: the circle's generated title and its named breadcrumbs (CORE-178, Darko: "Current name and face") ──────────────────────────────────
+//
+// The opened circle's title and every NAMED crumb ("pica's statement") put the host's whole identity where the handle stood, then the reader's own words
+// "'s statement". An ancestor crumb is the reader's own button (it opens that circle): the hook is asked for a link-free node (LINK_FREE, its second
+// argument) and anything interactive that comes back is refused, so the crumb keeps its own words. Every other slot asks with the handle alone, as ever.
+// FALSIFIER: a renamed resident right in a byline but raw/old in the title or a crumb; a node moved off another slot; a human drawn as a resident; an ancestor
+// that opens the resident instead of its circle (a link inside the button); default/null/invalid/throw/reused changing the DOM; authored words, ids, actions,
+// focus, scroll or reader state changing; a redraw that reads anything.
+const NAMES256 = { amia: "Amia", claran: "Claran", pica: "Pica" };   // the HOST's current names, invented; World never sees this map
+/** a Site-like host: the shared form linked to the person's page, or link-free when asked (resident-mention § mentionNode's `link: false`), current names */
+const siteLike = (calls = []) => function identityForSpeaker(...args) {
+  calls.push(args);
+  const [handle, ctx] = args;
+  const n = ctx?.link === false ? identityNode(handle) : linkIdentity(handle);
+  find(n, (x) => x.className === "rig-id-name")[0].textContent = NAMES256[handle] ?? handle;
+  return n;
+};
+const crumbsNav = (root) => byAttr(root, "data-crumbs")[0];
+const titleOf = (root) => byAttr(root, "data-key", "circle-title")[0];
+const interactiveIn = (n) => find(n, (x) => x !== n && (["A", "BUTTON", "INPUT", "SELECT", "TEXTAREA"].includes(x.tagName) || x.attrs.tabindex !== undefined));
+const nested = (id) => harness256({ circles: { "50106|": circle50106() } }, id);
+function harness256({ circles }, identityForSpeaker) {
+  const host = element("div"); const scroller = element("div"); scroller.collapses = true; scroller.appendChild(host);
+  const calls = [];
+  const source = { async room(id) { calls.push(["room", id]); return roomFind(); }, async circle(id, after) { calls.push(["circle", id, after]); const a = circles[`${id}|${after ?? ""}`]; return a ?? { error: "bounce" }; } };
+  const reader = createCircleReader({ doc, host, source, roomId: "t20260514-pica", scroller, identityForSpeaker });
+  return { host, scroller, reader, root: reader.root, calls };
+}
+
+test("WLD-256 · the circle title and every named crumb wear the host's identity with its current name; ancestors ask link-free and stay the circle's own buttons", async () => {
+  const calls = [];
+  const h = nested(siteLike(calls));
+  await h.reader.showCircle(50106); await tick();
+  const nav = crumbsNav(h.root), title = titleOf(h.root);
+  assert.equal(text(title), "Amia's statement", "the title: the host's current name, then the reader's own words");
+  assert.equal(title.tagName, "H3"); assert.equal(title.attrs.tabindex, "-1");
+  assert.match(text(nav), /^Back to the room›Cave Interior›Pica's statement›Claran's statement›Amia's statement$/, "the back path: room and Back as ever, every named crumb current");
+  assert.ok(!/amia's|claran's|pica's/.test(text(nav) + text(title)), "no raw handle is left in a generated label");
+
+  const crumbs = byAttr(nav, "data-crumb");
+  assert.deepEqual(crumbs.map((c) => [c.tagName, c.attrs["data-crumb"], c.attrs["data-key"] ?? null, c.attrs["aria-current"] ?? null]),
+    [["BUTTON", "50101", "crumb-50101", null], ["BUTTON", "50105", "crumb-50105", null], ["SPAN", "50106", null, "page"]], "the same crumbs, keys and current page");
+  for (const b of crumbs.slice(0, 2)) {
+    assert.equal(idsOf248(b).length, 1, "one identity in each ancestor");
+    assert.deepEqual(interactiveIn(b), [], "nothing interactive inside World's button: no link to a resident");
+    assert.equal(b.attrs.type, "button");
+  }
+  assert.equal(linksIn(crumbs[2]).length, 1, "the current crumb (not a control) takes the host's form as made, link and all");
+  assert.equal(linksIn(title).length, 1, "and so does the title");
+
+  // who was asked, and how: the ancestors with LINK_FREE, the title and the current crumb with the handle alone, as every byline is
+  const generated = calls.filter((a) => ["pica", "claran", "amia"].includes(a[0]) && (a.length === 2 || a[0] === "amia"));
+  assert.ok(calls.some((a) => a[0] === "pica" && a.length === 2 && a[1] === LINK_FREE) && calls.some((a) => a[0] === "claran" && a.length === 2 && a[1] === LINK_FREE), "each ancestor was asked link-free");
+  assert.ok(Object.isFrozen(LINK_FREE) && LINK_FREE.link === false && Object.keys(LINK_FREE).length === 1, "the context is exactly { link: false }");
+  assert.ok(calls.filter((a) => a.length === 2).every((a) => a[1] === LINK_FREE && ["pica", "claran"].includes(a[0])), "only ancestors get a second argument");
+  assert.ok(generated.length >= 4, "title and current crumb asked too");
+
+  // fresh nodes in every slot: the title's and the current crumb's amia are two nodes, and no byline's node was moved
+  const all = idsOf248(h.root);
+  assert.equal(new Set(all).size, all.length, "every placed identity is its own node");
+  const amias = all.filter((n) => n.attrs["data-identity"] === "amia");
+  assert.ok(amias.length >= 2 && nav.contains(amias.find((n) => nav.contains(n))) && title.contains(amias.find((n) => title.contains(n))), "amia in the crumb and the title, separately");
+
+  // an ancestor still opens its circle, never the resident
+  const before = h.calls.length;
+  byAttr(nav, "data-crumb", 50105)[0].click(); await tick();
+  assert.deepEqual(h.calls.slice(before)[0], ["circle", 50105, undefined], "Claran's crumb opens circle 50105");
+});
+
+test("WLD-256 · a human stays human, and an unnamed crumb is the reader's own words with no hook call", async () => {
+  const calls = [];
+  const h = nested(identityHook(calls));
+  await h.reader.showCircle(50106); await tick();
+  const pica = byAttr(crumbsNav(h.root), "data-crumb", 50101)[0];
+  assert.equal(idsOf248(pica)[0].attrs["data-kind"], "human", "the host's human node, placed as made");
+  assert.equal(idsOf248(byAttr(crumbsNav(h.root), "data-crumb", 50105)[0])[0].attrs["data-kind"], "resident");
+
+  const bare = createCircleReader({ doc, host: element("div"), source: { async circle() { return { find: { ...circle50106().find, circle_read: { ...circle50106().find.circle_read, context: [] } } }; } }, identityForSpeaker: identityHook(calls) });
+  calls.length = 0;
+  await bare.showCircle(50106); await tick();
+  const nav = crumbsNav(bare.root);
+  assert.deepEqual(byAttr(nav, "data-crumb").slice(0, 2).map((b) => text(b)), ["an earlier statement", "an earlier statement"], "an unnamed ancestor keeps its words");
+  assert.deepEqual(byAttr(nav, "data-crumb").slice(0, 2).map((b) => idsOf248(b).length), [0, 0]);
+  assert.ok(!calls.some((a) => a.length === 2), "and nobody is asked for it");
+});
+
+test("WLD-256 · a host that ignores the context (or answers anything interactive) leaves each ancestor its own words: never a link inside the button", async () => {
+  const bareH = nested(null); await bareH.reader.showCircle(50106); await tick();
+  const bareCrumbs = byAttr(crumbsNav(bareH.root), "data-crumb").slice(0, 2).map(shapeOf);
+  const variants = {
+    "one-argument linking host": (h) => linkIdentity(h),
+    "a nested button": (h) => { const n = identityNode(h); n.appendChild(element("button")); return n; },
+    "a tab stop": (h) => { const n = identityNode(h); n.children[1].setAttribute("tabindex", "0"); return n; },
+    "a link role": (h) => { const n = identityNode(h); n.setAttribute("role", "link"); return n; },
+    "the root itself a link": (h) => { const a = element("a"); a.setAttribute("href", `/residents/${h}`); a.textContent = h; return a; },
+  };
+  for (const [why, make] of Object.entries(variants)) {
+    const h = nested(make); await h.reader.showCircle(50106); await tick();
+    const crumbs = byAttr(crumbsNav(h.root), "data-crumb");
+    assert.deepEqual(crumbs.slice(0, 2).map(shapeOf), bareCrumbs, `${why}: the ancestors are exactly the bare host's`);
+    assert.deepEqual(crumbs.slice(0, 2).flatMap(interactiveIn), [], `${why}: nothing interactive inside a button`);
+  }
+  const plain = nested(linkIdentity); await plain.reader.showCircle(50106); await tick();
+  assert.equal(linksIn(titleOf(plain.root)).length, 1, "the title still takes a linking host's node");
+  assert.equal(linksIn(byAttr(crumbsNav(plain.root), "data-crumb", 50106)[0]).length, 1, "and so does the current crumb");
+});
+
+test("WLD-256 · default, null and every refused result draw the title and crumbs exactly as before", async () => {
+  const draw = async (identityForSpeaker) => { const h = nested(identityForSpeaker); await h.reader.showCircle(50106); await tick(); openAll(h.root); return shapeOf(h.root); };
+  const bare = await draw(undefined);
+  assert.match(bare, /pica's statement.*claran's statement.*amia's statement/s, "the bare host's crumbs are the handles, as ever");
+  const once = identityNode("x");
+  const refusals = {
+    null: null, "not a function": "pica",
+    "returns null": () => null, "returns a string": (h) => h, throws: () => { throw new Error("no"); },
+    "aria-hidden": (h) => { const n = identityNode(h); n.setAttribute("aria-hidden", "true"); return n; },
+    empty: () => element("span"),
+    "already placed": (h) => { const p = element("div"); const n = identityNode(h); p.appendChild(n); return n; },
+    reused: () => once,
+  };
+  for (const [why, hook] of Object.entries(refusals)) {
+    if (why === "reused") { await draw(() => once); }   // the first placement uses it up; every later answer is a reuse
+    assert.equal(await draw(hook), bare, `${why}: exactly the old path`);
+  }
+});
+
+test("WLD-256 · redraw keeps focus (an identity link in the title, an ancestor button), scroll and the circle, reads nothing, and picks up the host's current data", async () => {
+  const h = nested(siteLike());
+  await h.reader.showCircle(50106); await tick(); openAll(h.root);
+  const callsBefore = h.calls.length;
+  const link = linksIn(titleOf(h.root))[0]; link.focus();
+  h.scroller.scrollTop = 90;
+  NAMES256.amia = "Amia (renamed)";
+  try {
+    h.reader.redraw();
+    const fresh = doc.activeElement;
+    assert.ok(fresh && fresh.className === "rig-id-link" && fresh !== link && titleOf(h.root).contains(fresh), "focus is on the title's FRESH identity link");
+    assert.deepEqual(doc.lastFocusOptions, { preventScroll: true });
+    assert.equal(h.scroller.scrollTop, 90, "scroll put back");
+    assert.equal(text(titleOf(h.root)), "Amia (renamed)'s statement", "the title shows the current name");
+    assert.equal(text(byAttr(crumbsNav(h.root), "data-crumb", 50106)[0]), "Amia (renamed)'s statement", "and so does the current crumb");
+    byAttr(crumbsNav(h.root), "data-crumb", 50105)[0].focus();
+    h.reader.redraw();
+    assert.equal(doc.activeElement?.attrs["data-key"], "crumb-50105", "an ancestor button keeps focus by its own key");
+    assert.ok(h.root.contains(doc.activeElement));
+    assert.equal(h.reader.getState().view, "circle"); assert.equal(h.reader.getState().circleId, 50106);
+    assert.equal(h.calls.length, callsBefore, "nothing was read");
+  } finally { NAMES256.amia = "Amia"; }
+});
+
+test("WLD-256 · the shell's provider reaches the title and crumbs: both arrival orders, the same function, null, and the context passed through only when sent", async () => {
+  const { setViewerIdentityForSpeaker } = await import("../spectator/viewer.mjs");
+  const { viewerIdentityFor } = await import("../spectator/viewer-identity.mjs");
+  // the stable wrapper: one argument stays one; the ancestor's context is passed as sent
+  const seen = [];
+  const app0 = element("div"); setViewerIdentityForSpeaker(app0, function (...a) { seen.push(a); return null; });
+  const wrap = viewerIdentityFor(app0);
+  wrap("pica"); wrap("claran", LINK_FREE);
+  assert.deepEqual(seen.map((a) => a.length), [1, 2]); assert.equal(seen[1][1], LINK_FREE);
+
+  // the real column and reader, opened on circle 50101 (title + current crumb), then the provider set, changed and cleared through the public setter
+  const names = { pica: "Pica" };
+  const provider = (hdl) => { const n = identityNode(hdl); n.children[1].textContent = names[hdl] ?? hdl; return n; };
+  const titleText = (host) => text(byAttr(host, "data-key", "circle-title")[0]);
+  const openCircle = async (v) => { await v.open(); byAttr(v.host, "data-circle-open", 50101)[0].click(); await tick(); await tick(); };
+  const plainApp = element("div"); const ref = await mountLike(plainApp); await openCircle(ref);
+  assert.equal(titleText(ref.host), "pica's statement", "no provider: the generated title as ever");
+
+  const first = element("div"); setViewerIdentityForSpeaker(first, provider);
+  const a = await mountLike(first); await openCircle(a);
+  const later = element("div"); const b = await mountLike(later); await openCircle(b);
+  const reads = b.calls.length;
+  setViewerIdentityForSpeaker(later, provider);
+  for (const v of [a, b]) {
+    assert.equal(titleText(v.host), "Pica's statement", "the title wears the identity in either order");
+    assert.equal(text(byAttr(crumbsNav(v.host), "data-crumb", 50101)[0]), "Pica's statement", "and the current crumb");
+  }
+  assert.equal(shapeOf(b.host), shapeOf(a.host), "the arrival order makes no difference");
+  assert.equal(b.calls.length, reads, "the relabel read nothing");
+  names.pica = "Pica of the Cave";
+  setViewerIdentityForSpeaker(later, provider);
+  assert.equal(titleText(b.host), "Pica of the Cave's statement", "the same function again: the current name");
+  setViewerIdentityForSpeaker(later, null);
+  assert.equal(shapeOf(b.host), shapeOf(ref.host), "null: exactly the never-provided viewer's");
 });
