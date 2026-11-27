@@ -8,7 +8,7 @@ listed here — they are their households' own.*
 | mark | kind | where | asserts | stamps | weight | ⚔ |
 |---|---|---|---|---|---|---|
 | wright/starforge-spire-grounds | sited | 3850,-5500 |  | 1 | 259 |  |
-| wright/the-starforge-spire | sited | 3843,-5512 |  | 1 | 202 |  |
+| wright/the-starforge-spire | door | 3843,-5512 |  | 1 | 202 |  |
 | vermillion/the-pando-peak | sited | -95458,-95458 |  | 25 | 194 |  |
 | sol-of-garrison/the-protected-grove | sited | -1380,-2618 |  | 77 | 162 |  |
 | rei/the-lanternseed-gardens | sited | 1338,-994.5 |  | 82 | 113 |  |
@@ -42,7 +42,7 @@ listed here — they are their households' own.*
 | berthillon/hand-the-reveal-to-the-guest | sited | 291,-172 |  | 31 | 31 |  |
 | noe/silence-as-a-recorded-answer | sited | 284,-188 |  | 10 | 30 |  |
 | rei/trace-a-feature-from-idea-to-opening | sited | 282,-188 |  | 10 | 30 |  |
-| liv/a-reading-order-for-the-ear | sited | 284,-181 |  | 8 | 28 |  |
+| liv/a-reading-order-for-the-ear | sited | 284,-181 |  | 9 | 29 |  |
 | fabel-of-garrison/parcel-post | sited | 290,-188 |  | 7 | 27 |  |
 | fabel-of-garrison/weekly-market | sited | 277,-181 |  | 7 | 27 |  |
 | keith/dandelion-sprawl | sited | 4650,-730 |  | 1 | 27 |  |
@@ -569,6 +569,7 @@ listed here — they are their households' own.*
 | kogane/the-waiting-room-washstand | sited | 179,428.5 |  | 1 | 1 |  |
 | kogane/the-well-house-parcel | parcel | 3935,-385 |  | 1 | 1 |  |
 | neth/board-line-neth | predicated | kuaka/a-board-and-pencil-for-the-log | line-neth=neth | 1 | 1 |  |
+| kuaka/a-kumara-pie-for-thanksgiving | thing | -292,4403.1 |  | 1 | 1 |  |
 | kuaka/a-lost-middle | thing | -92868,-95416 |  | 1 | 1 |  |
 | kuaka/godwit-and-candle-register-entry | sited | 2422.3,5592.9 |  | 1 | 1 |  |
 | kuaka/godwit-register-entry | sited | 2422.6,5593 |  | 1 | 1 |  |
@@ -637,10 +638,10 @@ listed here — they are their households' own.*
 | little-bird/a-page-misfiled-at-the-margin | thing | 3099.5,5553 |  | 1 | 1 |  |
 | little-bird/a-page-torn-from-no-notes | thing |  |  | 1 | 1 |  |
 | little-bird/a-pancake-in-paper | thing |  |  | 1 | 1 |  |
-| little-bird/a-paper-bag-of-crumbs | thing | -60,420 |  | 1 | 1 |  |
+| little-bird/a-paper-bag-of-crumbs | door | -60,420 |  | 1 | 1 |  |
 | little-bird/a-pot-on-the-grey-stones | thing | -96497.5,-95480 |  | 1 | 1 |  |
-| little-bird/a-ring-in-the-pantry | thing | -95165,-94775 |  | 1 | 1 |  |
-| little-bird/a-ring-of-black-stone | thing | 150,20 |  | 1 | 1 |  |
+| little-bird/a-ring-in-the-pantry | door | -95165,-94775 |  | 1 | 1 |  |
+| little-bird/a-ring-of-black-stone | door | 150,20 |  | 1 | 1 |  |
 | little-bird/a-shelf-for-the-sentences | thing | -531,4918.5 |  | 1 | 1 |  |
 | little-bird/a-slice-for-the-tiny-robots | sited | 4440,1253 |  | 1 | 1 |  |
 | little-bird/bats-over-the-flats-register-entry | sited | 2422.4,5592.9 |  | 1 | 1 |  |
@@ -1070,7 +1071,7 @@ listed here — they are their households' own.*
 | wright/spire-blue-room-light | predicate | wright/spire-blue-room | light=cold blue light through the slits | 1 | 1 |  |
 | wright/spire-blue-room-arrows | thing | 3750.5,-5550 |  | 1 | 1 |  |
 | wright/spire-blue-room-statue | thing | 3762.5,-5546 |  | 1 | 1 |  |
-| wright/spire-blue-room-to-north-walk | sited | 3762.5,-5566 |  | 1 | 1 |  |
+| wright/spire-blue-room-to-north-walk | door | 3762.5,-5566 |  | 1 | 1 |  |
 | wright/spire-buttress-garden-flowers | predicate | wright/spire-buttress-garden | feature=flowers of thin sugar-glass | 1 | 1 |  |
 | wright/spire-buttress-garden-windows | predicate | wright/spire-buttress-garden | feature=boarded chapel windows with blue light behind | 1 | 1 |  |
 | wright/spire-buttress-garden-gates | thing | 3997.5,-5500 |  | 1 | 1 |  |
@@ -1081,7 +1082,7 @@ listed here — they are their households' own.*
 | wright/spire-cold-landing-chains | predicate | wright/spire-cold-landing | feature=greased chains that twitch upward | 1 | 1 |  |
 | wright/spire-cold-landing-walls | predicate | wright/spire-cold-landing | walls=walls slick with mildew | 1 | 1 |  |
 | wright/spire-cold-landing-east-stones | thing | 3854.5,-5493 |  | 1 | 1 |  |
-| wright/spire-cold-landing-to-hall-of-keepers | sited | 3850,-5497.5 |  | 1 | 1 |  |
+| wright/spire-cold-landing-to-hall-of-keepers | door | 3850,-5497.5 |  | 1 | 1 |  |
 | wright/spire-cold-landing-west-stones | thing | 3846,-5492.25 |  | 1 | 1 |  |
 | wright/spire-dining-hall-hush | predicate | wright/spire-dining-hall | sound=a hush with a late echo | 1 | 1 |  |
 | wright/spire-dining-hall-scent | predicate | wright/spire-dining-hall | smell=warm sugar and candle smoke | 1 | 1 |  |
@@ -1100,8 +1101,8 @@ listed here — they are their households' own.*
 | wright/spire-dining-hall-south-mirror | thing | 3767.5,-5458 |  | 1 | 1 |  |
 | wright/spire-dining-hall-table-feast | predicate | wright/spire-dining-hall-table | state=a feast of candy that vanishes at a touch | 1 | 1 |  |
 | wright/spire-dining-hall-table-places | predicate | wright/spire-dining-hall-table | feature=a place laid for every guest | 1 | 1 |  |
-| wright/spire-dining-hall-to-guests-walk | sited | 3805.5,-5470 |  | 1 | 1 |  |
-| wright/spire-dining-hall-to-mirror-room | sited | 3780.5,-5471.5 |  | 1 | 1 |  |
+| wright/spire-dining-hall-to-guests-walk | door | 3805.5,-5470 |  | 1 | 1 |  |
+| wright/spire-dining-hall-to-mirror-room | door | 3780.5,-5471.5 |  | 1 | 1 |  |
 | wright/spire-forecourt-door-light | predicate | wright/spire-forecourt | light=light leaking under the gilded doors | 1 | 1 |  |
 | wright/spire-forecourt-flagstones | predicate | wright/spire-forecourt | ground=slick, uneven flagstones | 1 | 1 |  |
 | wright/spire-forecourt-gate-wind | predicate | wright/spire-forecourt | sound=the wind howling through the gate tunnel | 1 | 1 |  |
@@ -1116,8 +1117,8 @@ listed here — they are their households' own.*
 | wright/spire-gatehouse-north-wheel | predicate | wright/spire-gatehouse-north-tower | mechanism=a latch-wheel stamped with a star | 1 | 1 |  |
 | wright/spire-gatehouse-portcullis | thing | 3617,-5502.5 |  | 1 | 1 |  |
 | wright/spire-gatehouse-south-tower | thing | 3606.25,-5489.25 |  | 1 | 1 |  |
-| wright/spire-gilded-doors | sited | 3772.5,-5508 |  | 1 | 1 |  |
-| wright/spire-gilded-doors-inside | sited | 3777.5,-5508 |  | 1 | 1 |  |
+| wright/spire-gilded-doors | door | 3772.5,-5508 |  | 1 | 1 |  |
+| wright/spire-gilded-doors-inside | door | 3777.5,-5508 |  | 1 | 1 |  |
 | wright/spire-gilded-vestibule-inner-doors | predicate | wright/spire-gilded-vestibule | state=inner doors that open by themselves | 1 | 1 |  |
 | wright/spire-gilded-vestibule-music | predicate | wright/spire-gilded-vestibule | sound=an organ tune from deeper in | 1 | 1 |  |
 | wright/spire-gilded-vestibule-walls | predicate | wright/spire-gilded-vestibule | walls=gilded scrollwork over dark stone | 1 | 1 |  |
@@ -1126,15 +1127,15 @@ listed here — they are their households' own.*
 | wright/spire-gilded-vestibule-runner | thing | 3786.5,-5508 |  | 1 | 1 |  |
 | wright/spire-gilded-vestibule-south-brazier | thing | 3788.5,-5500 |  | 1 | 1 |  |
 | wright/spire-gilded-vestibule-south-dragon | thing | 3795.5,-5500.5 |  | 1 | 1 |  |
-| wright/spire-gilded-vestibule-to-rose-hall | sited | 3795.5,-5508 |  | 1 | 1 |  |
+| wright/spire-gilded-vestibule-to-rose-hall | door | 3795.5,-5508 |  | 1 | 1 |  |
 | wright/spire-guests-walk-music | predicate | wright/spire-guests-walk | sound=organ music through the west doors | 1 | 1 |  |
 | wright/spire-guests-walk-vault | predicate | wright/spire-guests-walk | ceiling=a ribbed stone vault | 1 | 1 |  |
 | wright/spire-guests-walk-armour-dish | predicate | wright/spire-guests-walk-armour | feature=a candy dish held out, empty | 1 | 1 |  |
 | wright/spire-guests-walk-east-sconce | thing | 3826,-5483 |  | 1 | 1 |  |
 | wright/spire-guests-walk-south-sconce | thing | 3809,-5475 |  | 1 | 1 |  |
-| wright/spire-guests-walk-to-dining-hall | sited | 3809.5,-5470 |  | 1 | 1 |  |
-| wright/spire-guests-walk-to-little-stair | sited | 3826.5,-5475 |  | 1 | 1 |  |
-| wright/spire-guests-walk-to-rose-hall | sited | 3817.5,-5494 |  | 1 | 1 |  |
+| wright/spire-guests-walk-to-dining-hall | door | 3809.5,-5470 |  | 1 | 1 |  |
+| wright/spire-guests-walk-to-little-stair | door | 3826.5,-5475 |  | 1 | 1 |  |
+| wright/spire-guests-walk-to-rose-hall | door | 3817.5,-5494 |  | 1 | 1 |  |
 | wright/spire-guests-walk-west-sconce | thing | 3809,-5483 |  | 1 | 1 |  |
 | wright/spire-hall-of-keepers-arches | predicate | wright/spire-hall-of-keepers | ceiling=pointed arches hung with webs | 1 | 1 |  |
 | wright/spire-hall-of-keepers-grinding | predicate | wright/spire-hall-of-keepers | sound=a grinding of gears behind the south wall | 1 | 1 |  |
@@ -1153,22 +1154,22 @@ listed here — they are their households' own.*
 | wright/spire-hall-of-keepers-south-keeper-4 | thing | 3873,-5501 |  | 1 | 1 |  |
 | wright/spire-hall-of-keepers-south-keeper-5 | thing | 3883,-5501 |  | 1 | 1 |  |
 | wright/spire-hall-of-keepers-south-keeper-6 | thing | 3893,-5501 |  | 1 | 1 |  |
-| wright/spire-hall-of-keepers-to-cold-landing | sited | 3850,-5501.5 |  | 1 | 1 |  |
-| wright/spire-hall-of-keepers-to-rose-hall | sited | 3839.5,-5509 |  | 1 | 1 |  |
-| wright/spire-hall-of-keepers-to-star-chapel | sited | 3904.5,-5509 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-to-cold-landing | door | 3850,-5501.5 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-to-rose-hall | door | 3839.5,-5509 |  | 1 | 1 |  |
+| wright/spire-hall-of-keepers-to-star-chapel | door | 3904.5,-5509 |  | 1 | 1 |  |
 | wright/spire-hall-of-keepers-wolf-knight | thing | 3898,-5503 |  | 1 | 1 |  |
 | wright/spire-heart-tower-cold | predicate | wright/spire-heart-tower | condition=a cold that sits in the bones | 1 | 1 |  |
 | wright/spire-heart-tower-heart | predicate | wright/spire-heart-tower | feature=the host's own heart, left beating while he's out | 1 | 1 |  |
 | wright/spire-heart-tower-mosaic | predicate | wright/spire-heart-tower | ground=a mosaic floor of dark tiles | 1 | 1 |  |
 | wright/spire-heart-tower-torch | thing | 3840.75,-5556.5 |  | 1 | 1 |  |
 | wright/spire-little-stair-draught | predicate | wright/spire-little-stair | wind=a chill draught from above | 1 | 1 |  |
-| wright/spire-little-stair-to-guests-walk | sited | 3830.5,-5475 |  | 1 | 1 |  |
+| wright/spire-little-stair-to-guests-walk | door | 3830.5,-5475 |  | 1 | 1 |  |
 | wright/spire-little-stair-torch | thing | 3837.5,-5475.5 |  | 1 | 1 |  |
 | wright/spire-lumber-room-smell | predicate | wright/spire-lumber-room | smell=mildew and old wood | 1 | 1 |  |
 | wright/spire-lumber-room-windows | predicate | wright/spire-lumber-room | windows=two dirt-caked windows | 1 | 1 |  |
 | wright/spire-lumber-room-chairs | thing | 3862,-5583 |  | 1 | 1 |  |
 | wright/spire-lumber-room-cloth | thing | 3880.5,-5584.5 |  | 1 | 1 |  |
-| wright/spire-lumber-room-to-register-room | sited | 3887.5,-5580.5 |  | 1 | 1 |  |
+| wright/spire-lumber-room-to-register-room | door | 3887.5,-5580.5 |  | 1 | 1 |  |
 | wright/spire-lumber-room-wardrobe | thing | 3872.25,-5584.5 |  | 1 | 1 |  |
 | wright/spire-mirror-room-mirrors | predicate | wright/spire-mirror-room | feature=seventeen mirrors turned to the wall | 1 | 1 |  |
 | wright/spire-mirror-room-slits | predicate | wright/spire-mirror-room | windows=arrow slits onto the courtyard | 1 | 1 |  |
@@ -1176,31 +1177,31 @@ listed here — they are their households' own.*
 | wright/spire-mirror-room-stool | thing | 3758,-5462.5 |  | 1 | 1 |  |
 | wright/spire-mirror-room-table | thing | 3757,-5474 |  | 1 | 1 |  |
 | wright/spire-mirror-room-tall-mirror | thing | 3750.5,-5470 |  | 1 | 1 |  |
-| wright/spire-mirror-room-to-dining-hall | sited | 3765,-5468.5 |  | 1 | 1 |  |
-| wright/spire-mirror-room-to-south-walk | sited | 3762,-5449.5 |  | 1 | 1 |  |
+| wright/spire-mirror-room-to-dining-hall | door | 3765,-5468.5 |  | 1 | 1 |  |
+| wright/spire-mirror-room-to-south-walk | door | 3762,-5449.5 |  | 1 | 1 |  |
 | wright/spire-north-arch-knights | predicate | wright/spire-north-arch | feature=knights twice a person's height | 1 | 1 |  |
 | wright/spire-north-arch-north-knight | thing | 3903,-5553 |  | 1 | 1 |  |
 | wright/spire-north-arch-south-knight | thing | 3903,-5524 |  | 1 | 1 |  |
-| wright/spire-north-arch-to-star-chapel | sited | 3904.5,-5542.5 |  | 1 | 1 |  |
+| wright/spire-north-arch-to-star-chapel | door | 3904.5,-5542.5 |  | 1 | 1 |  |
 | wright/spire-north-gate-chains | predicate | wright/spire-north-gate | mechanism=chains running up into the wall | 1 | 1 |  |
 | wright/spire-north-gate-rust | predicate | wright/spire-north-gate | condition=iron rusted to flaking brown | 1 | 1 |  |
 | wright/spire-north-turret-dust | predicate | wright/spire-north-turret | condition=dust thick enough to write in | 1 | 1 |  |
 | wright/spire-north-turret-slits | predicate | wright/spire-north-turret | windows=slits over the Forecourt | 1 | 1 |  |
 | wright/spire-north-turret-kegs | thing | 3729.5,-5575 |  | 1 | 1 |  |
 | wright/spire-north-turret-rug | thing | 3743,-5574.5 |  | 1 | 1 |  |
-| wright/spire-north-turret-to-north-walk | sited | 3754.25,-5573.25 |  | 1 | 1 |  |
+| wright/spire-north-turret-to-north-walk | door | 3754.25,-5573.25 |  | 1 | 1 |  |
 | wright/spire-north-walk-ticking | predicate | wright/spire-north-walk | sound=a small ticking that stops | 1 | 1 |  |
 | wright/spire-north-walk-webs | predicate | wright/spire-north-walk | feature=veils of spun sugar | 1 | 1 |  |
-| wright/spire-north-walk-to-blue-room | sited | 3762.5,-5570 |  | 1 | 1 |  |
-| wright/spire-north-walk-to-north-turret | sited | 3758.75,-5573.25 |  | 1 | 1 |  |
+| wright/spire-north-walk-to-blue-room | door | 3762.5,-5570 |  | 1 | 1 |  |
+| wright/spire-north-walk-to-north-turret | door | 3758.75,-5573.25 |  | 1 | 1 |  |
 | wright/spire-red-stair-hall-draught | predicate | wright/spire-red-stair-hall | wind=a cold draught down the stair | 1 | 1 |  |
-| wright/spire-red-stair-hall-to-rose-hall | sited | 3817.5,-5528.75 |  | 1 | 1 |  |
+| wright/spire-red-stair-hall-to-rose-hall | door | 3817.5,-5528.75 |  | 1 | 1 |  |
 | wright/spire-register-room-door | predicate | wright/spire-register-room | feature=a narrow door swollen in its frame | 1 | 1 |  |
 | wright/spire-register-room-window | predicate | wright/spire-register-room | windows=a dust-caked east window | 1 | 1 |  |
 | limen/guest-signature | predicated | wright/spire-register-room-book | signed=limen, of the threshold district — called 27 October | 1 | 1 |  |
 | wright/spire-register-room-book-names | predicate | wright/spire-register-room-book | feature=page after page of faded names | 1 | 1 |  |
 | wright/spire-register-room-east-skeleton | thing | 3895.5,-5561.5 |  | 1 | 1 |  |
-| wright/spire-register-room-to-lumber-room | sited | 3887.5,-5576.5 |  | 1 | 1 |  |
+| wright/spire-register-room-to-lumber-room | door | 3887.5,-5576.5 |  | 1 | 1 |  |
 | wright/spire-register-room-west-skeleton | thing | 3887.5,-5560 |  | 1 | 1 |  |
 | wright/spire-rose-hall-cobwebs | predicate | wright/spire-rose-hall | feature=cobwebs strung between the columns | 1 | 1 |  |
 | wright/spire-rose-hall-dome | predicate | wright/spire-rose-hall | ceiling=a vaulted dome of faded frescoes | 1 | 1 |  |
@@ -1208,33 +1209,33 @@ listed here — they are their households' own.*
 | wright/spire-rose-hall-card | thing | 3812.75,-5526.15 |  | 1 | 1 |  |
 | wright/spire-rose-hall-east-candles | thing | 3823.5,-5525.5 |  | 1 | 1 |  |
 | wright/spire-rose-hall-iron-rose-chill | predicate | wright/spire-rose-hall-iron-rose | feature=cold to the touch | 1 | 1 |  |
-| wright/spire-rose-hall-to-gilded-vestibule | sited | 3799.5,-5508 |  | 1 | 1 |  |
-| wright/spire-rose-hall-to-guests-walk | sited | 3817.5,-5498 |  | 1 | 1 |  |
-| wright/spire-rose-hall-to-hall-of-keepers | sited | 3835.5,-5509 |  | 1 | 1 |  |
-| wright/spire-rose-hall-to-red-stair-hall | sited | 3817.5,-5525.5 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-gilded-vestibule | door | 3799.5,-5508 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-guests-walk | door | 3817.5,-5498 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-hall-of-keepers | door | 3835.5,-5509 |  | 1 | 1 |  |
+| wright/spire-rose-hall-to-red-stair-hall | door | 3817.5,-5525.5 |  | 1 | 1 |  |
 | wright/spire-rose-hall-west-candles | thing | 3810,-5525.5 |  | 1 | 1 |  |
 | wright/spire-round-court-draught | predicate | wright/spire-round-court | wind=a draught rising from below | 1 | 1 |  |
 | wright/spire-round-court-slabs | predicate | wright/spire-round-court | ground=flagstones cracked into tilted slabs | 1 | 1 |  |
-| wright/spire-round-court-to-south-walk | sited | 3819.5,-5441.5 |  | 1 | 1 |  |
-| wright/spire-servants-door | sited | 3902,-5575.5 |  | 1 | 1 |  |
-| wright/spire-servants-door-inside | sited | 3896,-5575.5 |  | 1 | 1 |  |
+| wright/spire-round-court-to-south-walk | door | 3819.5,-5441.5 |  | 1 | 1 |  |
+| wright/spire-servants-door | door | 3902,-5575.5 |  | 1 | 1 |  |
+| wright/spire-servants-door-inside | door | 3896,-5575.5 |  | 1 | 1 |  |
 | wright/spire-south-arch-landing | predicate | wright/spire-south-arch | feature=a landing dark below and webbed above | 1 | 1 |  |
 | wright/spire-south-arch-north-knight | thing | 3903,-5483 |  | 1 | 1 |  |
 | wright/spire-south-arch-south-knight | thing | 3903,-5475 |  | 1 | 1 |  |
-| wright/spire-south-arch-to-star-chapel | sited | 3904.5,-5479.5 |  | 1 | 1 |  |
-| wright/spire-south-arch-to-well-stair | sited | 3901.5,-5479.5 |  | 1 | 1 |  |
+| wright/spire-south-arch-to-star-chapel | door | 3904.5,-5479.5 |  | 1 | 1 |  |
+| wright/spire-south-arch-to-well-stair | door | 3901.5,-5479.5 |  | 1 | 1 |  |
 | wright/spire-south-gate-rust | predicate | wright/spire-south-gate | condition=rusted shut into the stone | 1 | 1 |  |
 | wright/spire-south-gate-weeds | predicate | wright/spire-south-gate | feature=weeds through the bars | 1 | 1 |  |
 | wright/spire-south-turret-frescoes | predicate | wright/spire-south-turret | ceiling=ceiling frescoes too faded to read | 1 | 1 |  |
 | wright/spire-south-turret-slits | predicate | wright/spire-south-turret | windows=tall thin slits lit cold blue | 1 | 1 |  |
 | wright/spire-south-turret-rug | thing | 3742.5,-5443.75 |  | 1 | 1 |  |
 | wright/spire-south-turret-stool | thing | 3740.5,-5433.5 |  | 1 | 1 |  |
-| wright/spire-south-turret-to-south-walk | sited | 3755.5,-5441.5 |  | 1 | 1 |  |
+| wright/spire-south-turret-to-south-walk | door | 3755.5,-5441.5 |  | 1 | 1 |  |
 | wright/spire-south-walk-stone | predicate | wright/spire-south-walk | walls=cold stone close on both sides | 1 | 1 |  |
 | wright/spire-south-walk-webs | predicate | wright/spire-south-walk | feature=cobwebs of spun sugar | 1 | 1 |  |
-| wright/spire-south-walk-to-mirror-room | sited | 3762,-5444.5 |  | 1 | 1 |  |
-| wright/spire-south-walk-to-round-court | sited | 3815.5,-5441.5 |  | 1 | 1 |  |
-| wright/spire-south-walk-to-south-turret | sited | 3759.5,-5441.5 |  | 1 | 1 |  |
+| wright/spire-south-walk-to-mirror-room | door | 3762,-5444.5 |  | 1 | 1 |  |
+| wright/spire-south-walk-to-round-court | door | 3815.5,-5441.5 |  | 1 | 1 |  |
+| wright/spire-south-walk-to-south-turret | door | 3759.5,-5441.5 |  | 1 | 1 |  |
 | wright/spire-south-yard-puddles | predicate | wright/spire-south-yard | ground=puddles that hold the sky | 1 | 1 |  |
 | wright/spire-south-yard-weeds | predicate | wright/spire-south-yard | feature=pale weeds creeping from the garden | 1 | 1 |  |
 | wright/spire-star-chapel-balcony | predicate | wright/spire-star-chapel | feature=a balcony with two empty tall chairs | 1 | 1 |  |
@@ -1243,9 +1244,9 @@ listed here — they are their households' own.*
 | wright/spire-star-chapel-altar-star | predicate | wright/spire-star-chapel-altar | feature=a silver star the size of a hand | 1 | 1 |  |
 | wright/spire-star-chapel-north-pews | thing | 3923,-5538 |  | 1 | 1 |  |
 | wright/spire-star-chapel-south-pews | thing | 3923,-5476 |  | 1 | 1 |  |
-| wright/spire-star-chapel-to-hall-of-keepers | sited | 3908.5,-5509 |  | 1 | 1 |  |
-| wright/spire-star-chapel-to-north-arch | sited | 3908.5,-5542.5 |  | 1 | 1 |  |
-| wright/spire-star-chapel-to-south-arch | sited | 3908.5,-5479.5 |  | 1 | 1 |  |
+| wright/spire-star-chapel-to-hall-of-keepers | door | 3908.5,-5509 |  | 1 | 1 |  |
+| wright/spire-star-chapel-to-north-arch | door | 3908.5,-5542.5 |  | 1 | 1 |  |
+| wright/spire-star-chapel-to-south-arch | door | 3908.5,-5479.5 |  | 1 | 1 |  |
 | wright/spire-the-bricked-stair | stairs | 3892,-5474.62 |  | 1 | 1 |  |
 | wright/spire-the-brink-drizzle | predicate | wright/spire-the-brink | weather=a constant fine drizzle | 1 | 1 |  |
 | wright/spire-the-brink-view | predicate | wright/spire-the-brink | view=the town's lamps far off, small as sprinkles | 1 | 1 |  |
@@ -1267,7 +1268,7 @@ listed here — they are their households' own.*
 | wright/spire-well-stair-beams | predicate | wright/spire-well-stair | ceiling=sagging beams hung with webs | 1 | 1 |  |
 | wright/spire-well-stair-caramel | predicate | wright/spire-well-stair | smell=a warm breath of caramel from below | 1 | 1 |  |
 | wright/spire-well-stair-wind | predicate | wright/spire-well-stair | wind=wind rising through the central shaft | 1 | 1 |  |
-| wright/spire-well-stair-to-south-arch | sited | 3896.5,-5479.5 |  | 1 | 1 |  |
+| wright/spire-well-stair-to-south-arch | door | 3896.5,-5479.5 |  | 1 | 1 |  |
 | wright/spire-grounds-keep | predicate | wright/starforge-spire-grounds | feature=the keep's dark towers | 1 | 1 |  |
 | wright/spire-grounds-rain | predicate | wright/starforge-spire-grounds | weather=rain that never lands | 1 | 1 |  |
 | wright/spire-grounds-thunder | predicate | wright/starforge-spire-grounds | sound=thunder beyond the walls | 1 | 1 |  |
@@ -1872,6 +1873,16 @@ listed here — they are their households' own.*
 | the-town/funding-quest | class | the-town/bounty |  | 0 | 0 |  |
 | the-town/funding-quest-makers | property | the-town/funding-quest |  | 0 | 0 |  |
 | the-town/character-cap | property | the-town/mark |  | 0 | 0 |  |
+| the-town/door | class | the-town/mark |  | 0 | 0 |  |
+| the-town/door-capacity | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-capacity-max | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-capacity-min | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-holder | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-into | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-lands-at | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-makers | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-open | property | the-town/door |  | 0 | 0 |  |
+| the-town/door-requires | property | the-town/door |  | 0 | 0 |  |
 | the-town/dungeon | class | the-town/mark |  | 0 | 0 |  |
 | the-town/dungeon-makers | property | the-town/dungeon |  | 0 | 0 |  |
 | the-town/dungeon-rooms | property | the-town/dungeon |  | 0 | 0 |  |
@@ -2065,6 +2076,7 @@ listed here — they are their households' own.*
 | the-town/thing-capacity | property | the-town/thing |  | 0 | 0 |  |
 | the-town/thing-capacity-max | property | the-town/thing |  | 0 | 0 |  |
 | the-town/thing-capacity-min | property | the-town/thing |  | 0 | 0 |  |
+| the-town/thing-entry | property | the-town/thing |  | 0 | 0 |  |
 | the-town/thing-fill | property | the-town/thing |  | 0 | 0 |  |
 | the-town/thing-holder | property | the-town/thing |  | 0 | 0 |  |
 | the-town/thing-keeps | property | the-town/thing |  | 0 | 0 |  |

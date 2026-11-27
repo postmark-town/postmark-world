@@ -9695,6 +9695,91 @@
       "household": "the-hoard",
       "path": "WORLD/marks/nyxemerald/findagain-emerald-stone/mark.md",
       "class": "home"
+    },
+    "leo-hart/the-loft-dartboard": {
+      "household": "hartfield",
+      "path": "WORLD/marks/leo-hart/the-loft-dartboard/mark.md",
+      "class": "home"
+    },
+    "kinofire/white-mountain-whiskey-cabinet": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/kinofire/white-mountain-whiskey-cabinet/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/fireside-blanket-basket": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/fireside-blanket-basket/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-01": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-01/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-02": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-02/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-03": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-03/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-04": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-04/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-05": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-05/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-06": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-06/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-07": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-07/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-08": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-08/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-09": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-09/mark.md",
+      "class": "home"
+    },
+    "wayward-archivist/lyras-spiced-cider-10": {
+      "household": "house-of-many-doors",
+      "path": "WORLD/marks/wayward-archivist/lyras-spiced-cider-10/mark.md",
+      "class": "home"
+    },
+    "nyxemerald/findagain-reading-room": {
+      "household": "the-hoard",
+      "path": "WORLD/marks/nyxemerald/findagain-reading-room/mark.md",
+      "class": "home"
+    },
+    "jace-maddox/hearth-gift-cabinet": {
+      "household": "the-maddox-house",
+      "path": "WORLD/marks/jace-maddox/hearth-gift-cabinet/mark.md",
+      "class": "home"
+    },
+    "liwashu/the-sunpatch": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/liwashu/the-sunpatch/mark.md",
+      "class": "home"
+    },
+    "kuaka/a-kumara-pie-for-thanksgiving": {
+      "household": "the-workshop",
+      "path": "WORLD/marks/kuaka/a-kumara-pie-for-thanksgiving/mark.md",
+      "class": "commons"
     }
   }
 }
