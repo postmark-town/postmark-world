@@ -144,11 +144,14 @@ export function modelOfRoom(envelope) {
   };
 }
 
-/** The named back path: each id resolved against what the read holds (a line it carries, a stub it was handed); an id it cannot name is "an earlier statement" (the id stays in `id`, never as text). */
+// the reader's own words after a named crumb's speaker ("pica's statement"); with a host's identity (WLD-256), they follow its node
+const STATEMENT_OF = "'s statement";
+/** The named back path: each id resolved against what the read holds (a line it carries, a stub it was handed); an id it cannot name is "an earlier statement" (the id stays in `id`, never as text).
+ *  A named crumb also carries its speaker's `handle` (WLD-256), so a host's whole identity can stand where the handle stands in `label`; `label` is unchanged. */
 export function crumbsOf(path, known) {
   return arr(path).filter(isId).map((id) => {
     const hit = known.get(String(id));
-    return { id, label: hit ? `${hit}'s statement` : READER_WORDS.earlier, named: !!hit };
+    return { id, label: hit ? `${hit}${STATEMENT_OF}` : READER_WORDS.earlier, named: !!hit, handle: hit || null };
   });
 }
 
@@ -381,16 +384,32 @@ const IDENTITY_PLACED = new WeakSet();
  * WLD-248: a host's `identityForSpeaker(handle)` result, made safe, or null for the old face + name path. Only a fresh, unplaced, never-before-placed Element
  * that carries a name (text or `aria-label`) and is not hidden from assistive tech counts; a string, a parented or reused node, an empty or hidden one, or a
  * throw is null. The node is returned as the host made it (it is the accessible name, so it is never made `aria-hidden`). Shared with home-column.mjs.
+ * WLD-256: `context`, when given, is passed as the hook's second argument; every caller without one calls the hook with the handle alone, as ever.
+ * `LINK_FREE` is the one context World sends, for a slot inside World's own control (an ancestor breadcrumb's button): there a node that is, or holds,
+ * anything interactive (a link, a control, a tab stop) is refused too, so a host that ignores the context leaves the crumb its own words.
  */
-export function speakerIdentity(identityForSpeaker, handle) {
+export function speakerIdentity(identityForSpeaker, handle, context) {
   if (typeof identityForSpeaker !== "function" || typeof handle !== "string" || handle === "") return null;
   let node = null;
-  try { node = identityForSpeaker(handle); } catch { return null; }
+  try { node = context === undefined ? identityForSpeaker(handle) : identityForSpeaker(handle, context); } catch { return null; }
   if (!node || typeof node !== "object" || node.nodeType !== 1 || node.parentNode || IDENTITY_PLACED.has(node)) return null;
   if (String(node.getAttribute?.("aria-hidden") ?? "").trim().toLowerCase() === "true") return null;
   if (!String(node.getAttribute?.("aria-label") ?? "").trim() && !String(node.textContent ?? "").trim()) return null;
+  if (context === LINK_FREE && holdsInteractive(node)) return null;
   IDENTITY_PLACED.add(node);
   return node;
+}
+/** WLD-256: the context for an identity placed inside one of World's own controls (an ancestor crumb is a button): no link may come back. */
+export const LINK_FREE = Object.freeze({ link: false });
+// interactive content may not sit inside a button (HTML): a link, a control, an embedded document, a tab stop, an editable or a link/button role
+const INTERACTIVE_TAGS = new Set(["A", "BUTTON", "INPUT", "SELECT", "TEXTAREA", "SUMMARY", "DETAILS", "LABEL", "IFRAME", "EMBED", "OBJECT", "AUDIO", "VIDEO"]);
+function holdsInteractive(n) {
+  if (!n || n.nodeType !== 1) return false;
+  if (INTERACTIVE_TAGS.has(String(n.tagName ?? "").toUpperCase())) return true;
+  if (n.getAttribute?.("tabindex") != null || n.getAttribute?.("contenteditable") != null) return true;
+  if (/^(link|button)$/i.test(String(n.getAttribute?.("role") ?? "").trim())) return true;
+  for (const c of n.children ?? []) if (holdsInteractive(c)) return true;
+  return false;
 }
 
 // WLD-248: FOCUS IN A HOST'S IDENTITY SURVIVES A REDRAW. The host's node carries no key of World's (it is placed as made), so World remembers the SLOT it
@@ -460,6 +479,9 @@ export function refocusIdentity(top, path) {
  *   that hides its name another way (`hidden`, `role="presentation"`, the only text in an `aria-hidden` child) is the host's error to avoid.
  *   FOCUS: a focusable element inside the node (a profile link) keeps focus through the reader's redraws (a refresh, a fold, setCanReply): the reader puts it
  *   back on the same place in the FRESH node of the same line, never on another line's, and marks nothing on the host's node to do it.
+ *   WLD-256: the circle view's generated title and every NAMED breadcrumb ask it too, and put the node where the handle stood, before the reader's own
+ *   "'s statement". An ancestor crumb is the reader's own button: there the hook is called `(handle, LINK_FREE)` and an interactive node is refused (the crumb
+ *   keeps its words); every other call is `(handle)` alone, as ever.
  */
 export function createCircleReader({ doc, host, source, roomId = null, canReply = false, onReply = null, onState = null, onNavigate = null, hrefForCircle = null, labels = null, scroller = null, faceForSpeaker = null, identityForSpeaker = null, hostHoldsPlain = false, hostOwnsHeader = false } = {}) {
   if (!doc || !host || !source) throw new Error("createCircleReader needs a document, a host and a source");
@@ -565,14 +587,14 @@ export function createCircleReader({ doc, host, source, roomId = null, canReply 
   };
   /** who said a line, into its head: the host's whole identity (WLD-248), else the face (if any) and the reader's own name, exactly as before. `slot` names the
    *  line (its say, opener or plain place); a repeat in one draw is told apart by its count, so focus returns to the same line, not the handle's first. */
+  const placeIdentity = (parent, identity, slot) => {
+    const n = (slotSeen.get(slot) ?? 0) + 1; slotSeen.set(slot, n);
+    identitySlots.set(`${slot}#${n}`, identity); slotOfIdentity.set(identity, `${slot}#${n}`);
+    parent.appendChild(identity);
+  };
   const speakerOf = (head, handle, slot) => {
     const identity = speakerIdentity(identityForSpeaker, handle);
-    if (identity) {
-      const n = (slotSeen.get(slot) ?? 0) + 1; slotSeen.set(slot, n);
-      identitySlots.set(`${slot}#${n}`, identity); slotOfIdentity.set(identity, `${slot}#${n}`);
-      head.appendChild(identity);
-      return;
-    }
+    if (identity) { placeIdentity(head, identity, slot); return; }
     const who = build(doc, "span", "cr-who", handle);
     const face = faceOf(handle);
     if (face) head.appendChild(face);
@@ -817,6 +839,16 @@ export function createCircleReader({ doc, host, source, roomId = null, canReply 
   }
 
   // ── the circle view ──
+  /** WLD-256: a named crumb's words into `el`: the host's whole identity for its speaker, then the reader's own "'s statement", or else the crumb's label
+   *  exactly as before (unnamed, no hook, or a refused node). `slot` names the place (the title, a crumb); `inControl` is an ancestor crumb, World's own
+   *  button: the hook is asked for a link-free node (LINK_FREE) and anything interactive is refused, so the button stays the one control there. */
+  const crumbWords = (el, c, slot, { inControl = false } = {}) => {
+    const identity = c.named && c.handle ? speakerIdentity(identityForSpeaker, c.handle, inControl ? LINK_FREE : undefined) : null;
+    if (!identity) { el.textContent = c.label; return el; }
+    placeIdentity(el, identity, slot);
+    el.appendChild(doc.createTextNode(STATEMENT_OF));
+    return el;
+  };
   function crumbsEl(models) {
     const first = models[0];
     const nav = build(doc, "nav", "cr-crumbs");
@@ -833,12 +865,12 @@ export function createCircleReader({ doc, host, source, roomId = null, canReply 
       nav.appendChild(build(doc, "span", "cr-sep", "›"));
       const last = i === crumbs.length - 1;
       if (last) {
-        const cur = build(doc, "span", "cr-crumb", c.label);
+        const cur = crumbWords(build(doc, "span", "cr-crumb"), c, `crumb:${s(c.id)}`);
         attr(cur, "aria-current", "page");
         attr(cur, "data-crumb", c.id);
         nav.appendChild(cur);
       } else {
-        const b = button(c.label, `crumb-${c.id}`, { "data-crumb": c.id });
+        const b = crumbWords(button(undefined, `crumb-${c.id}`, { "data-crumb": c.id }), c, `crumb:${s(c.id)}`, { inControl: true });
         b.addEventListener("click", () => showCircle(c.id));
         nav.appendChild(b);
       }
@@ -856,7 +888,7 @@ export function createCircleReader({ doc, host, source, roomId = null, canReply 
       return;
     }
     const head = build(doc, "div", "cr-head");
-    const title = build(doc, "h3", "cr-title", first.crumbs.length ? first.crumbs[first.crumbs.length - 1].label : (first.room.place || W.room));
+    const title = first.crumbs.length ? crumbWords(build(doc, "h3", "cr-title"), first.crumbs[first.crumbs.length - 1], "title") : build(doc, "h3", "cr-title", first.room.place || W.room);
     attr(title, "tabindex", "-1");
     attr(title, "data-key", "circle-title");
     head.appendChild(title);

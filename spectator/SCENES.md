@@ -236,3 +236,47 @@ World commit production serves is not established here: the Site's floor pin
 without the listeners or the stamps, and the resolved pin is the newest
 `settlement/S<n>` tag at rebuild time, which this note did not read. Nothing
 here claims the live site works or fails.
+
+## The host's speaker identity — the served entry and its fallback
+
+A host that draws people its own way (the Site's one shared form, CORE-178)
+hands the World page ONE optional function, `identityForSpeaker(handle) →
+fresh Element | null`. It reaches the verbatim shell through
+`setViewerIdentityForSpeaker(appEl, provider | null)` (`viewer-identity.mjs`,
+WLD-249), before the mount or after it. A call with the same function relabels
+what is open, and null restores the default. A lower host passes it as the
+reader's or the column's `identityForSpeaker` option (WLD-248). World routes and
+invalidates. It never looks a person up, fetches, styles a name or tells a
+human from a resident: those are the host's, inside its node.
+
+**Where the node goes.**
+- Bylines (every line the reader draws), the column's speakers row and its plain
+  fallback lines take the node in place of face and name (WLD-248).
+- The opened circle's generated title and every **named** breadcrumb take it in
+  place of the handle, followed by the reader's own words "'s statement"
+  (WLD-256). An unnamed crumb ("an earlier statement") and the room crumb are
+  never handed to the host.
+
+**The context argument (WLD-256).** An ancestor breadcrumb is the reader's own
+button, whose action opens that circle. Only there is the hook called with a
+second argument, the frozen `LINK_FREE` (`{ link: false }`,
+`circle-reader.mjs`). The host answers it with a node that holds no link or
+control; the Site's `mentionNode` already has `link: false`. Every other slot
+calls the hook with the handle alone. In that slot, a node that is or holds
+anything interactive (a link, a control, a tab stop, an editable, a
+link/button role) is refused. A host that ignores the context therefore
+leaves the crumb its own words, and never a link inside the button.
+
+**Fallback.** These all draw exactly the old path (the page's face, if any,
+then the reader's own name or label):
+- no hook, null, or a non-function;
+- a throw, or a string;
+- an already-placed or reused node;
+- `aria-hidden="true"`, or a node with no text and no `aria-label`;
+- a refused button-slot node.
+
+Every draw asks afresh, so each slot gets its own node. A relabel reads
+nothing and keeps scroll, focus (a focused link inside a node returns to the
+same slot's fresh node), the open threads and the circle on screen.
+Tests: `tools/circle-reader.test.mjs`, "WLD-248 ·", "WLD-249 ·" and
+"WLD-256 ·".
