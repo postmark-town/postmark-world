@@ -15,27 +15,35 @@ import { exitLockWords, lockedOutWords, lockedPassage, hhmmZ } from "./portals.m
 import { nameInSentence } from "./mark-name.mjs";
 
 const SPIRE = "spire/the-spire";
+const PORCH = "spire/the-spire-porch";
 const UNTIL = "2026-10-19T18:00:00.000Z";
 const LEFT = "2026-10-19T17:12:30.000Z";
 const LOCKED = { [SPIRE]: { until: UNTIL, left_at: LEFT } };
 
+// the doors are doors, and the town's (WLD-253: door is a class, into and lands_at its own fields; a resident's door no rule allows does not
+// pass); the lock on them is the test
+const TOWN = "the-town";
+
 function world({ word = "neutral", determined = undefined } = {}) {
   const marks = [
     { id: "spire/grounds", kind: "sited", by: "spire", at: { x: 1000, y: 1000 }, extent: { w: 500, h: 400 }, body: "The Grounds." },
-    { id: SPIRE, kind: "sited", by: "spire", class: "dungeon", at: { x: 1000, y: 1000 }, extent: { w: 300, h: 300 },
-      body: "The Starforge Spire.", entry: { into: "spire/vestibule", lands_at: "spire/doors-inside" } },
+    // the dungeon names no way in of its own (WLD-253: into is a door's); its porch, a door drawn round it, does
+    { id: SPIRE, kind: "sited", by: TOWN, class: "dungeon", at: { x: 1000, y: 1000 }, extent: { w: 300, h: 300 },
+      body: "The Starforge Spire." },
+    { id: PORCH, kind: "door", by: TOWN, at: { x: 1000, y: 1000 }, extent: { w: 302, h: 302 },
+      body: "The Spire's porch.", into: "spire/vestibule", lands_at: "spire/doors-inside" },
     { id: "spire/vestibule", kind: "sited", by: "spire", at: { x: 880, y: 1000 }, extent: { w: 50, h: 50 }, body: "The vestibule." },
     { id: "spire/hall", kind: "sited", by: "spire", at: { x: 1030, y: 1000 }, extent: { w: 200, h: 200 }, body: "The great hall." },
     { id: "spire/the-approach", kind: "sited", by: "spire", at: { x: 820, y: 1000 }, extent: { w: 30, h: 30 }, body: "The approach." },
-    { id: "spire/doors-outside", kind: "sited", by: "spire", at: { x: 845, y: 1000 }, extent: { w: 4, h: 2 },
-      body: "The Gilded Doors.", entry: { word, into: "spire/vestibule", lands_at: "spire/doors-inside" } },
-    { id: "spire/doors-inside", kind: "sited", by: "spire", at: { x: 860, y: 1000 }, extent: { w: 4, h: 2 },
-      body: "The Gilded Doors, from inside.", entry: { word: "neutral", into: "spire/the-approach" } },
-    { id: "spire/hall-door", kind: "sited", by: "spire", at: { x: 900, y: 1000 }, extent: { w: 2, h: 2 },
-      body: "A door to the hall.", entry: { word: "neutral", into: "spire/hall" } },
+    { id: "spire/doors-outside", kind: "door", by: TOWN, at: { x: 845, y: 1000 }, extent: { w: 4, h: 2 },
+      body: "The Gilded Doors.", entry: { word }, into: "spire/vestibule", lands_at: "spire/doors-inside" },
+    { id: "spire/doors-inside", kind: "door", by: TOWN, at: { x: 860, y: 1000 }, extent: { w: 4, h: 2 },
+      body: "The Gilded Doors, from inside.", entry: { word: "neutral" }, into: "spire/the-approach" },
+    { id: "spire/hall-door", kind: "door", by: TOWN, at: { x: 900, y: 1000 }, extent: { w: 2, h: 2 },
+      body: "A door to the hall.", entry: { word: "neutral" }, into: "spire/hall" },
     // a signpost on the Grounds that leads two ways: into the Spire, or along the approach
-    { id: "spire/signpost", kind: "sited", by: "spire", at: { x: 800, y: 1150 }, extent: { w: 2, h: 2 },
-      body: "Two ways.", entry: { word: "neutral", into: ["spire/vestibule", "spire/the-approach"] } },
+    { id: "spire/signpost", kind: "door", by: TOWN, at: { x: 800, y: 1150 }, extent: { w: 2, h: 2 },
+      body: "Two ways.", entry: { word: "neutral" }, into: ["spire/vestibule", "spire/the-approach"] },
   ];
   return { marks, ...(determined ? { determined } : {}) };
 }
@@ -90,8 +98,8 @@ test("WLD-132 · A FLEE SAYS WHY, through the real passage: nerve, when, and whe
   assert.equal(e.dungeon, SPIRE);
   assert.equal(e.locked_until, UNTIL, "the same lock, the same instant");
   assert.equal(e.rows, undefined, "nothing is written");
-  // the dungeon itself, from its outline, is the same lock with the same words
-  assert.equal(enter(AT(1100, 1100), SPIRE, w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: FLED }).error, FLED_LINE);
+  // the dungeon's porch, from anywhere in its outline, is the same lock with the same words
+  assert.equal(enter(AT(1100, 1100), PORCH, w, { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: FLED }).error, FLED_LINE);
 });
 
 test("WLD-132 · AN EXIT THE RESIDENT MADE KEEPS ITS WORDS BYTE FOR BYTE, and so does a lock with no cause, an unknown cause, or no time", () => {
@@ -142,8 +150,8 @@ test("WLD-132 · A CREATURE ID IS NOT A CAUSE: without `fled: nerve` the words a
   assert.equal(askBy(WOLF, { until: UNTIL, left_at: LEFT, fled: "hunger" }).error, EXIT_LINE);
 });
 
-test("LOCKED OUT: the dungeon itself, entered from anywhere in its outline", () => {
-  const e = enter(AT(1100, 1100), SPIRE, world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: LOCKED });
+test("LOCKED OUT: the dungeon's porch, entered from anywhere in its outline (a dungeon names no way in of its own since WLD-253)", () => {
+  const e = enter(AT(1100, 1100), PORCH, world(), { occupancy: occ(["spire/grounds"]), handle: "ann", lockedOut: LOCKED });
   assert.equal(e.refused, "dungeon-locked");
   assert.equal(e.dungeon, SPIRE);
 });

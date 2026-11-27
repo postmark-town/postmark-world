@@ -30,6 +30,7 @@ import { enter, exit, enterPrompt, exitPrompt, containmentChain, investigate } f
 
 const HEIST = "spire/the-gilded-doo-YOULL-NEVER-CATCH-ME";
 const SPIRE = "spire/the-spire";
+const TOWN = "the-town";
 
 function world({ heist = false } = {}) {
   const marks = [
@@ -43,19 +44,21 @@ function world({ heist = false } = {}) {
     { id: "spire/chapel", kind: "sited", by: "spire", at: { x: 1090, y: 1125 }, extent: { w: 30, h: 30 }, body: "The chapel." },
     { id: "spire/candle", kind: "sited", by: "spire", at: { x: 1030, y: 1010 }, extent: { w: 1, h: 1 }, body: "A candle in the hall." },
     { id: "spire/the-approach", kind: "sited", by: "spire", at: { x: 820, y: 1000 }, extent: { w: 30, h: 30 }, body: "The approach." },
-    { id: "spire/doors-outside", kind: "sited", by: "spire", at: { x: 845, y: 1000 }, extent: { w: 4, h: 2 },
+    // the doors are doors, and the town's (WLD-253: door is a class, into and lands_at its own fields; a resident's door no rule allows
+    // does not pass); where they lead is the test
+    { id: "spire/doors-outside", kind: "door", by: TOWN, at: { x: 845, y: 1000 }, extent: { w: 4, h: 2 },
       body: "The Gilded Doors.",
-      entry: { word: "neutral", into: "spire/vestibule", lands_at: heist ? HEIST : "spire/doors-inside" } },
-    { id: "spire/doors-inside", kind: "sited", by: "spire", at: { x: 860, y: 1000 }, extent: { w: 4, h: 2 },
-      body: "The Gilded Doors, from inside.", entry: { word: "neutral", into: "spire/the-approach" } },
-    { id: "spire/hall-door", kind: "sited", by: "spire", at: { x: 900, y: 1000 }, extent: { w: 2, h: 2 },
-      body: "A door to the hall.", entry: { word: "neutral", into: "spire/hall", lands_at: "spire/hall-back" } },
-    { id: "spire/hall-back", kind: "sited", by: "spire", at: { x: 935, y: 1000 }, extent: { w: 2, h: 2 },
-      body: "The hall's door back.", entry: { word: "neutral", into: "spire/vestibule", lands_at: "spire/hall-door" } },
-    { id: "spire/chapel-arch", kind: "sited", by: "spire", at: { x: 1090, y: 1095 }, extent: { w: 2, h: 2 },
-      body: "An arch to the chapel.", entry: { word: "neutral", into: ["spire/chapel", "spire/vestibule"] } },
-    { id: "spire/chapel-back", kind: "sited", by: "spire", at: { x: 1090, y: 1115 }, extent: { w: 2, h: 2 },
-      body: "Back to the hall.", entry: { word: "neutral", into: "spire/hall", lands_at: "spire/chapel-arch" } },
+      entry: { word: "neutral" }, into: "spire/vestibule", lands_at: heist ? HEIST : "spire/doors-inside" },
+    { id: "spire/doors-inside", kind: "door", by: TOWN, at: { x: 860, y: 1000 }, extent: { w: 4, h: 2 },
+      body: "The Gilded Doors, from inside.", entry: { word: "neutral" }, into: "spire/the-approach" },
+    { id: "spire/hall-door", kind: "door", by: TOWN, at: { x: 900, y: 1000 }, extent: { w: 2, h: 2 },
+      body: "A door to the hall.", entry: { word: "neutral" }, into: "spire/hall", lands_at: "spire/hall-back" },
+    { id: "spire/hall-back", kind: "door", by: TOWN, at: { x: 935, y: 1000 }, extent: { w: 2, h: 2 },
+      body: "The hall's door back.", entry: { word: "neutral" }, into: "spire/vestibule", lands_at: "spire/hall-door" },
+    { id: "spire/chapel-arch", kind: "door", by: TOWN, at: { x: 1090, y: 1095 }, extent: { w: 2, h: 2 },
+      body: "An arch to the chapel.", entry: { word: "neutral" }, into: ["spire/chapel", "spire/vestibule"] },
+    { id: "spire/chapel-back", kind: "door", by: TOWN, at: { x: 1090, y: 1115 }, extent: { w: 2, h: 2 },
+      body: "Back to the hall.", entry: { word: "neutral" }, into: "spire/hall", lands_at: "spire/chapel-arch" },
     { id: "town/green", kind: "sited", by: "town", at: { x: 0, y: 0 }, extent: { w: 100, h: 100 }, body: "A green, far off." },
   ];
   return { marks };
@@ -171,7 +174,7 @@ test("only the portal's own word is asked: opposed refuses and is recorded; term
   const r = enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ([]), handle: "ann" });
   assert.equal(r.refused.effect, "refused");
   assert.match(r.rows[0], /enters spire\/doors-outside · ferry 0\.0000 · word opposed$/);
-  doors.entry = { word: "neutral", edge: "within", consequence: "mind the step", into: "spire/vestibule" };
+  doors.entry = { word: "neutral", edge: "within", consequence: "mind the step" };
   const t = enter(AT(845, 1000), "spire/doors-outside", w, { occupancy: occ([]), handle: "ann" });
   assert.equal(t.awaiting.effect, "terms");
   assert.deepEqual(t.rows, []);
@@ -179,7 +182,7 @@ test("only the portal's own word is asked: opposed refuses and is recorded; term
 
 // ── the dungeon's rules ──────────────────────────────────────────────────────
 
-test("a dungeon that names no into of its own is entered by its portals (WLD-63: one that does is passed through it, dungeon-into.test.mjs)", () => {
+test("a dungeon names no into of its own and is entered by its portals (WLD-253: into is a door's; dungeon-into.test.mjs refuses one that writes it)", () => {
   const a = enter(AT(1000, 1000), SPIRE, world(), { occupancy: occ([]), handle: "ann" });
   assert.equal(a.refused, "dungeon");
   assert.deepEqual(a.portals.map((p) => p.id), ["spire/doors-outside"]);
@@ -314,7 +317,7 @@ test("the heist reds the lint by name, and there is no door to let it through by
 
 test("a landing more than the reach from its into is red", () => {
   const w = world();
-  w.marks.find((m) => m.id === "spire/hall-door").entry.lands_at = { x: 935 + LANDING_REACH_M + 200, y: 1000 };
+  w.marks.find((m) => m.id === "spire/hall-door").lands_at = { x: 935 + LANDING_REACH_M + 200, y: 1000 };
   assert.deepEqual(portalFindings(w.marks).map((f) => f.rule), ["lands-at-reaches-into"]);
 });
 
@@ -445,7 +448,7 @@ test("G4 · the walk inside a dungeon is fenced to the room entered; outside one
 
 test("an into naming no mark is red", () => {
   const w = world();
-  w.marks.find((m) => m.id === "spire/hall-back").entry.into = "spire/nowhere";
+  w.marks.find((m) => m.id === "spire/hall-back").into = "spire/nowhere";
   assert.ok(portalFindings(w.marks).some((f) => f.rule === "into-names-a-mark" && f.mark === "spire/hall-back"));
 });
 
@@ -463,29 +466,30 @@ function gateTree({ heist, mutate = null }) {
   mkdirSync(root, { recursive: true });
   copyFileSync(join(REAL, "mark.md"), join(root, "mark.md"));
   cpSync(join(REAL, "logos"), join(root, "logos"), { recursive: true });
-  // the dungeon class must be in the roster, so the works' chain to it comes too
+  // the dungeon and door classes must be in the roster, so the works' chain to them comes too
   for (const rel of ["the-town-centre", "the-town-centre/the-keeping-works", "the-town-centre/the-keeping-works/postmark-node",
-                     "the-town-centre/the-keeping-works/postmark-node/mark", "the-town-centre/the-keeping-works/postmark-node/mark/dungeon"]) {
+                     "the-town-centre/the-keeping-works/postmark-node/mark", "the-town-centre/the-keeping-works/postmark-node/mark/dungeon",
+                     "the-town-centre/the-keeping-works/postmark-node/mark/sited", "the-town-centre/the-keeping-works/postmark-node/mark/door"]) {
     mkdirSync(join(root, rel), { recursive: true });
     copyFileSync(join(REAL, rel, "mark.md"), join(root, rel, "mark.md"));
   }
   const w = world({ heist });
   if (mutate) mutate(w);
+  // the Spire's marks are testerhh's, its doors the town's (WLD-253); a fixture mark's id is <by>/<dir>, so the ids the laws name move with `by`
+  const byOf = new Map(w.marks.filter((m) => m.id.startsWith("spire/")).map((m) => [m.id, m.by === TOWN ? TOWN : "testerhh"]));
+  const rid = (s) => s.replace(/^spire\//, `${byOf.get(s) ?? "testerhh"}/`);
   for (const m of w.marks) {
-    if (m.by !== "spire") continue;
+    if (!byOf.has(m.id)) continue;
     const d = join(root, m.id.split("/")[1]);
     mkdirSync(d, { recursive: true });
-    const lines = ["---", "kind: sited", "by: testerhh", "date: 2026-10-13",
+    const lines = ["---", `kind: ${m.kind === "door" ? "door" : "sited"}`, `by: ${byOf.get(m.id)}`, "date: 2026-10-13",
       `at: { x: ${m.at.x}, y: ${m.at.y} }`, `extent: { w: ${m.extent.w}, h: ${m.extent.h} }`];
     if (m.class) lines.push(`class: ${m.class}`);
-    if (m.rooms) lines.push(`rooms: ${JSON.stringify(m.rooms.map((s) => s.replace("spire/", "testerhh/")))}`);
-    // a fixture mark's id is <by>/<dir>, so the ids the laws name move with `by`
-    const rid = (s) => s.replace(/^spire\//, "testerhh/");
-    if (m.entry) lines.push(`entry: ${JSON.stringify({
-      ...m.entry,
-      into: Array.isArray(m.entry.into) ? m.entry.into.map(rid) : rid(m.entry.into),
-      ...(typeof m.entry.lands_at === "string" ? { lands_at: rid(m.entry.lands_at) } : {}),
-    })}`);
+    if (m.rooms) lines.push(`rooms: ${JSON.stringify(m.rooms.map(rid))}`);
+    if (m.entry) lines.push(`entry: ${JSON.stringify(m.entry)}`);
+    // a door's own fields, as the record grammar writes them: an id bare, a list or a point as JSON
+    if (m.into !== undefined) lines.push(`into: ${Array.isArray(m.into) ? JSON.stringify(m.into.map(rid)) : rid(m.into)}`);
+    if (m.lands_at !== undefined) lines.push(`lands_at: ${typeof m.lands_at === "string" ? rid(m.lands_at) : JSON.stringify(m.lands_at)}`);
     lines.push("---", "", m.body, "");
     writeFileSync(join(d, "mark.md"), lines.join("\n"));
   }
@@ -503,10 +507,10 @@ test("THE GATE: the ruled instance lints clean, and the heist refuses with no wa
   const dir = gateTree({ heist: true });
   const red = gate(dir);
   assert.equal(red.code, 1, red.out);
-  assert.match(red.out, /\[ERROR\] [^\n]*doors-outside: \[lands-at-names-a-mark\] entry\.lands_at: "testerhh\/the-gilded-doo-YOULL-NEVER-CATCH-ME" names no mark/);
+  assert.match(red.out, /\[ERROR\] [^\n]*doors-outside: \[lands-at-names-a-mark\] lands_at: "testerhh\/the-gilded-doo-YOULL-NEVER-CATCH-ME" names no mark/);
 
   const exc = join(dir, "exceptions.json");
-  writeFileSync(exc, JSON.stringify({ exceptions: [{ mark: "testerhh/doors-outside", rule: "lands-at-names-a-mark", by: "jetto", why: "the heist (WLD-18)" }] }));
+  writeFileSync(exc, JSON.stringify({ exceptions: [{ mark: "the-town/doors-outside", rule: "lands-at-names-a-mark", by: "jetto", why: "the heist (WLD-18)" }] }));
   // until 2026-11-01 this list let the finding through by slug (code 0, "EXCEPTED"); Darko, 07:58: "if we're hardcoding
   // enumerated exceptions as slugs that's no good". The option is retired: a list handed to it changes nothing.
   const still_red = gate(dir, ["--portal-exceptions", exc]);

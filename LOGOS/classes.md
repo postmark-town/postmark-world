@@ -259,6 +259,11 @@ answers; an instance, and the class answers. It replaces the hand-kept
 household-made class is sovereign, and its answer is the household's. The
 town makes the candy kinds, each a subclass of candy, and residents may make
 instances of any of them.
+**`makers` governs amending as well as making** (Darko, 2026-11-25, CORE-129
+layer 1): where a class answers false, a resident may neither create its
+instance nor change that class's own fields on one (for a door, its `into`,
+`lands_at` and `requires`; § The portal and the dungeon). Moving the mark or
+withdrawing it stays its maker's.
 *SUPERSEDED 2026-10-16 18:44: "Its value's shape is OPEN: the recommendation
 it was ruled from wrote it as `town | sovereign`, a one-of, which 15:12 rules
 out …, so the shape waits on Darko's read."*
@@ -455,6 +460,15 @@ pedantic to require like an entire child predicate mark"*; ruled 12:42:
     bookkeeping). **Every dial is a property, and a locked value is its
     `default`** (ruled 16:02): no instance can override it, so the four
     fields below are enough.
+  - **The override rule** (Darko, 2026-11-25, CORE-129 layer 1: *"we need to
+    implement is an override rule … explicitly setting the override version
+    of that property on the subclass"*): a subclass explicitly redeclares a
+    property it inherits, the nearest declaration wins, and only the town's
+    own subclass may loosen a locked one. Its first use: `the-town/thing`
+    redeclares `entry` as `none`, constitution (`the-town/thing-entry`), so a
+    thing has no way in (WLD-212's rule, made law); a thing writes no `entry`,
+    and a bag of holding would be a town subclass that loosens it (CORE-129
+    layer 2).
   - **Sovereign tier:** the maker fills the value when they make the
     instance. The first is `portable` under `the-town/thing`, default `true`
     (ruled 12:38: *"we can express default in the predicate class node itself
@@ -806,6 +820,29 @@ what-relates (postmark-edge), and what-governs (postmark-class):
   channels, the two apexes — lives whole in [tiers.md](tiers.md) and is
   never restated here (the paraphrase-drift class). Red until its engine
   child names the walk.
+
+## What keeps a mark in the world
+
+Ruled 2026-10-14 (WLD-51, Darko): *"At each settlement, a commons mark with no
+stamps behind it leaves the world. A mark standing on your household's ground
+or the town's never does, whatever it was first filed as."*
+
+- **The ground a mark stands on now decides.** At each settlement a mark is
+  judged by its standing as the record walks it then (its `tier`, § The
+  derived above; [tiers.md](tiers.md)), never by how it was first filed, how
+  old it is, or what a list says about it. On its household's own ground, or
+  on the town's, it stays with no stamp behind it. On the commons it stays
+  while at least one stamp stands behind it.
+- **A held thing is not judged while it is held** (POS-688; § Published is
+  not placed below). It is published but unplaced, so it stands on no ground.
+  Set down, it is judged where it now stands, for its owner, as the drop
+  clause says.
+- **Registry absence is no exemption** (WLD-252, Darko 2026-11-25). A mark the
+  sweep's publication list never recorded is judged by the same rule as one
+  it did.
+
+The rule is decided in one place, `tools/unpublish-verdict.mjs`, which the
+settlement's sweep and the office's stakes warning both read.
 
 ## The becomes edge — lifecycle
 
@@ -2006,21 +2043,72 @@ the three must never be read as one mechanism wearing three hats.
 
 *A portal changes where you are when you cross it. A dungeon changes what you may see and how you may leave.*
 
-Rendered in the world as `the-town/dungeon` and `the-town/land`.
+Rendered in the world as `the-town/dungeon`, `the-town/land` and `the-town/door`.
 
 Ruled by Darko with Wright in the doors sitting of 2026-10-13 (WLD-5, concluded 20:03 EDT; exit amended 21:13), and
 built on the entry law
 that already stood: a mark's `entry: {word, edge, consequence}` is its fixed answer to every entrant.
 
-- **A portal is a mark whose entry law carries `into`.** `into` is a mark, or a list of marks: entering the portal
+- **A portal is a door whose `into` names where it leads** (a door's own field since 2026-11-25; until then a mark's
+  entry law carried it). `into` is a mark, or a list of marks: entering the portal
   enters that mark, and with a list the walker picks, and nothing is recorded until they do. An optional
   **`lands_at`** (a mark, or coordinates) names where you come in: the door on the far side, or a point. A two-way
   passage is two portals pointing at each other, each with its own word, body and art, so it can be locked from one
   side only. You enter a portal from anywhere in its extent, by the reach rule every threshold keeps, **or from
   anywhere in a mark you have entered that holds it** (Darko 2026-10-16 19:15, row 68 A1: no walk across a room to
   its door; on ground you have not entered, you still stand at the portal).
+- **Door is a class, and doors are the town's (ruled 2026-11-25, CORE-129 layer 1, WLD-253; Darko: "the first layer
+  we need to implement is the enforcement, which means whatever rule that we forgot to include that makes doors not
+  instantiable by default by residents, we need to build first").** `the-town/door` stands under `sited`, a sibling
+  of `thing` (not `portal-ground`, which lends its ground's verbs; a door routes you elsewhere), and answers
+  **`makers: false`**, which governs amending as well as making: a resident may neither create a door nor change a
+  door's door fields; moving or withdrawing the mark stays its maker's. **`into`, `lands_at` and `requires` are
+  declared on door alone** (`the-town/door-into`, `the-town/door-lands-at`, `the-town/door-requires`), as a door's
+  own flat fields, each door's own value. The lint and the gate refuse them on any other class, in any spelling, and
+  refuse a door that still carries them inside `entry`; the passage refuses such a record by name. `entry` keeps how
+  a mark receives you: its word and its terms. A door may hold (`the-town/door-holder`, with its capacity and its
+  open), so a fed door still opens. WLD-21's admin households keep exactly their three classes, dungeon, stairs and
+  portal-ground, and no door; a stairs that writes no `entry` leads where its class says, and writes no door field.
+  **Three things this narrows**, each refused by name now: a dungeon naming its own way in (WLD-63: "from ANYWHERE
+  in the Chapel's extent, you can enter, and pick your into"), which a door drawn round the place now carries; a
+  stair writing its own way up (WLD-21; below); and a room of a class other than door naming its own landing (row 68
+  (a); below). None of the records that stood on 2026-11-25 used any of the three.
+  **A World PR merged by a founder is the town's act** (WLD-253/town-act, Darko 2026-11-25: "yes to bevel's open
+  question"): a PR carries no actor, so the gate reads what a record says (its class, its fields, its `by`, its id)
+  and refuses what may not stand, and a founder's merge is what makes a change to a door the town's; the office,
+  which knows its writer, refuses a resident's door and a resident's change to one (POS-1238). No base-ref write
+  check stands beside that. **The 44 doors that stood are re-kinded to door by the town**, keeping every value and
+  their makers (Darko, 2026-11-24 19:28 EST: *"we'll just make a special case for whatever was grandfathered because
+  it's a feels bad to create something and then have it taken away"*): that act is their grandfathering, and they
+  stand by name. Little Bird's three, `little-bird/a-paper-bag-of-crumbs`,
+  `little-bird/a-ring-in-the-pantry` and `little-bird/a-ring-of-black-stone` (world #416, #427, #434), and the
+  Starforge Spire's 41, `wright/the-starforge-spire`, `wright/spire-blue-room-to-north-walk`,
+  `wright/spire-cold-landing-to-hall-of-keepers`, `wright/spire-dining-hall-to-guests-walk`,
+  `wright/spire-dining-hall-to-mirror-room`, `wright/spire-gilded-doors`, `wright/spire-gilded-doors-inside`,
+  `wright/spire-gilded-vestibule-to-rose-hall`, `wright/spire-guests-walk-to-dining-hall`,
+  `wright/spire-guests-walk-to-little-stair`, `wright/spire-guests-walk-to-rose-hall`,
+  `wright/spire-hall-of-keepers-to-cold-landing`, `wright/spire-hall-of-keepers-to-rose-hall`,
+  `wright/spire-hall-of-keepers-to-star-chapel`, `wright/spire-little-stair-to-guests-walk`,
+  `wright/spire-lumber-room-to-register-room`, `wright/spire-mirror-room-to-dining-hall`,
+  `wright/spire-mirror-room-to-south-walk`, `wright/spire-north-arch-to-star-chapel`,
+  `wright/spire-north-turret-to-north-walk`, `wright/spire-north-walk-to-blue-room`,
+  `wright/spire-north-walk-to-north-turret`, `wright/spire-red-stair-hall-to-rose-hall`,
+  `wright/spire-register-room-to-lumber-room`, `wright/spire-rose-hall-to-gilded-vestibule`,
+  `wright/spire-rose-hall-to-guests-walk`, `wright/spire-rose-hall-to-hall-of-keepers`,
+  `wright/spire-rose-hall-to-red-stair-hall`, `wright/spire-round-court-to-south-walk`, `wright/spire-servants-door`,
+  `wright/spire-servants-door-inside`, `wright/spire-south-arch-to-star-chapel`, `wright/spire-south-arch-to-well-stair`,
+  `wright/spire-south-turret-to-south-walk`, `wright/spire-south-walk-to-mirror-room`,
+  `wright/spire-south-walk-to-round-court`, `wright/spire-south-walk-to-south-turret`,
+  `wright/spire-star-chapel-to-hall-of-keepers`, `wright/spire-star-chapel-to-north-arch`,
+  `wright/spire-star-chapel-to-south-arch` and `wright/spire-well-stair-to-south-arch`. Each keeps the `into`,
+  `lands_at` and `requires` it had, now as its own fields, and Little Bird's keep their holding. Any other door a
+  resident signs does not stand and does not pass. How a resident may come to make a door is CORE-129's layer 2,
+  case by case under governance, not this line. The one law the lint, the passage and the office read is
+  `tools/door-law.mjs`.
 - **Where a passage sets you down** (Darko 2026-10-16 19:15, row 68 (a)): fully inside the room it enters, first
-  match wins: the room's own `entry.lands_at` (a place may say where its entrants land without naming an `into`);
+  match wins: the room's own `lands_at`, when the room is a door (a door may say where its entrants land without
+  naming an `into`; *narrowed 2026-11-25, WLD-253:* until then any place could, and a room of any other class now
+  names no landing of its own, since `lands_at` is a door's);
   a portal `lands_at` that points inside the room, as written (a point in it, or a mark in it that is not a door);
   a step in from the door (the paired door, the door picked from a list, or the portal itself when it stands at the
   room), 1.5 m past the door's own edge, so never on the door's square that touches or straddles the wall, and a
@@ -2089,11 +2177,12 @@ that already stood: a mark's `entry: {word, edge, consequence}` is its fixed ans
   `WORLD/portal-lint-exceptions.json` is retired.
 
 - **A door that opens when it holds what it asks for** (WLD-5 B; ruled 2026-10-18 21:23, 2026-10-19 17:48): a
-  portal's entry may carry `requires: { holds: [ids], in, says }`. The passage is refused, and nothing is recorded,
-  until the holder (`in`, or the portal itself, a thing with `holder: true`) holds every mark `holds` names; then it
+  door may carry `requires: { holds: [ids], in, says }` (its own field since 2026-11-25; it rode in the portal's entry
+  until then). The passage is refused, and nothing is recorded,
+  until the holder (`in`, or the door itself, writing `holder: true`) holds every mark `holds` names; then it
   passes for everyone. Things go in by an ordinary give. The refusal says `says`, the door's own line, with
   `{held}` and `{asks}` read as the counts, so the door shows how far it has come. An exit never carries one (locked
-  from the outside, never from the inside), and the lint holds every id it names to a mark. `entry` itself is a property of every mark (`the-town/mark-entry`), so a thing that is a door carries it like any other mark.
+  from the outside, never from the inside), and the lint holds every id it names to a mark. `entry` itself is a property of every mark (`the-town/mark-entry`), and `requires` is door's (`the-town/door-requires`): a thing is no door, and has no way in (`the-town/thing-entry`).
   - **Several holders** (2026-10-22, carrying out WLD-25/k): `in` may be a list of holders. Then each mark `holds`
     names counts once any one of them holds it, and which mark goes in which holder is each holder's own law (its
     `accepts`). The lint holds every holder in the list to a mark that writes `holder: true`.
@@ -2160,9 +2249,13 @@ answers **"Moving to higher/lower floors has not been implemented yet. Coming So
 - **Its refusal is the line.** The refusal's `because`, which is what every reader prints, is the line, not the
   town's standing "opposes entry" sentence. That is for a stair on the class's default only; every other opposed
   mark keeps the standing sentence.
-- **A stair that writes its own `entry:` is read by that entry alone, as any mark is** (a portal when it writes
-  `into`), and keeps the class. Nothing of the default carries over, its refusal included: a stair that writes its
-  own opposed entry says the standing sentence. A later floor is reached by writing `into`, `lands_at` and a word.
+- **A stair that writes its own `entry:` is read by that entry alone, as any mark is**, and keeps the class. Nothing
+  of the default carries over, its refusal included: a stair that writes its own opposed entry says the standing
+  sentence. *Narrowed 2026-11-25 (WLD-253, CORE-129 layer 1):* until then "a later floor is reached by writing
+  `into`, `lands_at` and a word" (WLD-21). `into`, `lands_at` and `requires` are door's alone now, so this rule
+  gives stairs no door fields, and it adds no replacement floor mechanism: a stair that writes its own way up is
+  refused by name. A stair that writes no `entry` keeps the class's answer above, and a stair's own word and terms
+  are read as any mark's.
 - **A stair is a box inside a room, not a door in a wall.** Until 2026-11-01 it was held to the rule that siblings
   inside a dungeon do not overlap, as a room is. It is not a room unless the dungeon lists it in `rooms`, so it
   overlaps freely now (Darko, 2026-11-01 07:59: "Everything should be allowed to overlap like normal").
@@ -2844,7 +2937,16 @@ position's anchor is a mark, an entity, or the world — a held thing rides its
 holder as a rider rides the deck; what may anchor where is class contract
 (rendered as `the-town/the-anchor`). **A thing is not ground**: nothing files
 under a thing by geometry, and a walk onto it sets you down on what it stands
-on (rendered as `the-town/the-not-ground`).
+on (rendered as `the-town/the-not-ground`). **A thing has no inside** (WLD-212, Darko 2026-11-19 22:12 EST: *"better to
+abolish this and then bring back an exception class later if we want to, rather than
+have it be blanket allowed"*): `enter` refuses, by name, a thing, or any subclass of it
+whose effective `entry` is still none (every subclass the town's own has not loosened).
+Since WLD-253 that is read from the class: thing declares `entry: none`, locked
+(`the-town/thing-entry`), and the nearest declaration wins, so only the town's subclass
+may loosen it. A thing writes no door field; what passes you through to an `into` is a
+door, a class of its own (`the-town/door`, under `sited`, a sibling of thing; § Door is a
+class). A thing's `entry` is therefore none, until an exception class gives a thing an
+inside.
 
 **Published is not placed (ruled 2026-10-18 20:58, POS-688, Darko: *"I totally
 forgot that we made it so that held marks are still technically considered

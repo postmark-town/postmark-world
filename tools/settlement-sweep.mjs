@@ -19,7 +19,7 @@ import {
 } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { markStanding as classifyMark, standingWalk, townOwned } from "./mark-standing.mjs"; // the ONE standing rule
-import { unpublishVerdict, rowClassOf, isCandidateRow } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
+import { unpublishVerdict, rowClassOf, isCandidateRow, unregisteredEntry } from "./unpublish-verdict.mjs"; // the ONE unpublish rule (postmark#3757)
 import { isHeld, heldBy, holdOnlyChange, handOffOnly } from "./mark-kind.mjs"; // POS-688: published but unplaced
 import { tmpdir } from "node:os";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -624,7 +624,87 @@ function idAt(repo, ref, path) {
   try { return recordAt(repo, ref, path).id; } catch { return null; }
 }
 
-function publicationRegistry(repo, mainRef) {
+/**
+ * WLD-252: the main marks with NO registry row that the unpublish pass asks at all: at ✦0, not the town's, not withdrawn, not held, and not one this
+ * crossing is publishing (its row is written by the publish). Their standing is walked like a row's, and the one verdict decides.
+ */
+export function unregisteredCandidates({ registry, mainFolded, escrow, gone = new Set(), touched = new Set() }) {
+  return [...mainFolded.keys()].filter((id) => !Object.prototype.hasOwnProperty.call(registry.published, id)
+    && (escrow.get(id) ?? 0) === 0 && !gone.has(id) && !touched.has(id)
+    && !townOwned(mainFolded.get(id)) && !isHeld(mainFolded.get(id)));
+}
+
+/**
+ * THE UNPUBLISH PASS: every registry row, then every unregistered candidate (WLD-252), asked of unpublish-verdict.mjs with what this crossing measured.
+ * `result` is the crossing's result (`{ byId, viewed }`; `byId === mainFolded` when nothing was laid on main). Returns the rows to take, with each file's
+ * content (a kept frame is written back from it). Reads git (the filing index, a row's path, the content) and nothing else; writes nothing.
+ */
+export function unpublishPass({ repo, mainBranch, registry, escrow, mainFolded, result, gone = new Set(), droppedTo = new Map(), unregisteredJudged = [], households = {}, staleRows = undefined }) {
+  const filingOnMain = filingIndexAt(repo, mainBranch);
+  const unpublished = [];
+  const standingOf = (id) => () => (!result.byId ? undefined : gone.has(id) || !mainFolded.has(id) ? null
+    : result.byId === mainFolded ? (mainFolded.get(id)?.tier ?? null) // nothing laid on main: the fold's own verdict
+    : result.viewed.has(id) ? classifyMark(result.byId.get(id), result.byId) : undefined);
+  for (const [id, row] of Object.entries(registry.published)) {
+    const entry = droppedTo.has(id) ? { ...row, class: droppedTo.get(id) } : row;
+    const verdict = unpublishVerdict(entry, {
+      escrow: escrow.get(id) ?? 0,
+      pathOnMain: () => hasObject(repo, `${mainBranch}:${entry.path}`),
+      standing: standingOf(id),
+      currentPath: () => filingOnMain(id),
+      // a held thing is published but unplaced: never a candidate while held (POS-688)
+      held: () => isHeld(result.byId?.get(id) ?? mainFolded.get(id)),
+      ...(staleRows ? { staleRows } : {}),
+    });
+    if (verdict.unpublish !== true) continue;
+    // `class` is the ROW's, as the registry holds it (a home row taken under G2
+    // says home), and `walked` is what the walk found: every take walks commons.
+    // The row's class is also what a kept frame's row is put back with, below.
+    unpublished.push({
+      household: entry.household,
+      id,
+      path: verdict.path,
+      class: entry.class,
+      walked: "commons",
+      escrow: escrow.get(id) ?? 0,
+      content: readAt(repo, mainBranch, verdict.path),
+    });
+  }
+  // WLD-252: the marks with no row, asked of the SAME verdict with the same measured inputs. There is no stored path to trust, so the walk must reach
+  // market ground and the mark's one current filing (by its stable id) must be found; `class` in the report says it had no row. Whose drafts a taken
+  // mark returns to: a row names its sketchbook; a mark with no row returns to its household's own name, the house main's registry binds its author to
+  // (`hh:starforge` → `starforge`, as the store-era rows are written). A handle the registry binds to no house is unread: nothing is taken.
+  const houseNameOf = (mark) => {
+    const house = households?.[mark?.household ?? mark?.by];
+    return typeof house === "string" && /^hh:./.test(house) ? house.slice(3) : null;
+  };
+  for (const id of unregisteredJudged) {
+    const mark = mainFolded.get(id);
+    const household = houseNameOf(mark);
+    if (!household) continue;
+    const entry = unregisteredEntry(household);
+    const verdict = unpublishVerdict(entry, {
+      escrow: escrow.get(id) ?? 0,
+      standing: standingOf(id),
+      currentPath: () => filingOnMain(id),
+      held: () => isHeld(result.byId?.get(id) ?? mark),
+    });
+    if (verdict.unpublish !== true) continue;
+    unpublished.push({
+      household: entry.household,
+      id,
+      path: verdict.path,
+      class: "unregistered",
+      walked: "commons",
+      escrow: escrow.get(id) ?? 0,
+      content: readAt(repo, mainBranch, verdict.path),
+    });
+  }
+  return unpublished;
+}
+
+/** the publication registry at `mainRef` (WORLD/settlement-publications.json), or an empty one */
+export function publicationRegistry(repo, mainRef) {
   if (!hasObject(repo, `${mainRef}:${REGISTRY_REL}`)) return { version: 1, published: {} };
   const parsed = JSON.parse(readAt(repo, mainRef, REGISTRY_REL));
   return {
@@ -1587,6 +1667,11 @@ export function settlementSweep({
     .filter(([id, entry]) => isCandidateRow(entry) && (escrow.get(id) ?? 0) === 0 && !gone.has(id)
       && !(mainFolded.has(id) && townOwned(mainFolded.get(id))))
     .map(([id]) => id);
+  // WLD-252 (Darko, 2026-11-25 08:53 EST): a main mark with NO registry row is asked too, but only one that could be taken at all: at ✦0, not the town's,
+  // not withdrawn, not held, and not one this crossing is publishing (its row is written below). Its standing is walked like a row's, and the one verdict
+  // decides; the registry is never filled in for it, and nothing is taken on an input not read.
+  const unregisteredJudged = unregisteredCandidates({ registry, mainFolded, escrow, gone, touched: new Set(pending.map((row) => row.id)) });
+  judged.push(...unregisteredJudged);
   const candidateOf = new Map(pending.filter((row) => row.candidate).map((row) => [row.id, row.candidate]));
 
   // THE RESULT of laying `rows` on main (with every withdrawal taken out).
@@ -1664,9 +1749,10 @@ export function settlementSweep({
   // The family crosses together, and a verdict whose ground stayed behind is let go.
   settlePublished();
 
-  // MARKET, PUBLISHED. Only marks previously admitted by this sweep are
-  // candidates for unpublish. Anything absent from the registry is founding
-  // estate and stays published. THE RULE IS unpublish-verdict.mjs's
+  // MARKET, PUBLISHED. The marks this sweep admitted (the registry's rows) and,
+  // since WLD-252, a main mark with no row that could be taken at all (below):
+  // registry absence is no exemption, and no stored path or class is invented
+  // for it. THE RULE IS unpublish-verdict.mjs's
   // (postmark#3757), the one the office's stakes warning reads too; this loop
   // measures and acts. A verdict of `null` (an input not measured) unpublishes
   // nothing, as a skipped row always did.
@@ -1680,37 +1766,9 @@ export function settlementSweep({
   // verb's door below. A mark kept by such ground is kept this crossing and
   // judged again at the next: the direction that takes nothing on a premise
   // that moved.
-  const filingOnMain = filingIndexAt(repo, mainBranch);
-  const unpublished = [];
   // a drop is judged where it now stands, at this settlement (POS-688 D4 step 3)
   const droppedTo = new Map(published.filter((row) => row.dropped).map((row) => [row.id, row.class]));
-  for (const [id, row] of Object.entries(registry.published)) {
-    const entry = droppedTo.has(id) ? { ...row, class: droppedTo.get(id) } : row;
-    const verdict = unpublishVerdict(entry, {
-      escrow: escrow.get(id) ?? 0,
-      pathOnMain: () => hasObject(repo, `${mainBranch}:${entry.path}`),
-      standing: () => (!result.byId ? undefined : gone.has(id) || !mainFolded.has(id) ? null
-        : result.byId === mainFolded ? (mainFolded.get(id)?.tier ?? null) // nothing laid on main: the fold's own verdict
-        : result.viewed.has(id) ? classifyMark(result.byId.get(id), result.byId) : undefined),
-      currentPath: () => filingOnMain(id),
-      // a held thing is published but unplaced: never a candidate while held (POS-688)
-      held: () => isHeld(result.byId?.get(id) ?? mainFolded.get(id)),
-      ...(staleRows ? { staleRows } : {}),
-    });
-    if (verdict.unpublish !== true) continue;
-    // `class` is the ROW's, as the registry holds it (a home row taken under G2
-    // says home), and `walked` is what the walk found: every take walks commons.
-    // The row's class is also what a kept frame's row is put back with, below.
-    unpublished.push({
-      household: entry.household,
-      id,
-      path: verdict.path,
-      class: entry.class,
-      walked: "commons",
-      escrow: escrow.get(id) ?? 0,
-      content: readAt(repo, mainBranch, verdict.path),
-    });
-  }
+  const unpublished = unpublishPass({ repo, mainBranch, registry, escrow, mainFolded, result, gone, droppedTo, unregisteredJudged, households: wallRegistry.households, staleRows });
 
   // § THE REPARENT VERB TAKES THE RETURN (2026-09-16, POS-102 · postmark#2865).
   // A zero-stake frame with standing marks filed under it used to be KEPT here
@@ -1945,7 +2003,8 @@ export function settlementSweep({
         if (left) {
           writeRepoFile(repo, left.path, left.content);
           unpublished.splice(unpublished.indexOf(left), 1);
-          registry.published[left.id] = { household: left.household, path: left.path, class: left.class };
+          // a kept frame gets back the row it had; one that had none (WLD-252) stays without one
+          if (left.class !== "unregistered") registry.published[left.id] = { household: left.household, path: left.path, class: left.class };
           leftDrafted.push({ household: left.household, id: left.id, path: left.path, class: left.class, escrow: left.escrow,
             reason: `kept: ${stuck.id} stands inside it and cannot keep its place exactly if it leaves (${stuck.reason}) — the frame stays until it is staked, or the mark is re-expressed by hand` });
           continue;

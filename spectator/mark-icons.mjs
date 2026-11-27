@@ -26,7 +26,8 @@
 // reader's, its ✦ figure and who is inside it. Pure.
 import { entryLawOf, isStairs, STAIRS_LINE } from "../tools/enter-exit.mjs";
 import { isDungeon } from "../tools/portals.mjs";
-import { isSited, isHeld } from "../tools/mark-kind.mjs"; // LOGOS v2 W2: a thing is kind: thing, still sited
+import { isSited, isHeld, kindIndexOf } from "../tools/mark-kind.mjs"; // LOGOS v2 W2: a thing is kind: thing, still sited
+import { isDoorClass, DOOR_CLASS } from "../tools/door-law.mjs"; // door is a class (WLD-253): the graph says which classes are doors
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 // THE TOKEN (play fix 43, Darko 20:16): a resident is drawn on the map as a round
@@ -125,12 +126,23 @@ export function thingClassesOf(marks = [], token = (c) => String(c ?? "").trim()
   return out;
 }
 
+/** The door classes, read from the record by the one door reader (door-law.mjs § isDoorClass, over the class graph the marks
+ *  carry): `door` and every class under it (WLD-253). The same answer the map's spineDoors gives, so the glyph, the display
+ *  switch and the pip cannot disagree about what is a door: a town subclass of door is a door whether or not it writes `into`. */
+export function doorClassesOf(marks = [], token = (c) => String(c ?? "").trim().toLowerCase()) {
+  const out = new Set([DOOR_CLASS]);
+  const list = [...(marks ?? [])];
+  const idx = kindIndexOf(list);
+  for (const m of list) if (m?.kind === "class" && m.class != null && isDoorClass(m.class, idx)) out.add(token(m.class));
+  return out;
+}
+
 /** What a mark IS, as one icon key, or null. Order matters where a mark is two
  *  things: a dungeon or a stair is also a portal by its law, a door may be a
  *  thing. Only an instance on the ground or a parcel is anything here — a class
  *  declaration, a predicate or a naming carries no icon, and neither do an idea
  *  and a bounty (deprecating, Darko 2026-10-15). */
-export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"]), thingClasses = new Set(["thing"]) } = {}) {
+export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"]), thingClasses = new Set(["thing"]), doorClasses = new Set([DOOR_CLASS]) } = {}) {
   if (!mark) return null;
   if (mark.kind === "parcel") return "home";
   if (isHeld(mark)) return "thing"; // in someone's hands: published, unplaced, and only a thing is held (POS-688)
@@ -138,7 +150,8 @@ export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"
   if (cls === "idea" || cls === "bounty") return null;
   if (isDungeon(mark) || cls === "dungeon") return "dungeon";
   if (isStairs(mark) || cls === "stairs") return "stairs";
-  if (cls === "portal-ground" || entryLawOf(mark)?.into) return "door";
+  // door is a class (WLD-253): door and every class under it (doorClasses, the graph's answer), whether or not it writes `into`
+  if (cls === DOOR_CLASS || doorClasses.has(cls) || cls === "portal-ground" || entryLawOf(mark)?.into) return "door";
   if (cls === "vehicle") return "vehicle";
   if (creatureClasses.has(cls)) return "creature";
   // a kind of thing is a thing (QA 10-17: a halloween-candy-bowl read "A place")

@@ -70,6 +70,19 @@
 // and the town's own row (class "constitution", the-town/berth) is never a
 // candidate.
 //
+// ── A MARK THE REGISTRY NEVER HELD (WLD-252; Darko, 2026-11-25 08:53 EST) ──
+//
+// The registry lists the marks the sweep itself admitted. A mark that reached
+// main any other way (founding estate, a direct filing, a repair) has no row,
+// and until WLD-252 that absence alone kept it: a commons mark with no stamps
+// behind it stood because nothing asked. Registry membership is not the law;
+// standing is. So an unregistered mark is handed in as `{ household,
+// unregistered: true }` and judged by the SAME walk, more narrowly than a row:
+// it is taken only when it is unheld, has zero escrow, its walk reaches market
+// ground NOW, and its one current filing is found. A held thing, positive
+// backing, home or the town's ground, a mark that does not stand, and any input
+// not read all keep it, as they keep a registered row.
+//
 // PURE. The caller hands in what it measured; this file reads no git, no store
 // and no clock. An input the caller could not measure is `null`, and `null` is
 // never "no": the verdict is then `unpublish: null` with the reason, because "I
@@ -81,16 +94,21 @@ export const STALE_ROWS = "rederive";
 export const CANDIDATE_CLASSES = Object.freeze(["commons", "home"]);
 export const isCandidateRow = (entry) => CANDIDATE_CLASSES.includes(entry?.class);
 
+/** WLD-252: a mark with no registry row, as the verdict is asked about it. `household` is the mark's own (for the report); nothing else is stored, because nothing was. */
+export const unregisteredEntry = (household) => ({ household: household ?? null, unregistered: true });
+export const isUnregistered = (entry) => entry?.unregistered === true;
+
 /** The registry's spelling of the verdict: the fold's `market` is the registry's `commons` (settlement-sweep.mjs § publish). */
 export const rowClassOf = (cls) => (cls === "market" ? "commons" : cls);
 
 /**
  * The rule in words, for any reader that quotes it: Darko's own sentence
  * (WLD-51, 2026-10-14 14:31 EDT), verbatim. It is the plain version on
- * purpose. Two conditions the verdict below still asks are left out of the
- * words, and stay in the code: the registered path must be on main, and only
- * a mark the registry holds is ever a candidate. The words explain; the
- * function decides.
+ * purpose. Conditions the verdict below still asks are left out of the words,
+ * and stay in the code: a registered row's path must be on main, an
+ * unregistered mark's one current filing must be found (WLD-252), a held thing
+ * is not judged while held, and an input not read takes nothing. The words
+ * explain; the function decides.
  */
 export const UNPUBLISH_RULE =
   "At each settlement, a commons mark with no stamps behind it leaves the world. A mark standing on your household's ground or the town's never does, whatever it was first filed as.";
@@ -101,7 +119,10 @@ const ask = (x) => (typeof x === "function" ? x() : x);
  * Will the sweep take this registry row out of the world?
  *
  * @param entry       the registry row: `{ household, path, class }`. A commons
- *                    or home row is a candidate; the walk decides (G2).
+ *                    or home row is a candidate; the walk decides (G2). A mark
+ *                    with no row is `unregisteredEntry(household)` (WLD-252):
+ *                    a candidate too, taken only on a walk that reaches market
+ *                    ground now, from its one current filing.
  * @param escrow      open stamps behind the mark at the crossing; `null` = unread.
  * @param pathOnMain  is `entry.path` on main? A boolean, `null` (unread), or a
  *                    function returning one: asked only when the answer turns
@@ -122,7 +143,8 @@ const ask = (x) => (typeof x === "function" ? x() : x);
  *          the sweep removes, present when `unpublish` is true.
  */
 export function unpublishVerdict(entry, { escrow = null, pathOnMain = null, standing, currentPath, held = false, staleRows = STALE_ROWS } = {}) {
-  if (!isCandidateRow(entry)) return { unpublish: false, why: "not-a-candidate" };
+  const unregistered = isUnregistered(entry);
+  if (!unregistered && !isCandidateRow(entry)) return { unpublish: false, why: "not-a-candidate" };
   if (ask(held) === true) return { unpublish: false, why: "held" };
   if (escrow === null || escrow === undefined) return { unpublish: null, why: "escrow-unread" };
   if (Number(escrow) > 0) return { unpublish: false, why: "backed" };
@@ -130,6 +152,13 @@ export function unpublishVerdict(entry, { escrow = null, pathOnMain = null, stan
   const tier = ask(standing);
   if (tier === undefined) return { unpublish: null, why: "standing-unread" };
   if (tier !== null && rowClassOf(tier) !== "commons") return { unpublish: false, why: "walks-not-commons" };
+  // WLD-252: no row, so no stored path or class to fall back on: taken only on a walk that reached market ground, from where it is filed now
+  if (unregistered) {
+    if (tier === null) return { unpublish: false, why: "not-standing" };
+    const at = ask(currentPath);
+    if (!at) return { unpublish: null, why: "filing-unread" };
+    return { unpublish: true, why: "unregistered-commons-unbacked", path: at };
+  }
   // a home row is taken only on a walk that reached market ground (G2)
   if (tier === null && entry.class === "home") return { unpublish: false, why: "not-standing" };
   const onMain = ask(pathOnMain);

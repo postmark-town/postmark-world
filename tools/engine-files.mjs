@@ -50,6 +50,10 @@ export const ENGINE_FILES = [
   "world-engine.mjs",
   // joined 2026-11-14 (WLD-173): the lint reads a spark's own grammar from spark.mjs
   "spark.mjs",
+  // joined 2026-11-25 (WLD-253): door is a class; the lint, the passage and the office read its law from door-law.mjs, which asks
+  // admin-makers.mjs whether a writer may make a door
+  "door-law.mjs",
+  "admin-makers.mjs",
 ];
 
 // Fixtures that additionally exercise the gate or the sketchbook wall name the

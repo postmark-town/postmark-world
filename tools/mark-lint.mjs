@@ -37,6 +37,7 @@ import { markStanding } from "./mark-standing.mjs";
 import { consentMap, CONSENT_WORDS, CONSENT_FIELD, townOwnedMark, cameAfter, inContact, seniorAtContact, parcelInteriorOf, parcelReaches } from "./consent.mjs";
 import { crossHouseholdRiders, householdResolver } from "./household-frames.mjs";
 import { portalFindings } from "./portals.mjs";
+import { doorRefusal, classHasNoWayIn } from "./door-law.mjs"; // WLD-253: door is a class, its fields its own; thing has no way in
 import { classIndex, classChain, ownProperties, propertyAt, propertyNames, propertyValue } from "./class-properties.mjs";
 import { instanceClassOf, isSited, isPredicate, HELD_BY, heldBy, OWNED_BY, ownedBy } from "./mark-kind.mjs";
 import { regionAnchors, groundStands } from "./world-build.mjs"; // WLD-97: the ground_m rule the heightfield honors
@@ -1308,6 +1309,21 @@ const TOP_LEVEL_MD = new Set(["SCHEMA.md", "README.md"]);
     const rec = standingIndex.get(f.mark) ?? { id: f.mark };
     if (f.sev === "WARN") warn(rec, `[${f.rule}] ${f.msg}`);
     else err(rec, `[${f.rule}] ${f.msg}`);
+  }
+  // DOOR IS A CLASS (WLD-253; CORE-129 layer 1, Darko 2026-11-25; door-law.mjs, the one law the passage and the office read too):
+  //   · into, lands_at and requires are door's alone. Any other class writing one, in any spelling, flat or inside entry, is an ERROR, and so
+  //     is a door writing one inside entry (where they rode before), misspelled, or twice. A finding, never a quiet drop.
+  //   · door answers makers: false. A door stands as the town's, or as one of the 44 the town re-kinded on 2026-11-25, by exact id: an
+  //     exception by ruling, as the gate's instance exceptions are (board-grammar.test.mjs), not the retired list above that hid a portal
+  //     finding. Its values are not pinned here: what the PR route carries no actor for, a founder's merge decides (WLD-253/town-act).
+  //   · a class whose entry is the locked none (thing, the override rule's first use) has no way in, so its instance writes no entry.
+  for (const rec of marks) {
+    if (rec._error || rec.kind === "class" || rec.kind === "property") continue;
+    const refusal = doorRefusal(rec, { marks: CLASS_IDX });
+    if (refusal) err(rec, `[door-law] ${refusal.words}`);
+    const klass = instanceClassOf(rec);
+    if (rec.entry !== undefined && classHasNoWayIn(klass, CLASS_IDX))
+      err(rec, `[door-law] entry: ${klass}'s entry is none, locked (the-town/thing-entry) — a ${klass} has no way in, so it writes no entry (WLD-212, made law by WLD-253)`);
   }
 }
 

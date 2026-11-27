@@ -5,7 +5,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CANDIDATE_CLASSES, STALE_ROWS, UNPUBLISH_RULE, isCandidateRow, rowClassOf, unpublishVerdict } from "./unpublish-verdict.mjs";
+import { CANDIDATE_CLASSES, STALE_ROWS, UNPUBLISH_RULE, isCandidateRow, rowClassOf, unpublishVerdict, unregisteredEntry, isUnregistered } from "./unpublish-verdict.mjs";
 
 const commons = { household: "house-of-many-doors", class: "commons", path: "WORLD/marks/let-there-be-light/the-uphill-firepit/mark.md" };
 const market = { standing: "market" };
@@ -106,4 +106,42 @@ test("\"rederive\" (WLD-51's other branch): a stale row is judged by where and w
   assert.deepEqual(unpublishVerdict(commons, { ...stale, standing: "market", currentPath: "x", pathOnMain: true }),
     { unpublish: true, why: "commons-unbacked", path: commons.path }, "a row whose path IS on main is untouched by the dial");
   assert.throws(() => unpublishVerdict(commons, { escrow: 0, pathOnMain: false, staleRows: "sweep-everything", ...market }), /unknown STALE_ROWS/);
+});
+
+// ── WLD-252 · a mark the registry never held (Darko, 2026-11-25 08:53 EST; Wright 14:33Z: "unregistered + market tier + unheld + zero escrow") ──
+// The motivating mark, the one the owner chose to let go; its held siblings, a backed commons, home and the town's ground are the controls.
+const SWEET = "WORLD/marks/jetto-of-starforge/a-sweet-that-was-just-here/mark.md";
+const unreg = unregisteredEntry("starforge");
+
+test("WLD-252 · an unregistered, unheld, current-commons mark at ✦0 gets the verdict its registered twin gets: taken, from its current filing", () => {
+  assert.deepEqual(unreg, { household: "starforge", unregistered: true }, "no path, no class: nothing is invented for it");
+  assert.equal(isUnregistered(unreg), true);
+  assert.equal(isCandidateRow(unreg), false, "it is not a registry row, and the row list is unchanged");
+  assert.deepEqual(unpublishVerdict(unreg, { escrow: 0, standing: "market", currentPath: SWEET }),
+    { unpublish: true, why: "unregistered-commons-unbacked", path: SWEET });
+  const twin = { household: "starforge", class: "commons", path: SWEET };
+  assert.equal(unpublishVerdict(twin, { escrow: 0, standing: "market", pathOnMain: true }).unpublish, true, "the registered twin: the same answer");
+});
+
+test("WLD-252 · the exclusions hold without a row: held, backed, home, the town's ground, not standing — each KEPT", () => {
+  const base = { escrow: 0, standing: "market", currentPath: SWEET };
+  assert.deepEqual(unpublishVerdict(unreg, { ...base, held: true }), { unpublish: false, why: "held" }, "a held sibling is not judged while held (POS-688)");
+  assert.deepEqual(unpublishVerdict(unreg, { ...base, held: () => true }), { unpublish: false, why: "held" });
+  assert.deepEqual(unpublishVerdict(unreg, { ...base, escrow: 1 }), { unpublish: false, why: "backed" }, "a backed commons (Sol's tower at ✦1) stays");
+  assert.deepEqual(unpublishVerdict(unreg, { ...base, standing: "home" }), { unpublish: false, why: "walks-not-commons" }, "home ground never needs a stamp");
+  assert.deepEqual(unpublishVerdict(unreg, { ...base, standing: "constitution" }), { unpublish: false, why: "walks-not-commons" }, "nor the town's");
+  assert.deepEqual(unpublishVerdict(unreg, { ...base, standing: null }), { unpublish: false, why: "not-standing" }, "no row and no standing: nothing to take, never a take on an absence");
+});
+
+test("WLD-252 · an input not read takes nothing: escrow, standing, the filing (none, or ambiguous → null)", () => {
+  assert.deepEqual(unpublishVerdict(unreg, { standing: "market", currentPath: SWEET }), { unpublish: null, why: "escrow-unread" });
+  assert.deepEqual(unpublishVerdict(unreg, { escrow: 0, currentPath: SWEET }), { unpublish: null, why: "standing-unread" });
+  assert.deepEqual(unpublishVerdict(unreg, { escrow: 0, standing: () => undefined, currentPath: SWEET }), { unpublish: null, why: "standing-unread" });
+  assert.deepEqual(unpublishVerdict(unreg, { escrow: 0, standing: "market", currentPath: null }), { unpublish: null, why: "filing-unread" });
+  assert.deepEqual(unpublishVerdict(unreg, { escrow: 0, standing: "market", currentPath: () => null }), { unpublish: null, why: "filing-unread" });
+  // the stale-row dial is the registry's; an unregistered mark never reads it
+  assert.equal(unpublishVerdict(unreg, { escrow: 0, standing: "market", currentPath: SWEET, staleRows: "skip" }).unpublish, true);
+  // a lookalike that is not explicitly unregistered is still not a candidate
+  assert.deepEqual(unpublishVerdict({ household: "starforge" }, { escrow: 0, standing: "market", currentPath: SWEET }), { unpublish: false, why: "not-a-candidate" });
+  assert.deepEqual(unpublishVerdict({ household: "starforge", unregistered: "yes" }, { escrow: 0, standing: "market", currentPath: SWEET }), { unpublish: false, why: "not-a-candidate" });
 });

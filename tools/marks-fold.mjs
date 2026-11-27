@@ -1745,6 +1745,12 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // door. Undefined on every mark that has written none, so a world with no
       // entry laws serializes byte-identically.
       entry: mk.entry,
+      // A DOOR'S OWN FIELDS (WLD-253, ruled 2026-11-25): door is a class, and where it leads (`into`), where you land
+      // (`lands_at`) and what it asks to hold first (`requires`) are its own flat fields now, not entry's. Carried
+      // for the reason entry is: the passage, the page and the office read the door from the store. An instance's
+      // only (an edge class's own `requires` is its law, not a door's), and undefined on every mark that writes
+      // none, so a world without doors serializes as before.
+      ...(mk.kind !== "class" && mk.kind !== "property" ? { into: mk.into, lands_at: mk.lands_at, requires: mk.requires } : {}),
       // the bounty grammar (the board's notices — founder-ruled 2026-08-11)
       // rides the same carried-through lane: without these five in the store,
       // the board page can never see a notice — letter-posted or door-posted

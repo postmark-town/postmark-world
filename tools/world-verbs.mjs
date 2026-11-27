@@ -10,7 +10,7 @@
 //   { marks, terrain, heightfield, light, fogCeilingM, charter }
 // A `state` is the walker: { x, y, name, household? }.
 
-import { isSited, isGround, isPredicate, isLandform, isThingIn, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isGround, isPredicate, isLandform, isThingIn, kindIndexOf, instanceClassOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
   fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
@@ -18,6 +18,7 @@ import {
 } from "./world-engine.mjs";
 import { homeOf } from "./where-is.mjs"; // the ONE home resolver (declared, own parcel, household)
 import { propertyOf } from "./class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
+import { doorRefusal, classHasNoWayIn } from "./door-law.mjs"; // WLD-253: door is a class, its fields its own; thing has no way in, by its class
 import {
   marksContain, marksOverlapArea, overlapArea, rect,
 } from "./geometry.mjs"; // the ONE containment definition — pure, browser-safe (no node:*)
@@ -470,14 +471,18 @@ export function enter(state, targetId, world, {
   // A mark a dungeon hides from you is no mark at all to you: the same answer
   // as an id that does not exist, so naming one from outside learns nothing.
   if (named && hiddenFrom(marks, held).has(targetId)) return { error: `no mark '${targetId}' to enter` };
-  // ENTERING A MARK ENTERS ITS `into` (WLD-5's ruling, restored by WLD-63): any
-  // mark carrying one is passed through it, the dungeon itself included. The
-  // Starforge Spire carries `into` its vestibule, so entering it from anywhere
-  // in its outline sets you down inside the Gilded Doors; a list asks which.
+  // ENTERING A DOOR ENTERS ITS `into` (WLD-5's ruling, restored by WLD-63): a
+  // mark carrying one is passed through it, and a list asks which. NARROWED
+  // 2026-11-25 (WLD-253, CORE-129 layer 1): `into` is door's alone, so a dungeon
+  // (or a stairs, or any other class) no longer names a way in of its own; a
+  // record that still writes one is passed here only to be refused by name at
+  // its threshold (door-law.mjs). The Starforge Spire, re-kinded to door,
+  // carries `into` its vestibule, so entering it from anywhere in its outline
+  // sets you down inside the Gilded Doors.
   if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into, lockedOut, holdings });
   // Inside a dungeon the only enter is through a portal (G3: the cure for the
-  // Swiss-cheese exit must not leak on the way in), and a dungeon that names no
-  // `into` of its own is entered by the portals that lead into it.
+  // Swiss-cheese exit must not leak on the way in), and a dungeon is entered by
+  // the doors that lead into it.
   if (named && dungeonIndex(marks).dungeons.length) {
     const inside = heldDungeon(held, marks);
     const governs = dungeonsOf(named, marks);
@@ -487,17 +492,19 @@ export function enter(state, targetId, world, {
       return {
         error: inside
           ? `you are inside ${d}, a dungeon — inside one, the only way to enter anything is a portal. The portals where you stand: ${ways.map((p) => p.id).join(", ") || "(none)"}`
-          : `${d} is a dungeon that names no way in of its own (no \`into\`), so it is entered through the portals that lead into it. Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
+          : `${d} is a dungeon, so it is entered through the doors that lead into it (a dungeon names no way in of its own: \`into\` is a door's). Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
         refused: "dungeon", dungeon: d, portals: ways,
       };
     }
   }
   // A THING HAS NO INSIDE (WLD-212; Darko 2026-11-19 22:12 EST: "better to abolish this and then bring back an
   // exception class later if we want to, rather than have it be blanket allowed"; the-town/the-not-ground:
-  // "a thing is not ground"). A thing — the class or any subclass of it — that carries no `entry.into` is refused
-  // here, by name, before any plan or row. A thing WITH an `into` was passed through its portal above and never
-  // arrives; ground, hidden targets and the dungeon laws are answered above or below, unchanged.
-  if (named && isThingIn(named, kindIndexOf(marks))) {
+  // "a thing is not ground"). It is LAW now, read from the class (WLD-253; CORE-129 layer 1, the override rule's first
+  // use): thing declares `entry: none`, locked (the-town/thing-entry), and the nearest declaration wins, so a thing and
+  // every subclass that does not loosen it (only the town's subclass may) have no way in. Refused here, by name, before
+  // any plan or row. A record writing `into` was asked at its portal above (a thing may not write one: door-law.mjs);
+  // ground, hidden targets and the dungeon laws are answered above or below, unchanged.
+  if (named && classHasNoWayIn(instanceClassOf(named), kindIndexOf(marks))) {
     return { error: `${targetId} is a thing, and a thing has no inside — there is nothing to enter`, refused: "thing", target: targetId };
   }
   const plan = enterExitPlan(state, targetId, world, { occupancy, handle });
@@ -577,7 +584,13 @@ export function enter(state, targetId, world, {
  *     "settlement"`, the world as the last settlement printed it), and then
  *     everyone. Nothing is written. */
 function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick, lockedOut = null, holdings = null }) {
+  // DOORS ARE THE TOWN'S (WLD-253): door is a class and into, lands_at and requires are its own. A record passes as a portal only if the door
+  // law lets it stand: a door the town made, or one of the 44 the town re-kinded, by name (its values are not pinned here; who may change them
+  // is the office's question and, by PR, a founder's merge). Asked first, by name, and nothing is written. A stairs leading where its class
+  // says writes no door field, and is not asked.
   const marks = world.marks ?? [];
+  const unlawful = doorRefusal(portal, { marks: kindIndexOf(marks) });
+  if (unlawful) return { error: unlawful.words, refused: "door-law", door: portal.id, fields: unlawful.fields };
   const byId = new Map(marks.map((m) => [m.id, m]));
   const lock = lockedPassage(portal, { pick: pick == null ? null : String(pick), marks, held, lockedOut, determined: world.determined ?? {} });
   if (lock) return { error: lock.words, refused: "dungeon-locked", dungeon: lock.dungeon, locked_until: lock.until, left_at: lock.left_at ?? null };
@@ -615,7 +628,7 @@ function enterThroughPortal(state, portal, world, { held, handle, at, iso, accep
 
   const broken = (field, value, because) => ({ ...base, crossings: [verdict], stranded: portal.id,
     broken: { field, value, because: `${because}. You are standing at ${portal.id}, and nothing was recorded.` } });
-  if (!chosen) return broken("into", law.into, "entry.into names no mark at all, so this portal leads nowhere");
+  if (!chosen) return broken("into", law.into, "into names no mark at all, so this portal leads nowhere");
   const intoMark = byId.get(chosen);
   if (!intoMark) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names no mark, so this portal leads nowhere`);
   if (!intoMark.at) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names a mark with no place in the world`);

@@ -46,9 +46,9 @@ test("what a mark is, read from the record", () => {
   assert.equal(markWhat(sited({ class: "dungeon" }), { cls: "dungeon" }), "dungeon");
   assert.equal(markWhat(sited({ class: "stairs" }), { cls: "stairs" }), "stairs",
     "a stair is a portal by its class's law, and is still called stairs");
-  assert.equal(markWhat(sited({ entry: { word: "welcomed", into: "h/room" } })), "door", "a law that carries `into` is a door");
+  assert.equal(markWhat(sited({ kind: "door", entry: { word: "welcomed" }, into: "h/room" }), { cls: "door" }), "door", "a door, with its into, is a door");
+  assert.equal(markWhat(sited({ kind: "door" }), { cls: "door" }), "door", "door is a class (WLD-253): a door is a door before it names a way");
   assert.equal(markWhat(sited({ class: "portal-ground" }), { cls: "portal-ground" }), "door", "and so is a portal-ground");
-  assert.equal(markWhat(sited({ class: "thing", entry: { into: "h/inside" } }), { cls: "thing" }), "door", "a door outranks a thing");
   assert.equal(markWhat(sited({ class: "vehicle" }), { cls: "vehicle" }), "vehicle");
   const creatures = creatureClassesOf([
     { kind: "class", class: "creature" },

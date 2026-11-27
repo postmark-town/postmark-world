@@ -24,6 +24,7 @@
 import { isGround, instanceClassOf, isPredicate, heldBy, ownedBy, isLandform, kindIndexOf } from "../tools/mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { openYourEyes, investigate, containmentChain, mistsSentence, veilSentence, standpointSight, shelterOf } from "../tools/world-verbs.mjs";
 import { ringRoomOf, ringRoomOutline } from "../tools/portals.mjs"; // a creature's ring stops at its room's walls (WLD-25)
+import { isDoorMark } from "../tools/door-law.mjs"; // a door keeps its own map marker, by its class (WLD-253)
 import { assembleWorld } from "../tools/world-build.mjs";
 import { DIALS, bearingDeg, quantizeBearing, mistsAt, mistsHere, mistsRoad } from "../tools/world-engine.mjs";
 import { marksContain, pointInPolygon, pointInRect, polygonBBox, polygonOf, rect } from "../tools/geometry.mjs"; // read-only: home color + point-destination labels
@@ -61,7 +62,7 @@ export { setViewerIdentityForSpeaker };
 import { homeOf, homesOnParcel } from "../tools/where-is.mjs";
 // WHAT A MARK IS, AS ICONS (Darko, playground sitting 2026-10-15): the closed
 // vocabulary, its one-line meanings and its three renderings live in one file.
-import { markIcons, markWhat, iconSVG, iconsHTML, creatureClassesOf, thingClassesOf, MARK_ICON_CSS, MARK_ICONS } from "./mark-icons.mjs";
+import { markIcons, markWhat, iconSVG, iconsHTML, creatureClassesOf, thingClassesOf, doorClassesOf, MARK_ICON_CSS, MARK_ICONS } from "./mark-icons.mjs";
 // LOGOS v2 part 2 on the page (POS-678): what a holder holds, who carries what,
 // and the say card's numbers, each from the office's own reads.
 import { holderLines, residentHoldLines, handsLines, holdingParts, heldWords, sayCardNote, thingKindLedger, isThingId } from "./holdings.mjs";
@@ -2480,6 +2481,24 @@ const isPortalGround = (classes) => /(?:^|\s)c-portal-ground(?:\s|$)/.test(Strin
 // a glyph centred on the dot (mark-icons.mjs § iconSVG), drawn the same way the
 // doorway is — over the circle, never instead of it — and it replaces the
 // doorway, which is the door glyph's older, smaller self.
+/** A DOOR KEEPS ITS OWN MARKER (WLD-253; Wright, 2026-11-26: "Door keeps its own map marker and label, reusing the existing
+ *  door sign, with no former-thing exception"). A door is sited ground, so one the reader or the camera stands within is on
+ *  the spine (`within`), not a bearing: the field of view lists it nowhere and the painting drew it no pip, so a 3×3 ring was
+ *  lost under the room around it. These are the doors on the spine, as marks, each once, to be drawn as any pip is (its
+ *  door sign from mark-icons, its own label and its own hit, so its own card). By CLASS only (door-law.mjs § isDoorMark, the
+ *  class graph's answer: a town subclass of door too), never by id or by what a mark used to be. */
+export function spineDoors(within, { byId = new Map(), marks = null } = {}) {
+  const idx = kindIndexOf(marks ?? [...byId.values()]);
+  const out = [], seen = new Set();
+  for (const w of within ?? []) {
+    const m = byId.get(w?.id) ?? w;
+    if (!m?.id || seen.has(m.id) || !Number.isFinite(Number(m.at?.x)) || !Number.isFinite(Number(m.at?.y)) || !isDoorMark(m, idx)) continue;
+    seen.add(m.id);
+    out.push(m);
+  }
+  return out;
+}
+
 export function overlayPipSVG({ at, id, classes = "", fan = null, title = null, inner = "", badges = [] } = {}) {
   const x = Number(at?.x), y = Number(at?.y);
   if (![x, y].every(Number.isFinite)) return "";
@@ -5578,15 +5597,22 @@ export function enterableMark(mark, { thingClasses = null } = {}) {
 
 /** A THING IS NOT GROUND (the-town/the-not-ground): "nothing files under it by
  *  geometry, and a walk onto it sets you down on what it stands on." A bag, a bowl
- *  or a pot has a footprint and no inside, so its card offers no enter. The one way
- *  in is a door it carries: a thing may hold an `entry` naming an `into` (Bevel,
- *  2026-11-19), and entering it passes you through to that room, so that thing keeps
- *  the button. A kind of thing is a thing (W2 final): the caller passes the page's
- *  thing classes; without them, only the class `thing` itself is known. */
+ *  or a pot has a footprint and no inside, so its card offers no enter. NARROWED
+ *  2026-11-25 (WLD-253, CORE-129 layer 1): a thing may no longer carry a door. Its
+ *  class's entry is the locked none (the-town/thing-entry) and `into` is a door's
+ *  alone, so a thing that still writes one is refused by name at the passage, and its
+ *  card offers no enter either (until then "a thing may hold an `entry` naming an
+ *  `into`", Bevel 2026-11-19; a bag of holding is CORE-129 layer 2). A kind of thing
+ *  is a thing (W2 final): the caller passes the page's thing classes; without them,
+ *  only the class `thing` itself is known. The name keeps its callers.
+ *  LAYER 2 NOTE (not built): the engine follows the class's EFFECTIVE `entry`
+ *  (door-law.mjs § classHasNoWayIn: the nearest declaration wins), and no thing
+ *  subclass loosens it today. When layer 2 adds one (a bag of holding), this card
+ *  must follow that effective entry too, not "every thing class", or the page will
+ *  hide an enter the passage allows. */
 export function thingWithoutDoor(mark, { thingClasses = null } = {}) {
   const cls = classToken(instanceClassOf(mark));
-  const isThing = cls === "thing" || (!!cls && !!thingClasses?.has?.(cls));
-  return isThing && !entryLawOf(mark)?.into;
+  return cls === "thing" || (!!cls && !!thingClasses?.has?.(cls));
 }
 
 /** Whether THIS reader may cross THIS threshold, and if not, why not.
@@ -9484,6 +9510,13 @@ export function mountViewer(appEl) {
     }
     return thingClassMemo.set;
   }
+  // and the door classes (WLD-253): door and every class under it, by the one door reader spineDoors uses, so the glyph and
+  // the display switch call a door subclass a door as the map's pip does, whether or not it writes `into`
+  let doorClassMemo = { epoch: -1, set: null };
+  function doorClasses() {
+    if (doorClassMemo.epoch !== worldEpoch || !doorClassMemo.set) doorClassMemo = { epoch: worldEpoch, set: doorClassesOf(allMarks(), classToken) };
+    return doorClassMemo.set;
+  }
   // the thing classes for a containment question over `marks`: each kind among them
   // with no answer yet is asked of the class layer (once), so a place line stops
   // naming a bowl as ground as soon as the office says what a bowl is
@@ -9501,7 +9534,7 @@ export function mountViewer(appEl) {
     const cls = classToken(instanceClassOf(full));
     askLineage(cls);   // a kind with no class mark in hand: its chain, asked once
     return markIconsOf(full, {
-      cls, creatureClasses: creatureClasses(), thingClasses: thingClasses(),
+      cls, creatureClasses: creatureClasses(), thingClasses: thingClasses(), doorClasses: doorClasses(),
       yours: isOwnMark(full), inside: (occupants.get(full.id) ?? []).length,
       ...(map ? { ownStake: householdStakeOn(full.id, { signedIn: !!pmKey(), portfolio: state.portfolio }) } : {}),
     });
@@ -9821,7 +9854,7 @@ export function mountViewer(appEl) {
   // be drawn, listed, hovered nor take a click that belongs to a smaller match.
   const displayHides = () => displaySelectionHides(state.display);
   // the icon a mark wears is the switch it answers to: `markWhat`, the very function the pip and the column read (CORE-147), asked with the page's own classes
-  const whatOfMark = (m) => markWhat(m, { cls: classToken(instanceClassOf(m)), creatureClasses: creatureClasses(), thingClasses: thingClasses() });
+  const whatOfMark = (m) => markWhat(m, { cls: classToken(instanceClassOf(m)), creatureClasses: creatureClasses(), thingClasses: thingClasses(), doorClasses: doorClasses() });
   const shownByDisplay = (m) => !displayHides() || markInDisplaySelection(byId.get(m?.id) ?? m, state.display, { isMine, isDraft, whatOf: whatOfMark });
   // the layers that are not marks: the residents (with their walking lines) and the speech bubbles have a switch of their own and no mark to ask
   const residentsOff = () => (state.display?.off ?? []).includes("residents");
@@ -12304,6 +12337,12 @@ export function mountViewer(appEl) {
           if (!m?.id || !m.at || typeof m.at.x !== "number" || seen.has(m.id)) continue;
           seen.add(m.id); if (shownByDisplay(m)) out.push(m);
         }
+    // A DOOR ON THE SPINE KEEPS ITS OWN PIP (WLD-253; spineDoors above): a door the reader or camera stands within is no
+    // bearing, so it is added here by its class, to be drawn, labelled and hit as its own mark
+    for (const m of spineDoors(radial?.within, { byId, marks: allMarks() })) {
+      if (seen.has(m.id)) continue;
+      seen.add(m.id); if (shownByDisplay(m)) out.push(m);
+    }
     // the radial's own entries come first and are KEPT: they carry distM and
     // bearing, which the bare record mark does not
     //

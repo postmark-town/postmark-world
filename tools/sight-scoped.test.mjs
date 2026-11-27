@@ -29,15 +29,18 @@ const ROOT = M("the-town/let-there-be-light", 0, 0, 60000, 60000);
 const GROUNDS = M("s/grounds", 0, 0, 500, 400);
 const SPIRE = M("s/spire", 0, 0, 240, 180, { class: "dungeon" });
 const HALL = M("s/red-stair-hall", -20, -40, 60, 40);
+// the doors are doors, and the town's (WLD-253: door is a class, into its own field; a resident's door no rule allows does not pass); who
+// sees and enters them is the test
+const TOWN = "the-town";
 const IN_HALL = [
-  M("s/hall-to-rose", -5, -22, 2, 2, { entry: { word: "neutral", into: "s/rose-hall" } }),
-  M("s/hall-to-blue", -48, -45, 2, 2, { entry: { word: "neutral", into: "s/blue-room" } }),
+  M("s/hall-to-rose", -5, -22, 2, 2, { kind: "door", by: TOWN, entry: { word: "neutral" }, into: "s/rose-hall" }),
+  M("s/hall-to-blue", -48, -45, 2, 2, { kind: "door", by: TOWN, entry: { word: "neutral" }, into: "s/blue-room" }),
   M("s/hall-benches", -40, -50, 8, 2),
   M("s/hall-rug", -20, -40, 10, 6),
   M("s/the-red-stair", -5, -50, 6, 10, { class: "stairs" }),
   // a door SET IN the hall's west wall (x = -50), straddling it, its anchor just inside:
   // the Chapel front-door shape, the room's to see though not wholly inside it (review-233)
-  M("s/hall-west-door", -49.5, -38, 2, 2, { entry: { word: "neutral", into: "s/blue-room" } }),
+  M("s/hall-west-door", -49.5, -38, 2, 2, { kind: "door", by: TOWN, entry: { word: "neutral" }, into: "s/blue-room" }),
 ];
 const ROSE = M("s/rose-hall", -5, -5, 40, 30);
 // the Blue Room shares the hall's west wall (x = -50), so the west door straddles into it
@@ -148,7 +151,7 @@ test("through the reads' own path (standpointSight → scopeWorld → hiddenFrom
 
 test("a door anchored exactly on a wall two rooms share belongs to ONE room, the one portalsIn lists it under", async () => {
   const { roomHolds, portalsIn } = await import("./portals.mjs");
-  const onTheWall = M("s/on-the-wall", -50, -40, 2, 2, { entry: { word: "neutral", into: "s/blue-room" } });
+  const onTheWall = M("s/on-the-wall", -50, -40, 2, 2, { kind: "door", by: TOWN, entry: { word: "neutral" }, into: "s/blue-room" });
   const w = worldOf([ROOT, GROUNDS, SPIRE, HALL, BLUE, onTheWall]);
   const byId = new Map(w.marks.map((m) => [m.id, m]));
   const holders = ["s/red-stair-hall", "s/blue-room"].filter((r) => roomHolds(byId.get(r), byId.get("s/on-the-wall"), w.marks));

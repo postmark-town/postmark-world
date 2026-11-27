@@ -96,10 +96,14 @@ test("a kind of thing is a thing, when the page knows its thing classes", () => 
   assert.equal(enterableMark(bowl, { thingClasses: things }), false);
 });
 
-test("a thing that carries a door keeps the button (Bevel, 2026-11-19: a thing can be a door)", () => {
-  const door = { ...BAG, entry: { word: "welcomed", into: "little-bird/inside-the-bag" } };
-  const a = enterAffordance({ mark: door, palette: GRANTED, actingAs: "little-bird" });
-  assert.equal(a.show, true, "a thing with an entry into a room is a way in");
+// NARROWED 2026-11-25 (WLD-253, CORE-129 layer 1): until then "a thing that carries a door keeps the button" (Bevel, 2026-11-19). A thing's
+// entry is the locked none and into is a door's alone, so a thing writing one offers no enter (the passage refuses it by name); a door does.
+test("a thing that writes a door offers no button (WLD-253: a thing has no way in); a door, the class, keeps it", () => {
+  const carried = { ...BAG, entry: { word: "welcomed", into: "little-bird/inside-the-bag" } };
+  assert.equal(enterAffordance({ mark: carried, palette: GRANTED, actingAs: "little-bird" }).show, false, "a thing is no way in, door or no door");
+  assert.equal(enterableMark(carried), false);
+  const door = { ...BAG, kind: "door", entry: { word: "welcomed" }, into: "little-bird/inside-the-bag" };
+  assert.equal(enterAffordance({ mark: door, palette: GRANTED, actingAs: "little-bird" }).show, true, "a door with its into is a way in");
   assert.equal(enterableMark(door), true);
 });
 

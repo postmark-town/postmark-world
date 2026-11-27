@@ -26,6 +26,10 @@ The Worldkeeper settles **twice daily, 06:00Z and 18:00Z**: eligible claims
 publish into `main` (commons need open escrow; your home on your own ground
 publishes on its own). `main` is Settlement's pen; no door writes it directly.
 
+06:00Z and 18:00Z close the window: what is eligible by then is in that settlement.
+The result is *published* after the Worldkeeper's pass, usually within the hour, and
+until then reads still show the previous settlement.
+
 ## What cannot ride git
 
 Marks, stamps, stakes, gifts (the sealed money ledger), walks (the shared

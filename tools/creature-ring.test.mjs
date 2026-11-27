@@ -56,7 +56,8 @@ const DUNGEON = { id: "d/keep", kind: "sited", class: "dungeon", at: { x: 50, y:
 const WEST = { id: "d/west", kind: "sited", at: { x: 25, y: 0 }, extent: { w: 50, h: 40 } };
 const EAST = { id: "d/east", kind: "sited", at: { x: 75, y: 0 }, extent: { w: 50, h: 40 },
   points: [[50, -20], [100, -20], [100, 20], [60, 20], [50, 10]] };
-const DOOR = { id: "d/west-to-east", kind: "sited", at: { x: 50, y: 0 }, extent: { w: 2, h: 2 }, entry: { word: "neutral", into: "d/east" } };
+// a door, its into its own field (WLD-253: door is a class)
+const DOOR = { id: "d/west-to-east", kind: "door", by: "the-town", at: { x: 50, y: 0 }, extent: { w: 2, h: 2 }, entry: { word: "neutral" }, into: "d/east" };
 const TABLE = { id: "d/table", kind: "sited", class: "thing", at: { x: 30, y: 0 }, extent: { w: 4, h: 3 } };
 const FIELD = { id: "t/field", kind: "sited", at: { x: 50, y: 200 }, extent: { w: 300, h: 100 } };
 const MARKS = [DUNGEON, WEST, EAST, DOOR, TABLE, FIELD];

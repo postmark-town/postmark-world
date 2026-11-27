@@ -17,17 +17,19 @@ const ASKS = ["tower/token-a", "tower/token-b", "tower/token-c"];
 
 function world({ requires = { holds: ASKS, says: "Three marks hold the door. {held} of {asks} are in place." }, holder = true, extra = [] } = {}) {
   const marks = [
-    { id: KEEP, kind: "sited", by: "tower", class: "dungeon", at: { x: 1000, y: 1000 }, extent: { w: 300, h: 300 },
+    // the doors are doors, and the town's (WLD-253: door is a class, into, lands_at and requires its own fields, and a door may hold; a
+    // resident's door no rule allows does not pass); what they ask and where they lead is the test
+    { id: KEEP, kind: "sited", by: "the-town", class: "dungeon", at: { x: 1000, y: 1000 }, extent: { w: 300, h: 300 },
       body: "The keep.", entry: { into: "tower/hall", lands_at: "tower/front-inside" } },
     { id: "tower/hall", kind: "sited", by: "tower", at: { x: 950, y: 1000 }, extent: { w: 100, h: 100 }, body: "The hall." },
     { id: "tower/inner-room", kind: "sited", by: "tower", at: { x: 1060, y: 1000 }, extent: { w: 20, h: 20 }, body: "The inner room." },
-    { id: "tower/front-inside", kind: "sited", by: "tower", at: { x: 905, y: 1000 }, extent: { w: 2, h: 2 },
-      body: "The way out.", entry: { word: "neutral", into: "tower/yard" } },
+    { id: "tower/front-inside", kind: "door", by: "the-town", at: { x: 905, y: 1000 }, extent: { w: 2, h: 2 },
+      body: "The way out.", entry: { word: "neutral" }, into: "tower/yard" },
     { id: "tower/yard", kind: "sited", by: "tower", at: { x: 700, y: 1000 }, extent: { w: 100, h: 100 }, body: "The yard." },
-    { id: DOOR, kind: "thing", by: "tower", at: { x: 999, y: 1000 }, extent: { w: 2, h: 2 }, ...(holder ? { holder: true, capacity: 3 } : {}),
-      body: "A door.", entry: { word: "neutral", into: "tower/inner-room", ...(requires ? { requires } : {}) } },
-    { id: "tower/inner-way-out", kind: "sited", by: "tower", at: { x: 1052, y: 1000 }, extent: { w: 2, h: 2 },
-      body: "Back to the hall.", entry: { word: "neutral", into: "tower/hall" } },
+    { id: DOOR, kind: "door", by: "the-town", at: { x: 999, y: 1000 }, extent: { w: 2, h: 2 }, ...(holder ? { holder: true, capacity: 3 } : {}),
+      body: "A door.", entry: { word: "neutral" }, into: "tower/inner-room", ...(requires ? { requires } : {}) },
+    { id: "tower/inner-way-out", kind: "door", by: "the-town", at: { x: 1052, y: 1000 }, extent: { w: 2, h: 2 },
+      body: "Back to the hall.", entry: { word: "neutral" }, into: "tower/hall" },
     ...ASKS.map((id) => ({ id, kind: "thing", by: "the-town", body: "A token." })),
     ...extra,
   ];
@@ -102,14 +104,14 @@ test("LINT: what it asks for and where it looks are marks, the holder holds, and
   assert.deepEqual(rules(world({ requires: { holds: "" } })), [`${DOOR} requires-names-marks`]);
   assert.deepEqual(rules(world({ holder: false })), [`${DOOR} requires-in-a-holder`]);
   const out = world({ extra: [] });
-  out.marks.find((m) => m.id === "tower/front-inside").entry.requires = { holds: ["tower/token-a"], in: DOOR };
+  out.marks.find((m) => m.id === "tower/front-inside").requires = { holds: ["tower/token-a"], in: DOOR };
   assert.deepEqual(rules(out), ["tower/front-inside exit-carries-no-requires"]);
 });
 
 test("LINT: a door that asks is no unlocked way when the lint looks for a path out", () => {
   // the inner room's only way out is back through a door that asks; it is advised, never refused
   const w = world();
-  w.marks.find((m) => m.id === "tower/inner-way-out").entry.requires = { holds: ["tower/token-a"], in: DOOR };
+  w.marks.find((m) => m.id === "tower/inner-way-out").requires = { holds: ["tower/token-a"], in: DOOR };
   const f = portalFindings(w.marks).filter((x) => x.rule === "path-to-an-exit").map((x) => `${x.mark} ${x.sev}`);
   assert.deepEqual(f, ["tower/inner-room WARN"]);
 });

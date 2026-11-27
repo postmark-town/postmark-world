@@ -377,11 +377,18 @@ test("WLD-197 · a spark is entered, sheltered in and framed by as on main; a la
 const CLASS = (name, ext) => ({ id: `the-town/${name}`, kind: "class", by: "the-town", tier: "constitution", class: name, ...(ext ? { extends: ext } : {}), body: `the ${name} class` });
 const BAG = { id: "little-bird/a-paper-bag-of-crumbs", kind: "thing", by: "little-bird", tier: "market", at: { x: 100, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A paper bag of crumbs." };
 const BOWL = { id: "little-bird/a-candy-bowl", kind: "halloween-candy-bowl", by: "little-bird", tier: "market", at: { x: 110, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A subclass thing." };
-const SATCHEL = { id: "little-bird/a-bag-of-holding", kind: "thing", by: "little-bird", tier: "market", at: { x: 120, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A thing that carries a door.",
+// NARROWED 2026-11-25 (WLD-253, CORE-129 layer 1): a thing may not carry a door. into is a door's alone, and thing's entry is the locked
+// none (the-town/thing-entry), so a thing that writes one is refused by name; a bag of holding is a town subclass for layer 2. The same way
+// in, written on a door of the town's, passes.
+const SATCHEL = { id: "little-bird/a-bag-of-holding", kind: "thing", by: "the-town", tier: "market", at: { x: 120, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A thing that carries a door.",
   entry: { word: "welcomed", into: [HOLD.id] } };
+const SATCHEL_DOOR = { id: "the-town/a-door-of-holding", kind: "door", by: "the-town", tier: "market", at: { x: 120, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A door.",
+  entry: { word: "welcomed" }, into: [HOLD.id] };
+// thing redeclares entry as the locked none (the override rule's first use): the WLD-212 refusal reads it off the class
+const THING_ENTRY = { id: "the-town/thing-entry", kind: "property", by: "the-town", tier: "constitution", name: "entry", default: "none", parent: "the-town/thing" };
 const thingWorld = {
   ...world,
-  marks: [...world.marks, CLASS("postmark-node"), CLASS("mark", "postmark-node"), CLASS("sited", "mark"), CLASS("thing", "sited"), CLASS("halloween-candy-bowl", "thing"), BAG, BOWL, SATCHEL],
+  marks: [...world.marks, CLASS("postmark-node"), CLASS("mark", "postmark-node"), CLASS("sited", "mark"), CLASS("thing", "sited"), CLASS("halloween-candy-bowl", "thing"), THING_ENTRY, BAG, BOWL, SATCHEL, SATCHEL_DOOR],
 };
 const BESIDE = { x: 100, y: -10, name: "adam" };
 
@@ -405,12 +412,15 @@ test("WLD-212 · the same refusal for a thing SUBCLASS (read through the class c
   assert.notEqual(enter(BESIDE, BOWL.id, bare, { handle: "adam", at: 20, accepted: true }).refused, "thing");
 });
 
-test("WLD-212 · controls: ground still enters, and a thing that carries a door still passes through it", () => {
+test("WLD-212 · controls: ground still enters; a thing that carries a door is refused by name (WLD-253), and the same way in on a door passes", () => {
   const ground = enter(ASHORE, SHIP.id, thingWorld, { handle: "adam", at: 20, accepted: true });
   assert.notEqual(ground.refused, "thing");
   assert.ok(ground.rows.length > 0 && ground.entered.includes(SHIP.id), "ground entry writes its rows as before");
-  const door = enter(BESIDE, SATCHEL.id, thingWorld, { handle: "adam", at: 20, accepted: true });
-  assert.notEqual(door.refused, "thing", "the portal-on-thing branch is untouched");
+  const carried = enter(BESIDE, SATCHEL.id, thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.equal(carried.refused, "door-law");
+  assert.match(carried.error, /^little-bird\/a-bag-of-holding writes entry\.into, and it is a thing, not a door — /);
+  assert.equal(carried.rows, undefined, "nothing recorded");
+  const door = enter(BESIDE, SATCHEL_DOOR.id, thingWorld, { handle: "adam", at: 20, accepted: true });
   assert.ok(!door.error, `no refusal: ${door.error}`);
   assert.ok(door.rows.length > 0, "and it writes its rows");
   const hidden = enter(BESIDE, "no/such-thing", thingWorld, { handle: "adam", at: 20, accepted: true });
