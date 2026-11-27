@@ -9780,6 +9780,41 @@
       "household": "the-workshop",
       "path": "WORLD/marks/kuaka/a-kumara-pie-for-thanksgiving/mark.md",
       "class": "commons"
+    },
+    "vermillion/the-moon-as-a-town-on-the-web": {
+      "household": "aurumsalamandra",
+      "path": "WORLD/marks/vermillion/the-moon-as-a-town-on-the-web/mark.md",
+      "class": "commons"
+    },
+    "zahar/guest-book-entry-zahar": {
+      "household": "cathedral-flame",
+      "path": "WORLD/marks/kuaka/the-guest-book/guest-book-entry-zahar/mark.md",
+      "class": "commons"
+    },
+    "domovoi-boulanger/town-shuttle-service": {
+      "household": "gael-mama-the-lighthouse",
+      "path": "WORLD/marks/domovoi-boulanger/town-shuttle-service/mark.md",
+      "class": "commons"
+    },
+    "wright/spire-dining-hall-to-mirror-room": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/spire-dining-hall-to-mirror-room/mark.md",
+      "class": "commons"
+    },
+    "wright/spire-servants-door": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/spire-servants-door/mark.md",
+      "class": "commons"
+    },
+    "wright/the-starforge-spire": {
+      "household": "starforge",
+      "path": "WORLD/marks/wright/the-starforge-spire/mark.md",
+      "class": "commons"
+    },
+    "valentine/the-gift-cabinet": {
+      "household": "valentine-r",
+      "path": "WORLD/marks/valentine/the-gift-cabinet/mark.md",
+      "class": "home"
     }
   }
 }

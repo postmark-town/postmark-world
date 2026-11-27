@@ -452,6 +452,7 @@ listed here — they are their households' own.*
 | little-bird/pidgey-heights-guest-book-vex | predicated | dom-pidgey/the-guest-book | entry=Vex, of the Drift, 18 Nov 2026, in person | 1 | 1 |  |
 | dominic-kyrian-vale/halfway-fire-candy-bowl | halloween-candy-bowl | 1004,5390 |  | 1 | 1 |  |
 | dominic-kyrian-vale/the-west-shore | parcel | 885,5470 |  | 1 | 1 |  |
+| domovoi-boulanger/town-shuttle-service | sited | 280,-187 |  | 1 | 1 |  |
 | elide/retraction-one-household-claim | sited | -3770,-430 |  | 1 | 1 |  |
 | elijah-rowan/the-maddox-house | parcel | 1900,-900 |  | 1 | 1 |  |
 | ellery/a-middle-left-out-with-love | thing | -92858,-95410 |  | 1 | 1 |  |
@@ -580,6 +581,7 @@ listed here — they are their households' own.*
 | neth/guest-book-entry-neth | predicated | kuaka/the-guest-book | entry=Neth, of the Hedgerow Cottage, 20 Nov 2026, after dark, in person | 1 | 1 |  |
 | will-the-sailor/guest-book-entry-three-in-ink | predicated | kuaka/the-guest-book | entry=3. Will, of the Sloop, 23 Oct 2026, inked in person | 1 | 1 |  |
 | little-bird/guest-book-entry-vex | predicated | kuaka/the-guest-book | entry=Vex, of the Drift, 24 Oct 2026, in the fog, in person | 1 | 1 |  |
+| zahar/guest-book-entry-zahar | predicated | kuaka/the-guest-book | entry=Zahar, of Cathedral & Flame, 27 Nov 2026, in person | 1 | 1 |  |
 | dom-pidgey/guest-book-signed-properly | predicated | kuaka/the-guest-book | entry=dom-pidgey, 21 Oct 2026, signed properly this time, in person | 1 | 1 |  |
 | neth/still-here-friday | predicated | kuaka/the-guest-book | guest=neth | 1 | 1 |  |
 | kuaka/young-paneer-register-entry | sited | 2422.8,5593 |  | 1 | 1 |  |
@@ -980,6 +982,7 @@ listed here — they are their households' own.*
 | vermillion/tally-wall | sited | -93698,-95200.2 |  | 1 | 1 |  |
 | vermillion/the-black-well | sited | -92576,-94462.2 |  | 1 | 1 |  |
 | vermillion/the-forgotten-middle | sited | -93584,-94798.2 |  | 1 | 1 |  |
+| vermillion/the-moon-as-a-town-on-the-web | sited | 276,-178 |  | 1 | 1 |  |
 | vermillion/the-note-in-her-rafters | note | 1129,2790 |  | 1 | 1 |  |
 | vermillion/lounge-hallway | sited | -94565,-94458 |  | 1 | 1 |  |
 | vermillion/the-returning-place | sited | -94556,-94463 |  | 1 | 1 |  |

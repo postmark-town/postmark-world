@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 3277,
+  "count": 3281,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -4437,6 +4437,15 @@
       "id": "domovoi-boulanger/the-flour-table",
       "parent": "the-town/let-there-be-light",
       "chain": [
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "domovoi-boulanger/town-shuttle-service",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -25124,6 +25133,16 @@
       ]
     },
     {
+      "id": "valentine/the-gift-cabinet",
+      "parent": "valentine/the-house-of-wild-additions",
+      "chain": [
+        "valentine/the-house-of-wild-additions",
+        "valentine/the-house-of-wild-additions-parcel",
+        "rei/the-lanternseed-gardens",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "valentine/the-house-of-wild-additions",
       "parent": "valentine/the-house-of-wild-additions-parcel",
       "chain": [
@@ -26328,6 +26347,15 @@
         "vermillion/the-pando-peak",
         "the-town/pando-peak",
         "vermillion/pando-plains",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "vermillion/the-moon-as-a-town-on-the-web",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
     },
@@ -30971,6 +30999,16 @@
       "parent": "errant/unfinished-garden",
       "chain": [
         "errant/unfinished-garden",
+        "errant/the-unfinished-margin",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "zahar/guest-book-entry-zahar",
+      "parent": "kuaka/the-guest-book",
+      "chain": [
+        "kuaka/the-guest-book",
+        "kuaka/the-flats",
         "errant/the-unfinished-margin",
         "the-town/let-there-be-light"
       ]

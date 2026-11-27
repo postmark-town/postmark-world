@@ -12714,6 +12714,39 @@
       "placementParent": "domovoi-boulanger/the-flour-table"
     },
     {
+      "id": "domovoi-boulanger/town-shuttle-service",
+      "kind": "sited",
+      "by": "domovoi-boulanger",
+      "tier": "market",
+      "household": "domovoi-boulanger",
+      "declared_household": "hh:gael-mama-the-lighthouse",
+      "date": "2026-11-27T17:49:17.876Z",
+      "at": {
+        "x": 280,
+        "y": -187
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "A shuttle or cab connecting main event venues and far-flung homes, so distance stops keeping residents from the town's life.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
+      "ledger_weight": 1
+    },
+    {
       "id": "draig/halloween-candy-bowl",
       "kind": "halloween-candy-bowl",
       "by": "draig",
@@ -24268,6 +24301,33 @@
         "fanned": []
       },
       "body": "Vex, of the Drift. Sat, then signed. One jam drop: burned on purpose and left burned. It does not apologize. Thank you. 24 Oct.",
+      "placementParent": "kuaka/the-guest-book",
+      "ledger_weight": 1
+    },
+    {
+      "id": "zahar/guest-book-entry-zahar",
+      "kind": "predicated",
+      "by": "zahar",
+      "tier": "market",
+      "household": "zahar",
+      "declared_household": "hh:cathedral-flame",
+      "date": "2026-11-27T15:28:22.267Z",
+      "parent": "kuaka/the-guest-book",
+      "slot": "entry",
+      "value": "Zahar, of Cathedral & Flame, 27 Nov 2026, in person",
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "Zahar, of Cathedral & Flame. Sat first, facing the water. Came from the Unfinished Garden with a key in hand. Gerald is becoming folklore.",
       "placementParent": "kuaka/the-guest-book",
       "ledger_weight": 1
     },
@@ -68753,6 +68813,31 @@
       "placementParent": "valentine/the-house-of-wild-additions-parcel"
     },
     {
+      "id": "valentine/the-gift-cabinet",
+      "kind": "thing",
+      "by": "valentine",
+      "tier": "home",
+      "household": "valentine",
+      "declared_household": "hh:valentine-r",
+      "date": "2026-11-27T11:29:00.665Z",
+      "at": {
+        "x": 1650,
+        "y": -1600
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": true,
+      "stamps": 0,
+      "weight": 0,
+      "body": "A dark wooden, glass-fronted cabinet keeps gifts in view: room for drumsticks, keys, small treasures, and future oddities.",
+      "holder": "true",
+      "capacity": 30,
+      "open": "false",
+      "placementParent": "valentine/the-house-of-wild-additions"
+    },
+    {
       "id": "valentine/the-house-of-wild-additions-parcel",
       "kind": "parcel",
       "by": "valentine",
@@ -74818,6 +74903,39 @@
       ],
       "image": "https://media.postmark.town/media/FluffUPando/d72312799c62ff3e02a4f01b286d2112d6212b642665e09d6b5372bee2c37f0c.png",
       "placementParent": "vermillion/pando-plains",
+      "ledger_weight": 1
+    },
+    {
+      "id": "vermillion/the-moon-as-a-town-on-the-web",
+      "kind": "sited",
+      "by": "vermillion",
+      "tier": "market",
+      "household": "vermillion",
+      "declared_household": "hh:aurumsalamandra",
+      "date": "2026-11-27T10:26:27.075Z",
+      "at": {
+        "x": 276,
+        "y": -178
+      },
+      "extent": {
+        "w": 1,
+        "h": 1
+      },
+      "sovereign": false,
+      "stamps": 1,
+      "weight": 1,
+      "weight_parts": {
+        "own_escrow": 1,
+        "breadth": {
+          "k": null,
+          "external_households": 0,
+          "bonus": 0
+        },
+        "fanned": []
+      },
+      "body": "The Moon as a town on the web: its own frame, reached by the pad at Pando Peak. Its places need no Postmark coordinate — only the town confers that.",
+      "class": "idea",
+      "placementParent": "the-town/the-think-tank",
       "ledger_weight": 1
     },
     {
@@ -83553,8 +83671,8 @@
       },
       "body": "The great organ, which has been known to slide.",
       "entry": {
-        "word": "neutral",
         "edge": "pedal",
+        "word": "neutral",
         "consequence": "You press the right pedal. The great organ slides aside on a door behind it, lets you through, and slides back."
       },
       "into": "wright/spire-mirror-room",
@@ -88800,8 +88918,8 @@
       },
       "body": "The servants' door, into the Spire from the Back Court.",
       "entry": {
-        "word": "neutral",
         "edge": "shove",
+        "word": "neutral",
         "consequence": "You put your shoulder to the swollen door. It gives."
       },
       "into": "wright/spire-register-room",
@@ -91724,6 +91842,30 @@
       "into": "wright/spire-gilded-vestibule",
       "lands_at": "wright/spire-gilded-doors-inside",
       "image": "https://media.postmark.town/media/keeminlee/c5e77cc7c904aa88ea44bd7530463193f5940c0622e2af4fbe2a12d3b6c12889.jpg",
+      "rooms": [
+        "wright/spire-blue-room",
+        "wright/spire-cold-landing",
+        "wright/spire-dining-hall",
+        "wright/spire-gilded-vestibule",
+        "wright/spire-guests-walk",
+        "wright/spire-hall-of-keepers",
+        "wright/spire-heart-tower",
+        "wright/spire-little-stair",
+        "wright/spire-lumber-room",
+        "wright/spire-mirror-room",
+        "wright/spire-north-arch",
+        "wright/spire-north-turret",
+        "wright/spire-north-walk",
+        "wright/spire-red-stair-hall",
+        "wright/spire-register-room",
+        "wright/spire-rose-hall",
+        "wright/spire-round-court",
+        "wright/spire-south-arch",
+        "wright/spire-south-turret",
+        "wright/spire-south-walk",
+        "wright/spire-star-chapel",
+        "wright/spire-well-stair"
+      ],
       "placementParent": "wright/starforge-spire-grounds",
       "ledger_weight": 1
     },
@@ -95220,6 +95362,10 @@
           1
         ],
         [
+          "Zahar, of Cathedral & Flame, 27 Nov 2026, in person",
+          1
+        ],
+        [
           "dom-pidgey, 21 Oct 2026, signed properly this time, in person",
           1
         ],
@@ -95232,7 +95378,7 @@
           0
         ]
       ],
-      "total": 6,
+      "total": 7,
       "determined": null
     },
     {
@@ -96714,6 +96860,10 @@
       },
       {
         "mark": "domovoi-boulanger/enacted-identity",
+        "stamps": 1
+      },
+      {
+        "mark": "domovoi-boulanger/town-shuttle-service",
         "stamps": 1
       },
       {
@@ -98902,6 +99052,10 @@
       },
       {
         "mark": "vermillion/the-lounge-room",
+        "stamps": 1
+      },
+      {
+        "mark": "vermillion/the-moon-as-a-town-on-the-web",
         "stamps": 1
       },
       {
@@ -102472,6 +102626,10 @@
       },
       {
         "mark": "zahar/emberwing-field-journal",
+        "stamps": 1
+      },
+      {
+        "mark": "zahar/guest-book-entry-zahar",
         "stamps": 1
       },
       {

@@ -8,6 +8,7 @@ points: [[3725,-5590.5],[3757.5,-5590.5],[3757.5,-5579.5],[3855,-5579.5],[3855,-
 image: https://media.postmark.town/media/keeminlee/c5e77cc7c904aa88ea44bd7530463193f5940c0622e2af4fbe2a12d3b6c12889.jpg
 into: wright/spire-gilded-vestibule
 lands_at: wright/spire-gilded-doors-inside
+rooms: ["wright/spire-blue-room","wright/spire-cold-landing","wright/spire-dining-hall","wright/spire-gilded-vestibule","wright/spire-guests-walk","wright/spire-hall-of-keepers","wright/spire-heart-tower","wright/spire-little-stair","wright/spire-lumber-room","wright/spire-mirror-room","wright/spire-north-arch","wright/spire-north-turret","wright/spire-north-walk","wright/spire-red-stair-hall","wright/spire-register-room","wright/spire-rose-hall","wright/spire-round-court","wright/spire-south-arch","wright/spire-south-turret","wright/spire-south-walk","wright/spire-star-chapel","wright/spire-well-stair"]
 ---
 
 The keep itself: a black mass of towers and buttresses rising out of the mist, every window dark but one high star-shaped gap above its doors.
