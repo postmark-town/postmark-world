@@ -49,12 +49,13 @@ const CANDLE_EXCLUSION = `CANDLE EXCLUSION (${CANDLE_ENV}=1): the throttled page
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SELF = "tools/page-throttle-sweep.advisory.mjs";
 const RATE = 4;
-// the 29 page tests: the 22 at WLD-71, tools/conversation-pages.test.mjs (POS-779: the mounted conversation badges),
+// the 30 page tests: the 22 at WLD-71, tools/conversation-pages.test.mjs (POS-779: the mounted conversation badges),
 // WLD-74's resident card (tools/candle-boundary.test.mjs counts them too), POS-945's "In town by mail" page test, WLD-205's art-window page test,
-// CORE-119's walk-card hover (tools/viewer-walk-hover.test.mjs), CORE-127's display selection (tools/viewer-display-filter.test.mjs) and WLD-220's first-visit tour (tools/tour-first-visit.test.mjs)
+// CORE-119's walk-card hover (tools/viewer-walk-hover.test.mjs), CORE-127's display selection (tools/viewer-display-filter.test.mjs), WLD-220's first-visit tour (tools/tour-first-visit.test.mjs)
+// and WLD-62's exit that drops the interior (tools/exit-drops-interior.test.mjs)
 const SWEPT = [
   "tools/act-as-town-bodies.test.mjs", "tools/art-window.test.mjs", "tools/backdrop-without-text.test.mjs", "tools/conversation-pages.test.mjs", "tools/dungeon-page.test.mjs",
-  "tools/first-paint-boot-shape.test.mjs", "tools/in-town-by-mail.test.mjs",
+  "tools/exit-drops-interior.test.mjs", "tools/first-paint-boot-shape.test.mjs", "tools/in-town-by-mail.test.mjs",
   "tools/lately-more-on-the-page.test.mjs", "tools/lately-on-the-resident-path.test.mjs",
   "tools/lately-reads-the-store.test.mjs", "tools/lite-mode.test.mjs", "tools/mine-stands-out.test.mjs", "tools/mists-stage.test.mjs",
   "tools/part2-on-the-page.test.mjs", "tools/pinned-house-card.test.mjs", "tools/placed-art.test.mjs",
