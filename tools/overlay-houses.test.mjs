@@ -334,6 +334,6 @@ test("a row the read carries is left as the read sent it, even where the househo
 });
 
 test("[pin] withTownHouses fills the resident's own marks from the town's whole record, and only those", () => {
-  assert.match(SOURCE, /fillFromTown\(byId, townHouses\);\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*if \(townWorld\) fillOwnFromTown\(byId, townWorld\.marks, mineForSight\(state\.outsider, mineSet\.marks\)\);/,
+  assert.match(SOURCE, /fillFromTown\(byId, townHouses\);\s*\/\/[^\n]*\n\s*\/\/[^\n]*\n\s*if \(townWorld\) fillOwnFromTown\(byId, townWorld\.marks, mineForSight\(state\.outsider, mineSet\.marks, townSeen\)\);/,
     "after the houses, the rest of the resident's own marks, from the same record, handed the household's own rows");
 });

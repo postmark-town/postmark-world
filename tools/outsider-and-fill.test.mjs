@@ -5,9 +5,11 @@
 // household owned nothing. The owner rule ("a household's own marks are always
 // its own to see") is the `keep` a caller hands the world tools' one sight
 // function, standpointSight; the office's `lens: "outsider"` hands it none, and
-// the page asks the office for that read and lays none of the household's own
-// rows over it. (The switch itself is the office's, tested there:
-// test/outsider-lens.test.mjs.) One switch on one rule, never a second copy of sight.
+// the page asks the office for that read and lays over it only the household's
+// own rows that the same sight of the town's record still holds (postmark#4479):
+// a published mark stays, a draft and a mark inside a closed place go. (The
+// switch itself is the office's, tested there: test/outsider-lens.test.mjs.)
+// One switch on one rule, never a second copy of sight.
 //
 // THE FILL FLAG. A picture-less thing draws a tinted block; `fill: false` (the
 // thing class's sovereign property, default true) draws its outline alone, so a
@@ -20,7 +22,8 @@ import { cpSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wri
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { placeholderExtentSVG, lensQuery, mineForSight, foldForSight, lensAnswered, readStillWanted, residentReadKey, OUTSIDER_LENS, OUTSIDER_UNAVAILABLE } from "../spectator/viewer.mjs";
+import { placeholderExtentSVG, lensQuery, mineForSight, seenIdsOf, foldForSight, lensAnswered, readStillWanted, residentReadKey, residentById, fillFromTown, fillOwnFromTown, townHouseMarks, OUTSIDER_LENS, OUTSIDER_UNAVAILABLE, OUTSIDER_RECORD_UNREAD } from "../spectator/viewer.mjs";
+import { standpointSight } from "./world-verbs.mjs";
 import vm from "node:vm";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -88,12 +91,33 @@ test("the thing class declares fill: sovereign, default true", () => {
 
 // ── the outsider view ────────────────────────────────────────────────────────
 
-test("the page's lens: the read asks for it, lays none of your own rows over it, and draws the town's fold", () => {
+// postmark#4479's four cases, on one household's rows: a draft (never on the
+// record), a published path far from the standpoint, a closed place of theirs,
+// and a published mark standing inside it. The record holds all but the draft.
+const PATH = { id: "mason/raised-path", kind: "sited", at: { x: 900, y: 900 }, extent: { w: 4, h: 40 } };
+const VAULT = { id: "mason/the-vault", kind: "sited", class: "dungeon", at: { x: 100, y: 100 }, extent: { w: 20, h: 20 } };
+const COIN = { id: "mason/a-coin", kind: "sited", at: { x: 100, y: 100 }, extent: { w: 1, h: 1 } };
+const DRAFT = { id: "mason/draft", kind: "sited", at: { x: 5, y: 5 }, extent: { w: 1, h: 1 } };
+const ownRows = () => new Map([DRAFT, PATH, VAULT, COIN].map((m) => [m.id, m]));
+const RECORD = { marks: [PATH, VAULT, COIN, { id: "stranger/a-bench", kind: "sited", at: { x: 0, y: 0 }, extent: { w: 1, h: 1 } }] };
+
+test("the page's lens: the read asks for it, lays only the rows a stranger sees over it, and draws the town's fold", () => {
   assert.equal(lensQuery(false), "", "off: the read you always asked for, byte for byte");
   assert.equal(lensQuery(true), `&lens=${OUTSIDER_LENS}`);
-  const mine = new Map([["mason/draft", { id: "mason/draft" }]]);
-  assert.equal(mineForSight(false, mine), mine);
-  assert.equal(mineForSight(true, mine).size, 0, "no draft and no mark of yours the read did not tell");
+  const mine = ownRows();
+  assert.equal(mineForSight(false, mine), mine, "lens off: every row, the same map");
+  assert.equal(mineForSight(false, mine, new Set()), mine, "lens off: `seen` changes nothing");
+  // the sight the page takes of the record: standpointSight, no keep, nothing entered
+  const sight = standpointSight(RECORD, { occupancy: new Map(), handle: "mason" });
+  assert.ok(!sight.marks.some((m) => m.id === COIN.id), "fixture: the closed place hides what stands inside it");
+  const seen = seenIdsOf(sight);
+  // ⚑ THE FLIP: return `new Map()` under the lens again (today's mineForSight) → the path is dropped and this reds
+  assert.deepEqual([...mineForSight(true, mine, seen).keys()].sort(), [VAULT.id, PATH.id].sort(),
+    "under the lens: the published path and the closed place's own mark stay; the draft and the mark inside it go");
+  assert.equal(mineForSight(true, mine).size, 0, "no record in hand: none of your rows, as before (fail closed)");
+  assert.equal(mineForSight(true, mine, null).size, 0);
+  assert.equal(seenIdsOf(null), null);
+  assert.equal(seenIdsOf({}), null);
   assert.equal(foldForSight({ trueWorld: "town", myWorld: "yours" }, false), "yours");
   assert.equal(foldForSight({ trueWorld: "town", myWorld: "yours" }, true), "town");
   assert.equal(foldForSight({ trueWorld: "town", myWorld: null }, false), "town");
@@ -171,6 +195,131 @@ test("F2: an office that ignores the lens is never believed: the toggle goes off
   assert.equal(lensAnswered(false, {}), true, "no lens asked, nothing to check");
   assert.equal(OUTSIDER_UNAVAILABLE, "the office can't show the outsider view yet");
   assert.ok(SOURCE.includes("if (!lensAnswered(askedLens, read)) { outsiderUnavailable(); return null; }"));
+});
+
+// ── postmark#4479: the record decides which of your rows the lens keeps, driven ─
+test("[pin] every own-row overlay hands mineForSight the record's ids", () => {
+  const calls = SOURCE.match(/mineForSight\([^()]*\)/g) ?? [];
+  assert.ok(calls.length >= 7, `the six overlays and the re-lay ask mineForSight (found ${calls.length})`);
+  // ⚑ THE FLIP: drop `, townSeen` from any call → `seen` is undefined there, that overlay keeps nothing under the lens, and this reds
+  for (const c of calls) assert.match(c, /, townSeen\)$/, `${c} passes the record's ids`);
+  assert.ok(SOURCE.includes("townSeen = seenIdsOf(townWorld);"), "the ids come from the page's own sight of the record");
+});
+
+function townHarness({ outsider = true } = {}) {
+  const requests = [], notes = [], drawn = [], asked = [];
+  const context = vm.createContext({
+    residentReadKey, mineForSight, seenIdsOf, residentById, fillFromTown, fillOwnFromTown, townHouseMarks, standpointSight,
+    OUTSIDER_LENS, OUTSIDER_RECORD_UNREAD, requests, notes, drawn, asked,
+    fetchWorldState: () => new Promise((resolve, reject) => { requests.push({ answer: (json) => resolve({ json }), fail: (e) => reject(e) }); }),
+    recordSources: (path) => [{ url: `https://record.invalid${path}` }],
+    buildHomeSet: () => new Set(), drawOverlay: () => drawn.push(1),
+    walkNote: (el) => notes.push(el.textContent),
+    document: { createElement: () => ({ textContent: "", classList: { add() {} } }) },
+    console: { warn() {} },
+  });
+  vm.runInContext(`
+    const officeBase = () => "https://office-a.invalid";
+    const state = { handle: "mason", crossing: 500, outsider: ${outsider} };
+    const walkState = { walkers: [{ handle: "mason" }] };
+    const onResidentPath = () => true;
+    const sightOf = (w) => standpointSight(w, { occupancy: new Map(), handle: state.handle });
+    const readCache = new Map();
+    let byId = new Map(), homeSet = new Set(), lastRadial = { at: 1 };
+    let townHouses = null, townWorld = null, townChain = null, townSeen = null, townHousesPending = null;
+    const mineSet = { marks: new Map() };
+    const allMarks = () => [...byId.values()];
+    ${bodyOf("residentStandpointKey")}
+    ${bodyOf("loadTownHouses")}
+    ${bodyOf("withTownHouses")}
+    ${bodyOf("relayOwnRows")}
+    ${bodyOf("lensRecordUnread")}
+    globalThis.probe = {
+      state, readCache, mineSet, key: () => residentStandpointKey(null, state.handle),
+      load: () => loadTownHouses(), byId: () => byId, seen: () => townSeen,
+      lay: (read) => { byId = residentById(read, mineForSight(state.outsider, mineSet.marks, townSeen)); },
+    };
+  `, context);
+  return { probe: context.probe, requests, notes, drawn };
+}
+
+test("4479 driven: turn the lens on, answer the town's record, and the published mark stays while the draft goes", async () => {
+  const h = townHarness({ outsider: true });
+  const lensRead = { handle: "mason", lens: OUTSIDER_LENS, records: {} };   // the read told none of mason's marks: they are far off
+  h.probe.readCache.set(h.probe.key(), lensRead);
+  for (const [id, m] of ownRows()) h.probe.mineSet.marks.set(id, m);
+  h.probe.lay(lensRead);                       // the lens read lands first, as loadResidentRead draws it
+  assert.equal(h.probe.byId().size, 0, "before the record: none of your rows (fail closed)");
+  const pending = h.probe.load();
+  assert.equal(h.requests.length, 1, "the page's one fetch of the town's record");
+  h.requests[0].answer(RECORD);
+  await pending;
+  // ⚑ THE FLIP: drop `if (state.outsider) relayOwnRows()` from loadTownHouses (or the ids from townSeen) → the path never comes back and this reds
+  assert.ok(h.probe.byId().has(PATH.id), "the published path is on the map again, as a stranger sees it");
+  assert.ok(h.probe.byId().has(VAULT.id), "the closed place's own mark stays");
+  assert.ok(!h.probe.byId().has(DRAFT.id), "the draft is gone");
+  assert.ok(!h.probe.byId().has(COIN.id), "what stands inside the closed place is gone");
+  assert.equal(h.drawn.length, 1, "and the map is drawn again");
+  assert.equal(h.notes.length, 0, "nothing to say when the record was read");
+});
+
+test("4479 driven: with the lens off, the record changes nothing: every row of yours, draft included", async () => {
+  const h = townHarness({ outsider: false });
+  const read = { handle: "mason", records: {} };
+  h.probe.readCache.set(h.probe.key(), read);
+  for (const [id, m] of ownRows()) h.probe.mineSet.marks.set(id, m);
+  h.probe.lay(read);
+  const pending = h.probe.load();
+  h.requests[0].answer(RECORD);
+  await pending;
+  assert.deepEqual([...h.probe.byId().keys()].sort(), [...ownRows().keys()].sort());
+});
+
+test("4479 driven: when the town's record cannot be read, the lens keeps none of your rows and says so on the map's side", async () => {
+  const h = townHarness({ outsider: true });
+  const lensRead = { handle: "mason", lens: OUTSIDER_LENS, records: {} };
+  h.probe.readCache.set(h.probe.key(), lensRead);
+  for (const [id, m] of ownRows()) h.probe.mineSet.marks.set(id, m);
+  h.probe.lay(lensRead);
+  const pending = h.probe.load();
+  h.requests[0].fail(new Error("the record answered 503"));
+  await pending;
+  assert.equal(h.probe.seen(), null);
+  assert.equal(h.probe.byId().size, 0, "none of your rows, never all of them");
+  // the line goes where the lens's other refusal goes: walkNote, the note on the map's side
+  assert.deepEqual(h.notes, [OUTSIDER_RECORD_UNREAD + "."]);
+  assert.equal(OUTSIDER_RECORD_UNREAD, "the outsider view couldn't read the town's record, so it shows none of your own marks");
+});
+
+test("4479 driven: turning the lens on before the record is in hand asks for it", () => {
+  const asked = [];
+  const context = vm.createContext({ mineForSight, residentById, residentReadKey, OUTSIDER_LENS, asked });
+  vm.runInContext(`
+    const state = { handle: "mason", outsider: false };
+    const walkState = { walkers: [{ handle: "mason" }] };
+    const officeBase = () => "https://office-a.invalid";
+    const readCache = new Map();
+    let byId = new Map(), homeSet = new Set(), townSeen = null;
+    const mineSet = { marks: new Map() };
+    const onResidentPath = () => true, paintOutsiderButton = () => {}, loadHands = () => {}, applyWorldLayer = () => {};
+    const withTownHouses = () => {}, buildHomeSet = () => new Set(), allMarks = () => [], renderCurrent = () => {};
+    const loadResidentRead = () => Promise.resolve(null), loadTownHouses = () => asked.push(1);
+    ${bodyOf("residentStandpointKey")}
+    ${bodyOf("toggleOutsider")}
+    // a lens read already cached (the cache key carries the lens): the lens was on before, and the record never came
+    state.outsider = true;
+    readCache.set(residentStandpointKey(null, state.handle), { handle: "mason", lens: OUTSIDER_LENS, records: {} });
+    state.outsider = false;
+    globalThis.probe = { toggle: () => toggleOutsider(), setSeen: (s) => { townSeen = s; } };
+  `, context);
+  context.probe.toggle();
+  // ⚑ THE FLIP: drop `if (state.outsider && !townSeen) loadTownHouses();` from toggleOutsider → this reds
+  assert.equal(asked.length, 1, "lens on, no record yet: the record is asked for");
+  context.probe.toggle();
+  assert.equal(asked.length, 1, "lens off: nothing asked");
+  context.probe.setSeen(new Set());
+  context.probe.toggle();
+  assert.equal(asked.length, 1, "lens on with the record in hand: nothing asked");
 });
 
 test("[pin] under the lens you own and hold nothing: the green own-mark colouring and your hands are off", () => {

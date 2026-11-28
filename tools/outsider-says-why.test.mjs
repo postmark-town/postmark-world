@@ -110,6 +110,7 @@ function pageHarness() {
     const readCache = new Map(), readPending = new Map();
     let readError = null, byId, homeSet, mapCtx = {}, lastRadial = null, settleTimer = null;
     const mineSet = { marks: new Map() };
+    let townSeen = null;   // the record's ids the lens keeps your rows by (postmark#4479); not in hand here
     const onPhone = () => phone.on;
     ${bodyOf("residentStandpointKey")}
     ${bodyOf("loadResidentRead")}

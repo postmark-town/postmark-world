@@ -8556,14 +8556,32 @@ export async function walkMinePages(fetchPage, { pageSize = MINE_PAGE_SIZE, page
 // ── THE OUTSIDER LENS (WLD-26, ruled in Sitting B, 2026-10-19 17:48) ────────
 // "View as an outsider" reads the world as if your household owned nothing: the
 // office's `lens: "outsider"` turns off its one owner rule ("a household's own
-// marks are always its own to see"), and the page lays none of your own rows
-// over the read (your drafts, and your marks the read did not tell). Read-only and
-// off by default: nothing is written, and every act is still your own.
+// marks are always its own to see"), and the page lays over the read only those
+// of your own rows a stranger would see too (postmark#4479): the ones the town's
+// record still holds through `sightOf`, the same standpointSight the office's
+// lens hands the same fold. Your drafts are not on the record, and what stands
+// inside a closed place you have not entered is hidden by that one function, so
+// both stay gone; a published mark the read did not tell stays on the map, as it
+// does for a stranger. Read-only and off by default: nothing is written, and
+// every act is still your own.
 export const OUTSIDER_LENS = "outsider";
 /** The query a resident read carries under the lens; empty without it. Pure. */
 export const lensQuery = (outsider) => (outsider ? `&lens=${OUTSIDER_LENS}` : "");
-/** Your own rows to lay over a read: none under the lens. Pure. */
-export const mineForSight = (outsider, mine) => (outsider ? new Map() : mine);
+/** Your own rows to lay over a read. With the lens off, all of them. Under the
+ *  lens, only those whose id `seen` holds: the ids of the town's record as a
+ *  stranger's sight has it (seenIdsOf). No `seen`, the record not in hand, keeps
+ *  none, as the lens always did: it fails closed, never to your own rows. Pure. */
+export const mineForSight = (outsider, mine, seen = null) => {
+  if (!outsider) return mine;
+  const kept = new Map();
+  if (!seen) return kept;
+  for (const [id, row] of mine ?? []) if (seen.has(id)) kept.set(id, row);
+  return kept;
+};
+/** The ids a sight of the town's record holds, for mineForSight; null with no record in hand. Pure. */
+export const seenIdsOf = (sight) => (Array.isArray(sight?.marks) ? new Set(sight.marks.map((m) => m?.id).filter(Boolean)) : null);
+/** What the lens says when the town's record could not be read: it shows none of your own marks rather than all of them (postmark#4479). */
+export const OUTSIDER_RECORD_UNREAD = "the outsider view couldn't read the town's record, so it shows none of your own marks";
 /** Did the office answer the lens it was asked for? An office that predates it
  *  ignores the undeclared query key and answers your own sight, so an outsider
  *  read is believed only when it says `lens: "outsider"`. Pure. */
@@ -9183,6 +9201,12 @@ export function mountViewer(appEl) {
   let townHouses = null;          // the parcels + their dwellings, once loaded
   let townWorld = null;           // the FULL record's fold-shaped copy, for homes per resident (POS-368)
   let townChain = null;           // id → { kind, parent, placementParent } for every mark on the record, from the same read
+  // THE IDS A STRANGER SEES, from the same record (postmark#4479). `townWorld` is
+  // already this page's `sightOf` over the whole fold, with no `keep`: exactly the
+  // sight the office's outsider lens takes of it. So the lens needs no fetch of its
+  // own; it asks which of your rows this set holds (mineForSight). Null until the
+  // record lands, and then the lens keeps none of your rows, as it always did.
+  let townSeen = null;
   let townHousesPending = null;
   function loadTownHouses() {
     if (townHouses || townHousesPending) return townHousesPending;
@@ -9196,9 +9220,17 @@ export function mountViewer(appEl) {
         // the containment chain of every mark, for the rule that hides what is
         // inside a parcel: the read's nearby entries carry no parents
         townChain = new Map(townWorld.marks.map((m) => [m.id, { kind: m.kind ?? null, parent: m.parent ?? null, placementParent: m.placementParent ?? null }]));
-        if (onResidentPath()) { withTownHouses(); if (lastRadial) drawOverlay(lastRadial); }
+        townSeen = seenIdsOf(townWorld);
+        if (onResidentPath()) {
+          // under the lens the index was laid with none of your rows; lay it again now the record can say which stay
+          if (state.outsider) relayOwnRows(); else withTownHouses();
+          if (lastRadial) drawOverlay(lastRadial);
+        }
       })
-      .catch((e) => { console.warn(`[world] the town's houses could not be read (${String(e?.message ?? e).slice(0, 120)}) — the map shows the read's own`); })
+      .catch((e) => {
+        console.warn(`[world] the town's houses could not be read (${String(e?.message ?? e).slice(0, 120)}) — the map shows the read's own`);
+        lensRecordUnread();
+      })
       .finally(() => { townHousesPending = null; });
     return townHousesPending;
   }
@@ -9238,7 +9270,28 @@ export function mountViewer(appEl) {
     fillFromTown(byId, townHouses);
     // and fills the rest of the resident's own marks the same way, adding none:
     // see fillOwnFromTown; only rows that are the household's own, never the read's
-    if (townWorld) fillOwnFromTown(byId, townWorld.marks, mineForSight(state.outsider, mineSet.marks));
+    if (townWorld) fillOwnFromTown(byId, townWorld.marks, mineForSight(state.outsider, mineSet.marks, townSeen));
+  }
+  // UNDER THE LENS, THE RECORD DECIDES WHICH OF YOUR ROWS STAY (postmark#4479).
+  // The lens read is drawn the moment it lands, and the town's record may land
+  // after it; until then none of your rows are laid. When it does, the index is
+  // laid again from the same lens read, with the rows a stranger's sight of the
+  // record still holds, and green still means home.
+  function relayOwnRows() {
+    const cached = readCache.get(residentStandpointKey(null, state.handle));
+    if (cached) byId = residentById(cached, mineForSight(state.outsider, mineSet.marks, townSeen));
+    withTownHouses();
+    homeSet = buildHomeSet(allMarks());
+  }
+  // AND IT SAYS SO WHEN IT CANNOT (postmark#4479, Wright's second edit). With no
+  // record the lens keeps none of your rows, never all of them, and the line goes
+  // where the lens's other refusal goes: the walk note on the map's side.
+  function lensRecordUnread() {
+    if (!state.outsider || !onResidentPath()) return;
+    const note = document.createElement("div");
+    note.textContent = OUTSIDER_RECORD_UNREAD + ".";
+    note.classList.add("refusal");
+    walkNote(note);
   }
   // THE ATLAS USED TO LOAD FOUR TIMES. Its one caller is guarded by `if (!mapCtx)`,
   // but mapCtx is not assigned until the scene is built, which is on the far side
@@ -17815,7 +17868,11 @@ export function mountViewer(appEl) {
     applyWorldLayer();
     if (onResidentPath() && state.handle) {
       const cached = readCache.get(residentStandpointKey(null, state.handle));
-      if (cached) { byId = residentById(cached, mineForSight(state.outsider, mineSet.marks)); withTownHouses(); homeSet = buildHomeSet(allMarks()); }
+      if (cached) {
+        byId = residentById(cached, mineForSight(state.outsider, mineSet.marks, townSeen)); withTownHouses(); homeSet = buildHomeSet(allMarks());
+        // the lens turned on before the town's record was in hand (or after it failed): ask for it; it lays your rows when it lands, or says why not
+        if (state.outsider && !townSeen) loadTownHouses();
+      }
       else loadResidentRead(null, state.handle).then(() => renderCurrent()).catch(() => {});
     }
     renderCurrent();
@@ -18448,7 +18505,7 @@ export function mountViewer(appEl) {
         // it — the records the read carries, plus the resident's own rows.
         // `homeSet` follows from the same set, so green still means home.
         if (readStillWanted({ handle, office: askedOffice, lens: askedLens }, { handle: state.handle, office: officeBase(), lens: !!state.outsider })) {
-          byId = residentById(read, mineForSight(askedLens, mineSet.marks));
+          byId = residentById(read, mineForSight(askedLens, mineSet.marks, townSeen));
           loadTownHouses();      // once; fills + repaints when it lands
           loadHands();           // your hands and the ground in reach (LOGOS v2 part 2)
           withTownHouses();      // and at once, when it already has
@@ -18573,7 +18630,7 @@ export function mountViewer(appEl) {
     if (!id) return null;
     const standpoint = { x: state.cam.x, y: state.cam.y };
     const read = readCache.get(residentStandpointKey(standpoint, state.handle));
-    return residentById(read ?? {}, mineForSight(state.outsider, mineSet.marks)).get(id) ?? null;
+    return residentById(read ?? {}, mineForSight(state.outsider, mineSet.marks, townSeen)).get(id) ?? null;
   }
 
   let mineSet = { marks: new Map(), unplaced: [], sentinel: [], complete: true, pages: 0, exhausted: false };
@@ -18784,7 +18841,7 @@ export function mountViewer(appEl) {
     // the compose pass asks for it and this repeats when it lands.
     const cachedRead = readCache.get(residentStandpointKey(null, actor));   // this office's read only (R2)
     if (cachedRead) {
-      byId = residentById(cachedRead, mineForSight(state.outsider, mineSet.marks));
+      byId = residentById(cachedRead, mineForSight(state.outsider, mineSet.marks, townSeen));
       withTownHouses();
       homeSet = buildHomeSet(allMarks());
     }
@@ -19473,7 +19530,7 @@ export function mountViewer(appEl) {
     if (!onResidentPath()) return allMarks();
     const standpoint = { x: state.cam.x, y: state.cam.y };
     const read = readCache.get(residentStandpointKey(standpoint, state.handle));
-    return [...residentById(read ?? {}, mineForSight(state.outsider, mineSet.marks)).values()];
+    return [...residentById(read ?? {}, mineForSight(state.outsider, mineSet.marks, townSeen)).values()];
   }
   function composeActivity(page) {
     const marks = activityMarks();
