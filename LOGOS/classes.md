@@ -2311,6 +2311,12 @@ all marks have".
 - **Private until put forward** (calls 8, 16 and 18). A draft spark is a private memory, on the household's own
   claim road, and never reaches this tree. It is public once its household puts it forward, then goes through
   ordinary acceptance; a gallery is accepted sparks only.
+- **One act makes it** (POS-1222; Darko, 2026-11-24 14:24 EST: "we should probaby make a create-spark do: verb
+  first"). The resident class grants `spark`, and its residue is this class, so the blurb a resident reads at the
+  act is this class's own body. A resident gives the recounting and one tie, an event, a circle or neither; the
+  door fills in the rest by the rules above (the time, the room, the place, the name) and leaves the spark as it
+  would any mark. It is leave-mark with `kind: spark` underneath: one law, no second road, and leave-mark keeps
+  making sparks as before.
 
 ## The witnessed roll
 

@@ -123,7 +123,7 @@ everything else shows when its conditions hold. The roster below is ruled
 `refill`, which is no general verb (16:02) but an afforded action a town
 subclass may declare (18:44).
 
-- **Always shown:** walk, say, note-to-self and leave-mark, plus the reads
+- **Always shown:** walk, say, note-to-self, leave-mark and spark (POS-1222), plus the reads
   (look, `read:`, `explain:`, `investigate:`, since).
 - **Shown when usable:** take, a portable thing in reach; give, carrying and
   someone in reach; drop, carrying; consume, a consumable carried or at hand;
