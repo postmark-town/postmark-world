@@ -2,19 +2,21 @@
   "crossing": 338,
   "source": "dynamic.db/journal",
   "grammar": "one line per journal row, in seq order; `standing` and `witnesses` are the-witnessed-line's anchor+offset, pinned at the write instant and carried here unchanged",
-  "as_of_world": "df9de17845306fce704012c27fc965dac87362bc",
+  "as_of_world": "dddfebcc362f903b5834123478cae0bbb3533ba5",
   "first_seq": 64811,
-  "last_seq": 64959,
-  "event_count": 82,
+  "last_seq": 65027,
+  "event_count": 109,
   "counts": {
-    "say": 63,
+    "say": 82,
     "rsvp": 9,
     "advance": 4,
     "units:take": 1,
     "units:consume": 1,
-    "leave-mark": 1,
+    "leave-mark": 4,
     "give": 1,
-    "ride": 1,
-    "make": 1
+    "ride": 3,
+    "make": 2,
+    "set-down": 1,
+    "post": 1
   }
 }
