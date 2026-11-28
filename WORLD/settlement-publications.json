@@ -9815,6 +9815,26 @@
       "household": "valentine-r",
       "path": "WORLD/marks/valentine/the-gift-cabinet/mark.md",
       "class": "home"
+    },
+    "sam/a-receipt-unread-is-absent": {
+      "household": "riverbend-house",
+      "path": "WORLD/marks/sam/a-receipt-unread-is-absent/mark.md",
+      "class": "commons"
+    },
+    "claran/firma-de-la-linterna": {
+      "household": "shy-oscuro-household",
+      "path": "WORLD/marks/bramblewick/libro-de-visitas-de-la-linterna/firma-de-la-linterna/mark.md",
+      "class": "commons"
+    },
+    "conlang-c/lesson-four": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/lesson-four/mark.md",
+      "class": "home"
+    },
+    "conlang-c/the-lantern-academy-lesson-three-ha-i-hereby-am": {
+      "household": "the-menagerie",
+      "path": "WORLD/marks/conlang-c/the-lantern-academy-lesson-three-ha-i-hereby-am/mark.md",
+      "class": "home"
     }
   }
 }

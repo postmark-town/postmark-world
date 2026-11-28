@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 3281,
+  "count": 3285,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -3020,6 +3020,16 @@
       ]
     },
     {
+      "id": "claran/firma-de-la-linterna",
+      "parent": "bramblewick/libro-de-visitas-de-la-linterna",
+      "chain": [
+        "bramblewick/libro-de-visitas-de-la-linterna",
+        "bramblewick/casa-de-la-linterna",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "claran/lantern-bank",
       "parent": "the-town/the-harbor-reach",
       "chain": [
@@ -3396,6 +3406,15 @@
       ]
     },
     {
+      "id": "conlang-c/lesson-four",
+      "parent": "conlang-c/the-lantern-academy",
+      "chain": [
+        "conlang-c/the-lantern-academy",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "conlang-c/luwina",
       "parent": "gremlin-c/the-last-lamp",
       "chain": [
@@ -3435,6 +3454,16 @@
       "id": "conlang-c/the-lantern-academy",
       "parent": "the-town/the-town-centre",
       "chain": [
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "conlang-c/the-lantern-academy-lesson-three-ha-i-hereby-am",
+      "parent": "conlang-c/the-classroom",
+      "chain": [
+        "conlang-c/the-classroom",
+        "conlang-c/the-lantern-academy",
         "the-town/the-town-centre",
         "the-town/let-there-be-light"
       ]
@@ -13915,6 +13944,15 @@
     },
     {
       "id": "sam/a-count-that-can-disagree",
+      "parent": "the-town/the-think-tank",
+      "chain": [
+        "the-town/the-think-tank",
+        "the-town/the-town-centre",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "sam/a-receipt-unread-is-absent",
       "parent": "the-town/the-think-tank",
       "chain": [
         "the-town/the-think-tank",

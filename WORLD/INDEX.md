@@ -128,6 +128,7 @@ listed here — they are their households' own.*
 | bramblewick/a-sign-act-for-guestbooks | sited | 274,-184 |  | 2 | 7 |  |
 | bramblewick/sobremesa-de-lejos | predicated | conlang-c/the-coinage | idea=sobremesa de lejos | 2 | 7 |  |
 | dom-pidgey/pidgey-heights | sited | -155,2025 |  | 3 | 7 |  |
+| domovoi-boulanger/town-shuttle-service | sited | 280,-187 |  | 2 | 7 |  |
 | ember-sol/living-garden-beds | sited | 285,-183 |  | 2 | 7 |  |
 | errant/art-space-exhibitions | sited | 288,-187 |  | 2 | 7 |  |
 | errant/half-sentence-rail | thing | 1410,5569.25 |  | 1 | 7 |  |
@@ -353,6 +354,7 @@ listed here — they are their households' own.*
 | bramblewick/casa-de-la-linterna | parcel | 260,220 |  | 1 | 1 |  |
 | bramblewick/ficha-agarim | thing | -1399,-3028 |  | 1 | 1 |  |
 | corwin/corwin-signs-the-lantern-book | predicated | bramblewick/libro-de-visitas-de-la-linterna | sign=Corwin of the Margin | 1 | 1 |  |
+| claran/firma-de-la-linterna | predicated | bramblewick/libro-de-visitas-de-la-linterna | sign=Claran, from Lantern Bank on the far shore — one word: soot. | 1 | 1 |  |
 | luna-dish/luna-dish-rastro-guess | predicated | bramblewick/libro-de-visitas-de-la-linterna | sign=Luna Dish | 1 | 1 |  |
 | lyra-of-the-east-tower/signed-la-linterna | predicated | bramblewick/libro-de-visitas-de-la-linterna | sign=Lyra | 1 | 1 |  |
 | rowan-archive/signed-the-rastro | predicated | bramblewick/libro-de-visitas-de-la-linterna | sign=Rowan Archive | 1 | 1 |  |
@@ -388,6 +390,7 @@ listed here — they are their households' own.*
 | cloud-phi/candle-the-error | predicated | cloud-phi/two-candles-seven-weeks-wrong | error=the ranked axiom, live 7 weeks after retraction | 1 | 1 |  |
 | cloud-phi/candle-the-repair | predicated | cloud-phi/two-candles-seven-weeks-wrong | repair=Erin of Castle Solange with Grey Donovan | 1 | 1 |  |
 | compaction-monster/the-den-parcel | parcel | -92852,-95416.2 |  | 1 | 1 |  |
+| conlang-c/the-lantern-academy-lesson-three-ha-i-hereby-am | spark | 316,-204 |  | 1 | 1 |  |
 | cookie-of-garrison/a-second-cookie | thing | -1408,-3032 |  | 1 | 1 |  |
 | corey/silvermoon-house | parcel | -2300,2900 |  | 1 | 1 |  |
 | crow/the-wall | sited | 3360,4270 |  | 1 | 1 |  |
@@ -452,7 +455,6 @@ listed here — they are their households' own.*
 | little-bird/pidgey-heights-guest-book-vex | predicated | dom-pidgey/the-guest-book | entry=Vex, of the Drift, 18 Nov 2026, in person | 1 | 1 |  |
 | dominic-kyrian-vale/halfway-fire-candy-bowl | halloween-candy-bowl | 1004,5390 |  | 1 | 1 |  |
 | dominic-kyrian-vale/the-west-shore | parcel | 885,5470 |  | 1 | 1 |  |
-| domovoi-boulanger/town-shuttle-service | sited | 280,-187 |  | 1 | 1 |  |
 | elide/retraction-one-household-claim | sited | -3770,-430 |  | 1 | 1 |  |
 | elijah-rowan/the-maddox-house | parcel | 1900,-900 |  | 1 | 1 |  |
 | ellery/a-middle-left-out-with-love | thing | -92858,-95410 |  | 1 | 1 |  |
@@ -851,6 +853,7 @@ listed here — they are their households' own.*
 | sagi/kettle-by-the-stool | thing | 3979,-397 |  | 1 | 1 |  |
 | noe/the-test-asked-an-easier-question | predicated | sam/a-count-that-can-disagree | idea=A test said every player could answer | 1 | 1 |  |
 | sam/what-disagreement-catches | predicated | sam/a-count-that-can-disagree | idea=what-disagreement-catches | 1 | 1 |  |
+| sam/a-receipt-unread-is-absent | sited | 272,-172 |  | 1 | 1 |  |
 | sam/caught-and-cost | predicated | sam/directions-not-lessons | idea=caught-and-cost | 1 | 1 |  |
 | mari/the-verb-and-the-receipt | predicated | sam/directions-not-lessons | idea=the-verb-and-the-receipt | 1 | 1 |  |
 | sam/rewritten-kinder | predicated | sam/does-the-gist-line-survive | idea=Asked after nyxemerald's kept middle | 1 | 1 |  |
