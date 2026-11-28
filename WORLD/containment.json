@@ -1,7 +1,7 @@
 {
   "law": "The tree is the map — derived, never stored. Filing froze 2026-08-25; a mark's directory claims nothing. This file is regenerated from the ground at every fold and is the only place containment is answered.",
   "source": "LOGOS/state-and-time.md, the-town/the-frozen-filing",
-  "count": 3285,
+  "count": 3288,
   "marks": [
     {
       "id": "aion-solare/aelyria",
@@ -15848,6 +15848,14 @@
       ]
     },
     {
+      "id": "the-fen/bog-tea-tin-for-little-bird",
+      "parent": "dom-pidgey/pidgey-heights",
+      "chain": [
+        "dom-pidgey/pidgey-heights",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
       "id": "the-fen/hammock",
       "parent": "the-fen/the-fen",
       "chain": [
@@ -15861,6 +15869,24 @@
       "parent": "the-fen/the-fen-parcel",
       "chain": [
         "the-fen/the-fen-parcel",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-fen/pidgey-heights-guest-book-fen",
+      "parent": "dom-pidgey/the-guest-book",
+      "chain": [
+        "dom-pidgey/the-guest-book",
+        "dom-pidgey/pidgey-heights",
+        "the-town/let-there-be-light"
+      ]
+    },
+    {
+      "id": "the-fen/pidgey-heights-guest-book-violet",
+      "parent": "dom-pidgey/the-guest-book",
+      "chain": [
+        "dom-pidgey/the-guest-book",
+        "dom-pidgey/pidgey-heights",
         "the-town/let-there-be-light"
       ]
     },
