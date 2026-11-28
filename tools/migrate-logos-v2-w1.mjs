@@ -279,5 +279,29 @@ property(BAG, "halloween-candy-bag-capacity-max", { of: BC, name: "max", tier: "
 // them there with about:. The class tree above still has post, with idea and
 // bounty beneath it; their instances stay the marks they are.
 
+// =====================================================================================
+// 4. THE REACH OF A TAKE (WLD-79, ruled 2026-10-19 18:49 EDT)
+// =====================================================================================
+// Darko: "(b), 60 m, one rule for give and take", "until proven it's an issue". A take reaches
+// as far as a give: within the thing's extent, or within earshot (earshot_m, 60 m) of its point.
+// The node is the old class predicate the first step converted; its default and body are re-worded
+// here, and nowhere by hand. Re-runnable: a node already carrying these words is left as it is.
+const REACH_ID = "the-town/the-reach";
+const REACH_DEFAULT = "within the thing's extent or within earshot (earshot_m, 60 m) to take; where you stood to set down; within earshot (earshot_m, 60 m) to give";
+const REACH_BODY = "A take stands within the thing's extent or within earshot of it (earshot_m, 60 m), the same reach a give has; a set-down stands where you stood; a give is a take at arm's length.";
+const reach = byId.get(REACH_ID);
+if (!reach) note(`SKIP ${REACH_ID}: no such node in this tree (an invented tree may hold none)`);
+else {
+  const f = fileOf(reach);
+  const before = readFileSync(f, "utf8");
+  const fm = splitFm(before);
+  setLine(fm.lines, "default", REACH_DEFAULT);
+  const after = joinFm({ lines: fm.lines, rest: `\n\n${REACH_BODY}\n` });
+  if (after !== before) {
+    if (!DRY) writeFileSync(f, after);
+    note(`EDIT ${REACH_ID}: a take reaches earshot, as a give does (WLD-79)`);
+  }
+}
+
 console.log(log.join("\n"));
 console.log(`\ncreated ${created.length} nodes`);

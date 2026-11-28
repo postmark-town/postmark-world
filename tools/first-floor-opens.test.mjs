@@ -47,6 +47,7 @@ import { ringRoomOf, portalFindings } from "./portals.mjs";
 import { fold } from "./marks-fold.mjs";
 import { buildHeightfield } from "./world-engine.mjs";
 import { markWhat } from "../spectator/mark-icons.mjs";
+import { STAIRS_LINE } from "./enter-exit.mjs";
 
 const SPIRE = "wright/the-starforge-spire";
 const GROUNDS = "wright/starforge-spire-grounds";
@@ -63,6 +64,8 @@ const KNIGHT = "wright/spire-hall-of-keepers-bat-knight";
 const KEY = "the-town/the-lumber-room-key";
 const RUG = "wright/spire-hall-of-keepers-rug";
 const STAIR = "wright/spire-the-little-spiral";
+// the way up: an ordinary door in the hall (a stair writes no `into` since WLD-253)
+const UP_DOOR = "wld3/the-door-up";
 // the floors above, a stand-in: their own dungeon, apart from the first floor's ground
 const UPPER = "wld3/the-upper-floors";
 const LANDING = "wld3/upper-landing";
@@ -75,7 +78,7 @@ const FIRST_FLOOR_ROOMS = [VESTIBULE, HALL, LUMBER, CHAPEL];
 // engine, so it cannot drift from the geometry below.
 const FIRST_FLOOR = [...FIRST_FLOOR_ROOMS, DOORS_INSIDE, "wright/spire-gilded-vestibule-to-hall-of-keepers",
   "wright/spire-hall-of-keepers-to-gilded-vestibule", TO_LUMBER, "wright/spire-lumber-room-to-hall-of-keepers",
-  CHAPEL_DOOR, "wright/spire-star-chapel-to-hall-of-keepers", KNIGHT, KEY, RUG, "wright/spire-star-chapel-altar", STAIR];
+  CHAPEL_DOOR, "wright/spire-star-chapel-to-hall-of-keepers", KNIGHT, KEY, RUG, "wright/spire-star-chapel-altar", STAIR, UP_DOOR];
 const UPPER_INSIDE = [LANDING, GALLERY, "wld3/landing-to-gallery", "wld3/gallery-to-landing", "wld3/landing-down", "wld3/gallery-chest"];
 
 const UNTIL = "2026-11-02T06:00:00.000Z";
@@ -83,16 +86,21 @@ const LEFT = "2026-11-01T23:10:00.000Z";
 
 const M = (id, x, y, w, h, extra = {}) => ({ id, by: id.split("/")[0], household: id.split("/")[0], kind: "sited", tier: "market",
   at: { x, y }, extent: { w, h }, date: "2026-10-18T12:00:00Z", body: id.split("/")[1], ...extra });
-const door = (id, x, y, into, extra = {}) => M(id, x, y, 2, 2, { entry: { word: "neutral", into, ...extra } });
+// the doors are doors, and the town's (WLD-253: door is a class, into, lands_at and requires its own fields; a resident's door no rule
+// allows does not pass); where they lead and what sees them is the test
+const TOWN = "the-town";
+const door = (id, x, y, into, extra = {}) => M(id, x, y, 2, 2, { kind: "door", by: TOWN, entry: { word: "neutral" }, into, ...extra });
 
 /** The Spire in one of three shapes, everything else the same:
- *    "open"        the opening: its mark leaves the class (kind: sited), its `rooms` dropped;
+ *    "open"        the opening: its mark leaves the class, its `rooms` dropped (kind: sited then; kind: door since the
+ *                  town re-kinded it with the 43 other doors, WLD-253, as World main has it);
  *    "dungeon"     today's Spire (kind: dungeon, its rooms declared);
  *    "rooms-only"  the falsifier: still kind: dungeon, every first-floor id taken off `rooms`.
- *  `drawnOver` adds a second dungeon drawn over the first floor's ground (the last test). */
-function world(spire = "open", { drawnOver = false } = {}) {
+ *  `drawnOver` adds a second dungeon drawn over the first floor's ground (the last test). Only the door writes the way in (`into`,
+ *  `lands_at`): a dungeon names none of its own since WLD-253. `stairUp`: the stair writes its own way up, as WLD-3 would have. */
+function world(spire = "open", { drawnOver = false, stairUp = false } = {}) {
   const keep = {
-    open: { kind: "sited" },
+    open: { kind: "door" },
     dungeon: { kind: "dungeon", rooms: [...FIRST_FLOOR_ROOMS] },
     "rooms-only": { kind: "dungeon", rooms: [] },
   }[spire];
@@ -102,7 +110,7 @@ function world(spire = "open", { drawnOver = false } = {}) {
     M("the-town/let-there-be-light", 0, 0, 60000, 60000),
     M(GROUNDS, 0, 0, 500, 400),
     M(FORECOURT, -170, 0, 60, 80),
-    M(SPIRE, 0, 0, 240, 180, { ...keep, entry: { into: VESTIBULE, lands_at: DOORS_INSIDE } }),
+    M(SPIRE, 0, 0, 240, 180, { ...keep, by: TOWN, ...(keep.kind === "door" ? { into: VESTIBULE, lands_at: DOORS_INSIDE } : {}) }),
     // the first floor: four rooms tiling the keep, two of them the heist's key rooms
     M(VESTIBULE, -98, 0, 36, 36),
     M(HALL, -40, 0, 76, 80),
@@ -122,8 +130,12 @@ function world(spire = "open", { drawnOver = false } = {}) {
     M(KEY, 40, -55, 1, 1, { kind: "thing" }),
     M(RUG, -40, 0, 10, 6),
     M("wright/spire-star-chapel-altar", 60, 40, 6, 3),
-    // the stair up, as WLD-3 would write it: a stair whose own entry carries `into`
-    M(STAIR, -60, -30, 4, 4, { kind: "stairs", entry: { word: "neutral", into: LANDING } }),
+    // the stair, as the class leaves it: it writes no entry, so it leads into itself and answers the class's line. NARROWED 2026-11-25
+    // (WLD-253): a stair may not write `into` (it is a door's), so the stair up "as WLD-3 would write it" is refused by name (`stairUp`),
+    // and this rule gives stairs no door field and adds no floor mechanism in its place. The floors above are reached here by an ordinary
+    // door of the town's, which keeps the controls below.
+    M(STAIR, -60, -30, 4, 4, { kind: "stairs", ...(stairUp ? { by: TOWN, entry: { word: "neutral", into: LANDING } } : {}) }),
+    door(UP_DOOR, -50, -30, LANDING),
     // the floors above: a dungeon of their own, with an exit down to the hall
     M(UPPER, ux, 0, 200, 150, { kind: "dungeon", rooms: [LANDING, GALLERY] }),
     M(LANDING, ux - 50, 0, 80, 100),
@@ -152,7 +164,7 @@ test("THE ARMS: the opening, today's Spire and the rooms-only edit differ only i
   assert.deepEqual(strip(world("open")), strip(world("dungeon")));
   assert.deepEqual(strip(world("rooms-only")), strip(world("dungeon")));
   const spire = (s) => world(s).marks.find((m) => m.id === SPIRE);
-  assert.equal(spire("open").kind, "sited");
+  assert.equal(spire("open").kind, "door", "re-kinded to door by the town with the 43 other doors (WLD-253), as World main has it");
   assert.equal("rooms" in spire("open"), false, "the opening drops `rooms`, a property of the dungeon class");
   assert.equal(spire("dungeon").kind, "dungeon");
   assert.deepEqual(spire("rooms-only").rooms, []);
@@ -225,10 +237,15 @@ test("ENTERED AS ANY PLACE IS: a first-floor room is entered by name from outsid
   assert.equal(enter(AT(-60, -30), GALLERY, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann" }).error, `no mark '${GALLERY}' to enter`);
   const upper = enter(AT(-60, -30), UPPER, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann" });
   assert.equal(upper.refused, "dungeon");
-  assert.deepEqual(upper.portals.map((p) => p.id), [STAIR]);
-  const up = enter(AT(-60, -30), STAIR, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann" });
+  assert.deepEqual(upper.portals.map((p) => p.id), [UP_DOOR]);
+  const up = enter(AT(-50, -30), UP_DOOR, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann" });
   assert.equal(up.error, undefined, up.error);
-  assert.deepEqual(up.within, [UPPER, LANDING], "up the stair is into the floors above, and out of the first floor");
+  assert.deepEqual(up.within, [UPPER, LANDING], "up the door is into the floors above, and out of the first floor");
+  // the stair keeps the class's answer; a stair that writes its own way up is refused by name (WLD-253: into is a door's)
+  assert.equal(enter(AT(-60, -30), STAIR, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann" }).refused?.because, STAIRS_LINE);
+  const written = enter(AT(-60, -30), STAIR, world("open", { stairUp: true }), { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann" });
+  assert.equal(written.refused, "door-law");
+  assert.match(written.error, /^wright\/spire-the-little-spiral writes entry\.into, and it is a stairs, not a door — /);
   // CONTROL: today the chapel and the lumber room are no marks at all to an outsider or a neighbour
   const today = world("dungeon");
   assert.equal(enter(AT(-200, 150), CHAPEL, today, { occupancy: occ([GROUNDS]), handle: "ann" }).error, `no mark '${CHAPEL}' to enter`);
@@ -241,8 +258,9 @@ test("NOT BY GEOMETRY: standing on a first-floor room's ground offers entry and 
   assert.equal(offer?.mark, CHAPEL, "the room is offered");
   assert.match(offer.ask, /Enter\?$/, "an offer, never an entry");
   assert.equal(enterPrompt(AT(2045, 0), w, { occupancy: occ([]), handle: "ann" }), null, "the floors above offer nothing to a walker outside");
-  // CONTROL: today the chapel's ground offers the Spire, never the chapel
-  assert.equal(enterPrompt(AT(40, 20), world("dungeon"), { occupancy: occ([GROUNDS]), handle: "ann" })?.mark, SPIRE);
+  // CONTROL: as a dungeon, the chapel's ground never offers the chapel. It offered the Spire while a dungeon could name a way in of its
+  // own; since WLD-253 it names none (into is a door's), so a dungeon is entered by its doors and its ground offers nothing
+  assert.equal(enterPrompt(AT(40, 20), world("dungeon"), { occupancy: occ([GROUNDS]), handle: "ann" }), null);
 });
 
 test("LEFT AS ANY PLACE IS: exit from a first-floor room is a plain step out, with no confirm, no whole-dungeon leave and no lock, even handed a settlement; the floors above still lock", () => {
@@ -279,7 +297,7 @@ test("THE EXIT LOCK NO LONGER APPLIES THERE: a lock left on the Spire before the
   const inner = enter(AT(-4, -30), TO_LUMBER, w, { occupancy: occ([GROUNDS, HALL]), handle: "ann", lockedOut });
   assert.equal(inner.refused, null, inner.error);
   // the floors above keep theirs
-  const up = enter(AT(-60, -30), STAIR, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann", lockedOut: { [UPPER]: { until: UNTIL, left_at: LEFT } } });
+  const up = enter(AT(-50, -30), UP_DOOR, w, { occupancy: occ([GROUNDS, SPIRE, HALL]), handle: "ann", lockedOut: { [UPPER]: { until: UNTIL, left_at: LEFT } } });
   assert.equal(up.refused, "dungeon-locked");
   assert.equal(up.dungeon, UPPER);
   // CONTROL: today the same lock refuses the doors

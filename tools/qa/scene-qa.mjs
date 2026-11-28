@@ -246,14 +246,14 @@ const wOut = await page.evaluate(() => Number(document.querySelector(".wv-minima
 check("FALSIFIER: zoom-out stops at the whole room — never past the walls", Math.abs(wOut - w0) < w0 * 0.02, `${wOut} vs full ${w0}`);
 const rail = await page.evaluate(() => {
   const box = document.querySelector(".wv-minimap");
-  const fp = box?.querySelector(".wv-map-fp"); const cv = box?.querySelector(".wv-map-convo");
+  const fp = box?.querySelector(".wv-map-fp"); const cv = document.querySelector('[data-dsel-layer="conversation"]');   // CORE-147: the speech bubbles' switch is in the Filters panel (the 💬 button is gone)
   fp?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   const fpOn = (() => { const l = box?.querySelector("#wv-fp-layer"); return !!l && l.style.display !== "none" && l.childNodes.length > 0; })();
   fp?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   return { fpBtn: !!fp, cvBtn: !!cv, fpOn };
 });
 check("the footprint toggle draws extent outlines inside", rail.fpBtn && rail.fpOn);
-check("the conversations toggle is on the rail inside", rail.cvBtn);
+check("the speech bubbles' switch is in the Filters panel inside", rail.cvBtn);
 
 // ── hover: the glance rides the same machinery ──────────────────────────────
 const hover = await page.evaluate(() => {

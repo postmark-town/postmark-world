@@ -10,7 +10,7 @@
 //   { marks, terrain, heightfield, light, fogCeilingM, charter }
 // A `state` is the walker: { x, y, name, household? }.
 
-import { isSited, isGround, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isGround, isPredicate, isLandform, isThingIn, kindIndexOf, instanceClassOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import {
   fieldOfView, radialSerialize, statusAt, fogModel,
   mistsAt, mistsHere, mistsBlock,
@@ -18,6 +18,7 @@ import {
 } from "./world-engine.mjs";
 import { homeOf } from "./where-is.mjs"; // the ONE home resolver (declared, own parcel, household)
 import { propertyOf } from "./class-properties.mjs"; // a class's properties, up extends (LOGOS v2 part 2)
+import { doorRefusal, classHasNoWayIn } from "./door-law.mjs"; // WLD-253: door is a class, its fields its own; thing has no way in, by its class
 import {
   marksContain, marksOverlapArea, overlapArea, rect,
 } from "./geometry.mjs"; // the ONE containment definition — pure, browser-safe (no node:*)
@@ -46,7 +47,13 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
   const self = statusAt({ x: state.x, y: state.y, groundH, eyeH: dials.eye_height_m, heightfield, light, fog, fogCeilingM, veil: mists ? mists.veil : 0 });
   // the containment spine: root → inward. within[0] is the frame (the root),
   // whose body is the establishing line — charter out of code, into the record.
-  const within = containmentChain(state, world.marks);
+  // A THING IS WITHIN ONLY ONCE ENTERED (WLD-74 E2, Wright 2026-11-05 04:48): the
+  // chain stays geometric, asked over the marks less the things `entered` does not
+  // hold. `entered` null is nothing entered (a keyless reader, a coords glance, or a
+  // ledger that would not read: the inside of a thing is never claimed unread).
+  const idx = kindIndexOf(world.marks);
+  const ent = new Set(entered ?? []);
+  const within = containmentChain(state, world.marks.filter((m) => ent.has(m.id) || !isThingIn(m, idx)));
   const root = within[0];
   return {
     charter: { ...(world.charter ?? CHARTER), establishing: root?.body ?? (world.charter ?? CHARTER).light, from_mark: root?.id ?? null },
@@ -72,6 +79,15 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
   };
 }
 
+// WHAT HAS AN INSIDE: a placed mark, and never a landform (WLD-97, ruled 2026-10-22:
+// a landform only shapes the ground; the #296 review found entering one sheltered you
+// from the Mists and framed your sight). Integrated onto main (WLD-197): the reviewed
+// test was `isGround`, which on main would also newly refuse a spark (WLD-173), so the
+// test is main's own `m.at` with the landform refused, and nothing else changes.
+function enterable(m, world) {
+  return !!m?.at && !isLandform(m, kindIndexOf(world?.marks ?? []));
+}
+
 /** AN ENTERED MARK IS SHELTER (Darko 2026-10-15): the test of a point the Mists leave alone for a walker whose enter
  *  stack is `entered` (mark ids): inside any of those marks. With `standpoint`, only the entered marks that contain it
  *  count: an entered mark you stand outside shelters nothing. null when nothing counts, so the Mists read as ever.
@@ -79,7 +95,7 @@ export function orient(state, world, { crossing = 0, dials = DIALS, entered = nu
 export function shelterOf(world, entered, standpoint = null) {
   const ids = new Set((entered ?? []).filter(Boolean));
   if (!ids.size) return null;
-  const marks = (world?.marks ?? []).filter((m) => ids.has(m.id) && m.at && (!standpoint || pointWithinMark(standpoint, m)));
+  const marks = (world?.marks ?? []).filter((m) => ids.has(m.id) && enterable(m, world) && (!standpoint || pointWithinMark(standpoint, m)));
   if (!marks.length) return null;
   return (p) => marks.some((m) => pointWithinMark(p, m));
 }
@@ -97,7 +113,7 @@ export function shelterOf(world, entered, standpoint = null) {
  *  frame, as ever. A future "see out" property on a mark is deferred, not built. */
 export function sightFrameOf(world, entered, standpoint = null) {
   const byId = new Map((world?.marks ?? []).map((m) => [m.id, m]));
-  const held = (entered ?? []).filter(Boolean).map((id) => byId.get(id)).filter((m) => m?.at && m.extent);
+  const held = (entered ?? []).filter(Boolean).map((id) => byId.get(id)).filter((m) => m?.at && m.extent && enterable(m, world));
   const room = [...held].reverse().find((m) => !standpoint || pointWithinMark(standpoint, m)) ?? null;
   if (!room) return null;
   const marks = world?.marks ?? [];
@@ -113,14 +129,20 @@ export function sightFrameOf(world, entered, standpoint = null) {
 // `actor` is the handle of the resident the eyes belong to (WLD-9): their home,
 // as tools/where-is.mjs § homeOf resolves it, is carried beyond the budget when
 // it is in view. No actor, or a home that resolves to nowhere, changes nothing.
-export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null, entered = null } = {}) {
+export function openYourEyes(state, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, actor = null, entered = null, explain = false } = {}) {
   const home = actor ? homeOf(actor, world) : null;
+  // AT YOUR FEET (WLD-74 E3/E4, Wright 2026-11-05 04:48): a thing whose footprint holds
+  // the standpoint and that `entered` does not hold is not where you are; it is an
+  // object at your feet, seen and in reach like any other, never cut for standing on it.
+  const idx = kindIndexOf(world.marks);
+  const ent = new Set(entered ?? []);
+  const atFeet = new Set(world.marks.filter((m) => m.at && !ent.has(m.id) && isThingIn(m, idx) && pointWithinMark(state, m)).map((m) => m.id));
   const fov = fieldOfView(state, world, { crossing, budget, dials, keep: home?.placed ? home.mark_id : null,
-    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state) });
+    shelter: shelterOf(world, entered, state), frame: sightFrameOf(world, entered, state), atFeet, explain });
   const radial = radialSerialize(fov);
-  radial.within = containmentChain(state, world.marks); // the spine: root → inward, parents first
+  radial.within = containmentChain(state, world.marks.filter((m) => ent.has(m.id) || !isThingIn(m, idx))); // the spine: root → inward, parents first; a thing only once entered (E3, as orient)
   fov.within = radial.within;
-  return { fov, radial, tell: () => renderTelling(state, radial, fov) };
+  return { fov, radial, tell: () => renderTelling(state, radial, fov, atFeet) };
 }
 
 // containmentChain — the telling's spine (Keemin, 2026-07-23): the marks the
@@ -410,6 +432,7 @@ export function enterExitPlan(state, targetId, world, { occupancy = new Map(), h
   const byId = new Map(world.marks.map((m) => [m.id, m]));
   const target = byId.get(targetId);
   if (!target) return { error: `no mark '${targetId}' to enter` };
+  if (isLandform(target, kindIndexOf(world.marks))) return { error: `'${targetId}' is a landform: a landform is ground, not a place to go in`, refused: "landform" };
   if (!target.at || !target.extent) return { error: `'${targetId}' has no extent — there is no inside to step into` };
   // THRESHOLD_KINDS, not the container list: this chain becomes ledger rows, and
   // a land title is not a door somebody crossed (see the kinds note above).
@@ -448,14 +471,18 @@ export function enter(state, targetId, world, {
   // A mark a dungeon hides from you is no mark at all to you: the same answer
   // as an id that does not exist, so naming one from outside learns nothing.
   if (named && hiddenFrom(marks, held).has(targetId)) return { error: `no mark '${targetId}' to enter` };
-  // ENTERING A MARK ENTERS ITS `into` (WLD-5's ruling, restored by WLD-63): any
-  // mark carrying one is passed through it, the dungeon itself included. The
-  // Starforge Spire carries `into` its vestibule, so entering it from anywhere
-  // in its outline sets you down inside the Gilded Doors; a list asks which.
+  // ENTERING A DOOR ENTERS ITS `into` (WLD-5's ruling, restored by WLD-63): a
+  // mark carrying one is passed through it, and a list asks which. NARROWED
+  // 2026-11-25 (WLD-253, CORE-129 layer 1): `into` is door's alone, so a dungeon
+  // (or a stairs, or any other class) no longer names a way in of its own; a
+  // record that still writes one is passed here only to be refused by name at
+  // its threshold (door-law.mjs). The Starforge Spire, re-kinded to door,
+  // carries `into` its vestibule, so entering it from anywhere in its outline
+  // sets you down inside the Gilded Doors.
   if (named && entryLawOf(named)?.into) return enterThroughPortal(state, named, world, { held, handle, at, iso, accepted, into, lockedOut, holdings });
   // Inside a dungeon the only enter is through a portal (G3: the cure for the
-  // Swiss-cheese exit must not leak on the way in), and a dungeon that names no
-  // `into` of its own is entered by the portals that lead into it.
+  // Swiss-cheese exit must not leak on the way in), and a dungeon is entered by
+  // the doors that lead into it.
   if (named && dungeonIndex(marks).dungeons.length) {
     const inside = heldDungeon(held, marks);
     const governs = dungeonsOf(named, marks);
@@ -465,10 +492,20 @@ export function enter(state, targetId, world, {
       return {
         error: inside
           ? `you are inside ${d}, a dungeon — inside one, the only way to enter anything is a portal. The portals where you stand: ${ways.map((p) => p.id).join(", ") || "(none)"}`
-          : `${d} is a dungeon that names no way in of its own (no \`into\`), so it is entered through the portals that lead into it. Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
+          : `${d} is a dungeon, so it is entered through the doors that lead into it (a dungeon names no way in of its own: \`into\` is a door's). Its ways in: ${ways.map((p) => p.id).join(", ") || "(none)"}`,
         refused: "dungeon", dungeon: d, portals: ways,
       };
     }
+  }
+  // A THING HAS NO INSIDE (WLD-212; Darko 2026-11-19 22:12 EST: "better to abolish this and then bring back an
+  // exception class later if we want to, rather than have it be blanket allowed"; the-town/the-not-ground:
+  // "a thing is not ground"). It is LAW now, read from the class (WLD-253; CORE-129 layer 1, the override rule's first
+  // use): thing declares `entry: none`, locked (the-town/thing-entry), and the nearest declaration wins, so a thing and
+  // every subclass that does not loosen it (only the town's subclass may) have no way in. Refused here, by name, before
+  // any plan or row. A record writing `into` was asked at its portal above (a thing may not write one: door-law.mjs);
+  // ground, hidden targets and the dungeon laws are answered above or below, unchanged.
+  if (named && classHasNoWayIn(instanceClassOf(named), kindIndexOf(marks))) {
+    return { error: `${targetId} is a thing, and a thing has no inside — there is nothing to enter`, refused: "thing", target: targetId };
   }
   const plan = enterExitPlan(state, targetId, world, { occupancy, handle });
   if (plan.error) return plan;
@@ -547,7 +584,13 @@ export function enter(state, targetId, world, {
  *     "settlement"`, the world as the last settlement printed it), and then
  *     everyone. Nothing is written. */
 function enterThroughPortal(state, portal, world, { held, handle, at, iso, accepted, into: pick, lockedOut = null, holdings = null }) {
+  // DOORS ARE THE TOWN'S (WLD-253): door is a class and into, lands_at and requires are its own. A record passes as a portal only if the door
+  // law lets it stand: a door the town made, or one of the 44 the town re-kinded, by name (its values are not pinned here; who may change them
+  // is the office's question and, by PR, a founder's merge). Asked first, by name, and nothing is written. A stairs leading where its class
+  // says writes no door field, and is not asked.
   const marks = world.marks ?? [];
+  const unlawful = doorRefusal(portal, { marks: kindIndexOf(marks) });
+  if (unlawful) return { error: unlawful.words, refused: "door-law", door: portal.id, fields: unlawful.fields };
   const byId = new Map(marks.map((m) => [m.id, m]));
   const lock = lockedPassage(portal, { pick: pick == null ? null : String(pick), marks, held, lockedOut, determined: world.determined ?? {} });
   if (lock) return { error: lock.words, refused: "dungeon-locked", dungeon: lock.dungeon, locked_until: lock.until, left_at: lock.left_at ?? null };
@@ -585,7 +628,7 @@ function enterThroughPortal(state, portal, world, { held, handle, at, iso, accep
 
   const broken = (field, value, because) => ({ ...base, crossings: [verdict], stranded: portal.id,
     broken: { field, value, because: `${because}. You are standing at ${portal.id}, and nothing was recorded.` } });
-  if (!chosen) return broken("into", law.into, "entry.into names no mark at all, so this portal leads nowhere");
+  if (!chosen) return broken("into", law.into, "into names no mark at all, so this portal leads nowhere");
   const intoMark = byId.get(chosen);
   if (!intoMark) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names no mark, so this portal leads nowhere`);
   if (!intoMark.at) return broken("into", chosen, `into: ${JSON.stringify(chosen)} names a mark with no place in the world`);
@@ -830,7 +873,7 @@ const townsOwn = (m) => authorOf(m) === TELLING_TOWN;
 export function residentMarkNamed(m, { withId = true } = {}) {
   return `a mark by ${authorOf(m) || "someone"}${withId ? ` [${m?.id}]` : ""}`;
 }
-function renderTelling(state, radial, fov) {
+function renderTelling(state, radial, fov, atFeet = null) {
   const o = radial.observer;
   const within = radial.within ?? [];
   const L = [];
@@ -889,7 +932,9 @@ function renderTelling(state, radial, fov) {
       const occ = m.occluded && m.signal ? " — its footing is hidden, only the light shows" : "";
       const dim = m.dim < 0.5 ? " — dim, at the dark edge" : "";
       const more = m.clusteredCount ? ` (+${m.clusteredCount} more of ${m.household}'s — investigate)` : "";
-      parts.push(`  · ${m.here ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
+      // a thing at your feet reads as HERE (WLD-74 E6, Darko's 10-18 word), keyed on the at-feet relation
+      // openYourEyes measured, never on a rounded 0 m; `here` on the row stays the kept home's alone
+      parts.push(`  · ${m.here || atFeet?.has(m.id) ? "here" : `${m.distM} m ${m.bearing}`} — ${told}${lit}${occ}${dim}${more}  [${m.id}, ✦${m.weight}]`);
     }
     if (parts.length) { L.push(`${bandHeading(bandName)}:`); L.push(...parts); }
   }

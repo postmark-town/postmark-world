@@ -1,0 +1,30 @@
+{
+  "crossing": 327,
+  "source": "dynamic.db/journal",
+  "grammar": "one line per journal row, in seq order; `standing` and `witnesses` are the-witnessed-line's anchor+offset, pinned at the write instant and carried here unchanged",
+  "as_of_world": "d6332565c38575efc46cafffba4281efa68e2dab",
+  "first_seq": 59625,
+  "last_seq": 60120,
+  "event_count": 350,
+  "counts": {
+    "declare-stance-on": 14,
+    "say": 213,
+    "advance": 7,
+    "leave-mark": 25,
+    "take": 5,
+    "units:take": 10,
+    "ride": 4,
+    "consume": 1,
+    "give": 16,
+    "make": 23,
+    "amend": 5,
+    "rsvp": 12,
+    "complete": 2,
+    "set-down": 1,
+    "describe": 1,
+    "units:give": 8,
+    "withdraw": 1,
+    "units:consume": 1,
+    "post": 1
+  }
+}

@@ -28,20 +28,24 @@ test("the lead line counts conversations in plain words", () => {
   assert.equal(chooserLeadLine([convoChoiceId("t1"), convoChoiceId("t2")]), "2 conversations are here — which one?");
 });
 
+// Until 2026-11-06 the two pins below asserted the NEW TAB: a lone badge click, and a chosen conversation row, called window.open(convoHref(...)).
+// POS-779 (Darko 2026-11-06: "A click opens the conversation in the right-side column, not a new tab") made both select the thread, which opens the column.
 test("pins: the wash case. Alone, its thread opens; with anything else, it joins the chooser", () => {
   // every wash holding the point, not only the smallest
-  assert.match(click, /const washes = \(\(\) => \{ const wp = worldPointForEvent\(e\); return convosAt\(wp\.x, wp\.y\)\.map\(\(h\) => convoChoiceId\(h\.id\)\); \}\)\(\);/);
+  // CORE-54: the world-space washes, plus the drawn discs resolved on screen for the pointer's own reach (a finger 22 px, a cursor 13 px)
+  assert.match(click, /const ids = new Set\(convosAt\(wp\.x, wp\.y\)\.map\(\(h\) => String\(h\.id\)\)\);\s*for \(const d of convoDiscsAt\(e\.clientX, e\.clientY, e\.pointerType\)\) ids\.add\(String\(d\.id\)\);/);
+  assert.match(click, /return \[\.\.\.ids\]\.map\(\(id\) => convoChoiceId\(id\)\);/);
   // a resident or creature under the point: the wash is one more entry
   assert.match(click, /if \(here\.all\.length \+ washes\.length > 1\) \{ openChooser\(\[\.\.\.here\.all, \.\.\.washes\]\); return; \}/);
   // marks only, or more than one wash: the chooser, with the washes
   assert.match(click, /if \(washes\.length && \(here\.all\.length \|\| washes\.length > 1\)\) \{ openChooser\(\[\.\.\.here\.all, \.\.\.washes\]\); return; \}/);
-  // a wash and nothing else: its thread, directly, as today
-  assert.match(click, /if \(hit\) \{ window\.open\(convoHref\(hit\.id\), "_blank", "noopener"\); return; \}/);
-  assert.ok(click.indexOf("if (washes.length && (here.all.length") < click.indexOf("if (hit) { window.open("), "the chooser is asked before the lone wash opens");
+  // a wash and nothing else: its thread, directly, in the right-hand column and no new tab
+  assert.match(click, /if \(hit\) \{ selectMark\(convoChoiceId\(hit\.id\)\); return; \}/);
+  assert.ok(click.indexOf("if (washes.length && (here.all.length") < click.indexOf("if (hit) { selectMark(convoChoiceId"), "the chooser is asked before the lone wash opens");
 });
 
-test("pins: a conversation row opens its thread beside the map; it reads as a conversation", () => {
-  assert.match(SOURCE, /if \(chosen && isConvoChoiceId\(chosen\.dataset\.choose\)\) \{ window\.open\(convoHref\(chosen\.dataset\.choose\.slice\(CONVO_CHOICE_PREFIX\.length\)\), "_blank", "noopener"\); return; \}/);
+test("pins: a conversation row opens its thread in the column beside the map; it reads as a conversation", () => {
+  assert.match(SOURCE, /if \(chosen && isConvoChoiceId\(chosen\.dataset\.choose\)\) \{ selectMark\(chosen\.dataset\.choose\); return; \}/);
   assert.match(SOURCE, /<span class="wv-choose-who">a conversation<\/span>/);
   assert.match(SOURCE, /section\("conversations", groups\.conversations\)/);
 });

@@ -1,5 +1,5 @@
-// registry-reconcile.test.mjs — a stale registry row follows its mark, in the
-// safe direction only (postmark#3757).
+// registry-reconcile.test.mjs — a stale registry row follows its mark
+// (postmark#3757); since WLD-51 ruling 2, every stale row does.
 
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -19,7 +19,7 @@ test("kinofire's fireplace: a stale commons row for a mark that walks home follo
   assert.deepEqual(p.repairs.map((r) => [r.id, r.to, r.why]), [["kinofire/the-too-big-fireplace",
     { path: "WORLD/marks/kinofire/spin-ghar-manor/the-too-big-fireplace/mark.md", class: "commons" }, "path"]],
     "the walk keeps it (postmark-world#208); a second copy of standing in the data would be two sources of truth");
-  assert.deepEqual([p.held, p.removed, p.unresolved], [[], [], []]);
+  assert.deepEqual([p.removed, p.unresolved], [[], []]);
 });
 
 test("a stale home row follows its mark's filing; its class was already right", () => {
@@ -35,22 +35,20 @@ test("a row at a PRESENT path is left exactly as it is, whatever its stored clas
     "keith/the-garage": { household: "h", path: garage, class: "commons" },   // walks home now
     "berthillon/a-cone": { household: "h", path: cone, class: "home" },       // walks market now: WLD-51
   }, { "keith/the-garage": garage, "berthillon/a-cone": cone }, { "keith/the-garage": "home", "berthillon/a-cone": "market" }, [garage, cone]);
-  assert.deepEqual([p.repairs, p.held, p.removed, p.unresolved], [[], [], [], []]);
+  assert.deepEqual([p.repairs, p.removed, p.unresolved], [[], [], []]);
 });
 
-test("a stale row stored HOME whose mark walks market follows its file: a stored home is never swept today, so the repair takes nothing new", () => {
+test("a stale row stored HOME whose mark walks market follows its file, and its class is not written (the walk decides: G2)", () => {
   const p = plan({ "a/cone": { household: "h", path: "WORLD/marks/let-there-be-light/cone/mark.md", class: "home" } },
     { "a/cone": "WORLD/marks/a/cone/mark.md" }, { "a/cone": "market" });
   assert.deepEqual(p.repairs.map((r) => [r.to, r.walks]), [[{ path: "WORLD/marks/a/cone/mark.md", class: "home" }, "market"]]);
-  assert.deepEqual(p.held, []);
 });
 
-test("WLD-51: a stale row whose mark walks market is HELD, never written (the repair would make it sweepable)", () => {
+test("WLD-51 ruling 2 (\"just take them\"): a stale commons row whose mark walks market follows its file too, and nothing is held", () => {
   const p = plan({ "lupi/rootwood-bookend": { household: "h", path: "WORLD/marks/let-there-be-light/rootwood-bookend/mark.md", class: "commons" } },
     { "lupi/rootwood-bookend": "WORLD/marks/lupi/rootwood-bookend/mark.md" }, { "lupi/rootwood-bookend": "market" });
-  assert.deepEqual(p.held.map((r) => r.id), ["lupi/rootwood-bookend"]);
-  assert.match(p.held[0].why, /WLD-51/);
-  assert.deepEqual(p.repairs, []);
+  assert.deepEqual(p.repairs.map((r) => [r.id, r.to.path, r.walks]), [["lupi/rootwood-bookend", "WORLD/marks/lupi/rootwood-bookend/mark.md", "market"]]);
+  assert.equal(p.held, undefined, "the plan has no held list");
 });
 
 test("a stale row for a mark that is gone is removed; a standing mark with no single filing is unresolved and left", () => {
@@ -63,16 +61,18 @@ test("a stale row for a mark that is gone is removed; a standing mark with no si
   assert.deepEqual(p.unresolved.map((r) => r.id), ["a/twice", "a/stale-state"]);
 });
 
-test("applyPlan writes repairs and removals only; held and unresolved rows are byte-for-byte as they were", () => {
+test("applyPlan writes repairs and removals only; unresolved rows are byte-for-byte as they were", () => {
   const doc = { version: 1, published: {
     "k/f": { household: "h", path: "old", class: "commons" },
     "l/b": { household: "h", path: "old-b", class: "commons" },
+    "u/r": { household: "h", path: "old-u", class: "home" },
     "t/d": { household: "t", path: "gone", class: "constitution" },
   } };
-  const p = plan(doc.published, { "k/f": "new", "l/b": "new-b" }, { "k/f": "home", "l/b": "market" });
+  const p = plan(doc.published, { "k/f": "new", "l/b": "new-b" }, { "k/f": "home", "l/b": "market", "u/r": "home" });
   const out = applyPlan(doc, p);
   assert.deepEqual(out.published["k/f"], { household: "h", path: "new", class: "commons" }, "the path moves; the class is never written");
-  assert.deepEqual(out.published["l/b"], doc.published["l/b"], "held");
+  assert.deepEqual(out.published["l/b"], { household: "h", path: "new-b", class: "commons" }, "a market mark's row follows its file too");
+  assert.deepEqual(out.published["u/r"], doc.published["u/r"], "unresolved: standing, with no filing");
   assert.equal(out.published["t/d"], undefined, "removed");
   assert.equal(out.version, 1);
   assert.equal(doc.published["k/f"].path, "old", "the input is not mutated");

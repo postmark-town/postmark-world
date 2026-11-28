@@ -312,6 +312,10 @@ export function whereIs(handle, { world = null, departures = [], at = fractional
 // `handles` is who to consider. Callers pass the roster they know (parcel
 // households plus anyone with a walk record); this owns the shape, so the office
 // door and the local spectator cannot drift apart the way they just did.
+// The roster itself is tools/walker-roster.mjs (no imports, so a reader that cannot import this tree can take it as one file);
+// re-exported here, beside publicResidents, for every caller that imports it from the engine (WLD-105 A2).
+export { walkerRoster } from "./walker-roster.mjs";
+
 export function publicResidents(handles, { world = null, departures = [], at = fractionalCrossing() } = {}) {
   const seen = new Set();
   const out = [];

@@ -67,8 +67,10 @@ const porch = (by, slug, body) => record({ by, at: spot(slug), extent: { w: 4, h
 const PUBLISHED = { "keith-old": "keithling", "wren-old": "wren", "fern-old": "fern", "kogane-hut": "kogane", "town-well": "the-town" };
 
 // ── the first knock, as lane.yml runs it (gh and git stubbed) ────────────────
+// The lane is retired (WLD-161): lane.yml and lane-wall.mjs sit under _archived/,
+// bytes unchanged, and this road still runs them from there.
 function bootstrapScript() {
-  const lines = readFileSync(join(ROOT, ".github", "workflows", "lane.yml"), "utf8").split("\n");
+  const lines = readFileSync(join(ROOT, "_archived", ".github", "workflows", "lane.yml"), "utf8").split("\n");
   const at = lines.findIndex((l) => /- name: "bootstrap: first knock/.test(l));
   const runAt = lines.findIndex((l, i) => i > at && /^\s+run: \|\s*$/.test(l));
   assert.ok(at >= 0 && runAt > at, "source extraction: the bootstrap step's run block");
@@ -113,8 +115,9 @@ function world(t, registry) {
   const has = (ref, path) => { try { git("cat-file", "-e", `${ref}:${path}`); return true; } catch { return false; } };
 
   mkdirSync(join(repo, "tools"), { recursive: true });
-  for (const file of withTool("mark-lint.mjs", "lane-wall.mjs", "admin-makers.mjs", "lane-author.mjs"))
+  for (const file of withTool("mark-lint.mjs", "admin-makers.mjs", "lane-author.mjs"))
     cpSync(join(HERE, file), join(repo, "tools", file));
+  cpSync(join(ROOT, "_archived", "tools", "lane-wall.mjs"), join(repo, "tools", "lane-wall.mjs"));
   put("WORLD/skeleton.json", JSON.stringify({ features: [], physics_registry: {} }, null, 2));
   put("WORLD/marks/let-there-be-light/mark.md", record({ by: "the-town", at: { x: 0, y: 0 }, extent: { w: 320000, h: 320000 }, body: "the frame" }).replace("kind: sited", "kind: sited\ntier: constitution"));
   for (const [by, slug, at] of [["kogane", PARCEL.slate, 1000], ["wren", PARCEL.wren, 2000], ["moss", PARCEL.moss, 3000]])

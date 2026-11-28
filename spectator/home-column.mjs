@@ -59,6 +59,18 @@
 // in, so nothing here imports the viewer and every decision above can be
 // falsified without a browser.
 
+// THE CIRCLE READER (CORE-82). A conversation's column hosts the one shared reader (spectator/circle-reader.mjs), which draws a room's top
+// circles and lets a visitor open one; the column keeps its host, its badge's link and its scroll. The reader is I/O-injected like this
+// module: the view hands in `reader: { roomId, source }`, and nothing here fetches.
+// WLD-248: `reader.identityForSpeaker(handle) → fresh Element|null` is the host's OPTIONAL whole speaker identity (face and name as one node; the contract is
+// circle-reader.mjs's `identityForSpeaker`). The column hands it to its reader and uses it for its own two speaker names: the header's speakers row, and a
+// plain statement whose FIRST span is its name as the page writes it (`{ type: "strong", spans: [{ type: "text", text: <speaker> }] }`), which the identity
+// replaces, face included; the time and words after it stay. A plain statement shaped any other way, or no valid node, keeps the old face + name path exactly.
+// Focus on a link inside such a node survives the column's same-key updates of its row and plain lines: it returns to the same place in the FRESH node of the
+// same speaker or line (World remembers which of its own slots held which node; nothing is marked on the host's node). The host must give the node a visible,
+// exposed name (see circle-reader.mjs; the refusal checks are not an accessibility audit).
+import { createCircleReader, speakerIdentity, identityFocusPath, refocusIdentity, READER_CSS, SAY_REPLY_CSS } from "./circle-reader.mjs";
+
 // ── the safe seams ──────────────────────────────────────────────────────────
 
 /** An href this column will hang on an anchor, or null. http(s) and nothing
@@ -70,6 +82,13 @@ export function safeLinkHref(raw) {
   let url;
   try { url = new URL(s); } catch { return null; }
   return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
+}
+
+/** A same-origin path (`/conversations/#t1`) this column will hang on a footer anchor, or null: one slash, then not another slash or a
+ *  backslash, no control characters. A scheme, a `//host` and a bare relative path are all refused. */
+export function safeSitePath(raw) {
+  const s = String(raw ?? "").trim();
+  return /^\/(?![\/\\])[^\u0000-\u001f\s]*$/.test(s) ? s : null;
 }
 
 /** A colour this column will paint as a swatch, or null. A `#` and three or six
@@ -231,7 +250,7 @@ export function isParcelMark(mark) {
  * renders blank: every state below ends in either prose or one line saying why
  * there is none.
  */
-export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null } = {}) {
+export function homeColumnModel({ handle, kicker, title, region, leadImage, door = null, error = null, loading = false, residentHref = null, titleLink = false, parcelId = null, canEnter = false, byline = null, residents = [], ownWords = null, enterId = null, facts = [], relations = [], back = null, icons = [], stamps = null, footprint = null, bars = [], tokens = [], copyId = null, pronouns = null, footerLink = null, reader = null, chooser = null, speakers = [], kickerTitle = null } = {}) {
   const who = String(handle ?? "").trim();
   // THE DOOR SPEAKS ONLY FOR ITS OWN PARCEL (POS-584, Darko 2026-10-11: "Sol's
   // parcel got yeeted"). There is one home page per handle, so a household's
@@ -248,7 +267,10 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     door = { description: typeof ownWords === "string" ? ownWords : "" };
   }
   const text = typeof door?.description === "string" ? door.description.trim() : "";
-  const blocks = text ? parseHomeMarkdown(text) : [];
+  // A VIEW MAY HAND IN PLAIN-DATA BLOCKS INSTEAD OF MARKDOWN (POS-779, the conversation view): what residents said is CONTENT, and
+  // parsing it as markdown would let a speaker's `#` or `[x](y)` dress itself as the column's own headings and links. The blocks
+  // are the same plain data `parseHomeMarkdown` produces (paragraph / spans / text); nothing in them is ever markup.
+  const blocks = Array.isArray(door?.blocks) ? door.blocks : text ? parseHomeMarkdown(text) : [];
   return {
     handle: who,
     kicker: String(kicker ?? who ?? "").trim(),
@@ -269,9 +291,9 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // it stops implying it is showing the region's own page. A caller may
     // therefore name its own byline; nobody else does, and the default is what
     // it always was.
-    byline: byline ? String(byline) : (who ? `in ${who}'s own words` : ""),
+    byline: byline === false ? "" : byline ? String(byline) : (who ? `in ${who}'s own words` : ""),
     blocks,
-    note: blocks.length ? ""
+    note: blocks.length || (chooser && typeof chooser.fill === "function") ? ""
       : loading ? "reading the home…"
       : error ? `the office did not answer for this home — ${error}`
       : "nothing written here yet",
@@ -317,6 +339,21 @@ export function homeColumnModel({ handle, kicker, title, region, leadImage, door
     // A RESIDENT'S PRONOUNS, beside the name (WLD-83, Darko 2026-10-20 08:44): their own
     // word from their appearance tree, shown only when written, never guessed
     pronouns: typeof pronouns === "string" && pronouns.trim() ? pronouns.trim() : null,
+    // A LINK OUT AT THE FOOT, for a view whose whole is elsewhere (POS-779: "all conversations" → /conversations/#<thread>). Only a
+    // same-origin path is hung (`safeSitePath`); anything else is no link at all rather than a cleaned one.
+    footerLink: footerLink && safeSitePath(footerLink.href) ? { href: safeSitePath(footerLink.href), text: String(footerLink.text ?? "").trim() || "more" } : null,
+    // THE CIRCLE READER'S SLOT (CORE-82): a conversation's view hands in `{ roomId, source, canReply?, onReply? }`; the column mounts the
+    // shared reader where the flat statements stood. The flat `door.blocks` stay, drawn only when the reader says it could not read the
+    // room (an unavailable read is said, and the words the map already holds stand in; it is never drawn as an empty room).
+    reader: reader && reader.source && reader.roomId !== undefined && reader.roomId !== null ? reader : null,
+    // THE CROWDED PRESS'S CHOICES (CORE-54, Wright 2026-11-20 16:57Z: on a phone a tap on crowded marks or conversation badges opens the EXISTING chooser content
+    // in the phone column). The view hands in `{ fill(host) }`: the viewer fills the column's host with the chooser it has always drawn (its own markup, its own
+    // escaping, its own rows and `data-choose` ids); this file holds no markup of its own and still parses no HTML string.
+    chooser: chooser && typeof chooser.fill === "function" ? chooser : null,
+    // WLD-215, the conversation's ONE header: who spoke (face + name, the face from the reader hook's host) and what the live mark means on hover. Plain data.
+    speakers: (speakers ?? []).filter((s) => s && String(s.handle ?? "").trim())
+      .map((s) => ({ handle: String(s.handle).trim(), name: String(s.name ?? s.handle).trim(), look: String(s.look ?? "") })),
+    kickerTitle: String(kickerTitle ?? "").trim() || null,
     // the way back to the mark this column was reached from, named
     back: back && String(back.id ?? "").trim()
       ? { id: String(back.id).trim(), name: String(back.name ?? back.id).trim() } : null,
@@ -414,7 +451,88 @@ function appendSpans(doc, parent, spans, imagePath) {
   }
 }
 
-function appendBlocks(doc, parent, blocks, imagePath) {
+// THE ONE FACE (the occupant token's idiom, WLD-215): the colour, the picture through the `imagePath` gate (a failed load removes itself, so the monogram under it stays),
+// else the silhouette or the monogram. A FRESH node on every call; `extra` adds a modifier class (the small speaker face).
+function faceEl(doc, tok, imagePath, extra = "") {
+  const face = el(doc, "span", extra ? `wv-tok-face ${extra}` : "wv-tok-face");
+  if (tok.color && tok.kind === "resident") face.setAttribute("style", `background:${tok.color}`);
+  const src = tok.picture && imagePath ? imagePath(tok.picture) : null;
+  if (src) {
+    const img = el(doc, "img", "wv-tok-img");
+    img.setAttribute("alt", "");
+    img.addEventListener?.("error", () => img.remove());
+    img.src = src;
+    face.appendChild(img);
+  } else if (tok.silhouette) {
+    const sil = el(doc, "span", "wv-tok-sil");
+    sil.setAttribute("style", `--wv-sil:${tok.silhouette}`);
+    face.appendChild(sil);
+  } else {
+    face.textContent = tok.monogram || String(tok.name ?? "").charAt(0).toUpperCase();
+  }
+  return face;
+}
+
+/** A small decorative face for a speaker (a resident's token fields: name, monogram, color, picture): a fresh node, hidden from assistive tech (the name is always beside it). */
+export function speakerFaceEl(doc, tok, imagePath = null) {
+  const face = faceEl(doc, { kind: "resident", ...tok }, imagePath, "wv-sp-face");
+  face.setAttribute("aria-hidden", "true");
+  return face;
+}
+
+// a host's `faceForSpeaker(handle)` hook, made safe: only a fresh Element counts (a string, a node already placed, or a throw is no face)
+function hostFace(faceFor, handle) {
+  if (typeof faceFor !== "function" || typeof handle !== "string" || handle === "") return null;
+  let node = null;
+  try { node = faceFor(handle); } catch { return null; }
+  if (!node || typeof node !== "object" || node.nodeType !== 1 || node.parentNode) return null;
+  if (node.getAttribute?.("aria-hidden") == null) node.setAttribute?.("aria-hidden", "true");
+  return node;
+}
+
+// WHO SPOKE, as face + name, one per speaker: the conversation header's list (a fresh face per entry, so a repeated handle never steals a node)
+// WLD-248: which host identity stands in which of the column's own slots (a speakers-row entry, a plain line), per container, rebuilt with it; never a mark on the node
+const IDENTITY_SLOT = new WeakMap();
+function placeIdentity(container, node, base) {
+  const reg = container.__idSlots ?? (container.__idSlots = { nodes: new Map(), seen: new Map() });
+  const n = (reg.seen.get(base) ?? 0) + 1; reg.seen.set(base, n);
+  reg.nodes.set(`${base}#${n}`, node); IDENTITY_SLOT.set(node, `${base}#${n}`);
+}
+/** before a container is rebuilt: the slot and place of a focused element inside one of its host identities, or null */
+function heldIdentityFocus(doc, container) {
+  const active = doc.activeElement;
+  if (!active || !container?.contains?.(active)) return null;
+  for (let n = active; n && n !== container; n = n.parentNode) if (IDENTITY_SLOT.has(n)) return { slot: IDENTITY_SLOT.get(n), path: identityFocusPath(n, active) };
+  return null;
+}
+/** after it is rebuilt: the same place in the same slot's fresh identity */
+function giveBackIdentityFocus(container, held) { if (held) refocusIdentity(container.__idSlots?.nodes.get(held.slot), held.path); }
+
+// (WLD-248: or the host's whole identity for that speaker, in place of both)
+function fillSpeakers(doc, row, speakers, faceFor, identityFor = null) {
+  while (row.firstChild) row.removeChild(row.firstChild);
+  row.__idSlots = null;
+  for (const sp of speakers) {
+    const item = el(doc, "span", "wv-homecol-speaker");
+    item.setAttribute("data-speaker", sp.handle);
+    const identity = speakerIdentity(identityFor, sp.handle);
+    if (identity) { placeIdentity(row, identity, `speaker:${sp.handle}`); item.appendChild(identity); row.appendChild(item); continue; }
+    const face = hostFace(faceFor, sp.handle);
+    if (face) item.appendChild(face);
+    const name = el(doc, "span", "wv-homecol-speaker-name");
+    name.textContent = sp.name;
+    item.appendChild(name);
+    row.appendChild(item);
+  }
+}
+
+// a plain statement's leading name, as the page writes it: the first span, strong, holding exactly the speaker's handle (WLD-248 replaces it with the identity)
+const leadsWithName = (block) => {
+  const first = block.spans?.[0];
+  return first?.type === "strong" && first.spans?.length === 1 && first.spans[0]?.type === "text" && first.spans[0].text === block.speaker;
+};
+
+function appendBlocks(doc, parent, blocks, imagePath, faceFor = null, identityFor = null) {
   for (const block of blocks ?? []) {
     if (block.type === "heading") {
       const node = el(doc, `h${Math.min(6, Math.max(1, block.level))}`);
@@ -465,6 +583,20 @@ function appendBlocks(doc, parent, blocks, imagePath) {
       continue;
     }
     const p = el(doc, "p");
+    // WLD-248: the host's whole identity takes the place of the face and the leading name, once; the rest of the spans (time, words) are drawn as ever
+    const identity = typeof block.speaker === "string" && leadsWithName(block) ? speakerIdentity(identityFor, block.speaker) : null;
+    if (identity) {
+      // the line's speaker and words name its slot, so new speech above or below does not move it; its presentation (`look`, which the page changes when a
+      // picture arrives late) is not who or what was said, and stays out of the key (it still redraws the line: the body's signature keeps it)
+      placeIdentity(parent, identity, `line:${JSON.stringify([block.speaker, block.spans])}`);
+      p.appendChild(identity);
+      appendSpans(doc, p, block.spans.slice(1), imagePath);
+      parent.appendChild(p);
+      continue;
+    }
+    // WLD-215: a plain statement names its speaker, and wears that speaker's face before the words (the old office's transcript, which prod still shows)
+    const face = typeof block.speaker === "string" ? hostFace(faceFor, block.speaker) : null;
+    if (face) p.appendChild(face);
     appendSpans(doc, p, block.spans, imagePath);
     parent.appendChild(p);
   }
@@ -478,6 +610,7 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
   const nav = el(doc, "div", "wv-homecol-nav");
   const kicker = el(doc, "span", "wv-homecol-kicker");
   kicker.textContent = model.kicker;
+  if (model.kickerTitle) kicker.setAttribute("title", model.kickerTitle);
   let enter = null;
   if (model.enter) {
     // THE CARD'S OWN DOOR (founder, 2026-09-11: "make the enter button in the
@@ -539,6 +672,20 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
     const meta = el(doc, "div", "wv-homecol-meta");
     meta.textContent = model.region;
     scroll.appendChild(meta);
+  }
+
+  if (model.speakers.length || model.reader) {   // a reader's column always holds the row (empty hides itself), so late speakers have a place
+    const row = el(doc, "div", "wv-homecol-speakers");
+    fillSpeakers(doc, row, model.speakers, model.reader?.faceForSpeaker ?? null, model.reader?.identityForSpeaker ?? null);
+    row.__sig = JSON.stringify(model.speakers);
+    scroll.appendChild(row);
+  }
+
+  if (model.chooser) {
+    // the crowded press's choices: the viewer fills this host with the chooser's rows (their `data-choose` ids are the viewer's one click delegate's)
+    const mount = el(doc, "div", "wv-homecol-chooser");
+    scroll.appendChild(mount);
+    model.chooser.fill(mount);
   }
 
   if (model.icons?.length) {
@@ -608,8 +755,34 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
   }
 
   const body = el(doc, "div", "wv-homecol-body");
-  appendBlocks(doc, body, model.blocks, imagePath);
-  scroll.appendChild(body);
+  if (model.reader) {
+    // the reader takes the body's place; the flat words wait behind it and show only if the reader could not read the room
+    const mount = el(doc, "div", "wv-homecol-reader");
+    scroll.appendChild(mount);
+    const note = el(doc, "p", "wv-homecol-flatnote");
+    note.textContent = "The circles could not be read, so these are the words the map already holds:";
+    body.hidden = true; note.hidden = true;
+    const reader = createCircleReader({
+      doc, host: mount, source: model.reader.source, roomId: model.reader.roomId,
+      canReply: !!model.reader.canReply, onReply: model.reader.onReply ?? null, hrefForCircle: model.reader.hrefForCircle ?? null,
+      faceForSpeaker: model.reader.faceForSpeaker ?? null,    // WLD-213: only a host that hands one in; the World page's conversation view hands the page's own face source (WLD-215)
+      identityForSpeaker: model.reader.identityForSpeaker ?? null,   // WLD-248: only a host that hands one in (the Site's shared identity form)
+      hostOwnsHeader: model.reader.hostOwnsHeader === true,   // WLD-215: only a view that draws the room's header itself (the conversation column) says so
+      hostHoldsPlain: model.blocks.length > 0,                // WLD-216: this column holds the selected conversation's plain transcript, so an old office's plain list stands down to it
+      // WLD-216: an office from before POS-1035 answers the room read with its plain list (`reason: "plain"`): that is no failure, so the plain transcript the
+      // map already holds shows as it always did, with no "could not be read" sentence over it. A real failed read keeps the sentence.
+      onState: (st, detail) => { const flat = st === "unavailable" && model.blocks.length > 0; body.hidden = !flat; note.hidden = !flat || detail?.reason === "plain"; },
+    });
+    host.__circleReader = reader;
+    appendBlocks(doc, body, model.blocks, imagePath, model.reader.faceForSpeaker ?? null, model.reader.identityForSpeaker ?? null);
+    scroll.appendChild(note);
+    scroll.appendChild(body);
+    reader.showRoom();
+  } else {
+    host.__circleReader = null;
+    appendBlocks(doc, body, model.blocks, imagePath);
+    scroll.appendChild(body);
+  }
 
   // ✦ AND THE FOOTPRINT, side by side: what backs it and how big it is, as shapes
   const fp = model.footprint && typeof doc.createElementNS === "function" ? model.footprint : null;
@@ -730,23 +903,7 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
       b.setAttribute("type", "button");
       b.setAttribute("data-choose", tok.id);
       b.setAttribute("title", tok.name);
-      const face = el(doc, "span", "wv-tok-face");
-      if (tok.color && tok.kind === "resident") face.setAttribute("style", `background:${tok.color}`);
-      const src = tok.picture && imagePath ? imagePath(tok.picture) : null;
-      if (src) {
-        const img = el(doc, "img", "wv-tok-img");
-        img.setAttribute("alt", "");
-        img.addEventListener?.("error", () => img.remove());
-        img.src = src;
-        face.appendChild(img);
-      } else if (tok.silhouette) {
-        const sil = el(doc, "span", "wv-tok-sil");
-        sil.setAttribute("style", `--wv-sil:${tok.silhouette}`);
-        face.appendChild(sil);
-      } else {
-        face.textContent = tok.monogram || tok.name.charAt(0).toUpperCase();
-      }
-      b.appendChild(face);
+      b.appendChild(faceEl(doc, tok, imagePath));
       // a creature is a diamond with no legs (WLD-82); a resident keeps its two
       if (tok.kind !== "creature") {
         b.appendChild(el(doc, "span", "wv-tok-leg l"));
@@ -811,6 +968,16 @@ export function renderHomeColumn(doc, host, model, { imagePath = null } = {}) {
     scroll.appendChild(copy);
   }
 
+  if (model.footerLink) {
+    const all = el(doc, "a", "wv-homecol-all");
+    all.setAttribute("href", model.footerLink.href);
+    // beside the map, never over it: the reader is mid-world with a lens up and a camera aimed (as the badge's own link always did)
+    all.setAttribute("target", "_blank");
+    all.setAttribute("rel", "noopener noreferrer");
+    all.textContent = model.footerLink.text;
+    scroll.appendChild(all);
+  }
+
   host.appendChild(scroll);
   return host;
 }
@@ -836,6 +1003,7 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
   // button carries `data-enter`, and the viewer's door handler is the one that
   // reads it, for this button exactly as for the card's.
   let shown = null;            // the parcel id on screen, or null
+  let lastView = null;         // the view on screen, as last handed in (WLD-249: what a relabel draws from)
   let inFlight = 0;
 
   const paint = (view, state) => {
@@ -868,20 +1036,92 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
       tokens: view.tokens ?? [],
       copyId: view.copyId ?? null,
       pronouns: view.pronouns ?? null,
+      footerLink: view.footerLink ?? null,
+      reader: view.reader ?? null,
+      chooser: view.chooser ?? null,
+      speakers: view.speakers ?? [],
+      kickerTitle: view.kickerTitle ?? null,
     }), { imagePath });
   };
 
   function close() {
-    shown = null;
+    shown = null; lastView = null;
     if (!host) return;
     host.hidden = true;
     host.parentElement?.classList.remove("has-homecol");
     while (host.firstChild) host.removeChild(host.firstChild);
   }
 
+  // A column that hosts the circle reader keeps ONE key for the life of the conversation, so a repaint never rebuilds the reader under the
+  // reader's cursor. What the office says about the room meanwhile (live / gone quiet, the counts, who can act) still has to arrive: it is
+  // written into the words already on screen, and into the reader's own options, and nothing is rebuilt.
+  function liveUpdate(view) {
+    const r = host?.__circleReader;
+    if (!r || !view.reader) return;
+    const set = (node, text) => { if (node && text !== undefined && text !== null && node.textContent !== String(text)) node.textContent = String(text); };
+    const one = (sel) => host.querySelector?.(sel) ?? null;
+    set(one(".wv-homecol-kicker"), view.kicker);
+    if (!view.titleLink) set(one(".wv-homecol-title"), view.title);
+    set(one(".wv-homecol-meta"), view.region);
+    set(one(".wv-homecol-byline"), view.byline);
+    const dds = Array.from(host.querySelectorAll?.(".wv-homecol-facts dd") ?? []);
+    (view.facts ?? []).forEach((f, i) => { if (f && !f.detail && !f.swatch) set(dds[i], f.value); });
+    r.setCanReply?.(!!view.reader.canReply, view.reader.onReply ?? null);
+    syncPlain(view, false);
+    syncSpeakers(view, false);
+    const kick = one(".wv-homecol-kicker");
+    if (kick && view.kickerTitle) kick.setAttribute("title", String(view.kickerTitle));
+  }
+  // WLD-216: the plain transcript behind the reader (what an old office's conversation shows) takes the words the map holds NOW, inside this same conversation
+  // only (the view is the selected thread's own, by id): rewritten only when they changed, so an unchanged redraw touches nothing; `force` (WLD-249: the host's
+  // identity changed, the words did not) rewrites it anyway
+  function syncPlain(view, force) {
+    const body = host.querySelector?.(".wv-homecol-body") ?? null;
+    const blocks = view.door?.blocks;
+    if (!body || !Array.isArray(blocks)) return;
+    const sig = JSON.stringify(blocks);
+    if (body.__plainSig === sig && !force) return;
+    const held = heldIdentityFocus(doc, body);
+    while (body.firstChild) body.removeChild(body.firstChild);
+    body.__idSlots = null;
+    appendBlocks(doc, body, blocks, imagePath, view.reader.faceForSpeaker ?? null, view.reader.identityForSpeaker ?? null);
+    body.__plainSig = sig;
+    giveBackIdentityFocus(body, held);
+  }
+  // WLD-215: the header's speakers and the live mark's meaning follow the office's late public metadata in place (rewritten only when they changed; `force` as above)
+  function syncSpeakers(view, force) {
+    const row = host.querySelector?.(".wv-homecol-speakers") ?? null;
+    if (!row || !Array.isArray(view.speakers)) return;
+    const speakers = view.speakers.filter((s) => s && String(s.handle ?? "").trim())
+      .map((s) => ({ handle: String(s.handle).trim(), name: String(s.name ?? s.handle).trim(), look: String(s.look ?? "") }));   // `look` = what the face is made from (so a picture arriving late redraws it)
+    const sig = JSON.stringify(speakers);
+    if (row.__sig === sig && !force) return;
+    const held = heldIdentityFocus(doc, row);
+    fillSpeakers(doc, row, speakers, view.reader.faceForSpeaker ?? null, view.reader.identityForSpeaker ?? null); row.__sig = sig;
+    giveBackIdentityFocus(row, held);
+  }
+
+  /**
+   * WLD-249: the host's speaker identity changed (a provider set, replaced or cleared, or the same one's data changed): draw the open conversation's labels
+   * again IN PLACE, from what the column already holds: its speakers row, its plain lines and its reader's bylines. Nothing is read, nothing remounted;
+   * scroll, focus (a focused identity link returns to the same line's fresh node), the open threads and the selection stay. Anything else open: nothing to do.
+   */
+  function refreshIdentities() {
+    const view = lastView;
+    const r = host?.__circleReader;
+    if (!view?.reader || shown !== view.key || !r) return false;
+    const scroller = host.querySelector?.(".wv-homecol-scroll") ?? null, top = scroller?.scrollTop;   // the column's own scroll, put back after every rebuild below
+    syncPlain(view, true);
+    syncSpeakers(view, true);
+    r.redraw?.();
+    if (scroller && typeof top === "number" && scroller.scrollTop !== top) scroller.scrollTop = top;
+    return true;
+  }
+
   function open(view) {
     if (!host || !doc || !view?.handle || !view?.key) return false;
-    if (shown === view.key) return true;
+    lastView = view;
+    if (shown === view.key) { liveUpdate(view); return true; }
     shown = view.key;
     host.hidden = false;
     host.parentElement?.classList.add("has-homecol");
@@ -908,7 +1148,9 @@ export function createHomeColumn({ doc, host, readHome, imagePath = null, reside
     return true;
   }
 
-  return { open, close, isOpen: () => shown !== null, shownKey: () => shown };
+  // the circle reader refreshes itself in place (it keeps the reader's scroll and focus and offers new says); the column never repaints for it
+  const refreshReader = () => host?.__circleReader?.refresh({ quiet: true });
+  return { open, close, isOpen: () => shown !== null, shownKey: () => shown, refreshReader, refreshIdentities, reader: () => host?.__circleReader ?? null };
 }
 
 // ── the dress ───────────────────────────────────────────────────────────────
@@ -931,6 +1173,20 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-close { margin-left:auto; flex:none; border:0; background:transparent; color:var(--dim);
   font:inherit; font-size:.95rem; line-height:1; padding:3px 7px; border-radius:4px; cursor:pointer; }
 .wv-homecol-close:hover, .wv-homecol-close:focus-visible { color:var(--paper); background:var(--panel2); }
+/* CORE-54 (Darko 2026-11-20: "1. Buttons cover titles", "4. Small targets"). ON A PHONE the host's own floating buttons (a Postmark pill, a Time-travel pill)
+   ride over the top of this full-height column, and nothing reserved room for them: the title began under them. The host says, in --wv-chrome-bottom, the
+   y (px from the top of the screen) below which it has nothing floating; the column's sticky nav is at least that tall, so its bar IS the band the
+   host's buttons float on and the title, the facts and the close sit clear below it. No host value, no reserve (a standalone viewer has no such buttons).
+   The close keeps its mark and gains a 44 px press target. */
+@media (max-width:720px) {
+  .wv-homecol-nav { min-height:var(--wv-chrome-bottom, 0px); box-sizing:border-box; align-items:flex-start; }
+  .wv-homecol-kicker { margin-top:14px; }   /* the kicker stays on the top row beside the close (a bottom-aligned kicker sat where the host's Time-travel pill floats) */
+  .wv-homecol-close { align-self:flex-start; }
+}
+@media (max-width:720px), (pointer:coarse) {
+  .wv-homecol-close { min-width:44px; min-height:44px; }
+  .wv-homecol-all { display:inline-block; padding:12px 6px; }
+}
 .wv-homecol-scroll { flex:1; min-height:0; overflow-y:auto; padding:14px 15px 26px;
   scrollbar-width:thin; scrollbar-color:var(--line) transparent; }
 .wv-homecol-title { margin:0; color:var(--paper); font-size:1.22rem; line-height:1.25; }
@@ -952,6 +1208,9 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-home-who { font-weight:600; }
 .wv-homecol-home-via { color:var(--muted, #9aa); font-size:.74rem; }
 .wv-homecol-body { color:var(--paper); font-size:.87rem; line-height:1.62; }
+.wv-homecol-body[hidden], .wv-homecol-flatnote[hidden] { display:none; }
+.wv-homecol-reader { color:var(--paper); font-size:.87rem; line-height:1.55; --cr-rule:var(--line); --cr-accent:var(--amber); }
+.wv-homecol-flatnote { color:var(--dim); font-size:.8rem; margin:.8rem 0 0; }
 .wv-homecol-body h1, .wv-homecol-body h2, .wv-homecol-body h3,
 .wv-homecol-body h4, .wv-homecol-body h5, .wv-homecol-body h6 {
   margin:1rem 0 .3rem; font-size:.95rem; color:var(--amber); letter-spacing:.01em; }
@@ -1029,6 +1288,13 @@ export const HOME_COLUMN_CSS = `
 .wv-tok.is-creature .wv-tok-face::before { content:""; position:absolute; z-index:-1; left:3px; top:3px; width:22px; height:22px;
   transform:rotate(45deg); background:#f4b4ad; box-shadow:0 0 0 2px #d8706a; border-radius:1px; }
 .wv-tok.is-creature .wv-tok-sil { width:68%; height:68%; }
+/* WLD-215: the same face, small, beside a name or a line (CORE-131 owns later sizing). z-index auto so it never rides over the column's own chrome. */
+.wv-sp-face { display:inline-grid; flex:none; width:20px; height:20px; font-size:.62rem; z-index:auto; box-shadow:0 0 0 1.5px var(--green); vertical-align:-5px; margin-right:6px; }
+.wv-homecol-speakers { display:flex; flex-wrap:wrap; gap:6px 14px; margin:.55rem 0 0; font-size:.8rem; color:var(--paper); }
+.wv-homecol-speakers:empty { display:none; }
+.wv-homecol-speaker { display:inline-flex; align-items:center; min-width:0; }
+.wv-homecol-speaker .wv-sp-face { vertical-align:baseline; }
+.wv-homecol-speaker-name { overflow-wrap:anywhere; }
 .wv-tok-img { width:100%; height:100%; object-fit:cover; display:block; }
 .wv-tok-sil { width:86%; height:86%; background:#4a2326; -webkit-mask:var(--wv-sil) center/contain no-repeat; mask:var(--wv-sil) center/contain no-repeat; }
 .wv-tok-leg { position:absolute; top:25px; width:2px; height:7px; border-radius:1px; background:var(--green); }
@@ -1040,8 +1306,10 @@ export const HOME_COLUMN_CSS = `
 .wv-homecol-resident { display:inline-block; margin-top:1.2rem; color:var(--amber);
   font-size:.8rem; text-decoration:none; border-bottom:1px solid rgba(232,197,106,.4); }
 .wv-homecol-resident:hover, .wv-homecol-resident:focus-visible { color:var(--paper); border-bottom-color:var(--paper); }
+.wv-homecol-all { display:inline-block; margin-top:1.2rem; color:var(--amber); font-size:.8rem; text-decoration:none; border-bottom:1px solid transparent; }
+.wv-homecol-all:hover, .wv-homecol-all:focus-visible { color:var(--paper); border-bottom-color:var(--paper); }
 @media (min-width:820px) {
   .wv-minimap.has-homecol .wv-mapctl { right:calc(var(--wv-homecol-w, min(26rem, 92%)) + 10px); }
   .wv-minimap.has-homecol .wv-walkdesk { right:calc(var(--wv-homecol-w, min(26rem, 92%)) + 10px); }
 }
-`;
+${READER_CSS}${SAY_REPLY_CSS}`;

@@ -286,6 +286,9 @@ async function readGround({ zoomToNear = false, stopAtTier = "near", tellingOpen
       water: q(".wv-tg-water, .wv-tg-water-line"),
       features: q(".wv-tg-feature"),
       furnished: q(".wv-ph-extent, .wv-scene-mark-art"),
+      // WHICH outlines (WLD-205): the outline is owed to a picture's subject at every tier, so at far the
+      // question is no longer "any?" but "whose?"
+      phIds: [...(svg ? svg.querySelectorAll(".wv-ph-extent[data-id]") : [])].map((e) => e.getAttribute("data-id")),
       // the spectator's parcel pass, counted three ways: the far glyph, the
       // card, and the picture inside the card — which are the three answers the
       // tier gate picks between
@@ -505,8 +508,14 @@ test("THE FAR TIER DRAWS NO FURNITURE — the spectator opens on the town, not o
 
   const g = await readGround();
   assert.equal(g.tier, "far", `the opening view is the whole town (tier: ${g.tier})`);
-  assert.equal(g.furnished, 0,
-    `no furniture is drawn at town width: ${g.furnished} (the 09-09 record put 11,961 marks through this pass)`);
+  // THE FOG STAYS OUT (the 09-09 record put 11,961 marks through this pass). What a far view may now draw is
+  // an OUTLINE for a mark that wears a picture — the picture's complement while it fades, owed to every
+  // admitted picture subject at every tier (WLD-205, review F2) — and for nothing else: no picture-less mark.
+  const pictured = new Set((SERVED.marks ?? []).filter((m) => m?.image).map((m) => m.id));
+  const fog = g.phIds.filter((id) => !pictured.has(id));
+  assert.deepEqual(fog, [],
+    `no furniture is drawn at town width — only the outline of a mark that wears a picture: ${fog.length} picture-less outlines (of ${g.phIds.length})`);
+  assert.ok(g.phIds.length < 200, `…and a handful of them, not a fog: ${g.phIds.length}`);
   // THE HOUSES ARE GLYPHS, NOT CARDS. This is the pass that made the contact
   // sheet: a card is a clipped photograph, a frame, a name and a pip, and there
   // is one per parcel whatever the zoom. At town width they are one filled

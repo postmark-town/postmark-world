@@ -786,10 +786,12 @@ export function lodScore({ extentM, distM, weight = 0, dials = DIALS, dimming = 
 // observer: { x, y, name? }
 // world:    { marks, terrain, heightfield, light, fogCeilingM } — marks are the
 //           FOLDED marks (id, kind, at, extent, weight, body, signal?, household).
-// opts:     { crossing, budget, keep }   keep: a mark id carried beyond the budget when visible
+// opts:     { crossing, budget, keep, atFeet }   keep: a mark id carried beyond the budget when visible
+//           atFeet: a Set of the mark ids of the things at the observer's feet (WLD-74 E4: the caller's
+//           measure, openYourEyes's), candidates at any distance and seated first within the budget (E5)
 // Returns a structured telling: the observer's state, the ranked visible marks
 // grouped by bearing→band, far-features on the horizon, and the aggregate tail.
-export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null, frame = null } = {}) {
+export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.context_budget, dials = DIALS, keep = null, shelter = null, frame = null, atFeet = null, explain = false } = {}) {
   const { marks, terrain, heightfield, light, fogCeilingM } = world;
   const fog = fogModel(crossing, dials);
   // the Mists (POS-466): null before the schedule's first crossing, and then
@@ -834,6 +836,11 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   const signalMult = dials.signal_fog_reach_mult;
 
   const seen = [];
+  // OPT-IN DIAGNOSTICS (WLD-105 A13): `explain: true` makes the result carry `explain`, the decision this very pass made for
+  // every mark with a place: why it is not a candidate, why it is cut (the Mists, the fog, the land), or whether it is told,
+  // folded into its household's cluster, or past the budget. The decisions are recorded where they are made; nothing is
+  // re-derived, and nothing here changes a candidate, a rank or a seat. Without it the result is byte for byte what it was.
+  const why = explain ? {} : null;
   const bareScore = new Map(); // id → the score at weight 0, for the landmark lift below (POS-632)
   for (const mk of marks) {
     if (!mk.at) continue;                                   // predicated/naming have no site of their own
@@ -842,7 +849,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     // reader has entered" (openYourEyes builds it from the enter stack, as it builds
     // `shelter`); only what it holds is a candidate. The entered mark and everything
     // above it are the frame, told in `within`, never a seat. Null: the whole world.
-    if (frame && !frame(mk)) continue;
+    if (frame && !frame(mk)) { if (why) why[mk.id] = { decision: "outside-frame" }; continue; }
     // A PARCEL RENDERS IN THE WORLD LIKE ANY OTHER MARK (the home-images
     // ruling, Keemin 2026-08-21: "make sure parcels render in the World like
     // any other mark. We removed them but that makes no sense if they get the
@@ -853,15 +860,23 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     // exclusion rather than gating it on `image:`, because a kind-gated hole in
     // the DEFAULT mark lane is the thing that made the art invisible in the
     // first place: parcels are marks, and the telling tells marks.
-    if (mk.far) continue;                                   // a far:true mark is a horizon object (told below), never ground scenery
-    if (markExtent(mk) >= dials.world_scale_extent_m) continue; // the world-root is the frame — establishing line, not a list item
+    if (mk.far) { if (why) why[mk.id] = { decision: "horizon" }; continue; } // a far:true mark is a horizon object (told below), never ground scenery
+    if (markExtent(mk) >= dials.world_scale_extent_m) { if (why) why[mk.id] = { decision: "world-scale" }; continue; } // the world-root is the frame — establishing line, not a list item
     const dx = mk.at.x - observer.x, dy = mk.at.y - observer.y;
     const distM = Math.hypot(dx, dy);
-    if (distM > dials.max_sight_m) continue;                // compute cull (bounds cost)
-    // standing on it — orient() covers "here". The one exception is the acting
+    // A THING AT YOUR FEET IS ADMITTED FROM WHERE YOU STAND (WLD-74 G1, Wright 2026-11-06 02:15Z: "for the
+    // at-feet ids only, max-sight, fog/Mists and line-of-sight admission use the resident's own point"): its
+    // footprint holds you, so its centre's distance or a rise before it never drops it. Its centre still
+    // places and ranks it (distM, bearing, score below); every other mark is admitted at its centre as ever.
+    const seenAt = atFeet?.has(mk.id) ? { x: observer.x, y: observer.y } : mk.at;
+    const seenM = seenAt === mk.at ? distM : 0;
+    if (seenM > dials.max_sight_m) { if (why) why[mk.id] = { decision: "beyond-sight", distM: Math.round(seenM), maxSightM: dials.max_sight_m }; continue; } // compute cull (bounds cost)
+    // standing on it — orient() covers "here". The exceptions are the acting
     // resident's own home (`keep`): standing at its centre is being at home, and
-    // the bare read must still carry it (WLD-9). Every other mark stays skipped.
-    if (distM < 1e-6 && mk.id !== keep) continue;
+    // the bare read must still carry it (WLD-9); and a thing at your feet
+    // (`atFeet`, WLD-74 E4): standing on a bowl is not being in it, so it stays an
+    // object you see and reach. Every other mark stays skipped.
+    if (distM < 1e-6 && mk.id !== keep && !atFeet?.has(mk.id)) { if (why) why[mk.id] = { decision: "at-centre" }; continue; }
     // angular size uses the mark's true SILHOUETTE span (its visible width from
     // here) when it carries a fine shape; a plain rect falls back to max(w,h) —
     // byte-identical for every current record (none carry a points: ring).
@@ -877,9 +892,9 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     // Mists, neither the wall nor the fringe's reach, for a reader standing inside it (`cover`, above the
     // loop: an entered mark you stand outside shelters nothing). `shelter` is the caller's test (the engine defines no
     // containment of its own): openYourEyes builds it from the reader's enter stack.
-    const mistHidden = !!mists && !cover?.(mk.at) && (mistsHide(observer, mk.at, mists)
-      || distM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
-    const fogHidden = distM > reach || mistHidden;
+    const mistHidden = !!mists && !cover?.(seenAt) && (mistsHide(observer, seenAt, mists)
+      || seenM > (isSignal && !mistSelf.inWall ? mistReach * signalMult : mistReach));
+    const fogHidden = seenM > reach || mistHidden;
 
     // darkness dimming: a non-signal, non-luminous mark at the dark end is dim
     // the unveiled light ranks (it is the light there was before the Mists, bit
@@ -892,7 +907,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 
     // terrain occlusion (the FOV over the heightfield) — every lean honored from
     // `dials` so a dev-pane override changes the sightline too, not just the ranking
-    const los = lineOfSight({ from: observer, to: mk.at, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
+    const los = lineOfSight({ from: observer, to: seenAt, heightfield, eyeH: dials.eye_height_m, targetTopM: markTop(mk, dials), step: dials.los_step_m, clearanceM: dials.los_clearance_m });
 
     const score = lodScore({ extentM, distM, weight: mk.weight, dials, dimming: rankDimming });
     bareScore.set(mk.id, lodScore({ extentM, distM, weight: 0, dials, dimming: rankDimming }));
@@ -905,11 +920,24 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
       elevM: +targetH.toFixed(1), aboveFogTarget: targetH >= fogCeilingM,
       occluded: !los.visible, occludeAt: los.occludeAt, dim: +dimming.toFixed(2), score,
       visible,
-      // the resident is standing ON this mark (only the acting home can get this far): the
-      // telling says HERE, not a bearing and "0 m"
-      ...(distM < 1e-6 ? { here: true } : {}),
+      // the resident is standing ON their kept home: the telling says HERE, not a bearing and
+      // "0 m". The kept home's flag ALONE (WLD-74): a thing at your feet gets this far too, and
+      // is told here by the at-feet relation (world-verbs.mjs § renderTelling), never by this
+      ...(distM < 1e-6 && mk.id === keep ? { here: true } : {}),
       ...(mists ? { mistHidden } : {}),
     });
+    if (why) {
+      // what this pass decided about the sightline, from the very flags it just used; seating (below) says the rest
+      why[mk.id] = {
+        decision: visible ? "visible" : mistHidden ? "mists" : fogHidden ? "fog" : "land",
+        distM: Math.round(seenM),
+        ...(!visible && !mistHidden && fogHidden ? { reachM: Math.round(reach) } : {}),
+        ...(!visible && !mistHidden && !fogHidden ? { occludeAt: los.occludeAt, eyeM: dials.eye_height_m } : {}),
+        ...(isSignal ? { signal: true } : {}),
+        ...(atFeet?.has(mk.id) ? { atFeet: true } : {}),
+        ...(mists && cover?.(seenAt) ? { sheltered: true } : {}),
+      };
+    }
   }
 
   // far-features on the horizon (Pando): a horizon object, not heightfield ground.
@@ -948,7 +976,13 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   // rest folded into a clusteredCount you `investigate` to open. This is the LOD
   // law — top-level marks at distance, descend with proximity or attention.
   const ranked = seen.filter((s) => s.visible).sort((a, b) => b.score - a.score);
-  const { collapsed, carried, tail } = seatsOf(ranked, { keep, budget, dials, count: true });
+  const { collapsed, carried, tail, folded } = seatsOf(ranked, { keep, budget, dials, count: true, atFeet });
+  if (why) { // the seating's own verdicts (see seatsOf): told, past the budget, or folded into its household's cluster
+    const told = new Set(carried.map((s) => s.id));
+    for (const s of ranked) if (told.has(s.id)) why[s.id].decision = "told";
+    for (const s of tail) why[s.id].decision = "budget";
+    for (const f of folded) { why[f.id].decision = "cluster"; why[f.id].into = f.into; }
+  }
 
   // THE LANDMARK LIFT (POS-632 G2, Darko 2026-10-14: "a place in view is flagged
   // landmark when its weight, not its size, puts it there"). The counterfactual,
@@ -961,7 +995,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
   // so re-sorting the weighted order would let the stamps break a weight-0 tie
   // (review-217 § 4)
   const bareRanked = seen.filter((s) => s.visible).sort((a, b) => bareScore.get(b.id) - bareScore.get(a.id));
-  const bareSeated = new Set(seatsOf(bareRanked, { keep, budget, dials, count: false }).carried.map((s) => s.id));
+  const bareSeated = new Set(seatsOf(bareRanked, { keep, budget, dials, count: false, atFeet }).carried.map((s) => s.id));
   for (const s of carried) if (!bareSeated.has(s.id)) s.lifted = true;
   const tailByBearing = {};
   for (const t of tail) tailByBearing[t.bearing] = (tailByBearing[t.bearing] ?? 0) + 1;
@@ -974,6 +1008,7 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
     crossing: fog.crossing, fog: { thickness: +fog.thickness.toFixed(2) }, sightReachM: Math.round(Math.min(clearReach, mistReach)),
     ...(mists ? { mists: { ...mistsBlock(mists, mistSelf, observer), ...(cover ? { sheltered: true } : {}) } } : {}),
     carried, far: farSeen.filter((f) => f.visible),
+    ...(why ? { explain: why } : {}),
     // THE HORIZON THE WALL TOOK (POS-551): a far feature on a horizon that is
     // otherwise clear, gone only because the wall stands in front of it, so the
     // telling can say where it stood. Kept apart from `far`, which is reach.
@@ -993,16 +1028,18 @@ export function fieldOfView(observer, world, { crossing = 0, budget = DIALS.cont
 // carry the kept home plus the first `budget` of the rest. `count` writes each
 // rep's clusteredCount (the real pass); the landmark lift's counterfactual pass
 // asks with count: false, so it never touches a row.
-function seatsOf(ranked, { keep, budget, dials, count }) {
+function seatsOf(ranked, { keep, budget, dials, count, atFeet = null }) {
   const repByHh = new Map();
   const collapsed = [];
+  const folded = []; // [{ id, into }]: each mark folded into its household's cluster, and the rep it went into (the `explain` diagnostic's)
   for (const s of ranked) {
     const far = s.distM > dials.cluster_beyond_m;
     // the acting home is never folded into (or made the rep of) its household's cluster: it
-    // is carried alone below, and the rest of the household clusters without it (WLD-9)
-    if (far && s.household && !s.signal && s.id !== keep) {
+    // is carried alone below, and the rest of the household clusters without it (WLD-9). A thing at
+    // your feet is not far, whatever its centre's distance: it goes on to the seats below (WLD-74 E5)
+    if (far && s.household && !s.signal && s.id !== keep && !atFeet?.has(s.id)) {
       const rep = repByHh.get(s.household);
-      if (rep) { if (count) rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; continue; }
+      if (rep) { if (count) rep.clusteredCount = (rep.clusteredCount ?? 0) + 1; folded.push({ id: s.id, into: rep.id }); continue; }
       repByHh.set(s.household, s);
     }
     collapsed.push(s);
@@ -1014,10 +1051,14 @@ function seatsOf(ranked, { keep, budget, dials, count }) {
   // the home sits at its own rank among them. It never makes a hidden mark
   // visible; the tail and the counts below describe what is left.
   const kept = keep == null ? null : collapsed.find((s) => s.id === keep) ?? null;
-  const rest = kept ? collapsed.filter((s) => s !== kept) : collapsed;
+  const others = kept ? collapsed.filter((s) => s !== kept) : collapsed;
+  // THE THINGS AT YOUR FEET GO FIRST IN THE BUDGET (WLD-74 E5, Wright 2026-11-05 04:48),
+  // after the kept home: they take the first seats and count toward the `budget`, and
+  // anything past it goes to the tail like any mark. Ordering, never an exemption.
+  const rest = atFeet?.size ? [...others.filter((s) => atFeet.has(s.id)), ...others.filter((s) => !atFeet.has(s.id))] : others;
   const seats = new Set(rest.slice(0, budget));
   const carried = collapsed.filter((s) => s === kept || seats.has(s));
-  return { collapsed, carried, tail: rest.slice(budget) };
+  return { collapsed, carried, tail: rest.slice(budget), folded };
 }
 
 // radialSerialize — group a fieldOfView result into bearing → band → marks, the

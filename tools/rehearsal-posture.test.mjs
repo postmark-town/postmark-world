@@ -106,7 +106,7 @@ test("FALSIFIER 6: a new env read in a tool the job runs breaks it", () => {
   broke(posture({ gate: `const u = process.env["WORLD2_DSN"];\n` }), "consumers");
   // the two the sweep already reads are named, deliberately, and stay quiet
   assert.equal(posture({ sweep: `process.env.BOT_NAME; process.env.BOT_EMAIL;\n` }).ok, true);
-  assert.deepEqual(ALLOWED_TOOL_ENV, ["BOT_EMAIL", "BOT_NAME", "WORLD_SNAPSHOT", "WORLD_SNAPSHOT_ROOT"]);
+  assert.deepEqual(ALLOWED_TOOL_ENV, ["BOT_EMAIL", "BOT_NAME", "HARM_GATE_MASS_TAKE_OK", "WORLD_SNAPSHOT", "WORLD_SNAPSHOT_ROOT"]);
   // the seam both tools load the marks through is read too (Wright's review of world#165),
   // and a switch it names by constant counts as a read
   broke(posture({ fold: `export const STORE_ENV = "WORLD2_PG_URL";\nconst u = env[STORE_ENV];\n` }), "consumers");

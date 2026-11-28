@@ -15,7 +15,7 @@ import {
   demandsWord, entityChild, entryLawOf, formatEnterExit, isEntity, isMark,
   occupancyAt, occupantsOf, parseEnterExitLedger, stampAt, termsAt, withinOf,
 } from "./enter-exit.mjs";
-import { enterExitPlan, enter, enterPrompt, enteredScope, exit, exitPrompt, withinChain } from "./world-verbs.mjs";
+import { enterExitPlan, enter, enterPrompt, enteredScope, exit, exitPrompt, withinChain, shelterOf, sightFrameOf } from "./world-verbs.mjs";
 import { walk } from "./world-verbs.mjs";
 
 // ── a tiny world: a ship at the quay, a wheelhouse inside her, open ground ──
@@ -338,4 +338,91 @@ test("the legal chain and the geometric one are allowed to disagree", () => {
   assert.deepEqual(legal.map((w) => w.id), [SHIP.id], "he crossed one threshold");
   // his body, meanwhile, is ashore: he walked off after boarding (v0 does not stop him)
   assert.equal(exitPrompt(ASHORE, world, { occupancy: occupancyAt(acts, 10), handle: "adam" }).mark, SHIP.id);
+});
+
+// ── WLD-197 (#296 security review F1): the landform's refusal is the landform's alone ──
+//
+// Main lets a spark (WLD-173: a place, not ground) be entered, and an entered spark
+// shelters and frames sight. Integrating the landform class onto main must leave that
+// exactly so: only a landform is refused at the door, and only a landform shelters
+// nothing and frames nothing (WLD-97, ruled 2026-10-22: it only shapes the ground).
+test("WLD-197 · a spark is entered, sheltered in and framed by as on main; a landform alone is refused, shelters nothing and frames nothing", () => {
+  const SPARK = { id: "adam/the-lamp-song", kind: "spark", by: "adam", at: { x: 120, y: -40 }, extent: { w: 6, h: 6 },
+    body: "We sang until the lamps came on.", recounting: "It rained.", experienced_at: "2026-11-14T20:03:00Z" };
+  const LANDFORM = { id: "the-town/the-inlet-slope", kind: "landform", by: "the-town", at: { x: 200, y: 40 }, extent: { w: 10, h: 10 },
+    ground_m: 4, body: "The slope down to the inlet." };
+  const w = { ...world, marks: [...world.marks, SPARK, LANDFORM] };
+  const atSpark = { x: 120, y: -40, name: "adam" }, atSlope = { x: 200, y: 40, name: "adam" };
+
+  const spark = enterExitPlan(ASHORE, SPARK.id, w, { handle: "adam" });
+  assert.equal(spark.error, undefined, `entering a spark is allowed, as on main: ${spark.error}`);
+  assert.equal(spark.chain.at(-1), SPARK.id);
+  assert.ok(shelterOf(w, [SPARK.id], atSpark), "an entered spark shelters, as on main");
+  assert.ok(sightFrameOf(w, [SPARK.id], atSpark), "and frames sight, as on main");
+
+  const slope = enterExitPlan(ASHORE, LANDFORM.id, w, { handle: "adam" });
+  assert.equal(slope.refused, "landform", "a landform is no place to go in");
+  assert.equal(shelterOf(w, [LANDFORM.id], atSlope), null, "naming a landform shelters nothing");
+  assert.equal(sightFrameOf(w, [LANDFORM.id], atSlope), null, "and frames no sight");
+
+  // CONTROL: an ordinary sited mark is entered as ever
+  assert.equal(enterExitPlan(ASHORE, HOLD.id, w, { handle: "adam" }).error, undefined);
+});
+
+// ── WLD-212: a thing has no inside (the-town/the-not-ground) ────────────────
+//
+// INVENTED fixture, no live enter call. The bag is named for the real one the report was about
+// (little-bird/a-paper-bag-of-crumbs) but is a planted record here: a thing, placed on the quay, with no door.
+
+const CLASS = (name, ext) => ({ id: `the-town/${name}`, kind: "class", by: "the-town", tier: "constitution", class: name, ...(ext ? { extends: ext } : {}), body: `the ${name} class` });
+const BAG = { id: "little-bird/a-paper-bag-of-crumbs", kind: "thing", by: "little-bird", tier: "market", at: { x: 100, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A paper bag of crumbs." };
+const BOWL = { id: "little-bird/a-candy-bowl", kind: "halloween-candy-bowl", by: "little-bird", tier: "market", at: { x: 110, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A subclass thing." };
+// NARROWED 2026-11-25 (WLD-253, CORE-129 layer 1): a thing may not carry a door. into is a door's alone, and thing's entry is the locked
+// none (the-town/thing-entry), so a thing that writes one is refused by name; a bag of holding is a town subclass for layer 2. The same way
+// in, written on a door of the town's, passes.
+const SATCHEL = { id: "little-bird/a-bag-of-holding", kind: "thing", by: "the-town", tier: "market", at: { x: 120, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A thing that carries a door.",
+  entry: { word: "welcomed", into: [HOLD.id] } };
+const SATCHEL_DOOR = { id: "the-town/a-door-of-holding", kind: "door", by: "the-town", tier: "market", at: { x: 120, y: -10 }, extent: { w: 0.5, h: 0.5 }, body: "A door.",
+  entry: { word: "welcomed" }, into: [HOLD.id] };
+// thing redeclares entry as the locked none (the override rule's first use): the WLD-212 refusal reads it off the class
+const THING_ENTRY = { id: "the-town/thing-entry", kind: "property", by: "the-town", tier: "constitution", name: "entry", default: "none", parent: "the-town/thing" };
+const thingWorld = {
+  ...world,
+  marks: [...world.marks, CLASS("postmark-node"), CLASS("mark", "postmark-node"), CLASS("sited", "mark"), CLASS("thing", "sited"), CLASS("halloween-candy-bowl", "thing"), THING_ENTRY, BAG, BOWL, SATCHEL, SATCHEL_DOOR],
+};
+const BESIDE = { x: 100, y: -10, name: "adam" };
+
+test("WLD-212 · a thing with no door is refused by name before any row: the bag", () => {
+  const a = enter(BESIDE, BAG.id, thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.equal(a.refused, "thing");
+  assert.equal(a.target, BAG.id);
+  assert.match(a.error, /little-bird\/a-paper-bag-of-crumbs/, "it names the target");
+  assert.match(a.error, /a thing has no inside/);
+  assert.equal(a.rows, undefined, "no row generated");
+  assert.equal(a.entered, undefined, "nothing entered");
+});
+
+test("WLD-212 · the same refusal for a thing SUBCLASS (read through the class chain, not a spelling of `kind`)", () => {
+  const a = enter(BESIDE, BOWL.id, thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.equal(a.refused, "thing");
+  assert.match(a.error, /a thing has no inside/);
+  assert.equal(a.rows, undefined);
+  // CONTROL: with no class nodes in hand the subclass cannot be known to be a thing, so this guard is the chain's, not a string's
+  const bare = { ...world, marks: [...world.marks, BOWL] };
+  assert.notEqual(enter(BESIDE, BOWL.id, bare, { handle: "adam", at: 20, accepted: true }).refused, "thing");
+});
+
+test("WLD-212 · controls: ground still enters; a thing that carries a door is refused by name (WLD-253), and the same way in on a door passes", () => {
+  const ground = enter(ASHORE, SHIP.id, thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.notEqual(ground.refused, "thing");
+  assert.ok(ground.rows.length > 0 && ground.entered.includes(SHIP.id), "ground entry writes its rows as before");
+  const carried = enter(BESIDE, SATCHEL.id, thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.equal(carried.refused, "door-law");
+  assert.match(carried.error, /^little-bird\/a-bag-of-holding writes entry\.into, and it is a thing, not a door — /);
+  assert.equal(carried.rows, undefined, "nothing recorded");
+  const door = enter(BESIDE, SATCHEL_DOOR.id, thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.ok(!door.error, `no refusal: ${door.error}`);
+  assert.ok(door.rows.length > 0, "and it writes its rows");
+  const hidden = enter(BESIDE, "no/such-thing", thingWorld, { handle: "adam", at: 20, accepted: true });
+  assert.equal(hidden.error, "no mark 'no/such-thing' to enter", "an unknown target keeps its answer");
 });

@@ -31,9 +31,10 @@ const scratch = (prefix) => { const d = mkdtempSync(join(tmpdir(), prefix)); SCR
 after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true }); });
 import { fileURLToPath } from "node:url";
 import { fold, loadMarks } from "./marks-fold.mjs";
-import { propertyOf } from "./class-properties.mjs";
+import { propertyOf, classIndex, classChain } from "./class-properties.mjs";
 import { instanceClassOf } from "./mark-kind.mjs";
 import { mayMake, makersRefusal } from "./admin-makers.mjs";
+import { allowedDoors, doorRefusal, doorFieldWrites, isDoorMark, isRekindedDoor, classHasNoWayIn, DOOR_FIELDS, REKINDED_DOORS } from "./door-law.mjs";
 // what a record IS, in either form (W2: `class:` folds into `kind:`); a class
 // node's own name is still its `class:`
 const classOf = (m) => (m.kind === "class" ? m.class : instanceClassOf(m));
@@ -146,6 +147,33 @@ test("a world with no notices serializes without a single new key", () => {
 // below is read off the tree, never kept by hand.
 const residentMay = (live, klass) => propertyOf(live, klass, "makers")?.value === true;
 
+// WLD-253 (CORE-129 layer 1, Darko 2026-11-25): door is a class under sited, makers: false for making and amending; into, lands_at and
+// requires are door's alone; thing's entry is the locked none (tools/door-law.mjs). The gate reads the tree for it: no record outside door
+// writes a door field, no door carries one inside entry, and every door is the town's or one of the 44 the town re-kinded, so a new
+// resident door, a 45th name, or an into on a thing fails here before it can reach the passage. (A re-kinded door taken away, or a new town
+// door, is lawful: a founder-merged PR is the town's act, WLD-253/town-act.)
+test("LIVE TREE: door is a class -- door fields only on doors, every door the town's or one of the 44 re-kinded, thing has no way in", () => {
+  const live = loadMarks(MARKS_DIR).filter((m) => m && !m._error);
+  const idx = classIndex(live);
+  const instances = live.filter((m) => m.kind !== "class" && m.kind !== "property");
+  assert.deepEqual(instances.filter((m) => doorRefusal(m, { marks: idx })).map((m) => `${m.id}: ${doorRefusal(m, { marks: idx }).words}`), []);
+  const doors = instances.filter((m) => isDoorMark(m, idx));
+  assert.ok(doors.length >= REKINDED_DOORS.length, "the instrument sees the tree's doors");
+  assert.deepEqual(allowedDoors(live), doors.map((m) => m.id).sort(), "every door in the tree stands");
+  assert.ok(doors.every((m) => m.by === "the-town" || isRekindedDoor(m.id)));
+  assert.deepEqual(instances.filter((m) => !isDoorMark(m, idx) && doorFieldWrites(m).length).map((m) => m.id), [], "no door field off a door");
+  // the class graph as ruled: door under sited, the town's alone; its fields declared on it; thing's entry the locked none
+  assert.deepEqual(classChain(idx, "door").map((c) => String(c.class)).slice(0, 2), ["door", "sited"]);
+  assert.equal(propertyOf(idx, "door", "makers")?.value, false);
+  for (const f of DOOR_FIELDS) assert.equal(propertyOf(idx, "door", f)?.from, "door", `${f} is declared on door`);
+  for (const k of ["mark", "sited", "thing", "portal-ground", "stairs", "dungeon"])
+    for (const f of DOOR_FIELDS) assert.equal(propertyOf(idx, k, f), null, `${k} declares no ${f}`);
+  assert.deepEqual([propertyOf(idx, "thing", "entry")?.value, propertyOf(idx, "thing", "entry")?.tier], ["none", "constitution"]);
+  assert.ok(classHasNoWayIn("halloween-candy-bowl", idx), "a thing's subclass inherits the locked none");
+  assert.equal(classHasNoWayIn("sited", idx), false);
+  assert.deepEqual(instances.filter((m) => m.entry !== undefined && classHasNoWayIn(instanceClassOf(m), idx)).map((m) => m.id), [], "no thing writes an entry");
+});
+
 test("LIVE TREE: class law -- town marks define; residents instantiate only what makers allows", () => {
   const live = loadMarks(MARKS_DIR);
   const classed = live.filter((m) => classOf(m) !== undefined);
@@ -216,6 +244,12 @@ test("LIVE TREE: class law -- town marks define; residents instantiate only what
     // the portal sitting only for WHOSE it was, and that half is now ruled.
     // LOGOS/classes.md Instantiation carries the same words, nodes first.
     ["wright/the-lanternstep-parlor", "founder ruling 2026-09-10 -- the birthday parlor passes to its builder"],
+    // 2026-11-25, the 44 doors that stood when door became a class (CORE-129 layer 1, WLD-253): the town re-kinds
+    // them to door keeping their makers, and that act is their grandfathering (Darko, 11-24 19:28 EST: "we'll just
+    // make a special case for whatever was grandfathered because it's a feels bad to create something and then have
+    // it taken away"). Named by exact id in door-law.mjs, the one list the lint, the passage and the office read; any
+    // other resident door still fails here.
+    ...REKINDED_DOORS.map((id) => [id, "founder ruling 2026-11-25 -- re-kinded to door by the town, its maker kept (WLD-253)"]),
   ]);
   // THE ADMIN ROLE (WLD-21, Darko 2026-10-18 19:38–19:52, G1–G6 21:23): an admin
   // household may make the three passage classes exactly (admin-makers.mjs), and
@@ -236,7 +270,7 @@ test("LIVE TREE: class law -- town marks define; residents instantiate only what
   assert.equal(propertyOf(live, "postmark-node", "makers")?.value, false, "the root answers false");
   for (const k of ["thing", "note", "post", "predicate", "sited", "idea", "bounty", "candy", "halloween-candy-bowl", "halloween-candy-bag", "naming"])
     assert.ok(residentMay(live, k), `${k} answers makers: true`);
-  for (const k of ["parcel", "portal-ground", "vehicle", "adversary", "dungeon", "home-mark", "stairs", "funding-quest", "stakeable", "home", "resident", "household", "mark"])
+  for (const k of ["parcel", "portal-ground", "vehicle", "adversary", "dungeon", "home-mark", "stairs", "funding-quest", "stakeable", "home", "resident", "household", "mark", "door"])
     assert.equal(residentMay(live, k), false, `${k} answers makers: false`);
   // Notice fields ride only bounty-classed marks (the board grammar); anywhere
   // else they are strays to investigate.

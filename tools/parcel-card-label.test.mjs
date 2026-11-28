@@ -96,8 +96,12 @@ test("[pin] the card's label call is the parcel's, not the dwelling's", async ()
   // are two views of one ground; left alone, the column kept reading
   // `markIdentity(home ?? mark)` and rei's card would have said "The
   // Lanternstep House" while her column said "The Garden Notebook Tin".
-  assert.match(code, /title: parcelCardLabel\(mark, data\?\.worldState\?\.determined \?\? \{\}\)/,
+  // WLD-105 A14: the column's fields are parcelColumnFields' now (shared with the 3D view); the title is still the card's rule,
+  // and the page's closure asks for it with its own determined names
+  assert.match(code, /title: parcelCardLabel\(mark, determined\)/,
     "the home column's title is the ground's name too");
+  assert.match(code, /parcelColumnFields\(mark, \{ homes, determined: data\?\.worldState\?\.determined \?\? \{\}/,
+    "and the 2D column asks for it over the page's own determined names");
   assert.ok(!/title: markIdentity\(home \?\? mark\)/.test(code),
     "and not the dwelling's, which is the same defect one surface over");
 });

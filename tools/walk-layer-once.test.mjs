@@ -315,7 +315,8 @@ import { after, before } from "node:test";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { createServer as createHttp } from "node:http";
-import { readFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { machinePage, readsSettled } from "./page-machine.mjs";
@@ -351,10 +352,26 @@ async function bootStubAtlas() {
   CLEANUP.push(() => srv.close());
   return { port };
 }
+// THIS PAGE IS SERVED A WORLD WITH NO PICTURES (WLD-205). A mark's picture now comes up and goes by its size
+// on screen, so a wheel tick that carries a pictured mark THE READER IS SHOWN (admitted, in the drawn box)
+// across a quarter-step of its window is a settle redraw BY DESIGN — the same rebuild a tier crossing is, and
+// it re-culls the walkers with the new box. The live centre of town carries a few dozen such marks, so two
+// ticks of -120 cross one of them. The subject here is the other tick: one with nothing visible to cross,
+// which must touch no walker DOM; stripped of pictures, the only thing that can redraw this page is the
+// data. That a picture nobody is shown rebuilds NOTHING is pinned on its own, not hidden by this fixture:
+// tools/art-window.test.mjs, "N2" (and the window's own crossings, there too).
+function picturelessWorld() {
+  const dir = mkdtempSync(join(tmpdir(), "walk-layer-"));
+  cpSync(join(ROOT, "WORLD"), dir, { recursive: true });
+  const w = JSON.parse(readFileSync(join(dir, "world-state.json"), "utf8"));
+  for (const m of w.marks ?? []) delete m.image;
+  writeFileSync(join(dir, "world-state.json"), JSON.stringify(w));
+  return dir;
+}
 async function bootRig(atlasPort) {
   const port = await freePort();
   const proc = spawn(process.execPath, [join(ROOT, "spectator", "server.mjs")], {
-    cwd: ROOT, env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:" + atlasPort },
+    cwd: ROOT, env: { ...process.env, PORT: String(port), ATLAS_ORIGIN: "http://127.0.0.1:" + atlasPort, WORLD_DIR: picturelessWorld() },
     stdio: ["ignore", "pipe", "pipe"],
   });
   CLEANUP.push(() => proc.kill());

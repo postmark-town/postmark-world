@@ -17,9 +17,15 @@ import { fileURLToPath } from "node:url";
 import { entryLawOf, isPortal, adjudicate, termsAt, occupancyAt, parseEnterExitLedger, STAIRS_CLASS, STAIRS_LINE } from "./enter-exit.mjs";
 import { portalsIn, portalFindings } from "./portals.mjs";
 import { enter } from "./world-verbs.mjs";
+import { doorRefusal } from "./door-law.mjs";
 import { enterSheetHTML } from "../spectator/viewer.mjs";
 
 const LINE = "Moving to higher/lower floors has not been implemented yet. Coming Soon!";
+
+// the doors are doors, and the town's (WLD-253: door is a class, into its own field; a resident's door no rule allows does not pass). A
+// stair writes no door field: one that writes its own way up is refused by name (`upstairs`), and this rule gives stairs no door field and
+// adds no floor mechanism in its place. A stair that writes no entry leads into itself and answers the class's line, as before.
+const TOWN = "the-town";
 
 function world({ upstairs = null } = {}) {
   const marks = [
@@ -27,10 +33,10 @@ function world({ upstairs = null } = {}) {
       at: { x: 500, y: 500 }, extent: { w: 100, h: 100 }, body: "A tall house." },
     { id: "home/hall", kind: "sited", by: "home", at: { x: 480, y: 500 }, extent: { w: 40, h: 40 }, body: "The hall." },
     { id: "home/landing", kind: "sited", by: "home", at: { x: 530, y: 500 }, extent: { w: 20, h: 20 }, body: "A landing." },
-    { id: "home/front-door", kind: "sited", by: "home", at: { x: 445, y: 500 }, extent: { w: 2, h: 2 },
-      body: "The front door.", entry: { word: "neutral", into: "home/hall" } },
-    { id: "home/front-door-inside", kind: "sited", by: "home", at: { x: 462, y: 500 }, extent: { w: 2, h: 2 },
-      body: "The way out.", entry: { word: "neutral", into: "home/porch" } },
+    { id: "home/front-door", kind: "door", by: TOWN, at: { x: 445, y: 500 }, extent: { w: 2, h: 2 },
+      body: "The front door.", entry: { word: "neutral" }, into: "home/hall" },
+    { id: "home/front-door-inside", kind: "door", by: TOWN, at: { x: 462, y: 500 }, extent: { w: 2, h: 2 },
+      body: "The way out.", entry: { word: "neutral" }, into: "home/porch" },
     { id: "home/porch", kind: "sited", by: "home", at: { x: 420, y: 500 }, extent: { w: 20, h: 20 }, body: "The porch." },
     { id: "home/the-stair", kind: "sited", by: "home", class: STAIRS_CLASS,
       at: { x: 490, y: 490 }, extent: { w: 6, h: 10 }, body: "A stair, up.",
@@ -71,10 +77,13 @@ test("a stair's refusal IS the line; every other opposed mark keeps the town's s
   assert.match(door.because, /^home\/shut opposes entry — an entity child opposed is a refusal at the threshold/);
 });
 
-test("a stair that writes its own entry law is an ordinary portal, and nothing of the default carries over", () => {
+test("a stair that writes its own entry law is read by it alone, nothing of the default carrying over; the into it writes is a door's, refused by name", () => {
   const stair = world({ upstairs: true }).marks.find((m) => m.id === "home/the-stair");
+  // the law still reads what it writes, so the passage can name what it refuses (WLD-253), never quietly drop it
   assert.deepEqual(entryLawOf(stair), { word: "neutral", edge: null, consequence: null, from: "home/the-stair", into: ["home/landing"] });
-  assert.equal(adjudicate(stair).effect, "entered");
+  assert.equal(adjudicate(stair).effect, "entered", "its own word answers, not the class's line");
+  assert.match(doorRefusal(stair).words, /^home\/the-stair writes entry\.into, and it is a stairs, not a door — /);
+  assert.equal(doorRefusal(world().marks.find((m) => m.id === "home/the-stair")), null, "a stair that writes no entry writes no door field");
 });
 
 // ── the passage, inside a dungeon ────────────────────────────────────────────
@@ -99,11 +108,15 @@ test("the World page's refusal sheet says the line", () => {
     /refused at the door[\s\S]*Moving to higher\/lower floors has not been implemented yet\. Coming Soon!/);
 });
 
-test("once a stair writes its way up, the passage climbs it", () => {
+// NARROWED 2026-11-25 (WLD-253): until then "once a stair writes its way up, the passage climbs it" (WLD-21, LOGOS: "a later floor is
+// reached by writing into, lands_at and a word"). into is a door's alone now, so the stair's own way up is refused by name, nothing recorded.
+test("a stair that writes its own way up is refused by name, and nothing is recorded (into is a door's)", () => {
   const w = world({ upstairs: true });
   const a = enter(AT(490, 490), "home/the-stair", w, { occupancy: occ(["home/house", "home/hall"]), handle: "ann", at: 301 });
-  assert.equal(a.error, undefined, a.error);
-  assert.deepEqual(a.entered, ["home/landing"]);
+  assert.equal(a.refused, "door-law");
+  assert.match(a.error, /^home\/the-stair writes entry\.into, and it is a stairs, not a door — into, lands_at and requires are door's alone/);
+  assert.equal(a.entered, undefined);
+  assert.equal(a.rows, undefined);
 });
 
 test("the portal lint holds a stair with no entry law clean", () => {
@@ -115,17 +128,18 @@ test("the portal lint holds a stair with no entry law clean", () => {
 test("a stair that writes its own OPPOSED entry is read by it alone: the standing sentence, never the class's line", () => {
   const STANDING = /^home\/the-stair opposes entry — an entity child opposed is a refusal at the threshold/;
   const own = (entry) => ({ ...world().marks.find((m) => m.id === "home/the-stair"), entry });
-  const locked = adjudicate(own({ word: "opposed", into: "home/landing" }));
+  // its own word and terms (a stair writes no into since WLD-253: the word is what this asks)
+  const locked = adjudicate(own({ word: "opposed" }));
   assert.equal(locked.effect, "refused");
-  assert.match(locked.because, STANDING, "a floor that exists but is locked never says 'Coming Soon!'");
-  assert.match(adjudicate(own({ word: "opposed", into: "home/landing", consequence: "Rotten." })).because, STANDING,
+  assert.match(locked.because, STANDING, "a stair that writes its own opposed word never says 'Coming Soon!'");
+  assert.match(adjudicate(own({ word: "opposed", consequence: "Rotten." })).because, STANDING,
     "its own consequence rides the terms, as any opposed mark's does");
 });
 
 test("the lint: a WELCOMED portal into itself is a place you stand in, so a room built that way with no way out still warns", () => {
   const w = world();
-  w.marks.push({ id: "home/closet", kind: "sited", by: "home", at: { x: 520, y: 520 }, extent: { w: 6, h: 6 },
-    body: "A closet.", entry: { word: "welcomed", into: "home/closet" } });
+  w.marks.push({ id: "home/closet", kind: "door", by: TOWN, at: { x: 520, y: 520 }, extent: { w: 6, h: 6 },
+    body: "A closet.", entry: { word: "welcomed" }, into: "home/closet" });
   const f = portalFindings(w.marks);
   assert.ok(f.some((x) => x.mark === "home/closet" && x.rule === "path-to-an-exit"), JSON.stringify(f));
   assert.ok(!f.some((x) => x.mark === "home/the-stair"), "the default stair (opposed, into itself) is still no room");
@@ -154,7 +168,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const LINT = join(HERE, "mark-lint.mjs");
 const REAL = join(HERE, "..", "WORLD", "marks", "let-there-be-light");
 const WORKS = ["the-town-centre", "the-town-centre/the-keeping-works", "the-town-centre/the-keeping-works/postmark-node",
-  "the-town-centre/the-keeping-works/postmark-node/mark", "the-town-centre/the-keeping-works/postmark-node/mark/dungeon"];
+  "the-town-centre/the-keeping-works/postmark-node/mark", "the-town-centre/the-keeping-works/postmark-node/mark/dungeon",
+  "the-town-centre/the-keeping-works/postmark-node/mark/sited", "the-town-centre/the-keeping-works/postmark-node/mark/door"];
 const STAIRS_NODE = "the-town-centre/the-keeping-works/postmark-node/mark/stairs";
 const SCRATCH = [];
 after(() => { for (const d of SCRATCH) rmSync(d, { recursive: true, force: true }); });
@@ -169,14 +184,18 @@ function gateTree({ declared }) {
     mkdirSync(join(root, rel), { recursive: true });
     copyFileSync(join(REAL, rel, "mark.md"), join(root, rel, "mark.md"));
   }
-  const rid = (s) => s.replace(/^home\//, "testerhh/");
-  for (const m of world().marks) {
+  // the house's marks are testerhh's, its doors the town's; a fixture mark's id is <by>/<dir>, so the ids the laws name move with `by`
+  const marks = world().marks;
+  const byOf = new Map(marks.map((m) => [m.id, m.by === TOWN ? TOWN : "testerhh"]));
+  const rid = (s) => s.replace(/^home\//, `${byOf.get(s) ?? "testerhh"}/`);
+  for (const m of marks) {
     const d = join(root, m.id.split("/")[1]);
     mkdirSync(d, { recursive: true });
     // the kind names the class (W2: `class:` folds into `kind:`)
-    const lines = ["---", `kind: ${m.class ?? "sited"}`, "by: testerhh", "date: 2026-10-15",
+    const lines = ["---", `kind: ${m.class ?? (m.kind === "door" ? "door" : "sited")}`, `by: ${byOf.get(m.id)}`, "date: 2026-10-15",
       `at: { x: ${m.at.x}, y: ${m.at.y} }`, `extent: { w: ${m.extent.w}, h: ${m.extent.h} }`];
-    if (m.entry) lines.push(`entry: ${JSON.stringify({ ...m.entry, into: rid(m.entry.into) })}`);
+    if (m.entry) lines.push(`entry: ${JSON.stringify(m.entry)}`);
+    if (m.into !== undefined) lines.push(`into: ${rid(m.into)}`);
     lines.push("---", "", m.body, "");
     writeFileSync(join(d, "mark.md"), lines.join("\n"));
   }

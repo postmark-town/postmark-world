@@ -223,7 +223,7 @@ export function afterDoorRefusal(decl, marks = []) {
   const door = (marks ?? []).find((m) => m?.id === decl.after_door);
   if (!door) return `its after_door ${JSON.stringify(decl.after_door)} names no mark`;
   const req = entryLawOf(door)?.requires;
-  if (!req) return `its after_door ${decl.after_door} asks for nothing (no entry.requires), so it is no lock to wait on`;
+  if (!req) return `its after_door ${decl.after_door} asks for nothing (no requires), so it is no lock to wait on`;
   if (req.malformed) return `its after_door ${decl.after_door} asks for something it does not say plainly (${req.malformed})`;
   if (req.at !== REQUIRES_AT_SETTLEMENT) return `its after_door ${decl.after_door} reads the live record; a creature waits on a door that counts at: "settlement", so the two open at the same settlement`;
   return null;

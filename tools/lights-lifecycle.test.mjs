@@ -148,6 +148,7 @@ const stopContext = (ids, active) => vm.createContext({
   clearInterval: (id) => active.delete(id),
   document: { removeEventListener() {} }, window: { removeEventListener() {} },
   onViewerKeydown() {}, onViewerResize() {}, onStoodOut() {}, bubbleResize: null,
+  offViewerIdentity() {},   // WLD-249: the stop also unsubscribes the host's identity relabel
 });
 
 test("Bevel R3: stop clears the lights interval as well as the existing two", () => {

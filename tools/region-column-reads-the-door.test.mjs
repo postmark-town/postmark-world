@@ -168,8 +168,13 @@ async function openARegionColumn(log = () => {}) {
   await page.goto("http://localhost:" + rig.port + "/", { waitUntil: "domcontentloaded", timeout: 90_000 });
   await page.waitForSelector(".wv-telling-pane", { state: "attached", timeout: 90_000 });
   await page.evaluate(() => { const el = document.querySelector(".wv-tour-skip"); if (el && el.offsetParent) el.click(); });
+  // WLD-205: a region's picture (and so its door) shows while its longest side is 24-192 px across. The opening
+  // view is a little too close for the regions on this record; a few notches out put them in their window.
+  await page.waitForTimeout(2500);
+  for (let i = 0; i < 3; i++) { await page.mouse.move(750, 475); await page.mouse.wheel(0, 80); await page.waitForTimeout(150); }
   await page.waitForFunction(() => document.querySelectorAll(".wv-far-art-hit[data-id]").length > 0,
     null, { timeout: 60_000 }).catch(() => {});
+  await page.waitForTimeout(2500);   // the camera and its redraw settle before a hand taps
 
   const ids = await page.evaluate(() => [...document.querySelectorAll(".wv-far-art-hit[data-id]")].map((e) => e.getAttribute("data-id")));
   let opened = null;

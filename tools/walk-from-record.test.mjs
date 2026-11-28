@@ -56,9 +56,11 @@ test("a stop the poll reports is an event: the poll's place wins; an unknown wal
 
 test("pins: drawn from the record each frame while something moves, never in a hidden tab, never re-implemented", () => {
   assert.match(SOURCE, /import \{[^}]*\bpositionAt\b[^}]*\} from "\.\.\/tools\/walk\.mjs";/);
-  assert.match(SOURCE, /const inView = sceneWalkerSet\(\{ walkers: \(walkState\.walkers \?\? \[\]\)\.map\(liveBody\),/);
+  // WLD-243: the draw takes the animation tick's frame answer (a copy), or its own liveWalkers() when redrawn standalone; both are liveWalkerAt over every walker
+  assert.match(SOURCE, /const inView = sceneWalkerSet\(\{ walkers: live \? \[\.\.\.live\] : liveWalkers\(\),/);
+  assert.match(SOURCE, /const liveWalkers = \(\) => liveWalkerRows\(walkState\.walkers \?\? \[\], \{/);
   assert.match(SOURCE, /function animateWalks\(\) \{\s*if \(walkFrame \|\| \(typeof document !== "undefined" && document\.hidden\)\) return;/);
-  assert.match(SOURCE, /if \(!moving\(\)\.length\) return;/, "nothing runs while all are still");
+  assert.match(SOURCE, /if \(!movingOf\(liveWalkers\(\)\)\.length\) return;/, "nothing runs while all are still");
   assert.match(SOURCE, /walkFrame = requestAnimationFrame\(tick\);/);
   // your own walk: the record from the act's answer, drawn before the poll is even asked
   assert.match(SOURCE, /ownWalkDeclared\(handle, response\.body\);\s*await pollWalkers\(\);/);

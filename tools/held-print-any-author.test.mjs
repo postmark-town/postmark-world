@@ -173,6 +173,157 @@ test("3b. THE BOUNDARY: a hold print that also carries any other difference from
   assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
 });
 
+// ── 5. A HELD THING'S FIRST FILE (WLD-168) ───────────────────────────────────
+//
+// The ask: "the settlement sweep admits a held thing's **first** file under the
+// same hold-only exemption it gives a change to an existing record". A thing
+// taken into hands before it ever had a file (the Pando Peak prize coin, held
+// and geometryless at zero stake) has no main record to be a hand-off FROM, so
+// it was judged as a new commons publication and waited for escrow forever.
+
+const COIN = "WORLD/marks/compaction-house/a-prize-coin/mark.md";
+const COIN_HELD = "---\nkind: thing\nby: compaction-house\ndate: 2026-10-30T00:00:00.000Z\nheld_by: compaction-house\n---\n\nA copper prize coin.\n";
+const LOOSE = "WORLD/marks/compaction-house/a-loose-coin/mark.md";
+const LOOSE_PLACED = "---\nkind: thing\nby: compaction-house\ndate: 2026-10-30T00:00:00.000Z\nat: { x: 3730, y: -5207 }\nextent: { w: 0.3, h: 0.3 }\n---\n\nA copper coin on the path.\n";
+const TWIN = "WORLD/marks/compaction-house/a-twin-coin/mark.md";
+const TWIN_UNHELD = COIN_HELD.replace("held_by: compaction-house\n", "").replace("A copper prize coin.", "Its twin, in no one's hands.");
+const registryOn = (c, ref) => { try { return JSON.parse(c.blob(ref, "WORLD/settlement-publications.json")); } catch { return null; } };
+
+test("5. a held thing with no file, no registry row and no escrow prints its first file, held and unplaced; an unheld commons thing beside it still waits", (t) => {
+  const c = world(t, "held-first-file");
+  c.commit("main, before the coin");
+  assert.equal(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"], undefined, "no registry row before");
+  c.git("switch", "-q", "-c", "draft/compaction-house");
+  c.put(COIN, COIN_HELD);
+  c.put(TWIN, TWIN_UNHELD);
+  c.put(LOOSE, LOOSE_PLACED);
+  c.commit("the held coin, its unheld twin and a loose one, printed");
+  c.git("switch", "-q", "main");
+  const report = c.sweep();
+  assert.ok(report.published.some((r) => r.id === "compaction-house/a-prize-coin"),
+    `the held coin's first file did not print: ${JSON.stringify(report.left_drafted)}`);
+  assert.equal(c.blob("main", COIN), COIN_HELD, "printed at its path, byte for byte");
+  const coin = heldOf(c, "compaction-house/a-prize-coin");
+  assert.equal(coin.held_by, "compaction-house", "still in its holder's hands");
+  assert.equal(coin.by, "compaction-house");
+  assert.equal(coin.owned_by, undefined, "its maker still owns it");
+  assert.equal(coin.at, undefined, "and it stands nowhere: published but unplaced");
+  assert.deepEqual(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"],
+    { household: "compaction-house", path: COIN, class: "commons" }, "a first publication's registry row");
+  // the negative controls, in the same crossing, no file and no escrow: the coin's
+  // unheld twin (the same record without held_by), and an unheld coin on the ground
+  for (const [id, path] of [["compaction-house/a-twin-coin", TWIN], ["compaction-house/a-loose-coin", LOOSE]]) {
+    assert.equal(report.published.some((r) => r.id === id), false, `${id} is not published`);
+    assert.match(report.left_drafted.find((r) => r.id === id)?.reason ?? "", /commons needs escrow > 0/, `${id} waits for backing`);
+    assert.throws(() => c.blob("main", path), `${id} has no file on main`);
+  }
+  // and the next crossing leaves it standing: a held thing is never taken while held
+  c.sweep();
+  assert.equal(c.blob("main", COIN), COIN_HELD);
+  assert.ok(registryOn(c, "main")?.published?.["compaction-house/a-prize-coin"]);
+});
+
+test("5b. a held first file that carries a place is not unplaced, and asks escrow like any new commons mark", (t) => {
+  const c = world(t, "held-first-file-placed");
+  c.commit("main, before the coin");
+  c.print("draft/compaction-house", COIN, COIN_HELD.replace("held_by: compaction-house\n", "held_by: compaction-house\nat: { x: 3730, y: -5207 }\nextent: { w: 0.3, h: 0.3 }\n"));
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "compaction-house/a-prize-coin"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "compaction-house/a-prize-coin")?.reason ?? "", /commons needs escrow > 0/);
+  assert.throws(() => c.blob("main", COIN));
+});
+
+test("5d. holding is not a way round escrow for a mark main already holds: a held copy filed at a NEW path is no first file", (t) => {
+  const c = world(t, "held-first-file-second-path");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", "WORLD/marks/tessel-attic/a-paper-boat/mark.md", BOAT_HELD);
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow > 0/);
+  assert.equal(c.blob("main", BOAT), BOAT_PLACED, "main's own file is untouched");
+});
+
+test("5e. holding is not a way round escrow over another's file: a held record written over a path main holds is no first file", (t) => {
+  const c = world(t, "held-first-file-over-a-file");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/compaction-house", BOAT, COIN_HELD);
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "compaction-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "compaction-house/a-paper-boat")?.reason ?? "", /commons needs escrow > 0/);
+  assert.equal(c.blob("main", BOAT), BOAT_PLACED, "main's own file is untouched");
+});
+
+test("5c. the town wall still stands for a first file: a held thing the town signs never publishes from a sketchbook", (t) => {
+  const c = world(t, "held-first-file-town");
+  c.commit("main, before the lamp");
+  c.print("draft/house-a", LAMP, LAMP_HELD);
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "the-town/a-lamp"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "the-town/a-lamp")?.reason ?? "", /town wall/);
+});
+
+// ── 6. THE STORE'S PRINTED FACTS (POS-571) ───────────────────────────────────
+//
+// The office prints `claimed_at` and `footprints` from its store (SCHEMA §
+// First-laid facts). A hand-off printed after it began carries them where main's
+// copy does not, and it is still a hand-off; they are never a resident's words,
+// and a print that changes nothing but them moves no hand.
+
+const FACTS = `claimed_at: 2026-09-01T00:00:00.000Z\nfootprints: ${JSON.stringify([
+  { since: "2026-09-01T00:00:00.000Z", at: { x: 3700, y: -5200 }, extent: { w: 0.3, h: 0.3 } },
+  { since: "2026-09-14T00:00:00.000Z", at: { x: 3730, y: -5207 }, extent: { w: 0.3, h: 0.3 } },
+])}\n`;
+const withFacts = (text) => text.replace("\n---\n\n", `\n${FACTS}---\n\n`);
+
+test("6. a hand-off printed with the store's first-laid facts, which main's file lacks, is still a hand-off", (t) => {
+  const c = world(t, "held-print-facts");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", BOAT, withFacts(BOAT_HELD));
+  const report = c.sweep();
+  assert.ok(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), `the hold did not print: ${JSON.stringify(report.left_drafted)}`);
+  assert.equal(c.blob("main", BOAT), withFacts(BOAT_HELD), "printed with its facts, byte for byte");
+  assert.equal(heldOf(c, "tessel-house/a-paper-boat").held_by, "sb-bram");
+});
+
+test("6b. the facts excuse nothing authored: the same hand-off with new words is an authoring change", (t) => {
+  const c = world(t, "held-print-facts-words");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", BOAT, withFacts(BOAT_HELD).replace("A paper boat.", "A paper boat, renamed."));
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
+});
+
+test("6c. a print that changes only the facts moves no hand: it is no hand-off, and asks escrow like any change", (t) => {
+  const c = world(t, "held-print-facts-only");
+  c.put(BOAT, BOAT_PLACED);
+  c.commit("authored in git, published main");
+  c.print("draft/tessel-house", BOAT, withFacts(BOAT_PLACED));
+  const report = c.sweep();
+  assert.equal(report.published.some((r) => r.id === "tessel-house/a-paper-boat"), false);
+  assert.match(report.left_drafted.find((r) => r.id === "tessel-house/a-paper-boat")?.reason ?? "", /commons needs escrow/);
+});
+
+test("6d. the town wall reads the facts the same way: a town-signed hand-off with them passes, and with new words it does not", (t) => {
+  const c = world(t, "held-print-facts-town");
+  c.put(LAMP, LAMP_PLACED);
+  c.commit("published main");
+  c.print("draft/house-a", LAMP, withFacts(LAMP_HELD));
+  const passes = c.sweep();
+  assert.ok(passes.published.some((r) => r.id === "the-town/a-lamp"), `the hold did not print: ${JSON.stringify(passes.left_drafted)}`);
+  const c2 = world(t, "held-print-facts-town-words");
+  c2.put(LAMP, LAMP_PLACED);
+  c2.commit("published main");
+  c2.print("draft/house-a", LAMP, withFacts(LAMP_HELD).replace("A brass lamp.", "A brass lamp, stolen."));
+  const refused = c2.sweep();
+  assert.equal(refused.published.some((r) => r.id === "the-town/a-lamp"), false);
+  assert.match(refused.left_drafted.find((r) => r.id === "the-town/a-lamp")?.reason ?? "", /town wall/);
+});
+
 // ── THE PREDICATE ITSELF ─────────────────────────────────────────────────────
 
 test("4. handOffOnly: a hand-off, and nothing wider", () => {
@@ -187,4 +338,8 @@ test("4. handOffOnly: a hand-off, and nothing wider", () => {
   assert.equal(handOffOnly(placed, { ...held, body: "y" }), false, "new words");
   assert.equal(handOffOnly(placed, { ...held, date: "2026-10-02" }), false, "any other field");
   assert.equal(handOffOnly(null, held), false, "a mark main does not hold");
+  const facts = { claimed_at: "2026-09-01", footprints: [{ since: "2026-09-01", at: { x: 1, y: 2 }, extent: { w: 1, h: 1 } }] };
+  assert.equal(handOffOnly(placed, { ...held, ...facts }), true, "into hands, printed with the store's facts (POS-571)");
+  assert.equal(handOffOnly(placed, { ...placed, ...facts }), false, "the facts alone move no hand");
+  assert.equal(handOffOnly(placed, { ...held, ...facts, body: "y" }), false, "and excuse no new words");
 });

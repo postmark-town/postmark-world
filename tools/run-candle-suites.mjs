@@ -33,8 +33,9 @@ const PIN_RE = new RegExp(PIN_PATTERN);
 // THE CANDLE SAYS IT IS THE CANDLE (WLD-71; Wright's review 2026-10-30 11:38, NO-MERGE
 // until the stress sweep stays out of the settlement). Set to "1" on the node --test
 // child this runner starts, and on nothing else. A suite that must not run in the
-// crossing (tools/page-throttle-sweep.test.mjs: 22 page tests in browsers at 4×
-// CPU, which CI and `npm test` run) reads this one name, and nothing CI or npm
+// crossing (tools/page-throttle-sweep.advisory.mjs: the page tests in browsers at 4×
+// CPU, which the advisory workflow runs; since WLD-170 outside tools/*.test.mjs, so this
+// runner never lists it) reads this one name, and nothing CI or npm
 // set, so an inherited CI=true or npm_lifecycle_event cannot put it back. It is
 // NOT a pin: a pin reads source text (#2790); this is a behaviour test the
 // crossing should not wait on.

@@ -4,8 +4,11 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { fold } from "./marks-fold.mjs";
-import { firstLaidOrdered } from "./consent.mjs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
+import { fold, loadMarks, footprintsOf } from "./marks-fold.mjs";
+import { firstLaidOrdered, firstCoverOrder } from "./consent.mjs";
 
 const terrain = { features: [] };
 const sited = (id, by, x, y, w, h, extra = {}) => ({
@@ -489,6 +492,87 @@ test("POS-369 · HELD FOR POS-572: several opposing seniors are judged ONE AT A 
   assert.equal(r.state, "pending-escrow");
 });
 
+// ── POS-571: an expansion is a newcomer on its new cells ─────────────────────
+//
+// LOGOS conflict-matrix § Roles from seniority (RULED 2026-10-04): "per-cell
+// (whoever first covered a cell is that cell's incumbent)", and "an expansion is
+// a newcomer on its new cells". The estate was first laid 08-01 over x -50..50
+// and amended 08-20 to reach x 150. The mill was laid 08-10 at x 100..140, which
+// only the amend reached; the gate was laid 08-10 at x 30..70, across the old edge.
+
+const T = (d) => `2026-08-${d}T00:00:00Z`;
+const ESTATE_HISTORY = [
+  { since: T("01"), at: { x: 0, y: 0 }, extent: { w: 100, h: 100 } },
+  { since: T("20"), at: { x: 50, y: 0 }, extent: { w: 200, h: 100 } },
+];
+const estateOf = (extra = {}) => sited("estate", "a", 50, 0, 200, 100, { date: T("20"), claimed_at: T("01"), footprints: ESTATE_HISTORY, ...extra });
+const mill = (extra = {}) => sited("mill", "b", 120, 0, 40, 40, { date: T("10"), ...extra });
+const gate = (extra = {}) => sited("gate", "c", 50, 0, 40, 40, { date: T("10"), ...extra });
+
+test("POS-571 · an EXPANSION is a newcomer on its new cells: the mill laid before the amend holds the word there, and the estate has none", () => {
+  const millSays = fold({ marks: [estateOf(), mill({ consent: { "a/estate": "opposed" } })], terrain, tick: 1, stakes: [stake("s", "b/mill", 100)] });
+  assert.equal(standing(millSays, "a/estate"), false, "on the cells the amend added, the mill was there first");
+  assert.equal(millSays.returned.find((x) => x.mark === "a/estate")?.returned_from, "b/mill");
+  const estateSays = fold({ marks: [estateOf({ consent: { "b/mill": "opposed" } }), mill()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "b/mill"), true, "the estate's first claim does not make it the mill's elder on ground it reached later");
+});
+
+test("POS-571 · NO HISTORY keeps the whole-mark answer: the same estate without footprints is the mill's elder, as before", () => {
+  const scalar = (extra) => estateOf({ footprints: undefined, ...extra });
+  const estateSays = fold({ marks: [scalar({ consent: { "b/mill": "opposed" } }), mill()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "b/mill"), false, "dated by its first claim, the estate holds the word");
+  const millSays = fold({ marks: [scalar(), mill({ consent: { "a/estate": "opposed" } })], terrain, tick: 1, stakes: [stake("s", "b/mill", 100)] });
+  assert.equal(standing(millSays, "a/estate"), true, "and the mill has none");
+});
+
+test("POS-571 · the ORIGINAL cells keep the elder's age: on the gate across the old edge, the estate is first on its old cells and the gate on the new", () => {
+  assert.deepEqual(firstCoverOrder(estateOf(), gate()), { grantorFirst: true }, "the estate covered x 30..50 on 08-01, before the gate");
+  assert.deepEqual(firstCoverOrder(gate(), estateOf()), { grantorFirst: true }, "the gate covered x 50..70 on 08-10, before the amend");
+  assert.deepEqual(firstCoverOrder(mill(), estateOf()), { grantorFirst: true });
+  assert.deepEqual(firstCoverOrder(estateOf(), mill()), { grantorFirst: false }, "on the mill's ground every shared cell is the amend's");
+  const estateSays = fold({ marks: [estateOf({ consent: { "c/gate": "opposed" } }), gate()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "c/gate"), false, "the estate's word on the gate counts, from the cells it always covered");
+});
+
+test("POS-571 · HELD FOR POS-572 stays held: a twin first coverage on every shared cell falls back to the containment edge", () => {
+  const twin = (id, by, w, extra) => sited(id, by, 0, 0, w, w, { date: T("10"), footprints: [{ since: T("10"), at: { x: 0, y: 0 }, extent: { w, h: w } }], ...extra });
+  const state = fold({
+    marks: [twin("estate", "a", 1000, { consent: { "b/shed": "opposed" } }), twin("shed", "b", 100)],
+    terrain, tick: 1, stakes: [stake("s", "a/estate", 100)],
+  });
+  assert.equal(firstCoverOrder(state.marks[0], state.marks[1]), null, "the cells prove nothing");
+  assert.equal(standing(state, "b/shed"), false, "so the old edge holds, as POS-369 left it");
+});
+
+test("POS-571 · a history that does not read whole is no history: the whole-mark answer stands", () => {
+  const broken = [{ ...ESTATE_HISTORY[0], since: "the first of August" }, ESTATE_HISTORY[1]];
+  assert.equal(footprintsOf(estateOf({ footprints: broken })), null);
+  const estateSays = fold({ marks: [estateOf({ footprints: broken, consent: { "b/mill": "opposed" } }), mill()], terrain, tick: 1, stakes: [stake("s", "a/estate", 100)] });
+  assert.equal(standing(estateSays, "b/mill"), false, "dated by its first claim, as if it carried none");
+});
+
+test("POS-571 · the history rides a file in WORLD numbers: loaded from a relative tree, the footprints are not reframed, and the cells still decide", () => {
+  const dir = mkdtempSync(join(tmpdir(), "first-laid-cells-"));
+  try {
+    const put = (path, lines) => { const d = join(dir, ...path.split("/")); mkdirSync(d, { recursive: true }); writeFileSync(join(d, "mark.md"), `---\n${lines.join("\n")}\n---\n\nA record in a fixture.\n`); };
+    const R = "let-there-be-light";
+    put(R, ["kind: sited", "by: the-town", "tier: constitution", "date: 2026-07-22", "at: { x: 0, y: 0 }", "extent: { w: 320000, h: 320000 }", "coords: relative"]);
+    put(`${R}/region`, ["kind: sited", "by: the-town", "tier: constitution", "date: 2026-07-22", "at: { x: 1000, y: 2000 }", "extent: { w: 500, h: 500 }"]);
+    // the estate's file numbers are an offset from the region's centre; its footprints are world numbers
+    const history = ESTATE_HISTORY.map((e) => ({ ...e, at: { x: e.at.x + 1000, y: e.at.y + 2000 } }));
+    put(`${R}/region/estate`, ["kind: sited", "by: a", "tier: market", `date: ${T("20")}`, `claimed_at: ${T("01")}`, "at: { x: 50, y: 0 }", "extent: { w: 200, h: 100 }", `footprints: ${JSON.stringify(history)}`]);
+    put(`${R}/region/mill`, ["kind: sited", "by: b", "tier: market", `date: ${T("10")}`, "at: { x: 120, y: 0 }", "extent: { w: 40, h: 40 }", 'consent: {"a/estate": "opposed"}']);
+    const marks = loadMarks(dir);
+    const estate = marks.find((m) => m.id === "a/estate");
+    assert.deepEqual(estate.at, { x: 1050, y: 2000 }, "the file's offset composes to world numbers");
+    assert.deepEqual(estate.footprints, history, "and the footprints are read exactly as written, in world numbers");
+    const state = fold({ marks, terrain, tick: 1, stakes: [stake("s", "b/mill", 100)] });
+    assert.equal(standing(state, "a/estate"), false, "the mill was first on the cells the amend added, read off the file");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 // ── returned, never dropped ──────────────────────────────────────────────────
 
 test("a returned mark takes the mark continued (its predicate), its sited child stays and is named in `stays`, and every member that left is disclosed (ruling B)", () => {
@@ -691,15 +775,81 @@ test("THE TOWN'S OPPOSITION PREVAILS: infinite backing in the veto, so no arithm
   assert.equal(standing(state, "foreign/room"), true);
 });
 
-test("the town's opposition keeps the ESCROW GUARD: open stakes hold the return, and the mark stands until they unwind", () => {
-  const marks = [sited("hall", "foreign", 0, 0, 100, 100)];
-  const state = fold({ marks, terrain, tick: 1, townWords: { "foreign/hall": "opposed" },
-    stakes: [{ holder: "backer", mark: "foreign/hall", n: 3, weight: 3, tick: 0 }] });
-  assert.equal(state.returned[0].authority, "the town (absolute)");
-  assert.equal(state.returned[0].state, "pending-escrow");
-  assert.deepEqual(state.returned[0].open_escrow_on, ["foreign/hall"]);
-  assert.equal(standing(state, "foreign/hall"), true);
-  assert.equal(w(state, "foreign/hall"), 3, "stamps go home whole: the weight is untouched");
+// ── WLD-203: the town's stance removes a backed mark or parcel too ────────────
+// Darko, 2026-11-18 14:53 EST: "the town declaring opposed to something should
+// remove it, even parcels"; the stamps go "Back to each staker" as a
+// "Town-authored return", which the Office writes at the crossing. The fold only
+// says what leaves; it names no recipient or amount and claims no return.
+
+// The accepted Office consumer's selection, as it reads this output
+// (postmark-office bc2b2221 src/town-return.mjs § townReturnTargets): a
+// returned town return citing no law, the mark and its subtree, never `stays`.
+const officeTargets = (state) => (state.returned ?? [])
+  .filter((r) => r?.state === "returned" && !r.law && r.authority === "the town (absolute)")
+  .map((r) => ({ mark: String(r.mark), leaving: [...new Set([String(r.mark), ...(r.subtree ?? []).map(String)])].sort() }))
+  .sort((a, b) => a.mark.localeCompare(b.mark));
+const ENTRY_KEYS = ["authority", "by", "grantor", "mark", "returned_from", "state", "stays", "subtree"];
+
+test("WLD-203 · THE TOWN'S STANCE REMOVES A BACKED MARK: returned and dropped though staked; its staked positioned child stays, stamps and all", () => {
+  const marks = [
+    sited("hall", "foreign", 0, 0, 100, 100),
+    sited("room", "foreign", 0, 0, 10, 10),                         // positioned: ruling B keeps it
+    { id: "foreign/warm", slug: "warm", by: "foreign", household: "foreign", kind: "predicated",
+      tier: "market", parent: "foreign/hall", slot: "feel", value: "warm", date: "2026-08-10", body: "warm" },
+  ];
+  const stakes = [stake("owner-ish", "foreign/hall", 3), stake("backer", "foreign/hall", 2), stake("backer", "foreign/warm", 1), stake("keeper", "foreign/room", 4)];
+  const state = fold({ marks, terrain, tick: 1, stakes, townWords: { "foreign/hall": "opposed" } });
+  assert.equal(state.returned.length, 1);
+  const r = state.returned[0];
+  assert.equal(r.authority, "the town (absolute)");
+  assert.equal(r.state, "returned", "the town's word removes it, staked or not");
+  assert.deepEqual(r.subtree, ["foreign/warm"], "the mark continued leaves with it");
+  assert.deepEqual(r.stays, ["foreign/room"]);
+  assert.deepEqual(Object.keys(r).sort(), ENTRY_KEYS, "no open_escrow_on, no refund metadata, no recipient or amount");
+  assert.equal(standing(state, "foreign/hall"), false, "dropped at this settlement");
+  assert.equal(standing(state, "foreign/warm"), false);
+  assert.equal(standing(state, "foreign/room"), true, "the positioned child stands");
+  assert.equal(w(state, "foreign/room"), 4, "with its own backing whole");
+  assert.deepEqual(officeTargets(state), [{ mark: "foreign/hall", leaving: ["foreign/hall", "foreign/warm"] }],
+    "the Office selects exactly the leaving mark and its continuation, never the child that stays");
+});
+
+test("WLD-203 · EVEN PARCELS: a backed parcel the town opposes is returned and dropped; the household's mark on it stays with its stake", () => {
+  const marks = [
+    parcel("plot", "foreign", 0, 0),
+    { id: "foreign/plot-name", slug: "plot-name", by: "foreign", household: "foreign", kind: "predicated",
+      tier: "market", parent: "foreign/plot", slot: "name", value: "The Quiet Plot", date: "2026-08-10", body: "The Quiet Plot" },
+    sited("shed", "foreign", 0, 0, 4, 4),
+  ];
+  const stakes = [stake("foreign", "foreign/plot", 5), stake("backer", "foreign/plot-name", 1), stake("backer", "foreign/shed", 2)];
+  const state = fold({ marks, terrain, tick: 1, stakes, townWords: { "foreign/plot": "opposed" } });
+  const r = state.returned.find((x) => x.mark === "foreign/plot");
+  assert.equal(r.state, "returned");
+  assert.equal(r.authority, "the town (absolute)");
+  assert.deepEqual(r.subtree, ["foreign/plot-name"]);
+  assert.ok(!(r.subtree.includes("foreign/shed")), "the shed has a place of its own: it is not carried out");
+  assert.equal(standing(state, "foreign/plot"), false, "the parcel leaves, staked");
+  assert.equal(standing(state, "foreign/plot-name"), false);
+  assert.equal(standing(state, "foreign/shed"), true, "the household's positioned mark on it stands");
+  assert.equal(w(state, "foreign/shed"), 2, "with its own backing");
+  assert.deepEqual(officeTargets(state), [{ mark: "foreign/plot", leaving: ["foreign/plot", "foreign/plot-name"] }]);
+});
+
+test("WLD-203 · ONLY THE TOWN'S STANCE: a backed LIMIT (townLaws) and a backed holder's veto keep the escrow guard and stand", () => {
+  const limited = fold({ marks: [sited("hall", "foreign", 0, 0, 100, 100)], terrain, tick: 1,
+    townWords: { "foreign/hall": "opposed" }, townLaws: { "foreign/hall": "the-town/claim-cap" },
+    stakes: [stake("backer", "foreign/hall", 3)] });
+  assert.equal(limited.returned[0].state, "pending-escrow", "no widening of LIMITS: a limit's return still waits for its stakes");
+  assert.deepEqual(limited.returned[0].open_escrow_on, ["foreign/hall"]);
+  assert.equal(standing(limited, "foreign/hall"), true);
+  assert.deepEqual(officeTargets(limited), [], "a pending return is not the Office's to pay");
+
+  const held = fold({ marks: [parcel("home", "holder", 0, 0, { consent: { "foreign/hall": "opposed" } }), sited("hall", "foreign", 0, 0, 100, 100)],
+    terrain, tick: 1, stakes: [stake("backer", "foreign/hall", 3)] });
+  assert.equal(held.returned[0].authority, "parcel (absolute)");
+  assert.equal(held.returned[0].state, "pending-escrow", "a holder's opposition keeps the guard");
+  assert.equal(standing(held, "foreign/hall"), true);
+  assert.deepEqual(officeTargets(held), []);
 });
 
 test("the town over a holder: one return, and it names the town (the town's opposition always prevails)", () => {

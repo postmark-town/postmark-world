@@ -60,8 +60,8 @@ contents, wherever they came from.
 ## The complete difference list
 
 Every code-level difference between the town scene and a mark scene, each with
-its justification. There are **eight** live (2026-09-08: #6 was retired by the atlas
-merge — see its row; 2026-09-11: #9 added).
+its justification. There are **nine** live (2026-09-08: #6 was retired by the atlas
+merge — see its row; 2026-09-11: #9 added; 2026-11-19: #10 added).
 
 | # | Difference | Justification |
 |---|---|---|
@@ -74,6 +74,7 @@ merge — see its row; 2026-09-11: #9 added).
 | 7 | **At-rest refit letterboxes** — a contained scene sitting at its full view letterboxes on pane reshape (contains the ground, centred); once zoomed in, the town's keep-width refit takes over | The room-shown-whole guarantee at rest (scene-qa's pip at y=−183 is the receipt), without fighting the hand once a hand exists. One branch on the same `zoomOutLimit` signal as #3. |
 | 8 | **`sceneWalkerSet`** — WHICH bodies the walk layer may draw, and nothing else about them: indoors, the room's own manifest (the crossing record's occupants, child rooms included); outdoors, the whole town, unchanged. How a body is drawn and where it stands are untouched — see the walker clause below | The founder's word (fix list 2026-08-29, reaffirmed 2026-08-31): *"resident activity OUTSIDE the interior is visible from interior view."* A room's ground carries its own registration (#2), so every walker in town projected onto it and anyone whose COORDINATES happened to fall inside the footprint was painted on the floor — 81 bodies offered, 2 of the 6 that landed being people the record puts in other rooms entirely. But standing on it is not being in it: coordinates answer `within`, a room is `insideOf`, and `standpointOccupancy`'s own header says the two "routinely disagree." The telling has enforced the crossing answer for its bodies since the room shipped; the floor was never asked the question, and a reader believes what they can see. Refused at the source like #4, so a body outside the room never becomes a glyph and cannot be hit, hovered or chosen either. |
 | 9 | **The parcel underfoot wears no card** — `enclosingParcels(sceneRoomId, byId)`, asked once per draw: the mounted room's own parcel (itself, or the parcel its `parent`/`placementParent` chain reaches) is skipped by both house passes — no card, no pip, no glyph id. Outdoors nothing is mounted and the set is empty. | Founder, 2026-09-11: *"let's not display the parcel card when the view is the parcel itself or anything within it."* A card is a landmark seen from outside; drawn over the floor you are standing on it is the roof over your head. Every other parcel in view keeps its card, exactly as outside — the inside-as-outside rule (What was deleted, 2026-09-11) is what makes this the ONE exception rather than a gate. |
+| 10 | **Ground pictures: the town's are a screen-size window, a room's are not** — `sceneRoomId` null: a mark's picture shows while its longest projected side (the whole footprint, in CSS px — `footprintPx`'s measure, never a clipped fragment, a metre, or a DPR pixel) is between `art_window_min_px` and `art_window_max_px` (24–384; the upper edge doubled from 192 by WLD-214, Darko 2026-11-19), crossfading with its outline over `art_window_fade_px` (8) inside each edge, at every tier, one eligible picture deep by `placementParent` (an ancestor covers a descendant by its own share; a picture-less or out-of-window ancestor covers nothing). Both passes obey the one window: the ground pass (`drawPlacedArt`) paints the picture once, under the overlay; the furnishing pass lays only the outline, at the picture's complement. A room (`sceneRoomId` set) keeps what it had: furniture wears its pictures at any size through `sceneArtSVG`, and only a place (`PLACE_M`, 200 m) is hung from the record. | Darko, 2026-11-18 ("the size of the mark should have like a certain zoom range, in which the image shows"; ruled *"Go, as proposed"*, WLD-205). It replaces the fixed 200 m `placed_art_min_m` and the coarse tier gates (near cleared hangings, mid dropped a region's, the furnishing pass bypassed both at near). Which marks are admitted is unchanged — places from the whole record, things from the reader's drawn set — so no mark gains a picture for being the right size on screen. A room is the one place the old rule is still right: the floor you stand on is its own scale. The three numbers are draw dials, re-drawn live; a window crossing inside one tier is stale-checked by `artSignature` in the settle pass (a pan inside the margin rebuilds nothing). |
 
 Additionally, the **draw-set source** differs by construction, not by branch:
 `drawOverlay` consumes whatever radial the telling hands it. Outdoors that is
@@ -235,3 +236,47 @@ World commit production serves is not established here: the Site's floor pin
 without the listeners or the stamps, and the resolved pin is the newest
 `settlement/S<n>` tag at rebuild time, which this note did not read. Nothing
 here claims the live site works or fails.
+
+## The host's speaker identity — the served entry and its fallback
+
+A host that draws people its own way (the Site's one shared form, CORE-178)
+hands the World page ONE optional function, `identityForSpeaker(handle) →
+fresh Element | null`. It reaches the verbatim shell through
+`setViewerIdentityForSpeaker(appEl, provider | null)` (`viewer-identity.mjs`,
+WLD-249), before the mount or after it. A call with the same function relabels
+what is open, and null restores the default. A lower host passes it as the
+reader's or the column's `identityForSpeaker` option (WLD-248). World routes and
+invalidates. It never looks a person up, fetches, styles a name or tells a
+human from a resident: those are the host's, inside its node.
+
+**Where the node goes.**
+- Bylines (every line the reader draws), the column's speakers row and its plain
+  fallback lines take the node in place of face and name (WLD-248).
+- The opened circle's generated title and every **named** breadcrumb take it in
+  place of the handle, followed by the reader's own words "'s statement"
+  (WLD-256). An unnamed crumb ("an earlier statement") and the room crumb are
+  never handed to the host.
+
+**The context argument (WLD-256).** An ancestor breadcrumb is the reader's own
+button, whose action opens that circle. Only there is the hook called with a
+second argument, the frozen `LINK_FREE` (`{ link: false }`,
+`circle-reader.mjs`). The host answers it with a node that holds no link or
+control; the Site's `mentionNode` already has `link: false`. Every other slot
+calls the hook with the handle alone. In that slot, a node that is or holds
+anything interactive (a link, a control, a tab stop, an editable, a
+link/button role) is refused. A host that ignores the context therefore
+leaves the crumb its own words, and never a link inside the button.
+
+**Fallback.** These all draw exactly the old path (the page's face, if any,
+then the reader's own name or label):
+- no hook, null, or a non-function;
+- a throw, or a string;
+- an already-placed or reused node;
+- `aria-hidden="true"`, or a node with no text and no `aria-label`;
+- a refused button-slot node.
+
+Every draw asks afresh, so each slot gets its own node. A relabel reads
+nothing and keeps scroll, focus (a focused link inside a node returns to the
+same slot's fresh node), the open threads and the circle on screen.
+Tests: `tools/circle-reader.test.mjs`, "WLD-248 ·", "WLD-249 ·" and
+"WLD-256 ·".

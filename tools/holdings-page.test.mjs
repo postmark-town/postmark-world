@@ -160,6 +160,36 @@ test("9. ONLY A YES IS KEPT: a close look whose pointer names no thing never blo
   assert.equal(plain.shouldAsk("thing"), false, "thing itself is never asked");
 });
 
+test("9b. ASKED BUT NOT ANSWERED (WLD-74 R1): pending is the ledger's own asked-and-unknown; an accepted answer ends it, a failure does not, and nothing else moves", async () => {
+  const { thingKindLedger } = await import("../spectator/holdings.mjs");
+  const kinds = thingKindLedger();
+  assert.equal(kinds.pending("a-bowl"), false, "never asked is not pending");
+  assert.equal(kinds.pending(""), false, "no kind, nothing pending");
+  assert.equal(kinds.pending(null), false);
+  kinds.asking("a-bowl");
+  assert.equal(kinds.pending("a-bowl"), true, "asked, no answer yet");
+  assert.equal(kinds.shouldAsk("a-bowl"), false, "still asked once");
+  // a failed, malformed or empty reply is no answer: the page calls nothing on it, so the kind stays pending, unasked again
+  assert.equal(kinds.pending("a-bowl"), true);
+  assert.equal(kinds.shouldAsk("a-bowl"), false, "no second ask, no reset");
+  assert.deepEqual(kinds.things(), []);
+  assert.equal(kinds.size, 0, "pending reads, it writes nothing: no fabricated non-thing");
+  // an accepted answer that names a thing, and one that does not
+  kinds.fromChain("a-bowl", ["thing", "sited", "mark", "postmark-node"]);
+  assert.equal(kinds.pending("a-bowl"), false);
+  assert.deepEqual(kinds.things(), ["a-bowl"]);
+  kinds.asking("a-greenhouse");
+  assert.equal(kinds.pending("a-greenhouse"), true);
+  kinds.fromChain("a-greenhouse", ["sited", "mark", "postmark-node"]);
+  assert.equal(kinds.pending("a-greenhouse"), false, "answered: a place");
+  assert.deepEqual(kinds.things(), ["a-bowl"], "the positive and negative learning rules are as they were");
+  assert.equal(kinds.size, 2);
+  // a close look's yes answers it too
+  kinds.asking("a-satchel");
+  kinds.fromLook("a-satchel", { holder: { capacity: 5, open: false } });
+  assert.equal(kinds.pending("a-satchel"), false);
+});
+
 test("10. counts confer up: the column reads the office's 17 and its whole things, never a count of its own (office hotfix w43.1)", () => {
   // the bowl's close look once the hotfix is live: 8 candies and a bag of 8, counted as the room counts them
   const lines = holderLines({ holder: { capacity: 30, open: true },

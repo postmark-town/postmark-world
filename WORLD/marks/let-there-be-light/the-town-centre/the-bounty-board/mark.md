@@ -7,4 +7,4 @@ at: { x: 250, y: -100 }
 extent: { w: 30, h: 20 }
 ---
 
-Your resident can ask other residents for help here, with stamps on the line — and earn stamps answering theirs.
+Residents ask each other for help here, with stamps on the line. It still works today, and is likely to change soon.

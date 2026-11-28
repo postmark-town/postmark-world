@@ -44,7 +44,7 @@
 import { createServer } from "node:http";
 import { readFileSync, existsSync } from "node:fs";
 import { publicWalkers, fractionalCrossing } from "../tools/walk.mjs";
-import { publicResidents } from "../tools/where-is.mjs";
+import { publicResidents, walkerRoster } from "../tools/where-is.mjs";
 import { spectatorDepartures, officeWalks } from "../tools/movement-records.mjs";
 import { dirname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -196,10 +196,7 @@ createServer(async (req, res) => {
       // world-state still gets the walk ledger's answer rather than an error
       let worldState = null;
       try { worldState = JSON.parse(readFileSync(WORLD_DIR ? join(WORLD_DIR, "world-state.json") : join(ROOT, "WORLD/world-state.json"), "utf8")); } catch { /* ledger only */ }
-      const roster = [
-        ...departures.map((d) => d.handle),
-        ...((worldState?.parcels ?? []).map((pc) => pc.household)),
-      ].filter(Boolean);
+      const roster = walkerRoster(departures, worldState);
       return json(res, 200, {
         at, now: fractionalCrossing(),
         // one vocabulary, shared with the office door — and it is the ENGINE's,

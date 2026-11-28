@@ -85,7 +85,12 @@ test("[pin] the page asks the world tools' one function, and keeps no dungeon ru
   assert.match(SOURCE, /import \{[^}]*\bstandpointSight\b[^}]*\} from "\.\.\/tools\/world-verbs\.mjs"/);
   assert.match(SOURCE, /world = sightOf\(assembleWorld\(/, "the assembled world is scoped before anything draws from it");
   assert.match(SOURCE, /townWorld = sightOf\(\{/, "the town's copy of the record is scoped too");
-  assert.doesNotMatch(SOURCE, /["']dungeon["']/, "no second implementation: the class name appears nowhere in the page");
+  // THE ONE NAMED EXCEPTION (CORE-147): the Filters dropdown's icon-catalog entry (DISPLAY_LAYERS), whose key is the very string `markWhat` returns and whose glyph is the
+  // icon it wears: a label, not a dungeon rule. It must appear exactly once, spelled that way; every OTHER spelling of the class name (single, double or backtick
+  // quotes) is still a second implementation and still reds this.
+  const CATALOG_ENTRY = '{ key: "dungeon", icon: "dungeon", kind: "mark",';
+  assert.equal(SOURCE.split(CATALOG_ENTRY).length - 1, 1, "the icon catalog's dungeon entry is present exactly once, in the one allowed spelling");
+  assert.doesNotMatch(SOURCE.replace(CATALOG_ENTRY, ""), /["'`]dungeon["'`]/, "no second implementation: the class name appears nowhere else in the page, in any quote");
 });
 
 test("THE MAP HIDES WHAT A DUNGEON HOLDS — a drawn mark made a dungeon draws alone, and nothing inside it draws", async (t) => {

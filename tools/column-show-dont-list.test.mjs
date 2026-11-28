@@ -13,7 +13,9 @@ test("[pin] a mark's column hands in its ✦, its outline and who is inside as t
   assert.doesNotMatch(markColumn, /label: "backing"/, "no backing line");
   assert.doesNotMatch(markColumn, /label: "size"/, "no size line");
   assert.doesNotMatch(markColumn, /label: "inside now"/, "no list of names");
-  assert.match(markColumn, /const ring = polygonOf\(mark\), bb = ring \? polygonBBox\(ring\) : null;/, "its own ring, when it has one");
+  // the outline (its own ring, when it has one) is markColumnParts' since WLD-105 A14, and the closure hands it the footprint
+  assert.match(SOURCE, /export function markColumnParts[\s\S]*?const ring = polygonOf\(mark\), bb = ring \? polygonBBox\(ring\) : null;/, "its own ring, when it has one");
+  assert.match(markColumn, /const \{ facts, relations, footprint \} = markColumnParts\(/, "the closure asks for it");
   assert.match(markColumn, /kind: "resident", id: walkerHoverId\(h\)/, "residents as their walker tokens");
   assert.match(markColumn, /kind: "creature", id: c\.id/, "creatures standing in it as theirs");
 });

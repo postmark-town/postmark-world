@@ -1,4 +1,9 @@
-// map-art-default.test.mjs — the map carries no pictures, for now.
+// map-art-default.test.mjs: a mark's card shows its picture by default.
+//
+// Darko, 2026-11-18, on little-bird's bug post: a clicked mark's card shows its
+// picture without ?mark-art=on, and ?mark-art=off turns it off (WLD-202). The
+// card only: whether a picture hangs on the ground is the placed_art_min_m dial.
+// Before that, the default below was off:
 //
 // Founder, 2026-08-21: "just by default, let's NOT load these images in for
 // let-there-be-light for now." A DEFAULT, not an amputation — the machinery
@@ -18,16 +23,16 @@ import { markArtOnMap, MARK_ART_PARAM, markImageURL, markImagePath, roomGround, 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SOURCE = readFileSync(join(HERE, "..", "spectator", "viewer.mjs"), "utf8");
 
-test("THE DEFAULT IS OFF, and the switch turns it back on — both directions", () => {
-  assert.equal(markArtOnMap(""), false, "no query string at all: off");
-  assert.equal(markArtOnMap("?crossing=141"), false, "an unrelated query: off");
-  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=on`), true, "the switch: on");
-  assert.equal(markArtOnMap(`?a=1&${MARK_ART_PARAM}=on&b=2`), true, "the switch, among others");
-  // a switch that answers yes to anything is not a switch
-  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=off`), false);
-  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=`), false);
-  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=true`), false, "one spelling, so the default cannot be turned off by accident");
-  assert.equal(markArtOnMap(null), false, "and nothing at all is still off");
+test("THE DEFAULT IS ON (Darko, 2026-11-18), and the switch turns it off: both directions", () => {
+  assert.equal(markArtOnMap(""), true, "no query string at all: on");
+  assert.equal(markArtOnMap("?crossing=141"), true, "an unrelated query: on");
+  assert.equal(markArtOnMap(null), true, "and nothing at all is on");
+  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=off`), false, "the switch: off");
+  assert.equal(markArtOnMap(`?a=1&${MARK_ART_PARAM}=off&b=2`), false, "the switch, among others");
+  // a switch that answers no to anything is not a switch
+  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=on`), true, "the old spelling still reads as on");
+  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=`), true);
+  assert.equal(markArtOnMap(`?${MARK_ART_PARAM}=false`), true, "one spelling, so the default cannot be turned off by accident");
 });
 
 test("[pin] THE GATE IS IN THE MARKUP: no figure is emitted, so no picture is ever asked for", () => {
@@ -63,8 +68,8 @@ test("[pin] INTERIORS STILL PAINT THEIR ART — the room's ground and the things
 
 test("THE LIVE RECORD: with the default on, the map's cells would have asked for real shelf URLs — so the gate is load-bearing", () => {
   // A gate over an empty record proves nothing. The record really does carry
-  // art now (63 marks as of the 08-21 fold), and every one of those is a
-  // request the default map no longer makes.
+  // art now (63 marks as of the 08-21 fold). Since 2026-11-18 every one of
+  // those is a picture its card asks for by default.
   const marks = loadMarks(join(HERE, "..", "WORLD/marks")).filter((m) => !m._error);
   const withArt = marks.filter((m) => markImageURL(m));
   assert.ok(withArt.length >= 40, `expected the record to carry real art; found ${withArt.length}`);

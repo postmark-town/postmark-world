@@ -11,6 +11,14 @@
 // PLACE rather than a thing standing in one, carrying a picture on the record,
 // wears it over the ground it covers, at `far` and `mid`.
 //
+// WLD-205 (Darko, 2026-11-18, "Go, as proposed"): WHEN it shows is no longer a fixed
+// 200 m but a window on the mark's size ON SCREEN — see tools/art-window.test.mjs, which
+// owns the window, the crossfade and the hand-down. What stays here is what a hung
+// picture IS: its shape, its shelf, its seam in the layer order, one picture deep by
+// placementParent, a region's picture as a door, the ring fill. `PLACE_M` (200 m) is
+// still the record's line between a thing and a place, and still says which marks the
+// ground pass admits from the whole record; it no longer says when a picture shows.
+//
 // THE THRESHOLD IS ASSERTED AGAINST THE RECORD, NOT REMEMBERED. The first test
 // below recomputes both facts the dial was chosen from — every parcel is 25 m,
 // the districts start at 300 m — out of WORLD/world-state.json on each run. If
@@ -33,25 +41,27 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { placedArtSVG, SPECTATOR_DRAW_DEFAULTS, isRegionMark } from "../spectator/viewer.mjs";
+import { placedArtSVG, isRegionMark } from "../spectator/viewer.mjs";
 import { machinePage } from "./page-machine.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator/viewer.mjs"), "utf8");
 const WORLD = JSON.parse(readFileSync(join(ROOT, "WORLD/world-state.json"), "utf8"));
 const span = (m) => Math.max(Number(m?.extent?.w) || 0, Number(m?.extent?.h) || 0);
+const PLACE_M = Number(SOURCE.match(/const PLACE_M = (\d+);/)?.[1]);   // the record's line between a thing and a place
 
 // ── the threshold, recomputed from the town it was read off ─────────────────
 
-test("the dial sits in the gap the record actually has, between a parcel and a district", () => {
+test("the place line sits in the gap the record actually has, between a parcel and a district", () => {
+  assert.equal(PLACE_M, 200, "PLACE_M is the old 200 m, read off the record");
   const parcels = WORLD.marks.filter((m) => m.kind === "parcel" && m.extent);
   assert.ok(parcels.length > 50, `the town has parcels to measure (${parcels.length})`);
   const parcelSpans = [...new Set(parcels.map(span))];
   assert.deepEqual(parcelSpans, [25], "every parcel in the town is 25 m across");
 
-  const floor = SPECTATOR_DRAW_DEFAULTS.placed_art_min_m;
+  const floor = PLACE_M;
   assert.ok(floor > Math.max(...parcelSpans),
-    `the dial (${floor} m) is above every parcel, so a house is never hung by this rule`);
+    `the line (${floor} m) is above every parcel, so a house is never admitted as a place`);
 
   // The districts: the market-tier place marks a reader zooms out to see. What
   // has to clear the dial is their SPAN, because that is what the rule reads —
@@ -81,11 +91,6 @@ test("the dial sits in the gap the record actually has, between a parcel and a d
     `a 30 x 1,700 strip — the worn path's own shape — qualifies on its span (${span(strip)} m) though its narrow side (30 m) is under the dial (${floor} m)`);
   // ⚑ THE FLIP: move placed_art_min_m to 10 and the parcel assertion reds; to
   //   4000 and the district one does.
-});
-
-test("[pin] the dial is a dial — Keemin can move it with a finger, not a pull request", () => {
-  assert.match(SOURCE, /\{ key: "placed_art_min_m", label: "[^"]+", min: \d+, max: \d+, step: \d+ \}/,
-    "it has a row in DRAW_DIALS beside art_min_px");
 });
 
 // ── the drawing: the mark's own extent, never squared ───────────────────────
@@ -128,8 +133,8 @@ test("[pin] the mountain's picture is no longer typed into the viewer", () => {
   // with an image like any other — which is the whole point
   const pando = WORLD.marks.find((m) => m.id === "vermillion/the-pando-peak");
   assert.ok(pando?.image, "vermillion/the-pando-peak carries its own image on the record");
-  assert.ok(span(pando) >= SPECTATOR_DRAW_DEFAULTS.placed_art_min_m,
-    "and it clears the dial by being large, not by being the mountain");
+  assert.ok(span(pando) >= PLACE_M,
+    "and it is a place by being large, not by being the mountain");
 });
 
 test("[pin] the mist stayed behind — it is the corridor's weather, not a mark's picture", () => {
@@ -142,7 +147,7 @@ test("[pin] the mist stayed behind — it is the corridor's weather, not a mark'
 test("[pin] the rule reads the whole record and is bounded by the viewport, not the radial", () => {
   const fn = SOURCE.slice(SOURCE.indexOf("function drawPlacedArt("));
   const body = fn.slice(0, fn.indexOf("\n  }"));
-  assert.match(body, /tier === "near"/, "near draws none of it");
+  assert.match(SOURCE, /if \(sceneRoomId && tier === "near"\)/, "a room's scene draws none of it at near; the town's pictures are the window's");
   assert.match(body, /allMarks\(\)/, "a landmark is not field-of-view furniture");
   assert.match(body, /markInDrawnBounds\(m, bounds\)/, "the viewport cull is what bounds the work");
   assert.match(body, /markImagePath\(m\)/, "through the same shelf gate as every other picture");
@@ -249,7 +254,7 @@ before(async () => {
 });
 
 /** open the page, settle the drawing, and read the art layer */
-async function readArt({ zoomIn = 0, stopAtTier = null } = {}) {
+async function readArt({ zoomIn = 0, zoomOut = 0, stopAtTier = null } = {}) {
   const page = await machinePage(browser, { viewport: { width: 1400, height: 900 } });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message.slice(0, 200)));
@@ -272,6 +277,11 @@ async function readArt({ zoomIn = 0, stopAtTier = null } = {}) {
     }
   };
   await settle();
+  // ZOOM OUT, about the middle of the pane. Under the WLD-205 window a 1,800 m mark's picture shows only
+  // while it is 24-192 px across, which the opening view is a little too close for: a few notches out
+  // brings it in (and away from the 200 m rule that used to put it there by size alone).
+  for (let i = 0; i < zoomOut; i++) { await page.mouse.move(700, 450); await page.mouse.wheel(0, 80); await page.waitForTimeout(140); }
+  if (zoomOut) await settle();
   if (zoomIn) {
     // ZOOM ONTO THE FIXTURE MARK ITSELF, never the middle of the pane. Wheeling
     // at the centre walks the camera off the mark, and then "no art at near" is
@@ -377,6 +387,12 @@ const pageShape = async () => {
   await page.waitForFunction(() => document.querySelectorAll("#wv-placed-art-layer .wv-far-art").length > 0,
     null, { timeout: 60_000 }).catch(() => {});
   await page.waitForTimeout(2000);
+  // WLD-205: the region's picture shows while it is 24-192 px across — 2,353 m wants ppm 0.0102-0.0816, and the
+  // opening view is 0.158 — so seven notches out put it in its window (162 px), where a reader finds it
+  for (let i = 0; i < 7; i++) { await page.mouse.move(700, 450); await page.mouse.wheel(0, 80); await page.waitForTimeout(150); }
+  await page.waitForFunction(() => /evermoon/i.test([...document.querySelectorAll("#wv-placed-art-layer .wv-far-art")].map((g) => g.getAttribute("aria-label")).join("|")),
+    null, { timeout: 20_000 }).catch(() => {});
+  await page.waitForTimeout(1200);
   const r = await page.evaluate(() => {
     const arts = [...document.querySelectorAll("#wv-placed-art-layer .wv-far-art")];
     const region = arts.find((g) => /evermoon/i.test(g.getAttribute("aria-label") ?? ""));
@@ -393,15 +409,15 @@ const pageShape = async () => {
   return r;
 };
 
-test("THE PAGE — a large mark with a picture hangs it; a small one does not; near hangs none", async (t) => {
+test("THE PAGE — a large mark with a picture hangs it (in its window); a small one does not; its shape, shelf and seam hold", async (t) => {
   if (!chromium) {
     t.skip("NO PLAYWRIGHT — the tier gate, the cull, the DOM seam and the Pando swap went UNGUARDED. "
       + "The source pins above prove the lines were typed and nothing more.");
     return;
   }
-  const far = await readArt();
+  const far = await readArt({ zoomOut: 4 });
   assert.deepEqual(far.errors, [], "the page mounted without throwing");
-  assert.equal(far.tier, "far", "the opening view is the far tier");
+  assert.equal(far.tier, "far", "four notches out of the opening view is still the far tier");
   assert.ok(far.overlayMarks > 0, "…and the overlay actually drew, so a zero below means something");
 
   // the fixture mark is hung, over its own 1800 x 1200 ground, whole
@@ -445,8 +461,8 @@ test("THE PAGE — a large mark with a picture hangs it; a small one does not; n
     "nothing is drawn from the old hard-coded file");
 });
 
-test("THE PAGE — zooming in to near takes the placed art off the ground", async (t) => {
-  if (!chromium) { t.skip("NO PLAYWRIGHT — the near gate went UNGUARDED."); return; }
+test("THE PAGE — zoomed in to near, the large mark's picture is gone because it is too big on screen, not because near is a tier", async (t) => {
+  if (!chromium) { t.skip("NO PLAYWRIGHT — the near end of the window went UNGUARDED."); return; }
   const near = await readArt({ zoomIn: 34 });
   assert.deepEqual(near.errors, [], "the page survived the zoom without throwing");
   if (near.tier !== "near") {
@@ -455,15 +471,17 @@ test("THE PAGE — zooming in to near takes the placed art off the ground", asyn
   }
   assert.equal(near.hungOnScreen, true,
     "the 1,800 m mark is STILL ON SCREEN at near — so a zero below is the gate, not the cull");
-  assert.equal(near.count, 0, "no placed art at near: the cards and the furnishing pass say it better");
-  // ⚑ THE FLIP: drop the `tier === "near"` guard and this reds while every
-  //   far assertion above stays green.
+  // its OWN picture is what must be gone, not every hanging: since WLD-214 (window edge 192 -> 384 CSS px) the
+  // planted 150 m yard is ~300 px here and rightly wears its picture
+  assert.ok(!near.labels.some((l) => /broad common/i.test(String(l))),
+    `an 1,800 m mark filling the pane is over the window: its picture has gone (labels: ${near.labels.join(", ")})`);
+  // (the converse — a SMALL mark's picture coming up at near — is tools/art-window.test.mjs's)
 });
 
 // ── ONE PICTURE DEEP (Keemin's addendum, 2026-09-12) ────────────────────────
 
 test("the edge is placementParent — measured on the record, not assumed", () => {
-  const big = WORLD.marks.filter((m) => m.at && m.extent && span(m) >= SPECTATOR_DRAW_DEFAULTS.placed_art_min_m);
+  const big = WORLD.marks.filter((m) => m.at && m.extent && span(m) >= PLACE_M);
   const withPlacement = big.filter((m) => m.placementParent).length;
   const withParent = big.filter((m) => m.parent).length;
   assert.ok(big.length > 40, `there are large marks to measure (${big.length})`);
@@ -510,8 +528,8 @@ test("PANDO: the anchor hangs and the pictured child under it is covered — one
     parent = byId.get(parent).placementParent;
   }
   assert.equal(child.placementParent, "the-town/pando-peak", "…and the child hangs off the anchor");
-  assert.ok(span(anchor) >= SPECTATOR_DRAW_DEFAULTS.placed_art_min_m, "the anchor clears the dial");
-  assert.ok(span(child) >= SPECTATOR_DRAW_DEFAULTS.placed_art_min_m, "and so does the child");
+  assert.ok(span(anchor) >= PLACE_M, "the anchor is a place");
+  assert.ok(span(child) >= PLACE_M, "and so is the child");
 
   // AND THE OUTCOME AS A RELATION, not as a snapshot of one day's fold. Whether
   // the anchor wears a picture is Keemin's to change and he has changed it once
@@ -533,7 +551,7 @@ test("the folded record hangs one picture per piece of ground, and no two overla
   // record the way the rule does and asserts the property the rule exists for,
   // rather than a count that moves every time a founder hangs art.
   const byId = new Map(WORLD.marks.map((m) => [m.id, m]));
-  const floor = SPECTATOR_DRAW_DEFAULTS.placed_art_min_m;
+  const floor = PLACE_M;
   const bigEnough = (m) => !!m?.at && !!m?.extent && span(m) >= floor && !!m.image;
   const candidates = WORLD.marks.filter(bigEnough);
   assert.ok(candidates.length >= 1,
@@ -562,47 +580,6 @@ test("the folded record hangs one picture per piece of ground, and no two overla
   // something that is not itself hanging, so two pictures never stack.
   assert.ok(covered.length < candidates.length,
     `not everything is covered — something hangs (${candidates.length - covered.length} of ${candidates.length})`);
-});
-
-test("THE PAGE — one picture deep: a covered child stays down, an uncovered one hangs", async (t) => {
-  if (!chromium) { t.skip("NO PLAYWRIGHT — the depth rule went UNGUARDED."); return; }
-  const far = await readArt();
-  assert.deepEqual(far.errors, [], "the page mounted without throwing");
-  const hung = (frag) => far.labels.some((l) => new RegExp(frag, "i").test(String(l)));
-
-  // a pictured district hangs…
-  assert.ok(hung("covering district"), `the pictured district hangs (labels: ${far.labels.join(", ")})`);
-  // …and the pictured child inside it does NOT: one picture on that ground
-  assert.ok(!hung("covered child"), "the child inside a hanging district does not hang a second picture");
-
-  // PANDO'S SHAPE: a large parent with NO picture, and a pictured child. The
-  // child hangs, because nothing is covering it.
-  assert.ok(!hung("bare parent"), "a large mark with no picture hangs nothing (there is nothing to hang)");
-  assert.ok(hung("bare child"), "…and its pictured child DOES hang — nothing is above it");
-
-  // ⚑ THE FLIP: make the rule literal — hang only when placementParent is the
-  //   root — and "bare child" reds while "covered child" stays green, which is
-  //   exactly the difference between the two readings of the ruling.
-});
-
-test("THE PAGE — a hung picture is not then painted over by the furnishing pass", async (t) => {
-  if (!chromium) { t.skip("NO PLAYWRIGHT — the two passes' agreement went UNGUARDED."); return; }
-  // Mid is where they meet: at far the furnishing pass is off entirely, at near
-  // the hanging rule is. Only mid runs both, so only mid can show the argument.
-  const mid = await readArt({ zoomIn: 60, stopAtTier: "mid" });
-  assert.deepEqual(mid.errors, [], "the page survived the zoom");
-  assert.equal(mid.tier, "mid", `the camera reached mid (got ${mid.tier})`);
-  assert.ok(mid.count > 0, "…and something is hung there, so the next line asks a question");
-  assert.ok(mid.tinted.length > 0,
-    "…and the furnishing pass IS running, so a clean result is agreement and not absence");
-
-  // the whole claim, in one line: nothing wears a picture AND a tint
-  const both = mid.tinted.filter((id) => /broad-common|long-terrace|covering-district|bare-child/.test(id));
-  assert.deepEqual(both, [],
-    `no hung mark also carries a tinted block (tinted: ${mid.tinted.join(", ")})`);
-  // ⚑ THE FLIP: drop the `!hungArt.has(m.id)` filter and this reds with the two
-  //   hung ids named, while every other assertion in this file stays green —
-  //   which is how it shipped in #40 without anybody seeing it.
 });
 
 // ── WHY THERE IS NO PAGE TEST FOR THE PARCEL/FURNISHING COLLISION ───────────
@@ -637,42 +614,13 @@ test("isRegionMark reads the roster, not a drawn ring", () => {
   assert.equal(isRegionMark(null), false);
 });
 
-test("THE PAGE — a region's picture hangs at far and is gone at mid, tint and all", async (t) => {
-  if (!chromium) { t.skip("NO PLAYWRIGHT — the region tier rule went UNGUARDED."); return; }
-  const far = await readArt();
-  assert.deepEqual(far.errors, [], "the page mounted");
-  assert.equal(far.tier, "far", `the opening view is far (got ${far.tier})`);
-  assert.ok(far.regionHung >= 1, `the pictured region hangs at far (hung: ${far.labels.join(", ")})`);
-
-  const mid = await readArt({ zoomIn: 60, stopAtTier: "mid" });
-  assert.deepEqual(mid.errors, [], "…and survived the zoom");
-  assert.equal(mid.tier, "mid", `the camera reached mid (got ${mid.tier})`);
-  assert.ok(mid.count > 0,
-    "…and something else is still hung at mid, so a zero for the region is the rule and not an empty layer");
-  assert.equal(mid.regionHung, 0, "the region's picture is gone at mid");
-  // ⚑ THE FLIP: drop the region filter in drawPlacedArt and this reds while the
-  //   far assertion stays green.
-  //
-  // AND WHAT IS *NOT* ASSERTED HERE, because I tried and it could not fail. The
-  // other half of the ruling — no furnishing TINT for a region at mid — has no
-  // page falsifier in this file. Flipping that filter out left every test green:
-  // the furnishing pass is built from `drawn`, `drawn` comes from the reader's
-  // field of view, the office supplies that, and this rig has no office, so a
-  // region is never a candidate here whatever the fixture does. Same wall as the
-  // parcel/furnishing collision two tests up. The tint filter is guarded by the
-  // source pin below and read on dev; it is not covered by this page test, and
-  // saying so is the point.
-});
-
-test("[pin] the tint filter exists and is scoped to mid — a source pin, and it says so", () => {
+test("[pin] the region's tinted block still stands down at mid — a source pin, and it says so (the picture is the window's: art-window.test.mjs)", () => {
   // The page cannot drive this on a rig with no office (see the note above), so
   // what is left is a pin that proves the line was typed. It is labelled as
   // exactly that rather than dressed up as coverage.
   const src = readFileSync(new URL("../spectator/viewer.mjs", import.meta.url), "utf8");
   assert.match(src, /\.filter\(\(m\) => !\(tier === "mid" && isRegionMark\(m\)\)\)/,
     "the furnishing pass stands regions down at mid");
-  assert.match(src, /if \(tier === "mid" && isRegionMark\(m\)\) return false;/,
-    "and so does the hanging pass");
 });
 
 // ── A REGION'S PICTURE IS A DOOR (Keemin, 2026-09-13) ───────────────────────
@@ -703,6 +651,12 @@ test("THE PAGE — clicking a region's hung picture at far opens its column", as
   await page.waitForFunction(() => document.querySelectorAll("#wv-placed-art-layer .wv-far-art").length > 0,
     null, { timeout: 60_000 }).catch(() => {});
   await page.waitForTimeout(2500);
+  // WLD-205: the region's picture shows while it is 24-192 px across — 2,353 m wants ppm 0.0102-0.0816, and the
+  // opening view is 0.158 — so seven notches out put it in its window (162 px), where a reader finds it
+  for (let i = 0; i < 7; i++) { await page.mouse.move(700, 450); await page.mouse.wheel(0, 80); await page.waitForTimeout(150); }
+  await page.waitForFunction(() => /evermoon/i.test([...document.querySelectorAll("#wv-placed-art-layer .wv-far-art")].map((g) => g.getAttribute("aria-label")).join("|")),
+    null, { timeout: 20_000 }).catch(() => {});
+  await page.waitForTimeout(1200);
 
   const before = await page.evaluate(() => {
     const c = document.querySelector(".wv-homecol");
@@ -791,7 +745,7 @@ test("a ring turns the picture into that shape, and a ringless mark keeps its bo
 
 test("THE PAGE — the region's hung picture is the ring's shape, and nothing else is", async (t) => {
   if (!chromium) { t.skip("NO PLAYWRIGHT — the ring fill on a real page went UNGUARDED."); return; }
-  const far = await readArt();
+  const far = await readArt({ zoomOut: 7 });
   assert.deepEqual(far.errors, [], "the page mounted");
   assert.equal(far.tier, "far");
   const shape = await pageShape();

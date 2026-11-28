@@ -7,9 +7,9 @@
 // the hover anchor, the hit target and (while the map fanned; it passes no fan
 // since WLD-95, 2026-10-20) the fan's seat. This extends the same
 // contract to any mark whose picture is ON THE PAINTING in the draw: hung at
-// far/mid (`drawPlacedArt`'s set) or drawn over its extent at near
-// (`sceneArtSVG` in the furnishing pass). A mark at mid keeps its dot — that
-// tier draws tinted extents and no pictures, so nothing else would mark it.
+// any tier by the window (`drawPlacedArt`'s map of shares, WLD-205). A mark
+// whose picture is under half up (out of its window, or mid-fade) keeps its dot,
+// so it always wears one of the two and never neither.
 //
 // The rule lives in three places that must agree — the set, the class, the
 // style — and this file pins all three, so dropping any one goes red.
@@ -24,12 +24,11 @@ import { overlayPipSVG, OVERLAY_PIP_R } from "../spectator/viewer.mjs";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = readFileSync(join(ROOT, "spectator", "viewer.mjs"), "utf8");
 
-test("the set: pictured marks = the hung art, plus every near-tier picture the furnishing pass drew", () => {
-  assert.match(SOURCE, /const pictured = new Set\(hungArt\);/, "seeded from the placed art, so a district hung at far/mid loses its dot too");
-  assert.match(SOURCE, /const art = markImagePath\(m\) \? sceneArtSVG\(m, px\) : "";\n\s+if \(art\) \{ s \+= art; pictured\.add\(m\.id\); \}/,
-    "a mark joins the set only when its picture was actually emitted — a mark with an image but no extent draws no art and keeps its dot");
+test("the set: pictured marks = the hung art that is at least half up", () => {
+  assert.match(SOURCE, /const pictured = new Set\(\[\.\.\.hungArt\]\.filter\(\(\[, a\]\) => a >= 0\.5\)\.map\(\(\[id\]\) => id\)\);/,
+    "seeded from the windowed art: a mark joins only when its picture is mostly up, so a mark mid-fade keeps its dot");
   assert.match(SOURCE, /if \(tier === "mid"\) \{ s \+= placeholderExtentSVG\(m, px, \{ ignoreArt: true \}\); continue; \}/,
-    "at mid the pass draws the tinted extent and never a picture, so nothing is added — the dot stays");
+    "a room's own pass is untouched: the scene hangs its pictures through sceneArtSVG there");
 });
 
 test("the class: the pip loop hands `ov-pip-pictured` to exactly the marks in the set", () => {

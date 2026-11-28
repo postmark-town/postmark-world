@@ -26,7 +26,8 @@
 // reader's, its ✦ figure and who is inside it. Pure.
 import { entryLawOf, isStairs, STAIRS_LINE } from "../tools/enter-exit.mjs";
 import { isDungeon } from "../tools/portals.mjs";
-import { isSited, isHeld } from "../tools/mark-kind.mjs"; // LOGOS v2 W2: a thing is kind: thing, still sited
+import { isSited, isHeld, kindIndexOf } from "../tools/mark-kind.mjs"; // LOGOS v2 W2: a thing is kind: thing, still sited
+import { isDoorClass, DOOR_CLASS } from "../tools/door-law.mjs"; // door is a class (WLD-253): the graph says which classes are doors
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 // THE TOKEN (play fix 43, Darko 20:16): a resident is drawn on the map as a round
@@ -63,6 +64,8 @@ export const MARK_ICONS = Object.freeze({
     d: "M 2 9.6 H 14 L 12 13 H 4 Z M 8 9.6 V 2.5 L 12.2 8 H 8" },
   creature: { kind: "what", label: "creature", meaning: "A creature: something alive that answers what you do near it.", fill: true,
     d: CREATURE_D },
+  conversation: { kind: "what", label: "conversation", meaning: "A conversation: voices within earshot, kept until the settlement.",
+    d: "M 2.5 3.5 H 13.5 V 10.5 H 8.6 L 5 13.5 V 10.5 H 2.5 Z M 5.4 7 H 5.5 M 8 7 H 8.1 M 10.6 7 H 10.7" },
   yours: { kind: "state", label: "yours", meaning: "Yours: your household's mark.",
     d: "M 4 14 V 2.5 M 4 3 H 12.5 L 10.4 5.6 L 12.5 8.2 H 4" },
   locked: { kind: "state", label: "locked", meaning: "Locked: it refuses entry.",
@@ -71,7 +74,7 @@ export const MARK_ICONS = Object.freeze({
     d: "M 4 2.5 H 9.8 L 12.4 5.1 V 13.5 H 4 Z M 9.8 2.5 V 5.1 H 12.4 M 6 8.6 H 10.4 M 6 11 H 9" },
   staked: { kind: "state", label: "staked", meaning: "Staked: your household has stamps staked on this.", fill: true,
     d: "M 8 1.5 L 9.6 6.4 L 14.5 8 L 9.6 9.6 L 8 14.5 L 6.4 9.6 L 1.5 8 L 6.4 6.4 Z" },
-  inside: { kind: "state", label: "people inside", meaning: "People inside: someone is inside it now.", fill: true,
+  inside: { kind: "state", label: "residents inside", meaning: "Residents inside: a resident is inside it now.", fill: true,
     d: TOKEN_D },
   soon: { kind: "state", label: "coming soon", meaning: "Coming soon: what it leads to is not built yet.",
     d: "M 4 2.5 H 12 M 4 13.5 H 12 M 5 2.5 C 5 6 8 7 8 8 C 8 9 5 10 5 13.5 M 11 2.5 C 11 6 8 7 8 8 C 8 9 11 10 11 13.5" },
@@ -85,6 +88,8 @@ const INK = {
   inside: "var(--green, #84c98f)", creature: "#e6948c",
 };
 const WHAT_INK = "var(--paper, #e8e0cf)";
+// a conversation is the pale gray-white the map has always drawn talk in (Darko 2026-10-24: "sticking with the gray-white is fine")
+INK.conversation = "#cfd6dd";
 export const inkOf = (key) => INK[key] ?? WHAT_INK;
 
 /** The creature classes, read from the record: the `creature` class and every
@@ -121,12 +126,23 @@ export function thingClassesOf(marks = [], token = (c) => String(c ?? "").trim()
   return out;
 }
 
+/** The door classes, read from the record by the one door reader (door-law.mjs § isDoorClass, over the class graph the marks
+ *  carry): `door` and every class under it (WLD-253). The same answer the map's spineDoors gives, so the glyph, the display
+ *  switch and the pip cannot disagree about what is a door: a town subclass of door is a door whether or not it writes `into`. */
+export function doorClassesOf(marks = [], token = (c) => String(c ?? "").trim().toLowerCase()) {
+  const out = new Set([DOOR_CLASS]);
+  const list = [...(marks ?? [])];
+  const idx = kindIndexOf(list);
+  for (const m of list) if (m?.kind === "class" && m.class != null && isDoorClass(m.class, idx)) out.add(token(m.class));
+  return out;
+}
+
 /** What a mark IS, as one icon key, or null. Order matters where a mark is two
  *  things: a dungeon or a stair is also a portal by its law, a door may be a
  *  thing. Only an instance on the ground or a parcel is anything here — a class
  *  declaration, a predicate or a naming carries no icon, and neither do an idea
  *  and a bounty (deprecating, Darko 2026-10-15). */
-export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"]), thingClasses = new Set(["thing"]) } = {}) {
+export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"]), thingClasses = new Set(["thing"]), doorClasses = new Set([DOOR_CLASS]) } = {}) {
   if (!mark) return null;
   if (mark.kind === "parcel") return "home";
   if (isHeld(mark)) return "thing"; // in someone's hands: published, unplaced, and only a thing is held (POS-688)
@@ -134,7 +150,8 @@ export function markWhat(mark, { cls = "", creatureClasses = new Set(["creature"
   if (cls === "idea" || cls === "bounty") return null;
   if (isDungeon(mark) || cls === "dungeon") return "dungeon";
   if (isStairs(mark) || cls === "stairs") return "stairs";
-  if (cls === "portal-ground" || entryLawOf(mark)?.into) return "door";
+  // door is a class (WLD-253): door and every class under it (doorClasses, the graph's answer), whether or not it writes `into`
+  if (cls === DOOR_CLASS || doorClasses.has(cls) || cls === "portal-ground" || entryLawOf(mark)?.into) return "door";
   if (cls === "vehicle") return "vehicle";
   if (creatureClasses.has(cls)) return "creature";
   // a kind of thing is a thing (QA 10-17: a halloween-candy-bowl read "A place")
@@ -185,7 +202,7 @@ function describe({ key, count = null, own = null }) {
   let meaning = icon.meaning;
   if (key === "staked" && count) meaning = `Staked: ✦ ${Number(count).toLocaleString()} behind it.`;
   if (key === "staked" && own) meaning = `Staked: your household has ${Number(own).toLocaleString()} stamp${own === 1 ? "" : "s"} staked on this.`;
-  if (key === "inside" && count) meaning = `People inside: ${count} ${count === 1 ? "person is" : "people are"} inside it now.`;
+  if (key === "inside" && count) meaning = `Residents inside: ${count} ${count === 1 ? "resident is" : "residents are"} inside it now.`;
   return { kind: icon.kind, label: icon.label, meaning };
 }
 

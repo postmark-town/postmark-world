@@ -21,13 +21,15 @@ import assert from "node:assert/strict";
 import vm from "node:vm";
 import { readFileSync } from "node:fs";
 import {
-  parseHomeMarkdown, parseInline, safeLinkHref, safeSwatch, homeHandleForParcel, isParcelMark,
+  parseHomeMarkdown, parseInline, safeLinkHref, safeSitePath, safeSwatch, homeHandleForParcel, isParcelMark,
   homeColumnModel, renderHomeColumn, createHomeColumn,
 } from "../spectator/home-column.mjs";
 import {
   residentProfileView, residentHref, residentFace, walkerHoverId, walkerHandleFromHoverId, walkingLabel, vesselHandles,
   isRegionMark, isCreatureId, creatureColumnFacts, creatureIcon, chooserIdsFrom, isAmbientMark, enterAffordance,
   standpointOccupancy, effectiveWeight, kickerOf, markByline, WORLD_ROOT_ID,
+  // the shared view builders the closures call since WLD-105 A14 (they stay real in every run below)
+  markColumnParts, regionColumnFields, creatureColumnFields, residentColumnParts,
 } from "../spectator/viewer.mjs";
 
 // ── the stand-in ────────────────────────────────────────────────────────────
@@ -619,7 +621,7 @@ function residentViewFor(card, handle = "rig-ash") {
     faceOf: (h) => residentFace(h, { name: h === "rig-ash" ? "Rig Ash" : h, household: "rig-house" }),
     walkerPlace: () => "in the Town Centre", residentCloseLook: () => null, residentCard: () => card,
     worldEpoch: 1, state: { handle: "someone-else" }, onResidentPath: () => false, allMarks: () => FOLD,
-    holdingFacts: () => [], closeLooks: new Map(), asWho: () => "", markIdentity: (m) => m.id, byId: new Map(),
+    residentColumnParts, closeLooks: new Map(), asWho: () => "", markIdentity: (m) => m.id, byId: new Map(),
   });
   vm.runInContext(bodyOf("residentColumnView"), context);
   const made = context.residentColumnView(walkerHoverId(handle));
@@ -653,7 +655,9 @@ test("[pin] a mark's column and a creature's column still turn the resident link
   // text pins, because those two builders are closures far too wide to run here; the behaviour they
   // switch is the controller's, tested above. WLD-125 decides, link by link, which of them gain one.
   assert.match(bodyOf("markColumnView"), /residentLink: false,/, "a mark's handle is the household that made it");
-  assert.match(bodyOf("creatureColumnView"), /residentLink: false,/, "a creature's handle is the town's");
+  // since WLD-105 A14 the creature's fields are the shared creatureColumnFields': the view takes its switch from them
+  assert.match(bodyOf("creatureColumnView"), /residentLink: fields\.residentLink,/, "a creature's view carries the shared fields' switch");
+  assert.equal(creatureColumnFields("creature:x-1-1", { id: "creature:x-1-1", name: "x" }, null).residentLink, false, "a creature's handle is the town's");
   // ⚑ THE FLIP: delete either line → its assertion reds, and not the other
 });
 
@@ -857,7 +861,7 @@ const withoutTheSwitch = (v) => { const { residentLink, ...rest } = v; return re
 /** regionColumnView's own body, run against stand-ins for the page's state; the door is never answered. */
 function regionViewFor(mark) {
   const context = vm.createContext({
-    isRegionMark, markImagePath: () => null, byId: new Map([[mark.id, mark]]), allMarks: () => [mark],
+    isRegionMark, regionColumnFields, markImagePath: () => null, byId: new Map([[mark.id, mark]]), allMarks: () => [mark],
     regionDoors: new Map(), readRegionDoor: () => {}, markIdentity: (m) => m.name ?? m.id, iconsOf: () => [],
   });
   vm.runInContext(bodyOf("regionColumnView"), context);
@@ -870,7 +874,7 @@ function regionViewFor(mark) {
 function creatureViewFor(row) {
   const context = vm.createContext({
     isCreatureId, liveCreatures: new Map([[row.id, row]]), creatureReads: new Map(), loadCreatureReading: () => {},
-    creatureColumnFacts, creatureIcon, sceneRoomId: null, byId: new Map(), pointInRect: () => false, rect: () => null,
+    creatureColumnFields, sceneRoomId: null, byId: new Map(), pointInRect: () => false, rect: () => null,
     markIdentity: (m) => m.id, isSpectating: () => true, walkState: { walkers: [] }, state: { cam: { x: 0, y: 0 }, handle: null },
   });
   vm.runInContext(bodyOf("creatureColumnView"), context);
@@ -892,8 +896,8 @@ function markViewFor(mark) {
     state: { palette: { entries: [] }, handle: null }, standpointKey: () => null, enterExitLedger: { acts: [] }, occupancyClock: () => 0,
     occupantsOf: () => new Map(), liveOccupancy: () => ({}), faceOf: (h) => ({ name: h }), entryLawOf: () => null,
     markCloseLook: () => null, noteThingKind: () => {}, holderLines: () => null, heldBy: () => null, heldLine: () => null,
-    isThingId: () => false, iconsOf: () => [], instanceClassOf: () => null, ownedBy: () => null, hands: { for: null },
-    holdingFacts: () => [], polygonOf: () => null, polygonBBox: () => null, liveCreatures: new Map(), pointInsideMark: () => false,
+    isThingId: () => false, iconsOf: () => [], instanceClassOf: () => null, ownedBy: () => null, hands: { for: null }, thingClasses: () => new Set(),
+    markColumnParts, liveCreatures: new Map(), pointInsideMark: () => false,
     silhouetteURL: () => "", bubbleTrail: [], worldEpoch: 1, enterExitEpoch: 1, sceneRoomId: null, canAct: () => false, loadAgentRead: () => null,
   });
   vm.runInContext(bodyOf("markColumnView"), context);
@@ -986,4 +990,78 @@ test("the walker card's \"their page →\" is the other place a handle becomes a
   assert.ok(!cardFor("the-town").includes("their page"), "the town's card has none");
   assert.ok(!cardFor("the-town").includes("/residents/"), "and no path to the site at all");
   // ⚑ THE FLIP: delete the `s === TOWN_HANDLE` line in residentHref → the town assertions red, and not the control
+});
+
+// ── A CONVERSATION'S COLUMN (POS-779, Darko 2026-11-06): plain-data blocks and a footer link ─────────────────────────
+
+test("a view may hand in plain-data blocks, and a statement's markdown and markup stay the letters it was typed in", () => {
+  const said = '# not a heading [x](javascript:alert(1)) <img src="x" onerror="alert(2)"> **not bold**';
+  const blocks = [{ type: "paragraph", spans: [{ type: "strong", spans: [{ type: "text", text: "rig-ash" }] }, { type: "text", text: ` (2026-11-06 14:05Z): ${said}` }] }];
+  const model = homeColumnModel({ handle: "the-town", kicker: "a conversation · live", title: "the porch", door: { blocks } });
+  assert.deepEqual(model.blocks, blocks, "the blocks are the ones handed in, not a parse of anything");
+  const host = render(model);
+  const tags = tagsIn(host);
+  for (const bad of ["SCRIPT", "IMG", "A", "H1", "B"]) assert.equal(tags.filter((t) => t === bad).length, 0, `no ${bad} was made from a statement`);
+  assert.ok(serialize(host).includes(said), "the statement reads exactly as typed");
+  assert.equal(find(host, "strong").length, 1, "and only the column's own emphasis (the speaker's name) is markup");
+  // the markdown path is unchanged for everything else
+  assert.equal(homeColumnModel({ handle: "x", kicker: "x", door: { description: "# a title" } }).blocks[0].type, "heading");
+  assert.deepEqual(homeColumnModel({ handle: "x", kicker: "x", door: { blocks: [] } }).blocks, [], "an empty list of blocks is the quiet thread, not a markdown parse");
+});
+
+test("a footer link is a same-origin path, opens beside the map, and nothing else is hung", () => {
+  const ok = render(homeColumnModel({ handle: "the-town", kicker: "k", title: "t", door: { blocks: [] }, footerLink: { href: "/conversations/#t1", text: "all conversations →" } }));
+  const [a] = byClass(ok, "wv-homecol-all");
+  assert.equal(a.getAttribute("href"), "/conversations/#t1");
+  assert.equal(a.getAttribute("target"), "_blank");
+  assert.equal(a.getAttribute("rel"), "noopener noreferrer");
+  assert.equal(a.textContent, "all conversations →");
+  assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "words" } })), "wv-homecol-all").length, 0, "no footer link unless a view asks");
+  for (const bad of ["https://evil.example/x", "//evil.example/x", "/\\evil", "javascript:alert(1)", "conversations/#t1", "/with space", "", null, undefined]) {
+    assert.equal(safeSitePath(bad), null, `refused: ${JSON.stringify(bad)}`);
+    assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "w" }, footerLink: { href: bad, text: "x" } })), "wv-homecol-all").length, 0, "and no anchor is hung for it");
+  }
+  assert.equal(safeSitePath("/conversations/#t%201"), "/conversations/#t%201");
+});
+
+// ── THE CROWDED PRESS'S CHOICES (CORE-54, Wright 2026-11-20 16:57Z) ──────────────────────
+
+test("CORE-54: a view's chooser slot is filled by the viewer into the column's own host, and the column writes no markup and no 'nothing written here yet'", () => {
+  let filled = null;
+  const chooser = { fill: (host) => { filled = host; const row = element("button"); row.className = "wv-choose-row"; row.setAttribute("data-choose", "the-town/main-channel"); host.appendChild(row); } };
+  const model = homeColumnModel({ kicker: "here", title: "Choose one", chooser });
+  assert.equal(model.chooser, chooser, "the slot passes through the model");
+  assert.equal(model.note, "", "a chooser column is not an empty home");
+  const col = render(model);
+  const mount = byClass(col, "wv-homecol-chooser")[0];
+  assert.ok(mount, "the column holds a host for the choices");
+  assert.equal(filled, mount, "the viewer was handed exactly that host");
+  assert.deepEqual(byClass(mount, "wv-choose-row").map((r) => r.getAttribute("data-choose")), ["the-town/main-channel"], "its rows are the viewer's, with the viewer's ids");
+  assert.doesNotMatch(serialize(col), /nothing written here yet/);
+  // no slot, no host: every existing column is untouched
+  assert.equal(byClass(render(homeColumnModel({ handle: "x", kicker: "x", door: { description: "w" } })), "wv-homecol-chooser").length, 0);
+  assert.equal(homeColumnModel({ kicker: "k", title: "t", chooser: { fill: "not a function" } }).chooser, null, "a slot with no fill is no slot");
+});
+
+test("CORE-54: the column OPENS the chooser view the viewer hands it (a handle and a key, its own empty door: no home read), and refuses a view with no handle", async () => {
+  // the first commit of this wiring handed a view with no handle: `open` returned false and a crowded press rendered nothing in the real browser
+  let reads = 0;
+  const host = element("aside");
+  const column = createHomeColumn({ doc, host, imagePath: shelfGate, readHome: async () => { reads++; return { description: "x" }; } });
+  const ids = "choose:the-town/the-main-channel convo:t1";
+  let fills = 0;
+  const chooser = { fill: (h) => { fills++; const row = element("button"); row.className = "wv-choose-row"; row.setAttribute("data-choose", "the-town/the-main-channel"); h.appendChild(row); } };
+  const view = { key: ids, handle: "the-town", residentLink: false, kicker: "here", title: "Choose one", byline: " ", door: { blocks: [] }, chooser };
+  assert.equal(column.open(view), true, "the column accepted the view");
+  await new Promise((r) => setTimeout(r, 0));
+  assert.equal(host.hidden, false);
+  assert.equal(reads, 0, "no home is read for a chooser");
+  assert.equal(fills, 1);
+  assert.deepEqual(byClass(host, "wv-choose-row").map((r) => r.getAttribute("data-choose")), ["the-town/the-main-channel"]);
+  assert.match(serialize(host), /Choose one/);
+  assert.doesNotMatch(serialize(host), /nothing written here yet|own words/, "no empty-home note and no 'in … own words' byline");
+  column.open(view);
+  assert.equal(fills, 1, "the same press does not rebuild the choices under the reader");
+  const bare = createHomeColumn({ doc, host: element("aside"), imagePath: shelfGate });
+  assert.equal(bare.open({ key: ids, kicker: "here", title: "Choose one", chooser }), false, "a view with no handle is refused (the lesson: it never opened)");
 });

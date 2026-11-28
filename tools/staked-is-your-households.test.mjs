@@ -47,7 +47,8 @@ test("the column and the nameplate keep the general ✦ figure", () => {
     const body = SOURCE.match(new RegExp(`function ${fn}\([^)]*\) \{[\s\S]*?\n  \}\n`))?.[0];
     if (body) assert.doesNotMatch(body, /map: true/, `${fn} asks the general figure`);
   }
-  assert.match(SOURCE, /function markNameplateHTML\(id\) \{[\s\S]*?const icons = iconsOf\(full\);/);
+  // WLD-105 A20: the closure asks iconsOf(full) (the general figure) and hands them to markNameplateMarkup
+  assert.match(SOURCE, /function markNameplateHTML\(id\) \{[\s\S]*?icons: iconsOf\(full\)/);
 });
 
 test("the states sit on the pip's own rim, inside its scaled group, the first at its top right", () => {

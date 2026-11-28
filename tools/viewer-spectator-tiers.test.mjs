@@ -264,7 +264,7 @@ test("[pin] THE TIER IS THE CAMERA'S ON EVERY PATH — no resident-path null, no
   assert.match(SOURCE, /const drawnBounds = \(\) => \(!mapCtx \? null : viewportWorldBounds\(\{/, "one cull box, no path branch");
   // …and, since #2940, the copy size each glyph asked for (thumbs) — a zoom
   // that carries a glyph across a copy's edge is a rebuild like a tier crossing
-  assert.match(SOURCE, /mapCtx\.drawnAt = \{ bounds, tier, thumbs: thumbClassKey\(\) \};/, "and the settle pass can see what every path drew");
+  assert.match(SOURCE, /mapCtx\.drawnAt = \{ bounds, tier, thumbs: thumbClassKey\(\), art: artSignature\(mapCtx\.artSpans\) \};/, "and the settle pass can see what every path drew, pictures included (WLD-205)");
   assert.doesNotMatch(SOURCE, /onResidentPath\(\) \? null : tierFor/, "the 09-10 null is gone");
   // ⚑ THE FLIP: restore `onResidentPath() ? null :` in drawTier → the first and last lines red.
 });

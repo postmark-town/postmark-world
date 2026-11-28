@@ -55,16 +55,17 @@ const ARENA = `${WORKS}/postmark-node/mark/portal-ground/arena/mark.md`;
 
 // ── channel 1 · ambient, unchanged ──────────────────────────────────────────
 
-test("the human's ambient roster is STILL one grant — the fence moved onto the household's ground, not off it", () => {
+test("the human's ambient roster is STILL one grant — speaking only, for now", () => {
   // LOGOS/classes.md § The human class, verbatim:
   //   "The one-grant fence IS the scope fence: everything further waits for
   //    the humans-as-residents design, and arrives — if it arrives — as law
   //    here first."
-  // The parcel grant is that arrival. It lands on the PARCEL class, so the
-  // human class's own ambient roster must be untouched: a human off their own
-  // ground is a voice through their resident, exactly as before. This test
-  // fails if a later hand "tidies" the new grants onto the human class, which
-  // would make them ambient and hand every human a walk everywhere.
+  // and (POS-955, 2026-11-08): "Walking may come later; if it does, it arrives
+  // as law here first." Until 2026-11-08 this comment called the parcel's
+  // grants that arrival; they came out under the founder's "Speaking only, for
+  // now". The human class's own ambient roster stays the one say: this test
+  // fails if a later hand puts a walk on the human class, which would make it
+  // ambient and hand every human a walk everywhere.
   const actions = field(HUMAN, "actions");
   assert.equal(actions.length, 1,
     "the human class grants exactly one action ambiently — walk arrives from the GROUND, never from the actor");
@@ -106,22 +107,24 @@ test("the human's stride POINTS at the resident's — one number, one home", () 
 
 // ── channel 2 · ground-granted, and the relation scope ──────────────────────
 
-test("the parcel class grants walk and say to the ground's OWN household's human", () => {
-  // LOGOS/classes.md § Class-nodes, verbatim:
-  //   "a ground's class may grant more to those it reaches"
-  // and § The three channels, verbatim:
-  //   "the grant reaches only an actor whose own household is the household
-  //    of the ground granting it. A guest's human standing on the same parcel
-  //    receives nothing, and that is the point."
+test("the parcel class grants the human NOTHING — speaking only, beside one of their own residents, for now", () => {
+  // LOGOS/classes.md § The human class, verbatim:
+  //   "A household's human speaks beside one of their own household's
+  //    residents, from that resident's standing, and does nothing on feet of
+  //    their own anywhere: no walk, and no say heard from the human's own place."
+  //
+  // ⚠ RETIRED BY RULING 2026-11-08 (POS-955, the founder: "Speaking only, for
+  // now"). Until then this test asserted the parcel's roster was exactly walk
+  // and say, `for: human`, `scope: own-ground` — the 2026-08-26 proposal's
+  // embodiment, which never received the founder's word. Both grants came out
+  // of the parcel class (version 4); this asserts the ruled removal, so either
+  // grant growing back reds here.
   const actions = field(PARCEL, "actions");
-  assert.deepEqual(actions.map((a) => a.action).sort(), ["say", "walk"],
-    "the parcel's roster is exactly walk and say — the embodiment is deliberately two verbs wide");
-  for (const a of actions) {
-    assert.equal(a.for, "human", `${a.action} on the parcel is granted to the human kind`);
-    assert.equal(a.scope, "own-ground",
-      `${a.action} is relation-scoped: a guest's human on this ground receives nothing`);
-    assert.ok(a.residue, `${a.action} names its residue — the door quotes the residue's own mark`);
-  }
+  assert.ok(Array.isArray(actions), "the parcel class still carries a roster, even empty — the channel is law, its contents are rulings");
+  assert.deepEqual(actions.filter((a) => a.for === "human").map((a) => a.action), [],
+    'LOGOS § The human class: "no walk, and no say heard from the human\'s own place" — the parcel grants a human nothing');
+  assert.deepEqual(actions, [], "and nothing else grew in their place: the roster is empty");
+  assert.equal(scalar(PARCEL, "version"), "4", "the removal is the parcel class's version 4");
 });
 
 test("no grant anywhere is scoped without naming the kind it is for", () => {
@@ -132,19 +135,26 @@ test("no grant anywhere is scoped without naming the kind it is for", () => {
   // hand a relation-scoped verb to the class the law makes the default — the
   // widening ruled-grants.test.mjs exists to refuse, arriving through a new key.
   // Swept over every class mark in the works, not only the ones this lane wrote.
+  //
+  // ⚠ TRUED 2026-11-08 with POS-955: the parcel's two own-ground grants were the
+  // only scoped entries in the works, and they came out, so no scoped grant
+  // stands today. Until then this sweep's vacuity guard asserted it found at
+  // least one; it now asserts what it actually inspects (the rosters and their
+  // entries), and the flip that plants a scoped grant with no for: on the
+  // resident class (tools/reached-grants-flips.mjs) is what proves the rule bites.
   const roots = markFiles();
-  let scoped = 0;
+  let entries = 0;
   for (const rel of roots) {
     const text = readFileSync(rel, "utf8");
     const line = text.split("\n").find((l) => l.startsWith("actions:"));
     if (!line) continue;
     for (const a of JSON.parse(line.slice("actions:".length).trim())) {
+      entries += 1;
       if (a.scope == null) continue;
-      scoped += 1;
       assert.ok(a.for, `${rel}: "${a.action}" carries scope: ${a.scope} with no for: — an absent for: reads as RESIDENT`);
     }
   }
-  assert.ok(scoped > 0, "the sweep found at least one scoped grant — a guard that inspects nothing passes vacuously");
+  assert.ok(entries > 0, "the sweep read grant entries — a guard that inspects nothing passes vacuously");
 });
 
 // ── channel 3 · held ────────────────────────────────────────────────────────

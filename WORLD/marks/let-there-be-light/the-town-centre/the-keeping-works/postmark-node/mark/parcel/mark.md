@@ -4,10 +4,10 @@ by: the-town
 tier: constitution
 date: 2026-08-09
 class: parcel
-version: 3
+version: 4
 extends: sited
 implements: ["tools/marks-fold.mjs", "postmark-office src/world-apex.mjs — the ground-granted channel resolves a standpoint's marks to their classes and gathers this contract"]
-actions: [{"action": "walk", "for": "human", "scope": "own-ground", "residue": "the-town/depart"}, {"action": "say", "for": "human", "scope": "own-ground", "residue": "the-town/say"}]
+actions: []
 mobility: settled
 source: LOGOS/classes.md
 ---

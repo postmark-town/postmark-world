@@ -24,11 +24,11 @@
 // (The header used to document a `stake:mark:<id>` grammar the mint could never
 // produce — a read-side orphan, flagged 2026-07-23, closed by this pass.)
 
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, lstatSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { markStanding } from "./mark-standing.mjs";   // the ONE standing rule (see § what the rank is READ FROM)
-import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn, HELD_BY, OWNED_BY, ownedBy } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { instanceClassOf, isPredicate, kindIndexOf, isSitedIn, isGroundIn, isSparkIn, HELD_BY, OWNED_BY, ownedBy } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..");
@@ -391,6 +391,9 @@ export function frameMarks(out) {
 // mark never changes its id (stakes stay attached). Shared with mark-lint.mjs so
 // both read the world from disk the same way. Bad frontmatter is flagged on the
 // record (_error), never thrown, so one bad file can't blind the whole fold/lint.
+// Plain files only (POS-969): folders are read with lstat, so a symbolic link
+// (mode 120000) is never walked into, and a `mark.md` that isn't a plain file
+// is flagged on its record the same way, never read.
 //
 // Every record comes back in WORLD coordinates whatever frame the files are
 // written in (see § the frame above) — `at` is world, `_fileAt` is what the file
@@ -460,7 +463,7 @@ export function loadTreeMarks(dir) {
   if (!existsSync(dir)) return out;
   for (const entry of readdirSync(dir)) {
     const p = join(dir, entry);
-    let st; try { st = statSync(p); } catch { continue; }
+    let st; try { st = lstatSync(p); } catch { continue; }
     if (!st.isDirectory()) continue;
     walkMarks(p, null, out); // v2: no household from the path; `by` comes from each mark's frontmatter
   }
@@ -474,7 +477,9 @@ function walkMarks(nodeDir, parentMarkId, out) {
     const slug = basename(nodeDir);
     let rec;
     try {
-      rec = parseRecord(readFileSync(join(nodeDir, "mark.md"), "utf8"), `${slug}/mark.md`);
+      const file = join(nodeDir, "mark.md");
+      if (!lstatSync(file).isFile()) throw new Error("not a plain file (the world reads plain files only)");
+      rec = parseRecord(readFileSync(file, "utf8"), `${slug}/mark.md`);
     } catch (e) {
       rec = { _error: e.message, body: "" };
     }
@@ -506,7 +511,7 @@ function walkMarks(nodeDir, parentMarkId, out) {
   for (const e of entries) {
     if (e === "mark.md") continue;
     const p = join(nodeDir, e);
-    let s; try { s = statSync(p); } catch { continue; }
+    let s; try { s = lstatSync(p); } catch { continue; }
     if (s.isDirectory()) walkMarks(p, thisId, out);
   }
 }
@@ -549,7 +554,7 @@ function loadStakes() {
 // mark-lint.mjs's `import { … rect, contains } from "./marks-fold.mjs"` is
 // unchanged. rects are centered on at, sized by extent) ----------
 export { rect, overlapArea, contains, marksContain, polygonOf, ringMatchesClaim } from "./geometry.mjs";
-import { rect, overlapArea, contains, marksContain, polygonOf, rectInsideRing } from "./geometry.mjs";
+import { rect, overlapArea, contains, marksContain, polygonOf, rectInsideRing, hasNoArea, pointsInside } from "./geometry.mjs";
 
 // a parcel's rect: its written rect, a missing or zero side filled from the
 // dials' standard parcel (the whole fold, `admitDelta` and `sovereignInResult`
@@ -583,12 +588,16 @@ export function placementParent(claim, marks, { worldScaleM = 50000 } = {}) {
   // ground by the class chain (G12): the fold is the record, so it asks the
   // lineage of the marks it holds, never the place as a proxy for it
   const kidx = kindIndexOf(marks);
+  // a spark frozen from a one-speaker room may be a point or a line, which an
+  // area test holds anywhere: ask where its points lie instead (WLD-173)
+  const pointLike = isSparkIn(claim, kidx) && hasNoArea(rect(claim));
   for (const m of marks) {
     if (!isGroundIn(m, kidx)) continue;
     const mr = rect(m), area = mr.w * mr.h;
     if (Math.max(mr.w, mr.h) >= worldScaleM) continue; // the world-root is the frame, never a parent → null means root
     if (area <= claimArea) continue;                    // a parent is strictly larger than its child (the fold's rule)
-    if (marksContain(m, claim) && area < bestArea) { best = m; bestArea = area; }
+    const holds = pointLike ? pointsInside(m, rect(claim)) : marksContain(m, claim);
+    if (holds && area < bestArea) { best = m; bestArea = area; }
   }
   return best ? best.id : null;
 }
@@ -646,7 +655,12 @@ export const worldRootOf = (marks) => marks.find((m) => leafSlugOf(m) === WORLD_
 export function containmentParentOf(mark, marks, root = worldRootOf(marks)) {
   const rootId = root?.id ?? null;
   if (rootId != null && mark.id === rootId) return null;
-  const geometric = isGroundIn(mark, kindIndexOf(marks));
+  // A spark stands in ground by geometry like any mark, so the standing walk
+  // reads its ground (home inside its own house's parcel, market on the
+  // commons) and its money rules are a mark's. It is never ground itself, so
+  // `placementParent` never offers it as anyone's container (WLD-173).
+  const kidx = kindIndexOf(marks);
+  const geometric = isGroundIn(mark, kidx) || (!!mark.at && isSparkIn(mark, kidx));
   // No self-exclusion needed and none paid for: `placementParent` requires a
   // parent to be STRICTLY larger than the claim, so a mark can never be its own
   // container, and neither can a twin sharing its rect. Filtering the array per
@@ -1001,7 +1015,7 @@ export const PARCEL_EXTENT_M = 25;
 // ── THE FIRST CLAIM, NOT THE LATEST DATE: claim-instant.mjs (POS-364 review,
 // 2026-10-08; POS-449). The claim order and the cap's law date read a record's
 // `claimed_at` first, its `date` only when it carries none.
-export { CLAIMED_AT_FIELD, claimInstant } from "./claim-instant.mjs";
+export { CLAIMED_AT_FIELD, claimInstant, FOOTPRINTS_FIELD, footprintsOf } from "./claim-instant.mjs";
 import { claimInstant } from "./claim-instant.mjs";
 
 export function compareClaimOrder(a, b) {
@@ -1358,7 +1372,7 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
         const up = smallestSitedAround(mk);
         if (up) parentOf.set(mk.id, up); else parentOf.delete(mk.id);
       }
-      if (isGround(mk) && consent.alone.has(containedBy.get(mk.id))) {
+      if ((isGround(mk) || (mk.at && isSparkIn(mk, KIDX))) && consent.alone.has(containedBy.get(mk.id))) {
         const up = containmentParentOf(mk, standing, root);
         containedBy.set(mk.id, up);
         mk._containedBy = up ?? null;
@@ -1717,6 +1731,10 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // mark carries — stops by mark id, departures, pace. tools/vessel.mjs derives
       // the vessel's position from THIS fold, never from a file.
       mechanic: mk.mechanic, top_m: mk.top_m, feature: mk.feature, points: mk.points,
+      // ground_m (WLD-97 part 2): the height a town mark holds the ground at
+      // (world-build.mjs § the ground the town shapes); undefined on every mark
+      // without one, so the published world is unchanged until one is written.
+      ground_m: mk.ground_m,
       timetable: mk.timetable,
       // entry (DEMO SLICE, step 5 — jetto/enter-exit-demo): the mark's standing
       // ENTRY LAW, the three-key clause the crossing reads at the threshold
@@ -1727,6 +1745,12 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // door. Undefined on every mark that has written none, so a world with no
       // entry laws serializes byte-identically.
       entry: mk.entry,
+      // A DOOR'S OWN FIELDS (WLD-253, ruled 2026-11-25): door is a class, and where it leads (`into`), where you land
+      // (`lands_at`) and what it asks to hold first (`requires`) are its own flat fields now, not entry's. Carried
+      // for the reason entry is: the passage, the page and the office read the door from the store. An instance's
+      // only (an edge class's own `requires` is its law, not a door's), and undefined on every mark that writes
+      // none, so a world without doors serializes as before.
+      ...(mk.kind !== "class" && mk.kind !== "property" ? { into: mk.into, lands_at: mk.lands_at, requires: mk.requires } : {}),
       // the bounty grammar (the board's notices — founder-ruled 2026-08-11)
       // rides the same carried-through lane: without these five in the store,
       // the board page can never see a notice — letter-posted or door-posted
@@ -1785,6 +1809,15 @@ export function fold({ marks, terrain, stakes, prev = null, tick = 0, dials = DI
       // them, the way `loot` is: undefined on every mark that wrote none, so a world with no such
       // thing serializes exactly as before.
       holder: mk.holder, capacity: mk.capacity, open: mk.open, portable: mk.portable,
+      // A SPARK'S OWN PARTS (WLD-173; CORE-70 calls 5, 9, 22, 23): the recounting, its time, its rooms,
+      // its circle and the circle's path (the spine its tree is read from), its event, picture, image
+      // prompt, acts, who was there, and the maker's own optional link. Carried as the record says them,
+      // the way `holder` is: undefined on every mark that wrote none, so a world with no sparks
+      // serializes exactly as before. tools/spark.mjs § SPARK_FIELDS is the list; spark.test.mjs holds
+      // this line to it.
+      recounting: mk.recounting, experienced_at: mk.experienced_at, experienced_until: mk.experienced_until,
+      rooms: mk.rooms, circle: mk.circle, circle_path: mk.circle_path, event: mk.event, picture: mk.picture,
+      image_prompt: mk.image_prompt, acts: mk.acts, present: mk.present, parent_spark: mk.parent_spark,
       // WHO HOLDS IT, for a thing printed as held (POS-688): published but unplaced, so it carries
       // no `at` and the record names its holder instead. Undefined on every placed mark.
       [HELD_BY]: mk[HELD_BY],

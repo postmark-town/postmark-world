@@ -74,11 +74,14 @@ test("the reader sees none: the real four class records, read by the real creatu
 test("the chapel door keeps its passage and asks for nothing", () => {
   const text = read(DOOR_FILE);
   const rec = parseRecord(text, DOOR_FILE);
-  assert.deepEqual(rec.entry, {
-    word: "neutral",
+  // re-kinded to door by the town (WLD-253): its into and lands_at are its own fields now, its word stays in entry
+  assert.equal(rec.kind, "door");
+  assert.deepEqual(rec.entry, { word: "neutral" }, "the word is as it was, and entry holds nothing else");
+  assert.deepEqual({ into: rec.into, lands_at: rec.lands_at }, {
     into: "wright/spire-star-chapel",
     lands_at: "wright/spire-star-chapel-to-hall-of-keepers",
-  }, "word, into and lands_at are as they were, and there is nothing else");
+  }, "into and lands_at are as they were");
+  assert.equal("requires" in rec, false);
   assert.equal("requires" in rec.entry, false);
   assert.doesNotMatch(text, /requires/, "no requirement anywhere in the file");
 });
@@ -110,8 +113,9 @@ const DOOR = "tower/inner-door";
 const HOLDERS = ["tower/holder-1", "tower/holder-2", "tower/holder-3"];
 const ASKS = ["tower/token-a", "tower/token-b", "tower/token-c"];
 const LOCK = { holds: ASKS, in: HOLDERS, at: "settlement" };
-const door = (requires) => ({ id: DOOR, kind: "thing", by: "tower", at: { x: 0, y: 0 }, extent: { w: 2, h: 2 }, body: "A door.",
-  entry: { word: "neutral", into: "tower/room", ...(requires ? { requires } : {}) } });
+// a door, the town's, its fields its own (WLD-253)
+const door = (requires) => ({ id: DOOR, kind: "door", by: "the-town", at: { x: 0, y: 0 }, extent: { w: 2, h: 2 }, body: "A door.",
+  entry: { word: "neutral" }, into: "tower/room", ...(requires ? { requires } : {}) });
 const tokens = () => ASKS.map((id, i) => ({ id, kind: "thing", by: "the-town", body: "A token.", held_by: HOLDERS[i] }));
 const WAITING = { id: "creature:candied-jetto-den", after_door: DOOR };
 

@@ -151,6 +151,7 @@ still written `kind: sited` + `class: thing` that `class:` folds into `kind:`.
 | `points` (reserved²) | opt | opt | — | — |
 | `far` (horizon object) | opt (the-town) | — | — | — |
 | `feature: <skeleton-id>` | opt (the-town, or the household a terrain mark has passed to) | — | — | — |
+| `ground_m: <m>` or `[lo, hi]` | — (a landform's own property: § `kind: landform`) | — | — | — |
 | `mechanic: <registry-id>`³ | opt | opt | opt | opt |
 | `timetable`⁵ | opt | opt | opt | opt |
 | `consent: { <mark id>: <word> }`⁶ | opt | opt | — | — |
@@ -225,6 +226,16 @@ sets, irregular shapes, FOV and fan-up over them — is a **filed PULSE follow-u
 not tonight. A mark that carries `points:` today gains fine honoring later with
 **no record change**.
 
+**The outline cap (WLD-196; ruled by Darko 2026-11-17/18).** A mark's 2D
+map-footprint outline (`points:`) holds at most **256 points** — the
+`outline-point-cap` dial, a locked constitution property of `mark` in the Keeping
+Works; this is not a limit on 3D geometry, and not a vertex or detail budget for a
+3D `form:`. A parcel keeps its own `extent_m` dial. **No size cap is set on a
+resident's common-ground mark for now:** the town may declare opposed any mark, a
+parcel included, that is obnoxious or deliberately obstructive, at its discretion
+until enough cases support a published guideline; the town's opposed removes the
+mark at the next settlement.
+
 **`face` — the reserved predicated slot, universal (2026-08-14, the classes
 sitting).** Any mark may carry one predicated child `slot: face, value: <asset
 path in the author's own space>` — its art. The slot is universal; the value is
@@ -240,6 +251,34 @@ class dials.
 (the precise geometry in `skeleton.json`) are joined by a field, not a
 convention. The engine can follow it to the precise geometry later; nothing
 consumes it tonight.
+
+**`kind: landform` — the ground the town shapes (WLD-97, ruled by Darko
+2026-10-22; the class 21:03–21:04).** A landform is its own class, `the-town/landform`:
+it extends `mark` directly, a sibling of `sited`, and it only shapes the ground the
+heightfield reads. It is never sited and never ground, so it takes no part in
+containment (nothing nests in it, it nests in nothing), and every sited reader
+passes it by. Its own properties are `at`, `extent` (or a `points` ring),
+`feature`, and **`ground_m: <m>`** (the height its ground is held at) or
+**`ground_m: [lo, hi]`** (the range it is held to). No other mark carries `ground_m`;
+the lint refuses it on one.
+- **Written only as `kind: landform`.** The old spelling (`kind: sited` with a `class: landform` line) is refused, not folded: the office reads it as the sited mark its `kind:` names.
+- **Only the town makes one** (the class answers `makers: false`), and **it never
+  passes to a household**: a commit that moves its `by:` is refused at the gate.
+- **Its value sits inside its region's band.** The region is its nearest region
+  anchor (`skeleton.json § elevation.regions`).
+- **Its outline stays in that region** (ruled 20:44): its whole `points` ring, or
+  else its extent.
+- **Water carves** (ruled 18:54): a landform linked by `feature:` to a water body
+  that carries `surface_m` is held between that surface and the region's top.
+- **In the heightfield** it is a control point whose reach is its own extent: held at
+  its centre and faded to nothing at the edge of the ellipse inside its w × h, so no
+  ground outside it moves. Linked to its water, it is **held to the shore** (G6,
+  19:55): full weight out to that water's edge, fading only from the shore. Inside a
+  surfaced lake under its reach, the water's surface wins.
+- Whether a resident may shape their own ground waits for the terraforming sitting.
+
+The rule is `tools/world-build.mjs § groundStands`, read by both the lint and the
+heightfield.
 
 **A terrain mark may pass to a household, and the link goes with it
 (founder-ruled 2026-09-10: *"the inlet is terrain; everything else is just a
@@ -367,6 +406,84 @@ with its *own* tools and the migrated tree with these, and compares every mark's
 world position, extent and ring. **A writer that emits a world coordinate into a
 nested record is now wrong**; take the target's `_origin` and write
 `worldToFile(at, _origin)`.
+
+### First-laid facts: `claimed_at` and `footprints` (POS-449, POS-571)
+
+Two lines a record may carry, both **printed by the office from its store**,
+never authored by a resident. They are when the mark was laid, which decides who
+may oppose whom (LOGOS conflict-matrix § Roles from seniority):
+
+```yaml
+claimed_at: 2026-08-01T00:00:00Z
+footprints: [{"since":"2026-08-01T00:00:00Z","at":{"x":1000,"y":2000},"extent":{"w":100,"h":100}},{"since":"2026-08-20T00:00:00Z","at":{"x":1050,"y":2000},"extent":{"w":200,"h":100}}]
+```
+
+- **`claimed_at`** is the instant of the mark's **first** claim, the start of its
+  claim chain. An amend re-dates `date` but never this (Darko, 2026-10-07: *"an
+  amend does not make an elder mark young"*). Absent, the mark's age is its `date`
+  (`tools/claim-instant.mjs § claimInstant`).
+- **`footprints`** is every footprint the mark has stood on: its origin, then each
+  successful amend that changed its geometry, each with the instant it took
+  effect (`since`). It is one line of strict JSON, oldest first, and each entry is
+  `{ since, at, extent, points? }`. **Its positions are WORLD numbers whatever the
+  tree's frame**: a past footprint has no parent to be an offset from, so
+  `loadMarks` never reframes it. With it, seniority at contact is read **cell by
+  cell** on the ground two marks share: whoever first covered a cell is that
+  cell's incumbent, and an expansion is a newcomer on its new cells
+  (`tools/consent.mjs § seniorAtContact`). Absent, or with any entry that does not
+  read whole, every cell is dated by the one instant above, as before.
+
+### A spark: `kind: spark` (WLD-173; LOGOS/classes.md § The spark)
+
+A spark files at its id, writes `kind: spark` (never the old form `kind: sited` +
+`class: spark`, which the lint refuses), and carries `at` and `extent` as its
+place, but **it is neither sited nor anchored**. It writes no `parent:` (that is the
+predicate's edge), no `slot`/`value`, and no `consent:`. The fold gives it the
+ground it stands in, never makes it anyone's container, and keeps it out of the
+market's contest (`tools/consent.mjs § IN THE MARKET`). Its body is its headline
+(≤ 150 characters). Its parts are flat fields, checked by `tools/spark.mjs`:
+
+```yaml
+kind: spark
+at: {x: 1000, y: 2000}
+extent: {w: 120, h: 120}
+recounting: We sang the ferry song until the lamps came on.
+experienced_at: 2026-11-14T20:03:00Z
+experienced_until: 2026-11-14T20:41:00Z
+rooms: ["<the circle's source room id>"]
+circle: 50102
+circle_path: [50101, 50102]
+present: ["<household id>", "<household id>"]
+parent_spark: pica/the-lamp-song
+```
+
+- **Required:** `recounting`, `experienced_at`, and the place (`at`, `extent`): four
+  finite numbers as written, the sides 0 or more. A missing, null or quoted value is
+  refused, never defaulted or coerced.
+- **Its time:** `experienced_at` and the optional `experienced_until` are the moment
+  itself: an event's window, a circle's first to last say, or for a spark tied to
+  neither, its maker's stated start and end. `date` stays when it was made.
+- **The room:** `rooms` is one line of strict JSON, a list of **at most one** room id:
+  a circle's spark its source room, an event's spark the one room it is for ("each
+  room gets its own spark", 04:11Z). A list of several rooms is refused, never
+  combined or cut to its first. A singular `room:` is refused: it has no alias, and
+  is never read as no room.
+- **The place:** its room's, frozen when made: the centre and the sides of the room's
+  absolute bounds `{x0, y0, x1, y1}` (`tools/spark.mjs § roomsPlace`, given the one
+  room's bounds as a list of one), never the room's display point. A one-speaker
+  room's bounds may keep a zero side (a point or a line) and are kept so, with no
+  padding; such a spark is placed by where its points lie. With no `rooms`, or an
+  empty list, its `extent` is the locked circle, twice `the-town/spark-radius` (60 m),
+  about the maker's `at`. An unknown room is not "no room".
+- **`present`:** the households with a public act at the place in its window (CORE-70
+  call 4), as the Office spells a household.
+- **The circle:** `circle` (a say's act number) needs `circle_path` (its ancestry,
+  top circle first, ending at `circle`) and `rooms` naming its one source room.
+- **Lists** (`rooms`, `circle_path`, `acts`, `present`) are one line of strict JSON, the lane
+  `points` and `timetable` use. **Text** fields are one line: no newline, nothing
+  after a `#` (the reader takes it as a comment), and none opening with `{` or `[`.
+- **`parent_spark`** names one spark, `<by>/<slug>`: the maker's own link, never its
+  place in the tree, which is read from `circle_path`.
 
 ## The body
 

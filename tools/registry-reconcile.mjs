@@ -18,16 +18,14 @@
 // half, postmark-world#208), and a mark that walks home or constitution is
 // never unpublished whatever its row says. A second copy of standing written
 // into the data would be two sources of truth, which is the bug (Darko,
-// 10-14). The one place the stored class still decides is a row stored home
-// whose mark now walks commons (never swept today); that is WLD-51's.
+// 10-14). Since WLD-51's G2 (Darko, 2026-10-15 12:59) the stored class decides
+// in neither direction: a home row whose mark walks market is taken at ✦0 too.
 //
-// One bound: a stale row is repaired only when the repair makes the sweep take
-// NOTHING it would not take today. A stale row is never swept today (its path
-// is not on main). Repointed, a row stored commons whose mark walks commons
-// would become sweepable at zero escrow: that is the founder's call (WLD-51),
-// and such a row is HELD, listed by name, never written. Every other stale row
-// is safe to repoint: a stored home or constitution row is never swept, and a
-// mark that walks home is kept by the walk.
+// NO ROW IS HELD ANY MORE. This verb used to hold back a stale row stored
+// commons whose mark walks commons, because repointing it made a ✦0 market mark
+// sweepable that the stale path hid. Darko ruled the 13 such rows on 10-14
+// 14:51: "just take them ... the sweep reaches them like any other ✦0 commons
+// mark". So every stale row follows its file, and the sweep judges it there.
 //
 // A row whose mark no longer stands and has no filing is removed. A row whose
 // mark stands but whose filing cannot be found (or is found twice) is left as
@@ -43,7 +41,6 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMarks } from "./marks-fold.mjs";
-import { rowClassOf } from "./unpublish-verdict.mjs";
 
 export const REGISTRY_REL = "WORLD/settlement-publications.json";
 
@@ -53,10 +50,10 @@ export const REGISTRY_REL = "WORLD/settlement-publications.json";
  * @param filingOf   `(id) => "WORLD/marks/…/mark.md" | null` — where the mark is filed now (null: none, or ambiguous).
  * @param tierOf     `(id) => tier | undefined` — the mark's derived standing on main; undefined when it does not stand.
  * @param pathExists `(path) => boolean` — is a registered path in the tree? A row whose path is, is left alone.
- * @returns `{ repairs, removed, held, unresolved }`, each a list of `{ id, from, to?, why }` in registry order.
+ * @returns `{ repairs, removed, unresolved }`, each a list of `{ id, from, to?, why }` in registry order.
  */
 export function reconcilePlan(published, { filingOf, tierOf, pathExists }) {
-  const repairs = [], removed = [], held = [], unresolved = [];
+  const repairs = [], removed = [], unresolved = [];
   for (const [id, row] of Object.entries(published ?? {})) {
     const from = { path: row.path, class: row.class };
     if (pathExists(row.path)) continue;   // not stale: the sweep's walk judges it at every crossing
@@ -69,17 +66,12 @@ export function reconcilePlan(published, { filingOf, tierOf, pathExists }) {
     }
     if (!filed) { unresolved.push({ id, from, why: "the mark stands but no single filing answers to its id; left as it is" }); continue; }
     const to = { path: filed, class: from.class };   // the class is never written: see the header
-    const walks = rowClassOf(tier);
-    if (from.class === "commons" && walks === "commons") {   // repointed, it would be sweepable at zero escrow
-      held.push({ id, from, to, walks: tier, why: "WLD-51: repointing it would make a zero-escrow commons mark sweepable; the founder rules first" });
-      continue;
-    }
     repairs.push({ id, from, to, walks: tier, why: "path" });
   }
-  return { repairs, removed, held, unresolved };
+  return { repairs, removed, unresolved };
 }
 
-/** Apply a plan to the registry document; returns a new document. Held and unresolved rows are untouched. */
+/** Apply a plan to the registry document; returns a new document. Unresolved rows are untouched. */
 export function applyPlan(doc, plan) {
   const published = { ...doc.published };
   for (const r of plan.repairs) published[r.id] = { ...published[r.id], path: r.to.path };
@@ -115,7 +107,6 @@ if (resolve(process.argv[1] ?? "") === resolve(fileURLToPath(import.meta.url))) 
   console.log(`${write ? "" : "DRY RUN · "}${Object.keys(doc.published).length} registry rows`);
   console.log(`repaired: ${plan.repairs.length}`); plan.repairs.forEach((r) => console.log(line(r)));
   console.log(`removed: ${plan.removed.length}`); plan.removed.forEach((r) => console.log(line(r)));
-  console.log(`HELD for WLD-51: ${plan.held.length}`); plan.held.forEach((r) => console.log(line(r)));
   console.log(`unresolved: ${plan.unresolved.length}`); plan.unresolved.forEach((r) => console.log(line(r)));
   if (write && (plan.repairs.length || plan.removed.length))
     writeFileSync(join(repo, REGISTRY_REL), `${JSON.stringify(applyPlan(doc, plan), null, 2)}\n`);

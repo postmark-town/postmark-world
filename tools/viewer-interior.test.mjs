@@ -385,7 +385,7 @@ test("THE ROOF IS AT THE SOURCE: drawWalkers iterates the scene's set, never the
   // becomes a glyph and cannot be hit, hovered, or chosen either. A filter
   // applied afterwards would leave all three of those alive.
   const SOURCE = read("spectator/viewer.mjs");
-  const from = SOURCE.indexOf("function drawWalkers()");
+  const from = SOURCE.indexOf("function drawWalkers(");   // (live = null) since WLD-243: the tick's frame answer, or the draw takes its own
   assert.ok(from > 0, "drawWalkers must be findable for this guard to mean anything");
   const rest = SOURCE.slice(from);
   const to = rest.indexOf("\n  function ", 10);

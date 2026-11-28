@@ -7,7 +7,10 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { fold, parseRecord, isValidMarkDate, placementParent, lossyValues, lossyMessage } from "./marks-fold.mjs";
+import { fold, parseRecord, isValidMarkDate, placementParent, lossyValues, lossyMessage, loadTreeMarks } from "./marks-fold.mjs";
+import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 test("isValidMarkDate accepts day precision AND full ISO 8601 datetime (world-write rung)", () => {
   for (const ok of ["2026-07-23", "2026-07-23T14:30:00", "2026-07-23T14:30:00Z",
@@ -209,4 +212,39 @@ test("a thing's own holding word (holder, capacity, open, portable) is published
   assert.deepEqual(word(out["sb-ash/a-tin-box"]), ["true", 4, undefined, undefined], "the W2 form, and only the words it wrote");
   for (const id of ["sb-ash/a-pebble", "the-town/let-there-be-light"])
     for (const k of ["holder", "capacity", "open", "portable"]) assert.ok(!(k in out[id]), `${id} grows no ${k} key`);
+});
+
+// POS-969: plain files only. Folders are read with lstat, so a symbolic link
+// is never walked into, and a mark.md that isn't a plain file is flagged on
+// its record, never read. Needs a machine that can make links (a Windows box
+// without the privilege skips).
+test("the tree loader reads plain files only: a linked mark.md is flagged, a linked folder is not walked", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "marks-plain-"));
+  const link = (target, at, type) => {
+    try { symlinkSync(target, at, type); return true; }
+    catch (e) { if (e.code === "EPERM") { t.skip("this machine cannot make symlinks"); return false; } throw e; }
+  };
+  const mark = (by) => `---\nkind: sited\nby: ${by}\ndate: 2026-11-08\nat: { x: 0, y: 0 }\nextent: { w: 1, h: 1 }\n---\n\nA plain mark.\n`;
+  try {
+    const marks = join(root, "marks");
+    const away = join(root, "away");
+    mkdirSync(join(away, "far-mark"), { recursive: true });
+    writeFileSync(join(away, "far-mark", "mark.md"), mark("away"));
+    mkdirSync(join(marks, "alice", "plain-mark"), { recursive: true });
+    writeFileSync(join(marks, "alice", "plain-mark", "mark.md"), mark("alice"));
+    mkdirSync(join(marks, "alice", "linked-mark"), { recursive: true });
+    if (!link(join(away, "far-mark", "mark.md"), join(marks, "alice", "linked-mark", "mark.md"), "file")) return;
+    if (!link(join(away, "far-mark"), join(marks, "alice", "linked-folder"), "dir")) return;
+    if (!link(away, join(marks, "bob"), "dir")) return;
+
+    const got = loadTreeMarks(marks);
+    assert.deepEqual(got.filter((m) => !m._error).map((m) => m.id), ["alice/plain-mark"]);
+    const flagged = got.filter((m) => m._error);
+    assert.equal(flagged.length, 1, "only the linked mark.md is flagged");
+    assert.equal(flagged[0].slug, "linked-mark");
+    assert.match(flagged[0]._error, /not a plain file/);
+    assert.ok(!got.some((m) => m.slug === "far-mark"), "neither linked folder is walked into");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

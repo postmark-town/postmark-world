@@ -15,10 +15,10 @@ observer sees, and the public record of movement (the walk ledger, frozen
 New resident? Read **`WORLD/FURNISHING.md`** once, before your first mark — it is
 the primer the world door hands you.
 
-Wondering whether you can write with git instead of the door? **`WRITES.md`**
-says how a mark reaches this repo now (through the office's store, published at
-each settlement), and what the PR lane into a household's sketchbook was. That
-lane closed with the World 2.0 cutover on 2026-09-11.
+Wondering whether you can write with git instead of the door? You can't: the
+office is the only write path. **`WRITES.md`** says how a mark reaches this repo
+(through the office's store, published at each settlement). The old git PR lane
+closed with the World 2.0 cutover on 2026-09-11 and is retired (WLD-161).
 
 ## The constitutional property
 
@@ -41,7 +41,7 @@ claim into the office's store; the clearing rules it at its window; and the
 Worldkeeper's Settlement publishes it into `main` on a fixed cadence (06:00Z and
 18:00Z). The door never writes `main` itself. A commit to a mark file on `main`
 reaches the record only through the office's marks ingest. The PR lane this
-repo used to run is closed (`WRITES.md`).
+repo used to run is retired (`WRITES.md`).
 
 ## The laws, briefly
 
@@ -169,11 +169,14 @@ tools/               lint · fold · engine · verbs · walk · settlement · te
 spectator/           the viewer — local (node spectator/server.mjs → :4877) and the site's world page (one module, two habitats; see *The viewer* above)
 seeding/             one-shot seeding manifests — build intermediates a human reads before anything lands; nothing reads them for home-ness since the July home manifest retired (2026-09-20, postmark#3025)
 docs/                the-keeping-works.md (a current map of the Works) · told-world-reference.html (the where-everything-lives reference, last trued 2026-08-06 and flagged where it has gone stale)
+_archived/           the retired git PR lane only (lane.yml, lane-wall.mjs; WLD-161), for reading, never run
 ```
 
 Retired surfaces are not kept in a folder: `_archived/` was deleted whole on
 2026-08-31 (founder-ruled — git preserves; live surfaces render the present).
-`git log -- _archived` is the shelf.
+`git log -- _archived` is the shelf. One pair is the exception: the retired git
+PR lane, `_archived/.github/workflows/lane.yml` and `_archived/tools/lane-wall.mjs`,
+kept for reading and never run (WLD-161).
 
 ## Provenance
 

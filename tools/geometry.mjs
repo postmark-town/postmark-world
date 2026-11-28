@@ -200,6 +200,20 @@ export function rectInsideRing(ring, r) {
   }
   return true;
 }
+// A RECT WITH NO AREA — a point, or a line — is held by `contains` anywhere,
+// since 0 >= 0.99 × 0, and it overlaps nothing by area. A spark frozen from a
+// one-speaker room keeps such a box as its room's bounds, with no padding
+// (WLD-173, the Office's 16:26Z wire answer). For it, ask where its points lie,
+// with the point and ring primitives above, instead of by area.
+export const hasNoArea = (r) => !(r.w > 0 && r.h > 0);
+/** Is every point of `r` (a rect, possibly with no area) inside `outer`: its ring when it has one, else its box, edges included? */
+export function pointsInside(outer, r) {
+  const ring = polygonOf(outer);
+  if (ring) return rectInsideRing(ring, r);
+  const o = rect(outer);
+  return rectCorners(r).every((c) => pointInRect(c.x, c.y, o));
+}
+
 // Do two rings share any ground at all? EXACT, and deliberately not an area:
 // two simple polygons are disjoint exactly when no edge of one crosses an edge
 // of the other AND neither holds a vertex of the other. An area test would need
@@ -229,18 +243,90 @@ export function segmentsCross(p1, p2, p3, p4) {
   return ((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0));
 }
 
+// ── THE BOX PRECHECK (POS-1219) ─────────────────────────────────────────────
+//
+// Prod's main thread spent 43% of its busy time in marksContain's per-cell ring
+// test (the office's 60 s CPU profile, 2026-11-24 17:51Z): every look at a point
+// inside Pando Plains (a 28-vertex ring of ~8.2M cells, past the rasterize cap)
+// asked whether the region it stands in is inside the plains, and answered by
+// parsing and ray-casting every one of that region's cells; and every chain's last
+// step asked the same of the town's frame, cell by cell, against a rect. Each
+// such cell's answer was already settled by a box: the cells all lie in a box, and
+// a box wholly inside the outer (or wholly outside it) settles every cell at once.
+//
+// EXACT, NOT APPROXIMATE. Each verdict below is only given where the per-cell
+// test would give the same answer for every cell, so marksContain answers what it
+// answered before, byte for byte (tools/containment-box.test.mjs holds it, against
+// `exhaustive: true`, the old per-cell path, kept for that comparison):
+//   · where a cell centre can lie: inside its rect, exactly as rasterizeRect admits
+//     it; or inside its ring's bounding box, give or take BOX_EPS (pointInPolygon
+//     is true only between an edge's ends in y, exactly, and left of the edge's
+//     computed crossing in x, which rounds by far less than BOX_EPS);
+//   · a point strictly above or below a ring's box crosses no edge, so it is
+//     outside; one more than BOX_EPS left of it crosses every edge spanning its y,
+//     an even number, so it is outside; one more than BOX_EPS right of it crosses
+//     none, so it is outside;
+//   · a box that no ring edge comes within BOX_EPS of lies wholly on one side of
+//     the ring, and every point in it is far enough from every edge that the
+//     ray-cast's rounding cannot change its answer, so every point answers as the
+//     box's centre answers.
+const BOX_EPS = 1e-6; // metres: far above the ray-cast's rounding at town scale (~1e-11 m), far below a 5 m cell
+/** The box every coverage cell centre of `mark` lies in, or null when there is none to be had (a feature swath). */
+function centresBox(mark, feature) {
+  const ring = polygonOf(mark);
+  if (ring) { const b = polygonBBox(ring); return { x0: b.minx - BOX_EPS, x1: b.maxx + BOX_EPS, y0: b.miny - BOX_EPS, y1: b.maxy + BOX_EPS }; }
+  if (hasFeatureLine(feature)) return null;
+  const r = rect(mark);
+  return { x0: r.x - r.w / 2, x1: r.x + r.w / 2, y0: r.y - r.h / 2, y1: r.y + r.h / 2 };
+}
+/** Does segment a–b come within the (closed) box at all? Liang–Barsky clipping, so a vertex inside it counts too. */
+function segmentMeetsBox(a, b, box) {
+  let t0 = 0, t1 = 1;
+  const dx = b.x - a.x, dy = b.y - a.y;
+  for (const [p, q] of [[-dx, a.x - box.x0], [dx, box.x1 - a.x], [-dy, a.y - box.y0], [dy, box.y1 - a.y]]) {
+    if (p === 0) { if (q < 0) return false; continue; }
+    const t = q / p;
+    if (p < 0) { if (t > t1) return false; if (t > t0) t0 = t; } else { if (t < t0) return false; if (t < t1) t1 = t; }
+  }
+  return true;
+}
+/**
+ * Every point of `box` against `outer`: "in" (inside the outer, every one), "out" (outside it, every one), or null (the box straddles it, or the outer
+ * is answered by its coverage set: count cell by cell). `outer` is a mark, with its ring when it has one; a feature swath answers null.
+ */
+export function boxVerdict(outer, box, { outerFeature = null } = {}) {
+  if (!box) return null;
+  const ring = polygonOf(outer);
+  if (ring) {
+    const bb = polygonBBox(ring);
+    if (box.x1 < bb.minx - BOX_EPS || box.x0 > bb.maxx + BOX_EPS || box.y1 < bb.miny || box.y0 > bb.maxy) return "out";
+    const near = { x0: box.x0 - BOX_EPS, x1: box.x1 + BOX_EPS, y0: box.y0 - BOX_EPS, y1: box.y1 + BOX_EPS };
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) if (segmentMeetsBox(ring[j], ring[i], near)) return null;
+    return pointInPolygon((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2, ring) ? "in" : "out";
+  }
+  if (hasFeatureLine(outerFeature)) return null;
+  const r = rect(outer);
+  const L = r.x - r.w / 2, R = r.x + r.w / 2, B = r.y - r.h / 2, T = r.y + r.h / 2; // pointInRect's own expressions
+  if (box.x0 >= L && box.x1 <= R && box.y0 >= B && box.y1 <= T) return "in";
+  if (box.x1 < L || box.x0 > R || box.y1 < B || box.y0 > T) return "out";
+  return null;
+}
+
 // marksContain(outer, inner) — containment that HONORS TRUE SHAPE. Regular vs
 // regular delegates to the analytic `contains` (byte-identical). Otherwise it is
 // a cell-set op: ≥`frac` of the inner's coverage cells fall inside the outer
 // (outer rect tested analytically per cell; outer irregular tested by membership
 // in its coverage set). Falls back to analytic bbox if a coverage set would be
 // intractable — never blocks, never lies more coarsely than the old bbox rule.
-export function marksContain(outer, inner, { cell = COVERAGE_CELL_M, outerFeature = null, innerFeature = null, frac = 0.99 } = {}) {
+// `exhaustive: true` skips the box precheck (POS-1219) and counts every cell, as
+// before it: the comparison the precheck is held to, never a caller's need.
+export function marksContain(outer, inner, { cell = COVERAGE_CELL_M, outerFeature = null, innerFeature = null, frac = 0.99, exhaustive = false } = {}) {
   const oIrr = isIrregular(outer, outerFeature), iIrr = isIrregular(inner, innerFeature);
   if (!oIrr && !iIrr) return contains(rect(outer), rect(inner));
   const innerCells = coverage(inner, { cell, feature: innerFeature });
   if (!innerCells) return contains(rect(outer), rect(inner)); // inner too big to rasterize → analytic
   let inOuter;
+  let boxed = false; // POS-1219: the outer is one the box precheck may settle (a ring past the rasterize cap, or a rect)
   if (oIrr) {
     const outerCells = coverage(outer, { cell, feature: outerFeature });
     if (outerCells) inOuter = (k) => outerCells.has(k);
@@ -253,14 +339,20 @@ export function marksContain(outer, inner, { cell = COVERAGE_CELL_M, outerFeatur
       // meant to end. A ring is exact, so test cell centres against it directly.
       const ring = polygonOf(outer);
       if (!ring) return contains(rect(outer), rect(inner)); // a feature-line outer, no ring: unchanged
+      const bb = polygonBBox(ring);
       inOuter = (k) => {
         const [cx, cy] = k.split(",").map(Number);
-        return pointInPolygon(cellCenter(cx, cell), cellCenter(cy, cell), ring);
+        const px = cellCenter(cx, cell), py = cellCenter(cy, cell);
+        // POS-1219: a centre strictly outside the ring's box (by BOX_EPS in x) is outside the ring, with no ray-cast (§ THE BOX PRECHECK)
+        if (!exhaustive && (px < bb.minx - BOX_EPS || px > bb.maxx + BOX_EPS || py < bb.miny || py > bb.maxy)) return false;
+        return pointInPolygon(px, py, ring);
       };
+      boxed = true;
     }
   } else {
     const ro = rect(outer);
     inOuter = (k) => { const [cx, cy] = k.split(",").map(Number); return pointInRect(cellCenter(cx, cell), cellCenter(cy, cell), ro); };
+    boxed = true;
   }
   // A mark SMALLER THAN A CELL can own no cell centre at all — a 1 m bowl at the
   // foot of the quay steps rasterizes to the empty set — and an empty set is not
@@ -287,6 +379,13 @@ export function marksContain(outer, inner, { cell = COVERAGE_CELL_M, outerFeatur
   // per cell, and placementParent asks this of every candidate parent for every
   // mark, so a non-contained inner must fail fast rather than ray-cast 120k cells.
   const allowedMisses = Math.floor(innerCells.size * (1 - frac));
+  // POS-1219: the box every cell centre lies in, settled against the outer in one step when it can be (§ THE BOX PRECHECK). "in": every cell is
+  // covered, which the count below answers as size/size >= frac; "out": none is, which it answers false once the misses pass allowedMisses, else 0 >= frac.
+  if (boxed && !exhaustive) {
+    const verdict = boxVerdict(outer, centresBox(inner, innerFeature), { outerFeature });
+    if (verdict === "in") return 1 >= frac;
+    if (verdict === "out") return innerCells.size > allowedMisses ? false : 0 >= frac;
+  }
   let covered = 0, missed = 0;
   for (const k of innerCells) {
     if (inOuter(k)) covered++;

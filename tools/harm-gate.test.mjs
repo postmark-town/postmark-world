@@ -11,7 +11,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlin
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { harmGate, harmGateOnSnapshots, defaultBase } from "./harm-gate.mjs";
+import { harmGate, harmGateOnSnapshots, defaultBase, judge, MASS_TAKE, MASS_TAKE_OK_ENV } from "./harm-gate.mjs";
 import { snapshotFromTree } from "./marks-fold.mjs";
 import { withTool } from "./engine-files.mjs";
 import { exportSnapshot } from "./snapshot-export.mjs";
@@ -76,7 +76,7 @@ test("a lawful crossing is NO HARM: a mark returns with the sweep saying so, and
   assert.equal(defaultBase(f.repo), "HEAD~1", "HEAD is a settlement commit, so the base is its parent");
   const out = harmGate({ repo: f.repo, sweep: { unpublished: [{ id: "alice/the-lamp" }] }, stakes: f.stakesPath });
   assert.equal(out.ok, true, JSON.stringify(out.checks.filter((c) => !c.ok)));
-  assert.deepEqual(out.checks.map((c) => c.name), ["lint", "moved", "lost", "escrow", "parcels"]);
+  assert.deepEqual(out.checks.map((c) => c.name), ["lint", "moved", "lost", "escrow", "parcels", "takes"]);
   assert.equal(out.before, 6); assert.equal(out.after, 5);
 });
 
@@ -206,6 +206,12 @@ test("THE 09-16 RETURN, REPLAYED: fifty lawful returns are no harm; one return t
   git("add", "-A");
   git("-c", "user.name=fixture", "-c", "user.email=fixture@test.invalid", "commit", "-q", "-m", `settlement: sweep 0 published, ${left.length} unpublished, ${kept.length} left drafted, 0 withdrawn, 0 quarantined, 0 dropped, 0 re-framed`);
   const report = { unpublished: left.map(([id]) => ({ id })) };
+  // A return this size is a mass take (check 6, WLD-51): it holds for a keeper,
+  // and the 09-16 one had its keeper (Keemin ruled it 09-11, his go 09-15).
+  const held = harmGate({ repo: scratch, sweep: report, lint: false });
+  assert.deepEqual(held.checks.filter((c) => !c.ok).map((c) => c.name), ["takes"], "without the keeper's receipt, only the ceiling speaks");
+  process.env[MASS_TAKE_OK_ENV] = "keemin, the 09-16 return (ruled 09-11, go 09-15)";
+  t.after(() => { delete process.env[MASS_TAKE_OK_ENV]; });
   const green = harmGate({ repo: scratch, sweep: report, lint: false });
   assert.equal(green.ok, true, JSON.stringify(green.checks.filter((c) => !c.ok)));
   t.diagnostic(`${left.length} returned and ${kept.length} kept over ${green.before} marks: no harm`);
@@ -298,4 +304,49 @@ test("REHEARSAL PAIR: the before-export is read at its commit, and the gate prin
   const clean = harmGateOnSnapshots({ repo: f.repo, before: after, after, acts: {}, stakes: f.stakesPath, lint: false });
   assert.equal(clean.ok, true, JSON.stringify(clean.checks.filter((c) => !c.ok)));
   assert.match(clean.base, /^the working tree at [0-9a-f]{40}$/);
+});
+
+// ── 6 · THE MASS-TAKE CEILING (WLD-51, the belt for G2) ─────────────────────
+
+const takes = (home, commons) => [
+  ...Array.from({ length: home }, (_, i) => ({ id: `h/home-${i}`, household: "house-h", class: "home", walked: "commons" })),
+  ...Array.from({ length: commons }, (_, i) => ({ id: `c/commons-${i}`, household: "house-c", class: "commons", walked: "commons" })),
+];
+const takesCheck = (unpublished, massTakeOk = null) =>
+  names(judge({ before: new Map(), after: new Map(), sweep: { unpublished }, state: {}, massTakeOk }), "takes");
+
+test("TAKES: up to the ceiling is an ordinary crossing — 5 from home rows and 10 in all pass", () => {
+  assert.deepEqual(MASS_TAKE, { home: 5, all: 10 });
+  const at = takesCheck(takes(5, 5));
+  assert.equal(at.ok, true, JSON.stringify(at));
+  assert.equal(at.note, "10 taken, 5 from home rows");
+});
+
+test("TAKES: a sixth home row, or an eleventh mark, is HARM, and the red names every mark and its row", () => {
+  const home = takesCheck(takes(6, 0));
+  assert.equal(home.ok, false);
+  assert.match(home.rows[0], /^a mass take: 6 mark\(s\), 6 from home rows, over the ceiling/);
+  assert.match(home.rows[0], /HARM_GATE_MASS_TAKE_OK="<who>, <why>" lets the crossing through/);
+  assert.deepEqual(home.rows.slice(1), Array.from({ length: 6 }, (_, i) => `h/home-${i}: taken from a home row (house-h)`));
+  const all = takesCheck(takes(0, 11));
+  assert.equal(all.ok, false);
+  assert.equal(all.rows.length, 12);
+});
+
+test("TAKES: the keeper's door lets a read mass take through, and the receipt rides the note", () => {
+  const let_ = takesCheck(takes(6, 6), "wright, the 13 and the cone all unstaked on purpose");
+  assert.equal(let_.ok, true);
+  assert.equal(let_.note, "12 taken, 6 from home rows; over the ceiling, let through by HARM_GATE_MASS_TAKE_OK: wright, the 13 and the cone all unstaked on purpose");
+});
+
+test("TAKES through the tree's gate: the door is the environment variable, read by harmGate", (t) => {
+  const f = fixture(t);
+  const sweep = { unpublished: takes(0, 11) };   // none of them stands in the fixture, so only check 6 speaks
+  const red = harmGate({ repo: f.repo, sweep, stakes: f.stakesPath, lint: false });
+  assert.equal(red.ok, false);
+  assert.deepEqual(red.checks.filter((c) => !c.ok).map((c) => c.name), ["takes"]);
+  process.env[MASS_TAKE_OK_ENV] = "darko, a test";
+  t.after(() => { delete process.env[MASS_TAKE_OK_ENV]; });
+  const green = harmGate({ repo: f.repo, sweep, stakes: f.stakesPath, lint: false });
+  assert.equal(green.ok, true, JSON.stringify(green.checks.filter((c) => !c.ok)));
 });

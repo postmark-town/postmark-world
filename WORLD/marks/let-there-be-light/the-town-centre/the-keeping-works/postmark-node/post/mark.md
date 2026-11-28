@@ -9,4 +9,4 @@ extends: postmark-node
 implements: []
 ---
 
-A post is an ask the town reads, not a claim on the world: an idea or a bounty is a post, and stands nowhere as a mark.
+A post is something the town reads, not a claim on the world: an idea, a bounty or a flare is a post, and stands nowhere as a mark.

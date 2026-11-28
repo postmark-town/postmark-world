@@ -20,7 +20,7 @@
 // which imports nothing). No node:*, no marks-fold. All numeric leans are dials,
 // movable by ruling.
 
-import { isSited, isPredicate } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
+import { isSited, isPredicate, isLandform, LANDFORM, kindIndexOf } from "./mark-kind.mjs"; // what a record is and how it stands, in either form (LOGOS v2 part 2, W2)
 import { buildHeightfield } from "./world-engine.mjs";
 
 // ───────────────────────── dials (moved from world-poc, verbatim) ───────────
@@ -37,29 +37,28 @@ export const SIGNAL_MARKS = {
   "little-bird/little-bird-the-turning-mark": "a spar buoy marking where the channel turns",
 };
 
-// The heightfield's region control points — decision 008's seventeen rows at a
-// representative grid coordinate carrying its band-midpoint height. Coordinate is
-// EXTRACTED where possible (a placed home / a terrain feature), DERIVED only where
-// no home or feature names the spot. Height is the band midpoint — never a pixel.
-export const REGION_ANCHORS = [
-  { id: "the-town-centre",                  at: { x: 0, y: 0 },      h: 5,    src: "terrain: origin, the Origin {0,0} (+5, ruled)" },
-  { id: "the-lanternseed-gardens",          at: { x: 1075, y: -800 }, h: 15,  src: "home: rei" },
-  { id: "the-trueing-terrace",              at: { x: 888, y: -2320 }, h: 37,  src: "home: wright, ethan-thorne (centroid)" },
-  { id: "north-rim",                        at: { x: 700, y: -3600 }, h: 60,  src: "derived: N of the trueing terrace toward the map's north edge" },
-  { id: "the-high-ground",                  at: { x: 2544, y: 175 },  h: 35,  src: "home: the reeves household (centroid)" },
-  { id: "the-threshold-district",           at: { x: 1358, y: 1821 }, h: 2.5, src: "home: limen, hal, liv, noe (centroid)" },
-  { id: "the-still-reach-and-blackwater",   at: { x: 1900, y: 3900 }, h: 3,   src: "terrain: the-still-reach centreline" },
-  { id: "the-long-run",                     at: { x: 1513, y: 4888 }, h: 2.5, src: "home: carta, jetto-of-starforge (centroid); the locks" },
-  { id: "the-east-low-hills",               at: { x: 2800, y: 900 },  h: 20,  src: "derived: the East Window District's western wall" },
-  { id: "the-east-window-district",         at: { x: 3125, y: 1675 }, h: 8,   src: "home: east-facing-window" },
-  { id: "evermoon",                         at: { x: -1900, y: 2150 }, h: 17, src: "home: caelum (== the dark pole; Evermoon moved WEST 07-22)" },
-  { id: "the-protected-grove",              at: { x: -1375, y: -2550 }, h: 40, src: "home: sol-of-garrison; the garrison lake" },
-  { id: "the-lochan",                       at: { x: 2575, y: -1160 }, h: 25, src: "terrain: the-lochan closed basin" },
-  { id: "the-reach",                        at: { x: -1725, y: 4840 }, h: 15, src: "home: orion-by-the-fire" },
-  { id: "the-headland",                     at: { x: -2300, y: 4200 }, h: 15, src: "derived: raised promontory seaward of the Reach" },
-  { id: "the-doubled-coast",                at: { x: -258, y: 5033 }, h: 4,   src: "home: claude-of-dregg, gael-renton, spar (centroid)" },
-  { id: "aelyria",                          at: { x: 4075, y: 5050 }, h: 7.5, src: "home: aion-solare; the aelyria cliffs" },
-];
+// The heightfield's region control points: decision 008's seventeen rows, each at
+// the coordinate its row in skeleton.json § elevation.regions names (`anchor.at_m`)
+// and at the MIDPOINT OF THAT ROW'S OWN band_m. They were a constant here, with
+// every height typed a second time beside the band (WLD-97, ruled 2026-10-22: the
+// dials live in the skeleton, so a dial is changed by editing it, not the code).
+// A skeleton without them is refused by name: a heightfield missing its regions
+// would still draw, as a flat wrong world nobody was told about.
+//
+// The refusal carries code HEIGHTS_UNREAD, and so does the river's fall's (below):
+// those two, and only those, are what a reader may choose to survive (the World
+// page draws flat; the office's world doors answer 503).
+export const HEIGHTS_UNREAD = "HEIGHTS_UNREAD";
+function heightsUnread(message) { return Object.assign(new Error(message), { code: HEIGHTS_UNREAD }); }
+const isBand = (b) => Array.isArray(b) && b.length === 2 && Number.isFinite(b[0]) && Number.isFinite(b[1]) && b[0] <= b[1];
+export function regionAnchors(skeleton) {
+  const rows = skeleton?.elevation?.regions ?? [];
+  const unanchored = rows.filter((r) => !Number.isFinite(r.anchor?.at_m?.x) || !Number.isFinite(r.anchor?.at_m?.y) || !isBand(r.band_m)).map((r) => r.id);
+  if (!rows.length || unanchored.length) {
+    throw heightsUnread(`skeleton.elevation.regions must give every region an anchor.at_m and a band_m of two numbers, low first (${rows.length ? `missing: ${unanchored.join(", ")}` : "no regions"})`);
+  }
+  return rows.map((r) => ({ id: r.id, at: { x: r.anchor.at_m.x, y: r.anchor.at_m.y }, h: (r.band_m[0] + r.band_m[1]) / 2, src: r.anchor.receipt ?? null }));
+}
 
 // Sea datum points: sea = 0 at the coasts and the mouth (decision 008 datum).
 export const SEA_DATUM = [
@@ -72,7 +71,9 @@ export const SEA_DATUM = [
 
 // ───────────────────────── pure control-point derivations ───────────────────
 // Water-surface control points from the skeleton's own channel/still-water/locks
-// geometry. Height follows decision 008's fall (~+8 m upstream → 0 at the mouth).
+// geometry. Height follows decision 008's fall: the skeleton's river_fall_m at the
+// northmost wet point, falling evenly to 0 at the mouth (the dial was H_UP = 8 here
+// until WLD-97 moved it into the skeleton).
 // The water is a strong LOW constraint that carves the quay/river corridor.
 export function waterControlPoints(skeleton) {
   const wet = (skeleton.features ?? []).filter((f) => ["channel", "still-water", "still-inlet", "locks"].includes(f.kind));
@@ -82,12 +83,13 @@ export function waterControlPoints(skeleton) {
     for (const p of (Array.isArray(line) ? line : [line])) if (p) pts.push(p);
   }
   if (!pts.length) return [];
+  const fall = skeleton.elevation?.river_fall_m;
+  if (!Number.isFinite(fall)) throw heightsUnread("skeleton.elevation.river_fall_m must be a number: the river's fall is a dial, read from the skeleton");
   const ys = pts.map((p) => p.y);
   const yN = Math.min(...ys), yMouth = Math.max(...ys);
-  const H_UP = 8; // dial: upstream water surface
   return pts.map((p) => {
     const t = (p.y - yN) / Math.max(1, yMouth - yN);
-    return { x: p.x, y: p.y, h: Math.max(0, H_UP * (1 - t)), id: null };
+    return { x: p.x, y: p.y, h: Math.max(0, fall * (1 - t)), id: null };
   });
 }
 
@@ -97,18 +99,163 @@ export function waterControlPoints(skeleton) {
 // in. The disk PoC used to override this with the manifest's declared-region
 // points, through assembleWorld's homeControlPoints; it stopped in postmark#3025
 // (see world-poc.mjs), so these derived points are what every caller gets now.
-export function deriveHomeControlPoints(marks) {
+// `anchors` is regionAnchors(skeleton).
+export function deriveHomeControlPoints(marks, anchors) {
   const pts = [];
+  const idx = kindIndexOf(marks);
   for (const m of marks) {
-    if (!isSited(m)) continue;
-    let best = null, bd = Infinity;
-    for (const r of REGION_ANCHORS) {
-      const d = (m.at.x - r.at.x) ** 2 + (m.at.y - r.at.y) ** 2;
-      if (d < bd) { bd = d; best = r; }
-    }
+    if (!isSited(m) || isLandform(m, idx)) continue;   // a landform (any class under it) lays no home point
+    const best = nearestAnchor(m.at, anchors);
     if (best) pts.push({ x: m.at.x, y: m.at.y, h: best.h, id: best.id });
   }
   return pts;
+}
+
+// A point's region is its nearest region anchor: the one rule the home
+// densification above has always used, and the one the ground_m band check reads.
+// Ties keep the earlier anchor.
+export function nearestAnchor(at, anchors) {
+  let best = null, bd = Infinity;
+  for (const r of anchors) {
+    const d = (at.x - r.at.x) ** 2 + (at.y - r.at.y) ** 2;
+    if (d < bd) { bd = d; best = r; }
+  }
+  return best;
+}
+
+// ───────────────────────── the ground the town shapes ───────────────────────
+// WLD-97 part 2 (Darko, 2026-10-22: "the town should own the terraform for
+// now"; 21:03–21:04: landforms are their own class). A LANDFORM (kind: landform,
+// a class that extends `mark`, a sibling of sited) carries `ground_m: <m>` or
+// `ground_m: [lo, hi]`: the height of the ground under it, or the range that
+// ground is held to. No other mark may carry it. Only the town makes a landform
+// (the class answers makers: false; the rule refuses any other `by`), and the
+// value must sit inside the band of the mark's region (or, for a landform linked by `feature:` to a water body with a
+// surface, between that surface and the region's top: water carves). In the heightfield it is a control point whose reach is the
+// mark's own extent (the ellipse inside its w × h): it holds the ground at its
+// centre and fades to nothing at the extent's edge, so it never moves an inch of
+// ground outside the mark. Where its reach covers a lake that carries
+// `surface_m`, the water's surface wins.
+export const GROUND_SHAPER = "the-town";
+const instanceKindOf = (m) => String(m?.class ?? m?.kind ?? "mark");
+
+/** `ground_m` read as `{ lo, hi }`; null when absent; `{ malformed }` when unreadable. */
+export function groundOf(mark) {
+  const g = mark?.ground_m;
+  if (g === undefined || g === null) return null;
+  if (typeof g === "number" && Number.isFinite(g)) return { lo: g, hi: g };
+  if (Array.isArray(g) && g.length === 2 && g.every((v) => typeof v === "number" && Number.isFinite(v)) && g[0] <= g[1]) return { lo: g[0], hi: g[1] };
+  return { malformed: true };
+}
+
+/**
+ * Whether a mark's `ground_m` stands: `{ ground, region, band }` when it does,
+ * `{ refused }` (a sentence) when it does not, null when the mark carries none.
+ * The one rule: the lint refuses by it and the heightfield honors only what it
+ * accepts.
+ */
+export function groundStands(mark, anchors, skeleton, idx = null) {
+  const ground = groundOf(mark);
+  if (!ground) return null;
+  // ONLY A LANDFORM SHAPES GROUND (ruled by Darko 2026-10-22 21:03): ground_m is
+  // the landform class's own property, never a field any sited mark may carry.
+  if (!isLandform(mark, idx)) return { refused: `ground_m: is a landform's own property (the-town/${LANDFORM}); this mark is kind: ${instanceKindOf(mark)}, and only a landform shapes the ground` };
+  if (ground.malformed) return { refused: `ground_m: is a height in metres or a [lo, hi] pair with lo ≤ hi; got ${JSON.stringify(mark.ground_m)}` };
+  // STAYS WITH THE TOWN (/k, ruled by Darko 2026-10-22 20:44): a mark carrying
+  // ground_m is the town's and can never pass to a household. A pass is a commit
+  // that moves a mark's `by:` (DEC-16 re-identification), so the gate that refuses
+  // the commit refuses the pass, before it ever reaches a settlement.
+  if (mark.by !== GROUND_SHAPER) return { refused: `ground_m: a mark that shapes the ground stays with the town and never passes to a household (ruled 2026-10-22: only ${GROUND_SHAPER} may shape the ground); this mark is by ${mark.by}` };
+  if (!mark.at || !Number.isFinite(mark.at.x) || !Number.isFinite(mark.at.y) || !mark.extent || !(mark.extent.w > 0) || !(mark.extent.h > 0)) return { refused: `ground_m: a landform shapes the ground inside its own place and extent, and this one gives none` };
+  const region = nearestAnchor(mark.at, anchors);
+  const row = (skeleton?.elevation?.regions ?? []).find((r) => r.id === region?.id);
+  if (!row?.band_m) return { refused: `ground_m: the mark's region has no band to hold it to` };
+  // WATER CARVES (G3, ruled by Darko 2026-10-22 18:54): a landform linked by
+  // `feature:` to a water body with a surface is bounded below by that surface,
+  // not by the upland's floor, so a valley can sink to its river. The top of the
+  // band is still the region's.
+  // STAYS IN ITS REGION (/j, ruled by Darko 2026-10-22 20:44): the landform's
+  // whole outline (its points ring, or else its extent's corners) lies in the one
+  // region its band is read from. A region is the set of points nearest its anchor,
+  // which is convex, so the outline's vertices standing in it put the whole
+  // outline in it.
+  const outline = Array.isArray(mark.points) && mark.points.length >= 3
+    ? mark.points.map((p) => (Array.isArray(p) ? { x: p[0], y: p[1] } : p))
+    : [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => ({ x: mark.at.x + sx * mark.extent.w / 2, y: mark.at.y + sy * mark.extent.h / 2 }));
+  const strays = outline.filter((p) => nearestAnchor(p, anchors)?.id !== region.id);
+  if (strays.length) return { refused: `ground_m: a landform stays in its region (ruled 2026-10-22), and this one's outline leaves ${region.id} at ${strays[0].x},${strays[0].y} (into ${nearestAnchor(strays[0], anchors).id})` };
+  const water = mark.feature ? (skeleton?.features ?? []).find((f) => f.id === mark.feature && Number.isFinite(f.surface_m)) : null;
+  const band = water ? [water.surface_m, row.band_m[1]] : row.band_m;
+  const said = water ? `[${band[0]}, ${band[1]}] (${water.id}'s surface to ${region.id}'s top)` : `${region.id}'s band [${band[0]}, ${band[1]}]`;
+  if (ground.lo < band[0] || ground.hi > band[1]) return { refused: `ground_m: ${JSON.stringify(mark.ground_m)} is outside ${said}` };
+  return { ground, region: region.id, band, ...(water ? { carvedBy: water.id } : {}) };
+}
+
+// The lakes whose surface is a dial, as ellipses.
+function surfacedWaters(skeleton) {
+  return (skeleton?.features ?? [])
+    .filter((f) => f.kind === "lake" && Number.isFinite(f.surface_m) && f.center_m && f.rx_m > 0 && f.ry_m > 0)
+    .map((f) => ({ id: f.id, cx: f.center_m.x, cy: f.center_m.y, rx: f.rx_m, ry: f.ry_m, surface: f.surface_m }));
+}
+
+/**
+ * The heightfield with the town's landforms laid on it. With none, the very
+ * heightfield handed in (the field the town had before ground_m existed).
+ */
+export function shapeGround(heightfield, marks, anchors, skeleton) {
+  const forms = [];
+  const idx = kindIndexOf(marks);   // a class under landform is a landform too
+  for (const m of marks) {
+    const s = groundStands(m, anchors, skeleton, idx);
+    if (!s || s.refused) continue;
+    forms.push({ id: m.id, cx: m.at.x, cy: m.at.y, rx: m.extent.w / 2, ry: m.extent.h / 2, lo: s.ground.lo, hi: s.ground.hi, carvedBy: s.carvedBy ?? null, waters: [], shore: null });
+  }
+  if (!forms.length) return heightfield;
+  const waters = surfacedWaters(skeleton);
+  for (const f of forms) {
+    f.waters = waters.filter((w) => Math.abs(w.cx - f.cx) < w.rx + f.rx && Math.abs(w.cy - f.cy) < w.ry + f.ry);
+    f.shore = f.carvedBy ? waters.find((w) => w.id === f.carvedBy) ?? null : null;
+  }
+  // HELD TO THE SHORE (G6, ruled by Darko 2026-10-22 19:55). A landform linked to
+  // its water holds ground_m at full weight from its centre out to that water's
+  // shore, and fades only from the shore to its own edge: the ground meets the
+  // water at the valley floor rather than half way up its side. The shore is
+  // found along the ray from the landform's centre through the point: the
+  // fraction of that ray still inside the water's ellipse (the larger root of the
+  // ray-ellipse quadratic). A landform with no water fades from its centre.
+  function shoreFraction(f, x, y) {
+    const w = f.shore;
+    if (!w) return 0;
+    const ux = x - f.cx, uy = y - f.cy, ox = f.cx - w.cx, oy = f.cy - w.cy;
+    const a = (ux / w.rx) ** 2 + (uy / w.ry) ** 2;
+    if (!(a > 0)) return 0;
+    const b = 2 * (ox * ux / w.rx ** 2 + oy * uy / w.ry ** 2), c = (ox / w.rx) ** 2 + (oy / w.ry) ** 2 - 1;
+    const disc = b * b - 4 * a * c;
+    return disc < 0 ? 0 : Math.max(0, (-b + Math.sqrt(disc)) / (2 * a));
+  }
+  const base = heightfield.elevationAt;
+  // OVERLAPS: landforms apply in the order the marks are given (the fold's
+  // order), each blending from the height the ones before it left; the first
+  // surfaced water a reach covers answers outright.
+  function elevationAt(x, y) {
+    let h = base(x, y);
+    for (const f of forms) {
+      const dx = (x - f.cx) / f.rx, dy = (y - f.cy) / f.ry;
+      const r2 = dx * dx + dy * dy;
+      if (!(r2 < 1)) continue;
+      for (const w of f.waters) {
+        const wx = (x - w.cx) / w.rx, wy = (y - w.cy) / w.ry;
+        if (wx * wx + wy * wy < 1) return w.surface;
+      }
+      const r = Math.sqrt(r2);
+      const rs = Math.min(r * shoreFraction(f, x, y), 0.999);   // the shore, in this landform's own radius
+      const weight = r <= rs ? 1 : 0.5 * (1 + Math.cos(Math.PI * (r - rs) / (1 - rs)));
+      const held = h < f.lo ? f.lo : h > f.hi ? f.hi : h;
+      h += weight * (held - h);
+    }
+    return h;
+  }
+  return { ...heightfield, elevationAt, landforms: forms.map(({ waters, shore, ...f }) => ({ ...f, waters: waters.map((w) => w.id) })) };
 }
 
 // ───────────────────────── the assembly ─────────────────────────────────────
@@ -120,7 +267,13 @@ export function deriveHomeControlPoints(marks) {
 //   parameter stays: this module is served at /world-engine, so it is a published
 //   export. Control-point ORDER is preserved so a given (points, skeleton) pair
 //   yields a byte-identical heightfield.
-export function assembleWorld({ worldState, skeleton, homeControlPoints = null } = {}) {
+// whenHeightsUnread: what to do when the skeleton's height dials cannot be read
+//   (no region anchors, no river_fall_m). "refuse" (the default) throws: the
+//   office tells the world, and a telling over ground it cannot read is no
+//   answer. "flat" is the World page's: it draws the town at 0 m and says why in
+//   `heightsUnread`, so a page that read a skeleton from a clone one settlement
+//   behind (an office whose clone predates the anchors) still draws (WLD-97 W1).
+export function assembleWorld({ worldState, skeleton, homeControlPoints = null, whenHeightsUnread = "refuse" } = {}) {
   // Signal is mechanic-backed now (07-23): a sited mark is a signal when it — or
   // any predicated mark describing it — carries `mechanic: signal` on the record.
   // The durable form SIGNAL_MARKS stood in for; the allowlist stays only for the
@@ -131,15 +284,24 @@ export function assembleWorld({ worldState, skeleton, homeControlPoints = null }
     signalParents.add(isPredicate(m) || m.kind === "naming" ? m.parent : m.id);
   }
   const marks = (worldState.marks ?? []).map((m) => ({ ...m, signal: signalParents.has(m.id) || !!SIGNAL_MARKS[m.id] }));
-  const homePts = homeControlPoints ?? deriveHomeControlPoints(marks);
-  const controlPoints = [
-    ...REGION_ANCHORS.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
-    ...homePts,
-    ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
-    ...waterControlPoints(skeleton),
-  ];
-  const heightfield = buildHeightfield({ controlPoints });
+  let heightfield, heightsUnread = null;
+  try {
+    const anchors = regionAnchors(skeleton);
+    const homePts = homeControlPoints ?? deriveHomeControlPoints(marks, anchors);
+    const controlPoints = [
+      ...anchors.map((r) => ({ x: r.at.x, y: r.at.y, h: r.h, id: r.id })),
+      ...homePts,
+      ...SEA_DATUM.map((s) => ({ x: s.at.x, y: s.at.y, h: s.h, id: null })),
+      ...waterControlPoints(skeleton),
+    ];
+    heightfield = shapeGround(buildHeightfield({ controlPoints }), marks, anchors, skeleton);
+  } catch (e) {
+    if (whenHeightsUnread !== "flat" || e?.code !== HEIGHTS_UNREAD) throw e;
+    heightsUnread = `the town is drawn flat, without terrain heights: ${e.message}`;
+    heightfield = { elevationAt: () => 0, controlPoints: [] };
+  }
   return {
+    ...(heightsUnread ? { heightsUnread } : {}),
     marks,
     // THE PARCEL IS THE HOME (ruling 7). Home is a household's parcel, so the
     // parcel is a first-class world object and the fold must publish it — every

@@ -22,8 +22,9 @@ const withNamed = (cls, named) => marks.map((m) => (m.kind === "class" && m.by =
 const DOOR = "tower/inner-door";
 const HOLDERS = ["tower/holder-1", "tower/holder-2", "tower/holder-3"];
 const ASKS = ["tower/token-a", "tower/token-b", "tower/token-c"];
-const door = (requires) => ({ id: DOOR, kind: "thing", by: "tower", at: { x: 0, y: 0 }, extent: { w: 2, h: 2 }, body: "A door.",
-  entry: { word: "neutral", into: "tower/room", requires } });
+// a door, the town's, its fields its own (WLD-253: door is a class)
+const door = (requires) => ({ id: DOOR, kind: "door", by: "the-town", at: { x: 0, y: 0 }, extent: { w: 2, h: 2 }, body: "A door.",
+  entry: { word: "neutral" }, into: "tower/room", ...(requires !== undefined ? { requires } : {}) });
 const LOCK = { holds: ASKS, in: HOLDERS, at: "settlement" };
 /** The world as a settlement printed it: the first n tokens in their holders' hands. */
 const world = (n, requires = LOCK) => [door(requires), ...ASKS.map((id, i) => ({ id, kind: "thing", by: "the-town", body: "A token.", ...(i < n ? { held_by: HOLDERS[i] } : {}) }))];
@@ -50,7 +51,7 @@ test("OPEN AT THE SETTLEMENT THAT PRINTS THE LAST ONE: two printed, it waits; th
 test("FAIL CLOSED: a door not in the world, or one that is no settlement lock, never opens", () => {
   assert.match(afterDoorOpen(DECL, world(3).slice(1)).why, /names no mark/);
   assert.match(afterDoorOpen(DECL, world(3, { holds: ASKS, in: HOLDERS })).why, /reads the live record/);
-  assert.match(afterDoorOpen(DECL, [{ ...door(undefined), entry: { word: "neutral", into: "tower/room" } }]).why, /asks for nothing/);
+  assert.match(afterDoorOpen(DECL, [door(undefined)]).why, /asks for nothing/);
   assert.match(afterDoorOpen(DECL, world(3, { holds: [] , at: "settlement" })).why, /does not say plainly/);
 });
 
